@@ -384,7 +384,7 @@ bot.on("ready", () => {
         timeTaken = null;
         ready = true;
         bot.options.defaultImageFormat = "png";
-        bot.editStatus("dnd", {name: "for suspicious activity", type: 3});
+        bot.editStatus("idle", {name: "the best music", type: 2});
 
         let slashCommands = [];
         Object.keys(modules).forEach(module => {
