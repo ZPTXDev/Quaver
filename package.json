@@ -1,0 +1,14 @@
+{
+  "name": "quaver",
+  "version": "1.0.0-dev",
+  "dependencies": {
+    "data-store": "^4.0.3",
+    "eris": "^0.15.1",
+    "lodash": "^4.17.21",
+    "mysql2": "^2.2.5",
+    "require-reload": "^0.2.2",
+    "slash-create": "^3.1.0",
+    "utf8": "^3.0.0",
+    "websocket": "^1.0.34"
+  }
+}
