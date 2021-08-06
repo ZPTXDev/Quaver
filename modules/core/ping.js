@@ -22,7 +22,7 @@ module.exports.slash = {
 };
 module.exports.slashAction = async function(ctx) {
     await ctx.defer();
-    const bot = require("../../main.js").bot;
+    const { bot } = require("../../main.js");
     await ctx.send({
         embeds: [
             {

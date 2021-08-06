@@ -2,7 +2,7 @@ module.exports.commands = ["stop"];
 module.exports.usage = "%cmd%";
 module.exports.description = "Stop Quaver gracefully.";
 module.exports.action = function (details) {
-    const settings = require("../../main.js").settings;
+    const { settings } = require("../../main.js");
     const managers = settings.get("managers");
     if (!managers.includes(details["message"].author.id)) {
         return "manager";

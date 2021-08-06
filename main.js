@@ -1,4 +1,4 @@
-const {SlashCreator, GatewayServer, SlashCommand} = require("slash-create");
+const { SlashCreator, GatewayServer, SlashCommand } = require("slash-create");
 const Eris = require("eris");
 const settings = require("data-store")({path: "settings.json"});
 const mysql = require("mysql2");
@@ -8,7 +8,7 @@ const _ = require("lodash");
 let ready = false;
 const gitFilePath = `.git/refs/heads/${settings.get("dev") ? "dev" : "master"}`;
 const build = fs.existsSync(gitFilePath) ? fs.readFileSync(gitFilePath).toString().replace("\n", "") : "unknown";
-const {version} = require('./package.json');
+const { version } = require('./package.json');
 let botLogChannelId = "";
 let pool;
 let promisePool;

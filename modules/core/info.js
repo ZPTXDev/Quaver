@@ -4,7 +4,7 @@ module.exports.commands = ["info"];
 module.exports.usage = "%cmd% [stats]";
 module.exports.description = "Display information about Quaver.";
 module.exports.action = function (details) {
-    const settings = require("../../main.js").settings;
+    const { settings } = require("../../main.js");
     const managers = settings.get("managers");
     let type = "";
     if (details["body"] === "stats") {
@@ -41,7 +41,7 @@ module.exports.slash = {
 };
 module.exports.slashAction = async function(ctx) {
     await ctx.defer();
-    const settings = require("../../main.js").settings;
+    const { settings } = require("../../main.js");
     const managers = settings.get("managers");
     let type = "";
     if ("stats" in ctx.options) {
@@ -60,13 +60,7 @@ module.exports.slashAction = async function(ctx) {
 }
 
 function common(type) {
-    const build = require("../../main.js").build;
-    const version = require("../../main.js").version;
-    const modules = require("../../main.js").modules;
-    const bot = require("../../main.js").bot;
-    const msToTime = require("../../main.js").msToTime;
-    const msToTimeString = require("../../main.js").msToTimeString;
-    const roundTo = require("../../main.js").roundTo;
+    const { build, version, modules, bot, msToTime, msToTimeString, roundTo } = require("../../main.js");
     let userTotal = 0;
     bot.guilds.map(g => g.memberCount).forEach(a => userTotal += a);
     let channelTotal = 0;
