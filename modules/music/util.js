@@ -1,3 +1,5 @@
+const superagent = require('superagent');
+
 function querySorter (query) {
     type = "";
     id = "";
@@ -47,7 +49,7 @@ function querySorter (query) {
 
 async function resolveTracks(node, search) {
     try {
-        let result = await superagent.get(`http://${node.host}:${node.port}/loadtracks?identifier=${search}`)
+        var result = await superagent.get(`http://${node.host}:${node.port}/loadtracks?identifier=${search}`)
             .set('Authorization', node.password)
             .set('Accept', 'application/json');
     }
