@@ -16,7 +16,7 @@ function querySorter (query) {
         type = "url";
     }
     else {
-        query.split(" ").forEach((b, i) => {
+        query.split(" ").forEach(b => {
             if (!type) {
                 if (b.startsWith("spuri:")) {
                     spuri = b.split("spuri:")[1];
@@ -73,6 +73,26 @@ function getPlayer(channel) {
     return bot.joinVoiceChannel(channel.id);
 }
 
+function trackHandler (tracks, type, search) {
+    if (["LOAD_FAILED", "UNKNOWN", "NO_MATCHES"].includes(tracks.loadType) || tracks.tracks.length == 0) {
+      return tracks.loadType;
+    }
+    else if (tracks.loadType == "TRACK_LOADED" && ["id", "url"].includes(type)) {
+      return tracks.tracks[0];
+    }
+    else if (tracks.loadType == "SEARCH_RESULT" && ["default", "ytsearch", "scsearch"].includes(type)) {
+      if (!search) {return tracks.tracks[0];}
+      else {return tracks.tracks;}
+    }
+    else if (tracks.loadType == "PLAYLIST_LOADED" && type == "url") {
+      return;
+    }
+    else {
+      return "unknown";
+    }
+  }
+
 module.exports.querySorter = querySorter;
 module.exports.resolveTracks = resolveTracks;
 module.exports.getPlayer = getPlayer;
+module.exports.trackHandler = trackHandler;
