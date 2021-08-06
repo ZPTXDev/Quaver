@@ -94,18 +94,6 @@ else {
             console.log(err);
             process.exit(1);
         });
-    databaseSync().then(() => {
-        settings.get("managers").forEach(managerId => {
-            if (!(managerId in memberships) || (managerId in memberships && memberships[managerId]["manager"] === 0)) {
-                console.log(`[!] Manager ID '${managerId}' is present in the settings file but not a manager in the database`);
-            }
-        });
-        Object.keys(memberships).filter(memberId => memberships[memberId]["manager"] === 1).forEach(memberId => {
-            if (!settings.get("managers").includes(memberships[memberId]["userid"])) {
-                console.log(`[!] Manager ID '${memberId}' is present in the database but not a manager in the settings file`);
-            }
-        });
-    });
 }
 
 if (!settings.get("prefix")) {
