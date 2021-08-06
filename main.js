@@ -1,5 +1,6 @@
 const { SlashCreator, GatewayServer, SlashCommand } = require("slash-create");
 const Eris = require("eris");
+const { PlayerManager } = require("eris-lavalink");
 const settings = require("data-store")({path: "settings.json"});
 const mysql = require("mysql2");
 const reload = require("require-reload")(require);
@@ -94,6 +95,17 @@ else {
             console.log(err);
             process.exit(1);
         });
+}
+
+if (!settings.get("lavalink")) {
+    settings.set("lavalink", [{
+        "host": "",
+        "port": "",
+        "region": "",
+        "password": ""
+    }]);
+    console.log("[!] Unable to start Quaver: No LavaLink credentials provided");
+    process.exit(1);
 }
 
 if (!settings.get("prefix")) {
@@ -336,6 +348,12 @@ exports.slashPermissionRejection = slashPermissionRejection;
 
 bot.on("ready", () => {
     if (!ready) {
+        if (!(bot.voiceConnections instanceof PlayerManager)) {
+            bot.voiceConnections = new PlayerManager(bot, nodes, {
+                numShards: bot.shards.size, // number of shards
+                userId: bot.user.id // the user id of the bot
+            });
+        }
         let timeTaken = (new Date().getTime() - initialTime) / 1000;
         let startupLogs = [];
         startupLogs.push(`[✓] Quaver started successfully (took ${timeTaken}s)`);
