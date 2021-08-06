@@ -434,8 +434,8 @@ bot.on("messageCreate", async msg => {
     let prefix;
     let mention = false;
     let guild = "guild" in msg.channel;
-    if (guild && msg.channel.guild.id in guildSettings) {
-        prefix = guildSettings[msg.channel.guild.id].prefix;
+    if (guild && msg.channel.guild.id in guilds) {
+        prefix = guilds[msg.channel.guild.id].prefix;
     }
     else {
         prefix = settings.get("prefix");
@@ -531,7 +531,7 @@ bot.on("messageCreate", async msg => {
         await msg.channel.createMessage({
             messageReference: {messageID: msg.id},
             embed: {
-                description: `The prefix in this server is \`${guild && msg.channel.guild.id in guildSettings ? guildSettings[msg.channel.guild.id].prefix : settings.get("prefix")}\`.\nYou may also mention me, following it with a command.`,
+                description: `The prefix in this server is \`${guild && msg.channel.guild.id in guilds ? guilds[msg.channel.guild.id].prefix : settings.get("prefix")}\`.\nYou may also mention me, following it with a command.`,
                 color: 0xf39bff
             }
         });
