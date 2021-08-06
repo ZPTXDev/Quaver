@@ -1,4 +1,4 @@
-module.exports.commands = ["stop"];
+module.exports.commands = ["exitprocess"];
 module.exports.usage = "%cmd%";
 module.exports.description = "Stop Quaver gracefully.";
 module.exports.action = function (details) {
