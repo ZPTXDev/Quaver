@@ -28,7 +28,7 @@ module.exports.action = function (details) {
 
 module.exports.slash = {
     name: "info",
-    description: "Display information about Quaver.",
+    description: module.exports.description,
     deferEphemeral: false,
     options: [
         {
