@@ -13,9 +13,8 @@ let botLogChannelId = "";
 let pool;
 let promisePool;
 let modules = {};
-let memberships = {};
-let guildMemberships = {};
-let guildSettings = {};
+let users = {};
+let guilds = {};
 
 let initialTime = new Date().getTime();
 
@@ -299,17 +298,13 @@ function getPermsMatch(userPerms, perms) {
     return permsMissing;
 }
 async function databaseSync() {
-    let m = await promisePool.query("SELECT * FROM `memberships`");
+    let u = await promisePool.query("SELECT * FROM `users`");
     let g = await promisePool.query("SELECT * FROM `guilds`");
-    let s = settings.get("dev") ? await promisePool.query("SELECT * FROM `guilds_quaver_dev`") : await promisePool.query("SELECT * FROM `guilds_quaver`");
-    m[0].forEach(me => {
-        memberships[me["userid"]] = me;
+    u[0].forEach(res => {
+        memberships[res["userid"]] = res;
     });
-    g[0].forEach(gm => {
-        guildMemberships[gm["guildid"]] = gm;
-    });
-    s[0].forEach(gs => {
-        guildSettings[gs["guildid"]] = gs;
+    g[0].forEach(res => {
+        guilds[res["guildid"]] = res;
     });
 }
 async function slashManagerRejection(ctx) {
