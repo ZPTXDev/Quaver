@@ -356,6 +356,7 @@ exports.slashPermissionRejection = slashPermissionRejection;
 
 bot.on("ready", () => {
     if (!ready) {
+        const nodes = settings.get("lavalink");
         if (!(bot.voiceConnections instanceof PlayerManager)) {
             bot.voiceConnections = new PlayerManager(bot, nodes, {
                 numShards: bot.shards.size, // number of shards
