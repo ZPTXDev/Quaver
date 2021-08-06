@@ -26,12 +26,7 @@ module.exports.action = function (details) {
         prefix = `${prefix} `;
     }
     (async () => {
-        if (settings.get("dev")) {
-            await promisePool.execute("INSERT INTO `guilds_quaver_dev` (`guildid`, `prefix`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `prefix` = VALUES(`prefix`)", [details["message"].channel.guild.id, prefix]);
-        }
-        else {
-            await promisePool.execute("INSERT INTO `guilds_quaver` (`guildid`, `prefix`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `prefix` = VALUES(`prefix`)", [details["message"].channel.guild.id, prefix]);
-        }
+        await promisePool.execute("INSERT INTO `guilds` (`guildid`, `prefix`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `prefix` = VALUES(`prefix`)", [details["message"].channel.guild.id, prefix]);
         databaseSync();
     })();
     details["message"].channel.createMessage({
