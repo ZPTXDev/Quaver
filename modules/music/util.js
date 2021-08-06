@@ -1,6 +1,6 @@
 const superagent = require('superagent');
 
-function querySorter (query) {
+function querySorter(query) {
     type = "";
     id = "";
     url = "";
@@ -73,7 +73,7 @@ function getPlayer(channel) {
     return bot.joinVoiceChannel(channel.id);
 }
 
-function trackHandler (tracks, type, search) {
+function trackHandler(tracks, type, search) {
     if (["LOAD_FAILED", "UNKNOWN", "NO_MATCHES"].includes(tracks.loadType) || tracks.tracks.length == 0) {
         return tracks.loadType;
     }
