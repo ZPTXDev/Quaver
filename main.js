@@ -217,7 +217,13 @@ function msToTime(milliseconds, format) {
             return { d: days, h: hours, m: minutes, s: seconds };
     }
 }
-function msToTimeString(msObject) {
+function msToTimeString(msObject, simple) {
+    if (simple) {
+        if (msObject["d"] > 0) {
+            return "more than a day";
+        }
+        return `${msObject["h"] > 0 ? `${msObject["h"]}:` : ""}${msObject["h"] > 0 ? msObject["m"].toString().padStart(2, "0") : msObject["m"]}:${msObject["s"].toString().padStart(2, "0")}`;
+    }
     return `${msObject["d"] > 0 ? `${msObject["d"]} day${msObject["d"] === 1 ? "" : "s"}, ` : ""}${msObject["h"] > 0 ? `${msObject["h"]} hr${msObject["h"] === 1 ? "" : "s"}, ` : ""}${msObject["m"] > 0 ? `${msObject["m"]} min${msObject["m"] === 1 ? "" : "s"}, ` : ""}${msObject["s"] > 0 ? `${msObject["s"]} sec${msObject["s"] === 1 ? "" : "s"}, ` : ""}`.slice(0, -2);
 }
 // thanks: https://stackoverflow.com/a/15762794
