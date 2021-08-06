@@ -75,20 +75,20 @@ function getPlayer(channel) {
 
 function trackHandler (tracks, type, search) {
     if (["LOAD_FAILED", "UNKNOWN", "NO_MATCHES"].includes(tracks.loadType) || tracks.tracks.length == 0) {
-      return tracks.loadType;
+        return tracks.loadType;
     }
     else if (tracks.loadType == "TRACK_LOADED" && ["id", "url"].includes(type)) {
-      return tracks.tracks[0];
+        return tracks.tracks[0];
     }
     else if (tracks.loadType == "SEARCH_RESULT" && ["default", "ytsearch", "scsearch"].includes(type)) {
-      if (!search) {return tracks.tracks[0];}
-      else {return tracks.tracks;}
+        if (!search) {return tracks.tracks[0];}
+        else {return tracks.tracks;}
     }
     else if (tracks.loadType == "PLAYLIST_LOADED" && type == "url") {
-      return;
+        return;
     }
     else {
-      return "unknown";
+        return "UNKNOWN";
     }
   }
 
