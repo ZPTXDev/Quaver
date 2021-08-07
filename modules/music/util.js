@@ -290,7 +290,20 @@ async function play(guild, track, newQueue, resQueue) {
         else {next = original[0].track;}
         play(guild, next, false, false);
     });
-  }
+}
+
+function getBar(progress) {
+    if (progress < 10) {return "🔘▬▬▬▬▬▬▬▬▬";}
+    else if (progress < 20) {return "▬🔘▬▬▬▬▬▬▬▬";}
+    else if (progress < 30) {return "▬▬🔘▬▬▬▬▬▬▬";}
+    else if (progress < 40) {return "▬▬▬🔘▬▬▬▬▬▬";}
+    else if (progress < 50) {return "▬▬▬▬🔘▬▬▬▬▬";}
+    else if (progress < 60) {return "▬▬▬▬▬🔘▬▬▬▬";}
+    else if (progress < 70) {return "▬▬▬▬▬▬🔘▬▬▬";}
+    else if (progress < 80) {return "▬▬▬▬▬▬▬🔘▬▬";}
+    else if (progress < 90) {return "▬▬▬▬▬▬▬▬🔘▬";}
+    else {return "▬▬▬▬▬▬▬▬▬🔘";}
+}
 
 module.exports.musicGuilds = musicGuilds;
 module.exports.querySorter = querySorter;
@@ -298,3 +311,4 @@ module.exports.resolveTracks = resolveTracks;
 module.exports.getPlayer = getPlayer;
 module.exports.trackHandler = trackHandler;
 module.exports.queueHandler = queueHandler;
+module.exports.getBar = getBar;
