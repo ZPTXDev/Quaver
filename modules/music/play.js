@@ -12,29 +12,9 @@ module.exports.action = async function action (details) {
     if (details["body"] === "") {
         return "usage";
     }
-    if (!details["message"].member.voiceState.channelID) {
-        details["message"].channel.createMessage({
-            messageReference: {messageID: details["message"].id},
-            embed: {
-                description: "You are not in a voice channel.",
-                color: 0xf39bff
-            }
-        });
-        return true;
-    }
     let botPermsMissing = getPermsMatch(details["message"].channel.guild.members.get(bot.user.id).permissions, ["voiceConnect", "voiceSpeak"]);
     if (botPermsMissing.length > 0) {
         return ["self"].concat(botPermsMissing);
-    }
-    if (musicGuilds[details["message"].channel.guild.id] && details["message"].member.voiceState.channelID != musicGuilds[details["message"].channel.guild.id].voice.id) {
-        details["message"].channel.createMessage({
-            messageReference: {messageID: details["message"].id},
-            embed: {
-                description: "You are not in my voice channel.",
-                color: 0xf39bff
-            }
-        });
-        return true;
     }
     let result = await common(details["body"], details["message"].channel.guild.id, details["message"].author.id, details["message"].channel.id);
     if (result.errored) {
@@ -87,33 +67,9 @@ module.exports.slash = {
 module.exports.slashAction = async function slashAction(ctx) {
     const { bot, slashPermissionRejection, getPermsMatch, msToTime, msToTimeString } = require("../../main.js");
     const { musicGuilds } = require("./util.js");
-    if (!bot.guilds.get(ctx.guildID).members.get(ctx.user.id).voiceState.channelID) {
-        await ctx.send({
-            embeds: [
-                {
-                    description: "You are not in a voice channel.",
-                    color: 0xf39bff
-                }
-            ],
-            ephemeral: true
-        });
-        return;
-    }
     let botPermsMissing = getPermsMatch(bot.guilds.get(ctx.guildID).members.get(bot.user.id).permissions, ["voiceConnect", "voiceSpeak"]);
     if (botPermsMissing.length > 0) {
         await slashPermissionRejection(ctx, ["self"].concat(botPermsMissing));
-        return;
-    }
-    if (musicGuilds[ctx.guildID] && bot.guilds.get(ctx.guildID).members.get(ctx.user.id).voiceState.channelID != musicGuilds[ctx.guildID].voice.id) {
-        await ctx.send({
-            embeds: [
-                {
-                    description: "You are not in my voice channel.",
-                    color: 0xf39bff
-                }
-            ],
-            ephemeral: true
-        });
         return;
     }
     let result = await common(ctx.options["query"], ctx.guildID, ctx.user.id, ctx.channelID);
@@ -156,10 +112,23 @@ module.exports.slashAction = async function slashAction(ctx) {
 }
 
 async function common(query, guildId, userId, channelId) {
+    const superagent = require("superagent");
     const { settings, bot } = require("../../main.js");
     // NOTE: while multiple nodes ARE allowed to be specified, only the FIRST one will be used
     const nodes = settings.get("lavalink");
     const { musicGuilds, querySorter, resolveTracks, trackHandler, queueHandler } = require("./util.js");
+    if (!bot.guilds.get(guildId).members.get(userId).voiceState.channelID) {
+        return {
+            errored: true,
+            code: "You are not in a voice channel."
+        };
+    }
+    if (musicGuilds[guildId] && bot.guilds.get(guildId).members.get(userId).voiceState.channelID != musicGuilds[guildId].voice.id) {
+        return {
+            errored: true,
+            code: "You are not in my voice channel."
+        };
+    }
     if (querySorter(query).type === "id") {
         try {
             let result = await superagent.get("http://img.youtube.com/vi/" + query + "/mqdefault.jpg");
