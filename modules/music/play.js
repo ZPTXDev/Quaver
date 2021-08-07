@@ -49,7 +49,7 @@ module.exports.action = async function action (details) {
     }
     let durationTime = msToTime(result.track.info.length);
     let duration = msToTimeString(durationTime, true);
-    if (!result.queued) {
+    if (result.newQueue || result.restartQueue) {
         details["message"].channel.createMessage({
             embed: {
                 description: `Now playing **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})** \`[${duration}]\`\nAdded by ${result.track.requester.mention}`,
@@ -58,7 +58,7 @@ module.exports.action = async function action (details) {
         });
         return true;
     }
-    if (result.queued) {
+    if (!result.newQueue && !result.restartQueue) {
         details["message"].channel.createMessage({
             messageReference: {messageID: details["message"].id},
             embed: {
@@ -131,7 +131,7 @@ module.exports.slashAction = async function slashAction(ctx) {
     }
     let durationTime = msToTime(result.track.info.length);
     let duration = msToTimeString(durationTime, true);
-    if (!result.queued) {
+    if (result.newQueue || result.restartQueue) {
         await ctx.send({
             embeds: [
                 {
@@ -142,7 +142,7 @@ module.exports.slashAction = async function slashAction(ctx) {
         });
         return;
     }
-    if (result.queued) {
+    if (!result.newQueue && !result.restartQueue) {
         await ctx.send({
             embeds: [
                 {
@@ -225,6 +225,7 @@ async function common(query, guildId, userId, channelId) {
         errored: queued.code !== "SUCCESS",
         code: queued.code,
         track: queued.track,
-        queued: queued.queued
+        newQueue: queued.newQueue,
+        restartQueue: queued.restartQueue
     };
 }

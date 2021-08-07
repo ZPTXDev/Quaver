@@ -107,6 +107,7 @@ async function queueHandler(track, guild, user, channel, voice) {
     track.info.title = track.info.title.length === 0 ? "*Missing title*" : track.info.title;
     track.info.author = track.info.author.length === 0 ? "*Missing author*" : track.info.author;
     let newQueue = false;
+    let resQueue = false;
     if (!musicGuilds[guild.id] || !musicGuilds[guild.id].queue) {
         musicGuilds[guild.id] = {
             queue: [],
@@ -120,7 +121,7 @@ async function queueHandler(track, guild, user, channel, voice) {
         newQueue = true;
     }
     if (!newQueue && musicGuilds[guild.id].queue.length === 0) {
-        newQueue = true;
+        resQueue = true;
     }
     // Queue exists
     if (typeof musicGuilds[guild.id].queue !== "object") {
@@ -133,17 +134,17 @@ async function queueHandler(track, guild, user, channel, voice) {
     // There's nothing in there right now
     if (musicGuilds[guild.id].queue.length === 0) {
         // Play it
-        play(guild, track.track, newQueue);
+        play(guild, track.track, newQueue, resQueue);
     }
     let defaultArtist = track.info.author;
     let defaultTitle = "???";
     let details = getArtistTitle(track.info.title, {defaultArtist: defaultArtist, defaultTitle: defaultTitle});
     track.info.friendlyTitle = details[1] !== defaultTitle ? `${details[0]} - ${details[1]}` : null;
     musicGuilds[guild.id].queue.push(track);
-    return {code: "SUCCESS", track: track, queued: !newQueue};
+    return {code: "SUCCESS", track: track, newQueue: newQueue, restartQueue: resQueue};
 }
 
-async function play(guild, track, newQueue) {
+async function play(guild, track, newQueue, resQueue) {
     const { msToTime, msToTimeString, bot } = require("../../main.js");
     // If no track is found (auto-called after a track ends), set a timeout to auto-disconnect after 30 minutes
     if (!track) {
@@ -152,7 +153,7 @@ async function play(guild, track, newQueue) {
         }
         musicGuilds[guild.id].channel.createMessage({
             embed: {
-                description: "There's nothing left in the queue. I'll leave after **30** minutes.",
+                description: `There's nothing left in the queue. I'll leave <t:${Math.floor(Date.now()/1000) + 1800}:R>.`,
                 color: 0xf39bff
             }
         });
@@ -209,7 +210,7 @@ async function play(guild, track, newQueue) {
         return;
     }
     player.play(track);
-    if (!newQueue) {
+    if (!newQueue && !resQueue) {
         let currentTrack = musicGuilds[guild.id].queue[0];
         let durationTime = msToTime(currentTrack.info.length);
         let duration = msToTimeString(durationTime, true);
@@ -221,6 +222,8 @@ async function play(guild, track, newQueue) {
         });
         return;
     }
+    // Event hooks already defined, don't re-define them
+    if (resQueue) {return;}
     player.on("disconnect", err => {
         if (err) {console.log(err);}
         delete musicGuilds[guild.id];
@@ -246,7 +249,7 @@ async function play(guild, track, newQueue) {
             delete musicGuilds[guild.id].errored;
             if (original.length === 0) {next = null;}
             else {next = original[0].track;}
-            play(guild, next, false);
+            play(guild, next, false, false);
         }
         musicGuilds[guild.id].channel.createMessage({
             embed: {
@@ -285,7 +288,7 @@ async function play(guild, track, newQueue) {
         delete musicGuilds[guild.id].errored;
         if (original.length === 0) {next = null;}
         else {next = original[0].track;}
-        play(guild, next, false);
+        play(guild, next, false, false);
     });
   }
 
