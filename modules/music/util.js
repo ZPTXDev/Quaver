@@ -213,7 +213,7 @@ async function play(guild, track, newQueue, resQueue) {
     if (!newQueue && !resQueue) {
         let currentTrack = musicGuilds[guild.id].queue[0];
         let durationTime = msToTime(currentTrack.info.length);
-        let duration = msToTimeString(durationTime, true);
+        let duration = currentTrack.info.isStream ? "∞" : msToTimeString(durationTime, true);
         musicGuilds[guild.id].channel.createMessage({
             embed: {
                 description: `Now playing **[${currentTrack.info.friendlyTitle === null ? currentTrack.info.title : currentTrack.info.friendlyTitle}](${currentTrack.info.uri})** \`[${duration}]\`\nAdded by ${currentTrack.requester.mention}`,

@@ -48,7 +48,7 @@ module.exports.action = async function action (details) {
         return true;
     }
     let durationTime = msToTime(result.track.info.length);
-    let duration = msToTimeString(durationTime, true);
+    let duration = result.track.info.isStream ? "∞" : msToTimeString(durationTime, true);
     if (result.newQueue || result.restartQueue) {
         details["message"].channel.createMessage({
             embed: {
@@ -130,7 +130,7 @@ module.exports.slashAction = async function slashAction(ctx) {
         return;
     }
     let durationTime = msToTime(result.track.info.length);
-    let duration = msToTimeString(durationTime, true);
+    let duration = result.track.info.isStream ? "∞" : msToTimeString(durationTime, true);
     if (result.newQueue || result.restartQueue) {
         await ctx.send({
             embeds: [
