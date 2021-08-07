@@ -38,7 +38,7 @@ module.exports.action = async function action (details) {
         details["message"].channel.createMessage({
             messageReference: {messageID: details["message"].id},
             embed: {
-                description: result.error,
+                description: result.code,
                 color: 0xf39bff
             }
         });
@@ -57,8 +57,9 @@ module.exports.action = async function action (details) {
     }
     if (result.queued) {
         details["message"].channel.createMessage({
+            messageReference: {messageID: details["message"].id},
             embed: {
-                description: `Added **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})** \`[${duration}]\` to queue\nAdded by ${result.track.requester.mention}`,
+                description: `Added **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})** to queue\nAdded by ${result.track.requester.mention}`,
                 color: 0xf39bff
             }
         });
@@ -82,7 +83,8 @@ module.exports.slash = {
 }
 module.exports.slashAction = async function slashAction(ctx) {
     await ctx.defer();
-    const { bot, slashPermissionRejection, getPermsMatch } = require("../../main.js");
+    const { bot, slashPermissionRejection, getPermsMatch, msToTime, msToTimeString } = require("../../main.js");
+    const { musicGuilds } = require("./util.js");
     if (!bot.guilds.get(ctx.guildID).members.get(ctx.user.id).voiceState.channelID) {
         await ctx.send({
             embeds: [
@@ -117,12 +119,37 @@ module.exports.slashAction = async function slashAction(ctx) {
         await ctx.send({
             embeds: [
                 {
-                    description: result.error,
+                    description: result.code,
                     color: 0xf39bff
                 }
             ],
             ephemeral: true
         });
+        return;
+    }
+    let durationTime = msToTime(result.track.info.length);
+    let duration = msToTimeString(durationTime, true);
+    if (!result.queued) {
+        await ctx.send({
+            embeds: [
+                {
+                    description: `Now playing **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})** \`[${duration}]\`\nAdded by ${result.track.requester.mention}`,
+                    color: 0xf39bff
+                }
+            ]
+        });
+        return;
+    }
+    if (result.queued) {
+        await ctx.send({
+            embeds: [
+                {
+                    description: `Added **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})** to queue\nAdded by ${result.track.requester.mention}`,
+                    color: 0xf39bff
+                }
+            ]
+        });
+        return;
     }
 }
 
@@ -184,7 +211,7 @@ async function common(query, guildId, userId, channelId) {
         }
         return {
             errored: true,
-            error: error
+            code: error
         };
     }
     let guild = bot.guilds.get(guildId);
@@ -193,7 +220,7 @@ async function common(query, guildId, userId, channelId) {
     let voice = bot.guilds.get(guildId).members.get(userId).voiceState.channelID;
     let queued = await queueHandler(track, guild, user, channel, voice);
     return {
-        errored: false,
+        errored: queued.code !== "SUCCESS",
         code: queued.code,
         track: queued.track,
         queued: queued.queued

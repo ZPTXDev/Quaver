@@ -119,13 +119,16 @@ async function queueHandler(track, guild, user, channel, voice) {
         };
         newQueue = true;
     }
+    if (!newQueue && musicGuilds[guild.id].queue.length === 0) {
+        newQueue = true;
+    }
     // Queue exists
     if (typeof musicGuilds[guild.id].queue !== "object") {
-        return {code: "QUEUE_BROKEN"};
+        return {code: "The queue is in a broken state."};
     }
     let identifiers = musicGuilds[guild.id].queue.map(q => q.info.identifier);
     if (identifiers.includes(track.info.identifier)) {
-        return {code: "QUEUE_DUPLICATE"};
+        return {code: "This track is already in the queue, or currently playing."};
     }
     // There's nothing in there right now
     if (musicGuilds[guild.id].queue.length === 0) {
@@ -144,6 +147,15 @@ async function play(guild, track, newQueue) {
     const { msToTime, msToTimeString, bot } = require("../../main.js");
     // If no track is found (auto-called after a track ends), set a timeout to auto-disconnect after 30 minutes
     if (!track) {
+        if (!(guild.id in musicGuilds)) {
+            return;
+        }
+        musicGuilds[guild.id].channel.createMessage({
+            embed: {
+                description: "There's nothing left in the queue. I'll leave after **30** minutes.",
+                color: 0xf39bff
+            }
+        });
         musicGuilds[guild.id].timeout = setTimeout(guildId => {
             let channel = musicGuilds[guildId].channel;
             let voiceId = musicGuilds[guildId].voice.id;
@@ -159,7 +171,7 @@ async function play(guild, track, newQueue) {
         return;
     }
     // If the playing track is "dc" (requesting a disconnect)
-    else if (track === "dc") {
+    if (track === "dc") {
         let channel = musicGuilds[guild.id].channel;
         let voiceId = musicGuilds[guild.id].voice.id;
         delete musicGuilds[guild.id];
@@ -173,7 +185,7 @@ async function play(guild, track, newQueue) {
         return;
     }
     // Cancel timeout if there's any set, we're going to be playing something
-    if (musicGuilds[guild.id].timeout) {
+    if ("timeout" in musicGuilds[guild.id]) {
         clearTimeout(musicGuilds[guild.id].timeout);
         delete musicGuilds[guild.id].timeout;
     }
@@ -217,6 +229,8 @@ async function play(guild, track, newQueue) {
         console.log("Error encountered for tracks:");
         console.log(err);
         let additionalInfo = "There's no case for what happened, which means something really bad probably happened. Use my disconnect command to reset the session.";
+        let title = musicGuilds[guild.id].queue[0].info.friendlyTitle === null ? musicGuilds[guild.id].queue[0].info.title : musicGuilds[guild.id].queue[0].info.friendlyTitle;
+        let uri = musicGuilds[guild.id].queue[0].info.uri;
         if (!musicGuilds[guild.id].errored) {
             additionalInfo = "Trying again.";
             let player = await getPlayer(musicGuilds[guild.id].voice);
@@ -225,7 +239,6 @@ async function play(guild, track, newQueue) {
         }
         else if (musicGuilds[guild.id].errored) {
             additionalInfo = "Skipping the track.";
-            let voiceId = musicGuilds[guild.id].voice.id;
             let original = musicGuilds[guild.id].queue;
             const shifted = original.shift();
             musicGuilds[guild.id].queue = original;
@@ -233,11 +246,11 @@ async function play(guild, track, newQueue) {
             delete musicGuilds[guild.id].errored;
             if (original.length === 0) {next = null;}
             else {next = original[0].track;}
-            play(guild, next);
+            play(guild, next, false);
         }
         musicGuilds[guild.id].channel.createMessage({
             embed: {
-                description: `An error occurred while playing the track. ${additionalInfo}`,
+                description: `An error occurred while playing **[${title}](${uri})**.\n${additionalInfo}`,
                 color: 0xf39bff
             }
         });
@@ -272,7 +285,7 @@ async function play(guild, track, newQueue) {
         delete musicGuilds[guild.id].errored;
         if (original.length === 0) {next = null;}
         else {next = original[0].track;}
-        play(guild, next);
+        play(guild, next, false);
     });
   }
 
