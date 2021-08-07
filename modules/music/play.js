@@ -6,6 +6,9 @@ module.exports.description = "Play a track. Use ytsearch: for YouTube, scsearch:
 module.exports.action = async function action (details) {
     const { bot, getPermsMatch, msToTime, msToTimeString } = require("../../main.js");
     const { musicGuilds } = require("./util.js");
+    if (!details["guild"]) {
+        return "guild";
+    }
     if (details["body"] === "") {
         return "usage";
     }
@@ -23,7 +26,7 @@ module.exports.action = async function action (details) {
     if (botPermsMissing.length > 0) {
         return ["self"].concat(botPermsMissing);
     }
-    if (musicGuilds[details["guild"].id] && details["message"].member.voiceState.channelID != musicGuilds[details["guild"].id].voice.id) {
+    if (musicGuilds[details["message"].channel.guild.id] && details["message"].member.voiceState.channelID != musicGuilds[details["message"].channel.guild.id].voice.id) {
         details["message"].channel.createMessage({
             messageReference: {messageID: details["message"].id},
             embed: {
@@ -82,7 +85,6 @@ module.exports.slash = {
     guildOnly: true
 }
 module.exports.slashAction = async function slashAction(ctx) {
-    await ctx.defer();
     const { bot, slashPermissionRejection, getPermsMatch, msToTime, msToTimeString } = require("../../main.js");
     const { musicGuilds } = require("./util.js");
     if (!bot.guilds.get(ctx.guildID).members.get(ctx.user.id).voiceState.channelID) {
@@ -114,7 +116,7 @@ module.exports.slashAction = async function slashAction(ctx) {
         });
         return;
     }
-    let result = await common(ctx.options["query"], ctx.guildId, ctx.user.id, ctx.channelID);
+    let result = await common(ctx.options["query"], ctx.guildID, ctx.user.id, ctx.channelID);
     if (result.errored) {
         await ctx.send({
             embeds: [
@@ -215,9 +217,9 @@ async function common(query, guildId, userId, channelId) {
         };
     }
     let guild = bot.guilds.get(guildId);
-    let user = bot.guilds.get(guildId).members.get(userId).user;
-    let channel = bot.guilds.get(guildId).channels.get(channelId);
-    let voice = bot.guilds.get(guildId).members.get(userId).voiceState.channelID;
+    let user = guild.members.get(userId).user;
+    let channel = guild.channels.get(channelId);
+    let voice = guild.members.get(userId).voiceState.channelID;
     let queued = await queueHandler(track, guild, user, channel, voice);
     return {
         errored: queued.code !== "SUCCESS",
