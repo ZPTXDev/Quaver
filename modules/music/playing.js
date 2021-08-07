@@ -60,7 +60,7 @@ module.exports.slashAction = async function slashAction(ctx) {
         await ctx.send({
             embeds: [
                 {
-                    description: `**[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})**\n🔴 **LIVE** ▬▬▬▬▬▬▬▬▬▬\n\`[Streaming]\` | ${result.track.requester.mention}`,
+                    description: `**[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})**\n🔴 **LIVE** ▬▬▬▬▬▬▬▬▬▬\n\`[Streaming]\` | Added by ${result.track.requester.mention}`,
                     color: 0xf39bff    
                 }
             ]
