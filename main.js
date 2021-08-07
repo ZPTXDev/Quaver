@@ -356,6 +356,7 @@ exports.slashPermissionRejection = slashPermissionRejection;
 
 bot.on("ready", () => {
     if (!ready) {
+        const { musicGuilds, getPlayer } = require("./modules/music/util.js");
         const nodes = settings.get("lavalink");
         if (!(bot.voiceConnections instanceof PlayerManager)) {
             bot.voiceConnections = new PlayerManager(bot, nodes, {
@@ -363,7 +364,26 @@ bot.on("ready", () => {
                 userId: bot.user.id // the user id of the bot
             });
         }
-        let timeTaken = (new Date().getTime() - initialTime) / 1000;
+        // We've lost connection to Discord, so we're going to resume the players to prevent an abrupt disconnect.
+        Object.keys(musicGuilds).forEach(async guildId => {
+            if (musicGuilds[guildId].queue.length !== 0) {
+                // This figures out the current position of the player, although not always very accurately.
+                let currentPosition = bot.voiceConnections.get(guildId).paused ? Math.min(bot.voiceConnections.get(guildId).state.position, musicGuilds[guildId].queue[0].info.length) : Math.min(bot.voiceConnections.get(guildId).state.position + (Date.now() - bot.voiceConnections.get(guildId).state.time), musicGuilds[guildId].queue[0].info.length);
+                let player = await getPlayer(musicGuilds[guildId].voice);
+                // If it's a stream, what's the point of resuming?
+                // Simply play it again.
+                if (musicGuilds[guildId].queue[0].info.isStream) {
+                    player.play(musicGuilds[guildId].queue[0].track);
+                }
+                // Else, we'll play it again and specify the start time as the last known position.
+                else {
+                    player.play(musicGuilds[guildId].queue[0].track, {startTime: currentPosition});
+                }
+                // Update the internal timestamp to match when we played the track.
+                bot.voiceConnections.get(guildId).timestamp -= currentPosition;
+            }
+        });
+        let timeTaken = (Date.now() - initialTime) / 1000;
         let startupLogs = [];
         startupLogs.push(`[✓] Quaver started successfully (took ${timeTaken}s)`);
         startupLogs.push(`[>] Running build: ${build}`);
