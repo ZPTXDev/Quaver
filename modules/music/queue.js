@@ -128,7 +128,7 @@ function common(guildId, userId, page) {
         page: pages[page - 1].map((track, index) => {
             let durationTime = msToTime(track.info.length);
             let duration = track.info.isStream ? "∞" : msToTimeString(durationTime, true);
-            return `\`${(firstIndex + index).toString().padStart(largestIndexSize, " ")}\` **[${track.info.friendlyTitle === null ? track.info.title : track.info.friendlyTitle}](${track.info.uri})** \`[${duration}]\``;
+            return `\`${(firstIndex + index).toString().padStart(largestIndexSize, " ")}.\` **[${track.info.friendlyTitle === null ? track.info.title : track.info.friendlyTitle}](${track.info.uri})** \`[${duration}]\``;
         }).join("\n"),
         currentPage: page,
         totalPages: pages.length
