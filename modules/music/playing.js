@@ -87,13 +87,13 @@ function common(guildId, userId) {
             code: "You are not in a voice channel."
         };
     }
-    if (musicGuilds[guildId] && bot.guilds.get(guildId).members.get(userId).voiceState.channelID != musicGuilds[guildId].voice.id) {
+    if (guildId in musicGuilds && bot.guilds.get(guildId).members.get(userId).voiceState.channelID != musicGuilds[guildId].voice.id) {
         return {
             errored: true,
             code: "You are not in my voice channel."
         };
     }
-    if (!musicGuilds[guildId]) {
+    if (!(guildId in musicGuilds)) {
         return {
             errored: true,
             code: "There is no active session in this server."
