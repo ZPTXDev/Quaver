@@ -42,7 +42,7 @@ module.exports.action = async function action (details) {
         details["message"].channel.createMessage({
             messageReference: {messageID: details["message"].id},
             embed: {
-                description: `Added **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})** to queue\nAdded by ${result.track.requester.mention}`,
+                description: `Added **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})** to queue`,
                 color: 0xf39bff
             }
         });
@@ -102,7 +102,7 @@ module.exports.slashAction = async function slashAction(ctx) {
         await ctx.send({
             embeds: [
                 {
-                    description: `Added **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})** to queue\nAdded by ${result.track.requester.mention}`,
+                    description: `Added **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})** to queue`,
                     color: 0xf39bff
                 }
             ]
