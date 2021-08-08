@@ -5,7 +5,6 @@ module.exports.usage = "%cmd% query";
 module.exports.description = "Play a track. Use ytsearch: for YouTube, scsearch: for SoundCloud, or a direct link.";
 module.exports.action = async function action (details) {
     const { bot, getPermsMatch, msToTime, msToTimeString } = require("../../main.js");
-    const { musicGuilds } = require("./util.js");
     if (!details["guild"]) {
         return "guild";
     }
@@ -66,7 +65,6 @@ module.exports.slash = {
 }
 module.exports.slashAction = async function slashAction(ctx) {
     const { bot, slashPermissionRejection, getPermsMatch, msToTime, msToTimeString } = require("../../main.js");
-    const { musicGuilds } = require("./util.js");
     let botPermsMissing = getPermsMatch(bot.guilds.get(ctx.guildID).members.get(bot.user.id).permissions, ["voiceConnect", "voiceSpeak"]);
     if (botPermsMissing.length > 0) {
         await slashPermissionRejection(ctx, ["self"].concat(botPermsMissing));
@@ -123,7 +121,7 @@ async function common(query, guildId, userId, channelId) {
             code: "You are not in a voice channel."
         };
     }
-    if (musicGuilds[guildId] && bot.guilds.get(guildId).members.get(userId).voiceState.channelID != musicGuilds[guildId].voice.id) {
+    if (guildId in musicGuilds && bot.guilds.get(guildId).members.get(userId).voiceState.channelID != musicGuilds[guildId].voice.id) {
         return {
             errored: true,
             code: "You are not in my voice channel."
