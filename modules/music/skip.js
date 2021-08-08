@@ -1,11 +1,11 @@
-module.exports.commands = ["skip"];
+module.exports.commands = ["skip", "s"];
 module.exports.usage = "%cmd%";
 module.exports.description = "Skip the current track.";
 module.exports.action = async function action (details) {
     if (!details["guild"]) {
         return "guild";
     }
-    let result = common(details["message"].channel.guild.id, details["message"].author.id);
+    let result = await common(details["message"].channel.guild.id, details["message"].author.id);
     if (result.errored) {
         details["message"].channel.createMessage({
             messageReference: {messageID: details["message"].id},
@@ -20,7 +20,7 @@ module.exports.action = async function action (details) {
         details["message"].channel.createMessage({
             messageReference: {messageID: details["message"].id},
             embed: {
-                description: `Skipped **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})**${result.cause !== null ? `by ${result.cause}` : ""}\nAdded by ${result.track.requester.mention}`,
+                description: `Skipped **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})**${result.cause !== null ? ` by ${result.cause}` : ""}\nAdded by ${result.track.requester.mention}`,
                 color: 0xf39bff
             }
         });
@@ -42,7 +42,7 @@ module.exports.slash = {
     guildOnly: true
 }
 module.exports.slashAction = async function slashAction(ctx) {
-    let result = common(ctx.guildID, ctx.user.id);
+    let result = await common(ctx.guildID, ctx.user.id);
     if (result.errored) {
         await ctx.send({
             embeds: [
@@ -59,7 +59,7 @@ module.exports.slashAction = async function slashAction(ctx) {
         await ctx.send({
             embeds: [
                 {
-                    description: `Skipped **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})**${result.cause !== null ? `by ${result.cause}` : ""}\nAdded by ${result.track.requester.mention}`,
+                    description: `Skipped **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})**${result.cause !== null ? ` by ${result.cause}` : ""}\nAdded by ${result.track.requester.mention}`,
                     color: 0xf39bff
                 }
             ]
@@ -111,7 +111,7 @@ async function common(guildId, userId) {
         skip = true;
     }
     // The user has elevated permissions
-    else if (getPermsMatch(bot.guilds.get(guildId).members.get(userId).permissions, ["manageGuild"]).length > 0) {
+    else if (getPermsMatch(bot.guilds.get(guildId).members.get(userId).permissions, ["manageGuild"]).length === 0) {
         skip = true;
         cause = "force";
     }
@@ -144,9 +144,9 @@ async function common(guildId, userId) {
                 requiredVotes: musicGuilds[guildId].skip.required
             };
         }
-        let player = await getPlayer(musicGuilds[guildId].voice);
-        player.stop();
     }
+    let player = await getPlayer(musicGuilds[guildId].voice);
+    player.stop();
     return {
         errored: false,
         code: "SUCCESS",
