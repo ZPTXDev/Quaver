@@ -305,6 +305,16 @@ function getBar(progress) {
     else {return "▬▬▬▬▬▬▬▬▬🔘";}
 }
 
+// thanks: https://stackoverflow.com/a/61074088
+function paginate(arr, size) {
+    return arr.reduce((acc, val, i) => {
+      let idx = Math.floor(i / size);
+      let page = acc[idx] || (acc[idx] = []);
+      page.push(val);
+      return acc;
+    }, []);
+  }
+
 module.exports.musicGuilds = musicGuilds;
 module.exports.querySorter = querySorter;
 module.exports.resolveTracks = resolveTracks;
@@ -312,3 +322,4 @@ module.exports.getPlayer = getPlayer;
 module.exports.trackHandler = trackHandler;
 module.exports.queueHandler = queueHandler;
 module.exports.getBar = getBar;
+module.exports.paginate = paginate;
