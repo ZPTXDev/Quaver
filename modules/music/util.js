@@ -232,8 +232,6 @@ async function play(guild, track, newQueue, resQueue) {
         console.log("Error encountered for tracks:");
         console.log(err);
         let additionalInfo = "There's no case for what happened, which means something really bad probably happened. Use my disconnect command to reset the session.";
-        let title = musicGuilds[guild.id].queue[0].info.friendlyTitle === null ? musicGuilds[guild.id].queue[0].info.title : musicGuilds[guild.id].queue[0].info.friendlyTitle;
-        let uri = musicGuilds[guild.id].queue[0].info.uri;
         if (!musicGuilds[guild.id].errored) {
             additionalInfo = "Trying again.";
             let player = await getPlayer(musicGuilds[guild.id].voice);
@@ -253,7 +251,7 @@ async function play(guild, track, newQueue, resQueue) {
         }
         await musicGuilds[guild.id].channel.createMessage({
             embed: {
-                description: `An error occurred while playing **[${title}](${uri})**.\n${additionalInfo}`,
+                description: `An error occurred while playing the track.\n${additionalInfo}`,
                 color: 0xf39bff
             }
         });

@@ -479,8 +479,6 @@ bot.on("ready", () => {
                     console.log("Error encountered for tracks:");
                     console.log(err);
                     let additionalInfo = "There's no case for what happened, which means something really bad probably happened. Use my disconnect command to reset the session.";
-                    let title = musicGuilds[guildId].queue[0].info.friendlyTitle === null ? musicGuilds[guildId].queue[0].info.title : musicGuilds[guildId].queue[0].info.friendlyTitle;
-                    let uri = musicGuilds[guildId].queue[0].info.uri;
                     if (!musicGuilds[guildId].errored) {
                         additionalInfo = "Trying again.";
                         let player = await getPlayer(musicGuilds[guildId].voice);
@@ -500,7 +498,7 @@ bot.on("ready", () => {
                     }
                     await musicGuilds[guildId].channel.createMessage({
                         embed: {
-                            description: `An error occurred while playing **[${title}](${uri})**.\n${additionalInfo}`,
+                            description: `An error occurred while playing the track.\n${additionalInfo}`,
                             color: 0xf39bff
                         }
                     });
