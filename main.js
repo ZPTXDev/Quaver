@@ -2,6 +2,7 @@ const { SlashCreator, GatewayServer, SlashCommand } = require("slash-create");
 const Eris = require("eris");
 const { PlayerManager } = require("eris-lavalink");
 const settings = require("data-store")({path: "settings.json"});
+const musicData = require("data-store")({path: "music.json"});
 const mysql = require("mysql2");
 const reload = require("require-reload")(require);
 const fs = require("fs");
@@ -307,7 +308,7 @@ async function databaseSync() {
     let u = await promisePool.query("SELECT * FROM `users`");
     let g = await promisePool.query("SELECT * FROM `guilds`");
     u[0].forEach(res => {
-        memberships[res["userid"]] = res;
+        users[res["userid"]] = res;
     });
     g[0].forEach(res => {
         guilds[res["guildid"]] = res;
@@ -338,6 +339,7 @@ async function slashPermissionRejection(ctx, permsArray) {
 }
 
 exports.settings = settings;
+exports.musicData = musicData;
 exports.reload = reload;
 exports.build = build;
 exports.version = version;
@@ -355,8 +357,8 @@ exports.slashManagerRejection = slashManagerRejection;
 exports.slashPermissionRejection = slashPermissionRejection;
 
 bot.on("ready", () => {
+    const { musicGuilds, getPlayer, play } = require("./modules/music/util.js");
     if (!ready) {
-        const { musicGuilds, getPlayer } = require("./modules/music/util.js");
         const nodes = settings.get("lavalink");
         if (!(bot.voiceConnections instanceof PlayerManager)) {
             bot.voiceConnections = new PlayerManager(bot, nodes, {
@@ -364,25 +366,14 @@ bot.on("ready", () => {
                 userId: bot.user.id // the user id of the bot
             });
         }
-        // We've lost connection to Discord, so we're going to resume the players to prevent an abrupt disconnect.
-        Object.keys(musicGuilds).forEach(async guildId => {
-            if (musicGuilds[guildId].queue.length !== 0) {
-                // This figures out the current position of the player, although not always very accurately.
-                let currentPosition = bot.voiceConnections.get(guildId).paused ? Math.min(bot.voiceConnections.get(guildId).state.position, musicGuilds[guildId].queue[0].info.length) : Math.min(bot.voiceConnections.get(guildId).state.position + (Date.now() - bot.voiceConnections.get(guildId).state.time), musicGuilds[guildId].queue[0].info.length);
-                let player = await getPlayer(musicGuilds[guildId].voice);
-                // If it's a stream, what's the point of resuming?
-                // Simply play it again.
-                if (musicGuilds[guildId].queue[0].info.isStream) {
-                    player.play(musicGuilds[guildId].queue[0].track);
-                }
-                // Else, we'll play it again and specify the start time as the last known position.
-                else {
-                    player.play(musicGuilds[guildId].queue[0].track, {startTime: currentPosition});
-                }
-                // Update the internal timestamp to match when we played the track.
-                bot.voiceConnections.get(guildId).timestamp -= currentPosition;
+        // There's some sessions from when we stopped the bot
+        if (Object.keys(musicData.get()).length > 0) {
+            for (const guildId of Object.keys(musicData.get())) {
+                let guildData = musicData.get(guildId);
+                musicGuilds[guildId] = guildData;
+                musicData.del(guildId);
             }
-        });
+        }
         let timeTaken = (Date.now() - initialTime) / 1000;
         let startupLogs = [];
         startupLogs.push(`[✓] Quaver started successfully (took ${timeTaken}s)`);
@@ -447,6 +438,123 @@ bot.on("ready", () => {
             .registerCommands(slashCommands)
             .syncCommands();
     }
+    // We've lost connection to Discord, so we're going to resume the players to prevent an abrupt disconnect.
+    Object.keys(musicGuilds).forEach(async guildId => {
+        if (musicGuilds[guildId].queue.length !== 0) {
+            // This figures out the current position of the player, although not always very accurately.
+            let currentPosition;
+            let restarted = false;
+            if (musicGuilds[guildId].currentPosition) {
+                currentPosition = musicGuilds[guildId].currentPosition;
+                restarted = true;
+                delete musicGuilds[guildId].currentPosition;
+            }
+            else {
+                currentPosition = bot.voiceConnections.get(guildId).paused ? Math.min(bot.voiceConnections.get(guildId).state.position, musicGuilds[guildId].queue[0].info.length) : Math.min(bot.voiceConnections.get(guildId).state.position + (Date.now() - bot.voiceConnections.get(guildId).state.time), musicGuilds[guildId].queue[0].info.length);
+            }
+            // For the case that we've just restarted the bot, play it safe by getting the voice channel again
+            let voice;
+            let player;
+            if (restarted) {
+                let channel = bot.guilds.get(guildId).channels.get(musicGuilds[guildId].channel.id);
+                voice = bot.guilds.get(guildId).channels.get(musicGuilds[guildId].voice.id);
+                // Give it a second when restarting the bot, before we're able to get the player.
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                player = await bot.joinVoiceChannel(musicGuilds[guildId].voice.id);
+                musicGuilds[guildId].voice = voice;
+                musicGuilds[guildId].channel = channel;
+                await musicGuilds[guildId].channel.createMessage({
+                    embed: {
+                        description: "Resuming your session.",
+                        color: 0xf39bff
+                    }
+                });
+                // If it's a restart, we'll need to re-define the event hooks
+                // TODO: This can definitely be optimized by re-using the functions in util.js, but for now this will work
+                player.on("disconnect", err => {
+                    if (err) {console.log(err);}
+                    delete musicGuilds[guildId];
+                });
+                player.on("error", async err => {
+                    console.log("Error encountered for tracks:");
+                    console.log(err);
+                    let additionalInfo = "There's no case for what happened, which means something really bad probably happened. Use my disconnect command to reset the session.";
+                    let title = musicGuilds[guildId].queue[0].info.friendlyTitle === null ? musicGuilds[guildId].queue[0].info.title : musicGuilds[guildId].queue[0].info.friendlyTitle;
+                    let uri = musicGuilds[guildId].queue[0].info.uri;
+                    if (!musicGuilds[guildId].errored) {
+                        additionalInfo = "Trying again.";
+                        let player = await getPlayer(musicGuilds[guildId].voice);
+                        player.play(musicGuilds[guildId].queue[0].track);
+                        musicGuilds[guildId].errored = true;
+                    }
+                    else if (musicGuilds[guildId].errored) {
+                        additionalInfo = "Skipping the track.";
+                        let original = musicGuilds[guildId].queue;
+                        const shifted = original.shift();
+                        musicGuilds[guildId].queue = original;
+                        delete musicGuilds[guildId].skip;
+                        delete musicGuilds[guildId].errored;
+                        if (original.length === 0) {next = null;}
+                        else {next = original[0].track;}
+                        play(guild, next, false, false);
+                    }
+                    musicGuilds[guildId].channel.createMessage({
+                        embed: {
+                            description: `An error occurred while playing **[${title}](${uri})**.\n${additionalInfo}`,
+                            color: 0xf39bff
+                        }
+                    });
+                });
+                player.on("end", d => {
+                    if (d.reason && d.reason === 'REPLACED') {return;}
+                    let totalDuration = 0;
+                    musicGuilds[guildId].queue.forEach(track => {
+                        if (track.info) {
+                            totalDuration += track.info.length;
+                        }
+                    });
+                    let original = musicGuilds[guildId].queue;
+                    const shifted = original.shift();
+                    // Loop logic
+                    if (musicGuilds[guildId].loop && shifted) {
+                        // Preventing loop if track / queue duration is too short, because this causes ratelimits really quickly
+                        if ((original.length === 0 && shifted.info.length < 60000) || totalDuration < 60000) {
+                            musicGuilds[guildId].channel.createMessage({
+                                embed: {
+                                    description: `Failed to loop **[${shifted.info.title}](${shifted.info.uri})** as the ${totalDuration < 60000 ? "queue" : "track"} duration is too short.`,
+                                    color: 0xf39bff
+                                }
+                            });
+                        }
+                        else {
+                            original.push(shifted);
+                        }
+                    }
+                    musicGuilds[guildId].queue = original;
+                    delete musicGuilds[guildId].skip;
+                    delete musicGuilds[guildId].errored;
+                    if (original.length === 0) {next = null;}
+                    else {next = original[0].track;}
+                    play(bot.guilds.get(guildId), next, false, false);
+                });
+            }
+            else {
+                voice = musicGuilds[guildId].voice;
+                player = await getPlayer(voice);
+            }
+            // If it's a stream, what's the point of resuming?
+            // Simply play it again.
+            if (musicGuilds[guildId].queue[0].info.isStream) {
+                player.play(musicGuilds[guildId].queue[0].track);
+            }
+            // Else, we'll play it again and specify the start time as the last known position.
+            else {
+                player.play(musicGuilds[guildId].queue[0].track, {startTime: currentPosition});
+            }
+            // Update the internal timestamp to match when we played the track.
+            bot.voiceConnections.get(guildId).timestamp -= currentPosition;
+        }
+    });
 });
 
 bot.on("connect", id => {

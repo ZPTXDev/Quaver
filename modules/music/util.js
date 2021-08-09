@@ -321,5 +321,6 @@ module.exports.resolveTracks = resolveTracks;
 module.exports.getPlayer = getPlayer;
 module.exports.trackHandler = trackHandler;
 module.exports.queueHandler = queueHandler;
+module.exports.play = play;
 module.exports.getBar = getBar;
 module.exports.paginate = paginate;
