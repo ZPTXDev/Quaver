@@ -115,6 +115,10 @@ function common(guildId, userId) {
     let currentProgress = bot.voiceConnections.get(guildId).paused ? Math.min(bot.voiceConnections.get(guildId).state.position, musicGuilds[guildId].queue[0].info.length) : Math.min(bot.voiceConnections.get(guildId).state.position + (new Date().getTime() - bot.voiceConnections.get(guildId).state.time), musicGuilds[guildId].queue[0].info.length);
     let bar = getBar((currentProgress / musicGuilds[guildId].queue[0].info.length) * 100);
     let currentProgressTime = msToTime(currentProgress);
+    // Edge case: there's instances of this being NaN / -1 at the start of a track, so we can fix it by setting it to 0:00
+    if (isNaN(currentProgressTime["s"]) || currentProgressTime["s"] < 0) {
+        currentProgressTime = { d: 0, h: 0, m: 0, s: 0 };
+    }
     let currentProgressString = msToTimeString(currentProgressTime, true);
     let fullProgressTime = msToTime(musicGuilds[guildId].queue[0].info.length);
     let fullProgressString = msToTimeString(fullProgressTime, true);
