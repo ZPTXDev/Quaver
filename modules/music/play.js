@@ -29,9 +29,19 @@ module.exports.action = async function action (details) {
     let durationTime = msToTime(result.track.info.length);
     let duration = result.track.info.isStream ? "∞" : msToTimeString(durationTime, true);
     if (result.newQueue || result.restartQueue) {
+        let playlistAdded = "playlistName" in result ? `\nPlaylist **[${result.playlistName}](${result.playlistUrl})** added \`[${result.successful} tracks]\`` : "";
         details["message"].channel.createMessage({
             embed: {
-                description: `Now playing **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})** \`[${duration}]\`\nAdded by ${result.track.requester.mention}`,
+                description: `Now playing **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})** \`[${duration}]\`${playlistAdded}\nAdded by ${result.track.requester.mention}`,
+                color: 0xf39bff
+            }
+        });
+        return true;
+    }
+    if ("playlistName" in result) {
+        details["message"].channel.createMessage({
+            embed: {
+                description: `Added **[${result.playlistName}](${result.playlistUrl})** (${result.successful} tracks) to queue`,
                 color: 0xf39bff
             }
         });
@@ -86,10 +96,22 @@ module.exports.slashAction = async function slashAction(ctx) {
     let durationTime = msToTime(result.track.info.length);
     let duration = result.track.info.isStream ? "∞" : msToTimeString(durationTime, true);
     if (result.newQueue || result.restartQueue) {
+        let playlistAdded = "playlistName" in result ? `\nPlaylist **[${result.playlistName}](${result.playlistUrl})** added \`[${result.successful} tracks]\`` : "";
         await ctx.send({
             embeds: [
                 {
-                    description: `Now playing **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})** \`[${duration}]\`\nAdded by ${result.track.requester.mention}`,
+                    description: `Now playing **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})** \`[${duration}]\`${playlistAdded}\nAdded by ${result.track.requester.mention}`,
+                    color: 0xf39bff
+                }
+            ]
+        });
+        return;
+    }
+    if ("playlistName" in result) {
+        await ctx.send({
+            embeds: [
+                {
+                    description: `Added **[${result.playlistName}](${result.playlistUrl})** (${result.successful} tracks) to queue`,
                     color: 0xf39bff
                 }
             ]
@@ -187,6 +209,36 @@ async function common(query, guildId, userId, channelId) {
     let user = guild.members.get(userId).user;
     let channel = guild.channels.get(channelId);
     let voice = guild.members.get(userId).voiceState.channelID;
+    if ("playlistName" in track) {
+        let successful = 0;
+        let total = 0;
+        let newQueue = false;
+        let restartQueue = false;
+        let firstTrack = null;
+        for (const playlistTrack of track.tracks) {
+            let queued = await queueHandler(playlistTrack, guild, user, channel, voice);
+            if (queued.newQueue) {newQueue = true;}
+            if (queued.restartQueue) {restartQueue = true;}
+            if (queued.code === "SUCCESS") {
+                successful++;
+            }
+            if (!firstTrack) {
+                firstTrack = queued.track;
+            }
+            total++;
+        }
+        return {
+            errored: false,
+            code: "SUCCESS",
+            playlistName: track.playlistName,
+            playlistUrl: data,
+            track: firstTrack,
+            successful: successful,
+            total: total,
+            newQueue: newQueue,
+            restartQueue: restartQueue
+        }
+    }
     let queued = await queueHandler(track, guild, user, channel, voice);
     return {
         errored: queued.code !== "SUCCESS",

@@ -496,16 +496,16 @@ bot.on("ready", () => {
                         delete musicGuilds[guildId].errored;
                         if (original.length === 0) {next = null;}
                         else {next = original[0].track;}
-                        play(guild, next, false, false);
+                        await play(guild, next, false, false);
                     }
-                    musicGuilds[guildId].channel.createMessage({
+                    await musicGuilds[guildId].channel.createMessage({
                         embed: {
                             description: `An error occurred while playing **[${title}](${uri})**.\n${additionalInfo}`,
                             color: 0xf39bff
                         }
                     });
                 });
-                player.on("end", d => {
+                player.on("end", async d => {
                     if (d.reason && d.reason === 'REPLACED') {return;}
                     let totalDuration = 0;
                     musicGuilds[guildId].queue.forEach(track => {
@@ -519,7 +519,7 @@ bot.on("ready", () => {
                     if (musicGuilds[guildId].loop && shifted) {
                         // Preventing loop if track / queue duration is too short, because this causes ratelimits really quickly
                         if ((original.length === 0 && shifted.info.length < 60000) || totalDuration < 60000) {
-                            musicGuilds[guildId].channel.createMessage({
+                            await musicGuilds[guildId].channel.createMessage({
                                 embed: {
                                     description: `Failed to loop **[${shifted.info.title}](${shifted.info.uri})** as the ${totalDuration < 60000 ? "queue" : "track"} duration is too short.`,
                                     color: 0xf39bff
@@ -535,7 +535,7 @@ bot.on("ready", () => {
                     delete musicGuilds[guildId].errored;
                     if (original.length === 0) {next = null;}
                     else {next = original[0].track;}
-                    play(bot.guilds.get(guildId), next, false, false);
+                    await play(bot.guilds.get(guildId), next, false, false);
                 });
             }
             else {

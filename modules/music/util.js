@@ -89,7 +89,7 @@ function trackHandler(tracks, type, search) {
         else {return tracks.tracks;}
     }
     else if (tracks.loadType === "PLAYLIST_LOADED" && type == "url") {
-        return;
+        return {playlistName: tracks.playlistInfo.name, tracks: tracks.tracks};
     }
     else {
         return "UNKNOWN";
@@ -134,7 +134,7 @@ async function queueHandler(track, guild, user, channel, voice) {
     // There's nothing in there right now
     if (musicGuilds[guild.id].queue.length === 0) {
         // Play it
-        play(guild, track.track, newQueue, resQueue);
+        await play(guild, track.track, newQueue, resQueue);
     }
     let defaultArtist = track.info.author;
     let defaultTitle = "???";
@@ -151,7 +151,7 @@ async function play(guild, track, newQueue, resQueue) {
         if (!(guild.id in musicGuilds)) {
             return;
         }
-        musicGuilds[guild.id].channel.createMessage({
+        await musicGuilds[guild.id].channel.createMessage({
             embed: {
                 description: `There's nothing left in the queue. I'll leave <t:${Math.floor(Date.now()/1000) + 1800}:R>.`,
                 color: 0xf39bff
@@ -177,7 +177,7 @@ async function play(guild, track, newQueue, resQueue) {
         let voiceId = musicGuilds[guild.id].voice.id;
         delete musicGuilds[guild.id];
         bot.leaveVoiceChannel(voiceId);
-        channel.createMessage({
+        await channel.createMessage({
             embed: {
                 description: "Disconnected by request.",
                 color: 0xf39bff
@@ -201,7 +201,7 @@ async function play(guild, track, newQueue, resQueue) {
         let channel = musicGuilds[guild.id].channel;
         delete musicGuilds[guild.id];
         bot.leaveVoiceChannel(voice.id);
-        channel.createMessage({
+        await channel.createMessage({
             embed: {
                 description: "Disconnected as everyone left.",
                 color: 0xf39bff
@@ -214,7 +214,7 @@ async function play(guild, track, newQueue, resQueue) {
         let currentTrack = musicGuilds[guild.id].queue[0];
         let durationTime = msToTime(currentTrack.info.length);
         let duration = currentTrack.info.isStream ? "∞" : msToTimeString(durationTime, true);
-        musicGuilds[guild.id].channel.createMessage({
+        await musicGuilds[guild.id].channel.createMessage({
             embed: {
                 description: `Now playing **[${currentTrack.info.friendlyTitle === null ? currentTrack.info.title : currentTrack.info.friendlyTitle}](${currentTrack.info.uri})** \`[${duration}]\`\nAdded by ${currentTrack.requester.mention}`,
                 color: 0xf39bff
@@ -249,16 +249,16 @@ async function play(guild, track, newQueue, resQueue) {
             delete musicGuilds[guild.id].errored;
             if (original.length === 0) {next = null;}
             else {next = original[0].track;}
-            play(guild, next, false, false);
+            await play(guild, next, false, false);
         }
-        musicGuilds[guild.id].channel.createMessage({
+        await musicGuilds[guild.id].channel.createMessage({
             embed: {
                 description: `An error occurred while playing **[${title}](${uri})**.\n${additionalInfo}`,
                 color: 0xf39bff
             }
         });
     });
-    player.on("end", d => {
+    player.on("end", async d => {
         if (d.reason && d.reason === 'REPLACED') {return;}
         let totalDuration = 0;
         musicGuilds[guild.id].queue.forEach(track => {
@@ -272,7 +272,7 @@ async function play(guild, track, newQueue, resQueue) {
         if (musicGuilds[guild.id].loop && shifted) {
             // Preventing loop if track / queue duration is too short, because this causes ratelimits really quickly
             if ((original.length === 0 && shifted.info.length < 60000) || totalDuration < 60000) {
-                musicGuilds[guild.id].channel.createMessage({
+                await musicGuilds[guild.id].channel.createMessage({
                     embed: {
                         description: `Failed to loop **[${shifted.info.title}](${shifted.info.uri})** as the ${totalDuration < 60000 ? "queue" : "track"} duration is too short.`,
                         color: 0xf39bff
@@ -288,7 +288,7 @@ async function play(guild, track, newQueue, resQueue) {
         delete musicGuilds[guild.id].errored;
         if (original.length === 0) {next = null;}
         else {next = original[0].track;}
-        play(guild, next, false, false);
+        await play(guild, next, false, false);
     });
 }
 

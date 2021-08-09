@@ -20,7 +20,7 @@ module.exports.action = async function action (details) {
         details["message"].channel.createMessage({
             messageReference: {messageID: details["message"].id},
             embed: {
-                description: `Skipped **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})**${result.cause !== null ? ` by ${result.cause}` : ""}\nAdded by ${result.track.requester.mention}`,
+                description: `Skipped **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})**${result.cause !== null ? ` by ${result.cause}\nAdded by ${result.track.requester.mention}` : ""}`,
                 color: 0xf39bff
             }
         });
@@ -59,7 +59,7 @@ module.exports.slashAction = async function slashAction(ctx) {
         await ctx.send({
             embeds: [
                 {
-                    description: `Skipped **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})**${result.cause !== null ? ` by ${result.cause}` : ""}\nAdded by ${result.track.requester.mention}`,
+                    description: `Skipped **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})**${result.cause !== null ? ` by ${result.cause}\nAdded by ${result.track.requester.mention}` : ""}`,
                     color: 0xf39bff
                 }
             ]
