@@ -5,7 +5,7 @@ module.exports.action = async function action (details) {
     if (!details["guild"]) {
         return "guild";
     }
-    let result = await common(details["message"].channel.guild.id, details["message"].author.id);
+    let result = common(details["message"].channel.guild.id, details["message"].author.id);
     if (result.errored) {
         details["message"].channel.createMessage({
             messageReference: {messageID: details["message"].id},
@@ -33,7 +33,7 @@ module.exports.slash = {
     guildOnly: true
 }
 module.exports.slashAction = async function slashAction(ctx) {
-    let result = await common(ctx.guildID, ctx.user.id);
+    let result = common(ctx.guildID, ctx.user.id);
     if (result.errored) {
         await ctx.send({
             embeds: [
