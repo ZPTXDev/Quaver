@@ -1,11 +1,16 @@
+const { CommandOptionType } = require("slash-create");
+
 module.exports.commands = ["boost"];
-module.exports.usage = "%cmd%";
-module.exports.description = "Enable bass boost for your music.";
+module.exports.usage = "%cmd% [true|false]";
+module.exports.description = "Bass boost for your music.";
 module.exports.action = async function action (details) {
     if (!details["guild"]) {
         return "guild";
     }
-    let result = await common(details["message"].channel.guild.id, details["message"].author.id);
+    if (details["body"] !== "" && !["true", "false"].includes(details["body"])) {
+        return "usage";
+    }
+    let result = await common(details["message"].channel.guild.id, details["message"].author.id, details["body"]);
     if (result.errored) {
         details["message"].channel.createMessage({
             messageReference: {messageID: details["message"].id},
@@ -30,10 +35,17 @@ module.exports.slash = {
     name: "boost",
     description: module.exports.description,
     deferEphemeral: false,
+    options: [
+        {
+            name: "boost",
+            description: "To enable or disable the boost. If not specified, it will be toggled instead.",
+            type: CommandOptionType.BOOLEAN
+        }
+    ],
     guildOnly: true
 }
 module.exports.slashAction = async function slashAction(ctx) {
-    let result = await common(ctx.guildID, ctx.user.id);
+    let result = await common(ctx.guildID, ctx.user.id, "boost" in ctx.options ? ctx.options["boost"] : "");
     if (result.errored) {
         await ctx.send({
             embeds: [
@@ -57,7 +69,7 @@ module.exports.slashAction = async function slashAction(ctx) {
     return;
 }
 
-async function common(guildId, userId) {
+async function common(guildId, userId, override) {
     const { bot } = require("../../main.js");
     const { musicGuilds, getPlayer } = require("./util.js");
     if (!bot.guilds.get(guildId).members.get(userId).voiceState.channelID) {
@@ -80,6 +92,12 @@ async function common(guildId, userId) {
     }
     let player = await getPlayer(musicGuilds[guildId].voice);
     let newBoosted = !musicGuilds[guildId].boost;
+    if (override === "true") {
+        newBoosted = true;
+    }
+    else if (override === "false") {
+        newBoosted = false;
+    }
     let eqValues = [
         {"band": 0, "gain": 0},
         {"band": 1, "gain": 0},
