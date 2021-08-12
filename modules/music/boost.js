@@ -58,7 +58,7 @@ module.exports.slashAction = async function slashAction(ctx) {
 }
 
 async function common(guildId, userId) {
-    const { bot, settings } = require("../../main.js");
+    const { bot } = require("../../main.js");
     const { musicGuilds, getPlayer } = require("./util.js");
     if (!bot.guilds.get(guildId).members.get(userId).voiceState.channelID) {
         return {
