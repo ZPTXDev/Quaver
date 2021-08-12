@@ -1,7 +1,7 @@
 const { CommandOptionType } = require("slash-create");
 
 module.exports.commands = ["queue", "q"];
-module.exports.usage = "%cmd%";
+module.exports.usage = "%cmd% [page]";
 module.exports.description = "Show what's going to be playing.";
 module.exports.action = async function action (details) {
     if (!details["guild"]) {
