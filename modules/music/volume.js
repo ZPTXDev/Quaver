@@ -25,7 +25,7 @@ module.exports.action = async function action (details) {
     details["message"].channel.createMessage({
         messageReference: {messageID: details["message"].id},
         embed: {
-            description: `Successfully adjusted the volume to **${volume}%**`,
+            description: `Volume adjusted to **${volume}%**`,
             color: 0xf39bff
         }
     });
@@ -63,7 +63,7 @@ module.exports.slashAction = async function slashAction(ctx) {
     await ctx.send({
         embeds: [
             {
-                description: `Successfully adjusted the volume to **${ctx.options["volume"]}%**`,
+                description: `Volume adjusted to **${ctx.options["volume"]}%**`,
                 color: 0xf39bff
             }
         ]

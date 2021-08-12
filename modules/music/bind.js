@@ -25,7 +25,7 @@ module.exports.action = async function action (details) {
     details["message"].channel.createMessage({
         messageReference: {messageID: details["message"].id},
         embed: {
-            description: `Successfully binded to <#${channelId}>`,
+            description: `Binded to <#${channelId}>`,
             color: 0xf39bff
         }
     });
@@ -63,7 +63,7 @@ module.exports.slashAction = async function slashAction(ctx) {
     await ctx.send({
         embeds: [
             {
-                description: `Successfully binded to <#${ctx.options["channel"]}>`,
+                description: `Binded to <#${ctx.options["channel"]}>`,
                 color: 0xf39bff
             }
         ]
