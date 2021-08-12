@@ -1,5 +1,3 @@
-const { CommandOptionType } = require("slash-create");
-
 module.exports.commands = ["boost"];
 module.exports.usage = "%cmd%";
 module.exports.description = "Enable bass boost for your music.";
