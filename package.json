@@ -1,6 +1,6 @@
 {
   "name": "quaver",
-  "version": "1.0.0-dev",
+  "version": "1.0.0",
   "dependencies": {
     "@ksoft/api": "^3.1.9",
     "data-store": "^4.0.3",
