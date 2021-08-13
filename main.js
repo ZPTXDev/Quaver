@@ -551,6 +551,24 @@ bot.on("ready", () => {
             }
             // Update the internal timestamp to match when we played the track.
             bot.voiceConnections.get(guildId).timestamp -= currentPosition;
+            // Re-send volume and equalizer settings
+            player.setVolume(musicGuilds[guildId].volume);
+            let eqValues = [
+                {"band": 0, "gain": 0},
+                {"band": 1, "gain": 0},
+                {"band": 2, "gain": 0},
+                {"band": 3, "gain": 0},
+                {"band": 4, "gain": 0},
+                {"band": 5, "gain": 0}
+            ];
+            if (musicGuilds[guildId].boost) {
+                eqValues = [
+                    {"band": 0, "gain": 1},
+                    {"band": 1, "gain": 0.8},
+                    {"band": 2, "gain": 0.6}
+                ];
+            }
+            await player.sendEvent({op: 'equalizer', guildId: this.guildId, bands: eqValues});
         }
     });
 });
