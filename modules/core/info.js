@@ -1,6 +1,6 @@
 const {CommandOptionType} = require("slash-create");
 
-module.exports.commands = ["info"];
+module.exports.commands = ["info", "about"];
 module.exports.usage = "%cmd% [stats]";
 module.exports.description = "Display information about Quaver.";
 module.exports.action = function (details) {
@@ -74,7 +74,7 @@ function common(type) {
     });
     return {
         title: "Quaver",
-        description: `A music bot, part of the ZapSquared Network.\nSource code available [here](https://github.com/zapteryx/Quaver).\nRunning version \`${version}\`.`,
+        description: `A music bot, part of the ZapSquared Network.\nSource code available [here](https://github.com/zapteryx/Quaver), invite [here](https://discord.com/oauth2/authorize?client_id=${bot.user.id}&permissions=8&scope=bot%20applications.commands).\nRunning version \`${version}\`.`,
         color: 0xf39bff,
         fields: type === "stats" ? [
             {
