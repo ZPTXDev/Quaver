@@ -108,12 +108,9 @@ async function common(guildId, userId, override) {
     ];
     if (newBoosted) {
         eqValues = [
-            {"band": 0, "gain": -0.1},
-            {"band": 1, "gain": 0.14},
-            {"band": 2, "gain": 0.32},
-            {"band": 3, "gain": 0.6},
-            {"band": 4, "gain": -1},
-            {"band": 5, "gain": 0.22}
+            {"band": 0, "gain": 1},
+            {"band": 1, "gain": 0.8},
+            {"band": 2, "gain": 0.6}
         ];
     }
     await player.sendEvent({op: 'equalizer', guildId: this.guildId, bands: eqValues});
