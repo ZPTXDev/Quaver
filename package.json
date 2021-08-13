@@ -2,6 +2,7 @@
   "name": "quaver",
   "version": "1.0.0-dev",
   "dependencies": {
+    "@ksoft/api": "^3.1.9",
     "data-store": "^4.0.3",
     "eris": "^0.15.1",
     "eris-lavalink": "^1.0.2",
