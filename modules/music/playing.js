@@ -20,7 +20,7 @@ module.exports.action = async function action (details) {
         details["message"].channel.createMessage({
             messageReference: {messageID: details["message"].id},
             embed: {
-                description: `**[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})**\n🔴 **LIVE** ▬▬▬▬▬▬▬▬▬▬\n\`[Streaming]\` | Added by ${result.track.requester.mention}`,
+                description: `**[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})**\n🔴 **LIVE** ▬▬▬▬▬▬▬▬▬▬${result.paused ? " ⏸️" : ""}${result.looped ? " 🔁" : ""}${result.boosted ? " 🅱️" : ""}\n\`[Streaming]\` | Added by ${result.track.requester.mention}`,
                 color: 0xf39bff    
             }
         });
@@ -29,7 +29,7 @@ module.exports.action = async function action (details) {
     details["message"].channel.createMessage({
         messageReference: {messageID: details["message"].id},
         embed: {
-            description: `**[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})**\n${result.bar}\n\`[${result.currentProgress} / ${result.fullProgress}]\` | Added by ${result.track.requester.mention}`,
+            description: `**[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})**\n${result.bar}${result.paused ? " ⏸️" : ""}${result.looped ? " 🔁" : ""}${result.boosted ? " 🅱️" : ""}\n\`[${result.currentProgress} / ${result.fullProgress}]\` | Added by ${result.track.requester.mention}`,
             color: 0xf39bff
         }
     });
@@ -60,7 +60,7 @@ module.exports.slashAction = async function slashAction(ctx) {
         await ctx.send({
             embeds: [
                 {
-                    description: `**[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})**\n🔴 **LIVE** ▬▬▬▬▬▬▬▬▬▬\n\`[Streaming]\` | Added by ${result.track.requester.mention}`,
+                    description: `**[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})**\n🔴 **LIVE** ▬▬▬▬▬▬▬▬▬▬${result.paused ? " ⏸️" : ""}${result.looped ? " 🔁" : ""}${result.boosted ? " 🅱️" : ""}\n\`[Streaming]\` | Added by ${result.track.requester.mention}`,
                     color: 0xf39bff    
                 }
             ]
@@ -70,7 +70,7 @@ module.exports.slashAction = async function slashAction(ctx) {
     await ctx.send({
         embeds: [
             {
-                description: `**[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})**\n${result.bar}\n\`[${result.currentProgress} / ${result.fullProgress}]\` | Added by ${result.track.requester.mention}`,
+                description: `**[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})**\n${result.bar}${result.paused ? " ⏸️" : ""}${result.looped ? " 🔁" : ""}${result.boosted ? " 🅱️" : ""}\n\`[${result.currentProgress} / ${result.fullProgress}]\` | Added by ${result.track.requester.mention}`,
                 color: 0xf39bff
             }
         ]
@@ -109,7 +109,10 @@ function common(guildId, userId) {
         return {
             errored: false,
             code: "SUCCESS",
-            track: musicGuilds[guildId].queue[0]
+            track: musicGuilds[guildId].queue[0],
+            paused: bot.voiceConnections.get(guildId).paused,
+            looped: musicGuilds[guildId].loop,
+            boosted: musicGuilds[guildId].boost
         };
     }
     let currentProgress = bot.voiceConnections.get(guildId).paused ? Math.min(bot.voiceConnections.get(guildId).state.position, musicGuilds[guildId].queue[0].info.length) : Math.min(bot.voiceConnections.get(guildId).state.position + (new Date().getTime() - bot.voiceConnections.get(guildId).state.time), musicGuilds[guildId].queue[0].info.length);
@@ -128,6 +131,9 @@ function common(guildId, userId) {
         track: musicGuilds[guildId].queue[0],
         bar: bar,
         currentProgress: currentProgressString,
-        fullProgress: fullProgressString
+        fullProgress: fullProgressString,
+        paused: bot.voiceConnections.get(guildId).paused,
+        looped: musicGuilds[guildId].loop,
+        boosted: musicGuilds[guildId].boost
     };
 }
