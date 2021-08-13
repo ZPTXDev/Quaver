@@ -1,7 +1,7 @@
 const { CommandOptionType } = require("slash-create");
 
-module.exports.commands = ["move"];
-module.exports.usage = "%cmd% pos1 pos2";
+module.exports.commands = ["move", "m"];
+module.exports.usage = "%cmd% position1 position2";
 module.exports.description = "Move a track in the queue.";
 module.exports.action = async function action (details) {
     if (!details["guild"]) {
@@ -28,7 +28,7 @@ module.exports.action = async function action (details) {
     details["message"].channel.createMessage({
         messageReference: {messageID: details["message"].id},
         embed: {
-            description: `Moved **${result.trackName}** from position **${result.originalPosition}** to position **${result.newPosition}**`,
+            description: `Moved **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})** from position **${result.originalPosition}** to position **${result.newPosition}**`,
             color: 0xf39bff
         }
     });
@@ -41,13 +41,13 @@ module.exports.slash = {
     deferEphemeral: false,
     options: [
         {
-            name: "pos1",
+            name: "position1",
             description: "The position of the track to move.",
             required: true,
             type: CommandOptionType.INTEGER
         },
         {
-            name: "pos2",
+            name: "position2",
             description: "The position to move the track to.",
             required: true,
             type: CommandOptionType.INTEGER
@@ -56,7 +56,7 @@ module.exports.slash = {
     guildOnly: true
 }
 module.exports.slashAction = async function slashAction(ctx) {
-    let result = common(ctx.guildID, ctx.user.id, ctx.options["pos1"], ctx.options["pos2"]);
+    let result = common(ctx.guildID, ctx.user.id, ctx.options["position1"], ctx.options["position2"]);
     if (result.errored) {
         await ctx.send({
             embeds: [
@@ -72,7 +72,7 @@ module.exports.slashAction = async function slashAction(ctx) {
     await ctx.send({
         embeds: [
             {
-                description: `Moved **${result.trackName}** from position **${result.originalPosition}** to position **${result.newPosition}**`,
+                description: `Moved **[${result.track.info.friendlyTitle === null ? result.track.info.title : result.track.info.friendlyTitle}](${result.track.info.uri})** from position **${result.originalPosition}** to position **${result.newPosition}**`,
                 color: 0xf39bff
             }
         ]
@@ -122,11 +122,11 @@ function common(guildId, userId, pos1, pos2) {
         };
     }
     musicGuilds[guildId].queue.splice(pos2, 0, musicGuilds[guildId].queue.splice(pos1, 1)[0]);
-    let trackName = musicGuilds[guildId].queue[pos2].info.title;
+    let track = musicGuilds[guildId].queue[pos2];
     return {
         errored: false,
         code: "SUCCESS",
-        trackName: trackName,
+        track: track,
         originalPosition: pos1,
         newPosition: pos2
     };
