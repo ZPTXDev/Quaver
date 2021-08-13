@@ -210,6 +210,7 @@ async function play(guild, track, newQueue, resQueue) {
         return;
     }
     player.play(track);
+    player.setPause(false);
     if (!newQueue && !resQueue) {
         let currentTrack = musicGuilds[guild.id].queue[0];
         let durationTime = msToTime(currentTrack.info.length);
