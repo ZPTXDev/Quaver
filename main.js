@@ -542,17 +542,19 @@ bot.on("ready", () => {
                 voice = musicGuilds[guildId].voice;
                 player = await getPlayer(voice);
             }
-            // If it's a stream, what's the point of resuming?
-            // Simply play it again.
-            if (musicGuilds[guildId].queue[0].info.isStream) {
-                player.play(musicGuilds[guildId].queue[0].track);
+            if (musicGuilds[guildId].queue.length > 0) {
+                // If it's a stream, what's the point of resuming?
+                // Simply play it again.
+                if (musicGuilds[guildId].queue[0].info.isStream) {
+                    player.play(musicGuilds[guildId].queue[0].track);
+                }
+                // Else, we'll play it again and specify the start time as the last known position.
+                else {
+                    player.play(musicGuilds[guildId].queue[0].track, {startTime: currentPosition});
+                }
+                // Update the internal timestamp to match when we played the track.
+                bot.voiceConnections.get(guildId).timestamp -= currentPosition;
             }
-            // Else, we'll play it again and specify the start time as the last known position.
-            else {
-                player.play(musicGuilds[guildId].queue[0].track, {startTime: currentPosition});
-            }
-            // Update the internal timestamp to match when we played the track.
-            bot.voiceConnections.get(guildId).timestamp -= currentPosition;
             // Re-send volume and equalizer settings
             player.setVolume(musicGuilds[guildId].volume);
             let eqValues = [

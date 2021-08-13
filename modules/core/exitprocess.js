@@ -19,12 +19,14 @@ module.exports.action = function (details) {
         for (const guildId of Object.keys(musicGuilds)) {
             await musicGuilds[guildId].channel.createMessage({
                 embed: {
-                    description: "Quaver is restarting and will resume your track momentarily.",
+                    description: "Quaver is restarting and will resume your session momentarily.",
                     color: 0xf39bff
                 }
             });
-            let currentPosition = bot.voiceConnections.get(guildId).paused ? Math.min(bot.voiceConnections.get(guildId).state.position, musicGuilds[guildId].queue[0].info.length) : Math.min(bot.voiceConnections.get(guildId).state.position + (Date.now() - bot.voiceConnections.get(guildId).state.time), musicGuilds[guildId].queue[0].info.length);
-            musicGuilds[guildId].currentPosition = currentPosition;
+            if (musicGuilds[guildId].queue.length > 0) {
+                let currentPosition = bot.voiceConnections.get(guildId).paused ? Math.min(bot.voiceConnections.get(guildId).state.position, musicGuilds[guildId].queue[0].info.length) : Math.min(bot.voiceConnections.get(guildId).state.position + (Date.now() - bot.voiceConnections.get(guildId).state.time), musicGuilds[guildId].queue[0].info.length);
+                musicGuilds[guildId].currentPosition = currentPosition;
+            }
             musicData.set(guildId, musicGuilds[guildId]);
         }
         process.exit(0);
