@@ -45,7 +45,7 @@ module.exports.slash = {
     guildOnly: true
 }
 module.exports.slashAction = async function slashAction(ctx) {
-    let result = await common(ctx.guildID, ctx.user.id, "boost" in ctx.options ? ctx.options["boost"] : "");
+    let result = await common(ctx.guildID, ctx.user.id, "boost" in ctx.options ? ctx.options["boost"].toString() : "");
     if (result.errored) {
         await ctx.send({
             embeds: [
