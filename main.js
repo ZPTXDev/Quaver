@@ -491,6 +491,7 @@ bot.on("ready", () => {
                         const shifted = original.shift();
                         musicGuilds[guildId].queue = original;
                         delete musicGuilds[guildId].skip;
+                        delete musicGuilds[guildId].restarted;
                         delete musicGuilds[guildId].errored;
                         if (original.length === 0) {next = null;}
                         else {next = original[0].track;}
@@ -530,6 +531,7 @@ bot.on("ready", () => {
                     }
                     musicGuilds[guildId].queue = original;
                     delete musicGuilds[guildId].skip;
+                    delete musicGuilds[guildId].delete;
                     delete musicGuilds[guildId].errored;
                     if (original.length === 0) {next = null;}
                     else {next = original[0].track;}

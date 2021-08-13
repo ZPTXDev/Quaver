@@ -245,6 +245,7 @@ async function play(guild, track, newQueue, resQueue) {
             const shifted = original.shift();
             musicGuilds[guild.id].queue = original;
             delete musicGuilds[guild.id].skip;
+            delete musicGuilds[guild.id].restart;
             delete musicGuilds[guild.id].errored;
             if (original.length === 0) {next = null;}
             else {next = original[0].track;}
@@ -284,6 +285,7 @@ async function play(guild, track, newQueue, resQueue) {
         }
         musicGuilds[guild.id].queue = original;
         delete musicGuilds[guild.id].skip;
+        delete musicGuilds[guild.id].restart;
         delete musicGuilds[guild.id].errored;
         if (original.length === 0) {next = null;}
         else {next = original[0].track;}
