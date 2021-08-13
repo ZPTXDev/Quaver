@@ -99,21 +99,42 @@ async function common(guildId, userId, override) {
         newBoosted = false;
     }
     let eqValues = [
-        {"band": 0, "gain": 0},
-        {"band": 1, "gain": 0},
-        {"band": 2, "gain": 0},
-        {"band": 3, "gain": 0},
-        {"band": 4, "gain": 0},
-        {"band": 5, "gain": 0}
+        { "band": 0, "gain": 0 },
+        { "band": 1, "gain": 0 },
+        { "band": 2, "gain": 0 },
+        { "band": 3, "gain": 0 },
+        { "band": 4, "gain": 0 },
+        { "band": 5, "gain": 0 },
+        { "band": 6, "gain": 0 },
+        { "band": 7, "gain": 0 },
+        { "band": 8, "gain": 0 },
+        { "band": 9, "gain": 0 },
+        { "band": 10, "gain": 0 },
+        { "band": 11, "gain": 0 },
+        { "band": 12, "gain": 0 },
+        { "band": 13, "gain": 0 },
+        { "band": 14, "gain": 0 }
     ];
     if (newBoosted) {
         eqValues = [
-            {"band": 0, "gain": 1},
-            {"band": 1, "gain": 0.8},
-            {"band": 2, "gain": 0.6}
+            { "band": 0, "gain": 0.2 },
+            { "band": 1, "gain": 0.15 },
+            { "band": 2, "gain": 0.1 },
+            { "band": 3, "gain": 0.05 },
+            { "band": 4, "gain": 0.0 },
+            { "band": 5, "gain": -0.05 },
+            { "band": 6, "gain": -0.05 },
+            { "band": 7, "gain": -0.05 },
+            { "band": 8, "gain": -0.05 },
+            { "band": 9, "gain": -0.05 },
+            { "band": 10, "gain": -0.05 },
+            { "band": 11, "gain": -0.05 },
+            { "band": 12, "gain": -0.05 },
+            { "band": 13, "gain": -0.05 },
+            { "band": 14, "gain": -0.05 }
         ];
     }
-    await player.sendEvent({op: 'equalizer', guildId: this.guildId, bands: eqValues});
+    await player.sendEvent({op: 'equalizer', guildId: guildId, bands: eqValues});
     musicGuilds[guildId].boost = newBoosted;
     return {
         errored: false,
