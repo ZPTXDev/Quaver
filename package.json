@@ -10,7 +10,7 @@
     "lodash": "^4.17.21",
     "mysql2": "^2.3.0",
     "require-reload": "^0.2.2",
-    "slash-create": "^4.0.1",
+    "slash-create": "^4.3.0",
     "superagent": "^6.1.0",
     "utf8": "^3.0.0",
     "websocket": "^1.0.34"
