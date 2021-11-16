@@ -263,6 +263,103 @@ bot.on('interactionCreate', async interaction => {
 				});
 				break;
 			}
+			case 'cancel':
+				if (interaction.customId.split('_')[1] !== interaction.user.id) {
+					await interaction.reply({
+						embeds: [
+							new MessageEmbed()
+								.setDescription('That is not your interaction.')
+								.setColor('DARK_RED'),
+						],
+						ephemeral: true,
+					});
+					return;
+				}
+				await interaction.update({
+					embeds: [
+						new MessageEmbed()
+							.setDescription(`This interaction was canceled by <@${interaction.user.id}>.`)
+							.setColor('#f39bff'),
+					],
+					components: [],
+				});
+				break;
+		}
+	}
+	else if (interaction.isSelectMenu()) {
+		const type = interaction.customId.split('_')[0];
+		switch (type) {
+			case 'play': {
+				if (interaction.customId.split('_')[1] !== interaction.user.id) {
+					await interaction.reply({
+						embeds: [
+							new MessageEmbed()
+								.setDescription('That is not your interaction.')
+								.setColor('DARK_RED'),
+						],
+						ephemeral: true,
+					});
+					return;
+				}
+				const tracks = interaction.values;
+				let player = interaction.client.music.players.get(interaction.guildId);
+				if (!interaction.member?.voice.channelId) {
+					await interaction.reply({
+						embeds: [
+							new MessageEmbed()
+								.setDescription(checks.IN_VOICE)
+								.setColor('DARK_RED'),
+						],
+						ephemeral: true,
+					});
+					return;
+				}
+				if (player && interaction.member?.voice.channelId !== player.channelId) {
+					await interaction.reply({
+						embeds: [
+							new MessageEmbed()
+								.setDescription(checks.IN_SESSION_VOICE)
+								.setColor('DARK_RED'),
+						],
+						ephemeral: true,
+					});
+					return;
+				}
+				if (!player?.connected) {
+					player = interaction.client.music.createPlayer(interaction.guildId);
+					player.queue.channel = interaction.channel;
+					await player.connect(interaction.member.voice.channelId, { deafened: true });
+				}
+
+				const resolvedTracks = [];
+				for (const track of tracks) {
+					const results = await interaction.client.music.rest.loadTracks(track);
+					if (results.loadType === 'TRACK_LOADED') {
+						resolvedTracks.push(results.tracks[0]);
+					}
+				}
+				const firstPosition = player.queue.tracks.length + 1;
+				const endPosition = firstPosition + resolvedTracks.length - 1;
+				let msg;
+				if (resolvedTracks.length === 1) {
+					msg = `Added **[${resolvedTracks[0].info.title}](${resolvedTracks[0].info.uri})** to queue`;
+				}
+				else {
+					msg = `Added **${resolvedTracks.length}** tracks from **your search** to queue`;
+				}
+				player.queue.add(resolvedTracks, { requester: interaction.user.id });
+				const started = player.playing || player.paused;
+				await interaction.update({
+					embeds: [
+						new MessageEmbed()
+							.setDescription(msg)
+							.setColor('#f39bff')
+							.setFooter(started ? `Position: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : ''),
+					],
+					components: [],
+				});
+				if (!started) { await player.queue.start(); }
+			}
 		}
 	}
 });
