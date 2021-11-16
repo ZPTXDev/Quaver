@@ -87,7 +87,10 @@ module.exports = {
 			await player.connect(interaction.member.voice.channelId, { deafened: true });
 		}
 
-		const position = player.queue.add(tracks, { requester: interaction.user.id, insert });
+		const firstPosition = insert ? 1 : player.queue.tracks.length + 1;
+		const endPosition = firstPosition + tracks.length - 1;
+
+		player.queue.add(tracks, { requester: interaction.user.id, insert });
 
 		const started = player.playing || player.paused;
 		await interaction.editReply({
@@ -95,7 +98,7 @@ module.exports = {
 				new MessageEmbed()
 					.setDescription(msg)
 					.setColor('#f39bff')
-					.setFooter(started ? `Position: ${insert ? '1' : position}` : ''),
+					.setFooter(started ? `Position: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : ''),
 			],
 		});
 		if (!started) { await player.queue.start(); }
