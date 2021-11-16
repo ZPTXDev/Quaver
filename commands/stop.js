@@ -15,6 +15,7 @@ module.exports = {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		player.queue.clear();
 		await player.queue.skip();
+		await player.queue.start();
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
