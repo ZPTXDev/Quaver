@@ -7,10 +7,10 @@ const { applicationId, token } = require('./settings.json');
 const rest = new REST({ version: '9' }).setToken(token);
 
 (async () => {
-	const data = await rest.get(Routes.applicationGuildCommands(applicationId));
+	const data = await rest.get(Routes.applicationCommands(applicationId));
 	const promises = [];
 	for (const command of data) {
-		const deleteUrl = `${Routes.applicationGuildCommands(applicationId)}/${command.id}`;
+		const deleteUrl = `${Routes.applicationCommands(applicationId)}/${command.id}`;
 		promises.push(rest.delete(deleteUrl));
 	}
 	return Promise.all(promises);
