@@ -100,16 +100,19 @@ bot.music.on('trackEnd', (queue) => {
 	delete queue.player.skip;
 });
 
-bot.on('ready', () => {
+bot.on('ready', async () => {
 	if (!startup) {
-		bot.music.connect(bot.user.id);
 		console.log(`[Quaver] Connected to Discord! Logged in as ${bot.user.tag}.`);
 		console.log(`[Quaver] Running version ${version}. For help, see https://github.com/ZapSquared/Quaver/issues.`);
+		bot.music.connect(bot.user.id);
 		startup = true;
 	}
 	else {
 		console.log('[Quaver] Lost connection to Discord. Attempting to resume sessions now.');
-		// TODO: Code here
+		for (const pair of bot.music.players) {
+			const player = pair[1];
+			await player.resume();
+		}
 	}
 });
 
