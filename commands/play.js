@@ -12,7 +12,7 @@ module.exports = {
 		.addStringOption(option =>
 			option
 				.setName('query')
-				.setDescription('What to search for. Prepend ytsearch: for YouTube, scsearch: for SoundCloud, or specify a link.')
+				.setDescription('What to search for. Links from Spotify, YouTube and more are supported. Searches YouTube by default.')
 				.setRequired(true))
 		.addBooleanOption(option =>
 			option
