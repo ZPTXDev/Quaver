@@ -35,6 +35,7 @@ module.exports = {
 			embeds: [
 				new MessageEmbed()
 					.setDescription(`Bass boost **${player.bassboost ? 'enabled' : 'disabled'}**`)
+					.setFooter('This may take a few seconds to apply')
 					.setColor('#f39bff'),
 			],
 		});

@@ -32,6 +32,7 @@ module.exports = {
 			embeds: [
 				new MessageEmbed()
 					.setDescription(`Nightcore **${player.nightcore ? 'enabled' : 'disabled'}**`)
+					.setFooter('This may take a few seconds to apply')
 					.setColor('#f39bff'),
 			],
 		});

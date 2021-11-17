@@ -36,6 +36,7 @@ module.exports = {
 			embeds: [
 				new MessageEmbed()
 					.setDescription(`Volume adjusted to \`${newvolume}%\``)
+					.setFooter('This may take a few seconds to apply')
 					.setColor('#f39bff'),
 			],
 		});
