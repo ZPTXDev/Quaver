@@ -19,7 +19,7 @@ module.exports = {
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const channel = interaction.options.getChannel('channel');
-		if (channel.text !== 'GUILD_TEXT') {
+		if (channel.type !== 'GUILD_TEXT') {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
