@@ -36,8 +36,6 @@ for (const file of commandFiles) {
 }
 let startup = false;
 
-module.exports = { version };
-
 bot.music.on('connect', () => {
 	console.log('[Quaver] Connected to Lavalink!');
 });
