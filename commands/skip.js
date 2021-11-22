@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
+const { defaultColor } = require('../settings.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -20,7 +21,7 @@ module.exports = {
 				embeds: [
 					new MessageEmbed()
 						.setDescription(`Skipped **[${track.title}](${track.uri})**`)
-						.setColor('#f39bff'),
+						.setColor(defaultColor),
 				],
 			});
 			return;
@@ -45,7 +46,7 @@ module.exports = {
 				embeds: [
 					new MessageEmbed()
 						.setDescription(`Skipped **[${track.title}](${track.uri})** by voting\nAdded by <@${track.requester}>`)
-						.setColor('#f39bff'),
+						.setColor(defaultColor),
 				],
 			});
 			await player.queue.next();
@@ -56,7 +57,7 @@ module.exports = {
 			embeds: [
 				new MessageEmbed()
 					.setDescription(`Voted to skip **[${player.queue.current.title}](${player.queue.current.uri})** \`[${skip.users.length} / ${skip.required}]\``)
-					.setColor('#f39bff'),
+					.setColor(defaultColor),
 			],
 		});
 	},

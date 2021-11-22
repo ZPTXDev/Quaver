@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed, MessageActionRow, MessageSelectMenu, MessageButton } = require('discord.js');
 const { checks } = require('../enums.js');
 const { msToTime, msToTimeString } = require('../functions.js');
+const { defaultColor } = require('../settings.json');
 
 // credit: https://github.com/lavaclient/djs-v13-example/blob/main/src/commands/Play.ts
 
@@ -54,7 +55,7 @@ module.exports = {
 						const durationString = track.info.isStream ? '∞' : msToTimeString(duration, true);
 						return `\`${(index + 1).toString().padStart(tracks.length.toString().length, ' ')}.\` **[${track.info.title}](${track.info.uri})** \`[${durationString}]\``;
 					}).join('\n'))
-					.setColor('#f39bff'),
+					.setColor(defaultColor),
 			],
 			components: [
 				new MessageActionRow()

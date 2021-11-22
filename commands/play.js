@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { SpotifyItemType } = require('@lavaclient/spotify');
 const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
+const { defaultColor } = require('../settings.json');
 
 // credit: https://github.com/lavaclient/djs-v13-example/blob/main/src/commands/Play.ts
 
@@ -97,7 +98,7 @@ module.exports = {
 			embeds: [
 				new MessageEmbed()
 					.setDescription(msg)
-					.setColor('#f39bff')
+					.setColor(defaultColor)
 					.setFooter(started ? `Position: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : ''),
 			],
 		});

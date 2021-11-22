@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { LoopType } = require('@lavaclient/queue');
 const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
+const { defaultColor } = require('../settings.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -40,7 +41,7 @@ module.exports = {
 			embeds: [
 				new MessageEmbed()
 					.setDescription(`Looping mode set to **${type}**`)
-					.setColor('#f39bff'),
+					.setColor(defaultColor),
 			],
 		});
 	},

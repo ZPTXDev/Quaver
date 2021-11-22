@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
+const { defaultColor } = require('../settings.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -29,7 +30,7 @@ module.exports = {
 			embeds: [
 				new MessageEmbed()
 					.setDescription('The player has been paused.')
-					.setColor('#f39bff'),
+					.setColor(defaultColor),
 			],
 		});
 	},

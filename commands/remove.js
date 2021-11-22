@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
+const { defaultColor } = require('../settings.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -57,7 +58,7 @@ module.exports = {
 			embeds: [
 				new MessageEmbed()
 					.setDescription(`Removed **[${track.title}](${track.uri})**`)
-					.setColor('#f39bff'),
+					.setColor(defaultColor),
 			],
 		});
 	},

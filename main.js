@@ -2,7 +2,7 @@ require('@lavaclient/queue/register');
 const { Client, Intents, Collection, MessageEmbed, MessageButton } = require('discord.js');
 const { Node } = require('lavaclient');
 const { load } = require('@lavaclient/spotify');
-const { token, lavalink, spotify } = require('./settings.json');
+const { token, lavalink, spotify, defaultColor } = require('./settings.json');
 const fs = require('fs');
 const { version } = require('./package.json');
 const { checks } = require('./enums.js');
@@ -52,7 +52,7 @@ bot.music.on('queueFinish', queue => {
 			embeds: [
 				new MessageEmbed()
 					.setDescription('Disconnected from inactivity.')
-					.setColor('#f39bff'),
+					.setColor(defaultColor),
 			],
 		});
 	}, 1800000, queue.player);
@@ -60,7 +60,7 @@ bot.music.on('queueFinish', queue => {
 		embeds: [
 			new MessageEmbed()
 				.setDescription(`There's nothing left in the queue. I'll leave <t:${Math.floor(Date.now() / 1000) + 1800}:R>.`)
-				.setColor('#f39bff'),
+				.setColor(defaultColor),
 		],
 	});
 });
@@ -78,7 +78,7 @@ bot.music.on('trackStart', (queue, song) => {
 			embeds: [
 				new MessageEmbed()
 					.setDescription('Disconnected as everyone left.')
-					.setColor('#f39bff'),
+					.setColor(defaultColor),
 			],
 		});
 		return;
@@ -89,7 +89,7 @@ bot.music.on('trackStart', (queue, song) => {
 		embeds: [
 			new MessageEmbed()
 				.setDescription(`Now playing **[${song.title}](${song.uri})** \`[${durationString}]\`\nAdded by <@${song.requester}>`)
-				.setColor('#f39bff'),
+				.setColor(defaultColor),
 		],
 	});
 });
@@ -277,7 +277,7 @@ bot.on('interactionCreate', async interaction => {
 					embeds: [
 						new MessageEmbed()
 							.setDescription(`This interaction was canceled by <@${interaction.user.id}>.`)
-							.setColor('#f39bff'),
+							.setColor(defaultColor),
 					],
 					components: [],
 				});
@@ -351,7 +351,7 @@ bot.on('interactionCreate', async interaction => {
 					embeds: [
 						new MessageEmbed()
 							.setDescription(msg)
-							.setColor('#f39bff')
+							.setColor(defaultColor)
 							.setFooter(started ? `Position: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : ''),
 					],
 					components: [],

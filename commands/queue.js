@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
 const { checks } = require('../enums.js');
 const { paginate, msToTime, msToTimeString } = require('../functions.js');
+const { defaultColor } = require('../settings.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -34,7 +35,7 @@ module.exports = {
 						const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
 						return `\`${index + 1}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 					}).join('\n'))
-					.setColor('#f39bff')
+					.setColor(defaultColor)
 					.setFooter(`Page 1 of ${pages.length}`),
 			],
 			components: [

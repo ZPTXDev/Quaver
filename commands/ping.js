@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
+const { defaultColor } = require('../settings.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -15,7 +16,7 @@ module.exports = {
 			embeds: [
 				new MessageEmbed()
 					.setDescription(`Pong!${interaction.guild ? `${interaction.guild.shard.ping}ms` : ''}`)
-					.setColor('#f39bff'),
+					.setColor(defaultColor),
 			],
 		});
 	},

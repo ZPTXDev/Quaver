@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
+const { defaultColor } = require('../settings.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -36,7 +37,7 @@ module.exports = {
 				new MessageEmbed()
 					.setDescription(`Bass boost **${player.bassboost ? 'enabled' : 'disabled'}**`)
 					.setFooter('This may take a few seconds to apply')
-					.setColor('#f39bff'),
+					.setColor(defaultColor),
 			],
 		});
 	},

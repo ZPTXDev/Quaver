@@ -3,6 +3,7 @@ const { LoopType } = require('@lavaclient/queue');
 const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
 const { getBar, msToTime, msToTimeString } = require('../functions.js');
+const { defaultColor } = require('../settings.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -40,7 +41,7 @@ module.exports = {
 				embeds: [
 					new MessageEmbed()
 						.setDescription(`**[${player.queue.current.title}](${player.queue.current.uri})**\n🔴 **LIVE** ${'▬'.repeat(10)}${player.paused ? ' ⏸️' : ''}${player.queue.loop.type !== LoopType.None ? ` ${player.queue.loop.type === LoopType.Queue ? '🔁' : '🔂'}` : ''}${player.bassboost ? ' 🅱️' : ''}\n\`[Streaming]\` | Added by <@${player.queue.current.requester}>`)
-						.setColor('#f39bff'),
+						.setColor(defaultColor),
 				],
 			});
 			return;
@@ -49,7 +50,7 @@ module.exports = {
 			embeds: [
 				new MessageEmbed()
 					.setDescription(`**[${player.queue.current.title}](${player.queue.current.uri})**\n${bar}${player.paused ? ' ⏸️' : ''}${player.queue.loop.type !== LoopType.None ? ` ${player.queue.loop.type === LoopType.Queue ? '🔁' : '🔂'}` : ''}${player.bassboost ? ' 🅱️' : ''}${player.nightcore ? ' 🇳' : ''}\n\`[${elapsedString} / ${durationString}]\` | Added by <@${player.queue.current.requester}>`)
-					.setColor('#f39bff'),
+					.setColor(defaultColor),
 			],
 		});
 	},
