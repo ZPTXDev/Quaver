@@ -17,7 +17,7 @@ module.exports = {
 			embeds: [
 				new MessageEmbed()
 					.setTitle('Quaver')
-					.setDescription(`A music bot, part of the ZapSquared Network.\nSource code available [here](https://go.zptx.icu/Quaver), invite [here](${interaction.client.generateInvite({ permissions: [Permissions.FLAGS.ADMINISTRATOR], scopes: ['bot', 'applications.commands'] })}).\nRunning version \`${version}\`.`)
+					.setDescription(`Open-source music bot for small communities.\nSource code available [here](https://go.zptx.icu/Quaver), invite [here](${interaction.client.generateInvite({ permissions: [Permissions.FLAGS.ADMINISTRATOR], scopes: ['bot', 'applications.commands'] })}).\nRunning version \`${version}\`.`)
 					.setColor(defaultColor)
 					.setThumbnail(interaction.client.user.avatarURL({ format: 'png' })),
 			],
