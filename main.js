@@ -103,6 +103,7 @@ bot.on('ready', async () => {
 		console.log(`[Quaver] Connected to Discord! Logged in as ${bot.user.tag}.`);
 		console.log(`[Quaver] Running version ${version}. For help, see https://github.com/ZapSquared/Quaver/issues.`);
 		bot.music.connect(bot.user.id);
+		bot.user.setActivity(version);
 		startup = true;
 	}
 	else {
