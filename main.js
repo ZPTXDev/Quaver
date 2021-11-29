@@ -371,4 +371,12 @@ bot.on('interactionCreate', async interaction => {
 	}
 });
 
+bot.on('guildCreate', guild => {
+	console.log(`[G ${guild.id}] Joined ${guild.name}`);
+});
+
+bot.on('guildDelete', guild => {
+	console.log(`[G ${guild.id}] Left ${guild.name}`);
+});
+
 bot.login(token);
