@@ -14,6 +14,7 @@ module.exports = {
 	},
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
+		clearTimeout(player.timeout);
 		player.disconnect();
 		interaction.client.music.destroyPlayer(interaction.guildId);
 		await interaction.reply({
