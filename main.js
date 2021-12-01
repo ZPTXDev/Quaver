@@ -123,7 +123,7 @@ bot.on('interactionCreate', async interaction => {
 	if (interaction.isCommand()) {
 		const command = bot.commands.get(interaction.commandName);
 		if (!command) return;
-		console.log(`[U ${interaction.user.id}] Processing command ${interaction.commandName}`);
+		console.log(`[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing command ${interaction.commandName}`);
 		const failedChecks = [];
 		for (const check of command.checks) {
 			switch (check) {
@@ -158,7 +158,7 @@ bot.on('interactionCreate', async interaction => {
 			}
 		}
 		if (failedChecks.length > 0) {
-			console.log(`[U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedChecks.length} checks`);
+			console.log(`[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedChecks.length} checks`);
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
@@ -203,11 +203,11 @@ bot.on('interactionCreate', async interaction => {
 			return;
 		}
 		try {
-			console.log(`[U ${interaction.user.id}] Executing command ${interaction.commandName}`);
+			console.log(`[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Executing command ${interaction.commandName}`);
 			await command.execute(interaction);
 		}
 		catch (err) {
-			console.log(`[U ${interaction.user.id}] Encountered error with command ${interaction.commandName}`);
+			console.log(`[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with command ${interaction.commandName}`);
 			console.error(err);
 			await interaction.reply({
 				embeds: [
