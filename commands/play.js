@@ -91,7 +91,7 @@ module.exports = {
 		const firstPosition = insert ? 1 : player.queue.tracks.length + 1;
 		const endPosition = firstPosition + tracks.length - 1;
 
-		player.queue.add(tracks, { requester: interaction.user.id, insert });
+		player.queue.add(tracks, { requester: interaction.user.id, next: insert });
 
 		const started = player.playing || player.paused;
 		await interaction.editReply({
