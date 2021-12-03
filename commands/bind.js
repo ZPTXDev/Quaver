@@ -35,7 +35,7 @@ module.exports = {
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(`Binded to <#${channel.id}>`)
+					.setDescription(`Bound to <#${channel.id}>`)
 					.setColor(defaultColor),
 			],
 		});
