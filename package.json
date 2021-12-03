@@ -1,6 +1,6 @@
 {
   "name": "quaver",
-  "version": "2.0.3",
+  "version": "2.1.0",
   "engines": {
     "node": ">=16.0.0"
   },
@@ -17,11 +17,6 @@
     "eslint": "^8.3.0"
   },
   "release": {
-    "tagFormat": "${version}",
-    "plugins": [
-      "@semantic-release/commit-analyzer",
-      "@semantic-release/release-notes-generator",
-      "@semantic-release/github"
-    ]
+    "tagFormat": "${version}"
   }
 }
