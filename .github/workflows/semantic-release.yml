@@ -15,5 +15,7 @@ jobs:
               'master',
               {name: 'next', prerelease: true},
             ]
+          extra_plugins: |
+            @semantic-release/git
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
