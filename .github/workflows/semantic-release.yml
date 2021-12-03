@@ -1,3 +1,6 @@
+name: Semantic Release Action
+on: push
+
 steps:
   - name: Checkout
     uses: actions/checkout@v2
