@@ -15,7 +15,7 @@ module.exports = {
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(`Pong!${interaction.guild ? `${interaction.guild.shard.ping}ms` : ''}`)
+					.setDescription(`Pong!${interaction.guild ? ` ${interaction.guild.shard.ping}ms` : ''}`)
 					.setColor(defaultColor),
 			],
 		});
