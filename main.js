@@ -403,7 +403,7 @@ async function shuttingDown() {
 			await player.queue.channel.send({
 				embeds: [
 					new MessageEmbed()
-						.setDescription('Quaver is restarting and will disconnect.\nYour queue data will not be saved.')
+						.setDescription(`Quaver is restarting and will disconnect.${fileBuffer.length > 0 ? '\nYour queue data will be attached.' : ''}`)
 						.setFooter('Sorry for the inconvenience caused.')
 						.setColor(defaultColor),
 				],
