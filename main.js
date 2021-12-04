@@ -3,7 +3,8 @@ const { Client, Intents, Collection, MessageEmbed, MessageButton } = require('di
 const { Node } = require('lavaclient');
 const { load } = require('@lavaclient/spotify');
 const { token, lavalink, spotify, defaultColor } = require('./settings.json');
-const fs = require('fs').promises;
+const fs = require('fs');
+const fsPromises = require('fs').promises;
 const { version } = require('./package.json');
 const { checks } = require('./enums.js');
 const { msToTime, msToTimeString, paginate } = require('./functions.js');
@@ -420,7 +421,7 @@ async function shuttingDown(err) {
 	}
 	if (err) {
 		console.log('[Quaver] Logging error to error.log.');
-		await fs.writeFile('error.log', err);
+		await fsPromises.writeFile('error.log', err);
 	}
 	bot.destroy();
 	process.exit();
