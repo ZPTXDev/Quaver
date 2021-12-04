@@ -3,7 +3,7 @@ const { Client, Intents, Collection, MessageEmbed, MessageButton } = require('di
 const { Node } = require('lavaclient');
 const { load } = require('@lavaclient/spotify');
 const { token, lavalink, spotify, defaultColor } = require('./settings.json');
-const fs = require('fs');
+const fs = require('fs').promises;
 const { version } = require('./package.json');
 const { checks } = require('./enums.js');
 const { msToTime, msToTimeString, paginate } = require('./functions.js');
@@ -382,7 +382,7 @@ bot.on('guildDelete', guild => {
 bot.login(token);
 
 let inprg = false;
-async function shuttingDown() {
+async function shuttingDown(err) {
 	if (inprg) return;
 	inprg = true;
 	console.log('[Quaver] Shutting down...');
@@ -403,7 +403,7 @@ async function shuttingDown() {
 			await player.queue.channel.send({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(`Quaver is restarting and will disconnect.${fileBuffer.length > 0 ? '\nYour queue data will be attached.' : ''}`)
+						.setDescription(`Quaver is restarting and will disconnect.${fileBuffer.length > 0 ? '\nYour queue data has been attached.' : ''}`)
 						.setFooter('Sorry for the inconvenience caused.')
 						.setColor(defaultColor),
 				],
@@ -418,10 +418,14 @@ async function shuttingDown() {
 			bot.music.destroyPlayer(player.guildId);
 		}
 	}
+	if (err) {
+		console.log('[Quaver] Logging error to error.log.');
+		await fs.writeFile('error.log', err);
+	}
 	bot.destroy();
 	process.exit();
 }
 
-['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'uncaughtException', 'SIGTERM'].forEach(eventType => {
+['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM', 'uncaughtException', 'unhandledRejection'].forEach(eventType => {
 	process.on(eventType, shuttingDown);
 });
