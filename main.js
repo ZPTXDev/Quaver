@@ -380,3 +380,48 @@ bot.on('guildDelete', guild => {
 });
 
 bot.login(token);
+
+let inprg = false;
+async function shuttingDown() {
+	if (inprg) return;
+	inprg = true;
+	console.log('[Quaver] Shutting down...');
+	if (startup) {
+		console.log('[Quaver] Disconnecting from all guilds...');
+		for (const pair of bot.music.players) {
+			const player = pair[1];
+			console.log(`[G ${player.guildId}] Disconnecting (restarting)`);
+			const fileBuffer = [];
+			if (player.queue.tracks.length > 0 || player.queue.current && (player.playing || player.paused)) {
+				fileBuffer.push('Current:');
+				fileBuffer.push(player.queue.current.uri);
+				if (player.queue.tracks.length > 0) {
+					fileBuffer.push('Queue:');
+					fileBuffer.push(player.queue.tracks.map(track => track.uri).join('\n'));
+				}
+			}
+			await player.queue.channel.send({
+				embeds: [
+					new MessageEmbed()
+						.setDescription('Quaver is restarting and will disconnect.\nYour queue data will not be saved.')
+						.setFooter('Sorry for the inconvenience caused.')
+						.setColor(defaultColor),
+				],
+				files: fileBuffer.length > 0 ? [
+					{
+						attachment: Buffer.from(fileBuffer.join('\n')),
+						name: 'queue.txt',
+					},
+				] : [],
+			});
+			player.disconnect();
+			bot.music.destroyPlayer(player.guildId);
+		}
+	}
+	bot.destroy();
+	process.exit();
+}
+
+['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'uncaughtException', 'SIGTERM'].forEach(eventType => {
+	process.on(eventType, shuttingDown);
+});
