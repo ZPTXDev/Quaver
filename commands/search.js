@@ -63,7 +63,13 @@ module.exports = {
 						new MessageSelectMenu()
 							.setCustomId(`play_${interaction.user.id}`)
 							.setPlaceholder('Pick track(s)')
-							.addOptions(tracks.map((track, index) => {return { label: `${index + 1}. ${track.info.title}`, description: track.info.author, value: track.info.identifier };}))
+							.addOptions(tracks.map((track, index) => {
+								let label = `${index + 1}. ${track.info.title}`;
+								if (label.length >= 100) {
+									label = `${label.substring(0, 97)}...`;
+								}
+								return { label: label, description: track.info.author, value: track.info.identifier };
+							}))
 							.setMinValues(1)
 							.setMaxValues(Math.min(tracks.length, 10)),
 					),
