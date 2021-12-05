@@ -383,7 +383,7 @@ bot.on('guildDelete', guild => {
 bot.login(token);
 
 let inprg = false;
-async function shuttingDown(err) {
+async function shuttingDown(eventType, err) {
 	if (inprg) return;
 	inprg = true;
 	console.log('[Quaver] Shutting down...');
@@ -419,9 +419,14 @@ async function shuttingDown(err) {
 			bot.music.destroyPlayer(player.guildId);
 		}
 	}
-	if (err) {
+	if (['uncaughtException', 'unhandledRejection'].includes(eventType) && err) {
 		console.log('[Quaver] Logging error to error.log.');
-		await fsPromises.writeFile('error.log', err);
+		try {
+			await fsPromises.writeFile('error.log', err.toString());
+		}
+		catch (e) {
+			console.error(`[Quaver] Encountered error while writing to error.log:\n${e}`);
+		}
 	}
 	bot.destroy();
 	process.exit();
