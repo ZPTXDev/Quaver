@@ -75,19 +75,6 @@ bot.music.on('trackStart', (queue, song) => {
 		clearTimeout(queue.player.timeout);
 		delete queue.player.timeout;
 	}
-	if (bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).members?.filter(m => !m.user.bot).size < 1) {
-		console.log(`[G ${queue.player.guildId}] Disconnecting (alone)`);
-		queue.player.disconnect();
-		bot.music.destroyPlayer(queue.player.guildId);
-		queue.channel.send({
-			embeds: [
-				new MessageEmbed()
-					.setDescription('Disconnected as everyone left.')
-					.setColor(defaultColor),
-			],
-		});
-		return;
-	}
 	const duration = msToTime(song.length);
 	const durationString = song.isStream ? '∞' : msToTimeString(duration, true);
 	queue.channel.send({
@@ -101,6 +88,19 @@ bot.music.on('trackStart', (queue, song) => {
 
 bot.music.on('trackEnd', queue => {
 	delete queue.player.skip;
+	if (bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).members?.filter(m => !m.user.bot).size < 1) {
+		console.log(`[G ${queue.player.guildId}] Disconnecting (alone)`);
+		queue.player.disconnect();
+		bot.music.destroyPlayer(queue.player.guildId);
+		queue.channel.send({
+			embeds: [
+				new MessageEmbed()
+					.setDescription('Disconnected as everyone left.')
+					.setColor(defaultColor),
+			],
+		});
+		return;
+	}
 });
 
 bot.on('ready', async () => {
