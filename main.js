@@ -380,7 +380,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 	const player = bot.music.players.get(guild.id);
 	// cancel pause timeout
 	if (newState.channelId === player?.channelId && player?.pauseTimeout) {
-		player.pause(false);
+		player.resume();
 		if (player.pauseTimeout) {
 			clearTimeout(player.pauseTimeout);
 			delete player.pauseTimeout;
