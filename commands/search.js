@@ -15,7 +15,7 @@ module.exports = {
 				.setName('query')
 				.setDescription('What to search for.')
 				.setRequired(true)),
-	checks: [checks.GUILD_ONLY, checks.IN_VOICE, checks.IN_SESSION_VOICE],
+	checks: [checks.GUILD_ONLY],
 	permissions: {
 		user: [],
 		bot: ['CONNECT', 'SPEAK'],
