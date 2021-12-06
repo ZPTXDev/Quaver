@@ -99,7 +99,7 @@ bot.music.on('trackStart', (queue, song) => {
 	});
 });
 
-bot.music.on('trackEnd', (queue) => {
+bot.music.on('trackEnd', queue => {
 	delete queue.player.skip;
 });
 
