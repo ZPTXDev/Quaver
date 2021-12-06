@@ -25,7 +25,7 @@ module.exports = {
 			});
 			return;
 		}
-		player.pause(true);
+		player.pause();
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
