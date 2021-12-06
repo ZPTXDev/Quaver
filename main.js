@@ -333,6 +333,7 @@ bot.on('interactionCreate', async interaction => {
 					});
 					return;
 				}
+				await interaction.deferUpdate();
 				if (!player?.connected) {
 					player = interaction.client.music.createPlayer(interaction.guildId);
 					player.queue.channel = interaction.channel;
@@ -357,7 +358,7 @@ bot.on('interactionCreate', async interaction => {
 				}
 				player.queue.add(resolvedTracks, { requester: interaction.user.id });
 				const started = player.playing || player.paused;
-				await interaction.update({
+				await interaction.editReply({
 					embeds: [
 						new MessageEmbed()
 							.setDescription(msg)
