@@ -385,6 +385,13 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			clearTimeout(player.pauseTimeout);
 			delete player.pauseTimeout;
 		}
+		await player.queue.channel.send({
+			embeds: [
+				new MessageEmbed()
+					.setDescription('Resuming your session.')
+					.setColor(defaultColor),
+			],
+		});
 		return;
 	}
 	// user has nothing to do with us
