@@ -422,7 +422,7 @@ async function shuttingDown(eventType, err) {
 	if (err) {
 		console.log('[Quaver] Logging additional output to error.log.');
 		try {
-			await fsPromises.writeFile('error.log', err.toString());
+			await fsPromises.writeFile('error.log', (await err).toString());
 		}
 		catch (e) {
 			console.error(`[Quaver] Encountered error while writing to error.log:\n${e}`);
