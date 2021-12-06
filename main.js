@@ -373,6 +373,54 @@ bot.on('interactionCreate', async interaction => {
 	}
 });
 
+bot.on('voiceStateUpdate', async (oldState, newState) => {
+	// is a bot
+	if (oldState.member.user.bot) return;
+	const guild = oldState.guild;
+	const player = bot.music.players.get(guild.id);
+	// cancel pause timeout
+	if (newState.channelId === player?.channelId && player?.pauseTimeout) {
+		player.pause(false);
+		if (player.pauseTimeout) {
+			clearTimeout(player.pauseTimeout);
+			delete player.pauseTimeout;
+		}
+		return;
+	}
+	// user has nothing to do with us
+	if (oldState.channelId !== player?.channelId) return;
+	// user didn't leave the vc
+	if (newState.channelId === oldState.channelId) return;
+	// vc still has people
+	if (oldState.channel.members.filter(m => !m.user.bot).size >= 1) return;
+	await player.pause();
+	console.log(`[G ${player.guildId}] Setting pause timeout`);
+	if (player.pauseTimeout) {
+		clearTimeout(player.pauseTimeout);
+	}
+	player.pauseTimeout = setTimeout(p => {
+		console.log(`[G ${p.guildId}] Disconnecting (inactivity)`);
+		const channel = p.queue.channel;
+		p.disconnect();
+		bot.music.destroyPlayer(p.guildId);
+		channel.send({
+			embeds: [
+				new MessageEmbed()
+					.setDescription('Disconnected from inactivity.')
+					.setColor(defaultColor),
+			],
+		});
+	}, 300000, player);
+	await player.queue.channel.send({
+		embeds: [
+			new MessageEmbed()
+				.setDescription(`There's nobody here. I'll leave <t:${Math.floor(Date.now() / 1000) + 300}:R>.`)
+				.setFooter('Rejoin to resume your session.')
+				.setColor(defaultColor),
+		],
+	});
+});
+
 bot.on('guildCreate', guild => {
 	console.log(`[G ${guild.id}] Joined ${guild.name}`);
 });
