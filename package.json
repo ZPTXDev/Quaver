@@ -38,7 +38,7 @@
         }
       ],
       "@semantic-release/github",
-      "semantic-release-github-milestones"
+      "zapteryx/semantic-release-github-milestones"
     ]
   }
 }
