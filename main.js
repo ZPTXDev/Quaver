@@ -8,6 +8,17 @@ const fsPromises = require('fs').promises;
 const { version } = require('./package.json');
 const { checks } = require('./enums.js');
 const { msToTime, msToTimeString, paginate } = require('./functions.js');
+const readline = require('readline');
+
+const rl = readline.createInterface({
+	input: process.stdin,
+	output: process.stdout,
+});
+rl.on('line', line => {
+	if (line === 'exit') {
+		process.exit();
+	}
+});
 
 load({
 	client: {
