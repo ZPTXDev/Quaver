@@ -17,6 +17,6 @@ jobs:
             ]
           extra_plugins: |
             @semantic-release/git
-            zapteryx/semantic-release-github-milestones
+            zapteryx/semantic-release-github-milestones --save-dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
