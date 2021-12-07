@@ -17,5 +17,6 @@ jobs:
             ]
           extra_plugins: |
             @semantic-release/git
+            semantic-release-github-milestones
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
