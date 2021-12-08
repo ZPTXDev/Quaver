@@ -345,7 +345,7 @@ bot.on('interactionCreate', async interaction => {
 					return;
 				}
 				// check for connect, speak permission for channel
-				if (!interaction.member?.voice.permissionsFor(bot.user.id).has(['CONNECT', 'SPEAK'])) {
+				if (!interaction.member?.voice.channel.permissionsFor(bot.user.id).has(['CONNECT', 'SPEAK'])) {
 					await interaction.reply({
 						embeds: [
 							new MessageEmbed()
