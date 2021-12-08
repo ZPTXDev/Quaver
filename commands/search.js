@@ -18,7 +18,7 @@ module.exports = {
 	checks: [checks.GUILD_ONLY],
 	permissions: {
 		user: [],
-		bot: ['CONNECT', 'SPEAK'],
+		bot: [],
 	},
 	async execute(interaction) {
 		await interaction.deferReply();

@@ -344,6 +344,18 @@ bot.on('interactionCreate', async interaction => {
 					});
 					return;
 				}
+				// check for connect, speak permission for channel
+				if (!interaction.member?.voice.permissionsFor(bot.user.id).has(['CONNECT', 'SPEAK'])) {
+					await interaction.reply({
+						embeds: [
+							new MessageEmbed()
+								.setDescription('I need to be able to connect and speak in the voice channel.')
+								.setColor('DARK_RED'),
+						],
+						ephemeral: true,
+					});
+					return;
+				}
 				await interaction.deferUpdate();
 				if (!player?.connected) {
 					player = interaction.client.music.createPlayer(interaction.guildId);
