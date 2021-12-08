@@ -462,7 +462,7 @@ bot.on('guildDelete', guild => {
 bot.login(token);
 
 let inprg = false;
-async function shuttingDown(err) {
+async function shuttingDown(eventType, err) {
 	if (inprg) return;
 	inprg = true;
 	console.log('[Quaver] Shutting down...');
@@ -483,7 +483,7 @@ async function shuttingDown(err) {
 			await player.queue.channel.send({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(`Quaver is restarting and will disconnect.${fileBuffer.length > 0 ? '\nYour queue data has been attached.' : ''}`)
+						.setDescription(`Quaver ${['exit', 'SIGINT'].includes(eventType) ? 'is restarting' : 'has crashed'} and will disconnect.${fileBuffer.length > 0 ? '\nYour queue data has been attached.' : ''}`)
 						.setFooter('Sorry for the inconvenience caused.')
 						.setColor(defaultColor),
 				],
@@ -512,5 +512,5 @@ async function shuttingDown(err) {
 }
 
 ['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM', 'uncaughtException', 'unhandledRejection'].forEach(eventType => {
-	process.on(eventType, shuttingDown);
+	process.on(eventType, err => shuttingDown(eventType, err));
 });
