@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { defaultColor } = require('../settings.json');
 const { msToTime, msToTimeString } = require('../functions.js');
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('ping')
