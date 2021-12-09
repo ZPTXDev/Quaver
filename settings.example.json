@@ -8,7 +8,8 @@
   "lavalink": {
     "host": "localhost",
     "port": 12345,
-    "password": "youshallnotpass"
+    "password": "youshallnotpass",
+    "secure: "true"
   },
   "spotify": {
     "client_id": "Paste Spotify Client ID here",
