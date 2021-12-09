@@ -9,7 +9,7 @@
     "host": "localhost",
     "port": 12345,
     "password": "youshallnotpass",
-    "secure: "true"
+    "secure": "true"
   },
   "spotify": {
     "client_id": "Paste Spotify Client ID here",
