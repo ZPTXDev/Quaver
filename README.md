@@ -41,4 +41,4 @@ Most probably not. They've only been targetting the larger bots so far, but if y
 Yes, if it is meaningful. Submit an issue [here](https://github.com/ZapSquared/Quaver/issues) and I'll take a look.
 
 # Contributing
-Feel free to create a PR. If it's a meaningful addition, I'll merge it.
+Refer to [CONTRIBUTING.md](CONTRIBUTING.md).
