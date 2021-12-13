@@ -346,7 +346,8 @@ bot.on('interactionCreate', async interaction => {
 					return;
 				}
 				// check for connect, speak permission for channel
-				if (!interaction.member?.voice.channel.permissionsFor(bot.user.id).has(['CONNECT', 'SPEAK'])) {
+				const permissions = interaction.member?.voice.channel.permissionsFor(bot.user.id);
+				if (!permissions.has(['CONNECT', 'SPEAK'])) {
 					await interaction.reply({
 						embeds: [
 							new MessageEmbed()
@@ -357,11 +358,26 @@ bot.on('interactionCreate', async interaction => {
 					});
 					return;
 				}
+				if (interaction.member?.voice.channel.type === 'GUILD_STAGE_VOICE' && !permissions.has(permissions.STAGE_MODERATOR)) {
+					await interaction.reply({
+						embeds: [
+							new MessageEmbed()
+								.setDescription('I need to be a stage moderator in the stage channel.')
+								.setColor('DARK_RED'),
+						],
+						ephemeral: true,
+					});
+					return;
+				}
+
 				await interaction.deferUpdate();
 				if (!player?.connected) {
 					player = interaction.client.music.createPlayer(interaction.guildId);
 					player.queue.channel = interaction.channel;
 					await player.connect(interaction.member.voice.channelId, { deafened: true });
+					if (interaction.member?.voice.channel.type === 'GUILD_STAGE_VOICE') {
+						await interaction.guild.members.cache.get(interaction.client.user.id).voice.setSuppressed(false);
+					}
 				}
 
 				const resolvedTracks = [];
