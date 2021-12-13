@@ -18,9 +18,6 @@ module.exports = {
 			if (!state.suppress) {
 				await state.setSuppressed(true);
 			}
-			if (state.channel.stageInstance?.topic === 'Music by Quaver') {
-				await state.channel.stageInstance.delete();
-			}
 		}
 		const player = interaction.client.music.players.get(interaction.guildId);
 		clearTimeout(player.timeout);
