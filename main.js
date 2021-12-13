@@ -80,16 +80,20 @@ bot.music.on('queueFinish', queue => {
 	});
 });
 
-bot.music.on('trackStart', (queue, song) => {
+bot.music.on('trackStart', async (queue, song) => {
 	console.log(`[G ${queue.player.guildId}] Starting track`);
 	queue.player.pause(false);
 	if (queue.player.timeout) {
 		clearTimeout(queue.player.timeout);
 		delete queue.player.timeout;
 	}
+	const state = bot.guilds.cache.get(queue.player.guildId).members.cache.get(bot.user.id).voice;
+	if (state.channel.type === 'GUILD_STAGE_VOICE' && state.suppress) {
+		await state.setSuppressed(false);
+	}
 	const duration = msToTime(song.length);
 	const durationString = song.isStream ? '∞' : msToTimeString(duration, true);
-	queue.channel.send({
+	await queue.channel.send({
 		embeds: [
 			new MessageEmbed()
 				.setDescription(`Now playing **[${song.title}](${song.uri})** \`[${durationString}]\`\nAdded by <@${song.requester}>`)
@@ -379,7 +383,6 @@ bot.on('interactionCreate', async interaction => {
 						if (!interaction.member.voice.channel.stageInstance) {
 							await interaction.member.voice.channel.createStageInstance({ topic: 'Music by Quaver', privacyLevel: 'GUILD_ONLY' });
 						}
-						await interaction.guild.members.cache.get(interaction.client.user.id).voice.setSuppressed(false);
 					}
 				}
 
