@@ -112,10 +112,8 @@ module.exports = {
 			player = interaction.client.music.createPlayer(interaction.guildId);
 			player.queue.channel = interaction.channel;
 			await player.connect(interaction.member.voice.channelId, { deafened: true });
-			if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE') {
-				if (!interaction.member.voice.channel.stageInstance) {
-					await interaction.member.voice.channel.createStageInstance({ topic: 'Music by Quaver', privacyLevel: 'GUILD_ONLY' });
-				}
+			if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE' && !interaction.member.voice.channel.stageInstance) {
+				await interaction.member.voice.channel.createStageInstance({ topic: 'Music by Quaver', privacyLevel: 'GUILD_ONLY' });
 			}
 		}
 
