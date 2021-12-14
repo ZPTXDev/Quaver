@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { SpotifyItemType } = require('@lavaclient/spotify');
-const { MessageEmbed } = require('discord.js');
+const { MessageEmbed, Permissions } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultColor } = require('../settings.json');
 
@@ -38,7 +38,7 @@ module.exports = {
 			});
 			return;
 		}
-		if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE' && !permissions.has(permissions.STAGE_MODERATOR)) {
+		if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE' && !permissions.has(Permissions.STAGE_MODERATOR)) {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()

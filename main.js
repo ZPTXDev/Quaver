@@ -1,5 +1,5 @@
 require('@lavaclient/queue/register');
-const { Client, Intents, Collection, MessageEmbed, MessageButton } = require('discord.js');
+const { Client, Intents, Collection, MessageEmbed, MessageButton, Permissions } = require('discord.js');
 const { Node } = require('lavaclient');
 const { load } = require('@lavaclient/spotify');
 const { token, lavalink, spotify, defaultColor } = require('./settings.json');
@@ -362,7 +362,7 @@ bot.on('interactionCreate', async interaction => {
 					});
 					return;
 				}
-				if (interaction.member?.voice.channel.type === 'GUILD_STAGE_VOICE' && !permissions.has(permissions.STAGE_MODERATOR)) {
+				if (interaction.member?.voice.channel.type === 'GUILD_STAGE_VOICE' && !permissions.has(Permissions.STAGE_MODERATOR)) {
 					await interaction.reply({
 						embeds: [
 							new MessageEmbed()
