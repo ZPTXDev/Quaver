@@ -132,5 +132,9 @@ module.exports = {
 			],
 		});
 		if (!started) { await player.queue.start(); }
+		const state = interaction.guild.members.cache.get(interaction.client.user.id).voice;
+		if (state.channel.type === 'GUILD_STAGE_VOICE' && state.suppress) {
+			await state.setSuppressed(false);
+		}
 	},
 };
