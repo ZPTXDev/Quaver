@@ -87,10 +87,6 @@ bot.music.on('trackStart', async (queue, song) => {
 		clearTimeout(queue.player.timeout);
 		delete queue.player.timeout;
 	}
-	const state = bot.guilds.cache.get(queue.player.guildId).members.cache.get(bot.user.id).voice;
-	if (state.channel.type === 'GUILD_STAGE_VOICE' && state.suppress) {
-		await state.setSuppressed(false);
-	}
 	const duration = msToTime(song.length);
 	const durationString = song.isStream ? '∞' : msToTimeString(duration, true);
 	await queue.channel.send({
@@ -100,6 +96,10 @@ bot.music.on('trackStart', async (queue, song) => {
 				.setColor(defaultColor),
 		],
 	});
+	const state = bot.guilds.cache.get(queue.player.guildId).members.cache.get(bot.user.id).voice;
+	if (state.channel.type === 'GUILD_STAGE_VOICE' && state.suppress) {
+		await state.setSuppressed(false);
+	}
 });
 
 bot.music.on('trackEnd', queue => {
