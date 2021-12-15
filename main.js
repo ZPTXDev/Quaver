@@ -445,6 +445,21 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 	if (newState.channelId === oldState.channelId) return;
 	// vc still has people
 	if (oldState.channel.members.filter(m => !m.user.bot).size >= 1) return;
+	if (!player.queue.current || !player.playing && !player.paused) {
+		console.log(`[G ${player.guildId}] Disconnecting (alone)`);
+		const channel = player.queue.channel;
+		clearTimeout(player.timeout);
+		clearTimeout(player.pauseTimeout);
+		player.disconnect();
+		bot.music.destroyPlayer(player.guildId);
+		channel.send({
+			embeds: [
+				new MessageEmbed()
+					.setDescription('Disconnected as everyone left.')
+					.setColor(defaultColor),
+			],
+		});
+	}
 	await player.pause();
 	console.log(`[G ${player.guildId}] Setting pause timeout`);
 	if (player.pauseTimeout) {
