@@ -27,7 +27,7 @@ module.exports = {
 	async execute(interaction) {
 		// check for connect, speak permission for channel
 		const permissions = interaction.member.voice.channel.permissionsFor(interaction.client.user.id);
-		if (!permissions.has(['CONNECT', 'SPEAK'])) {
+		if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
