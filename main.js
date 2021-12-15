@@ -61,6 +61,7 @@ bot.music.on('queueFinish', queue => {
 	queue.player.timeout = setTimeout(p => {
 		console.log(`[G ${p.guildId}] Disconnecting (inactivity)`);
 		const channel = p.queue.channel;
+		clearTimeout(p.pauseTimeout);
 		p.disconnect();
 		bot.music.destroyPlayer(p.guildId);
 		channel.send({
@@ -452,6 +453,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 	player.pauseTimeout = setTimeout(p => {
 		console.log(`[G ${p.guildId}] Disconnecting (inactivity)`);
 		const channel = p.queue.channel;
+		clearTimeout(p.timeout);
 		p.disconnect();
 		bot.music.destroyPlayer(p.guildId);
 		channel.send({
