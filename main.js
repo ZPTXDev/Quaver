@@ -15,8 +15,20 @@ const rl = readline.createInterface({
 	output: process.stdout,
 });
 rl.on('line', line => {
-	if (line === 'exit') {
-		process.exit(0);
+	switch (line) {
+		case 'exit':
+			process.exit(0);
+			break;
+		case 'sessions':
+			if (!startup) {
+				console.log('Quaver is not initialized yet.');
+				break;
+			}
+			console.log(`There are currently ${bot.music.players.size} active session(s).`);
+			break;
+		default:
+			console.log('Available commands: exit, sessions');
+			break;
 	}
 });
 
