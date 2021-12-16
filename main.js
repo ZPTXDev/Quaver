@@ -443,8 +443,6 @@ bot.on('interactionCreate', async interaction => {
 });
 
 bot.on('voiceStateUpdate', async (oldState, newState) => {
-	// is a bot and is not Quaver
-	if (oldState.member.user.bot && oldState.member.user.id !== bot.user.id) return;
 	const guild = oldState.guild;
 	const player = bot.music.players.get(guild.id);
 	// is Quaver and is no longer in any vc
@@ -462,6 +460,8 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		});
 		return;
 	}
+	// is a bot
+	if (oldState.member.user.bot) return;
 	// cancel pause timeout
 	if (newState.channelId === player?.channelId && player?.pauseTimeout) {
 		player.resume();
