@@ -463,13 +463,13 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		}
 		// this also handles suppressing Quaver mid-track
 		else if (newState.channel.type === 'GUILD_STAGE_VOICE' && newState.suppress) {
-			const permissions =	bot.guilds.cache.get(player.guildId).channels.cache.get(player.channelId).permissionsFor(bot.user.id);
+			const permissions =	bot.guilds.cache.get(guild.id).channels.cache.get(newState.channelId).permissionsFor(bot.user.id);
 			if (!permissions.has(Permissions.STAGE_MODERATOR)) {
 				const channel = player.queue.channel;
 				clearTimeout(player.timeout);
 				clearTimeout(player.pauseTimeout);
 				player.disconnect();
-				bot.music.destroyPlayer(player.guildId);
+				bot.music.destroyPlayer(guild.id);
 				channel.send({
 					embeds: [
 						new MessageEmbed()
