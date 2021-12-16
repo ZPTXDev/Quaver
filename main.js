@@ -481,6 +481,62 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			}
 			await newState.setSuppressed(false);
 		}
+		if (newState.channel?.members.filter(m => !m.user.bot).size < 1) {
+			if (!player.queue.current || !player.playing && !player.paused) {
+				console.log(`[G ${newState.guildId}] Disconnecting (alone)`);
+				if (newState.channel.type === 'GUILD_STAGE_VOICE') {
+					if (!newState.suppress) {
+						await newState.setSuppressed(true);
+					}
+				}
+				const channel = player.queue.channel;
+				clearTimeout(player.timeout);
+				clearTimeout(player.pauseTimeout);
+				player.disconnect();
+				bot.music.destroyPlayer(newState.guildId);
+				channel.send({
+					embeds: [
+						new MessageEmbed()
+							.setDescription('Disconnected as there was no one in the target channel.')
+							.setColor(defaultColor),
+					],
+				});
+				return;
+			}
+			await player.pause();
+			console.log(`[G ${newState.guildId}] Setting pause timeout`);
+			if (player.pauseTimeout) {
+				clearTimeout(player.pauseTimeout);
+			}
+			player.pauseTimeout = setTimeout(p => {
+				console.log(`[G ${p.guildId}] Disconnecting (inactivity)`);
+				const state = bot.guilds.cache.get(p.guildId).members.cache.get(bot.user.id).voice;
+				if (state.channel.type === 'GUILD_STAGE_VOICE') {
+					if (!state.suppress) {
+						state.setSuppressed(true);
+					}
+				}
+				const channel = p.queue.channel;
+				clearTimeout(p.timeout);
+				p.disconnect();
+				bot.music.destroyPlayer(p.guildId);
+				channel.send({
+					embeds: [
+						new MessageEmbed()
+							.setDescription('Disconnected from inactivity.')
+							.setColor(defaultColor),
+					],
+				});
+			}, 300000, player);
+			await player.queue.channel.send({
+				embeds: [
+					new MessageEmbed()
+						.setDescription(`There's nobody here. I'll leave <t:${Math.floor(Date.now() / 1000) + 300}:R>.`)
+						.setFooter('Rejoin to resume your session.')
+						.setColor(defaultColor),
+				],
+			});
+		}
 	}
 	// is a bot
 	if (oldState.member.user.bot) return;
@@ -526,6 +582,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 					.setColor(defaultColor),
 			],
 		});
+		return;
 	}
 	await player.pause();
 	console.log(`[G ${player.guildId}] Setting pause timeout`);
