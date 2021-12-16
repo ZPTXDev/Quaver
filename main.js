@@ -446,19 +446,41 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 	const guild = oldState.guild;
 	const player = bot.music.players.get(guild.id);
 	// is Quaver and is no longer in any vc
-	if (oldState.member.user.id === bot.user.id && !newState.channelId) {
-		const channel = player.queue.channel;
-		clearTimeout(player.timeout);
-		clearTimeout(player.pauseTimeout);
-		bot.music.destroyPlayer(player.guildId);
-		channel.send({
-			embeds: [
-				new MessageEmbed()
-					.setDescription('Session ended.')
-					.setColor(defaultColor),
-			],
-		});
-		return;
+	if (oldState.member.user.id === bot.user.id) {
+		if (!newState.channelId) {
+			const channel = player.queue.channel;
+			clearTimeout(player.timeout);
+			clearTimeout(player.pauseTimeout);
+			bot.music.destroyPlayer(player.guildId);
+			channel.send({
+				embeds: [
+					new MessageEmbed()
+						.setDescription('Session ended as I was disconnected.')
+						.setColor(defaultColor),
+				],
+			});
+			return;
+		}
+		// this also handles suppressing Quaver mid-track
+		else if (newState.channel.type === 'GUILD_STAGE_VOICE' && newState.suppress) {
+			const permissions =	bot.guilds.cache.get(player.guildId).channels.cache.get(player.channelId).permissionsFor(bot.user.id);
+			if (!permissions.has(Permissions.STAGE_MODERATOR)) {
+				const channel = player.queue.channel;
+				clearTimeout(player.timeout);
+				clearTimeout(player.pauseTimeout);
+				player.disconnect();
+				bot.music.destroyPlayer(player.guildId);
+				channel.send({
+					embeds: [
+						new MessageEmbed()
+							.setDescription('Session ended as I was moved to a stage channel that I was not a stage moderator of.')
+							.setColor(defaultColor),
+					],
+				});
+				return;
+			}
+			await newState.setSuppressed(false);
+		}
 	}
 	// is a bot
 	if (oldState.member.user.bot) return;
