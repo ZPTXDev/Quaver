@@ -1,8 +1,11 @@
+const { defaultLocale } = require('./settings.json');
+const { getLocale } = require('./functions.js');
+
 const checks = {
-	GUILD_ONLY: 'This command only works in servers.',
-	ACTIVE_SESSION: 'There is no session in this server.',
-	IN_VOICE: 'You need to be in a voice channel.',
-	IN_SESSION_VOICE: 'You need to be in my voice channel.',
+	GUILD_ONLY: getLocale(defaultLocale, 'CHECK_GUILD_ONLY'),
+	ACTIVE_SESSION: getLocale(defaultLocale, 'CHECK_ACTIVE_SESSION'),
+	IN_VOICE: getLocale(defaultLocale, 'CHECK_IN_VOICE'),
+	IN_SESSION_VOICE: getLocale(defaultLocale, 'CHECK_IN_SESSION_VOICE'),
 };
 
 module.exports = { checks };

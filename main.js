@@ -2,12 +2,12 @@ require('@lavaclient/queue/register');
 const { Client, Intents, Collection, MessageEmbed, MessageButton, Permissions } = require('discord.js');
 const { Node } = require('lavaclient');
 const { load } = require('@lavaclient/spotify');
-const { token, lavalink, spotify, defaultColor } = require('./settings.json');
+const { token, lavalink, spotify, defaultColor, defaultLocale } = require('./settings.json');
 const fs = require('fs');
 const fsPromises = require('fs').promises;
 const { version } = require('./package.json');
 const { checks } = require('./enums.js');
-const { msToTime, msToTimeString, paginate } = require('./functions.js');
+const { msToTime, msToTimeString, paginate, getLocale } = require('./functions.js');
 const readline = require('readline');
 
 const rl = readline.createInterface({
@@ -21,13 +21,13 @@ rl.on('line', line => {
 			break;
 		case 'sessions':
 			if (!startup) {
-				console.log('Quaver is not initialized yet.');
+				console.log(getLocale(defaultLocale, 'CMDLINE_NOT_INITIALIZED'));
 				break;
 			}
-			console.log(`There are currently ${bot.music.players.size} active session(s).`);
+			console.log(getLocale(defaultLocale, 'CMDLINE_SESSIONS', bot.music.players.size));
 			break;
 		default:
-			console.log('Available commands: exit, sessions');
+			console.log(getLocale(defaultLocale, 'CMDLINE_HELP'));
 			break;
 	}
 });
@@ -62,16 +62,16 @@ for (const file of commandFiles) {
 let startup = false;
 
 bot.music.on('connect', () => {
-	console.log('[Quaver] Connected to Lavalink!');
+	console.log(`[Quaver] ${getLocale(defaultLocale, 'LOG_LAVALINK_CONNECTED')}`);
 });
 
 bot.music.on('queueFinish', queue => {
-	console.log(`[G ${queue.player.guildId}] Setting timeout`);
+	console.log(`[G ${queue.player.guildId}] ${getLocale(defaultLocale, 'LOG_SETTING_TIMEOUT')}`);
 	if (queue.player.timeout) {
 		clearTimeout(queue.player.timeout);
 	}
 	queue.player.timeout = setTimeout(p => {
-		console.log(`[G ${p.guildId}] Disconnecting (inactivity)`);
+		console.log(`[G ${p.guildId}] ${getLocale(defaultLocale, 'LOG_INACTIVITY')}`);
 		const state = bot.guilds.cache.get(p.guildId).members.cache.get(bot.user.id).voice;
 		if (state.channel.type === 'GUILD_STAGE_VOICE') {
 			if (!state.suppress) {
@@ -85,7 +85,7 @@ bot.music.on('queueFinish', queue => {
 		channel.send({
 			embeds: [
 				new MessageEmbed()
-					.setDescription('Disconnected from inactivity.')
+					.setDescription(getLocale(defaultLocale, 'MUSIC_INACTIVITY'))
 					.setColor(defaultColor),
 			],
 		});
@@ -93,14 +93,14 @@ bot.music.on('queueFinish', queue => {
 	queue.channel.send({
 		embeds: [
 			new MessageEmbed()
-				.setDescription(`There's nothing left in the queue. I'll leave <t:${Math.floor(Date.now() / 1000) + 1800}:R>.`)
+				.setDescription(`${getLocale(defaultLocale, 'MUSIC_QUEUE_EMPTY')} ${getLocale(defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 1800)}`)
 				.setColor(defaultColor),
 		],
 	});
 });
 
 bot.music.on('trackStart', async (queue, song) => {
-	console.log(`[G ${queue.player.guildId}] Starting track`);
+	console.log(`[G ${queue.player.guildId}] ${getLocale(defaultLocale, 'LOG_STARTING_TRACK')}`);
 	queue.player.pause(false);
 	if (queue.player.timeout) {
 		clearTimeout(queue.player.timeout);
@@ -111,7 +111,7 @@ bot.music.on('trackStart', async (queue, song) => {
 	await queue.channel.send({
 		embeds: [
 			new MessageEmbed()
-				.setDescription(`Now playing **[${song.title}](${song.uri})** \`[${durationString}]\`\nAdded by <@${song.requester}>`)
+				.setDescription(`${getLocale(defaultLocale, 'MUSIC_NOW_PLAYING', song.title, song.uri, durationString)}\n${getLocale(defaultLocale, 'MUSIC_ADDED_BY', song.requester)}`)
 				.setColor(defaultColor),
 		],
 	});
@@ -120,7 +120,7 @@ bot.music.on('trackStart', async (queue, song) => {
 bot.music.on('trackEnd', queue => {
 	delete queue.player.skip;
 	if (bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).members?.filter(m => !m.user.bot).size < 1) {
-		console.log(`[G ${queue.player.guildId}] Disconnecting (alone)`);
+		console.log(`[G ${queue.player.guildId}] ${getLocale(defaultLocale, 'LOG_ALONE')}`);
 		const state = bot.guilds.cache.get(queue.player.guildId).members.cache.get(bot.user.id).voice;
 		if (state.channel.type === 'GUILD_STAGE_VOICE') {
 			if (!state.suppress) {
@@ -132,7 +132,7 @@ bot.music.on('trackEnd', queue => {
 		queue.channel.send({
 			embeds: [
 				new MessageEmbed()
-					.setDescription('Disconnected as everyone left.')
+					.setDescription(getLocale(defaultLocale, 'MUSIC_ALONE'))
 					.setColor(defaultColor),
 			],
 		});
@@ -142,14 +142,14 @@ bot.music.on('trackEnd', queue => {
 
 bot.on('ready', async () => {
 	if (!startup) {
-		console.log(`[Quaver] Connected to Discord! Logged in as ${bot.user.tag}.`);
-		console.log(`[Quaver] Running version ${version}. For help, see https://github.com/ZapSquared/Quaver/issues.`);
+		console.log(`[Quaver] ${getLocale(defaultLocale, 'LOG_DISCORD_CONNECTED', bot.user.tag)}`);
+		console.log(`[Quaver] ${getLocale(defaultLocale, 'LOG_STARTUP', version)}`);
 		bot.music.connect(bot.user.id);
 		bot.user.setActivity(version);
 		startup = true;
 	}
 	else {
-		console.log('[Quaver] Lost connection to Discord. Attempting to resume sessions now.');
+		console.log(`[Quaver] ${getLocale(defaultLocale, 'LOG_CONNECTION_LOST')}`);
 		for (const pair of bot.music.players) {
 			const player = pair[1];
 			await player.resume();
@@ -161,7 +161,7 @@ bot.on('interactionCreate', async interaction => {
 	if (interaction.isCommand()) {
 		const command = bot.commands.get(interaction.commandName);
 		if (!command) return;
-		console.log(`[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing command ${interaction.commandName}`);
+		console.log(`[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] ${getLocale(defaultLocale, 'LOG_CMD_PROCESSING', interaction.commandName)}`);
 		const failedChecks = [];
 		for (const check of command.checks) {
 			switch (check) {
@@ -196,7 +196,7 @@ bot.on('interactionCreate', async interaction => {
 			}
 		}
 		if (failedChecks.length > 0) {
-			console.log(`[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedChecks.length} checks`);
+			console.log(`[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] ${getLocale(defaultLocale, 'LOG_CMD_FAILED', interaction.commandName, failedChecks.length)}`);
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
@@ -222,7 +222,7 @@ bot.on('interactionCreate', async interaction => {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(`You are missing permissions: ${failedPermissions.user.map(perm => '`' + perm + '`').join(' ')}`)
+						.setDescription(getLocale(defaultLocale, 'DISCORD_USER_MISSING_PERMISSIONS', failedPermissions.user.map(perm => '`' + perm + '`').join(' ')))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -233,7 +233,7 @@ bot.on('interactionCreate', async interaction => {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(`I am missing permissions: ${failedPermissions.user.map(perm => '`' + perm + '`').join(' ')}`)
+						.setDescription(getLocale(defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS', failedPermissions.bot.map(perm => '`' + perm + '`').join(' ')))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -241,16 +241,16 @@ bot.on('interactionCreate', async interaction => {
 			return;
 		}
 		try {
-			console.log(`[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Executing command ${interaction.commandName}`);
+			console.log(`[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] ${getLocale(defaultLocale, 'LOG_CMD_EXECUTING', interaction.commandName)}`);
 			await command.execute(interaction);
 		}
 		catch (err) {
-			console.log(`[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with command ${interaction.commandName}`);
+			console.log(`[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] ${getLocale(defaultLocale, 'LOG_CMD_ERROR', interaction.commandName)}`);
 			console.error(err);
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription('There was an error while handling the command.')
+						.setDescription(getLocale(defaultLocale, 'DISCORD_CMD_ERROR'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -285,7 +285,7 @@ bot.on('interactionCreate', async interaction => {
 						const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
 						return `\`${(firstIndex + index).toString().padStart(largestIndexSize, ' ')}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 					}).join('\n'))
-					.setFooter(`Page ${page} of ${pages.length}`);
+					.setFooter(getLocale(defaultLocale, 'PAGE', page, pages.length));
 				original.components[0].components = [];
 				original.components[0].components[0] = new MessageButton()
 					.setCustomId(`queue_${page - 1}`)
@@ -301,7 +301,7 @@ bot.on('interactionCreate', async interaction => {
 					.setCustomId(`queue_${page}`)
 					.setEmoji('🔁')
 					.setStyle('SECONDARY')
-					.setLabel('Refresh'),
+					.setLabel(getLocale(defaultLocale, 'REFRESH')),
 				interaction.update({
 					embeds: original.embeds,
 					components: original.components,
@@ -313,7 +313,7 @@ bot.on('interactionCreate', async interaction => {
 					await interaction.reply({
 						embeds: [
 							new MessageEmbed()
-								.setDescription('That is not your interaction.')
+								.setDescription(getLocale(defaultLocale, 'DISCORD_INTERACTION_WRONG_USER'))
 								.setColor('DARK_RED'),
 						],
 						ephemeral: true,
@@ -323,7 +323,7 @@ bot.on('interactionCreate', async interaction => {
 				await interaction.update({
 					embeds: [
 						new MessageEmbed()
-							.setDescription(`This interaction was canceled by <@${interaction.user.id}>.`)
+							.setDescription(getLocale(defaultLocale, 'DISCORD_INTERACTION_CANCELED', interaction.user.id))
 							.setColor(defaultColor),
 					],
 					components: [],
@@ -339,7 +339,7 @@ bot.on('interactionCreate', async interaction => {
 					await interaction.reply({
 						embeds: [
 							new MessageEmbed()
-								.setDescription('That is not your interaction.')
+								.setDescription(getLocale(defaultLocale, 'DISCORD_INTERACTION_WRONG_USER'))
 								.setColor('DARK_RED'),
 						],
 						ephemeral: true,
@@ -376,7 +376,7 @@ bot.on('interactionCreate', async interaction => {
 					await interaction.reply({
 						embeds: [
 							new MessageEmbed()
-								.setDescription('I need to be able to connect and speak in the voice channel.')
+								.setDescription(getLocale(defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_BASIC'))
 								.setColor('DARK_RED'),
 						],
 						ephemeral: true,
@@ -387,7 +387,7 @@ bot.on('interactionCreate', async interaction => {
 					await interaction.reply({
 						embeds: [
 							new MessageEmbed()
-								.setDescription('I need to be a stage moderator in the stage channel.')
+								.setDescription(getLocale(defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_STAGE'))
 								.setColor('DARK_RED'),
 						],
 						ephemeral: true,
@@ -401,7 +401,7 @@ bot.on('interactionCreate', async interaction => {
 					player.queue.channel = interaction.channel;
 					await player.connect(interaction.member.voice.channelId, { deafened: true });
 					if (interaction.member?.voice.channel.type === 'GUILD_STAGE_VOICE' && !interaction.member?.voice.channel.stageInstance) {
-						await interaction.member.voice.channel.createStageInstance({ topic: 'Music by Quaver', privacyLevel: 'GUILD_ONLY' });
+						await interaction.member.voice.channel.createStageInstance({ topic: getLocale(defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
 					}
 				}
 
@@ -416,10 +416,10 @@ bot.on('interactionCreate', async interaction => {
 				const endPosition = firstPosition + resolvedTracks.length - 1;
 				let msg;
 				if (resolvedTracks.length === 1) {
-					msg = `Added **[${resolvedTracks[0].info.title}](${resolvedTracks[0].info.uri})** to queue`;
+					msg = getLocale(defaultLocale, 'MUSIC_QUEUE_ADDED', resolvedTracks[0].info.title, resolvedTracks[0].info.uri);
 				}
 				else {
-					msg = `Added **${resolvedTracks.length}** tracks from **your search** to queue`;
+					msg = getLocale(defaultLocale, 'MUSIC_QUEUE_ADDED_MULTI', resolvedTracks.length, getLocale(defaultLocale, 'MUSIC_SEARCH'), '');
 				}
 				player.queue.add(resolvedTracks, { requester: interaction.user.id });
 				const started = player.playing || player.paused;
@@ -428,7 +428,7 @@ bot.on('interactionCreate', async interaction => {
 						new MessageEmbed()
 							.setDescription(msg)
 							.setColor(defaultColor)
-							.setFooter(started ? `Position: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : ''),
+							.setFooter(started ? `${getLocale(defaultLocale, 'POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : ''),
 					],
 					components: [],
 				});
@@ -455,7 +455,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			channel.send({
 				embeds: [
 					new MessageEmbed()
-						.setDescription('Session ended as I was disconnected.')
+						.setDescription(getLocale(defaultLocale, 'MUSIC_FORCED'))
 						.setColor(defaultColor),
 				],
 			});
@@ -473,7 +473,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				channel.send({
 					embeds: [
 						new MessageEmbed()
-							.setDescription('Session ended as I was moved to a stage channel that I was not a stage moderator of.')
+							.setDescription(getLocale(defaultLocale, 'MUSIC_FORCED_STAGE'))
 							.setColor(defaultColor),
 					],
 				});
@@ -483,7 +483,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		}
 		if (newState.channel?.members.filter(m => !m.user.bot).size < 1) {
 			if (!player.queue.current || !player.playing && !player.paused) {
-				console.log(`[G ${newState.guildId}] Disconnecting (alone)`);
+				console.log(`[G ${newState.guildId}] ${getLocale(defaultLocale, 'LOG_ALONE')}`);
 				if (newState.channel.type === 'GUILD_STAGE_VOICE') {
 					if (!newState.suppress) {
 						await newState.setSuppressed(true);
@@ -497,19 +497,19 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				channel.send({
 					embeds: [
 						new MessageEmbed()
-							.setDescription('Disconnected as there was no one in the target channel.')
+							.setDescription(getLocale(defaultLocale, 'MUSIC_ALONE_MOVED'))
 							.setColor(defaultColor),
 					],
 				});
 				return;
 			}
 			await player.pause();
-			console.log(`[G ${newState.guildId}] Setting pause timeout`);
+			console.log(`[G ${newState.guildId}] ${getLocale(defaultLocale, 'LOG_SETTING_TIMEOUT_PAUSE')}`);
 			if (player.pauseTimeout) {
 				clearTimeout(player.pauseTimeout);
 			}
 			player.pauseTimeout = setTimeout(p => {
-				console.log(`[G ${p.guildId}] Disconnecting (inactivity)`);
+				console.log(`[G ${p.guildId}] ${getLocale(defaultLocale, 'LOG_INACTIVITY')}`);
 				const state = bot.guilds.cache.get(p.guildId).members.cache.get(bot.user.id).voice;
 				if (state.channel.type === 'GUILD_STAGE_VOICE') {
 					if (!state.suppress) {
@@ -523,7 +523,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				channel.send({
 					embeds: [
 						new MessageEmbed()
-							.setDescription('Disconnected from inactivity.')
+							.setDescription(getLocale(defaultLocale, 'MUSIC_INACTIVITY'))
 							.setColor(defaultColor),
 					],
 				});
@@ -531,8 +531,8 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			await player.queue.channel.send({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(`There's nobody here. I'll leave <t:${Math.floor(Date.now() / 1000) + 300}:R>.`)
-						.setFooter('Rejoin to resume your session.')
+						.setDescription(`${getLocale(defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`)
+						.setFooter(getLocale(defaultLocale, 'MUSIC_ALONE_REJOIN'))
 						.setColor(defaultColor),
 				],
 			});
@@ -550,7 +550,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		await player.queue.channel.send({
 			embeds: [
 				new MessageEmbed()
-					.setDescription('Resuming your session.')
+					.setDescription(getLocale(defaultLocale, 'MUSIC_ALONE_RESUMED'))
 					.setColor(defaultColor),
 			],
 		});
@@ -563,7 +563,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 	// vc still has people
 	if (oldState.channel.members.filter(m => !m.user.bot).size >= 1) return;
 	if (!player.queue.current || !player.playing && !player.paused) {
-		console.log(`[G ${player.guildId}] Disconnecting (alone)`);
+		console.log(`[G ${player.guildId}] ${getLocale(defaultLocale, 'LOG_ALONE')}`);
 		const state = bot.guilds.cache.get(player.guildId).members.cache.get(bot.user.id).voice;
 		if (state.channel.type === 'GUILD_STAGE_VOICE') {
 			if (!state.suppress) {
@@ -578,19 +578,19 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		channel.send({
 			embeds: [
 				new MessageEmbed()
-					.setDescription('Disconnected as everyone left.')
+					.setDescription(getLocale(defaultLocale, 'MUSIC_ALONE'))
 					.setColor(defaultColor),
 			],
 		});
 		return;
 	}
 	await player.pause();
-	console.log(`[G ${player.guildId}] Setting pause timeout`);
+	console.log(`[G ${player.guildId}] ${getLocale(defaultLocale, 'LOG_SETTING_TIMEOUT_PAUSE')}`);
 	if (player.pauseTimeout) {
 		clearTimeout(player.pauseTimeout);
 	}
 	player.pauseTimeout = setTimeout(p => {
-		console.log(`[G ${p.guildId}] Disconnecting (inactivity)`);
+		console.log(`[G ${p.guildId}] ${getLocale(defaultLocale, 'LOG_INACTIVITY')}`);
 		const state = bot.guilds.cache.get(p.guildId).members.cache.get(bot.user.id).voice;
 		if (state.channel.type === 'GUILD_STAGE_VOICE') {
 			if (!state.suppress) {
@@ -604,7 +604,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		channel.send({
 			embeds: [
 				new MessageEmbed()
-					.setDescription('Disconnected from inactivity.')
+					.setDescription(getLocale(defaultLocale, 'MUSIC_INACTIVITY'))
 					.setColor(defaultColor),
 			],
 		});
@@ -612,19 +612,19 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 	await player.queue.channel.send({
 		embeds: [
 			new MessageEmbed()
-				.setDescription(`There's nobody here. I'll leave <t:${Math.floor(Date.now() / 1000) + 300}:R>.`)
-				.setFooter('Rejoin to resume your session.')
+				.setDescription(`${getLocale(defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`)
+				.setFooter(getLocale(defaultLocale, 'MUSIC_ALONE_REJOIN'))
 				.setColor(defaultColor),
 		],
 	});
 });
 
 bot.on('guildCreate', guild => {
-	console.log(`[G ${guild.id}] Joined ${guild.name}`);
+	console.log(`[G ${guild.id}] ${getLocale(defaultLocale, 'LOG_GUILD_JOINED', guild.name)}`);
 });
 
 bot.on('guildDelete', guild => {
-	console.log(`[G ${guild.id}] Left ${guild.name}`);
+	console.log(`[G ${guild.id}] ${getLocale(defaultLocale, 'LOG_GUILD_LEFT', guild.name)}`);
 });
 
 bot.login(token);
@@ -633,12 +633,12 @@ let inprg = false;
 async function shuttingDown(eventType, err) {
 	if (inprg) return;
 	inprg = true;
-	console.log('[Quaver] Shutting down...');
+	console.log(`[Quaver] ${getLocale(defaultLocale, 'LOG_SHUTDOWN')}`);
 	if (startup) {
-		console.log('[Quaver] Disconnecting from all guilds...');
+		console.log(`[Quaver] ${getLocale(defaultLocale, 'LOG_DISCONNECTING')}`);
 		for (const pair of bot.music.players) {
 			const player = pair[1];
-			console.log(`[G ${player.guildId}] Disconnecting (restarting)`);
+			console.log(`[G ${player.guildId}] ${getLocale(defaultLocale, 'LOG_RESTARTING')}`);
 			const state = bot.guilds.cache.get(player.guildId).members.cache.get(bot.user.id).voice;
 			if (state.channel.type === 'GUILD_STAGE_VOICE') {
 				if (!state.suppress) {
@@ -647,18 +647,18 @@ async function shuttingDown(eventType, err) {
 			}
 			const fileBuffer = [];
 			if (player.queue.tracks.length > 0 || player.queue.current && (player.playing || player.paused)) {
-				fileBuffer.push('Current:');
+				fileBuffer.push(`${getLocale(defaultLocale, 'CURRENT')}:`);
 				fileBuffer.push(player.queue.current.uri);
 				if (player.queue.tracks.length > 0) {
-					fileBuffer.push('Queue:');
+					fileBuffer.push(`${getLocale(defaultLocale, 'QUEUE')}:`);
 					fileBuffer.push(player.queue.tracks.map(track => track.uri).join('\n'));
 				}
 			}
 			await player.queue.channel.send({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(`Quaver ${['exit', 'SIGINT'].includes(eventType) ? 'is restarting' : 'has crashed'} and will disconnect.${fileBuffer.length > 0 ? '\nYour queue data has been attached.' : ''}`)
-						.setFooter('Sorry for the inconvenience caused.')
+						.setDescription(`${getLocale(defaultLocale, ['exit', 'SIGINT'].includes(eventType) ? 'MUSIC_RESTART' : 'MUSIC_RESTART_CRASH')}${fileBuffer.length > 0 ? `\n${getLocale(defaultLocale, 'MUSIC_RESTART_QUEUEDATA')}` : ''}`)
+						.setFooter(getLocale(defaultLocale, 'MUSIC_RESTART_SORRY'))
 						.setColor(defaultColor),
 				],
 				files: fileBuffer.length > 0 ? [
@@ -673,12 +673,12 @@ async function shuttingDown(eventType, err) {
 		}
 	}
 	if (err) {
-		console.log('[Quaver] Logging additional output to error.log.');
+		console.log(`[Quaver] ${getLocale(defaultLocale, 'LOG_ERROR')}`);
 		try {
 			await fsPromises.writeFile('error.log', `${eventType}\n${err.message}\n${err.stack}`);
 		}
 		catch (e) {
-			console.error(`[Quaver] Encountered error while writing to error.log:\n${e}`);
+			console.error(`[Quaver] ${getLocale(defaultLocale, 'LOG_ERROR_FAIL')}\n${e}`);
 		}
 	}
 	bot.destroy();

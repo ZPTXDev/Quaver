@@ -1,12 +1,13 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
-const { defaultColor } = require('../settings.json');
+const { defaultColor, defaultLocale } = require('../settings.json');
+const { getLocale } = require('../functions.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('pause')
-		.setDescription('Pause Quaver.'),
+		.setDescription(getLocale(defaultLocale, 'CMD_PAUSE_DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -18,7 +19,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription('The player is already paused.')
+						.setDescription(getLocale(defaultLocale, 'CMD_PAUSE_PAUSED'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -29,7 +30,7 @@ module.exports = {
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription('The player has been paused.')
+					.setDescription(getLocale(defaultLocale, 'CMD_PAUSE_SUCCESS'))
 					.setColor(defaultColor),
 			],
 		});

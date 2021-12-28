@@ -1,21 +1,22 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
-const { defaultColor } = require('../settings.json');
+const { defaultColor, defaultLocale } = require('../settings.json');
+const { getLocale } = require('../functions.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('move')
-		.setDescription('Move a track within the queue.')
+		.setDescription(getLocale(defaultLocale, 'CMD_MOVE_DESCRIPTION'))
 		.addIntegerOption(option =>
 			option
 				.setName('oldposition')
-				.setDescription('The position of the track to move.')
+				.setDescription(getLocale(defaultLocale, 'CMD_MOVE_OPTION_OLDPOSITION'))
 				.setRequired(true))
 		.addIntegerOption(option =>
 			option
 				.setName('newposition')
-				.setDescription('The new position to move the track to.')
+				.setDescription(getLocale(defaultLocale, 'CMD_MOVE_OPTION_NEWPOSITION'))
 				.setRequired(true)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
@@ -30,7 +31,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription('There aren\'t enough tracks in the queue to perform a move.')
+						.setDescription(getLocale(defaultLocale, 'CMD_MOVE_INSUFFICIENT'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -41,7 +42,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescriptiuon('One (or both) of your arguments are out of range.')
+						.setDescription(getLocale(defaultLocale, 'CMD_MOVE_NOT_IN_RANGE'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -52,7 +53,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescriptiuon('Your arguments cannot be the same.')
+						.setDescription(getLocale(defaultLocale, 'CMD_MOVE_EQUAL'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -64,7 +65,7 @@ module.exports = {
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(`Moved **[${track.title}](${track.uri})** \`${oldposition} -> ${newposition}\``)
+					.setDescription(getLocale(defaultLocale, 'CMD_MOVE_SUCCESS', track.title, track.uri, oldposition, newposition))
 					.setColor(defaultColor),
 			],
 		});

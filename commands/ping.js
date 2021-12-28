@@ -1,12 +1,12 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
-const { defaultColor } = require('../settings.json');
-const { msToTime, msToTimeString } = require('../functions.js');
+const { defaultColor, defaultLocale } = require('../settings.json');
+const { msToTime, msToTimeString, getLocale } = require('../functions.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('ping')
-		.setDescription('Check Quaver\'s latency and uptime.'),
+		.setDescription(getLocale(defaultLocale, 'CMD_PING_DESCRIPTION')),
 	checks: [],
 	permissions: {
 		user: [],
@@ -18,8 +18,8 @@ module.exports = {
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(`Pong!${interaction.guild ? ` ${interaction.guild.shard.ping}ms` : ''}`)
-					.setFooter(`Uptime: ${uptimeString}`)
+					.setDescription(`${getLocale(defaultLocale, 'CMD_PING_SUCCESS')}${interaction.guild ? ` ${interaction.guild.shard.ping}ms` : ''}`)
+					.setFooter(`${getLocale(defaultLocale, 'CMD_PING_UPTIME')} ${uptimeString}`)
 					.setColor(defaultColor),
 			],
 		});

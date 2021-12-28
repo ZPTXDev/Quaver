@@ -1,16 +1,17 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
-const { defaultColor } = require('../settings.json');
+const { defaultColor, defaultLocale } = require('../settings.json');
+const { getLocale } = require('../functions.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('bind')
-		.setDescription('Change the text channel used by Quaver to send messages automatically.')
+		.setDescription(getLocale(defaultLocale, 'CMD_BIND_DESCRIPTION'))
 		.addChannelOption(option =>
 			option
 				.setName('channel')
-				.setDescription('The text channel to bind to.')
+				.setDescription(getLocale(defaultLocale, 'CMD_BIND_OPTION_CHANNEL'))
 				.setRequired(true)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
@@ -24,7 +25,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription('Please specify a valid text channel.')
+						.setDescription(getLocale(defaultLocale, 'CHECK_INVALID_TEXT_CHANNEL'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -35,7 +36,7 @@ module.exports = {
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(`Bound to <#${channel.id}>`)
+					.setDescription(getLocale(defaultLocale, 'CMD_BIND_SUCCESS', channel.id))
 					.setColor(defaultColor),
 			],
 		});

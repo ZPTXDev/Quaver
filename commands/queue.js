@@ -2,12 +2,13 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
 const { checks } = require('../enums.js');
 const { paginate, msToTime, msToTimeString } = require('../functions.js');
-const { defaultColor } = require('../settings.json');
+const { defaultColor, defaultLocale } = require('../settings.json');
+const { getLocale } = require('../functions.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('queue')
-		.setDescription('Show the queue.'),
+		.setDescription(getLocale(defaultLocale, 'CMD_QUEUE_DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -20,7 +21,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription('There is nothing coming up.')
+						.setDescription(getLocale(defaultLocale, 'CMD_QUEUE_EMPTY'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -36,7 +37,7 @@ module.exports = {
 						return `\`${index + 1}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 					}).join('\n'))
 					.setColor(defaultColor)
-					.setFooter(`Page 1 of ${pages.length}`),
+					.setFooter(getLocale(defaultLocale, 'PAGE', '1', pages.length)),
 			],
 			components: [
 				new MessageActionRow()
@@ -55,7 +56,7 @@ module.exports = {
 							.setCustomId('queue_1')
 							.setEmoji('🔁')
 							.setStyle('SECONDARY')
-							.setLabel('Refresh'),
+							.setLabel(getLocale(defaultLocale, 'REFRESH')),
 					),
 			],
 		});

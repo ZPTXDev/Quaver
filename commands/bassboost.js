@@ -1,16 +1,17 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
-const { defaultColor } = require('../settings.json');
+const { defaultColor, defaultLocale } = require('../settings.json');
+const { getLocale } = require('../functions.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('bassboost')
-		.setDescription('Boost the bass levels in your music.')
+		.setDescription(getLocale(defaultLocale, 'CMD_BASSBOOST_DESCRIPTION'))
 		.addBooleanOption(option =>
 			option
 				.setName('enabled')
-				.setDescription('Whether or not bass boost will be enabled. If not specified, it will be toggled.')),
+				.setDescription(getLocale(defaultLocale, 'CMD_BASSBOOST_OPTION_ENABLED'))),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -35,8 +36,8 @@ module.exports = {
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(`Bass boost **${player.bassboost ? 'enabled' : 'disabled'}**`)
-					.setFooter('This may take a few seconds to apply')
+					.setDescription(getLocale(defaultLocale, player.bassboost ? 'CMD_BASSBOOST_ENABLED' : 'CMD_BASSBOOST_DISABLED'))
+					.setFooter(getLocale(defaultLocale, 'MUSIC_FILTERS_NOTE'))
 					.setColor(defaultColor),
 			],
 		});
