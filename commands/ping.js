@@ -18,7 +18,7 @@ module.exports = {
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(`${getLocale(defaultLocale, 'CMD_PING_SUCCESS')}${interaction.guild ? ` ${interaction.guild.shard.ping}ms` : ''}`)
+					.setDescription(`${getLocale(defaultLocale, 'CMD_PING_PONG')}${interaction.guild ? ` ${interaction.guild.shard.ping}ms` : ''}`)
 					.setFooter(`${getLocale(defaultLocale, 'CMD_PING_UPTIME')} ${uptimeString}`)
 					.setColor(defaultColor),
 			],
