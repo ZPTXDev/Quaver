@@ -1,3 +1,5 @@
+const { defaultLocale } = require('./settings.json');
+
 // thanks: https://gist.github.com/flangofas/714f401b63a1c3d84aaa
 function msToTime(milliseconds, format) {
 	const total_seconds = parseInt(Math.floor(milliseconds / 1000));
@@ -25,7 +27,7 @@ function msToTime(milliseconds, format) {
 function msToTimeString(msObject, simple) {
 	if (simple) {
 		if (msObject['d'] > 0) {
-			return 'more than a day';
+			return getLocale(defaultLocale, 'MORETHANADAY');
 		}
 		return `${msObject['h'] > 0 ? `${msObject['h']}:` : ''}${msObject['h'] > 0 ? msObject['m'].toString().padStart(2, '0') : msObject['m']}:${msObject['s'].toString().padStart(2, '0')}`;
 	}
@@ -79,5 +81,19 @@ function paginate(arr, size) {
 		return acc;
 	}, []);
 }
+// thanks: https://stackoverflow.com/a/63376860
+function getLocale(language, string, ...vars) {
+	const strings = require(`./locales/${language}.json`);
+	if (!strings) return 'LOCALE_MISSING';
+	let locale = strings[string];
+	if (!locale) return string;
+	let count = 0;
+	locale = locale.replace(/%VAR%/g, x => {
+		const returning = vars[count] !== null ? vars[count] : x;
+		count++;
+		return returning;
+	});
+	return locale;
+}
 
-module.exports = { msToTime, msToTimeString, roundTo, getSeconds, getBar, paginate };
+module.exports = { msToTime, msToTimeString, roundTo, getSeconds, getBar, paginate, getLocale };

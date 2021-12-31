@@ -1,16 +1,17 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
-const { defaultColor } = require('../settings.json');
+const { defaultColor, defaultLocale } = require('../settings.json');
+const { getLocale } = require('../functions.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('nightcore')
-		.setDescription('Nightcore mode speeds up your music.')
+		.setDescription(getLocale(defaultLocale, 'CMD_NIGHTCORE_DESCRIPTION'))
 		.addBooleanOption(option =>
 			option
 				.setName('enabled')
-				.setDescription('Whether or not nightcore will be enabled. If not specified, it will be toggled.')),
+				.setDescription(getLocale(defaultLocale, 'CMD_NIGHTCORE_OPTION_ENABLED'))),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -32,8 +33,8 @@ module.exports = {
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(`Nightcore **${player.nightcore ? 'enabled' : 'disabled'}**`)
-					.setFooter('This may take a few seconds to apply')
+					.setDescription(getLocale(defaultLocale, player.nightcore ? 'CMD_NIGHTCORE_ENABLED' : 'CMD_NIGHTCORE_DISABLED'))
+					.setFooter(getLocale(defaultLocale, 'MUSIC_FILTERS_NOTE'))
 					.setColor(defaultColor),
 			],
 		});

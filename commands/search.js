@@ -2,18 +2,19 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed, MessageActionRow, MessageSelectMenu, MessageButton } = require('discord.js');
 const { checks } = require('../enums.js');
 const { msToTime, msToTimeString } = require('../functions.js');
-const { defaultColor } = require('../settings.json');
+const { defaultColor, defaultLocale } = require('../settings.json');
+const { getLocale } = require('../functions.js');
 
 // credit: https://github.com/lavaclient/djs-v13-example/blob/main/src/commands/Play.ts
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('search')
-		.setDescription('Search YouTube for a track.')
+		.setDescription(getLocale(defaultLocale, 'CMD_SEARCH_DESCRIPTION'))
 		.addStringOption(option =>
 			option
 				.setName('query')
-				.setDescription('What to search for.')
+				.setDescription(getLocale(defaultLocale, 'CMD_SEARCH_OPTION_QUERY'))
 				.setRequired(true)),
 	checks: [checks.GUILD_ONLY],
 	permissions: {
@@ -40,7 +41,7 @@ module.exports = {
 			await interaction.editReply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription('Try using the play command instead.')
+						.setDescription(getLocale(defaultLocale, 'CMD_SEARCH_USE_PLAY_CMD'))
 						.setColor('DARK_RED'),
 				],
 			});
@@ -62,7 +63,7 @@ module.exports = {
 					.addComponents(
 						new MessageSelectMenu()
 							.setCustomId(`play_${interaction.user.id}`)
-							.setPlaceholder('Pick track(s)')
+							.setPlaceholder(getLocale(defaultLocale, 'CMD_SEARCH_PICK'))
 							.addOptions(tracks.map((track, index) => {
 								let label = `${index + 1}. ${track.info.title}`;
 								if (label.length >= 100) {
@@ -77,7 +78,7 @@ module.exports = {
 					.addComponents(
 						new MessageButton()
 							.setCustomId(`cancel_${interaction.user.id}`)
-							.setLabel('Cancel')
+							.setLabel(getLocale(defaultLocale, 'CANCEL'))
 							.setStyle('DANGER'),
 					),
 			],

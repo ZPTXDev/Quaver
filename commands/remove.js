@@ -1,16 +1,17 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
-const { defaultColor } = require('../settings.json');
+const { defaultColor, defaultLocale } = require('../settings.json');
+const { getLocale } = require('../functions.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('remove')
-		.setDescription('Remove a track from the queue.')
+		.setDescription(getLocale(defaultLocale, 'CMD_REMOVE_DESCRIPTION'))
 		.addIntegerOption(option =>
 			option
 				.setName('position')
-				.setDescription('The position of the track to remove.')
+				.setDescription(getLocale(defaultLocale, 'CMD_REMOVE_OPTION_POSITION'))
 				.setRequired(true)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
@@ -24,7 +25,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription('There are no tracks in the queue to remove.')
+						.setDescription(getLocale(defaultLocale, 'CMD_REMOVE_EMPTY'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -35,7 +36,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription('Please specify a valid index.')
+						.setDescription(getLocale(defaultLocale, 'CHECK_INVALID_INDEX'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -46,7 +47,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription('You are not the requester of that track.')
+						.setDescription(getLocale(defaultLocale, 'CHECK_NOT_REQUESTER'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -57,7 +58,7 @@ module.exports = {
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(`Removed **[${track.title}](${track.uri})**`)
+					.setDescription(getLocale(defaultLocale, 'CMD_REMOVE_SUCCESS', track.title, track.uri))
 					.setColor(defaultColor),
 			],
 		});

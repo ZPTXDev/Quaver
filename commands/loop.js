@@ -2,20 +2,21 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { LoopType } = require('@lavaclient/queue');
 const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
-const { defaultColor } = require('../settings.json');
+const { defaultColor, defaultLocale } = require('../settings.json');
+const { getLocale } = require('../functions.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('loop')
-		.setDescription('Loop the queue.')
+		.setDescription(getLocale(defaultLocale, 'CMD_LOOP_DESCRIPTION'))
 		.addStringOption(option =>
 			option
 				.setName('type')
-				.setDescription('The looping mode.')
+				.setDescription(getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE'))
 				.setRequired(true)
-				.addChoice('Disabled', 'disabled')
-				.addChoice('Track', 'track')
-				.addChoice('Queue', 'queue')),
+				.addChoice(getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_DISABLED'), 'disabled')
+				.addChoice(getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_TRACK'), 'track')
+				.addChoice(getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_QUEUE'), 'queue')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -24,23 +25,27 @@ module.exports = {
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const type = interaction.options.getString('type');
-		let loop;
+		let loop, typeLocale;
 		switch (type) {
 			case 'disabled':
 				loop = LoopType.None;
+				typeLocale = getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_DISABLED');
 				break;
 			case 'track':
 				loop = LoopType.Song;
+				typeLocale = getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_TRACK');
 				break;
 			case 'queue':
 				loop = LoopType.Queue;
+				typeLocale = getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_QUEUE');
 				break;
 		}
+		typeLocale = typeLocale.toLowerCase();
 		player.queue.setLoop(loop);
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(`Looping mode set to **${type}**`)
+					.setDescription(getLocale(defaultLocale, 'CMD_LOOP_SUCCESS', typeLocale))
 					.setColor(defaultColor),
 			],
 		});

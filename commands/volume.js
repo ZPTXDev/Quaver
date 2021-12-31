@@ -1,16 +1,17 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
-const { managers, defaultColor } = require('../settings.json');
+const { managers, defaultColor, defaultLocale } = require('../settings.json');
+const { getLocale } = require('../functions.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('volume')
-		.setDescription('Adjust the volume of Quaver.')
+		.setDescription(getLocale(defaultLocale, 'CMD_VOLUME_DESCRIPTION'))
 		.addIntegerOption(option =>
 			option
 				.setName('newvolume')
-				.setDescription('The new volume to adjust to.')
+				.setDescription(getLocale(defaultLocale, 'CMD_VOLUME_OPTION_NEWVOLUME'))
 				.setRequired(true)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
@@ -24,7 +25,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription('That is not within the valid range of `0%` to `200%`.')
+						.setDescription(getLocale(defaultLocale, 'CMD_VOLUME_NOT_IN_RANGE'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -35,8 +36,8 @@ module.exports = {
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(`Volume adjusted to \`${newvolume}%\``)
-					.setFooter('This may take a few seconds to apply')
+					.setDescription(getLocale(defaultLocale, 'CMD_VOLUME_SUCCESS', newvolume))
+					.setFooter(getLocale(defaultLocale, 'MUSIC_FILTERS_NOTE'))
 					.setColor(defaultColor),
 			],
 		});

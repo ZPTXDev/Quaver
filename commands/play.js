@@ -2,23 +2,24 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { SpotifyItemType } = require('@lavaclient/spotify');
 const { MessageEmbed, Permissions } = require('discord.js');
 const { checks } = require('../enums.js');
-const { defaultColor } = require('../settings.json');
+const { defaultColor, defaultLocale } = require('../settings.json');
+const { getLocale } = require('../functions.js');
 
 // credit: https://github.com/lavaclient/djs-v13-example/blob/main/src/commands/Play.ts
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('play')
-		.setDescription('Play a track.')
+		.setDescription(getLocale(defaultLocale, 'CMD_PLAY_DESCRIPTION'))
 		.addStringOption(option =>
 			option
 				.setName('query')
-				.setDescription('What to search for. Links from Spotify, YouTube and more are supported. Searches YouTube by default.')
+				.setDescription(getLocale(defaultLocale, 'CMD_PLAY_OPTION_QUERY'))
 				.setRequired(true))
 		.addBooleanOption(option =>
 			option
 				.setName('insert')
-				.setDescription('Whether or not to play the track next.')),
+				.setDescription(getLocale(defaultLocale, 'CMD_PLAY_OPTION_INSERT'))),
 	checks: [checks.GUILD_ONLY, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -31,7 +32,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription('I need to be able to connect and speak in the voice channel.')
+						.setDescription(getLocale(defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_BASIC'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -42,7 +43,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription('I need to be a stage moderator in the stage channel.')
+						.setDescription(getLocale(defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_STAGE'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -59,20 +60,20 @@ module.exports = {
 				case SpotifyItemType.Track: {
 					const track = await item.resolveYoutubeTrack();
 					tracks = [track];
-					msg = `Added **[${item.name}](${query})** to${insert ? ' start of' : ''} queue`;
+					msg = getLocale(defaultLocale, insert ? 'MUSIC_QUEUE_ADDED_INSERT' : 'MUSIC_QUEUE_ADDED', item.name, query);
 					break;
 				}
 				case SpotifyItemType.Album:
 				case SpotifyItemType.Playlist:
 				case SpotifyItemType.Artist:
 					tracks = await item.resolveYoutubeTracks();
-					msg = `Added **${tracks.length}** tracks from **[${item.name}](${query})** to${insert ? ' start of' : ''} queue`;
+					msg = getLocale(defaultLocale, insert ? 'MUSIC_QUEUE_ADDED_MULTI_INSERT' : 'MUSIC_QUEUE_ADDED_MULTI', tracks.length, item.name, query);
 					break;
 				default:
 					await interaction.editReply({
 						embeds: [
 							new MessageEmbed()
-								.setDescription('Found no results from your Spotify query.')
+								.setDescription(getLocale(defaultLocale, 'CMD_PLAY_SPOTIFY_NO_RESULTS'))
 								.setColor('DARK_RED'),
 						],
 					});
@@ -85,13 +86,13 @@ module.exports = {
 			switch (results.loadType) {
 				case 'PLAYLIST_LOADED':
 					tracks = results.tracks;
-					msg = `Added **${tracks.length}** tracks from **[${results.playlistInfo.name}](${query})** to${insert ? ' start of' : ''} queue`;
+					msg = getLocale(defaultLocale, insert ? 'MUSIC_QUEUE_ADDED_MULTI_INSERT' : 'MUSIC_QUEUE_ADDED_MULTI', tracks.length, results.playlistInfo.name, query);
 					break;
 				case 'TRACK_LOADED':
 				case 'SEARCH_RESULT': {
 					const [track] = results.tracks;
 					tracks = [track];
-					msg = `Added **[${track.info.title}](${track.info.uri})** to${insert ? ' start of' : ''} queue`;
+					msg = getLocale(defaultLocale, insert ? 'MUSIC_QUEUE_ADDED_INSERT' : 'MUSIC_QUEUE_ADDED', track.info.title, track.info.uri);
 					break;
 				}
 				default:
@@ -99,7 +100,7 @@ module.exports = {
 					await interaction.editReply({
 						embeds: [
 							new MessageEmbed()
-								.setDescription('An unexpected error occurred. Try again later.')
+								.setDescription(getLocale(defaultLocale, 'DISCORD_CMD_ERROR'))
 								.setColor('DARK_RED'),
 						],
 					});
@@ -113,7 +114,7 @@ module.exports = {
 			player.queue.channel = interaction.channel;
 			await player.connect(interaction.member.voice.channelId, { deafened: true });
 			if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE' && !interaction.member.voice.channel.stageInstance) {
-				await interaction.member.voice.channel.createStageInstance({ topic: 'Music by Quaver', privacyLevel: 'GUILD_ONLY' });
+				await interaction.member.voice.channel.createStageInstance({ topic: getLocale(defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
 			}
 		}
 
@@ -128,7 +129,7 @@ module.exports = {
 				new MessageEmbed()
 					.setDescription(msg)
 					.setColor(defaultColor)
-					.setFooter(started ? `Position: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : ''),
+					.setFooter(started ? `${getLocale(defaultLocale, 'POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : ''),
 			],
 		});
 		if (!started) { await player.queue.start(); }
