@@ -446,7 +446,9 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 	const guild = oldState.guild;
 	const player = bot.music.players.get(guild.id);
 	if (!player) return;
+	// Quaver voiceStateUpdate
 	if (oldState.member.user.id === bot.user.id) {
+		// disconnected
 		if (!newState.channelId) {
 			const channel = player.queue.channel;
 			clearTimeout(player.timeout);
@@ -461,6 +463,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			});
 			return;
 		}
+		// channel is a stage channel, and bot is suppressed
 		// this also handles suppressing Quaver mid-track
 		if (newState.channel.type === 'GUILD_STAGE_VOICE' && newState.suppress) {
 			const permissions =	bot.guilds.cache.get(guild.id).channels.cache.get(newState.channelId).permissionsFor(bot.user.id);
@@ -481,7 +484,9 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			}
 			await newState.setSuppressed(false);
 		}
-		if (newState.channel?.members.filter(m => !m.user.bot).size < 1) {
+		// the new vc has no humans
+		if (newState.channel.members.filter(m => !m.user.bot).size < 1) {
+			// the bot is not playing anything - leave immediately
 			if (!player.queue.current || !player.playing && !player.paused) {
 				console.log(`[G ${newState.guildId}] ${getLocale(defaultLocale, 'LOG_ALONE')}`);
 				if (newState.channel.type === 'GUILD_STAGE_VOICE') {
@@ -503,6 +508,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				});
 				return;
 			}
+			// the bot was playing something - set pauseTimeout
 			await player.pause();
 			console.log(`[G ${newState.guildId}] ${getLocale(defaultLocale, 'LOG_SETTING_TIMEOUT_PAUSE')}`);
 			if (player.pauseTimeout) {
@@ -538,9 +544,9 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			});
 		}
 	}
-	// is a bot
+	// other bots voiceStateUpdate - ignore
 	if (oldState.member.user.bot) return;
-	// cancel pause timeout
+	// user voiceStateUpdate, the channel is the bot's channel, and there's a pauseTimeout
 	if (newState.channelId === player?.channelId && player?.pauseTimeout) {
 		player.resume();
 		if (player.pauseTimeout) {
