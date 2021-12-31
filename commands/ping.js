@@ -19,7 +19,7 @@ module.exports = {
 			embeds: [
 				new MessageEmbed()
 					.setDescription(`${getLocale(defaultLocale, 'CMD_PING_PONG')}${interaction.guild ? ` ${interaction.guild.shard.ping}ms` : ''}`)
-					.setFooter(`${getLocale(defaultLocale, 'CMD_PING_UPTIME')} ${uptimeString}`)
+					.setFooter({ text: `${getLocale(defaultLocale, 'CMD_PING_UPTIME')} ${uptimeString}` })
 					.setColor(defaultColor),
 			],
 		});

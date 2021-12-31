@@ -285,7 +285,7 @@ bot.on('interactionCreate', async interaction => {
 						const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
 						return `\`${(firstIndex + index).toString().padStart(largestIndexSize, ' ')}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 					}).join('\n'))
-					.setFooter(getLocale(defaultLocale, 'PAGE', page, pages.length));
+					.setFooter({ text: getLocale(defaultLocale, 'PAGE', page, pages.length) });
 				original.components[0].components = [];
 				original.components[0].components[0] = new MessageButton()
 					.setCustomId(`queue_${page - 1}`)
@@ -428,7 +428,7 @@ bot.on('interactionCreate', async interaction => {
 						new MessageEmbed()
 							.setDescription(msg)
 							.setColor(defaultColor)
-							.setFooter(started ? `${getLocale(defaultLocale, 'POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : ''),
+							.setFooter({ text: started ? `${getLocale(defaultLocale, 'POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '' }),
 					],
 					components: [],
 				});
@@ -538,7 +538,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				embeds: [
 					new MessageEmbed()
 						.setDescription(`${getLocale(defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`)
-						.setFooter(getLocale(defaultLocale, 'MUSIC_ALONE_REJOIN'))
+						.setFooter({ text: getLocale(defaultLocale, 'MUSIC_ALONE_REJOIN') })
 						.setColor(defaultColor),
 				],
 			});
@@ -619,7 +619,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		embeds: [
 			new MessageEmbed()
 				.setDescription(`${getLocale(defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`)
-				.setFooter(getLocale(defaultLocale, 'MUSIC_ALONE_REJOIN'))
+				.setFooter({ text: getLocale(defaultLocale, 'MUSIC_ALONE_REJOIN') })
 				.setColor(defaultColor),
 		],
 	});
@@ -664,7 +664,7 @@ async function shuttingDown(eventType, err) {
 				embeds: [
 					new MessageEmbed()
 						.setDescription(`${getLocale(defaultLocale, ['exit', 'SIGINT'].includes(eventType) ? 'MUSIC_RESTART' : 'MUSIC_RESTART_CRASH')}${fileBuffer.length > 0 ? `\n${getLocale(defaultLocale, 'MUSIC_RESTART_QUEUEDATA')}` : ''}`)
-						.setFooter(getLocale(defaultLocale, 'MUSIC_RESTART_SORRY'))
+						.setFooter({ text: getLocale(defaultLocale, 'MUSIC_RESTART_SORRY') })
 						.setColor(defaultColor),
 				],
 				files: fileBuffer.length > 0 ? [

@@ -37,7 +37,7 @@ module.exports = {
 			embeds: [
 				new MessageEmbed()
 					.setDescription(getLocale(defaultLocale, 'CMD_VOLUME_SUCCESS', newvolume))
-					.setFooter(getLocale(defaultLocale, 'MUSIC_FILTERS_NOTE'))
+					.setFooter({ text: getLocale(defaultLocale, 'MUSIC_FILTERS_NOTE') })
 					.setColor(defaultColor),
 			],
 		});

@@ -129,7 +129,7 @@ module.exports = {
 				new MessageEmbed()
 					.setDescription(msg)
 					.setColor(defaultColor)
-					.setFooter(started ? `${getLocale(defaultLocale, 'POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : ''),
+					.setFooter({ text: started ? `${getLocale(defaultLocale, 'POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '' }),
 			],
 		});
 		if (!started) { await player.queue.start(); }

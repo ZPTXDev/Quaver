@@ -34,7 +34,7 @@ module.exports = {
 			embeds: [
 				new MessageEmbed()
 					.setDescription(getLocale(defaultLocale, player.nightcore ? 'CMD_NIGHTCORE_ENABLED' : 'CMD_NIGHTCORE_DISABLED'))
-					.setFooter(getLocale(defaultLocale, 'MUSIC_FILTERS_NOTE'))
+					.setFooter({ text: getLocale(defaultLocale, 'MUSIC_FILTERS_NOTE') })
 					.setColor(defaultColor),
 			],
 		});

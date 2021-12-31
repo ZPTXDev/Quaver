@@ -37,7 +37,7 @@ module.exports = {
 						return `\`${index + 1}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 					}).join('\n'))
 					.setColor(defaultColor)
-					.setFooter(getLocale(defaultLocale, 'PAGE', '1', pages.length)),
+					.setFooter({ text: getLocale(defaultLocale, 'PAGE', '1', pages.length) }),
 			],
 			components: [
 				new MessageActionRow()

@@ -37,7 +37,7 @@ module.exports = {
 			embeds: [
 				new MessageEmbed()
 					.setDescription(getLocale(defaultLocale, player.bassboost ? 'CMD_BASSBOOST_ENABLED' : 'CMD_BASSBOOST_DISABLED'))
-					.setFooter(getLocale(defaultLocale, 'MUSIC_FILTERS_NOTE'))
+					.setFooter({ text: getLocale(defaultLocale, 'MUSIC_FILTERS_NOTE') })
 					.setColor(defaultColor),
 			],
 		});
