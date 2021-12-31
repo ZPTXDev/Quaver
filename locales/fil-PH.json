@@ -103,7 +103,7 @@
     "CMD_PING_PONG": "Pong!",
     "CMD_PING_UPTIME": "Uptime:",
     "CMD_PLAY_DESCRIPTION": "Magpatugtog ng track.",
-    "CMD_PLAY_OPTION_QUERY": "Ano ang hahanapin. Ang mga link mula sa Spotify, YouTube at higit pa ay sinusuportahan. Naghahanap sa YouTube bilang default.",
+    "CMD_PLAY_OPTION_QUERY": "Ano ang hahanapin. Spotify, YouTube at higit pa ay supported. Naghahanap sa YouTube bilang default.",
     "CMD_PLAY_OPTION_INSERT": "Magpe-play man o hindi sa susunod na track.",
     "CMD_PLAY_SPOTIFY_NO_RESULTS": "Walang nahanap na resulta mula sa iyong query sa Spotify.",
     "CMD_PLAYING_DESCRIPTION": "Ipakita kung ano ang kasalukuyang nagpe-play.",
