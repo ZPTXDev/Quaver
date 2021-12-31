@@ -40,5 +40,13 @@ Most probably not. They've only been targetting the larger bots so far, but if y
 ## Can you add x feature to Quaver?
 Yes, if it is meaningful. Submit an issue [here](https://github.com/ZapSquared/Quaver/issues) and I'll take a look.
 
+## I changed the locale through `/locale`. Why isn't it updating in slash commands?
+Unfortunately, slash commands are defined when running `node deploy-commands.js`.
+
+This means that slash command descriptions and console logs will follow the locale set in `settings.json` (`defaultLocale` key).
+
+## I changed `defaultLocale`, but it isn't updating in slash command descriptions. Why?
+You need to re-deploy the commands using `node deploy-commands.js` for the new locale to take effect. Logs, however, update immediately.
+
 # Contributing
 Refer to [CONTRIBUTING.md](CONTRIBUTING.md).
