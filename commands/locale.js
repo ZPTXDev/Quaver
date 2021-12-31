@@ -5,6 +5,7 @@ const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
 const { guildData } = require('../data.js');
 const fs = require('fs');
+const path = require('path');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -15,7 +16,7 @@ module.exports = {
 				.setName('locale')
 				.setDescription(getLocale(defaultLocale, 'CMD_LOCALE_OPTION_LOCALE'))
 				.setRequired(true)
-				.addChoices(fs.readdirSync('../locales').filter(file => file.endsWith('.json')).map(file => {return { name: file.slice(0, -5), value: file.slice(0, -5) };}))),
+				.addChoices(fs.readdirSync(path.resolve(__dirname, '../locales')).filter(file => file.endsWith('.json')).map(file => {return [file.slice(0, -5), file.slice(0, -5)];}))),
 	checks: [checks.GUILD_ONLY],
 	permissions: {
 		user: ['MANAGE_GUILD'],
