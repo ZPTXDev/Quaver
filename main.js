@@ -445,7 +445,7 @@ bot.on('interactionCreate', async interaction => {
 bot.on('voiceStateUpdate', async (oldState, newState) => {
 	const guild = oldState.guild;
 	const player = bot.music.players.get(guild.id);
-	// is Quaver and is no longer in any vc
+	if (!player) return;
 	if (oldState.member.user.id === bot.user.id) {
 		if (!newState.channelId) {
 			const channel = player.queue.channel;
