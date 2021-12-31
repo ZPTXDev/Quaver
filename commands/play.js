@@ -4,6 +4,7 @@ const { MessageEmbed, Permissions } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
+const { guildData } = require('../data.js');
 
 // credit: https://github.com/lavaclient/djs-v13-example/blob/main/src/commands/Play.ts
 
@@ -32,7 +33,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(getLocale(defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_BASIC'))
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_BASIC'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -43,7 +44,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(getLocale(defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_STAGE'))
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_STAGE'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -60,20 +61,20 @@ module.exports = {
 				case SpotifyItemType.Track: {
 					const track = await item.resolveYoutubeTrack();
 					tracks = [track];
-					msg = getLocale(defaultLocale, insert ? 'MUSIC_QUEUE_ADDED_INSERT' : 'MUSIC_QUEUE_ADDED', item.name, query);
+					msg = getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, insert ? 'MUSIC_QUEUE_ADDED_INSERT' : 'MUSIC_QUEUE_ADDED', item.name, query);
 					break;
 				}
 				case SpotifyItemType.Album:
 				case SpotifyItemType.Playlist:
 				case SpotifyItemType.Artist:
 					tracks = await item.resolveYoutubeTracks();
-					msg = getLocale(defaultLocale, insert ? 'MUSIC_QUEUE_ADDED_MULTI_INSERT' : 'MUSIC_QUEUE_ADDED_MULTI', tracks.length, item.name, query);
+					msg = getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, insert ? 'MUSIC_QUEUE_ADDED_MULTI_INSERT' : 'MUSIC_QUEUE_ADDED_MULTI', tracks.length, item.name, query);
 					break;
 				default:
 					await interaction.editReply({
 						embeds: [
 							new MessageEmbed()
-								.setDescription(getLocale(defaultLocale, 'CMD_PLAY_SPOTIFY_NO_RESULTS'))
+								.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_PLAY_SPOTIFY_NO_RESULTS'))
 								.setColor('DARK_RED'),
 						],
 					});
@@ -86,13 +87,13 @@ module.exports = {
 			switch (results.loadType) {
 				case 'PLAYLIST_LOADED':
 					tracks = results.tracks;
-					msg = getLocale(defaultLocale, insert ? 'MUSIC_QUEUE_ADDED_MULTI_INSERT' : 'MUSIC_QUEUE_ADDED_MULTI', tracks.length, results.playlistInfo.name, query);
+					msg = getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, insert ? 'MUSIC_QUEUE_ADDED_MULTI_INSERT' : 'MUSIC_QUEUE_ADDED_MULTI', tracks.length, results.playlistInfo.name, query);
 					break;
 				case 'TRACK_LOADED':
 				case 'SEARCH_RESULT': {
 					const [track] = results.tracks;
 					tracks = [track];
-					msg = getLocale(defaultLocale, insert ? 'MUSIC_QUEUE_ADDED_INSERT' : 'MUSIC_QUEUE_ADDED', track.info.title, track.info.uri);
+					msg = getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, insert ? 'MUSIC_QUEUE_ADDED_INSERT' : 'MUSIC_QUEUE_ADDED', track.info.title, track.info.uri);
 					break;
 				}
 				default:
@@ -100,7 +101,7 @@ module.exports = {
 					await interaction.editReply({
 						embeds: [
 							new MessageEmbed()
-								.setDescription(getLocale(defaultLocale, 'DISCORD_CMD_ERROR'))
+								.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_CMD_ERROR'))
 								.setColor('DARK_RED'),
 						],
 					});
@@ -114,7 +115,7 @@ module.exports = {
 			player.queue.channel = interaction.channel;
 			await player.connect(interaction.member.voice.channelId, { deafened: true });
 			if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE' && !interaction.member.voice.channel.stageInstance) {
-				await interaction.member.voice.channel.createStageInstance({ topic: getLocale(defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
+				await interaction.member.voice.channel.createStageInstance({ topic: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
 			}
 		}
 
@@ -129,7 +130,7 @@ module.exports = {
 				new MessageEmbed()
 					.setDescription(msg)
 					.setColor(defaultColor)
-					.setFooter({ text: started ? `${getLocale(defaultLocale, 'POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '' }),
+					.setFooter({ text: started ? `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '' }),
 			],
 		});
 		if (!started) { await player.queue.start(); }

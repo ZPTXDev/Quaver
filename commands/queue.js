@@ -4,6 +4,7 @@ const { checks } = require('../enums.js');
 const { paginate, msToTime, msToTimeString } = require('../functions.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
+const { guildData } = require('../data.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -21,7 +22,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(getLocale(defaultLocale, 'CMD_QUEUE_EMPTY'))
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_QUEUE_EMPTY'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -37,7 +38,7 @@ module.exports = {
 						return `\`${index + 1}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 					}).join('\n'))
 					.setColor(defaultColor)
-					.setFooter({ text: getLocale(defaultLocale, 'PAGE', '1', pages.length) }),
+					.setFooter({ text: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'PAGE', '1', pages.length) }),
 			],
 			components: [
 				new MessageActionRow()
@@ -56,7 +57,7 @@ module.exports = {
 							.setCustomId('queue_1')
 							.setEmoji('🔁')
 							.setStyle('SECONDARY')
-							.setLabel(getLocale(defaultLocale, 'REFRESH')),
+							.setLabel(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'REFRESH')),
 					),
 			],
 		});

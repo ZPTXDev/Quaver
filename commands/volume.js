@@ -3,6 +3,7 @@ const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
 const { managers, defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
+const { guildData } = require('../data.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -25,7 +26,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(getLocale(defaultLocale, 'CMD_VOLUME_NOT_IN_RANGE'))
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_VOLUME_NOT_IN_RANGE'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -36,8 +37,8 @@ module.exports = {
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(getLocale(defaultLocale, 'CMD_VOLUME_SUCCESS', newvolume))
-					.setFooter({ text: getLocale(defaultLocale, 'MUSIC_FILTERS_NOTE') })
+					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_VOLUME_SUCCESS', newvolume))
+					.setFooter({ text: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_FILTERS_NOTE') })
 					.setColor(defaultColor),
 			],
 		});

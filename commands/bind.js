@@ -3,6 +3,7 @@ const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
+const { guildData } = require('../data.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -25,7 +26,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(getLocale(defaultLocale, 'CHECK_INVALID_TEXT_CHANNEL'))
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CHECK_INVALID_TEXT_CHANNEL'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -36,7 +37,7 @@ module.exports = {
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(getLocale(defaultLocale, 'CMD_BIND_SUCCESS', channel.id))
+					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_BIND_SUCCESS', channel.id))
 					.setColor(defaultColor),
 			],
 		});

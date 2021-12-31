@@ -3,6 +3,7 @@ const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
+const { guildData } = require('../data.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -31,7 +32,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(getLocale(defaultLocale, 'CMD_MOVE_INSUFFICIENT'))
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_MOVE_INSUFFICIENT'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -42,7 +43,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(getLocale(defaultLocale, 'CMD_MOVE_NOT_IN_RANGE'))
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_MOVE_NOT_IN_RANGE'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -53,7 +54,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(getLocale(defaultLocale, 'CMD_MOVE_EQUAL'))
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_MOVE_EQUAL'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -65,7 +66,7 @@ module.exports = {
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(getLocale(defaultLocale, 'CMD_MOVE_SUCCESS', track.title, track.uri, oldposition, newposition))
+					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_MOVE_SUCCESS', track.title, track.uri, oldposition, newposition))
 					.setColor(defaultColor),
 			],
 		});

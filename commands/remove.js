@@ -3,6 +3,7 @@ const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
+const { guildData } = require('../data.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -25,7 +26,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(getLocale(defaultLocale, 'CMD_REMOVE_EMPTY'))
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_REMOVE_EMPTY'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -36,7 +37,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(getLocale(defaultLocale, 'CHECK_INVALID_INDEX'))
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CHECK_INVALID_INDEX'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -47,7 +48,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(getLocale(defaultLocale, 'CHECK_NOT_REQUESTER'))
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CHECK_NOT_REQUESTER'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -58,7 +59,7 @@ module.exports = {
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(getLocale(defaultLocale, 'CMD_REMOVE_SUCCESS', track.title, track.uri))
+					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_REMOVE_SUCCESS', track.title, track.uri))
 					.setColor(defaultColor),
 			],
 		});

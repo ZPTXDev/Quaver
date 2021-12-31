@@ -9,6 +9,7 @@ const { version } = require('./package.json');
 const { checks } = require('./enums.js');
 const { msToTime, msToTimeString, paginate, getLocale } = require('./functions.js');
 const readline = require('readline');
+const { guildData } = require('./data.js');
 
 const rl = readline.createInterface({
 	input: process.stdin,
@@ -85,7 +86,7 @@ bot.music.on('queueFinish', queue => {
 		channel.send({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(getLocale(defaultLocale, 'MUSIC_INACTIVITY'))
+					.setDescription(getLocale(guildData.get(`${p.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY'))
 					.setColor(defaultColor),
 			],
 		});
@@ -93,7 +94,7 @@ bot.music.on('queueFinish', queue => {
 	queue.channel.send({
 		embeds: [
 			new MessageEmbed()
-				.setDescription(`${getLocale(defaultLocale, 'MUSIC_QUEUE_EMPTY')} ${getLocale(defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 1800)}`)
+				.setDescription(`${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_EMPTY')} ${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 1800)}`)
 				.setColor(defaultColor),
 		],
 	});
@@ -111,7 +112,7 @@ bot.music.on('trackStart', async (queue, song) => {
 	await queue.channel.send({
 		embeds: [
 			new MessageEmbed()
-				.setDescription(`${getLocale(defaultLocale, 'MUSIC_NOW_PLAYING', song.title, song.uri, durationString)}\n${getLocale(defaultLocale, 'MUSIC_ADDED_BY', song.requester)}`)
+				.setDescription(`${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_NOW_PLAYING', song.title, song.uri, durationString)}\n${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ADDED_BY', song.requester)}`)
 				.setColor(defaultColor),
 		],
 	});
@@ -132,7 +133,7 @@ bot.music.on('trackEnd', queue => {
 		queue.channel.send({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(getLocale(defaultLocale, 'MUSIC_ALONE'))
+					.setDescription(getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE'))
 					.setColor(defaultColor),
 			],
 		});
@@ -222,7 +223,7 @@ bot.on('interactionCreate', async interaction => {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(getLocale(defaultLocale, 'DISCORD_USER_MISSING_PERMISSIONS', failedPermissions.user.map(perm => '`' + perm + '`').join(' ')))
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_USER_MISSING_PERMISSIONS', failedPermissions.user.map(perm => '`' + perm + '`').join(' ')))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -233,7 +234,7 @@ bot.on('interactionCreate', async interaction => {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(getLocale(defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS', failedPermissions.bot.map(perm => '`' + perm + '`').join(' ')))
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS', failedPermissions.bot.map(perm => '`' + perm + '`').join(' ')))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -250,7 +251,7 @@ bot.on('interactionCreate', async interaction => {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(getLocale(defaultLocale, 'DISCORD_CMD_ERROR'))
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_CMD_ERROR'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -285,7 +286,7 @@ bot.on('interactionCreate', async interaction => {
 						const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
 						return `\`${(firstIndex + index).toString().padStart(largestIndexSize, ' ')}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 					}).join('\n'))
-					.setFooter({ text: getLocale(defaultLocale, 'PAGE', page, pages.length) });
+					.setFooter({ text: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'PAGE', page, pages.length) });
 				original.components[0].components = [];
 				original.components[0].components[0] = new MessageButton()
 					.setCustomId(`queue_${page - 1}`)
@@ -301,7 +302,7 @@ bot.on('interactionCreate', async interaction => {
 					.setCustomId(`queue_${page}`)
 					.setEmoji('🔁')
 					.setStyle('SECONDARY')
-					.setLabel(getLocale(defaultLocale, 'REFRESH')),
+					.setLabel(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'REFRESH')),
 				interaction.update({
 					embeds: original.embeds,
 					components: original.components,
@@ -313,7 +314,7 @@ bot.on('interactionCreate', async interaction => {
 					await interaction.reply({
 						embeds: [
 							new MessageEmbed()
-								.setDescription(getLocale(defaultLocale, 'DISCORD_INTERACTION_WRONG_USER'))
+								.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_INTERACTION_WRONG_USER'))
 								.setColor('DARK_RED'),
 						],
 						ephemeral: true,
@@ -323,7 +324,7 @@ bot.on('interactionCreate', async interaction => {
 				await interaction.update({
 					embeds: [
 						new MessageEmbed()
-							.setDescription(getLocale(defaultLocale, 'DISCORD_INTERACTION_CANCELED', interaction.user.id))
+							.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_INTERACTION_CANCELED', interaction.user.id))
 							.setColor(defaultColor),
 					],
 					components: [],
@@ -339,7 +340,7 @@ bot.on('interactionCreate', async interaction => {
 					await interaction.reply({
 						embeds: [
 							new MessageEmbed()
-								.setDescription(getLocale(defaultLocale, 'DISCORD_INTERACTION_WRONG_USER'))
+								.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_INTERACTION_WRONG_USER'))
 								.setColor('DARK_RED'),
 						],
 						ephemeral: true,
@@ -376,7 +377,7 @@ bot.on('interactionCreate', async interaction => {
 					await interaction.reply({
 						embeds: [
 							new MessageEmbed()
-								.setDescription(getLocale(defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_BASIC'))
+								.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_BASIC'))
 								.setColor('DARK_RED'),
 						],
 						ephemeral: true,
@@ -387,7 +388,7 @@ bot.on('interactionCreate', async interaction => {
 					await interaction.reply({
 						embeds: [
 							new MessageEmbed()
-								.setDescription(getLocale(defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_STAGE'))
+								.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_STAGE'))
 								.setColor('DARK_RED'),
 						],
 						ephemeral: true,
@@ -401,7 +402,7 @@ bot.on('interactionCreate', async interaction => {
 					player.queue.channel = interaction.channel;
 					await player.connect(interaction.member.voice.channelId, { deafened: true });
 					if (interaction.member?.voice.channel.type === 'GUILD_STAGE_VOICE' && !interaction.member?.voice.channel.stageInstance) {
-						await interaction.member.voice.channel.createStageInstance({ topic: getLocale(defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
+						await interaction.member.voice.channel.createStageInstance({ topic: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
 					}
 				}
 
@@ -416,10 +417,10 @@ bot.on('interactionCreate', async interaction => {
 				const endPosition = firstPosition + resolvedTracks.length - 1;
 				let msg;
 				if (resolvedTracks.length === 1) {
-					msg = getLocale(defaultLocale, 'MUSIC_QUEUE_ADDED', resolvedTracks[0].info.title, resolvedTracks[0].info.uri);
+					msg = getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_ADDED', resolvedTracks[0].info.title, resolvedTracks[0].info.uri);
 				}
 				else {
-					msg = getLocale(defaultLocale, 'MUSIC_QUEUE_ADDED_MULTI', resolvedTracks.length, getLocale(defaultLocale, 'MUSIC_SEARCH'), '');
+					msg = getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_ADDED_MULTI', resolvedTracks.length, getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_SEARCH'), '');
 				}
 				player.queue.add(resolvedTracks, { requester: interaction.user.id });
 				const started = player.playing || player.paused;
@@ -428,7 +429,7 @@ bot.on('interactionCreate', async interaction => {
 						new MessageEmbed()
 							.setDescription(msg)
 							.setColor(defaultColor)
-							.setFooter({ text: started ? `${getLocale(defaultLocale, 'POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '' }),
+							.setFooter({ text: started ? `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '' }),
 					],
 					components: [],
 				});
@@ -457,7 +458,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			channel.send({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(getLocale(defaultLocale, 'MUSIC_FORCED'))
+						.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_FORCED'))
 						.setColor(defaultColor),
 				],
 			});
@@ -476,7 +477,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				channel.send({
 					embeds: [
 						new MessageEmbed()
-							.setDescription(getLocale(defaultLocale, 'MUSIC_FORCED_STAGE'))
+							.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_FORCED_STAGE'))
 							.setColor(defaultColor),
 					],
 				});
@@ -502,7 +503,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				channel.send({
 					embeds: [
 						new MessageEmbed()
-							.setDescription(getLocale(defaultLocale, 'MUSIC_ALONE_MOVED'))
+							.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_MOVED'))
 							.setColor(defaultColor),
 					],
 				});
@@ -529,7 +530,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				channel.send({
 					embeds: [
 						new MessageEmbed()
-							.setDescription(getLocale(defaultLocale, 'MUSIC_INACTIVITY'))
+							.setDescription(getLocale(guildData.get(`${p.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY'))
 							.setColor(defaultColor),
 					],
 				});
@@ -537,8 +538,8 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			await player.queue.channel.send({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(`${getLocale(defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`)
-						.setFooter({ text: getLocale(defaultLocale, 'MUSIC_ALONE_REJOIN') })
+						.setDescription(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`)
+						.setFooter({ text: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_REJOIN') })
 						.setColor(defaultColor),
 				],
 			});
@@ -556,7 +557,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		await player.queue.channel.send({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(getLocale(defaultLocale, 'MUSIC_ALONE_RESUMED'))
+					.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_RESUMED'))
 					.setColor(defaultColor),
 			],
 		});
@@ -584,7 +585,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		channel.send({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(getLocale(defaultLocale, 'MUSIC_ALONE'))
+					.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE'))
 					.setColor(defaultColor),
 			],
 		});
@@ -610,7 +611,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		channel.send({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(getLocale(defaultLocale, 'MUSIC_INACTIVITY'))
+					.setDescription(getLocale(guildData.get(`${p.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY'))
 					.setColor(defaultColor),
 			],
 		});
@@ -618,8 +619,8 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 	await player.queue.channel.send({
 		embeds: [
 			new MessageEmbed()
-				.setDescription(`${getLocale(defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`)
-				.setFooter({ text: getLocale(defaultLocale, 'MUSIC_ALONE_REJOIN') })
+				.setDescription(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`)
+				.setFooter({ text: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_REJOIN') })
 				.setColor(defaultColor),
 		],
 	});
@@ -653,18 +654,18 @@ async function shuttingDown(eventType, err) {
 			}
 			const fileBuffer = [];
 			if (player.queue.tracks.length > 0 || player.queue.current && (player.playing || player.paused)) {
-				fileBuffer.push(`${getLocale(defaultLocale, 'CURRENT')}:`);
+				fileBuffer.push(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'CURRENT')}:`);
 				fileBuffer.push(player.queue.current.uri);
 				if (player.queue.tracks.length > 0) {
-					fileBuffer.push(`${getLocale(defaultLocale, 'QUEUE')}:`);
+					fileBuffer.push(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'QUEUE')}:`);
 					fileBuffer.push(player.queue.tracks.map(track => track.uri).join('\n'));
 				}
 			}
 			await player.queue.channel.send({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(`${getLocale(defaultLocale, ['exit', 'SIGINT'].includes(eventType) ? 'MUSIC_RESTART' : 'MUSIC_RESTART_CRASH')}${fileBuffer.length > 0 ? `\n${getLocale(defaultLocale, 'MUSIC_RESTART_QUEUEDATA')}` : ''}`)
-						.setFooter({ text: getLocale(defaultLocale, 'MUSIC_RESTART_SORRY') })
+						.setDescription(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, ['exit', 'SIGINT'].includes(eventType) ? 'MUSIC_RESTART' : 'MUSIC_RESTART_CRASH')}${fileBuffer.length > 0 ? `\n${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_RESTART_QUEUEDATA')}` : ''}`)
+						.setFooter({ text: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_RESTART_SORRY') })
 						.setColor(defaultColor),
 				],
 				files: fileBuffer.length > 0 ? [

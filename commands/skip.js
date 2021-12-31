@@ -3,6 +3,7 @@ const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
+const { guildData } = require('../data.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -21,7 +22,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(getLocale(defaultLocale, 'CMD_SKIP_SUCCESS', track.title, track.uri))
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SKIP_SUCCESS', track.title, track.uri))
 						.setColor(defaultColor),
 				],
 			});
@@ -32,7 +33,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(getLocale(defaultLocale, 'CMD_SKIP_VOTED'))
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SKIP_VOTED'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
@@ -46,7 +47,7 @@ module.exports = {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(`${getLocale(defaultLocale, 'CMD_SKIP_SUCCESS_VOTED', track.title, track.uri)}\n${getLocale(defaultLocale, 'MUSIC_ADDED_BY', track.requester)}`)
+						.setDescription(`${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SKIP_SUCCESS_VOTED', track.title, track.uri)}\n${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_ADDED_BY', track.requester)}`)
 						.setColor(defaultColor),
 				],
 			});
@@ -57,7 +58,7 @@ module.exports = {
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(getLocale(defaultLocale, 'CMD_SKIP_VOTED_SUCCESS', player.queue.current.title, player.queue.current.uri, skip.users.length, skip.required))
+					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SKIP_VOTED_SUCCESS', player.queue.current.title, player.queue.current.uri, skip.users.length, skip.required))
 					.setColor(defaultColor),
 			],
 		});

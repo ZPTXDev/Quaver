@@ -4,6 +4,7 @@ const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
+const { guildData } = require('../data.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -29,15 +30,15 @@ module.exports = {
 		switch (type) {
 			case 'disabled':
 				loop = LoopType.None;
-				typeLocale = getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_DISABLED');
+				typeLocale = getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_LOOP_OPTION_TYPE_DISABLED');
 				break;
 			case 'track':
 				loop = LoopType.Song;
-				typeLocale = getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_TRACK');
+				typeLocale = getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_LOOP_OPTION_TYPE_TRACK');
 				break;
 			case 'queue':
 				loop = LoopType.Queue;
-				typeLocale = getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_QUEUE');
+				typeLocale = getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_LOOP_OPTION_TYPE_QUEUE');
 				break;
 		}
 		typeLocale = typeLocale.toLowerCase();
@@ -45,7 +46,7 @@ module.exports = {
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(getLocale(defaultLocale, 'CMD_LOOP_SUCCESS', typeLocale))
+					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_LOOP_SUCCESS', typeLocale))
 					.setColor(defaultColor),
 			],
 		});

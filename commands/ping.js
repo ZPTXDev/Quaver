@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { msToTime, msToTimeString, getLocale } = require('../functions.js');
+const { guildData } = require('../data.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -18,8 +19,8 @@ module.exports = {
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(`${getLocale(defaultLocale, 'CMD_PING_PONG')}${interaction.guild ? ` ${interaction.guild.shard.ping}ms` : ''}`)
-					.setFooter({ text: `${getLocale(defaultLocale, 'CMD_PING_UPTIME')} ${uptimeString}` })
+					.setDescription(`${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_PING_PONG')}${interaction.guild ? ` ${interaction.guild.shard.ping}ms` : ''}`)
+					.setFooter({ text: `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_PING_UPTIME')} ${uptimeString}` })
 					.setColor(defaultColor),
 			],
 		});
