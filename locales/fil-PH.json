@@ -75,7 +75,7 @@
   "CMD_DISCONNECT_DESCRIPTION": "Idiskonekta si Quaver.",
   "CMD_DISCONNECT_SUCCESS": "Umalis sa voice channel.",
   "CMD_INFO_DESCRIPTION": "Magpakita ng impormasyon tungkol kay Quaver.",
-  "CMD_INFO_DETAIL": "Open-source music bot para sa maliliit na mga komunidad.\nAvailable ang source code [dito](https://go.zptx.icu/Quaver), invite [dito](%1).\nTumatakbo sa bersyong `%2`.",
+  "CMD_INFO_DETAIL": "Open-source na music bot para sa maliliit na mga komunidad.\nAvailable ang source code [dito](https://go.zptx.icu/Quaver), invite [dito](%1).\nTumatakbo sa bersyong `%2`.",
   "CMD_LOCALE_DESCRIPTION": "Baguhin ang locale ni Quaver sa server na ito.",
   "CMD_LOCALE_OPTION_LOCALE": "Ang locale na gagamitin.",
   "CMD_LOCALE_SUCCESS": "Ang locale para sa **%1** ay itinakda sa `%2`.",
