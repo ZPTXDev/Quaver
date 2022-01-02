@@ -107,5 +107,6 @@ dist
 .idea
 .vscode
 
-# Settings
+# Settings and Data
 settings.json
+data.json
