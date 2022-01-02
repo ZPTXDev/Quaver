@@ -13,6 +13,8 @@ Hosting Quaver is fairly simple. Make a copy of `settings.example.json`, edit th
 
 You are required to host your own instance of [Lavalink](https://github.com/freyacodes/Lavalink) and specify the connection details in `settings.json`.
 
+For a detailed explanation on configuration, view [CONFIGURATION.md](CONFIGURATION.md).
+
 From version **2.0.0**, you are no longer required to specify MySQL connection details as Quaver will use JSON for guild data.
 
 ## Prerequisites
