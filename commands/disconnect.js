@@ -15,12 +15,6 @@ module.exports = {
 		bot: [],
 	},
 	async execute(interaction) {
-		const state = interaction.client.guilds.cache.get(interaction.guildId).members.cache.get(interaction.client.user.id).voice;
-		if (state.channel.type === 'GUILD_STAGE_VOICE') {
-			if (!state.suppress) {
-				await state.setSuppressed(true);
-			}
-		}
 		const player = interaction.client.music.players.get(interaction.guildId);
 		clearTimeout(player.timeout);
 		clearTimeout(player.pauseTimeout);

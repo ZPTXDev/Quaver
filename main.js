@@ -73,12 +73,6 @@ bot.music.on('queueFinish', queue => {
 	}
 	queue.player.timeout = setTimeout(p => {
 		console.log(`[G ${p.guildId}] ${getLocale(defaultLocale, 'LOG_INACTIVITY')}`);
-		const state = bot.guilds.cache.get(p.guildId).members.cache.get(bot.user.id).voice;
-		if (state.channel.type === 'GUILD_STAGE_VOICE') {
-			if (!state.suppress) {
-				state.setSuppressed(true);
-			}
-		}
 		const channel = p.queue.channel;
 		clearTimeout(p.pauseTimeout);
 		p.disconnect();
@@ -122,12 +116,6 @@ bot.music.on('trackEnd', queue => {
 	delete queue.player.skip;
 	if (bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).members?.filter(m => !m.user.bot).size < 1) {
 		console.log(`[G ${queue.player.guildId}] ${getLocale(defaultLocale, 'LOG_ALONE')}`);
-		const state = bot.guilds.cache.get(queue.player.guildId).members.cache.get(bot.user.id).voice;
-		if (state.channel.type === 'GUILD_STAGE_VOICE') {
-			if (!state.suppress) {
-				state.setSuppressed(true);
-			}
-		}
 		queue.player.disconnect();
 		bot.music.destroyPlayer(queue.player.guildId);
 		queue.channel.send({
@@ -490,11 +478,6 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			// the bot is not playing anything - leave immediately
 			if (!player.queue.current || !player.playing && !player.paused) {
 				console.log(`[G ${newState.guildId}] ${getLocale(defaultLocale, 'LOG_ALONE')}`);
-				if (newState.channel.type === 'GUILD_STAGE_VOICE') {
-					if (!newState.suppress) {
-						await newState.setSuppressed(true);
-					}
-				}
 				const channel = player.queue.channel;
 				clearTimeout(player.timeout);
 				clearTimeout(player.pauseTimeout);
@@ -517,12 +500,6 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			}
 			player.pauseTimeout = setTimeout(p => {
 				console.log(`[G ${p.guildId}] ${getLocale(defaultLocale, 'LOG_INACTIVITY')}`);
-				const state = bot.guilds.cache.get(p.guildId).members.cache.get(bot.user.id).voice;
-				if (state.channel.type === 'GUILD_STAGE_VOICE') {
-					if (!state.suppress) {
-						state.setSuppressed(true);
-					}
-				}
 				const channel = p.queue.channel;
 				clearTimeout(p.timeout);
 				p.disconnect();
@@ -571,12 +548,6 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 	if (oldState.channel.members.filter(m => !m.user.bot).size >= 1) return;
 	if (!player.queue.current || !player.playing && !player.paused) {
 		console.log(`[G ${player.guildId}] ${getLocale(defaultLocale, 'LOG_ALONE')}`);
-		const state = bot.guilds.cache.get(player.guildId).members.cache.get(bot.user.id).voice;
-		if (state.channel.type === 'GUILD_STAGE_VOICE') {
-			if (!state.suppress) {
-				await state.setSuppressed(true);
-			}
-		}
 		const channel = player.queue.channel;
 		clearTimeout(player.timeout);
 		clearTimeout(player.pauseTimeout);
@@ -598,12 +569,6 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 	}
 	player.pauseTimeout = setTimeout(p => {
 		console.log(`[G ${p.guildId}] ${getLocale(defaultLocale, 'LOG_INACTIVITY')}`);
-		const state = bot.guilds.cache.get(p.guildId).members.cache.get(bot.user.id).voice;
-		if (state.channel.type === 'GUILD_STAGE_VOICE') {
-			if (!state.suppress) {
-				state.setSuppressed(true);
-			}
-		}
 		const channel = p.queue.channel;
 		clearTimeout(p.timeout);
 		p.disconnect();
@@ -646,12 +611,6 @@ async function shuttingDown(eventType, err) {
 		for (const pair of bot.music.players) {
 			const player = pair[1];
 			console.log(`[G ${player.guildId}] ${getLocale(defaultLocale, 'LOG_RESTARTING')}`);
-			const state = bot.guilds.cache.get(player.guildId).members.cache.get(bot.user.id).voice;
-			if (state.channel.type === 'GUILD_STAGE_VOICE') {
-				if (!state.suppress) {
-					await state.setSuppressed(true);
-				}
-			}
 			const fileBuffer = [];
 			if (player.queue.tracks.length > 0 || player.queue.current && (player.playing || player.paused)) {
 				fileBuffer.push(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'CURRENT')}:`);
