@@ -87,11 +87,9 @@ function getLocale(language, string, ...vars) {
 	if (!strings) return 'LOCALE_MISSING';
 	let locale = strings[string];
 	if (!locale) return string;
-	let count = 0;
-	locale = locale.replace(/%VAR%/g, x => {
-		const returning = vars[count] !== null ? vars[count] : x;
-		count++;
-		return returning;
+	vars.forEach((v, i) => {
+		const humanReadable = i + 1;
+		locale = locale.replace(`%${humanReadable}`, v);
 	});
 	return locale;
 }
