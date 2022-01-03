@@ -83,15 +83,31 @@ function paginate(arr, size) {
 }
 // thanks: https://stackoverflow.com/a/63376860
 function getLocale(language, string, ...vars) {
-	const strings = require(`./locales/${language}.json`);
+	let strings = require(`./locales/${language}.json`);
 	if (!strings) return 'LOCALE_MISSING';
 	let locale = strings[string];
-	if (!locale) return string;
+	if (!locale) {
+		// this uses en-US by default on purpose.
+		// en-US is the only locale I can confirm is 100% complete.
+		strings = require('./locales/en-US.json');
+		locale = strings[string];
+	}
 	vars.forEach((v, i) => {
-		const humanReadable = i + 1;
-		locale = locale.replace(`%${humanReadable}`, v);
+		locale = locale.replace(`%${i + 1}`, v);
 	});
 	return locale;
 }
 
-module.exports = { msToTime, msToTimeString, roundTo, getSeconds, getBar, paginate, getLocale };
+function checkLocaleCompletion(language) {
+	const foreignStrings = require(`./locales/${language}.json`);
+	const strings = require('./locales/en-US.json');
+	const foreignStringsKeys = Object.keys(foreignStrings);
+	const stringsKeys = Object.keys(strings);
+	// missing strings
+	if (stringsKeys.length > foreignStringsKeys.length) {
+		return { completion: foreignStringsKeys.length / stringsKeys.length * 100, missing: stringsKeys.filter(x => !foreignStringsKeys.includes(x)) };
+	}
+	return { completion: 100, missing: [] };
+}
+
+module.exports = { msToTime, msToTimeString, roundTo, getSeconds, getBar, paginate, getLocale, checkLocaleCompletion };
