@@ -189,7 +189,7 @@ bot.on('interactionCreate', async interaction => {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(failedChecks[0])
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, failedChecks[0]))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
