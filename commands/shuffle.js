@@ -27,12 +27,7 @@ module.exports = {
 			});
 			return;
 		}
-		let currentIndex = player.queue.tracks.length, randomIndex;
-		while (currentIndex !== 0) {
-			randomIndex = Math.floor(Math.random() * currentIndex);
-			currentIndex--;
-			[player.queue.tracks[currentIndex], player.queue.tracks[randomIndex]] = [player.queue.tracks[randomIndex], player.queue.tracks[currentIndex]];
-		}
+		player.queue.shuffle();
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
