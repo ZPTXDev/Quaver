@@ -457,6 +457,9 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 	if (oldState.member.user.id === bot.user.id) {
 		// disconnected
 		if (!newState.channelId) {
+			if (guildData.get(`${player.guildId}.always.enabled`)) {
+				guildData.set(`${player.guildId}.always.enabled`, false);
+			}
 			const channel = player.queue.channel;
 			clearTimeout(player.timeout);
 			clearTimeout(player.pauseTimeout);
@@ -475,6 +478,9 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		if (newState.channel.type === 'GUILD_STAGE_VOICE' && newState.suppress) {
 			const permissions =	bot.guilds.cache.get(guild.id).channels.cache.get(newState.channelId).permissionsFor(bot.user.id);
 			if (!permissions.has(Permissions.STAGE_MODERATOR)) {
+				if (guildData.get(`${player.guildId}.always.enabled`)) {
+					guildData.set(`${player.guildId}.always.enabled`, false);
+				}
 				const channel = player.queue.channel;
 				clearTimeout(player.timeout);
 				clearTimeout(player.pauseTimeout);
@@ -495,6 +501,9 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		if (newState.channel.members.filter(m => !m.user.bot).size < 1) {
 			// the bot is not playing anything - leave immediately
 			if (!player.queue.current || !player.playing && !player.paused) {
+				if (guildData.get(`${player.guildId}.always.enabled`)) {
+					guildData.set(`${player.guildId}.always.enabled`, false);
+				}
 				console.log(`[G ${newState.guildId}] ${getLocale(defaultLocale, 'LOG_ALONE')}`);
 				const channel = player.queue.channel;
 				clearTimeout(player.timeout);
@@ -510,6 +519,8 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				});
 				return;
 			}
+			// avoid pauseTimeout if 24/7 is enabled
+			if (guildData.get(`${player.guildId}.always.enabled`)) return;
 			// the bot was playing something - set pauseTimeout
 			await player.pause();
 			console.log(`[G ${newState.guildId}] ${getLocale(defaultLocale, 'LOG_SETTING_TIMEOUT_PAUSE')}`);
@@ -564,6 +575,9 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 	if (newState.channelId === oldState.channelId) return;
 	// vc still has people
 	if (oldState.channel.members.filter(m => !m.user.bot).size >= 1) return;
+	// 24/7 mode enabled, ignore
+	if (guildData.get(`${guild.id}.always.enabled`)) return;
+	// nothing is playing so we just leave
 	if (!player.queue.current || !player.playing && !player.paused) {
 		console.log(`[G ${player.guildId}] ${getLocale(defaultLocale, 'LOG_ALONE')}`);
 		const channel = player.queue.channel;
