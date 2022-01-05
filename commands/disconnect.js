@@ -15,6 +15,17 @@ module.exports = {
 		bot: [],
 	},
 	async execute(interaction) {
+		if (guildData.get(`${interaction.guildId}.always.enabled`)) {
+			await interaction.reply({
+				embeds: [
+					new MessageEmbed()
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_DISCONNECT_247_ENABLED'))
+						.setColor('DARK_RED'),
+				],
+				ephemeral: true,
+			});
+			return;
+		}
 		const player = interaction.client.music.players.get(interaction.guildId);
 		clearTimeout(player.timeout);
 		clearTimeout(player.pauseTimeout);

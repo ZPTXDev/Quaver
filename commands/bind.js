@@ -34,6 +34,9 @@ module.exports = {
 			return;
 		}
 		player.queue.channel = channel;
+		if (guildData.get(`${interaction.guildId}.always.enabled`)) {
+			guildData.set(`${interaction.guildId}.always.text`, channel.id);
+		}
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()

@@ -64,9 +64,27 @@ let startup = false;
 
 bot.music.on('connect', () => {
 	console.log(`[Quaver] ${getLocale(defaultLocale, 'LOG_LAVALINK_CONNECTED')}`);
+	Object.keys(guildData.data).forEach(async guildId => {
+		if (guildData.get(`${guildId}.always.enabled`)) {
+			const guild = bot.guilds.cache.get(guildId);
+			const player = bot.music.createPlayer(guildId);
+			player.queue.channel = guild.channels.cache.get(guildData.get(`${guildId}.always.text`));
+			await player.connect(guildData.get(`${guildId}.always.channel`), { deafened: true });
+		}
+	});
 });
 
 bot.music.on('queueFinish', queue => {
+	if (guildData.get(`${queue.player.guildId}.always.enabled`)) {
+		queue.channel.send({
+			embeds: [
+				new MessageEmbed()
+					.setDescription(`${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_EMPTY')}`)
+					.setColor(defaultColor),
+			],
+		});
+		return;
+	}
 	console.log(`[G ${queue.player.guildId}] ${getLocale(defaultLocale, 'LOG_SETTING_TIMEOUT')}`);
 	if (queue.player.timeout) {
 		clearTimeout(queue.player.timeout);
@@ -114,7 +132,7 @@ bot.music.on('trackStart', async (queue, song) => {
 
 bot.music.on('trackEnd', queue => {
 	delete queue.player.skip;
-	if (bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).members?.filter(m => !m.user.bot).size < 1) {
+	if (bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).members?.filter(m => !m.user.bot).size < 1 && !guildData.get(`${queue.player.guildId}.always.enabled`)) {
 		console.log(`[G ${queue.player.guildId}] ${getLocale(defaultLocale, 'LOG_ALONE')}`);
 		queue.player.disconnect();
 		bot.music.destroyPlayer(queue.player.guildId);
