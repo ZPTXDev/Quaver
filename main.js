@@ -657,6 +657,8 @@ async function shuttingDown(eventType, err) {
 					fileBuffer.push(player.queue.tracks.map(track => track.uri).join('\n'));
 				}
 			}
+			player.disconnect();
+			bot.music.destroyPlayer(player.guildId);
 			await player.queue.channel.send({
 				embeds: [
 					new MessageEmbed()
@@ -671,8 +673,6 @@ async function shuttingDown(eventType, err) {
 					},
 				] : [],
 			});
-			player.disconnect();
-			bot.music.destroyPlayer(player.guildId);
 		}
 	}
 	if (err) {
