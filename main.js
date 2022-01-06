@@ -464,7 +464,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			clearTimeout(player.timeout);
 			clearTimeout(player.pauseTimeout);
 			bot.music.destroyPlayer(player.guildId);
-			channel.send({
+			await channel.send({
 				embeds: [
 					new MessageEmbed()
 						.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_FORCED'))
@@ -486,13 +486,18 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				clearTimeout(player.pauseTimeout);
 				player.disconnect();
 				bot.music.destroyPlayer(guild.id);
-				channel.send({
-					embeds: [
-						new MessageEmbed()
-							.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_FORCED_STAGE'))
-							.setColor(defaultColor),
-					],
-				});
+				try {
+					await channel.send({
+						embeds: [
+							new MessageEmbed()
+								.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_FORCED_STAGE'))
+								.setColor(defaultColor),
+						],
+					});
+				}
+				catch (err) {
+					console.error(err);
+				}
 				return;
 			}
 			await newState.setSuppressed(false);
