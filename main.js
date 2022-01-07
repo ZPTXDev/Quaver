@@ -503,18 +503,18 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			await newState.setSuppressed(false);
 		}
 		// the new vc has no humans
-		if (newState.channel.members.filter(m => !m.user.bot).size < 1) {
+		if (newState.channel.members.filter(m => !m.user.bot).size < 1 && !guildData.get(`${player.guildId}.always.enabled`)) {
 			// the bot is not playing anything - leave immediately
 			if (!player.queue.current || !player.playing && !player.paused) {
 				if (guildData.get(`${player.guildId}.always.enabled`)) {
 					guildData.set(`${player.guildId}.always.enabled`, false);
 				}
-				console.log(`[G ${newState.guildId}] ${getLocale(defaultLocale, 'LOG_ALONE')}`);
+				console.log(`[G ${player.guildId}] ${getLocale(defaultLocale, 'LOG_ALONE')}`);
 				const channel = player.queue.channel;
 				clearTimeout(player.timeout);
 				clearTimeout(player.pauseTimeout);
 				player.disconnect();
-				bot.music.destroyPlayer(newState.guildId);
+				bot.music.destroyPlayer(player.guildId);
 				channel.send({
 					embeds: [
 						new MessageEmbed()
