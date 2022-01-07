@@ -28,7 +28,7 @@ module.exports = {
 		const localeCompletion = checkLocaleCompletion(locale);
 		const additionalEmbed = localeCompletion.completion !== 100 ? [
 			new MessageEmbed()
-				.setDescription(`This locale is incomplete. Completion: \`${roundTo(localeCompletion.completion, 2)}%\`\nMissing strings:\n\`\`\`${localeCompletion.missing.join('\n')}\`\`\``)
+				.setDescription(`This locale is incomplete. Completion: \`${roundTo(localeCompletion.completion, 2)}%\`\nMissing strings:\n\`\`\`\n${localeCompletion.missing.join('\n')}\`\`\``)
 				.setColor('DARK_RED'),
 		] : [];
 		await interaction.reply({
