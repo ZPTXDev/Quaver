@@ -1,4 +1,5 @@
 {
+  "CMDLINE_REGISTERED": "Successfully registered application commands.",
   "CMDLINE_NOT_INITIALIZED": "Quaver is not initialized yet.",
   "CMDLINE_SESSIONS": "There are currently %1 active session(s).",
   "CMDLINE_HELP": "Available commands: exit, sessions",

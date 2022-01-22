@@ -1,4 +1,5 @@
 {
+  "CMDLINE_REGISTERED": "Malampuson nga narehistro ang mga application commands.",
   "CMDLINE_NOT_INITIALIZED": "Si Quaver kay wala pa ma-initialize.",
   "CMDLINE_SESSIONS": "Naa pay %1 ka (mga) active nga session.",
   "CMDLINE_HELP": "Magamit nga mga command: exit, sessions",

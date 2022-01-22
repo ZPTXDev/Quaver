@@ -1,4 +1,5 @@
 {
+  "CMDLINE_REGISTERED": "Successfully registered application commands.",
   "CMDLINE_NOT_INITIALIZED": "Quaver 还未启动。",
   "CMDLINE_SESSIONS": "目前在同时运营 %1 场听歌会。",
   "CMDLINE_HELP": "可执行的指令：exit, sessions",
