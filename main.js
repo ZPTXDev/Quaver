@@ -27,6 +27,12 @@ rl.on('line', line => {
 			}
 			console.log(getLocale(defaultLocale, 'CMDLINE_SESSIONS', bot.music.players.size));
 			break;
+		case 'stats': {
+			const uptime = msToTime(bot.uptime);
+			const uptimeString = msToTimeString(uptime);
+			console.log(getLocale(defaultLocale, 'CMDLINE_STATS', bot.guilds.cache.size, uptimeString));
+			break;
+		}
 		case 'whitelist': {
 			const guildId = line.split(' ')[1];
 			if (!functions['247'].whitelist) {
