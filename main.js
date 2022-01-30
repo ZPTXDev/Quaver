@@ -2,7 +2,7 @@ require('@lavaclient/queue/register');
 const { Client, Intents, Collection, MessageEmbed, MessageButton, Permissions } = require('discord.js');
 const { Node } = require('lavaclient');
 const { load } = require('@lavaclient/spotify');
-const { token, lavalink, spotify, defaultColor, defaultLocale } = require('./settings.json');
+const { token, lavalink, spotify, defaultColor, defaultLocale, functions } = require('./settings.json');
 const fs = require('fs');
 const fsPromises = require('fs').promises;
 const { version } = require('./package.json');
@@ -16,7 +16,7 @@ const rl = readline.createInterface({
 	output: process.stdout,
 });
 rl.on('line', line => {
-	switch (line) {
+	switch (line.split(' ')[0]) {
 		case 'exit':
 			process.exit(0);
 			break;
@@ -27,6 +27,22 @@ rl.on('line', line => {
 			}
 			console.log(getLocale(defaultLocale, 'CMDLINE_SESSIONS', bot.music.players.size));
 			break;
+		case 'whitelist': {
+			const guildId = line.split(' ')[1];
+			if (!functions['247'].whitelist) {
+				console.log(getLocale(defaultLocale, 'CMDLINE_247_WHITELIST_DISABLED'));
+				break;
+			}
+			if (!guildData.get(`${guildId}.247.whitelisted`)) {
+				console.log(getLocale(defaultLocale, 'CMDLINE_247_WHITELIST_ADDED', guildId));
+				guildData.set(`${guildId}.247.whitelisted`, true);
+			}
+			else {
+				console.log(getLocale(defaultLocale, 'CMDLINE_247_WHITELIST_REMOVED', guildId));
+				guildData.set(`${guildId}.247.whitelisted`, false);
+			}
+			break;
+		}
 		default:
 			console.log(getLocale(defaultLocale, 'CMDLINE_HELP'));
 			break;

@@ -20,6 +20,12 @@ The file structure is as follows:
   "spotify": {
     "client_id": "Paste Spotify Client ID here",
     "client_secret": "Paste Spotify Client Secret here"
+  },
+  "functions": {
+    "247": {
+      "enabled": true,
+      "whitelist": false
+    }
   }
 }
 ```
@@ -64,3 +70,9 @@ The file structure is as follows:
 
 `spotify.client_secret`
 > Spotify API Client Secret, obtainable [here](https://developer.spotify.com/dashboard/applications). Used to authenticate your Spotify application.
+
+`functions.247.enabled`
+> Whether or not the **24/7** feature is enabled.
+
+`functions.247.whitelist`
+> Whether or not the **24/7** feature requires guilds to be whitelisted.

@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
-const { defaultColor, defaultLocale } = require('../settings.json');
+const { defaultColor, defaultLocale, functions } = require('../settings.json');
 const { getLocale } = require('../functions.js');
 const { guildData } = require('../data.js');
 
@@ -19,6 +19,30 @@ module.exports = {
 		bot: [],
 	},
 	async execute(interaction) {
+		if (!functions['247'].enabled) {
+			await interaction.reply({
+				embeds: [
+					new MessageEmbed()
+						.setDescription(getLocale(`${interaction.guildId}.locale` ?? defaultLocale, 'FUNCTION_DISABLED'))
+						.setColor('DARK_RED'),
+				],
+				ephemeral: true,
+			});
+			return;
+		}
+		if (functions['247'].whitelist) {
+			if (!guildData.get(`${interaction.guildId}.247.whitelisted`)) {
+				await interaction.reply({
+					embeds: [
+						new MessageEmbed()
+							.setDescription(getLocale(`${interaction.guildId}.locale` ?? defaultLocale, 'CMD_247_NOT_WHITELISTED'))
+							.setColor('DARK_RED'),
+					],
+					ephemeral: true,
+				});
+				return;
+			}
+		}
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const enabled = interaction.options.getBoolean('enabled');
 		let always;
