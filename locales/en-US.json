@@ -7,6 +7,7 @@
   "CMDLINE_247_WHITELIST_ADDED": "Added %1 to the 24/7 whitelist.",
   "CMDLINE_247_WHITELIST_REMOVED": "Removed %1 from the 24/7 whitelist.",
   "CMDLINE_247_WHITELIST_DISABLED": "The 24/7 whitelist is not enabled.",
+  "CMDLINE_247_WHITELIST_GUILD_NOT_FOUND": "Guild not found.",
   "LOG_SETTING_TIMEOUT": "Setting timeout",
   "LOG_SETTING_TIMEOUT_PAUSE": "Setting pause timeout",
   "LOG_STARTING_TRACK": "Starting track",

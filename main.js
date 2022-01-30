@@ -34,17 +34,26 @@ rl.on('line', line => {
 			break;
 		}
 		case 'whitelist': {
+			if (!startup) {
+				console.log(getLocale(defaultLocale, 'CMDLINE_NOT_INITIALIZED'));
+				break;
+			}
 			const guildId = line.split(' ')[1];
 			if (!functions['247'].whitelist) {
 				console.log(getLocale(defaultLocale, 'CMDLINE_247_WHITELIST_DISABLED'));
 				break;
 			}
+			const guild = bot.guilds.cache.get(guildId);
+			if (!guild) {
+				console.log(getLocale(defaultLocale, 'CMDLINE_247_WHITELIST_GUILD_NOT_FOUND'));
+				break;
+			}
 			if (!guildData.get(`${guildId}.247.whitelisted`)) {
-				console.log(getLocale(defaultLocale, 'CMDLINE_247_WHITELIST_ADDED', guildId));
+				console.log(getLocale(defaultLocale, 'CMDLINE_247_WHITELIST_ADDED', guild.name));
 				guildData.set(`${guildId}.247.whitelisted`, true);
 			}
 			else {
-				console.log(getLocale(defaultLocale, 'CMDLINE_247_WHITELIST_REMOVED', guildId));
+				console.log(getLocale(defaultLocale, 'CMDLINE_247_WHITELIST_REMOVED', guild.name));
 				guildData.set(`${guildId}.247.whitelisted`, false);
 			}
 			break;
