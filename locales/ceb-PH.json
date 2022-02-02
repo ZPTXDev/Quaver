@@ -67,7 +67,6 @@
   "CHECK_ACTIVE_SESSION": "Walay session ani nga server.",
   "CHECK_IN_VOICE": "Kailangan naa ka sa usa ka voice channel.",
   "CHECK_IN_SESSION_VOICE": "Kailangan naa ka sa akoang voice channel.",
-  "CHECK_INVALID_TEXT_CHANNEL": "Palihug pagpiho og balido nga text channel.",
   "CHECK_INVALID_INDEX": "Palihug pagpiho og balido nga index.",
   "CHECK_NOT_REQUESTER": "Dili ikaw ang requester ana nga track.",
   "CMD_247_DESCRIPTION": "Ipabilin si Quaver sa imong channel.",

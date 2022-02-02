@@ -67,7 +67,6 @@
   "CHECK_ACTIVE_SESSION": "Walang session sa server na ito.",
   "CHECK_IN_VOICE": "Kailangang nasa voice channel ka.",
   "CHECK_IN_SESSION_VOICE": "Kailangang nasa aking voice channel ka.",
-  "CHECK_INVALID_TEXT_CHANNEL": "Pakiusap lang na tumukoy ng isang wastong text channel.",
   "CHECK_INVALID_INDEX": "Pakiusap lang na tumukoy ng isang wastong index.",
   "CHECK_NOT_REQUESTER": "Hindi ikaw ang requester sa track na iyon.",
   "CMD_247_DESCRIPTION": "Panatilihin si Quaver sa iyong channel.",

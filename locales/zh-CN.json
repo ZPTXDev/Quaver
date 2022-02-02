@@ -59,7 +59,6 @@
   "CHECK_ACTIVE_SESSION": "这个服务器里没有听歌会。",
   "CHECK_IN_VOICE": "你需要在一个音频里。",
   "CHECK_IN_SESSION_VOICE": "你需要在我的音频里。",
-  "CHECK_INVALID_TEXT_CHANNEL": "请指定一个可用的语文频道。",
   "CHECK_INVALID_INDEX": "请指定一个队伍位置。",
   "CHECK_NOT_REQUESTER": "你不是要求那首歌曲的用户。",
   "CMD_247_DESCRIPTION": "吧 Quaver 保留在你的音频里。",

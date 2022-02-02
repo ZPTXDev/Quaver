@@ -13,6 +13,8 @@ module.exports = {
 			option
 				.setName('newvolume')
 				.setDescription(getLocale(defaultLocale, 'CMD_VOLUME_OPTION_NEWVOLUME'))
+				.setMinValue(1)
+				.setMaxValue(1000)
 				.setRequired(true)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
@@ -22,7 +24,7 @@ module.exports = {
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const newvolume = interaction.options.getInteger('newvolume');
-		if (newvolume < 0 || (newvolume > 200 && !managers.includes(interaction.user.id))) {
+		if (newvolume > 200 && !managers.includes(interaction.user.id)) {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()

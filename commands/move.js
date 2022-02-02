@@ -13,11 +13,13 @@ module.exports = {
 			option
 				.setName('oldposition')
 				.setDescription(getLocale(defaultLocale, 'CMD_MOVE_OPTION_OLDPOSITION'))
+				.setMinValue(1)
 				.setRequired(true))
 		.addIntegerOption(option =>
 			option
 				.setName('newposition')
 				.setDescription(getLocale(defaultLocale, 'CMD_MOVE_OPTION_NEWPOSITION'))
+				.setMinValue(1)
 				.setRequired(true)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
@@ -39,7 +41,7 @@ module.exports = {
 			});
 			return;
 		}
-		if (oldposition < 1 || newposition < 1 || oldposition > player.queue.tracks.length || newposition > player.queue.tracks.length) {
+		if (oldposition > player.queue.tracks.length || newposition > player.queue.tracks.length) {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()

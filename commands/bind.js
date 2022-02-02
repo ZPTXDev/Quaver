@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { MessageEmbed, Constants } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
@@ -13,6 +13,7 @@ module.exports = {
 			option
 				.setName('channel')
 				.setDescription(getLocale(defaultLocale, 'CMD_BIND_OPTION_CHANNEL'))
+				.addChannelType(Constants.ChannelTypes.GUILD_TEXT)
 				.setRequired(true)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
@@ -22,17 +23,6 @@ module.exports = {
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const channel = interaction.options.getChannel('channel');
-		if (channel.type !== 'GUILD_TEXT') {
-			await interaction.reply({
-				embeds: [
-					new MessageEmbed()
-						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CHECK_INVALID_TEXT_CHANNEL'))
-						.setColor('DARK_RED'),
-				],
-				ephemeral: true,
-			});
-			return;
-		}
 		player.queue.channel = channel;
 		if (guildData.get(`${interaction.guildId}.always.enabled`)) {
 			guildData.set(`${interaction.guildId}.always.text`, channel.id);

@@ -13,6 +13,7 @@ module.exports = {
 			option
 				.setName('position')
 				.setDescription(getLocale(defaultLocale, 'CMD_REMOVE_OPTION_POSITION'))
+				.setMinValue(1)
 				.setRequired(true)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
@@ -33,7 +34,7 @@ module.exports = {
 			});
 			return;
 		}
-		if (position < 1 || position > player.queue.tracks.length) {
+		if (position > player.queue.tracks.length) {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()

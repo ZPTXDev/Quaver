@@ -67,7 +67,6 @@
   "CHECK_ACTIVE_SESSION": "There is no session in this server.",
   "CHECK_IN_VOICE": "You need to be in a voice channel.",
   "CHECK_IN_SESSION_VOICE": "You need to be in my voice channel.",
-  "CHECK_INVALID_TEXT_CHANNEL": "Please specify a valid text channel.",
   "CHECK_INVALID_INDEX": "Please specify a valid index.",
   "CHECK_NOT_REQUESTER": "You are not the requester of that track.",
   "CMD_247_DESCRIPTION": "Keep Quaver in your channel.",
