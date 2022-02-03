@@ -3,7 +3,7 @@
   "CMDLINE_NOT_INITIALIZED": "Si Quaver ay hindi pa na-initialize.",
   "CMDLINE_SESSIONS": "Kasalukuyang mayroon pang %1 na aktibong (mga) session.",
   "CMDLINE_HELP": "Mga command na pwedeng magamit: exit, sessions, whitelist, stats",
-  "CMDLINE_STATS": "Mga istatistika:\nMga Guild: %1\nUptime: %2",
+  "CMDLINE_STATS": "Istatistika:\nMga Guild: %1\nUptime: %2",
   "CMDLINE_247_WHITELIST_ADDED": "Idinagdag ang %1 sa 24/7 whitelist.",
   "CMDLINE_247_WHITELIST_REMOVED": "Inalis ang %1 mula sa 24/7 whitelist.",
   "CMDLINE_247_WHITELIST_DISABLED": "Ang 24/7 whitelist ay naka-disable.",
