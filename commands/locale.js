@@ -13,7 +13,7 @@ module.exports = {
 		.setDescription(getLocale(defaultLocale, 'CMD_LOCALE_DESCRIPTION'))
 		.addStringOption(option =>
 			option
-				.setName('locale')
+				.setName('new_locale')
 				.setDescription(getLocale(defaultLocale, 'CMD_LOCALE_OPTION_LOCALE'))
 				.setRequired(true)
 				.addChoices(fs.readdirSync(path.resolve(__dirname, '../locales')).filter(file => file.endsWith('.json')).map(file => {return [file.slice(0, -5), file.slice(0, -5)];}))),
@@ -24,7 +24,7 @@ module.exports = {
 		bot: [],
 	},
 	async execute(interaction) {
-		const locale = interaction.options.getString('locale');
+		const locale = interaction.options.getString('new_locale');
 		guildData.set(`${interaction.guildId}.locale`, locale);
 		const localeCompletion = checkLocaleCompletion(locale);
 		const additionalEmbed = localeCompletion.completion !== 100 ? [

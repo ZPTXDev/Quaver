@@ -11,7 +11,7 @@ module.exports = {
 		.setDescription(getLocale(defaultLocale, 'CMD_VOLUME_DESCRIPTION'))
 		.addIntegerOption(option =>
 			option
-				.setName('newvolume')
+				.setName('new_volume')
 				.setDescription(getLocale(defaultLocale, 'CMD_VOLUME_OPTION_NEWVOLUME'))
 				.setMinValue(0)
 				.setMaxValue(1000)
@@ -23,8 +23,8 @@ module.exports = {
 	},
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
-		const newvolume = interaction.options.getInteger('newvolume');
-		if (newvolume > 200 && !managers.includes(interaction.user.id)) {
+		const volume = interaction.options.getInteger('new_volume');
+		if (volume > 200 && !managers.includes(interaction.user.id)) {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
@@ -35,11 +35,11 @@ module.exports = {
 			});
 			return;
 		}
-		await player.setVolume(newvolume);
+		await player.setVolume(volume);
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_VOLUME_SUCCESS', newvolume))
+					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_VOLUME_SUCCESS', volume))
 					.setFooter({ text: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_FILTERS_NOTE') })
 					.setColor(defaultColor),
 			],

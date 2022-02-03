@@ -11,13 +11,13 @@ module.exports = {
 		.setDescription(getLocale(defaultLocale, 'CMD_MOVE_DESCRIPTION'))
 		.addIntegerOption(option =>
 			option
-				.setName('oldposition')
+				.setName('old_position')
 				.setDescription(getLocale(defaultLocale, 'CMD_MOVE_OPTION_OLDPOSITION'))
 				.setMinValue(1)
 				.setRequired(true))
 		.addIntegerOption(option =>
 			option
-				.setName('newposition')
+				.setName('new_position')
 				.setDescription(getLocale(defaultLocale, 'CMD_MOVE_OPTION_NEWPOSITION'))
 				.setMinValue(1)
 				.setRequired(true)),
@@ -28,8 +28,8 @@ module.exports = {
 	},
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
-		const oldposition = interaction.options.getInteger('oldposition');
-		const newposition = interaction.options.getInteger('newposition');
+		const oldPosition = interaction.options.getInteger('old_position');
+		const newPosition = interaction.options.getInteger('new_position');
 		if (player.queue.tracks.length <= 1) {
 			await interaction.reply({
 				embeds: [
@@ -41,7 +41,7 @@ module.exports = {
 			});
 			return;
 		}
-		if (oldposition > player.queue.tracks.length || newposition > player.queue.tracks.length) {
+		if (oldPosition > player.queue.tracks.length || newPosition > player.queue.tracks.length) {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
@@ -52,7 +52,7 @@ module.exports = {
 			});
 			return;
 		}
-		if (oldposition === newposition) {
+		if (oldPosition === newPosition) {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
@@ -63,12 +63,12 @@ module.exports = {
 			});
 			return;
 		}
-		player.queue.tracks.splice(newposition - 1, 0, player.queue.tracks.splice(oldposition - 1, 1)[0]);
-		const track = player.queue.tracks[newposition - 1];
+		player.queue.tracks.splice(newPosition - 1, 0, player.queue.tracks.splice(oldPosition - 1, 1)[0]);
+		const track = player.queue.tracks[newPosition - 1];
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_MOVE_SUCCESS', track.title, track.uri, oldposition, newposition))
+					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_MOVE_SUCCESS', track.title, track.uri, oldPosition, newPosition))
 					.setColor(defaultColor),
 			],
 		});

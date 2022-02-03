@@ -11,7 +11,7 @@ module.exports = {
 		.setDescription(getLocale(defaultLocale, 'CMD_BIND_DESCRIPTION'))
 		.addChannelOption(option =>
 			option
-				.setName('channel')
+				.setName('new_channel')
 				.setDescription(getLocale(defaultLocale, 'CMD_BIND_OPTION_CHANNEL'))
 				.addChannelType(Constants.ChannelTypes.GUILD_TEXT)
 				.setRequired(true)),
@@ -22,7 +22,7 @@ module.exports = {
 	},
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
-		const channel = interaction.options.getChannel('channel');
+		const channel = interaction.options.getChannel('new_channel');
 		player.queue.channel = channel;
 		if (guildData.get(`${interaction.guildId}.always.enabled`)) {
 			guildData.set(`${interaction.guildId}.always.text`, channel.id);
