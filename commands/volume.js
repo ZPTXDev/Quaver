@@ -13,7 +13,7 @@ module.exports = {
 			option
 				.setName('newvolume')
 				.setDescription(getLocale(defaultLocale, 'CMD_VOLUME_OPTION_NEWVOLUME'))
-				.setMinValue(1)
+				.setMinValue(0)
 				.setMaxValue(1000)
 				.setRequired(true)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
