@@ -45,6 +45,17 @@ module.exports = {
 			});
 			return;
 		}
+		if (player.queue.current.isStream) {
+			await interaction.reply({
+				embeds: [
+					new MessageEmbed()
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SEEK_STREAM'))
+						.setColor('DARK_RED'),
+				],
+				ephemeral: true,
+			});
+			return;
+		}
 		const hoursInput = interaction.options.getInteger('hours');
 		const minutesInput = interaction.options.getInteger('minutes');
 		const secondsInput = interaction.options.getInteger('seconds');
@@ -74,17 +85,6 @@ module.exports = {
 				embeds: [
 					new MessageEmbed()
 						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SEEK_INVALID_POSITION', durationString))
-						.setColor('DARK_RED'),
-				],
-				ephemeral: true,
-			});
-			return;
-		}
-		if (player.queue.current.isStream) {
-			await interaction.reply({
-				embeds: [
-					new MessageEmbed()
-						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SEEK_STREAM'))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
