@@ -46,6 +46,16 @@ module.exports = {
 			return;
 		}
 		const hoursInput = interaction.options.getInteger('hours');
+		const minutesInput = interaction.options.getInteger('minutes');
+		const secondsInput = interaction.options.getInteger('seconds');
+
+		const hoursInputInMs = hoursInput * 3600000;
+		const minutesInputInMs = minutesInput * 60000;
+		const secondsInputInMs = secondsInput * 1000;
+
+		const ms = hoursInputInMs + secondsInputInMs + minutesInputInMs;
+		const trackLengthInMs = player.queue.current.length;
+
 		const seekMilliseconds = newseek * 1000;
 		const durationSeconds = player.queue.current.length / 1000;
 		const seekTime = msToTime(seekMilliseconds);
