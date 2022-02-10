@@ -14,8 +14,7 @@ module.exports = {
 				.setName('hours')
 				.setDescription(getLocale(defaultLocale, 'CMD_SEEK_OPTION_HOURS'))
 				.setMinValue(0)
-				.setMaxValue(24)
-				.setRequired(true)),
+				.setMaxValue(24)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
