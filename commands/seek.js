@@ -58,7 +58,7 @@ module.exports = {
 
 		const duration = msToTime(trackLengthInMs);
 		const durationString = msToTimeString(duration, true);
-		if (ms > durationString) {
+		if (ms > trackLengthInMs) {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
