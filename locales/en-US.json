@@ -155,7 +155,7 @@
   "CMD_SEEK_OPTION_INVALID": "Please specify a valid time to seek.",
   "CMD_SEEK_INVALID_POSITION": "The seek position must be between `0` to `%1` for this track.",
   "CMD_SEEK_STREAM": "Livestreams cannot be seeked.",
-  "CMD_SEEK_SUCCESS": "Seeked to `%1` of `%2` seconds for this track.\n`[%3 / %4]`",
+  "CMD_SEEK_SUCCESS": "Seeked to `%1` of `%2` for this track.\n`[%3 / %4]`",
   "PAGE": "Page %1 of %2",
   "POSITION": "Position",
   "REFRESH": "Refresh",
