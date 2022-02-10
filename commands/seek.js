@@ -53,7 +53,19 @@ module.exports = {
 		const minutesInputInMs = minutesInput * 60000;
 		const secondsInputInMs = secondsInput * 1000;
 
+		const AllInputs = hoursInput + minutesInput + secondsInput;
 		const ms = hoursInputInMs + secondsInputInMs + minutesInputInMs;
+		if (AllInputs !== null && AllInputs === 0) {
+			await interaction.reply({
+				embeds: [
+					new MessageEmbed()
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SEEK_OPTION_INVALID'))
+						.setColor('DARK_RED'),
+				],
+				ephemeral: true,
+			});
+			return;
+		}
 		const trackLengthInMs = player.queue.current.length;
 
 		const duration = msToTime(trackLengthInMs);
