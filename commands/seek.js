@@ -1,9 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
-const { msToTime, msToTimeString } = require('../functions.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
-const { getLocale } = require('../functions.js');
+const { getLocale, msToTime, msToTimeString } = require('../functions.js');
 const { guildData } = require('../data.js');
 
 module.exports = {
