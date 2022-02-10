@@ -83,7 +83,7 @@ module.exports = {
 		}
 		const seekInput = msToTime(ms);
 		const seekString = msToTimeString(seekInput, true);
-		await player.seek(seekMilliseconds);
+		await player.seek(ms);
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
