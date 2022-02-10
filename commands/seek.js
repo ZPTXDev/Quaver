@@ -20,6 +20,12 @@ module.exports = {
 				.setName('minutes')
 				.setDescription(getLocale(defaultLocale, 'CMD_SEEK_OPTION_MINUTES'))
 				.setMinValue(0)
+				.setMaxValue(59))
+		.addIntegerOption(option =>
+			option
+				.setName('seconds')
+				.setDescription(getLocale(defaultLocale, 'CMD_SEEK_OPTION_SECONDS'))
+				.setMinValue(0)
 				.setMaxValue(59)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
