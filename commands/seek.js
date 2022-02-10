@@ -45,7 +45,7 @@ module.exports = {
 			});
 			return;
 		}
-		const newseek = interaction.options.getInteger('newseek');
+		const hoursInput = interaction.options.getInteger('hours');
 		const seekMilliseconds = newseek * 1000;
 		const durationSeconds = player.queue.current.length / 1000;
 		const seekTime = msToTime(seekMilliseconds);
