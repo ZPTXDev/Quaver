@@ -58,8 +58,8 @@ module.exports = {
 
 		const seekMilliseconds = ms * 1000;
 		const durationSeconds = player.queue.current.length / 1000;
-		const seekTime = msToTime(seekMilliseconds);
-		const seekString = msToTimeString(seekTime, true);
+		const seekInput = msToTime(seekMilliseconds);
+		const seekString = msToTimeString(seekInput, true);
 		const duration = msToTime(trackLengthInMs);
 		const durationString = msToTimeString(duration, true);
 		const durationTime = msToTimeString(duration);
