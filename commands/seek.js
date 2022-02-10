@@ -12,7 +12,7 @@ module.exports = {
 		.addIntegerOption(option =>
 			option
 				.setName('hours')
-				.setDescription(getLocale(defaultLocale, 'CMD_SEEK_OPTION_TIME'))
+				.setDescription(getLocale(defaultLocale, 'CMD_SEEK_OPTION_HOURS'))
 				.setMinValue(0)
 				.setRequired(true)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
