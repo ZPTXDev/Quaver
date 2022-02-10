@@ -56,14 +56,14 @@ module.exports = {
 		const ms = hoursInputInMs + secondsInputInMs + minutesInputInMs;
 		const trackLengthInMs = player.queue.current.length;
 
-		const seekMilliseconds = newseek * 1000;
+		const seekMilliseconds = ms * 1000;
 		const durationSeconds = player.queue.current.length / 1000;
 		const seekTime = msToTime(seekMilliseconds);
 		const seekString = msToTimeString(seekTime, true);
 		const duration = msToTime(player.queue.current.length);
 		const durationString = msToTimeString(duration, true);
 		const durationTime = msToTimeString(duration);
-		if (newseek > durationSeconds) {
+		if (ms > durationSeconds) {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
@@ -89,7 +89,7 @@ module.exports = {
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SEEK_SUCCESS', newseek, durationSeconds, seekString, durationString))
+					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SEEK_SUCCESS', ms , durationSeconds, seekString, durationString))
 					.setColor(defaultColor),
 			],
 		});
