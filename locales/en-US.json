@@ -151,6 +151,7 @@
   "CMD_SEEK_DESCRIPTION": "Seek to the given time for the current track.",
   "CMD_SEEK_OPTION_HOURS": "The hours of time to seek to.",
   "CMD_SEEK_OPTION_MINUTES": "The minutes of time to seek to.",
+  "CMD_SEEK_OPTION_SECONDS": "The seconds of time to seek to.",
   "CMD_SEEK_BEYOND_LENGTH": "The seek position must be between `0` to `%1` seconds for this track.",
   "CMD_SEEK_STREAM": "Livestreams cannot be seeked.",
   "CMD_SEEK_SUCCESS": "Seeked to `%1` of `%2` seconds for this track.\n`[%3 / %4]`",
