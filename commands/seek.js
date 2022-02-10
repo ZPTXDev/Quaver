@@ -34,14 +34,6 @@ module.exports = {
 	},
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
-		const newseek = interaction.options.getInteger('newseek');
-		const seekMilliseconds = newseek * 1000;
-		const durationSeconds = player.queue.current.length / 1000;
-		const seekTime = msToTime(seekMilliseconds);
-		const seekString = msToTimeString(seekTime, true);
-		const duration = msToTime(player.queue.current.length);
-		const durationString = msToTimeString(duration, true);
-		const durationTime = msToTimeString(duration);
 		if (!player.queue.current || !player.playing && !player.paused) {
 			await interaction.reply({
 				embeds: [
@@ -53,6 +45,14 @@ module.exports = {
 			});
 			return;
 		}
+		const newseek = interaction.options.getInteger('newseek');
+		const seekMilliseconds = newseek * 1000;
+		const durationSeconds = player.queue.current.length / 1000;
+		const seekTime = msToTime(seekMilliseconds);
+		const seekString = msToTimeString(seekTime, true);
+		const duration = msToTime(player.queue.current.length);
+		const durationString = msToTimeString(duration, true);
+		const durationTime = msToTimeString(duration);
 		if (newseek > durationSeconds) {
 			await interaction.reply({
 				embeds: [
