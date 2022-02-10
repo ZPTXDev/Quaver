@@ -56,11 +56,9 @@ module.exports = {
 		const ms = hoursInputInMs + secondsInputInMs + minutesInputInMs;
 		const trackLengthInMs = player.queue.current.length;
 
-		const seekMilliseconds = ms * 1000;
-		const durationSeconds = player.queue.current.length / 1000;
+
 		const duration = msToTime(trackLengthInMs);
 		const durationString = msToTimeString(duration, true);
-		const durationTime = msToTimeString(duration);
 		if (ms > durationSeconds) {
 			await interaction.reply({
 				embeds: [
