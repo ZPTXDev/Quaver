@@ -59,11 +59,11 @@ module.exports = {
 
 		const duration = msToTime(trackLengthInMs);
 		const durationString = msToTimeString(duration, true);
-		if (ms > durationSeconds) {
+		if (ms > durationString) {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SEEK_BEYOND_LENGTH', durationTime))
+						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SEEK_BEYOND_LENGTH', durationString))
 						.setColor('DARK_RED'),
 				],
 				ephemeral: true,
