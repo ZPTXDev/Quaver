@@ -67,7 +67,6 @@ module.exports = {
 			return;
 		}
 		const trackLengthInMs = player.queue.current.length;
-
 		const duration = msToTime(trackLengthInMs);
 		const durationString = msToTimeString(duration, true);
 		if (ms > trackLengthInMs) {
