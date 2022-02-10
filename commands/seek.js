@@ -60,7 +60,7 @@ module.exports = {
 		const durationSeconds = player.queue.current.length / 1000;
 		const seekTime = msToTime(seekMilliseconds);
 		const seekString = msToTimeString(seekTime, true);
-		const duration = msToTime(player.queue.current.length);
+		const duration = msToTime(trackLengthInMs);
 		const durationString = msToTimeString(duration, true);
 		const durationTime = msToTimeString(duration);
 		if (ms > durationSeconds) {
