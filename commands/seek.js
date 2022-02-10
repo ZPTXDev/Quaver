@@ -58,8 +58,6 @@ module.exports = {
 
 		const seekMilliseconds = ms * 1000;
 		const durationSeconds = player.queue.current.length / 1000;
-		const seekInput = msToTime(ms);
-		const seekString = msToTimeString(seekInput, true);
 		const duration = msToTime(trackLengthInMs);
 		const durationString = msToTimeString(duration, true);
 		const durationTime = msToTimeString(duration);
@@ -85,6 +83,8 @@ module.exports = {
 			});
 			return;
 		}
+		const seekInput = msToTime(ms);
+		const seekString = msToTimeString(seekInput, true);
 		await player.seek(seekMilliseconds);
 		await interaction.reply({
 			embeds: [
