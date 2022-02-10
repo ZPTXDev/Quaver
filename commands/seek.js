@@ -11,7 +11,7 @@ module.exports = {
 		.setDescription(getLocale(defaultLocale, 'CMD_SEEK_DESCRIPTION'))
 		.addIntegerOption(option =>
 			option
-				.setName('newseek')
+				.setName('hours')
 				.setDescription(getLocale(defaultLocale, 'CMD_SEEK_OPTION_TIME'))
 				.setMinValue(0)
 				.setRequired(true)),
