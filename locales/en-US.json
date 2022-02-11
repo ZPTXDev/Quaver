@@ -148,7 +148,7 @@
   "CMD_VOLUME_OPTION_NEWVOLUME": "The new volume to adjust to.",
   "CMD_VOLUME_NOT_IN_RANGE": "That is not within the valid range of `0%` to `200%`.",
   "CMD_VOLUME_SUCCESS": "Volume adjusted to `%1%`",
-  "CMD_SEEK_DESCRIPTION": "Seek to the given time for the current track.",
+  "CMD_SEEK_DESCRIPTION": "Skip to a different timestamp in the current track.",
   "CMD_SEEK_OPTION_HOURS": "The hours of time to seek to.",
   "CMD_SEEK_OPTION_MINUTES": "The minutes of time to seek to.",
   "CMD_SEEK_OPTION_SECONDS": "The seconds of time to seek to.",

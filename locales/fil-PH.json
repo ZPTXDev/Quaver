@@ -148,7 +148,7 @@
   "CMD_VOLUME_OPTION_NEWVOLUME": "Ang bagong volume na ia-adjust.",
   "CMD_VOLUME_NOT_IN_RANGE": "Wala iyon sa wastong range ng `0%` to `200%`.",
   "CMD_VOLUME_SUCCESS": "Inadjust ang volume sa `%1%`",
-  "CMD_SEEK_DESCRIPTION": "Magseek sa ibinigay na oras para sa kasalukuyang track.",
+  "CMD_SEEK_DESCRIPTION": "Lumaktaw sa ibang timestamp sa kasalukuyang track.",
   "CMD_SEEK_OPTION_HOURS": "Ang oras na i-seek.",
   "CMD_SEEK_OPTION_MINUTES": "Ang mga minuto ng oras na i-seek.",
   "CMD_SEEK_OPTION_SECONDS": "Ang mga segundo ng oras na i-seek.",
