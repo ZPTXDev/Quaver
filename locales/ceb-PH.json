@@ -154,7 +154,7 @@
   "CMD_SEEK_OPTION_SECONDS": "Ang mga segundo sa oras sa pagseek.",
   "CMD_SEEK_OPTION_INVALID": "Palihug pagpiho ug balido nga oras sa pagseek.",
   "CMD_SEEK_INVALID_POSITION": "Ang posisyon sa pagseek kay kinahanglan nga naa sa `0` hangtod sa `%1` para niini nga track.",
-  "CMD_SEEK_STREAM": "Ang mga livestream kay dili maseek.",
+  "CMD_SEEK_IS_STREAM": "Ang mga livestream kay dili maseek.",
   "CMD_SEEK_SUCCESS": "Gi-seek ngadto sa `%1` hantod `%2` ka oras para niini nga track.",
   "PAGE": "Pahina %1 sa %2",
   "POSITION": "Posisyon",
