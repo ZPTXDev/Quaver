@@ -64,9 +64,8 @@ module.exports = {
 		const minutesInputInMs = minutesInput * 60000;
 		const secondsInputInMs = secondsInput * 1000;
 
-		const AllInputs = hoursInput + minutesInput + secondsInput;
 		const ms = hoursInputInMs + secondsInputInMs + minutesInputInMs;
-		if (AllInputs !== null && AllInputs === 0) {
+		if (hoursInput === null && minutesInput === null && secondsInput === null && hoursInput !== 0) {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
