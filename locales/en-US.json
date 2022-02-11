@@ -150,7 +150,7 @@
   "CMD_VOLUME_SUCCESS": "Volume adjusted to `%1%`",
   "CMD_SEEK_DESCRIPTION": "Skip to a different timestamp in the current track.",
   "CMD_SEEK_OPTION_HOURS": "The hours position for the target timestamp.",
-  "CMD_SEEK_OPTION_MINUTES": "The minutes of time to seek to.",
+  "CMD_SEEK_OPTION_MINUTES": "The minutes position for the target timestamp.",
   "CMD_SEEK_OPTION_SECONDS": "The seconds of time to seek to.",
   "CMD_SEEK_UNSPECIFIED_TIMESTAMP": "Please specify a timestamp to seek to.", 
   "CMD_SEEK_INVALID_TIMESTAMP": "The timestamp provided exceeds the track's duration of `%1`.",

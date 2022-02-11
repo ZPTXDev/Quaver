@@ -150,7 +150,7 @@
   "CMD_VOLUME_SUCCESS": "Gi-adjust ang volume sa `%1%`",
   "CMD_SEEK_DESCRIPTION": "Laktaw ngadto sa laing timestamp sa kasamtangang track.",
   "CMD_SEEK_OPTION_HOURS": "Ang posisyon sa oras para sa target nga timestamp.",
-  "CMD_SEEK_OPTION_MINUTES": "Ang mga minuto sa oras sa pagseek.",
+  "CMD_SEEK_OPTION_MINUTES": "Ang posisyon sa minuto para sa target nga timestamp.",
   "CMD_SEEK_OPTION_SECONDS": "Ang mga segundo sa oras sa pagseek.",
   "CMD_SEEK_UNSPECIFIED_TIMESTAMP": "Palihug pagpiho ug timestamp nga i-seek.",
   "CMD_SEEK_INVALID_TIMESTAMP": "Ang timestamp nga gihatag milapas sa duration sa track nga `%1`.",
