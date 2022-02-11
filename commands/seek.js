@@ -58,7 +58,7 @@ module.exports = {
 		}
 		const hours = interaction.options.getInteger('hours') ?? 0, minutes = interaction.options.getInteger('minutes') ?? 0, seconds = interaction.options.getInteger('seconds') ?? 0;
 		const ms = hours * 3600000 + minutes * 60000 + seconds * 1000;
-		if (hoursInput === null && minutesInput === null && secondsInput === null) {
+		if (interaction.options.getInteger('hours') === null && interaction.options.getInteger('minutes') === null && interaction.options.getInteger('seconds') === null) {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
