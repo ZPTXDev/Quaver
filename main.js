@@ -559,7 +559,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			if (guildData.get(`${player.guildId}.always.enabled`)) return;
 			// the bot was playing something - set pauseTimeout
 			await player.pause();
-			console.log(`[G ${newState.guildId}] ${getLocale(defaultLocale, 'LOG_SETTING_TIMEOUT_PAUSE')}`);
+			console.log(`[G ${player.guildId}] ${getLocale(defaultLocale, 'LOG_SETTING_TIMEOUT_PAUSE')}`);
 			if (player.pauseTimeout) {
 				clearTimeout(player.pauseTimeout);
 			}
