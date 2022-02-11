@@ -136,7 +136,7 @@
   "CMD_SEARCH_PICK": "Pick track(s)",
   "CMD_SHUFFLE_DESCRIPTION": "Shuffle the queue.",
   "CMD_SHUFFLE_INSUFFICIENT": "There aren't enough tracks in the queue to perform a shuffle.",
-  "CMD_SHUFFLE_SUCCESS": "Shuffled the queue successfully.",
+  "CMD_SHUFFLE_SUCCESS": "Shuffled the queue.",
   "CMD_SKIP_DESCRIPTION": "Skip the current track.",
   "CMD_SKIP_SUCCESS": "Skipped **[%1](%2)**",
   "CMD_SKIP_SUCCESS_VOTED": "Skipped **[%1](%2)** by voting",
