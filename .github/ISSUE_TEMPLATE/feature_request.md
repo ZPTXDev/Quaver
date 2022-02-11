@@ -3,7 +3,8 @@ name: Feature request
 about: Come up with something useful for everyone!
 title: ''
 labels: enhancement
-assignees: ''
+assignees:
+    - zapteryx
 
 ---
 
