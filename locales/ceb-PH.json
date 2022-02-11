@@ -155,7 +155,7 @@
   "CMD_SEEK_UNSPECIFIED_TIMESTAMP": "Palihug pagpiho ug balido nga oras sa pagseek.",
   "CMD_SEEK_INVALID_TIMESTAMP": "Ang posisyon sa pagseek kay kinahanglan nga naa sa `0` hangtod sa `%1` para niini nga track.",
   "CMD_SEEK_IS_STREAM": "Ang mga livestream kay dili maseek.",
-  "CMD_SEEK_SUCCESS": "Gi-seek ngadto sa `%1` hantod `%2` ka oras para niini nga track.",
+  "CMD_SEEK_SUCCESS": "Nagseek ngadto sa `[%1 / %2]`",
   "PAGE": "Pahina %1 sa %2",
   "POSITION": "Posisyon",
   "REFRESH": "I-refresh",
