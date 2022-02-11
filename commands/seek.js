@@ -83,8 +83,8 @@ module.exports = {
 			});
 			return;
 		}
-		const seekInput = msToTime(ms);
-		const seekString = msToTimeString(seekInput, true);
+		const seek = msToTime(ms);
+		const seekString = msToTimeString(seek, true);
 		await player.seek(ms);
 		await interaction.reply({
 			embeds: [
