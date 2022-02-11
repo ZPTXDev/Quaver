@@ -56,15 +56,8 @@ module.exports = {
 			});
 			return;
 		}
-		const hoursInput = interaction.options.getInteger('hours');
-		const minutesInput = interaction.options.getInteger('minutes');
-		const secondsInput = interaction.options.getInteger('seconds');
-
-		const hoursInputInMs = hoursInput * 3600000;
-		const minutesInputInMs = minutesInput * 60000;
-		const secondsInputInMs = secondsInput * 1000;
-
-		const ms = hoursInputInMs + secondsInputInMs + minutesInputInMs;
+		const hours = interaction.options.getInteger('hours') ?? 0, minutes = interaction.options.getInteger('minutes') ?? 0, seconds = interaction.options.getInteger('seconds') ?? 0;
+		const ms = hours * 3600000 + minutes * 60000 + seconds * 1000;
 		if (hoursInput === null && minutesInput === null && secondsInput === null) {
 			await interaction.reply({
 				embeds: [
