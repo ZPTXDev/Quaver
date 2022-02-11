@@ -154,7 +154,7 @@
   "CMD_SEEK_OPTION_SECONDS": "Ang mga segundo ng oras na i-seek.",
   "CMD_SEEK_UNSPECIFIED_TIMESTAMP": "Pakiusap lang na tumukoy ng wastong oras para magseek.",
   "CMD_SEEK_INVALID_TIMESTAMP": "Ang posisyon sa pagseek ay dapat nasa pagitan ng `0` hanggang `%1` sa track na ito.",
-  "CMD_SEEK_IS_STREAM": "Ang mga livestream ay hindi maaaring maseek.",
+  "CMD_SEEK_IS_STREAM": "Hindi magagamit ang seek para sa mga stream.",
   "CMD_SEEK_SUCCESS": "Nagseek sa `[%1 / %2]`",
   "PAGE": "Pahina %1 ng %2",
   "POSITION": "Posisyon",
