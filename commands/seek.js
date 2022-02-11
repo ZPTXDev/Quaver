@@ -14,7 +14,7 @@ module.exports = {
 				.setName('hours')
 				.setDescription(getLocale(defaultLocale, 'CMD_SEEK_OPTION_HOURS'))
 				.setMinValue(0)
-				.setMaxValue(24))
+				.setMaxValue(23))
 		.addIntegerOption(option =>
 			option
 				.setName('minutes')
