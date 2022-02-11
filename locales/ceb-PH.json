@@ -153,7 +153,7 @@
   "CMD_SEEK_OPTION_MINUTES": "Ang mga minuto sa oras sa pagseek.",
   "CMD_SEEK_OPTION_SECONDS": "Ang mga segundo sa oras sa pagseek.",
   "CMD_SEEK_UNSPECIFIED_TIMESTAMP": "Palihug pagpiho ug balido nga oras sa pagseek.",
-  "CMD_SEEK_INVALID_TIMESTAMP": "Ang posisyon sa pagseek kay kinahanglan nga naa sa `0` hangtod sa `%1` para niini nga track.",
+  "CMD_SEEK_INVALID_TIMESTAMP": "Ang timestamp nga gihatag milapas sa duration sa track nga `%1`.",
   "CMD_SEEK_IS_STREAM": "Ang seek dili magamit para sa mga stream.",
   "CMD_SEEK_SUCCESS": "Nagseek ngadto sa `[%1 / %2]`",
   "PAGE": "Pahina %1 sa %2",
