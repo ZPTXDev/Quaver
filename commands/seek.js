@@ -69,10 +69,10 @@ module.exports = {
 			});
 			return;
 		}
-		const trackLengthInMs = player.queue.current.length;
-		const duration = msToTime(trackLengthInMs);
+		const trackLength = player.queue.current.length;
+		const duration = msToTime(trackLength);
 		const durationString = msToTimeString(duration, true);
-		if (ms > trackLengthInMs) {
+		if (ms > trackLength) {
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
