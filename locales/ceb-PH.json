@@ -143,7 +143,7 @@
   "CMD_SKIP_VOTED": "Nakaboto ka na nga laktawan kini nga track.",
   "CMD_SKIP_VOTED_SUCCESS": "Giboto nga laktawan ang **[%1](%2)** `[%3 / %4]`",
   "CMD_STOP_DESCRIPTION": "Hunonga ang karon nga track ug i-clear ang queue.",
-  "CMD_STOP_SUCCESS": "Gipahunong ang karon nga track ug malampuson nga na clear ang queue.",
+  "CMD_STOP_SUCCESS": "Gipahunong ang karon nga track ug na clear ang queue.",
   "CMD_VOLUME_DESCRIPTION": "I-adjust ang volume ni Quaver.",
   "CMD_VOLUME_OPTION_NEWVOLUME": "Ang bag-ong volume aron ma-adjust.",
   "CMD_VOLUME_NOT_IN_RANGE": "Dili kana sulod sa balido nga range sa `0%` to `200%`.",
