@@ -722,7 +722,12 @@ async function shuttingDown(eventType, err) {
 	if (err) {
 		console.log(`[Quaver] ${getLocale(defaultLocale, 'LOG_ERROR')}`);
 		try {
-			await fsPromises.writeFile('error.log', `${eventType}\n${err.message}\n${err.stack}`);
+			if (err.message || err.stack !== undefined) {
+				await fsPromises.writeFile('error.log', `${eventType}\n${err.message}\n${err.stack}`);
+				bot.destroy();
+				process.exit();
+			}
+			await fsPromises.writeFile('error.log', `${eventType}`);
 		}
 		catch (e) {
 			console.error(`[Quaver] ${getLocale(defaultLocale, 'LOG_ERROR_FAIL')}\n${e}`);
