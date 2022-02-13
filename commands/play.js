@@ -118,7 +118,7 @@ module.exports = {
 			if (!interaction.member.voice.channelId) {
 				player.disconnect();
 				interaction.client.music.destroyPlayer(interaction.guildId);
-				await interaction.reply({
+				await interaction.channel.send({
 					embeds: [
 						new MessageEmbed()
 							.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_INTERACTION_CANCELED', interaction.user.id))
