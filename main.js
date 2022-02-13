@@ -483,22 +483,13 @@ bot.on('interactionCreate', async interaction => {
 					],
 					components: [],
 				});
-				if (!started) {
-					// that kid left while we were busy bruh
-					if (!interaction.member.voice.channelId) {
-						player.disconnect();
-						interaction.client.music.destroyPlayer(interaction.guildId);
-						await interaction.editReply({
-							embeds: [
-								new MessageEmbed()
-									.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_INTERACTION_CANCELED', interaction.user.id))
-									.setColor(defaultColor),
-							],
-						});
-						return;
-					}
-					await player.queue.start();
+				// that kid left while we were busy bruh
+				if (!interaction.member.voice.channelId) {
+					player.disconnect();
+					interaction.client.music.destroyPlayer(interaction.guildId);
+					return;
 				}
+				if (!started) { await player.queue.start(); }
 				const state = interaction.guild.members.cache.get(interaction.client.user.id).voice;
 				if (state.channel.type === 'GUILD_STAGE_VOICE' && state.suppress) {
 					await state.setSuppressed(false);
