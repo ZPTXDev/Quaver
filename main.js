@@ -485,8 +485,6 @@ bot.on('interactionCreate', async interaction => {
 				});
 				// that kid left while we were busy bruh
 				if (!interaction.member.voice.channelId) {
-					player.disconnect();
-					interaction.client.music.destroyPlayer(interaction.guildId);
 					return;
 				}
 				if (!started) { await player.queue.start(); }
