@@ -17,7 +17,7 @@ module.exports = {
 				.setName('query')
 				.setDescription(getLocale(defaultLocale, 'CMD_SEARCH_OPTION_QUERY'))
 				.setRequired(true)),
-	checks: [checks.GUILD_ONLY],
+	checks: [checks.GUILD_ONLY, checks.IN_VOICE],
 	permissions: {
 		user: [],
 		bot: [],
