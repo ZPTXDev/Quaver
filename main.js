@@ -448,6 +448,7 @@ bot.on('interactionCreate', async interaction => {
 									.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_INTERACTION_CANCELED', interaction.user.id))
 									.setColor(defaultColor),
 							],
+							components: [],
 						});
 						return;
 					}
