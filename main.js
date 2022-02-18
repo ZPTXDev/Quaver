@@ -500,6 +500,10 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 	if (!player) return;
 	// Quaver voiceStateUpdate
 	if (oldState.member.user.id === bot.user.id) {
+		// just the suppress state changed
+		if (oldState.suppress !== newState.suppress) {
+			return;
+		}
 		// disconnected
 		if (!newState.channelId) {
 			if (guildData.get(`${player.guildId}.always.enabled`)) {
