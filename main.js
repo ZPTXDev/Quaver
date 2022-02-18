@@ -442,7 +442,7 @@ bot.on('interactionCreate', async interaction => {
 					if (!interaction.member.voice.channelId) {
 						player.disconnect();
 						bot.music.destroyPlayer(interaction.guildId);
-						await interaction.channel.send({
+						await interaction.editReply({
 							embeds: [
 								new MessageEmbed()
 									.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_INTERACTION_CANCELED', interaction.user.id))
