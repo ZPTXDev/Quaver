@@ -483,10 +483,6 @@ bot.on('interactionCreate', async interaction => {
 					],
 					components: [],
 				});
-				// that kid left while we were busy bruh
-				if (!interaction.member.voice.channelId) {
-					return;
-				}
 				if (!started) { await player.queue.start(); }
 				const state = interaction.guild.members.cache.get(interaction.client.user.id).voice;
 				if (state.channel.type === 'GUILD_STAGE_VOICE' && state.suppress) {
