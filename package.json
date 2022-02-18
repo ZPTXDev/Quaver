@@ -1,6 +1,6 @@
 {
   "name": "quaver",
-  "version": "3.3.0-next.5",
+  "version": "3.3.0-next.6",
   "engines": {
     "node": ">=16.6.0"
   },
