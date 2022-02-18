@@ -394,7 +394,7 @@ bot.on('interactionCreate', async interaction => {
 					await interaction.reply({
 						embeds: [
 							new MessageEmbed()
-								.setDescription(checks.IN_VOICE)
+								.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, checks.IN_VOICE))
 								.setColor('DARK_RED'),
 						],
 						ephemeral: true,
@@ -405,7 +405,7 @@ bot.on('interactionCreate', async interaction => {
 					await interaction.reply({
 						embeds: [
 							new MessageEmbed()
-								.setDescription(checks.IN_SESSION_VOICE)
+								.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, checks.IN_SESSION_VOICE))
 								.setColor('DARK_RED'),
 						],
 						ephemeral: true,
