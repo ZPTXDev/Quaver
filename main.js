@@ -100,6 +100,10 @@ bot.music.on('connect', () => {
 			const guild = bot.guilds.cache.get(guildId);
 			const player = bot.music.createPlayer(guildId);
 			player.queue.channel = guild.channels.cache.get(guildData.get(`${guildId}.always.text`));
+			const voice = guild.channels.cache.get(guildData.get(`${guildId}.always.channel`));
+			if (voice.type === 'GUILD_STAGE_VOICE' && !voice.stageInstance) {
+				await voice.createStageInstance({ topic: getLocale(guildData.get(`${guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
+			}
 			await player.connect(guildData.get(`${guildId}.always.channel`), { deafened: true });
 		}
 	});
