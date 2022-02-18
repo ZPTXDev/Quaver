@@ -554,6 +554,9 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				return;
 			}
 			await newState.setSuppressed(false);
+			if (!newState.channel.stageInstance) {
+				await newState.channel.createStageInstance({ topic: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
+			}
 		}
 		// the new vc has no humans
 		if (newState.channel.members.filter(m => !m.user.bot).size < 1 && !guildData.get(`${player.guildId}.always.enabled`)) {
