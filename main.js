@@ -289,7 +289,7 @@ bot.on('interactionCreate', async interaction => {
 		catch (err) {
 			console.log(`[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] ${getLocale(defaultLocale, 'LOG_CMD_ERROR', interaction.commandName)}`);
 			console.error(err);
-			await interaction.reply({
+			await interaction.editReply({
 				embeds: [
 					new MessageEmbed()
 						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_CMD_ERROR'))
