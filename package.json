@@ -10,7 +10,7 @@
     "@lavaclient/queue": "^2.0.6",
     "@lavaclient/spotify": "^3.0.0",
     "data-store": "^4.0.3",
-    "discord-api-types": "^0.27.2",
+    "discord-api-types": "^0.27.3",
     "discord.js": "^13.6.0",
     "lavaclient": "^4.0.7"
   },
