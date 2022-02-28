@@ -15,7 +15,7 @@
     "lavaclient": "^4.0.7"
   },
   "devDependencies": {
-    "eslint": "^8.9.0"
+    "eslint": "^8.10.0"
   },
   "release": {
     "tagFormat": "${version}",
