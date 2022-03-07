@@ -756,6 +756,7 @@ async function shuttingDown(eventType, err) {
 		}
 	}
 	bot.destroy();
+	rl.close();
 	process.exit();
 }
 
