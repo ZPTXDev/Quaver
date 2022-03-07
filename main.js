@@ -755,14 +755,10 @@ async function shuttingDown(eventType, err) {
 		}
 	}
 	bot.destroy();
-	rl.close();
 	process.exit();
 }
 
 ['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM', 'uncaughtException', 'unhandledRejection'].forEach(eventType => {
 	process.on(eventType, err => shuttingDown(eventType, err));
-	rl.on('close', () => {
-		process.exitCode = 0;
-		shuttingDown('SIGINT');
-	});
+	rl.on('close', () => shuttingDown('SIGINT'));
 });
