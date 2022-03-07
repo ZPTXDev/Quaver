@@ -18,7 +18,6 @@ const rl = readline.createInterface({
 rl.on('line', line => {
 	switch (line.split(' ')[0]) {
 		case 'exit':
-			rl.close();
 			process.exit(0);
 			break;
 		case 'sessions':
