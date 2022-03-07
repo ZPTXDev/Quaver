@@ -761,5 +761,7 @@ async function shuttingDown(eventType, err) {
 
 ['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM', 'uncaughtException', 'unhandledRejection'].forEach(eventType => {
 	process.on(eventType, err => shuttingDown(eventType, err));
-	rl.on('close', () => shuttingDown(eventType));
+	rl.on('close', () => {
+		shuttingDown('SIGINT');
+	});
 });
