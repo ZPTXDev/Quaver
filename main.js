@@ -15,7 +15,7 @@ const rl = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout,
 });
-rl.on('SIGINT', () => { process.exit(0); });
+rl.on('close', () => { process.exit(0); });
 rl.on('line', line => {
 	switch (line.split(' ')[0]) {
 		case 'exit':
