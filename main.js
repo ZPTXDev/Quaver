@@ -15,7 +15,6 @@ const rl = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout,
 });
-rl.on('close', () => { process.exit(0); });
 rl.on('line', line => {
 	switch (line.split(' ')[0]) {
 		case 'exit':
@@ -762,4 +761,5 @@ async function shuttingDown(eventType, err) {
 
 ['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM', 'uncaughtException', 'unhandledRejection'].forEach(eventType => {
 	process.on(eventType, err => shuttingDown(eventType, err));
+	rl.on('close', () => shuttingDown(eventType));
 });
