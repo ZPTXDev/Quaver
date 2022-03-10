@@ -2,7 +2,7 @@
   "name": "quaver",
   "version": "3.3.0",
   "engines": {
-    "node": ">=16.6.0"
+    "node": ">=16.9.0"
   },
   "dependencies": {
     "@discordjs/builders": "^0.12.0",
