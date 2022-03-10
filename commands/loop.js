@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { LoopType } = require('@lavaclient/queue');
-const { MessageEmbed } = require('discord.js');
+const { Embed } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
@@ -15,9 +15,11 @@ module.exports = {
 				.setName('type')
 				.setDescription(getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE'))
 				.setRequired(true)
-				.addChoice(getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_DISABLED'), 'disabled')
-				.addChoice(getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_TRACK'), 'track')
-				.addChoice(getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_QUEUE'), 'queue')),
+				.addChoices(
+					{ name: getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_DISABLED'), value: 'disabled' },
+					{ name: getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_TRACK'), value: 'track' },
+					{ name: getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_QUEUE'), value: 'queue' },
+				)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -45,7 +47,7 @@ module.exports = {
 		player.queue.setLoop(loop);
 		await interaction.reply({
 			embeds: [
-				new MessageEmbed()
+				new Embed()
 					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_LOOP_SUCCESS', typeLocale))
 					.setColor(defaultColor),
 			],

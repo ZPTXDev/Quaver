@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed, Constants } = require('discord.js');
+const { Embed } = require('discord.js');
+const { ChannelType } = require('discord-api-types/v10');
 const { checks } = require('../enums.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
@@ -13,7 +14,7 @@ module.exports = {
 			option
 				.setName('new_channel')
 				.setDescription(getLocale(defaultLocale, 'CMD_BIND_OPTION_CHANNEL'))
-				.addChannelType(Constants.ChannelTypes.GUILD_TEXT)
+				.addChannelTypes(ChannelType.GuildText)
 				.setRequired(true)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
@@ -29,7 +30,7 @@ module.exports = {
 		}
 		await interaction.reply({
 			embeds: [
-				new MessageEmbed()
+				new Embed()
 					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_BIND_SUCCESS', channel.id))
 					.setColor(defaultColor),
 			],

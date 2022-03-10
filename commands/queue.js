@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
+const { Embed, MessageActionRow, MessageButton } = require('discord.js');
 const { checks } = require('../enums.js');
 const { paginate, msToTime, msToTimeString } = require('../functions.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
@@ -21,9 +21,9 @@ module.exports = {
 		if (player.queue.tracks.length === 0) {
 			await interaction.reply({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_QUEUE_EMPTY'))
-						.setColor('DARK_RED'),
+						.setColor('DarkRed'),
 				],
 				ephemeral: true,
 			});
@@ -31,7 +31,7 @@ module.exports = {
 		}
 		await interaction.reply({
 			embeds: [
-				new MessageEmbed()
+				new Embed()
 					.setDescription(pages[0].map((track, index) => {
 						const duration = msToTime(track.length);
 						const durationString = track.isStream ? '∞' : msToTimeString(duration, true);

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { Embed } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
@@ -36,7 +36,7 @@ module.exports = {
 		player.bassboost = boost;
 		await interaction.reply({
 			embeds: [
-				new MessageEmbed()
+				new Embed()
 					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, player.bassboost ? 'CMD_BASSBOOST_ENABLED' : 'CMD_BASSBOOST_DISABLED'))
 					.setFooter({ text: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_FILTERS_NOTE') })
 					.setColor(defaultColor),

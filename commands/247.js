@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { Embed } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultColor, defaultLocale, functions } = require('../settings.json');
 const { getLocale } = require('../functions.js');
@@ -22,9 +22,9 @@ module.exports = {
 		if (!functions['247'].enabled) {
 			await interaction.reply({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(getLocale(`${interaction.guildId}.locale` ?? defaultLocale, 'FUNCTION_DISABLED'))
-						.setColor('DARK_RED'),
+						.setColor('DarkRed'),
 				],
 				ephemeral: true,
 			});
@@ -34,9 +34,9 @@ module.exports = {
 			if (!guildData.get(`${interaction.guildId}.247.whitelisted`)) {
 				await interaction.reply({
 					embeds: [
-						new MessageEmbed()
+						new Embed()
 							.setDescription(getLocale(`${interaction.guildId}.locale` ?? defaultLocale, 'CMD_247_NOT_WHITELISTED'))
-							.setColor('DARK_RED'),
+							.setColor('DarkRed'),
 					],
 					ephemeral: true,
 				});
@@ -65,7 +65,7 @@ module.exports = {
 		// and pause timeout is only set when everyone leaves
 		await interaction.reply({
 			embeds: [
-				new MessageEmbed()
+				new Embed()
 					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, always ? 'CMD_247_ENABLED' : 'CMD_247_DISABLED'))
 					.setFooter({ text: always ? getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_247_NOTE') : '' })
 					.setColor(defaultColor),

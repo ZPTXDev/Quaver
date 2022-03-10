@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { Embed } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
@@ -33,7 +33,7 @@ module.exports = {
 		player.nightcore = nightcore;
 		await interaction.reply({
 			embeds: [
-				new MessageEmbed()
+				new Embed()
 					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, player.nightcore ? 'CMD_NIGHTCORE_ENABLED' : 'CMD_NIGHTCORE_DISABLED'))
 					.setFooter({ text: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_FILTERS_NOTE') })
 					.setColor(defaultColor),

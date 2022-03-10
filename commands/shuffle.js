@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { Embed } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
@@ -19,9 +19,9 @@ module.exports = {
 		if (player.queue.tracks.length <= 1) {
 			await interaction.reply({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SHUFFLE_INSUFFICIENT'))
-						.setColor('DARK_RED'),
+						.setColor('DarkRed'),
 				],
 				ephemeral: true,
 			});
@@ -35,7 +35,7 @@ module.exports = {
 		}
 		await interaction.reply({
 			embeds: [
-				new MessageEmbed()
+				new Embed()
 					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SHUFFLE_SUCCESS'))
 					.setColor(defaultColor),
 			],

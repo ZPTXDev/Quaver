@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { Embed } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale, msToTime, msToTimeString } = require('../functions.js');
@@ -37,9 +37,9 @@ module.exports = {
 		if (!player.queue.current || !player.playing && !player.paused) {
 			await interaction.reply({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_NOT_PLAYING'))
-						.setColor('DARK_RED'),
+						.setColor('DarkRed'),
 				],
 				ephemeral: true,
 			});
@@ -48,9 +48,9 @@ module.exports = {
 		if (player.queue.current.isStream) {
 			await interaction.reply({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SEEK_IS_STREAM'))
-						.setColor('DARK_RED'),
+						.setColor('DarkRed'),
 				],
 				ephemeral: true,
 			});
@@ -61,9 +61,9 @@ module.exports = {
 		if (interaction.options.getInteger('hours') === null && interaction.options.getInteger('minutes') === null && interaction.options.getInteger('seconds') === null) {
 			await interaction.reply({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SEEK_UNSPECIFIED_TIMESTAMP'))
-						.setColor('DARK_RED'),
+						.setColor('DarkRed'),
 				],
 				ephemeral: true,
 			});
@@ -75,9 +75,9 @@ module.exports = {
 		if (ms > trackLength) {
 			await interaction.reply({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SEEK_INVALID_TIMESTAMP', durationString))
-						.setColor('DARK_RED'),
+						.setColor('DarkRed'),
 				],
 				ephemeral: true,
 			});
@@ -88,7 +88,7 @@ module.exports = {
 		await player.seek(ms);
 		await interaction.reply({
 			embeds: [
-				new MessageEmbed()
+				new Embed()
 					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SEEK_SUCCESS', seekString, durationString))
 					.setColor(defaultColor),
 			],

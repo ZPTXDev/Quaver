@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { LoopType } = require('@lavaclient/queue');
-const { MessageEmbed } = require('discord.js');
+const { Embed } = require('discord.js');
 const { checks } = require('../enums.js');
 const { getBar, msToTime, msToTimeString } = require('../functions.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
@@ -22,9 +22,9 @@ module.exports = {
 		if (!player.queue.current || !player.playing && !player.paused) {
 			await interaction.reply({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_NOT_PLAYING'))
-						.setColor('DARK_RED'),
+						.setColor('DarkRed'),
 				],
 				ephemeral: true,
 			});
@@ -41,7 +41,7 @@ module.exports = {
 		if (player.queue.current.isStream) {
 			await interaction.reply({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(`**[${player.queue.current.title}](${player.queue.current.uri})**\n🔴 **${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_LIVE')}** ${'▬'.repeat(10)}${player.paused ? ' ⏸️' : ''}${player.queue.loop.type !== LoopType.None ? ` ${player.queue.loop.type === LoopType.Queue ? '🔁' : '🔂'}` : ''}${player.bassboost ? ' 🅱️' : ''}\n\`[${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_STREAMING')}]\` | ${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_ADDED_BY', player.queue.current.requester)}`)
 						.setColor(defaultColor),
 				],
@@ -50,7 +50,7 @@ module.exports = {
 		}
 		await interaction.reply({
 			embeds: [
-				new MessageEmbed()
+				new Embed()
 					.setDescription(`**[${player.queue.current.title}](${player.queue.current.uri})**\n${bar}${player.paused ? ' ⏸️' : ''}${player.queue.loop.type !== LoopType.None ? ` ${player.queue.loop.type === LoopType.Queue ? '🔁' : '🔂'}` : ''}${player.bassboost ? ' 🅱️' : ''}${player.nightcore ? ' 🇳' : ''}\n\`[${elapsedString} / ${durationString}]\` | ${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_ADDED_BY', player.queue.current.requester)}`)
 					.setColor(defaultColor),
 			],

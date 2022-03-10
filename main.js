@@ -1,5 +1,5 @@
 require('@lavaclient/queue/register');
-const { Client, Intents, Collection, MessageEmbed, MessageButton, Permissions } = require('discord.js');
+const { Client, IntentsBitField, Collection, Embed, MessageButton, Permissions } = require('discord.js');
 const { Node } = require('lavaclient');
 const { load } = require('@lavaclient/spotify');
 const { token, lavalink, spotify, defaultColor, defaultLocale, functions } = require('./settings.json');
@@ -72,7 +72,7 @@ load({
 	autoResolveYoutubeTracks: false,
 });
 
-const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
+const bot = new Client({ intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildPresences, IntentsBitField.Flags.GuildMembers, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.GuildVoiceStates] });
 bot.commands = new Collection();
 bot.music = new Node({
 	connection: {
@@ -113,7 +113,7 @@ bot.music.on('queueFinish', queue => {
 	if (guildData.get(`${queue.player.guildId}.always.enabled`)) {
 		queue.channel.send({
 			embeds: [
-				new MessageEmbed()
+				new Embed()
 					.setDescription(`${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_EMPTY')}`)
 					.setColor(defaultColor),
 			],
@@ -132,7 +132,7 @@ bot.music.on('queueFinish', queue => {
 		bot.music.destroyPlayer(p.guildId);
 		channel.send({
 			embeds: [
-				new MessageEmbed()
+				new Embed()
 					.setDescription(getLocale(guildData.get(`${p.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY'))
 					.setColor(defaultColor),
 			],
@@ -140,7 +140,7 @@ bot.music.on('queueFinish', queue => {
 	}, 1800000, queue.player);
 	queue.channel.send({
 		embeds: [
-			new MessageEmbed()
+			new Embed()
 				.setDescription(`${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_EMPTY')} ${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 1800)}`)
 				.setColor(defaultColor),
 		],
@@ -158,7 +158,7 @@ bot.music.on('trackStart', async (queue, song) => {
 	const durationString = song.isStream ? '∞' : msToTimeString(duration, true);
 	await queue.channel.send({
 		embeds: [
-			new MessageEmbed()
+			new Embed()
 				.setDescription(`${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_NOW_PLAYING', song.title, song.uri, durationString)}\n${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ADDED_BY', song.requester)}`)
 				.setColor(defaultColor),
 		],
@@ -173,7 +173,7 @@ bot.music.on('trackEnd', queue => {
 		bot.music.destroyPlayer(queue.player.guildId);
 		queue.channel.send({
 			embeds: [
-				new MessageEmbed()
+				new Embed()
 					.setDescription(getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE'))
 					.setColor(defaultColor),
 			],
@@ -241,9 +241,9 @@ bot.on('interactionCreate', async interaction => {
 			console.log(`[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] ${getLocale(defaultLocale, 'LOG_CMD_FAILED', interaction.commandName, failedChecks.length)}`);
 			await interaction.reply({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, failedChecks[0]))
-						.setColor('DARK_RED'),
+						.setColor('DarkRed'),
 				],
 				ephemeral: true,
 			});
@@ -263,9 +263,9 @@ bot.on('interactionCreate', async interaction => {
 		if (failedPermissions.user.length > 0) {
 			await interaction.reply({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_USER_MISSING_PERMISSIONS', failedPermissions.user.map(perm => '`' + perm + '`').join(' ')))
-						.setColor('DARK_RED'),
+						.setColor('DarkRed'),
 				],
 				ephemeral: true,
 			});
@@ -274,9 +274,9 @@ bot.on('interactionCreate', async interaction => {
 		if (failedPermissions.bot.length > 0) {
 			await interaction.reply({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS', failedPermissions.bot.map(perm => '`' + perm + '`').join(' ')))
-						.setColor('DARK_RED'),
+						.setColor('DarkRed'),
 				],
 				ephemeral: true,
 			});
@@ -291,9 +291,9 @@ bot.on('interactionCreate', async interaction => {
 			console.error(err);
 			await interaction.reply({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_CMD_ERROR'))
-						.setColor('DARK_RED'),
+						.setColor('DarkRed'),
 				],
 				ephemeral: true,
 			});
@@ -354,9 +354,9 @@ bot.on('interactionCreate', async interaction => {
 				if (interaction.customId.split('_')[1] !== interaction.user.id) {
 					await interaction.reply({
 						embeds: [
-							new MessageEmbed()
+							new Embed()
 								.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_INTERACTION_WRONG_USER'))
-								.setColor('DARK_RED'),
+								.setColor('DarkRed'),
 						],
 						ephemeral: true,
 					});
@@ -364,7 +364,7 @@ bot.on('interactionCreate', async interaction => {
 				}
 				await interaction.update({
 					embeds: [
-						new MessageEmbed()
+						new Embed()
 							.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_INTERACTION_CANCELED', interaction.user.id))
 							.setColor(defaultColor),
 					],
@@ -380,9 +380,9 @@ bot.on('interactionCreate', async interaction => {
 				if (interaction.customId.split('_')[1] !== interaction.user.id) {
 					await interaction.reply({
 						embeds: [
-							new MessageEmbed()
+							new Embed()
 								.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_INTERACTION_WRONG_USER'))
-								.setColor('DARK_RED'),
+								.setColor('DarkRed'),
 						],
 						ephemeral: true,
 					});
@@ -393,9 +393,9 @@ bot.on('interactionCreate', async interaction => {
 				if (!interaction.member?.voice.channelId) {
 					await interaction.reply({
 						embeds: [
-							new MessageEmbed()
+							new Embed()
 								.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, checks.IN_VOICE))
-								.setColor('DARK_RED'),
+								.setColor('DarkRed'),
 						],
 						ephemeral: true,
 					});
@@ -404,9 +404,9 @@ bot.on('interactionCreate', async interaction => {
 				if (player && interaction.member?.voice.channelId !== player.channelId) {
 					await interaction.reply({
 						embeds: [
-							new MessageEmbed()
+							new Embed()
 								.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, checks.IN_SESSION_VOICE))
-								.setColor('DARK_RED'),
+								.setColor('DarkRed'),
 						],
 						ephemeral: true,
 					});
@@ -417,9 +417,9 @@ bot.on('interactionCreate', async interaction => {
 				if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
 					await interaction.reply({
 						embeds: [
-							new MessageEmbed()
+							new Embed()
 								.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_BASIC'))
-								.setColor('DARK_RED'),
+								.setColor('DarkRed'),
 						],
 						ephemeral: true,
 					});
@@ -428,9 +428,9 @@ bot.on('interactionCreate', async interaction => {
 				if (interaction.member?.voice.channel.type === 'GUILD_STAGE_VOICE' && !permissions.has(Permissions.STAGE_MODERATOR)) {
 					await interaction.reply({
 						embeds: [
-							new MessageEmbed()
+							new Embed()
 								.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_STAGE'))
-								.setColor('DARK_RED'),
+								.setColor('DarkRed'),
 						],
 						ephemeral: true,
 					});
@@ -448,7 +448,7 @@ bot.on('interactionCreate', async interaction => {
 						bot.music.destroyPlayer(interaction.guildId);
 						await interaction.editReply({
 							embeds: [
-								new MessageEmbed()
+								new Embed()
 									.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_INTERACTION_CANCELED', interaction.user.id))
 									.setColor(defaultColor),
 							],
@@ -481,7 +481,7 @@ bot.on('interactionCreate', async interaction => {
 				const started = player.playing || player.paused;
 				await interaction.editReply({
 					embeds: [
-						new MessageEmbed()
+						new Embed()
 							.setDescription(msg)
 							.setColor(defaultColor)
 							.setFooter({ text: started ? `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '' }),
@@ -519,7 +519,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			bot.music.destroyPlayer(player.guildId);
 			await channel.send({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_FORCED'))
 						.setColor(defaultColor),
 				],
@@ -542,7 +542,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				try {
 					await channel.send({
 						embeds: [
-							new MessageEmbed()
+							new Embed()
 								.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_FORCED_STAGE'))
 								.setColor(defaultColor),
 						],
@@ -573,7 +573,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				bot.music.destroyPlayer(player.guildId);
 				channel.send({
 					embeds: [
-						new MessageEmbed()
+						new Embed()
 							.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_MOVED'))
 							.setColor(defaultColor),
 					],
@@ -596,7 +596,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				bot.music.destroyPlayer(p.guildId);
 				channel.send({
 					embeds: [
-						new MessageEmbed()
+						new Embed()
 							.setDescription(getLocale(guildData.get(`${p.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY'))
 							.setColor(defaultColor),
 					],
@@ -604,7 +604,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			}, 300000, player);
 			await player.queue.channel.send({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`)
 						.setFooter({ text: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_REJOIN') })
 						.setColor(defaultColor),
@@ -618,7 +618,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			delete player.pauseTimeout;
 			await player.queue.channel.send({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_RESUMED'))
 						.setColor(defaultColor),
 				],
@@ -637,7 +637,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		}
 		await player.queue.channel.send({
 			embeds: [
-				new MessageEmbed()
+				new Embed()
 					.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_RESUMED'))
 					.setColor(defaultColor),
 			],
@@ -662,7 +662,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		bot.music.destroyPlayer(player.guildId);
 		channel.send({
 			embeds: [
-				new MessageEmbed()
+				new Embed()
 					.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE'))
 					.setColor(defaultColor),
 			],
@@ -682,7 +682,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		bot.music.destroyPlayer(p.guildId);
 		channel.send({
 			embeds: [
-				new MessageEmbed()
+				new Embed()
 					.setDescription(getLocale(guildData.get(`${p.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY'))
 					.setColor(defaultColor),
 			],
@@ -690,7 +690,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 	}, 300000, player);
 	await player.queue.channel.send({
 		embeds: [
-			new MessageEmbed()
+			new Embed()
 				.setDescription(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`)
 				.setFooter({ text: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_REJOIN') })
 				.setColor(defaultColor),
@@ -731,7 +731,7 @@ async function shuttingDown(eventType, err) {
 			bot.music.destroyPlayer(player.guildId);
 			await player.queue.channel.send({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, ['exit', 'SIGINT'].includes(eventType) ? 'MUSIC_RESTART' : 'MUSIC_RESTART_CRASH')}${fileBuffer.length > 0 ? `\n${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_RESTART_QUEUEDATA')}` : ''}`)
 						.setFooter({ text: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_RESTART_SORRY') })
 						.setColor(defaultColor),

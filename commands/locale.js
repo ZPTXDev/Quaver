@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { Embed } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { roundTo, getLocale, checkLocaleCompletion } = require('../functions.js');
@@ -16,7 +16,7 @@ module.exports = {
 				.setName('new_locale')
 				.setDescription(getLocale(defaultLocale, 'CMD_LOCALE_OPTION_LOCALE'))
 				.setRequired(true)
-				.addChoices(fs.readdirSync(path.resolve(__dirname, '../locales')).filter(file => file.endsWith('.json')).map(file => {return [file.slice(0, -5), file.slice(0, -5)];}))),
+				.addChoices(...fs.readdirSync(path.resolve(__dirname, '../locales')).filter(file => file.endsWith('.json')).map(file => {return { name: file.slice(0, -5), value: file.slice(0, -5) };}))),
 	checks: [checks.GUILD_ONLY],
 	permissions: {
 		// TODO: https://msciotti.notion.site/msciotti/Command-Permissions-V2-4d113cb49090409f998f3bd80a06c3bd (when it gets released)
@@ -28,13 +28,13 @@ module.exports = {
 		guildData.set(`${interaction.guildId}.locale`, locale);
 		const localeCompletion = checkLocaleCompletion(locale);
 		const additionalEmbed = localeCompletion.completion !== 100 ? [
-			new MessageEmbed()
+			new Embed()
 				.setDescription(`This locale is incomplete. Completion: \`${roundTo(localeCompletion.completion, 2)}%\`\nMissing strings:\n\`\`\`\n${localeCompletion.missing.join('\n')}\`\`\``)
-				.setColor('DARK_RED'),
+				.setColor('DarkRed'),
 		] : [];
 		await interaction.reply({
 			embeds: [
-				new MessageEmbed()
+				new Embed()
 					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_LOCALE_SUCCESS', interaction.guild.name, locale))
 					.setColor(defaultColor),
 				...additionalEmbed,

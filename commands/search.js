@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed, MessageActionRow, MessageSelectMenu, MessageButton } = require('discord.js');
+const { Embed, MessageActionRow, MessageSelectMenu, MessageButton } = require('discord.js');
 const { checks } = require('../enums.js');
 const { msToTime, msToTimeString } = require('../functions.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
@@ -41,9 +41,9 @@ module.exports = {
 		if (tracks.length <= 1) {
 			await interaction.editReply({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SEARCH_USE_PLAY_CMD'))
-						.setColor('DARK_RED'),
+						.setColor('DarkRed'),
 				],
 			});
 			return;
@@ -51,7 +51,7 @@ module.exports = {
 
 		await interaction.editReply({
 			embeds: [
-				new MessageEmbed()
+				new Embed()
 					.setDescription(tracks.map((track, index) => {
 						const duration = msToTime(track.info.length);
 						const durationString = track.info.isStream ? '∞' : msToTimeString(duration, true);

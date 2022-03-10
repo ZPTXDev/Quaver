@@ -5,13 +5,13 @@
     "node": ">=16.9.0"
   },
   "dependencies": {
-    "@discordjs/builders": "^0.12.0",
+    "@discordjs/builders": "^0.13.0-dev.1646870850.e787cd5",
     "@discordjs/rest": "^0.3.0",
     "@lavaclient/queue": "^2.0.6",
     "@lavaclient/spotify": "^3.0.0",
     "data-store": "^4.0.3",
     "discord-api-types": "^0.28.0",
-    "discord.js": "^13.6.0",
+    "discord.js": "^14.0.0-dev.1646870856.e787cd5",
     "lavaclient": "^4.0.7"
   },
   "devDependencies": {

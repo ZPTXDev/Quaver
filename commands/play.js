@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { SpotifyItemType } = require('@lavaclient/spotify');
-const { MessageEmbed, Permissions } = require('discord.js');
+const { Embed, Permissions } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
@@ -32,9 +32,9 @@ module.exports = {
 		if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
 			await interaction.reply({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_BASIC'))
-						.setColor('DARK_RED'),
+						.setColor('DarkRed'),
 				],
 				ephemeral: true,
 			});
@@ -43,9 +43,9 @@ module.exports = {
 		if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE' && !permissions.has(Permissions.STAGE_MODERATOR)) {
 			await interaction.reply({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_STAGE'))
-						.setColor('DARK_RED'),
+						.setColor('DarkRed'),
 				],
 				ephemeral: true,
 			});
@@ -73,9 +73,9 @@ module.exports = {
 				default:
 					await interaction.editReply({
 						embeds: [
-							new MessageEmbed()
+							new Embed()
 								.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_PLAY_SPOTIFY_NO_RESULTS'))
-								.setColor('DARK_RED'),
+								.setColor('DarkRed'),
 						],
 					});
 					return;
@@ -100,9 +100,9 @@ module.exports = {
 					console.log(results);
 					await interaction.editReply({
 						embeds: [
-							new MessageEmbed()
+							new Embed()
 								.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_CMD_ERROR'))
-								.setColor('DARK_RED'),
+								.setColor('DarkRed'),
 						],
 					});
 					return;
@@ -120,7 +120,7 @@ module.exports = {
 				interaction.client.music.destroyPlayer(interaction.guildId);
 				await interaction.editReply({
 					embeds: [
-						new MessageEmbed()
+						new Embed()
 							.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_INTERACTION_CANCELED', interaction.user.id))
 							.setColor(defaultColor),
 					],
@@ -140,7 +140,7 @@ module.exports = {
 		const started = player.playing || player.paused;
 		await interaction.editReply({
 			embeds: [
-				new MessageEmbed()
+				new Embed()
 					.setDescription(msg)
 					.setColor(defaultColor)
 					.setFooter({ text: started ? `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '' }),

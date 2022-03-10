@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed, Permissions } = require('discord.js');
+const { Embed, Permissions } = require('discord.js');
 const { version } = require('../package.json');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
@@ -17,7 +17,7 @@ module.exports = {
 	async execute(interaction) {
 		await interaction.reply({
 			embeds: [
-				new MessageEmbed()
+				new Embed()
 					.setTitle('Quaver')
 					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_INFO_DETAIL', interaction.client.generateInvite({ permissions: [Permissions.FLAGS.ADMINISTRATOR], scopes: ['bot', 'applications.commands'] }), version))
 					.setColor(defaultColor)

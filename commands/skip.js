@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { Embed } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
@@ -21,7 +21,7 @@ module.exports = {
 			await player.queue.start();
 			await interaction.reply({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SKIP_SUCCESS', track.title, track.uri))
 						.setColor(defaultColor),
 				],
@@ -32,9 +32,9 @@ module.exports = {
 		if (skip.users.includes(interaction.user.id)) {
 			await interaction.reply({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SKIP_VOTED'))
-						.setColor('DARK_RED'),
+						.setColor('DarkRed'),
 				],
 				ephemeral: true,
 			});
@@ -46,7 +46,7 @@ module.exports = {
 			await player.queue.start();
 			await interaction.reply({
 				embeds: [
-					new MessageEmbed()
+					new Embed()
 						.setDescription(`${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SKIP_SUCCESS_VOTED', track.title, track.uri)}\n${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_ADDED_BY', track.requester)}`)
 						.setColor(defaultColor),
 				],
@@ -57,7 +57,7 @@ module.exports = {
 		player.skip = skip;
 		await interaction.reply({
 			embeds: [
-				new MessageEmbed()
+				new Embed()
 					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SKIP_VOTED_SUCCESS', player.queue.current.title, player.queue.current.uri, skip.users.length, skip.required))
 					.setColor(defaultColor),
 			],
