@@ -63,6 +63,7 @@ rl.on('line', line => {
 			break;
 	}
 });
+rl.on('close', () => shuttingDown('SIGINT'));
 
 load({
 	client: {
