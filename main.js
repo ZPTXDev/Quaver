@@ -63,6 +63,7 @@ rl.on('line', line => {
 			break;
 	}
 });
+rl.on('close', () => shuttingDown('SIGINT'));
 
 load({
 	client: {
@@ -760,5 +761,4 @@ async function shuttingDown(eventType, err) {
 
 ['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM', 'uncaughtException', 'unhandledRejection'].forEach(eventType => {
 	process.on(eventType, err => shuttingDown(eventType, err));
-	rl.on('close', () => shuttingDown('SIGINT'));
 });
