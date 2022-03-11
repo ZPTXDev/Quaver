@@ -1,6 +1,12 @@
 const { defaultLocale } = require('./settings.json');
 
-// thanks: https://gist.github.com/flangofas/714f401b63a1c3d84aaa
+/**
+ * Converts milliseconds to a time object or a converted equivalent if a format is provided.
+ * Reference: https://gist.github.com/flangofas/714f401b63a1c3d84aaa
+ * @param {number} milliseconds - The milliseconds to convert.
+ * @param {string} [format] - The format to convert to. Accepts 's' for seconds, 'm' for minutes, 'h' for hours, 'd' for days.
+ * @returns {(Object|number)} - Time object or the converted equivalent if a format is provided.
+ */
 function msToTime(milliseconds, format) {
 	const total_seconds = parseInt(Math.floor(milliseconds / 1000));
 	const total_minutes = parseInt(Math.floor(total_seconds / 60));
@@ -24,6 +30,13 @@ function msToTime(milliseconds, format) {
 			return { d: days, h: hours, m: minutes, s: seconds };
 	}
 }
+
+/**
+ * Converts time object from msToTime to a string.
+ * @param {Object} msObject - The time object provided by msToTime.
+ * @param {boolean} simple - Whether to return a simple string or a more detailed one.
+ * @returns {string} - The converted string.
+ */
 function msToTimeString(msObject, simple) {
 	if (simple) {
 		if (msObject['d'] > 0) {
@@ -33,7 +46,14 @@ function msToTimeString(msObject, simple) {
 	}
 	return `${msObject['d'] > 0 ? `${msObject['d']} day${msObject['d'] === 1 ? '' : 's'}, ` : ''}${msObject['h'] > 0 ? `${msObject['h']} hr${msObject['h'] === 1 ? '' : 's'}, ` : ''}${msObject['m'] > 0 ? `${msObject['m']} min${msObject['m'] === 1 ? '' : 's'}, ` : ''}${msObject['s'] > 0 ? `${msObject['s']} sec${msObject['s'] === 1 ? '' : 's'}, ` : ''}`.slice(0, -2);
 }
-// thanks: https://stackoverflow.com/a/15762794
+
+/**
+ * Round a number to the number of decimal places provided.
+ * Reference: https://stackoverflow.com/a/15762794
+ * @param {number} n - The number to round.
+ * @param {number} digits - The number of decimal places to round to.
+ * @returns {number} - The rounded number.
+ */
 function roundTo(n, digits) {
 	let negative = false;
 	if (digits === undefined) {digits = 0;}
@@ -48,7 +68,13 @@ function roundTo(n, digits) {
 	if (digits === 0) {n = parseInt(n, 10);}
 	return n;
 }
-// thanks: https://stackoverflow.com/a/54897508
+
+/**
+ * Get seconds from a human-readable string.
+ * Reference: https://stackoverflow.com/a/54897508
+ * @param {string} str - The human-readable string.
+ * @returns {number} - Seconds extracted from the string.
+ */
 function getSeconds(str) {
 	let seconds = 0;
 	const days = str.match(/(\d+)\s*d/);
@@ -61,6 +87,12 @@ function getSeconds(str) {
 	if (secs) { seconds += parseInt(secs[1]); }
 	return seconds;
 }
+
+/**
+ * Get a progress bar based on the percentage provided.
+ * @param {number} progress - The percentage of the bar to be filled.
+ * @returns {string} - The progress bar.
+ */
 function getBar(progress) {
 	if (isNaN(progress) || progress < 10) {return '🔘▬▬▬▬▬▬▬▬▬';}
 	else if (progress < 20) {return '▬🔘▬▬▬▬▬▬▬▬';}
@@ -73,6 +105,13 @@ function getBar(progress) {
 	else if (progress < 90) {return '▬▬▬▬▬▬▬▬🔘▬';}
 	else {return '▬▬▬▬▬▬▬▬▬🔘';}
 }
+
+/**
+ * Paginate an array.
+ * @param {Array} arr - The array to paginate.
+ * @param {number} size - The size of each page.
+ * @returns {Array} - The paginated array.
+ */
 function paginate(arr, size) {
 	return arr.reduce((acc, val, i) => {
 		const idx = Math.floor(i / size);
@@ -81,7 +120,15 @@ function paginate(arr, size) {
 		return acc;
 	}, []);
 }
-// thanks: https://stackoverflow.com/a/63376860
+
+/**
+ * Get the localized string.
+ * Reference: https://stackoverflow.com/a/63376860
+ * @param {string} language - The language to use.
+ * @param {string} string - The string to get.
+ * @param {...string} vars - The extra variables required in some localized strings.
+ * @returns {string} - The localized string.
+ */
 function getLocale(language, string, ...vars) {
 	let strings = require(`./locales/${language}.json`);
 	if (!strings) return 'LOCALE_MISSING';
@@ -98,6 +145,11 @@ function getLocale(language, string, ...vars) {
 	return locale;
 }
 
+/**
+ * Checks locale completion for a given locale.
+ * @param {*} language - The locale code to check.
+ * @returns {Object} - Completion percentage and missing strings.
+ */
 function checkLocaleCompletion(language) {
 	const foreignStrings = require(`./locales/${language}.json`);
 	const strings = require('./locales/en-US.json');
