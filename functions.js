@@ -147,7 +147,7 @@ function getLocale(language, string, ...vars) {
 
 /**
  * Checks locale completion for a given locale.
- * @param {*} language - The locale code to check.
+ * @param {string} language - The locale code to check.
  * @returns {Object} - Completion percentage and missing strings.
  */
 function checkLocaleCompletion(language) {
