@@ -5,7 +5,6 @@ Starting from version **2.0.0**, that will no longer be the case.
 
 Quaver will now use a simpler system to handle requests and its focus will be shifted to serving a smaller community, with an aim to be self-hosted without much hassle.
 
-# Using Quaver
 Quaver was written to use both slash commands and normal commands, but with this rewrite, only slash commands will be accepted, alongside buttons and menus.
 
 # Hosting Quaver
