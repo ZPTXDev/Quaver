@@ -127,9 +127,6 @@ module.exports = {
 				});
 				return;
 			}
-			if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE' && !interaction.member.voice.channel.stageInstance) {
-				await interaction.member.voice.channel.createStageInstance({ topic: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
-			}
 		}
 
 		const firstPosition = insert ? 1 : player.queue.tracks.length + 1;
