@@ -554,6 +554,32 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				}
 				return;
 			}
+			// check for connect, speak permission for channel
+			const channel = player.queue.channel;
+			if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
+				await channel.send({
+					embeds: [
+						new MessageEmbed()
+							.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_BASIC'))
+							.setColor('DARK_RED'),
+					],
+				});
+				bot.music.destroyPlayer(player.guildId);
+				player.disconnect();
+				return;
+			}
+			if (newState.member?.voice.channel.type === 'GUILD_STAGE_VOICE' && !permissions.has(Permissions.STAGE_MODERATOR)) {
+				await channel.send({
+					embeds: [
+						new MessageEmbed()
+							.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_STAGE'))
+							.setColor('DARK_RED'),
+					],
+				});
+				bot.music.destroyPlayer(player.guildId);
+				player.disconnect();
+				return;
+			}
 			await newState.setSuppressed(false);
 			if (!newState.channel.stageInstance) {
 				await newState.channel.createStageInstance({ topic: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
