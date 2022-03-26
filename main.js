@@ -560,6 +560,30 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				}
 				return;
 			}
+			// check for connect, speak permission for stage channel
+			const channel = player.queue.channel;
+			if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
+				clearTimeout(player.timeout);
+				clearTimeout(player.pauseTimeout);
+				player.disconnect();
+				bot.music.destroyPlayer(player.guildId);
+				// check for permissions for text channel
+				const text = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+				if (!text.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
+				try {
+					await channel.send({
+						embeds: [
+							new MessageEmbed()
+								.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_BASIC'))
+								.setColor('DARK_RED'),
+						],
+					});
+				}
+				catch (err) {
+					console.error(err);
+				}
+				return;
+			}
 			await newState.setSuppressed(false);
 			if (!newState.channel.stageInstance) {
 				await newState.channel.createStageInstance({ topic: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
