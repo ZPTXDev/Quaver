@@ -530,6 +530,34 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			});
 			return;
 		}
+		// channel is a voice channel
+		if (newState.channel.type === 'GUILD_VOICE') {
+			// check for connect, speak permission for voice channel
+			const channel = player.queue.channel;
+			const permissions =	bot.guilds.cache.get(guild.id).channels.cache.get(newState.channelId).permissionsFor(bot.user.id);
+			if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
+				clearTimeout(player.timeout);
+				clearTimeout(player.pauseTimeout);
+				player.disconnect();
+				bot.music.destroyPlayer(player.guildId);
+				// check for permissions for text channel
+				const text = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+				if (!text.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
+				try {
+					await channel.send({
+						embeds: [
+							new MessageEmbed()
+								.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_BASIC'))
+								.setColor('DARK_RED'),
+						],
+					});
+				}
+				catch (err) {
+					console.error(err);
+				}
+				return;
+			}
+		}
 		// channel is a stage channel, and bot is suppressed
 		// this also handles suppressing Quaver mid-track
 		if (newState.channel.type === 'GUILD_STAGE_VOICE' && newState.suppress) {
