@@ -554,7 +554,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				}
 				return;
 			}
-			// check for connect, speak permission for channel
+			// check for connect, speak permission for stage channel
 			const channel = player.queue.channel;
 			if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
 				await channel.send({
