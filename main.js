@@ -519,8 +519,8 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			clearTimeout(player.pauseTimeout);
 			bot.music.destroyPlayer(player.guildId);
 			// check for permissions for text channel
-			const text = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
-			if (!text.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
+			const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+			if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 			await channel.send({
 				embeds: [
 					new MessageEmbed()
@@ -541,8 +541,8 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				player.disconnect();
 				bot.music.destroyPlayer(player.guildId);
 				// check for permissions for text channel
-				const text = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
-				if (!text.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
+				const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+				if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 				try {
 					await channel.send({
 						embeds: [
