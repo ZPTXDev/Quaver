@@ -251,8 +251,9 @@ bot.on('interactionCreate', async interaction => {
 			return;
 		}
 		const failedPermissions = { user: [], bot: [] };
-		if (!interaction.channel.permissionsFor(bot.user.id).has(['VIEW_CHANNEL'])) { failedPermissions.bot.push(['VIEW_CHANNEL']); }
-		if (!interaction.channel.permissionsFor(bot.user.id).has(['SEND_MESSAGES'])) { failedPermissions.bot.push(['SEND_MESSAGES']); }
+		const botChannelPerms = interaction.channel.permissionsFor(bot.user.id);
+		if (!botChannelPerms.has(['VIEW_CHANNEL'])) { failedPermissions.bot.push(['VIEW_CHANNEL']); }
+		if (!botChannelPerms.has(['SEND_MESSAGES'])) { failedPermissions.bot.push(['SEND_MESSAGES']); }
 		for (const perm of command.permissions.user) {
 			if (!interaction.member.permissions.has(perm)) {
 				failedPermissions.user.push(perm);
