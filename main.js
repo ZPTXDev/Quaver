@@ -322,6 +322,16 @@ bot.on('interactionCreate', async interaction => {
 					});
 				}
 			}
+			if (!interaction.replied) {
+				await interaction.reply({
+					embeds: [
+						new MessageEmbed()
+							.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_CMD_ERROR'))
+							.setColor('DARK_RED'),
+					],
+					ephemeral: true,
+				});
+			}
 		}
 	}
 	else if (interaction.isButton()) {
