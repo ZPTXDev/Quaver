@@ -112,6 +112,9 @@ bot.music.on('connect', () => {
 
 bot.music.on('queueFinish', queue => {
 	if (guildData.get(`${queue.player.guildId}.always.enabled`)) {
+		// check for permissions for text channel
+		const botChannelPerms = bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).permissionsFor(bot.user.id);
+		if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 		queue.channel.send({
 			embeds: [
 				new MessageEmbed()
@@ -131,6 +134,9 @@ bot.music.on('queueFinish', queue => {
 		clearTimeout(p.pauseTimeout);
 		p.disconnect();
 		bot.music.destroyPlayer(p.guildId);
+		// check for permissions for text channel
+		const botChannelPerms = bot.guilds.cache.get(p.guildId).channels.cache.get(p.channelId).permissionsFor(bot.user.id);
+		if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 		channel.send({
 			embeds: [
 				new MessageEmbed()
@@ -139,6 +145,9 @@ bot.music.on('queueFinish', queue => {
 			],
 		});
 	}, 1800000, queue.player);
+	// check for permissions for text channel
+	const botChannelPerms = bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).permissionsFor(bot.user.id);
+	if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 	queue.channel.send({
 		embeds: [
 			new MessageEmbed()
@@ -157,6 +166,9 @@ bot.music.on('trackStart', async (queue, song) => {
 	}
 	const duration = msToTime(song.length);
 	const durationString = song.isStream ? '∞' : msToTimeString(duration, true);
+	// check for permissions for text channel
+	const botChannelPerms = bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).permissionsFor(bot.user.id);
+	if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 	await queue.channel.send({
 		embeds: [
 			new MessageEmbed()
@@ -172,6 +184,9 @@ bot.music.on('trackEnd', queue => {
 		console.log(`[G ${queue.player.guildId}] ${getLocale(defaultLocale, 'LOG_ALONE')}`);
 		queue.player.disconnect();
 		bot.music.destroyPlayer(queue.player.guildId);
+		// check for permissions for text channel
+		const botChannelPerms = bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).permissionsFor(bot.user.id);
+		if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 		queue.channel.send({
 			embeds: [
 				new MessageEmbed()
