@@ -293,7 +293,7 @@ bot.on('interactionCreate', async interaction => {
 		catch (err) {
 			console.log(`[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] ${getLocale(defaultLocale, 'LOG_CMD_ERROR', interaction.commandName)}`);
 			console.error(err);
-			if (!interaction.deferred) {
+			if (!interaction.deferred || interaction.deferred) {
 				if (interaction.replied) {
 					await interaction.editReply({
 						embeds: [
@@ -313,27 +313,6 @@ bot.on('interactionCreate', async interaction => {
 						ephemeral: true,
 					});
 				}
-			}
-			if (interaction.deferred) {
-				if (interaction.replied) {
-					await interaction.editReply({
-						embeds: [
-							new MessageEmbed()
-								.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_CMD_ERROR'))
-								.setColor('DARK_RED'),
-						],
-					});
-				}
-			}
-			if (!interaction.replied) {
-				await interaction.reply({
-					embeds: [
-						new MessageEmbed()
-							.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_CMD_ERROR'))
-							.setColor('DARK_RED'),
-					],
-					ephemeral: true,
-				});
 			}
 		}
 	}
