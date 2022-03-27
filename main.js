@@ -733,8 +733,8 @@ async function shuttingDown(eventType, err) {
 			}
 			player.disconnect();
 			bot.music.destroyPlayer(player.guildId);
-			const text = bot.guilds.cache.get(player.guildId).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
-			if (!text.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { break; }
+			const botChannelPerms = bot.guilds.cache.get(player.guildId).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
+			if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { break; }
 			await player.queue.channel.send({
 				embeds: [
 					new MessageEmbed()
