@@ -572,8 +572,8 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				player.disconnect();
 				bot.music.destroyPlayer(guild.id);
 				// check for permissions for text channel
-				const text = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
-				if (!text.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
+				const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+				if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 				try {
 					await channel.send({
 						embeds: [
@@ -596,8 +596,8 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				player.disconnect();
 				bot.music.destroyPlayer(player.guildId);
 				// check for permissions for text channel
-				const text = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
-				if (!text.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
+				const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+				if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 				try {
 					await channel.send({
 						embeds: [
@@ -636,8 +636,8 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				player.disconnect();
 				bot.music.destroyPlayer(player.guildId);
 				// check for permissions for text channel
-				const text = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
-				if (!text.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
+				const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+				if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 				channel.send({
 					embeds: [
 						new MessageEmbed()
@@ -662,8 +662,8 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				p.disconnect();
 				bot.music.destroyPlayer(p.guildId);
 				// check for permissions for text channel
-				const text = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
-				if (!text.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
+				const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+				if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 				channel.send({
 					embeds: [
 						new MessageEmbed()
@@ -673,8 +673,8 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				});
 			}, 300000, player);
 			// check for permissions for text channel
-			const text = bot.guilds.cache.get(guild.id).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
-			if (!text.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
+			const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
+			if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 			await player.queue.channel.send({
 				embeds: [
 					new MessageEmbed()
@@ -690,8 +690,8 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			clearTimeout(player.pauseTimeout);
 			delete player.pauseTimeout;
 			// check for permissions for text channel
-			const text = bot.guilds.cache.get(guild.id).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
-			if (!text.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
+			const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
+			if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 			await player.queue.channel.send({
 				embeds: [
 					new MessageEmbed()
@@ -712,8 +712,8 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			delete player.pauseTimeout;
 		}
 		// check for permissions for text channel
-		const text = bot.guilds.cache.get(guild.id).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
-		if (!text.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
+		const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
+		if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 		await player.queue.channel.send({
 			embeds: [
 				new MessageEmbed()
@@ -740,8 +740,8 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		player.disconnect();
 		bot.music.destroyPlayer(player.guildId);
 		// check for permissions for text channel
-		const text = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
-		if (!text.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
+		const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+		if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 		channel.send({
 			embeds: [
 				new MessageEmbed()
@@ -763,8 +763,8 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		p.disconnect();
 		bot.music.destroyPlayer(p.guildId);
 		// check for permissions for text channel
-		const text = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
-		if (!text.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
+		const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+		if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 		channel.send({
 			embeds: [
 				new MessageEmbed()
@@ -774,8 +774,8 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		});
 	}, 300000, player);
 	// check for permissions for text channel
-	const text = bot.guilds.cache.get(guild.id).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
-	if (!text.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
+	const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
+	if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 	await player.queue.channel.send({
 		embeds: [
 			new MessageEmbed()
