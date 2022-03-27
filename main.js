@@ -297,7 +297,6 @@ bot.on('interactionCreate', async interaction => {
 							.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_CMD_ERROR'))
 							.setColor('DARK_RED'),
 					],
-					ephemeral: true,
 				});
 			}
 			if (!interaction.replied && !interaction.deferred) {
