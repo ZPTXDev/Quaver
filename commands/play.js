@@ -97,7 +97,6 @@ module.exports = {
 					break;
 				}
 				default:
-					console.log(results);
 					await interaction.editReply({
 						embeds: [
 							new MessageEmbed()
