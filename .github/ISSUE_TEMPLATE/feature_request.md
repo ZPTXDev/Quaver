@@ -1,21 +1,18 @@
 ---
 name: Feature request
-about: Come up with something useful for everyone!
+about: Proposal for a new feature or improvement.
 title: ''
-labels: enhancement
+labels: type:enhancement
 assignees:
     - zapteryx
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+**Describe the feature**
+What feature are you proposing?
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+**List the benefits of adding such a feature**
+What will you gain from this feature?
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
-
-**Additional context**
-Add any other context or screenshots about the feature request here.
+**Is this feature request related to a problem?**
+Is there a problem with the current implementation (if any), or is there an issue that would be resolved with this feature?
