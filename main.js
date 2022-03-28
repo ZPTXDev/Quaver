@@ -596,7 +596,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 					});
 				}
 				catch (err) {
-					console.error(err);
+					logger.error({ message: err, label: 'Quaver' });
 				}
 				return;
 			}
