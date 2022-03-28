@@ -1,5 +1,5 @@
 ### Thank you for your interest in contributing!
-Before proceeding, please review the [guidelines for contributing](../CONTRIBUTING.md).
+Before proceeding, please review the [guidelines for contributing](CONTRIBUTING.md).
 
 - [ ] Are you targeting the `next` branch? (right side)
 - [ ] Did you review the guidelines for contributing?
