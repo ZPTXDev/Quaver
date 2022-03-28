@@ -584,7 +584,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 					});
 				}
 				catch (err) {
-					console.error(err);
+					logger.error({ message: err, label: 'Quaver' });
 				}
 				return;
 			}
@@ -615,7 +615,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 					});
 				}
 				catch (err) {
-					console.error(err);
+					logger.error({ message: err, label: 'Quaver' });
 				}
 				return;
 			}
@@ -639,7 +639,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 					});
 				}
 				catch (err) {
-					console.error(err);
+					logger.error({ message: err, label: 'Quaver' });
 				}
 				return;
 			}
@@ -649,7 +649,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 					await newState.channel.createStageInstance({ topic: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
 				}
 				catch (err) {
-					console.error(err);
+					logger.error({ message: err, label: 'Quaver' });
 				}
 			}
 		}
