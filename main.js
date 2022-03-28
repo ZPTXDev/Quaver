@@ -9,6 +9,7 @@ const { version } = require('./package.json');
 const { checks } = require('./enums.js');
 const { msToTime, msToTimeString, paginate, getLocale } = require('./functions.js');
 const readline = require('readline');
+const { createLogger, format, transports } = require('winston');
 const { guildData } = require('./data.js');
 
 const rl = readline.createInterface({
@@ -22,48 +23,74 @@ rl.on('line', line => {
 			break;
 		case 'sessions':
 			if (!startup) {
-				console.log(getLocale(defaultLocale, 'CMDLINE_NOT_INITIALIZED'));
+				console.log('Quaver is not initialized yet.');
 				break;
 			}
-			console.log(getLocale(defaultLocale, 'CMDLINE_SESSIONS', bot.music.players.size));
+			console.log(`There are currently ${bot.music.players.size} active session(s).`);
 			break;
 		case 'stats': {
 			const uptime = msToTime(bot.uptime);
 			const uptimeString = msToTimeString(uptime);
-			console.log(getLocale(defaultLocale, 'CMDLINE_STATS', bot.guilds.cache.size, uptimeString));
+			console.log(`Statistics:\nGuilds: ${bot.guilds.cache.size}\nUptime: ${uptimeString}`);
 			break;
 		}
 		case 'whitelist': {
 			if (!startup) {
-				console.log(getLocale(defaultLocale, 'CMDLINE_NOT_INITIALIZED'));
+				console.log('Quaver is not initialized yet.');
 				break;
 			}
 			const guildId = line.split(' ')[1];
 			if (!functions['247'].whitelist) {
-				console.log(getLocale(defaultLocale, 'CMDLINE_247_WHITELIST_DISABLED'));
+				console.log('The 24/7 whitelist is not enabled.');
 				break;
 			}
 			const guild = bot.guilds.cache.get(guildId);
 			if (!guild) {
-				console.log(getLocale(defaultLocale, 'CMDLINE_247_WHITELIST_GUILD_NOT_FOUND'));
+				console.log('Guild not found.');
 				break;
 			}
 			if (!guildData.get(`${guildId}.247.whitelisted`)) {
-				console.log(getLocale(defaultLocale, 'CMDLINE_247_WHITELIST_ADDED', guild.name));
+				console.log(`Added ${guild.name} to the 24/7 whitelist.`);
 				guildData.set(`${guildId}.247.whitelisted`, true);
 			}
 			else {
-				console.log(getLocale(defaultLocale, 'CMDLINE_247_WHITELIST_REMOVED', guild.name));
+				console.log(`Removed ${guild.name} from the 24/7 whitelist.`);
 				guildData.set(`${guildId}.247.whitelisted`, false);
 			}
 			break;
 		}
 		default:
-			console.log(getLocale(defaultLocale, 'CMDLINE_HELP'));
+			console.log('Available commands: exit, sessions, whitelist, stats');
 			break;
 	}
 });
+// 'close' event catches ctrl+c, therefore we pass it to shuttingDown as a ctrl+c event
 rl.on('close', () => shuttingDown('SIGINT'));
+
+const logger = createLogger({
+	level: 'info',
+	format: format.combine(
+		format.errors({ stack: true }),
+		format.timestamp(),
+		format.printf(info => `${info.timestamp} [${info.label}] ${info.level.toUpperCase()}: ${info.message}`),
+	),
+	transports: [
+		new transports.Console({
+			format: format.combine(
+				format(info => {
+					info.level = info.level.toUpperCase();
+					return info;
+				})(),
+				format.errors({ stack: true }),
+				format.timestamp(),
+				format.colorize(),
+				format.printf(info => `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`),
+			),
+		}),
+		new transports.File({ filename: 'logs/error.log', level: 'error' }),
+		new transports.File({ filename: 'logs/log.log' }),
+	],
+});
 
 load({
 	client: {
@@ -95,7 +122,7 @@ for (const file of commandFiles) {
 let startup = false;
 
 bot.music.on('connect', () => {
-	console.log(`[Quaver] ${getLocale(defaultLocale, 'LOG_LAVALINK_CONNECTED')}`);
+	logger.info({ message: 'Connected!', label: 'Lavalink' });
 	Object.keys(guildData.data).forEach(async guildId => {
 		if (guildData.get(`${guildId}.always.enabled`)) {
 			const guild = bot.guilds.cache.get(guildId);
@@ -121,12 +148,12 @@ bot.music.on('queueFinish', queue => {
 		});
 		return;
 	}
-	console.log(`[G ${queue.player.guildId}] ${getLocale(defaultLocale, 'LOG_SETTING_TIMEOUT')}`);
+	logger.info({ message: `[G ${queue.player.guildId}] Setting timeout`, label: 'Quaver' });
 	if (queue.player.timeout) {
 		clearTimeout(queue.player.timeout);
 	}
 	queue.player.timeout = setTimeout(p => {
-		console.log(`[G ${p.guildId}] ${getLocale(defaultLocale, 'LOG_INACTIVITY')}`);
+		logger.info({ message: `[G ${p.guildId}] Disconnecting (inactivity)`, label: 'Quaver' });
 		const channel = p.queue.channel;
 		clearTimeout(p.pauseTimeout);
 		p.disconnect();
@@ -149,7 +176,7 @@ bot.music.on('queueFinish', queue => {
 });
 
 bot.music.on('trackStart', async (queue, song) => {
-	console.log(`[G ${queue.player.guildId}] ${getLocale(defaultLocale, 'LOG_STARTING_TRACK')}`);
+	logger.info({ message: `[G ${queue.player.guildId}] Starting track`, label: 'Quaver' });
 	queue.player.pause(false);
 	if (queue.player.timeout) {
 		clearTimeout(queue.player.timeout);
@@ -169,7 +196,7 @@ bot.music.on('trackStart', async (queue, song) => {
 bot.music.on('trackEnd', queue => {
 	delete queue.player.skip;
 	if (bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).members?.filter(m => !m.user.bot).size < 1 && !guildData.get(`${queue.player.guildId}.always.enabled`)) {
-		console.log(`[G ${queue.player.guildId}] ${getLocale(defaultLocale, 'LOG_ALONE')}`);
+		logger.info({ message: `[G ${queue.player.guildId}] Disconnecting (alone)`, label: 'Quaver' });
 		queue.player.disconnect();
 		bot.music.destroyPlayer(queue.player.guildId);
 		queue.channel.send({
@@ -185,14 +212,15 @@ bot.music.on('trackEnd', queue => {
 
 bot.on('ready', async () => {
 	if (!startup) {
-		console.log(`[Quaver] ${getLocale(defaultLocale, 'LOG_DISCORD_CONNECTED', bot.user.tag)}`);
-		console.log(`[Quaver] ${getLocale(defaultLocale, 'LOG_STARTUP', version)}`);
+		logger.info({ message: `Connected! Logged in as ${bot.user.tag}.`, label: 'Discord' });
+		logger.info({ message: `Running version ${version}. For help, see https://github.com/ZapSquared/Quaver/issues.`, label: 'Quaver' });
 		bot.music.connect(bot.user.id);
 		bot.user.setActivity(version);
 		startup = true;
 	}
 	else {
-		console.log(`[Quaver] ${getLocale(defaultLocale, 'LOG_CONNECTION_LOST')}`);
+		logger.info({ message: 'Reconnected!', label: 'Discord' });
+		logger.warn({ message: 'Attempting to resume sessions.', label: 'Quaver' });
 		for (const pair of bot.music.players) {
 			const player = pair[1];
 			await player.resume();
@@ -204,7 +232,7 @@ bot.on('interactionCreate', async interaction => {
 	if (interaction.isCommand()) {
 		const command = bot.commands.get(interaction.commandName);
 		if (!command) return;
-		console.log(`[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] ${getLocale(defaultLocale, 'LOG_CMD_PROCESSING', interaction.commandName)}`);
+		logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing command ${interaction.commandName}`, label: 'Quaver' });
 		const failedChecks = [];
 		for (const check of command.checks) {
 			switch (check) {
@@ -239,7 +267,7 @@ bot.on('interactionCreate', async interaction => {
 			}
 		}
 		if (failedChecks.length > 0) {
-			console.log(`[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] ${getLocale(defaultLocale, 'LOG_CMD_FAILED', interaction.commandName, failedChecks.length)}`);
+			logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedChecks.length} checks`, label: 'Quaver' });
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
@@ -287,12 +315,12 @@ bot.on('interactionCreate', async interaction => {
 			return;
 		}
 		try {
-			console.log(`[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] ${getLocale(defaultLocale, 'LOG_CMD_EXECUTING', interaction.commandName)}`);
+			logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Executing command ${interaction.commandName}`, label: 'Quaver' });
 			await command.execute(interaction);
 		}
 		catch (err) {
-			console.log(`[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] ${getLocale(defaultLocale, 'LOG_CMD_ERROR', interaction.commandName)}`);
-			console.error(err);
+			logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with command ${interaction.commandName}`, label: 'Quaver' });
+			logger.error({ message: err, label: 'Quaver' });
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
@@ -569,7 +597,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				if (guildData.get(`${player.guildId}.always.enabled`)) {
 					guildData.set(`${player.guildId}.always.enabled`, false);
 				}
-				console.log(`[G ${player.guildId}] ${getLocale(defaultLocale, 'LOG_ALONE')}`);
+				logger.info({ message: `[G ${player.guildId}] Disconnecting (alone)`, label: 'Quaver' });
 				const channel = player.queue.channel;
 				clearTimeout(player.timeout);
 				clearTimeout(player.pauseTimeout);
@@ -588,12 +616,12 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			if (guildData.get(`${player.guildId}.always.enabled`)) return;
 			// the bot was playing something - set pauseTimeout
 			await player.pause();
-			console.log(`[G ${player.guildId}] ${getLocale(defaultLocale, 'LOG_SETTING_TIMEOUT_PAUSE')}`);
+			logger.info({ message: `[G ${player.guildId}] Setting pause timeout`, label: 'Quaver' });
 			if (player.pauseTimeout) {
 				clearTimeout(player.pauseTimeout);
 			}
 			player.pauseTimeout = setTimeout(p => {
-				console.log(`[G ${p.guildId}] ${getLocale(defaultLocale, 'LOG_INACTIVITY')}`);
+				logger.info({ message: `[G ${p.guildId}] Disconnecting (inactivity)`, label: 'Quaver' });
 				const channel = p.queue.channel;
 				clearTimeout(p.timeout);
 				p.disconnect();
@@ -658,7 +686,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 	if (guildData.get(`${guild.id}.always.enabled`)) return;
 	// nothing is playing so we just leave
 	if (!player.queue.current || !player.playing && !player.paused) {
-		console.log(`[G ${player.guildId}] ${getLocale(defaultLocale, 'LOG_ALONE')}`);
+		logger.info({ message: `[G ${player.guildId}] Disconnecting (alone)`, label: 'Quaver' });
 		const channel = player.queue.channel;
 		clearTimeout(player.timeout);
 		clearTimeout(player.pauseTimeout);
@@ -674,12 +702,12 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		return;
 	}
 	await player.pause();
-	console.log(`[G ${player.guildId}] ${getLocale(defaultLocale, 'LOG_SETTING_TIMEOUT_PAUSE')}`);
+	logger.info({ message: `[G ${player.guildId}] Setting pause timeout`, label: 'Quaver' });
 	if (player.pauseTimeout) {
 		clearTimeout(player.pauseTimeout);
 	}
 	player.pauseTimeout = setTimeout(p => {
-		console.log(`[G ${p.guildId}] ${getLocale(defaultLocale, 'LOG_INACTIVITY')}`);
+		logger.info({ message: `[G ${p.guildId}] Disconnecting (inactivity)`, label: 'Quaver' });
 		const channel = p.queue.channel;
 		clearTimeout(p.timeout);
 		p.disconnect();
@@ -703,11 +731,11 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 });
 
 bot.on('guildCreate', guild => {
-	console.log(`[G ${guild.id}] ${getLocale(defaultLocale, 'LOG_GUILD_JOINED', guild.name)}`);
+	logger.info({ message: `[G ${guild.id}] Joined guild ${guild.name}`, label: 'Discord' });
 });
 
 bot.on('guildDelete', guild => {
-	console.log(`[G ${guild.id}] ${getLocale(defaultLocale, 'LOG_GUILD_LEFT', guild.name)}`);
+	logger.info({ message: `[G ${guild.id}] Left guild ${guild.name}`, label: 'Discord' });
 });
 
 bot.login(token);
@@ -716,12 +744,12 @@ let inprg = false;
 async function shuttingDown(eventType, err) {
 	if (inprg) return;
 	inprg = true;
-	console.log(`[Quaver] ${getLocale(defaultLocale, 'LOG_SHUTDOWN')}`);
+	logger.info({ message: 'Shutting down...', label: 'Quaver' });
 	if (startup) {
-		console.log(`[Quaver] ${getLocale(defaultLocale, 'LOG_DISCONNECTING')}`);
+		logger.info({ message: 'Disconnecting from all guilds...', label: 'Quaver' });
 		for (const pair of bot.music.players) {
 			const player = pair[1];
-			console.log(`[G ${player.guildId}] ${getLocale(defaultLocale, 'LOG_RESTARTING')}`);
+			logger.info({ message: `[G ${player.guildId}] Disconnecting (restarting)`, label: 'Quaver' });
 			const fileBuffer = [];
 			if (player.queue.tracks.length > 0 || player.queue.current && (player.playing || player.paused)) {
 				fileBuffer.push(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'CURRENT')}:`);
@@ -752,12 +780,14 @@ async function shuttingDown(eventType, err) {
 		}
 	}
 	if (!['exit', 'SIGINT', 'SIGTERM'].includes(eventType)) {
-		console.log(`[Quaver] ${getLocale(defaultLocale, 'LOG_ERROR')}`);
+		logger.error({ message: err, label: 'Quaver' });
+		logger.info({ message: 'Logging additional output to error.log.', label: 'Quaver' });
 		try {
 			await fsPromises.writeFile('error.log', `${eventType}${err.message ? `\n${err.message}` : ''}${err.stack ? `\n${err.stack}` : ''}`);
 		}
 		catch (e) {
-			console.error(`[Quaver] ${getLocale(defaultLocale, 'LOG_ERROR_FAIL')}\n${e}`);
+			logger.error({ message: 'Encountered error while writing to error.log.', label: 'Quaver' });
+			logger.error({ message: e, label: 'Quaver' });
 		}
 	}
 	bot.destroy();
