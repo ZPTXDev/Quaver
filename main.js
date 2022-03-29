@@ -763,10 +763,10 @@ bot.on('guildDelete', guild => {
 
 bot.login(token);
 
-let inprg = false;
+let inProgress = false;
 async function shuttingDown(eventType, err) {
-	if (inprg) return;
-	inprg = true;
+	if (inProgress) return;
+	inProgress = true;
 	logger.info({ message: 'Shutting down...', label: 'Quaver' });
 	if (startup) {
 		logger.info({ message: 'Disconnecting from all guilds...', label: 'Quaver' });
