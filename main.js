@@ -147,7 +147,7 @@ bot.music.on('error', (err) => {
 	// quaver is already shuttingDown, do not log
 	if (inprg === true) { return; }
 	logger.error({ message: 'Encountered error while connecting to Lavalink.', label: 'Lavalink' });
-	// pass the an empty eventType with error message as err
+	// pass empty eventType with error message as err
 	shuttingDown('', err);
 });
 
