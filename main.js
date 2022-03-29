@@ -214,6 +214,9 @@ bot.on('ready', async () => {
 	if (!startup) {
 		logger.info({ message: `Connected! Logged in as ${bot.user.tag}.`, label: 'Discord' });
 		logger.info({ message: `Running version ${version}. For help, see https://github.com/ZapSquared/Quaver/issues.`, label: 'Quaver' });
+		if (version.includes('-')) {
+			logger.warn({ message: 'You are running an unstable version of Quaver. Please report bugs using the link above, and note that features may change or be removed entirely prior to release.', label: 'Quaver' });
+		}
 		bot.music.connect(bot.user.id);
 		bot.user.setActivity(version);
 		startup = true;
