@@ -138,13 +138,13 @@ bot.music.on('connect', () => {
 });
 
 bot.music.on('disconnect', () => {
-	// quaver is already shuttingDown, do not log
+	// already shuttingDown, do not log
 	if (inprg === true) { return; }
 	logger.warn({ message: 'Disconnected.', label: 'Lavalink' });
 });
 
 bot.music.on('error', (err) => {
-	// quaver is already shuttingDown, do not log
+	// already shuttingDown, do not log
 	if (inprg === true) { return; }
 	logger.error({ message: 'Encountered error while connecting to Lavalink.', label: 'Lavalink' });
 	// pass empty eventType with error message as err
