@@ -138,9 +138,17 @@ bot.music.on('connect', () => {
 });
 
 bot.music.on('disconnect', () => {
+	// quaver is already shuttingDown, do not log
+	if (inprg === true) { return; }
 	logger.warn({ message: 'Disconnected.', label: 'Lavalink' });
-	logger.error({ message: 'Quaver is unable to resume after disconnecting from Lavalink and will now shut down gracefully to avoid issues.', label: 'Quaver' });
-	shuttingDown('exit');
+});
+
+bot.music.on('error', (err) => {
+	// quaver is already shuttingDown, do not log
+	if (inprg === true) { return; }
+	logger.error({ message: 'Encountered error while connecting to Lavalink.', label: 'Lavalink' });
+	// pass the an empty eventType with error message as err
+	shuttingDown('', err);
 });
 
 bot.music.on('queueFinish', queue => {
