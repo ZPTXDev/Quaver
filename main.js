@@ -224,7 +224,6 @@ bot.on('ready', async () => {
 			logger.warn({ message: 'You are running an unstable version of Quaver. Please report bugs using the link above, and note that features may change or be removed entirely prior to release.', label: 'Quaver' });
 		}
 		bot.music.connect(bot.user.id);
-		bot.user.setActivity(version);
 		startup = true;
 	}
 	else {
@@ -235,6 +234,7 @@ bot.on('ready', async () => {
 			await player.resume();
 		}
 	}
+	bot.user.setActivity(version);
 });
 
 bot.on('shardDisconnect', () => {
