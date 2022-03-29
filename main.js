@@ -17,7 +17,7 @@ const rl = readline.createInterface({
 	output: process.stdout,
 });
 rl.on('line', line => {
-	switch (line.split(' ')[0]) {
+	switch (line.split(' ')[0].toLowerCase()) {
 		case 'exit':
 			shuttingDown('exit');
 			break;
