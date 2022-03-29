@@ -338,14 +338,20 @@ bot.on('interactionCreate', async interaction => {
 		catch (err) {
 			logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with command ${interaction.commandName}`, label: 'Quaver' });
 			logger.error({ message: err, label: 'Quaver' });
-			await interaction.reply({
+			const replyData = {
 				embeds: [
 					new MessageEmbed()
 						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_CMD_ERROR'))
 						.setColor('DARK_RED'),
 				],
-				ephemeral: true,
-			});
+			};
+			if (!interaction.replied) {
+				replyData.ephemeral = true;
+				await interaction.reply(replyData);
+			}
+			else {
+				await interaction.editReply(replyData);
+			}
 		}
 	}
 	else if (interaction.isButton()) {
