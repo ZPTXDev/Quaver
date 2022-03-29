@@ -778,6 +778,8 @@ async function shuttingDown(eventType, err) {
 			}
 			player.disconnect();
 			bot.music.destroyPlayer(player.guildId);
+			const botChannelPerms = bot.guilds.cache.get(player.guildId).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
+			if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { continue; }
 			await player.queue.channel.send({
 				embeds: [
 					new MessageEmbed()
