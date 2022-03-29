@@ -17,7 +17,7 @@ const rl = readline.createInterface({
 	output: process.stdout,
 });
 rl.on('line', line => {
-	switch (line.split(' ')[0]) {
+	switch (line.split(' ')[0].toLowerCase()) {
 		case 'exit':
 			shuttingDown('exit');
 			break;
@@ -122,7 +122,7 @@ for (const file of commandFiles) {
 let startup = false;
 
 bot.music.on('connect', () => {
-	logger.info({ message: 'Connected!', label: 'Lavalink' });
+	logger.info({ message: 'Connected.', label: 'Lavalink' });
 	Object.keys(guildData.data).forEach(async guildId => {
 		if (guildData.get(`${guildId}.always.enabled`)) {
 			const guild = bot.guilds.cache.get(guildId);
@@ -135,6 +135,12 @@ bot.music.on('connect', () => {
 			await player.connect(guildData.get(`${guildId}.always.channel`), { deafened: true });
 		}
 	});
+});
+
+bot.music.on('disconnect', () => {
+	logger.warn({ message: 'Disconnected.', label: 'Lavalink' });
+	logger.error({ message: 'Quaver is unable to resume after disconnecting from Lavalink and will now shut down gracefully to avoid issues.', label: 'Quaver' });
+	shuttingDown('exit');
 });
 
 bot.music.on('queueFinish', queue => {
@@ -212,20 +218,31 @@ bot.music.on('trackEnd', queue => {
 
 bot.on('ready', async () => {
 	if (!startup) {
-		logger.info({ message: `Connected! Logged in as ${bot.user.tag}.`, label: 'Discord' });
+		logger.info({ message: `Connected. Logged in as ${bot.user.tag}.`, label: 'Discord' });
 		logger.info({ message: `Running version ${version}. For help, see https://github.com/ZapSquared/Quaver/issues.`, label: 'Quaver' });
+		if (version.includes('-')) {
+			logger.warn({ message: 'You are running an unstable version of Quaver. Please report bugs using the link above, and note that features may change or be removed entirely prior to release.', label: 'Quaver' });
+		}
 		bot.music.connect(bot.user.id);
-		bot.user.setActivity(version);
 		startup = true;
 	}
 	else {
-		logger.info({ message: 'Reconnected!', label: 'Discord' });
+		logger.info({ message: 'Reconnected.', label: 'Discord' });
 		logger.warn({ message: 'Attempting to resume sessions.', label: 'Quaver' });
 		for (const pair of bot.music.players) {
 			const player = pair[1];
 			await player.resume();
 		}
 	}
+	bot.user.setActivity(version);
+});
+
+bot.on('shardDisconnect', () => {
+	logger.warn({ message: 'Disconnected.', label: 'Discord' });
+});
+
+bot.on('error', err => {
+	logger.error({ message: err, label: 'Quaver' });
 });
 
 bot.on('interactionCreate', async interaction => {
@@ -321,14 +338,20 @@ bot.on('interactionCreate', async interaction => {
 		catch (err) {
 			logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with command ${interaction.commandName}`, label: 'Quaver' });
 			logger.error({ message: err, label: 'Quaver' });
-			await interaction.reply({
+			const replyData = {
 				embeds: [
 					new MessageEmbed()
 						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_CMD_ERROR'))
 						.setColor('DARK_RED'),
 				],
-				ephemeral: true,
-			});
+			};
+			if (!interaction.replied && !interaction.deferred) {
+				replyData.ephemeral = true;
+				await interaction.reply(replyData);
+			}
+			else {
+				await interaction.editReply(replyData);
+			}
 		}
 	}
 	else if (interaction.isButton()) {
@@ -848,6 +871,8 @@ async function shuttingDown(eventType, err) {
 			}
 			player.disconnect();
 			bot.music.destroyPlayer(player.guildId);
+			const botChannelPerms = bot.guilds.cache.get(player.guildId).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
+			if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { continue; }
 			await player.queue.channel.send({
 				embeds: [
 					new MessageEmbed()
