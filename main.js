@@ -345,7 +345,7 @@ bot.on('interactionCreate', async interaction => {
 						.setColor('DARK_RED'),
 				],
 			};
-			if (!interaction.replied) {
+			if (!interaction.replied && !interaction.deferred) {
 				replyData.ephemeral = true;
 				await interaction.reply(replyData);
 			}
