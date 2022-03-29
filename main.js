@@ -122,7 +122,7 @@ for (const file of commandFiles) {
 let startup = false;
 
 bot.music.on('connect', () => {
-	logger.info({ message: 'Connected!', label: 'Lavalink' });
+	logger.info({ message: 'Connected.', label: 'Lavalink' });
 	Object.keys(guildData.data).forEach(async guildId => {
 		if (guildData.get(`${guildId}.always.enabled`)) {
 			const guild = bot.guilds.cache.get(guildId);
@@ -135,6 +135,12 @@ bot.music.on('connect', () => {
 			await player.connect(guildData.get(`${guildId}.always.channel`), { deafened: true });
 		}
 	});
+});
+
+bot.music.on('disconnect', () => {
+	logger.warn({ message: 'Disconnected.', label: 'Lavalink' });
+	logger.error({ message: 'Quaver is unable to resume after disconnecting from Lavalink and will now shut down gracefully to avoid issues.', label: 'Quaver' });
+	shuttingDown('exit');
 });
 
 bot.music.on('queueFinish', queue => {
@@ -212,7 +218,7 @@ bot.music.on('trackEnd', queue => {
 
 bot.on('ready', async () => {
 	if (!startup) {
-		logger.info({ message: `Connected! Logged in as ${bot.user.tag}.`, label: 'Discord' });
+		logger.info({ message: `Connected. Logged in as ${bot.user.tag}.`, label: 'Discord' });
 		logger.info({ message: `Running version ${version}. For help, see https://github.com/ZapSquared/Quaver/issues.`, label: 'Quaver' });
 		if (version.includes('-')) {
 			logger.warn({ message: 'You are running an unstable version of Quaver. Please report bugs using the link above, and note that features may change or be removed entirely prior to release.', label: 'Quaver' });
@@ -222,13 +228,21 @@ bot.on('ready', async () => {
 		startup = true;
 	}
 	else {
-		logger.info({ message: 'Reconnected!', label: 'Discord' });
+		logger.info({ message: 'Reconnected.', label: 'Discord' });
 		logger.warn({ message: 'Attempting to resume sessions.', label: 'Quaver' });
 		for (const pair of bot.music.players) {
 			const player = pair[1];
 			await player.resume();
 		}
 	}
+});
+
+bot.on('shardDisconnect', () => {
+	logger.warn({ message: 'Disconnected.', label: 'Discord' });
+});
+
+bot.on('error', err => {
+	logger.error({ message: err, label: 'Quaver' });
 });
 
 bot.on('interactionCreate', async interaction => {
