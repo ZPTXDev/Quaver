@@ -9,8 +9,8 @@ const { version } = require('./package.json');
 const { checks } = require('./enums.js');
 const { msToTime, msToTimeString, paginate, getLocale } = require('./functions.js');
 const readline = require('readline');
-const { createLogger, format, transports } = require('winston');
 const { guildData } = require('./data.js');
+const { logger } = require('./logger.js');
 
 const rl = readline.createInterface({
 	input: process.stdin,
@@ -67,31 +67,6 @@ rl.on('line', line => {
 // 'close' event catches ctrl+c, therefore we pass it to shuttingDown as a ctrl+c event
 rl.on('close', () => shuttingDown('SIGINT'));
 
-const logger = createLogger({
-	level: 'info',
-	format: format.combine(
-		format.errors({ stack: true }),
-		format.timestamp(),
-		format.printf(info => `${info.timestamp} [${info.label}] ${info.level.toUpperCase()}: ${info.message}`),
-	),
-	transports: [
-		new transports.Console({
-			format: format.combine(
-				format(info => {
-					info.level = info.level.toUpperCase();
-					return info;
-				})(),
-				format.errors({ stack: true }),
-				format.timestamp(),
-				format.colorize(),
-				format.printf(info => `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`),
-			),
-		}),
-		new transports.File({ filename: 'logs/error.log', level: 'error' }),
-		new transports.File({ filename: 'logs/log.log' }),
-	],
-});
-
 load({
 	client: {
 		id: spotify.client_id,
@@ -134,7 +109,12 @@ bot.music.on('connect', () => {
 			player.queue.channel = guild.channels.cache.get(guildData.get(`${guildId}.always.text`));
 			const voice = guild.channels.cache.get(guildData.get(`${guildId}.always.channel`));
 			if (voice.type === 'GUILD_STAGE_VOICE' && !voice.stageInstance?.topic) {
-				await voice.createStageInstance({ topic: getLocale(guildData.get(`${guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
+				try {
+					await voice.createStageInstance({ topic: getLocale(guildData.get(`${guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
+				}
+				catch (err) {
+					logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+				}
 			}
 			await player.connect(guildData.get(`${guildId}.always.channel`), { deafened: true });
 		}
@@ -262,15 +242,7 @@ bot.on('error', err => {
 	logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
 });
 
-bot.on('invalidRequestWarning', err => {
-	logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-});
-
-bot.on('uncaughtException', err => {
-	logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-});
-
-bot.on('unhandledRejection', err => {
+bot.on('shardError', err => {
 	logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
 });
 
@@ -541,7 +513,12 @@ bot.on('interactionCreate', async interaction => {
 						return;
 					}
 					if (interaction.member?.voice.channel.type === 'GUILD_STAGE_VOICE' && !interaction.member?.voice.channel.stageInstance?.topic) {
-						await interaction.member.voice.channel.createStageInstance({ topic: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
+						try {
+							await interaction.member.voice.channel.createStageInstance({ topic: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
+						}
+						catch (err) {
+							logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+						}
 					}
 				}
 
@@ -639,7 +616,12 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			}
 			await newState.setSuppressed(false);
 			if (!newState.channel.stageInstance?.topic) {
-				await newState.channel.createStageInstance({ topic: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
+				try {
+					await newState.channel.createStageInstance({ topic: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
+				}
+				catch (err) {
+					logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+				}
 			}
 		}
 		// the new vc has no humans
