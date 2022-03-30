@@ -148,7 +148,7 @@ bot.music.on('queueFinish', queue => {
 		queue.channel.send({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(`${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_EMPTY')}`)
+					.setDescription(getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_EMPTY'))
 					.setColor(defaultColor),
 			],
 		});
