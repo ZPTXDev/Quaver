@@ -570,7 +570,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			return;
 		}
 		// disconnected
-		if (!newState.channelId) {
+		if (!newState.channelId || !newState.channel?.members.find(m => m.user.id === bot.user.id)) {
 			if (guildData.get(`${player.guildId}.always.enabled`)) {
 				guildData.set(`${player.guildId}.always.enabled`, false);
 			}
