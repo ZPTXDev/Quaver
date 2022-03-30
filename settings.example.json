@@ -12,7 +12,7 @@
     "password": "youshallnotpass",
     "secure": false,
     "reconnect": {
-      "delay": 5000,
+      "delay": 3000,
       "tries": 5
     }
   },
