@@ -725,7 +725,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		channel.send({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_FORCEDs'))
+					.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_FORCED'))
 					.setColor(defaultColor),
 			],
 		});
