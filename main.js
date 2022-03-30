@@ -133,7 +133,7 @@ bot.music.on('connect', () => {
 			const player = bot.music.createPlayer(guildId);
 			player.queue.channel = guild.channels.cache.get(guildData.get(`${guildId}.always.text`));
 			const voice = guild.channels.cache.get(guildData.get(`${guildId}.always.channel`));
-			if (voice.type === 'GUILD_STAGE_VOICE' && !voice.stageInstance) {
+			if (voice.type === 'GUILD_STAGE_VOICE' && !voice.stageInstance?.topic) {
 				await voice.createStageInstance({ topic: getLocale(guildData.get(`${guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
 			}
 			await player.connect(guildData.get(`${guildId}.always.channel`), { deafened: true });
@@ -540,7 +540,7 @@ bot.on('interactionCreate', async interaction => {
 						});
 						return;
 					}
-					if (interaction.member?.voice.channel.type === 'GUILD_STAGE_VOICE' && !interaction.member?.voice.channel.stageInstance) {
+					if (interaction.member?.voice.channel.type === 'GUILD_STAGE_VOICE' && !interaction.member?.voice.channel.stageInstance?.topic) {
 						await interaction.member.voice.channel.createStageInstance({ topic: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
 					}
 				}
@@ -638,7 +638,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				return;
 			}
 			await newState.setSuppressed(false);
-			if (!newState.channel.stageInstance) {
+			if (!newState.channel.stageInstance?.topic) {
 				await newState.channel.createStageInstance({ topic: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
 			}
 		}
