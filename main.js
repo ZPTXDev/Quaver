@@ -588,7 +588,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 			return;
 		}
 		// disconnected
-		if (!newState.channelId) {
+		if (!newState.channelId || !newState.channel?.members.find(m => m.user.id === bot.user.id)) {
 			if (guildData.get(`${player.guildId}.always.enabled`)) {
 				guildData.set(`${player.guildId}.always.enabled`, false);
 			}
@@ -743,7 +743,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		channel.send({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_FORCEDs'))
+					.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_FORCED'))
 					.setColor(defaultColor),
 			],
 		});
