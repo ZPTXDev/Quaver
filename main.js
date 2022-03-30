@@ -716,6 +716,21 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 	if (newState.channelId === oldState.channelId) return;
 	// vc still has people
 	if (oldState.channel.members.filter(m => !m.user.bot).size >= 1) return;
+	// bot isn't in vc anymore (edge case)
+	if (!oldState.channel.members.find(m => m.user.id === bot.user.id)) {
+		const channel = player.queue.channel;
+		clearTimeout(player.timeout);
+		clearTimeout(player.pauseTimeout);
+		bot.music.destroyPlayer(player.guildId);
+		channel.send({
+			embeds: [
+				new MessageEmbed()
+					.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_FORCEDs'))
+					.setColor(defaultColor),
+			],
+		});
+		return;
+	}
 	// 24/7 mode enabled, ignore
 	if (guildData.get(`${guild.id}.always.enabled`)) return;
 	// nothing is playing so we just leave
