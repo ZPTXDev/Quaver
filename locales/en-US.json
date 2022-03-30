@@ -1,6 +1,7 @@
 {
   "MUSIC_INACTIVITY": "Disconnected from inactivity.",
   "MUSIC_INACTIVITY_WARNING": "I'll leave <t:%1:R>.",
+  "MUSIC_TRACK_SKIPPED": "Skipped **[%1](%2)** as an error occurred: `%3`",
   "MUSIC_ALONE": "Disconnected as everyone left.",
   "MUSIC_ALONE_MOVED": "Disconnected as there was no one in the target channel.",
   "MUSIC_ALONE_WARNING": "There's nobody here.",

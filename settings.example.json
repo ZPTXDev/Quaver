@@ -10,7 +10,11 @@
     "host": "localhost",
     "port": 12345,
     "password": "youshallnotpass",
-    "secure": false
+    "secure": false,
+    "reconnect": {
+      "delay": 3000,
+      "tries": 5
+    }
   },
   "spotify": {
     "client_id": "Paste Spotify Client ID here",

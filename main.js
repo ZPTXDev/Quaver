@@ -9,8 +9,8 @@ const { version } = require('./package.json');
 const { checks } = require('./enums.js');
 const { msToTime, msToTimeString, paginate, getLocale } = require('./functions.js');
 const readline = require('readline');
-const { createLogger, format, transports } = require('winston');
 const { guildData } = require('./data.js');
+const { logger } = require('./logger.js');
 
 const rl = readline.createInterface({
 	input: process.stdin,
@@ -67,31 +67,6 @@ rl.on('line', line => {
 // 'close' event catches ctrl+c, therefore we pass it to shuttingDown as a ctrl+c event
 rl.on('close', () => shuttingDown('SIGINT'));
 
-const logger = createLogger({
-	level: 'info',
-	format: format.combine(
-		format.errors({ stack: true }),
-		format.timestamp(),
-		format.printf(info => `${info.timestamp} [${info.label}] ${info.level.toUpperCase()}: ${info.message}`),
-	),
-	transports: [
-		new transports.Console({
-			format: format.combine(
-				format(info => {
-					info.level = info.level.toUpperCase();
-					return info;
-				})(),
-				format.errors({ stack: true }),
-				format.timestamp(),
-				format.colorize(),
-				format.printf(info => `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`),
-			),
-		}),
-		new transports.File({ filename: 'logs/error.log', level: 'error' }),
-		new transports.File({ filename: 'logs/log.log' }),
-	],
-});
-
 load({
 	client: {
 		id: spotify.client_id,
@@ -108,6 +83,10 @@ bot.music = new Node({
 		port: lavalink.port,
 		password: lavalink.password,
 		secure: !!lavalink.secure,
+		reconnect: {
+			delay: lavalink.reconnect.delay,
+			tries: lavalink.reconnect.tries,
+		},
 	},
 	sendGatewayPayload: (id, payload) => bot.guilds.cache.get(id)?.shard?.send(payload),
 });
@@ -129,8 +108,13 @@ bot.music.on('connect', () => {
 			const player = bot.music.createPlayer(guildId);
 			player.queue.channel = guild.channels.cache.get(guildData.get(`${guildId}.always.text`));
 			const voice = guild.channels.cache.get(guildData.get(`${guildId}.always.channel`));
-			if (voice.type === 'GUILD_STAGE_VOICE' && !voice.stageInstance) {
-				await voice.createStageInstance({ topic: getLocale(guildData.get(`${guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
+			if (voice.type === 'GUILD_STAGE_VOICE' && !voice.stageInstance?.topic) {
+				try {
+					await voice.createStageInstance({ topic: getLocale(guildData.get(`${guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
+				}
+				catch (err) {
+					logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+				}
 			}
 			await player.connect(guildData.get(`${guildId}.always.channel`), { deafened: true });
 		}
@@ -139,8 +123,11 @@ bot.music.on('connect', () => {
 
 bot.music.on('disconnect', () => {
 	logger.warn({ message: 'Disconnected.', label: 'Lavalink' });
-	logger.error({ message: 'Quaver is unable to resume after disconnecting from Lavalink and will now shut down gracefully to avoid issues.', label: 'Quaver' });
-	shuttingDown('exit');
+});
+
+bot.music.on('error', err => {
+	logger.error({ message: 'An error occurred. Quaver will now shut down to prevent any further issues.', label: 'Lavalink' });
+	shuttingDown('', err);
 });
 
 bot.music.on('queueFinish', queue => {
@@ -148,7 +135,7 @@ bot.music.on('queueFinish', queue => {
 		queue.channel.send({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(`${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_EMPTY')}`)
+					.setDescription(getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_EMPTY'))
 					.setColor(defaultColor),
 			],
 		});
@@ -199,8 +186,18 @@ bot.music.on('trackStart', async (queue, song) => {
 	});
 });
 
-bot.music.on('trackEnd', queue => {
+bot.music.on('trackEnd', (queue, track, reason) => {
 	delete queue.player.skip;
+	if (reason === 'LOAD_FAILED') {
+		logger.warn({ message: `[G ${queue.player.guildId}] Track skipped with reason: ${reason}`, label: 'Quaver' });
+		queue.channel.send({
+			embeds: [
+				new MessageEmbed()
+					.setDescription(getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_TRACK_SKIPPED', track.title, track.uri, reason))
+					.setColor('DARK_RED'),
+			],
+		});
+	}
 	if (bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).members?.filter(m => !m.user.bot).size < 1 && !guildData.get(`${queue.player.guildId}.always.enabled`)) {
 		logger.info({ message: `[G ${queue.player.guildId}] Disconnecting (alone)`, label: 'Quaver' });
 		queue.player.disconnect();
@@ -242,7 +239,11 @@ bot.on('shardDisconnect', () => {
 });
 
 bot.on('error', err => {
-	logger.error({ message: err, label: 'Quaver' });
+	logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+});
+
+bot.on('shardError', err => {
+	logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
 });
 
 bot.on('interactionCreate', async interaction => {
@@ -337,7 +338,7 @@ bot.on('interactionCreate', async interaction => {
 		}
 		catch (err) {
 			logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with command ${interaction.commandName}`, label: 'Quaver' });
-			logger.error({ message: err, label: 'Quaver' });
+			logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
 			const replyData = {
 				embeds: [
 					new MessageEmbed()
@@ -511,8 +512,13 @@ bot.on('interactionCreate', async interaction => {
 						});
 						return;
 					}
-					if (interaction.member?.voice.channel.type === 'GUILD_STAGE_VOICE' && !interaction.member?.voice.channel.stageInstance) {
-						await interaction.member.voice.channel.createStageInstance({ topic: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
+					if (interaction.member?.voice.channel.type === 'GUILD_STAGE_VOICE' && !interaction.member?.voice.channel.stageInstance?.topic) {
+						try {
+							await interaction.member.voice.channel.createStageInstance({ topic: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
+						}
+						catch (err) {
+							logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+						}
 					}
 				}
 
@@ -638,7 +644,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 					});
 				}
 				catch (err) {
-					logger.error({ message: err, label: 'Quaver' });
+					logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
 				}
 				return;
 			}
@@ -667,12 +673,12 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 				return;
 			}
 			await newState.setSuppressed(false);
-			if (!newState.channel.stageInstance) {
+			if (!newState.channel.stageInstance?.topic) {
 				try {
 					await newState.channel.createStageInstance({ topic: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
 				}
 				catch (err) {
-					logger.error({ message: err, label: 'Quaver' });
+					logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
 				}
 			}
 		}
@@ -783,6 +789,23 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 	if (newState.channelId === oldState.channelId) return;
 	// vc still has people
 	if (oldState.channel.members.filter(m => !m.user.bot).size >= 1) return;
+	// bot isn't in vc anymore (edge case)
+	if (!oldState.channel.members.find(m => m.user.id === bot.user.id)) {
+		const channel = player.queue.channel;
+		clearTimeout(player.timeout);
+		clearTimeout(player.pauseTimeout);
+		bot.music.destroyPlayer(player.guildId);
+		channel.send({
+			embeds: [
+				new MessageEmbed()
+					.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_FORCEDs'))
+					.setColor(defaultColor),
+			],
+		});
+		return;
+	}
+	// player's gone!
+	if (!player) return;
 	// 24/7 mode enabled, ignore
 	if (guildData.get(`${guild.id}.always.enabled`)) return;
 	// nothing is playing so we just leave
@@ -850,10 +873,10 @@ bot.on('guildDelete', guild => {
 
 bot.login(token);
 
-let inprg = false;
+let inProgress = false;
 async function shuttingDown(eventType, err) {
-	if (inprg) return;
-	inprg = true;
+	if (inProgress) return;
+	inProgress = true;
 	logger.info({ message: 'Shutting down...', label: 'Quaver' });
 	if (startup) {
 		logger.info({ message: 'Disconnecting from all guilds...', label: 'Quaver' });
@@ -890,20 +913,20 @@ async function shuttingDown(eventType, err) {
 		}
 	}
 	if (!['exit', 'SIGINT', 'SIGTERM'].includes(eventType)) {
-		logger.error({ message: err, label: 'Quaver' });
+		logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
 		logger.info({ message: 'Logging additional output to error.log.', label: 'Quaver' });
 		try {
 			await fsPromises.writeFile('error.log', `${eventType}${err.message ? `\n${err.message}` : ''}${err.stack ? `\n${err.stack}` : ''}`);
 		}
 		catch (e) {
 			logger.error({ message: 'Encountered error while writing to error.log.', label: 'Quaver' });
-			logger.error({ message: e, label: 'Quaver' });
+			logger.error({ message: `${e.message}\n${e.stack}`, label: 'Quaver' });
 		}
 	}
 	bot.destroy();
 	process.exit();
 }
 
-['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM', 'uncaughtException', 'unhandledRejection'].forEach(eventType => {
+['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM'].forEach(eventType => {
 	process.on(eventType, err => shuttingDown(eventType, err));
 });
