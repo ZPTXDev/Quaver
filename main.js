@@ -108,6 +108,10 @@ bot.music = new Node({
 		port: lavalink.port,
 		password: lavalink.password,
 		secure: !!lavalink.secure,
+		reconnect: {
+			delay: lavalink.reconnect.delay,
+			tries: lavalink.reconnect.tries,
+		},
 	},
 	sendGatewayPayload: (id, payload) => bot.guilds.cache.get(id)?.shard?.send(payload),
 });
