@@ -108,6 +108,10 @@ bot.music = new Node({
 		port: lavalink.port,
 		password: lavalink.password,
 		secure: !!lavalink.secure,
+		reconnect: {
+			delay: lavalink.reconnect.delay,
+			tries: lavalink.reconnect.tries,
+		},
 	},
 	sendGatewayPayload: (id, payload) => bot.guilds.cache.get(id)?.shard?.send(payload),
 });
@@ -154,7 +158,7 @@ bot.music.on('queueFinish', queue => {
 		queue.channel.send({
 			embeds: [
 				new MessageEmbed()
-					.setDescription(`${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_EMPTY')}`)
+					.setDescription(getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_EMPTY'))
 					.setColor(defaultColor),
 			],
 		});
@@ -205,8 +209,18 @@ bot.music.on('trackStart', async (queue, song) => {
 	});
 });
 
-bot.music.on('trackEnd', queue => {
+bot.music.on('trackEnd', (queue, track, reason) => {
 	delete queue.player.skip;
+	if (reason) {
+		logger.warn({ message: `[G ${queue.player.guildId}] Track skipped with reason: ${reason}`, label: 'Quaver' });
+		queue.channel.send({
+			embeds: [
+				new MessageEmbed()
+					.setDescription(getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_TRACK_SKIPPED', track.title, track.uri, reason))
+					.setColor('DARK_RED'),
+			],
+		});
+	}
 	if (bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).members?.filter(m => !m.user.bot).size < 1 && !guildData.get(`${queue.player.guildId}.always.enabled`)) {
 		logger.info({ message: `[G ${queue.player.guildId}] Disconnecting (alone)`, label: 'Quaver' });
 		queue.player.disconnect();
@@ -769,10 +783,10 @@ bot.on('guildDelete', guild => {
 
 bot.login(token);
 
-let inprg = false;
+let inProgress = false;
 async function shuttingDown(eventType, err) {
-	if (inprg) return;
-	inprg = true;
+	if (inProgress) return;
+	inProgress = true;
 	logger.info({ message: 'Shutting down...', label: 'Quaver' });
 	if (startup) {
 		logger.info({ message: 'Disconnecting from all guilds...', label: 'Quaver' });

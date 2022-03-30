@@ -83,7 +83,6 @@ module.exports = {
 		}
 		else {
 			const results = await interaction.client.music.rest.loadTracks(/^https?:\/\//.test(query) ? query : `ytsearch:${query}`);
-
 			switch (results.loadType) {
 				case 'PLAYLIST_LOADED':
 					tracks = results.tracks;
