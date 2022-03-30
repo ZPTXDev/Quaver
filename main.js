@@ -188,7 +188,7 @@ bot.music.on('trackStart', async (queue, song) => {
 
 bot.music.on('trackEnd', (queue, track, reason) => {
 	delete queue.player.skip;
-	if (reason) {
+	if (reason === 'LOAD_FAILED') {
 		logger.warn({ message: `[G ${queue.player.guildId}] Track skipped with reason: ${reason}`, label: 'Quaver' });
 		queue.channel.send({
 			embeds: [
