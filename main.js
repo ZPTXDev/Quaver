@@ -142,14 +142,11 @@ bot.music.on('connect', () => {
 });
 
 bot.music.on('disconnect', () => {
-	// already shuttingDown, do not log
-	if (inprg === true) { return; }
 	logger.warn({ message: 'Disconnected.', label: 'Lavalink' });
 });
 
 bot.music.on('error', (err) => {
-	logger.error({ message: 'Encountered error while connecting to Lavalink.', label: 'Lavalink' });
-	// pass empty eventType with error message as err
+	logger.error({ message: 'An error occurred. Quaver will now shut down to prevent any further issues.', label: 'Lavalink' });
 	shuttingDown('', err);
 });
 
