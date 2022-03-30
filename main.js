@@ -731,6 +731,8 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		});
 		return;
 	}
+	// player's gone!
+	if (!player) return;
 	// 24/7 mode enabled, ignore
 	if (guildData.get(`${guild.id}.always.enabled`)) return;
 	// nothing is playing so we just leave
