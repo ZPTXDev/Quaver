@@ -262,6 +262,18 @@ bot.on('error', err => {
 	logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
 });
 
+bot.on('invalidRequestWarning', err => {
+	logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+});
+
+bot.on('uncaughtException', err => {
+	logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+});
+
+bot.on('unhandledRejection', err => {
+	logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+});
+
 bot.on('interactionCreate', async interaction => {
 	if (interaction.isCommand()) {
 		const command = bot.commands.get(interaction.commandName);
