@@ -256,7 +256,7 @@ bot.on('shardDisconnect', () => {
 });
 
 bot.on('error', err => {
-	logger.error({ message: err, label: 'Quaver' });
+	logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
 });
 
 bot.on('interactionCreate', async interaction => {
@@ -351,7 +351,7 @@ bot.on('interactionCreate', async interaction => {
 		}
 		catch (err) {
 			logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with command ${interaction.commandName}`, label: 'Quaver' });
-			logger.error({ message: err, label: 'Quaver' });
+			logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
 			const replyData = {
 				embeds: [
 					new MessageEmbed()
@@ -618,7 +618,7 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 					});
 				}
 				catch (err) {
-					logger.error({ message: err, label: 'Quaver' });
+					logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
 				}
 				return;
 			}
@@ -817,14 +817,14 @@ async function shuttingDown(eventType, err) {
 		}
 	}
 	if (!['exit', 'SIGINT', 'SIGTERM'].includes(eventType)) {
-		logger.error({ message: err, label: 'Quaver' });
+		logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
 		logger.info({ message: 'Logging additional output to error.log.', label: 'Quaver' });
 		try {
 			await fsPromises.writeFile('error.log', `${eventType}${err.message ? `\n${err.message}` : ''}${err.stack ? `\n${err.stack}` : ''}`);
 		}
 		catch (e) {
 			logger.error({ message: 'Encountered error while writing to error.log.', label: 'Quaver' });
-			logger.error({ message: e, label: 'Quaver' });
+			logger.error({ message: `${e.message}\n${e.stack}`, label: 'Quaver' });
 		}
 	}
 	bot.destroy();
