@@ -202,6 +202,9 @@ bot.music.on('trackEnd', (queue, track, reason) => {
 	delete queue.player.skip;
 	if (reason === 'LOAD_FAILED') {
 		logger.warn({ message: `[G ${queue.player.guildId}] Track skipped with reason: ${reason}`, label: 'Quaver' });
+		// check for permissions for text channel
+		const botChannelPerms = bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).permissionsFor(bot.user.id);
+		if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 		queue.channel.send({
 			embeds: [
 				new MessageEmbed()
