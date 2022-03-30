@@ -795,6 +795,9 @@ bot.on('voiceStateUpdate', async (oldState, newState) => {
 		clearTimeout(player.timeout);
 		clearTimeout(player.pauseTimeout);
 		bot.music.destroyPlayer(player.guildId);
+		// check for permissions for text channel
+		const botChannelPerms = bot.guilds.cache.get(player.guildId).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+		if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 		channel.send({
 			embeds: [
 				new MessageEmbed()
