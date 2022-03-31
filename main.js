@@ -16,19 +16,19 @@ const rl = readline.createInterface({
 rl.on('line', line => {
 	switch (line.split(' ')[0].toLowerCase()) {
 		case 'exit':
-			shuttingDown('exit');
+			module.exports.shuttingDown('exit');
 			break;
 		case 'sessions':
 			if (!module.exports.startup) {
 				console.log('Quaver is not initialized yet.');
 				break;
 			}
-			console.log(`There are currently ${bot.music.players.size} active session(s).`);
+			console.log(`There are currently ${module.exports.bot.music.players.size} active session(s).`);
 			break;
 		case 'stats': {
-			const uptime = msToTime(bot.uptime);
+			const uptime = msToTime(module.exports.bot.uptime);
 			const uptimeString = msToTimeString(uptime);
-			console.log(`Statistics:\nGuilds: ${bot.guilds.cache.size}\nUptime: ${uptimeString}`);
+			console.log(`Statistics:\nGuilds: ${module.exports.bot.guilds.cache.size}\nUptime: ${uptimeString}`);
 			break;
 		}
 		case 'whitelist': {
@@ -41,7 +41,7 @@ rl.on('line', line => {
 				console.log('The 24/7 whitelist is not enabled.');
 				break;
 			}
-			const guild = bot.guilds.cache.get(guildId);
+			const guild = module.exports.bot.guilds.cache.get(guildId);
 			if (!guild) {
 				console.log('Guild not found.');
 				break;
@@ -62,7 +62,7 @@ rl.on('line', line => {
 	}
 });
 // 'close' event catches ctrl+c, therefore we pass it to shuttingDown as a ctrl+c event
-rl.on('close', () => shuttingDown('SIGINT'));
+rl.on('close', () => module.exports.shuttingDown('SIGINT'));
 
 load({
 	client: {
@@ -72,9 +72,9 @@ load({
 	autoResolveYoutubeTracks: false,
 });
 
-const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
-bot.commands = new Collection();
-bot.music = new Node({
+module.exports.bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
+module.exports.bot.commands = new Collection();
+module.exports.bot.music = new Node({
 	connection: {
 		host: lavalink.host,
 		port: lavalink.port,
@@ -85,25 +85,25 @@ bot.music = new Node({
 			tries: lavalink.reconnect.tries ?? 5,
 		},
 	},
-	sendGatewayPayload: (id, payload) => bot.guilds.cache.get(id)?.shard?.send(payload),
+	sendGatewayPayload: (id, payload) => module.exports.bot.guilds.cache.get(id)?.shard?.send(payload),
 });
-bot.ws.on('VOICE_SERVER_UPDATE', data => bot.music.handleVoiceUpdate(data));
-bot.ws.on('VOICE_STATE_UPDATE', data => bot.music.handleVoiceUpdate(data));
+module.exports.bot.ws.on('VOICE_SERVER_UPDATE', data => module.exports.bot.music.handleVoiceUpdate(data));
+module.exports.bot.ws.on('VOICE_STATE_UPDATE', data => module.exports.bot.music.handleVoiceUpdate(data));
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
-	bot.commands.set(command.data.name, command);
+	module.exports.bot.commands.set(command.data.name, command);
 }
 
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 for (const file of eventFiles) {
 	const event = require(`./events/${file}`);
 	if (event.once) {
-		bot.once(event.name, (...args) => event.execute(...args));
+		module.exports.bot.once(event.name, (...args) => event.execute(...args));
 	}
 	else {
-		bot.on(event.name, (...args) => event.execute(...args));
+		module.exports.bot.on(event.name, (...args) => event.execute(...args));
 	}
 }
 
@@ -111,23 +111,23 @@ const musicEventFiles = fs.readdirSync('./events/music').filter(file => file.end
 for (const file of musicEventFiles) {
 	const event = require(`./events/music/${file}`);
 	if (event.once) {
-		bot.music.once(event.name, (...args) => event.execute(...args));
+		module.exports.bot.music.once(event.name, (...args) => event.execute(...args));
 	}
 	else {
-		bot.music.on(event.name, (...args) => event.execute(...args));
+		module.exports.bot.music.on(event.name, (...args) => event.execute(...args));
 	}
 }
 
-bot.login(token);
+module.exports.bot.login(token);
 
 let inProgress = false;
-async function shuttingDown(eventType, err) {
+module.exports.shuttingDown = async (eventType, err) => {
 	if (inProgress) return;
 	inProgress = true;
 	logger.info({ message: 'Shutting down...', label: 'Quaver' });
 	if (module.exports.startup) {
 		logger.info({ message: 'Disconnecting from all guilds...', label: 'Quaver' });
-		for (const pair of bot.music.players) {
+		for (const pair of module.exports.bot.music.players) {
 			const player = pair[1];
 			logger.info({ message: `[G ${player.guildId}] Disconnecting (restarting)`, label: 'Quaver' });
 			const fileBuffer = [];
@@ -140,8 +140,8 @@ async function shuttingDown(eventType, err) {
 				}
 			}
 			player.disconnect();
-			bot.music.destroyPlayer(player.guildId);
-			const botChannelPerms = bot.guilds.cache.get(player.guildId).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
+			module.exports.bot.music.destroyPlayer(player.guildId);
+			const botChannelPerms = module.exports.bot.guilds.cache.get(player.guildId).channels.cache.get(player.queue.channel.id).permissionsFor(module.exports.bot.user.id);
 			if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { continue; }
 			await player.queue.channel.send({
 				embeds: [
@@ -170,12 +170,12 @@ async function shuttingDown(eventType, err) {
 			logger.error({ message: `${e.message}\n${e.stack}`, label: 'Quaver' });
 		}
 	}
-	bot.destroy();
+	module.exports.bot.destroy();
 	process.exit();
-}
+};
 
 ['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM', 'uncaughtException', 'unhandledRejection'].forEach(eventType => {
-	process.on(eventType, err => shuttingDown(eventType, err));
+	process.on(eventType, err => module.exports.shuttingDown(eventType, err));
 });
 
 module.exports = {
@@ -183,6 +183,4 @@ module.exports = {
 	updateStartup: () => {
 		module.exports.startup = true;
 	},
-	bot,
-	shuttingDown,
 };
