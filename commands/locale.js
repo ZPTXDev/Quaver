@@ -3,7 +3,7 @@ const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { roundTo, getLocale, checkLocaleCompletion } = require('../functions.js');
-const { guildData } = require('../data.js');
+const { guildData } = require('../shared.js');
 const fs = require('fs');
 const path = require('path');
 

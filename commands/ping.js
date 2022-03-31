@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { msToTime, msToTimeString, getLocale } = require('../functions.js');
-const { guildData } = require('../data.js');
+const { guildData } = require('../shared.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()

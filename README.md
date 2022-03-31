@@ -1,12 +1,8 @@
 # Quaver
-As YouTube cracks down on music bots on Discord, hosting large-scale bots for this purpose is no longer feasible. Previously, Quaver was written to be run just like that.
-
-Starting from version **2.0.0**, that will no longer be the case.
-
-Quaver will now use a simpler system to handle requests and its focus will be shifted to serving a smaller community, with an aim to be self-hosted without much hassle.
+Quaver is a simple-to-use music bot with features such as bass boost,  nightcore, seek, search, and more.
 
 # Using Quaver
-Quaver was written to use both slash commands and normal commands, but with this rewrite, only slash commands will be accepted, alongside buttons and menus.
+Quaver utilizes slash commands, buttons, and menus. After running deploying the commands, type `/` into your chat to list Quaver's commands.
 
 # Hosting Quaver
 Hosting Quaver is fairly simple. Make a copy of `settings.example.json`, edit the fields as necessary and rename it to `settings.json`.
@@ -15,16 +11,14 @@ You are required to host your own instance of [Lavalink](https://github.com/frey
 
 For a detailed explanation on configuration, view [CONFIGURATION.md](CONFIGURATION.md).
 
-From version **2.0.0**, you are no longer required to specify MySQL connection details as Quaver will use JSON for guild data.
-
 ## Prerequisites
-- Node.js v16.0.0 (or higher)
-- npm (should come with Node.js)
+- Node.js v16.9.0 (or higher)
+- npm (should come bundled with Node.js)
 - Lavalink (latest release)
 - Bot token from [Discord](https://discord.com/developers/applications)
 
 ## Starting Quaver for the first time
-In a Terminal, Command Prompt, Shell or however you access `node`, run `npm i` to install packages required to run Quaver.
+Run `npm ci` to install packages required to run Quaver.
 
 Then, run `node deploy-commands.js` **after** you've configured your `settings.json` in order to register your commands on Discord.
 
@@ -34,21 +28,24 @@ Once that's done, run `node main.js` to start the bot. This will be the only com
 ## What happened to Lyrics?
 Unfortunately, due to legal issues, the API that Quaver relied on is no longer able to provide lyrics. Instead of sourcing for an alternative, the command was removed altogether as it simply wasn't worth the effort to keep.
 
-You can probably implement it yourself if you have another API in mind, but I will provide no support for it.
+You can probably implement it yourself if you have another API in mind, but I will not provide support for it.
 
-## Will Google send me a legal letter if I run Quaver for my community?
-Most probably not. They've only been targetting the larger bots so far, but if you really don't wish to take the risk, you can take a sneak peek at Discord's new **Watch Together** feature [here](https://discord.gg/discordgameslab).
+## Can I get in trouble with Google for using this?
+Most probably not. They've only been targetting the larger bots so far, but if you really don't wish to take the risk, you can take a sneak peek at Discord's **Watch Together** feature [here](https://discord.gg/discordgameslab).
 
 ## Can you add x feature to Quaver?
-Yes, if it is meaningful. Submit an issue [here](https://github.com/ZapSquared/Quaver/issues) and I'll take a look.
+Yes, if it is meaningful. Submit an issue [here](https://github.com/ZapSquared/Quaver/issues) and I'll be happy to take a look.
 
 ## I changed the locale through `/locale`. Why isn't it updating in slash commands?
-Unfortunately, slash commands are defined when running `node deploy-commands.js`.
+Slash commands are defined when running `node deploy-commands.js`.
 
-This means that slash command descriptions and console logs will follow the locale set in `settings.json` (`defaultLocale` key).
+This means that slash command descriptions will follow the locale set in `settings.json` (`defaultLocale` 
+key).
 
 ## I changed `defaultLocale`, but it isn't updating in slash command descriptions. Why?
-You need to re-deploy the commands using `node deploy-commands.js` for the new locale to take effect. Logs, however, update immediately.
+You need to re-deploy the commands using `node deploy-commands.js` for the new locale to take effect.
+
+Due to Discord's limitations, it is impossible for each guild to have different locales in slash command descriptions.
 
 # Contributing
 Refer to [CONTRIBUTING.md](CONTRIBUTING.md).

@@ -15,7 +15,11 @@ The file structure is as follows:
     "host": "localhost",
     "port": 12345,
     "password": "youshallnotpass",
-    "secure": false
+    "secure": false,
+    "reconnect": {
+      "delay": 3000,
+      "tries": 5
+    }
   },
   "spotify": {
     "client_id": "Paste Spotify Client ID here",
@@ -64,6 +68,12 @@ The file structure is as follows:
 
 `lavalink.secure`
 > Whether or not the Lavalink instance is secure. Defaults to `false` if unspecified.
+
+`lavalink.reconnect.delay`
+> The delay between reconnect attempts. Defaults to `3000` if unspecified.
+
+`lavalink.reconnect.tries`
+> The number of reconnect attempts before giving up. Defaults to `5` if unspecified.
 
 `spotify.client_id`
 > Spotify API Client ID, obtainable [here](https://developer.spotify.com/dashboard/applications). Used to resolve Spotify tracks.
