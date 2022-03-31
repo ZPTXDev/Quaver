@@ -27,6 +27,9 @@ module.exports = {
 				clearTimeout(player.timeout);
 				clearTimeout(player.pauseTimeout);
 				bot.music.destroyPlayer(player.guildId);
+				// check for permissions for text channel
+				const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+				if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 				await channel.send({
 					embeds: [
 						new MessageEmbed()
@@ -35,6 +38,34 @@ module.exports = {
 					],
 				});
 				return;
+			}
+			// channel is a voice channel
+			if (newState.channel.type === 'GUILD_VOICE') {
+				// check for connect, speak permission for voice channel
+				const channel = player.queue.channel;
+				const permissions =	bot.guilds.cache.get(guild.id).channels.cache.get(newState.channelId).permissionsFor(bot.user.id);
+				if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
+					clearTimeout(player.timeout);
+					clearTimeout(player.pauseTimeout);
+					player.disconnect();
+					bot.music.destroyPlayer(player.guildId);
+					// check for permissions for text channel
+					const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+					if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
+					try {
+						await channel.send({
+							embeds: [
+								new MessageEmbed()
+									.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_BASIC'))
+									.setColor('DARK_RED'),
+							],
+						});
+					}
+					catch (err) {
+						logger.error({ message: err, label: 'Quaver' });
+					}
+					return;
+				}
 			}
 			// channel is a stage channel, and bot is suppressed
 			// this also handles suppressing Quaver mid-track
@@ -49,6 +80,9 @@ module.exports = {
 					clearTimeout(player.pauseTimeout);
 					player.disconnect();
 					bot.music.destroyPlayer(guild.id);
+					// check for permissions for text channel
+					const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+					if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 					try {
 						await channel.send({
 							embeds: [
@@ -60,6 +94,30 @@ module.exports = {
 					}
 					catch (err) {
 						logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+					}
+					return;
+				}
+				// check for connect, speak permission for stage channel
+				const channel = player.queue.channel;
+				if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
+					clearTimeout(player.timeout);
+					clearTimeout(player.pauseTimeout);
+					player.disconnect();
+					bot.music.destroyPlayer(player.guildId);
+					// check for permissions for text channel
+					const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+					if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
+					try {
+						await channel.send({
+							embeds: [
+								new MessageEmbed()
+									.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_BASIC'))
+									.setColor('DARK_RED'),
+							],
+						});
+					}
+					catch (err) {
+						logger.error({ message: err, label: 'Quaver' });
 					}
 					return;
 				}
@@ -86,6 +144,9 @@ module.exports = {
 					clearTimeout(player.pauseTimeout);
 					player.disconnect();
 					bot.music.destroyPlayer(player.guildId);
+					// check for permissions for text channel
+					const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+					if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 					channel.send({
 						embeds: [
 							new MessageEmbed()
@@ -109,6 +170,9 @@ module.exports = {
 					clearTimeout(p.timeout);
 					p.disconnect();
 					bot.music.destroyPlayer(p.guildId);
+					// check for permissions for text channel
+					const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+					if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 					channel.send({
 						embeds: [
 							new MessageEmbed()
@@ -117,6 +181,9 @@ module.exports = {
 						],
 					});
 				}, 300000, player);
+				// check for permissions for text channel
+				const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
+				if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 				await player.queue.channel.send({
 					embeds: [
 						new MessageEmbed()
@@ -131,6 +198,9 @@ module.exports = {
 				player.resume();
 				clearTimeout(player.pauseTimeout);
 				delete player.pauseTimeout;
+				// check for permissions for text channel
+				const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
+				if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 				await player.queue.channel.send({
 					embeds: [
 						new MessageEmbed()
@@ -150,6 +220,9 @@ module.exports = {
 				clearTimeout(player.pauseTimeout);
 				delete player.pauseTimeout;
 			}
+			// check for permissions for text channel
+			const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
+			if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 			await player.queue.channel.send({
 				embeds: [
 					new MessageEmbed()
@@ -177,6 +250,9 @@ module.exports = {
 			clearTimeout(player.pauseTimeout);
 			player.disconnect();
 			bot.music.destroyPlayer(player.guildId);
+			// check for permissions for text channel
+			const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+			if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 			channel.send({
 				embeds: [
 					new MessageEmbed()
@@ -197,6 +273,9 @@ module.exports = {
 			clearTimeout(p.timeout);
 			p.disconnect();
 			bot.music.destroyPlayer(p.guildId);
+			// check for permissions for text channel
+			const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+			if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 			channel.send({
 				embeds: [
 					new MessageEmbed()
@@ -205,6 +284,9 @@ module.exports = {
 				],
 			});
 		}, 300000, player);
+		// check for permissions for text channel
+		const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
+		if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 		await player.queue.channel.send({
 			embeds: [
 				new MessageEmbed()
