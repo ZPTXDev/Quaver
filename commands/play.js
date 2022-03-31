@@ -4,8 +4,7 @@ const { MessageEmbed, Permissions } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
-const { guildData } = require('../data.js');
-const { logger } = require('../logger.js');
+const { logger, guildData } = require('../shared.js');
 
 // credit: https://github.com/lavaclient/djs-v13-example/blob/main/src/commands/Play.ts
 

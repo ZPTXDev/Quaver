@@ -1,6 +1,9 @@
 const { createLogger, format, transports } = require('winston');
 
 module.exports = {
+	// used for per-guild data (locales, 24/7, etc.)
+	guildData: require('data-store')({ path: 'data.json' }),
+	// single logger instance
 	logger: createLogger({
 		level: 'info',
 		format: format.combine(
