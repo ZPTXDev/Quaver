@@ -7,8 +7,7 @@ const fs = require('fs');
 const fsPromises = require('fs').promises;
 const { msToTime, msToTimeString, getLocale } = require('./functions.js');
 const readline = require('readline');
-const { guildData } = require('./data.js');
-const { logger } = require('./logger.js');
+const { logger, guildData } = require('./shared.js');
 
 const rl = readline.createInterface({
 	input: process.stdin,

@@ -3,7 +3,7 @@ const { MessageEmbed, Permissions } = require('discord.js');
 const { version } = require('../package.json');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
-const { guildData } = require('../data.js');
+const { guildData } = require('../shared.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
