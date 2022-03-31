@@ -19,7 +19,7 @@ rl.on('line', line => {
 			shuttingDown('exit');
 			break;
 		case 'sessions':
-			if (!module.exports.startup) {
+			if (!module.exports.startUp) {
 				console.log('Quaver is not initialized yet.');
 				break;
 			}
@@ -32,7 +32,7 @@ rl.on('line', line => {
 			break;
 		}
 		case 'whitelist': {
-			if (!module.exports.startup) {
+			if (!module.exports.startUp) {
 				console.log('Quaver is not initialized yet.');
 				break;
 			}
@@ -96,7 +96,7 @@ async function shuttingDown(eventType, err) {
 	if (inProgress) return;
 	inProgress = true;
 	logger.info({ message: 'Shutting down...', label: 'Quaver' });
-	if (module.exports.startup) {
+	if (module.exports.startUp) {
 		logger.info({ message: 'Disconnecting from all guilds...', label: 'Quaver' });
 		for (const pair of bot.music.players) {
 			const player = pair[1];
@@ -180,7 +180,7 @@ bot.login(token);
 	process.on(eventType, err => shuttingDown(eventType, err));
 });
 
-module.exports.startup = false;
+module.exports.startUp = false;
 module.exports.updateStartup = () => {
-	module.exports.startup = true;
+	module.exports.startUp = true;
 };
