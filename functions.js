@@ -1,7 +1,7 @@
 const { defaultLocale } = require('./settings.json');
 
 /**
- * Converts milliseconds to a time object or a converted equivalent if a format is provided.
+ * Returns a time object (or a converted equivalent if a format is provided) converted from milliseconds.
  * Reference: https://gist.github.com/flangofas/714f401b63a1c3d84aaa
  * @param {number} milliseconds - The milliseconds to convert.
  * @param {string} [format] - The format to convert to. Accepts 's' for seconds, 'm' for minutes, 'h' for hours, 'd' for days.
@@ -32,7 +32,7 @@ function msToTime(milliseconds, format) {
 }
 
 /**
- * Converts time object from msToTime to a string.
+ * Returns a converted time object (from msToTime) in string format.
  * @param {Object} msObject - The time object provided by msToTime.
  * @param {boolean} simple - Whether to return a simple string or a more detailed one.
  * @returns {string} - The converted string.
@@ -48,7 +48,7 @@ function msToTimeString(msObject, simple) {
 }
 
 /**
- * Round a number to the number of decimal places provided.
+ * Returns a number rounded to the number of decimal places provided.
  * Reference: https://stackoverflow.com/a/15762794
  * @param {number} n - The number to round.
  * @param {number} digits - The number of decimal places to round to.
@@ -70,7 +70,7 @@ function roundTo(n, digits) {
 }
 
 /**
- * Get seconds from a human-readable string.
+ * Returns seconds from a human-readable string.
  * Reference: https://stackoverflow.com/a/54897508
  * @param {string} str - The human-readable string.
  * @returns {number} - Seconds extracted from the string.
@@ -89,7 +89,7 @@ function getSeconds(str) {
 }
 
 /**
- * Get a progress bar based on the percentage provided.
+ * Returns a progress bar based on the percentage provided.
  * @param {number} progress - The percentage of the bar to be filled.
  * @returns {string} - The progress bar.
  */
@@ -107,7 +107,7 @@ function getBar(progress) {
 }
 
 /**
- * Paginate an array.
+ * Returns a paginated array.
  * @param {Array} arr - The array to paginate.
  * @param {number} size - The size of each page.
  * @returns {Array} - The paginated array.
@@ -122,7 +122,7 @@ function paginate(arr, size) {
 }
 
 /**
- * Get the localized string.
+ * Returns the localized string.
  * Reference: https://stackoverflow.com/a/63376860
  * @param {string} language - The language to use.
  * @param {string} string - The string to get.
@@ -146,7 +146,7 @@ function getLocale(language, string, ...vars) {
 }
 
 /**
- * Checks locale completion for a given locale.
+ * Returns locale completion for a given locale.
  * @param {string} language - The locale code to check.
  * @returns {Object} - Completion percentage and missing strings.
  */
