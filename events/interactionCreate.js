@@ -58,21 +58,18 @@ module.exports = {
 				return;
 			}
 			const failedPermissions = { user: [], bot: [] };
-			const botChannelPerms = interaction.channel.permissionsFor(interaction.client.user.id);
-			if (!botChannelPerms.has('VIEW_CHANNEL')) { failedPermissions.bot.push('VIEW_CHANNEL'); }
-			if (!botChannelPerms.has('SEND_MESSAGES')) { failedPermissions.bot.push('SEND_MESSAGES'); }
-			// we should use the permissions from the channel instead
 			for (const perm of command.permissions.user) {
-				if (!interaction.member.permissions.has(perm)) {
+				if (!interaction.channel.permissionsFor(interaction.member).has(perm)) {
 					failedPermissions.user.push(perm);
 				}
 			}
-			for (const perm of command.permissions.bot) {
-				if (!interaction.guild.members.cache.get(interaction.client.user.id).permissions.has(perm)) {
-					failedPermissions.user.push(perm);
+			for (const perm of ['VIEW_CHANNEL', 'SEND_MESSAGES', ...command.permissions.bot]) {
+				if (!interaction.channel.permissionsFor(interaction.client.user.id).has(perm)) {
+					failedPermissions.bot.push(perm);
 				}
 			}
 			if (failedPermissions.user.length > 0) {
+				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedPermissions.user.length} user permission checks`, label: 'Quaver' });
 				await interaction.reply({
 					embeds: [
 						new MessageEmbed()
@@ -84,6 +81,7 @@ module.exports = {
 				return;
 			}
 			if (failedPermissions.bot.length > 0) {
+				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedPermissions.bot.length} bot permission checks`, label: 'Quaver' });
 				await interaction.reply({
 					embeds: [
 						new MessageEmbed()
