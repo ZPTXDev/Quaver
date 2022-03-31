@@ -2,6 +2,7 @@ const { MessageEmbed } = require('discord.js');
 const { logger, guildData } = require('../../shared.js');
 const { getLocale, msToTime, msToTimeString } = require('../../functions.js');
 const { defaultLocale, defaultColor } = require('../../settings.json');
+const { bot } = require('../../main.js');
 
 module.exports = {
 	name: 'trackStart',
@@ -15,6 +16,9 @@ module.exports = {
 		}
 		const duration = msToTime(track.length);
 		const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
+		// check for permissions for text channel
+		const botChannelPerms = bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).permissionsFor(bot.user.id);
+		if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 		await queue.channel.send({
 			embeds: [
 				new MessageEmbed()
