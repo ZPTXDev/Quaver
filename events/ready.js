@@ -5,8 +5,8 @@ module.exports = {
 	name: 'ready',
 	once: false,
 	async execute(client) {
-		const { startup, updateStartup } = require('../main.js');
-		if (!startup) {
+		const { startUp, updateStartup } = require('../main.js');
+		if (!startUp) {
 			logger.info({ message: `Connected. Logged in as ${client.user.tag}.`, label: 'Discord' });
 			logger.info({ message: `Running version ${version}. For help, see https://github.com/ZapSquared/Quaver/issues.`, label: 'Quaver' });
 			if (version.includes('-')) {
