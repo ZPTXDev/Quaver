@@ -14,6 +14,10 @@ module.exports = {
 	},
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
+		if (!player.queue.current || !player.playing && !player.paused) {
+			await interaction.replyHandler.localeErrorReply('MUSIC_QUEUE_NOT_PLAYING');
+			return;
+		}
 		player.queue.clear();
 		await player.queue.skip();
 		await player.queue.start();
