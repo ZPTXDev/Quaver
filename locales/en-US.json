@@ -53,6 +53,7 @@
   "CMD_BASSBOOST_DISABLED": "Bass boost **disabled**",
   "CMD_BIND_DESCRIPTION": "Change the text channel used by Quaver to send messages automatically.",
   "CMD_BIND_OPTION_CHANNEL": "The text channel to bind to.",
+  "CMD_BIND_NO_PERMISSIONS": "I do not have sufficient permissions in <#%1>.",
   "CMD_BIND_SUCCESS": "Bound to <#%1>",
   "CMD_CLEAR_DESCRIPTION": "Clear the queue.",
   "CMD_CLEAR_EMPTY": "There are no tracks in the queue to clear.",
