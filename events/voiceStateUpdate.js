@@ -28,7 +28,7 @@ module.exports = {
 				clearTimeout(player.pauseTimeout);
 				bot.music.destroyPlayer(player.guildId);
 				// check for permissions for text channel
-				const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+				const botChannelPerms = bot.guilds.cache.get(player.guildId).channels.cache.get(channel.id).permissionsFor(bot.user.id);
 				if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 				await channel.send({
 					embeds: [
@@ -50,7 +50,7 @@ module.exports = {
 					player.disconnect();
 					bot.music.destroyPlayer(player.guildId);
 					// check for permissions for text channel
-					const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+					const botChannelPerms = bot.guilds.cache.get(player.guildId).channels.cache.get(channel.id).permissionsFor(bot.user.id);
 					if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 					try {
 						await channel.send({
@@ -105,7 +105,7 @@ module.exports = {
 					player.disconnect();
 					bot.music.destroyPlayer(player.guildId);
 					// check for permissions for text channel
-					const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+					const botChannelPerms = bot.guilds.cache.get(player.guildId).channels.cache.get(channel.id).permissionsFor(bot.user.id);
 					if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 					try {
 						await channel.send({
@@ -145,7 +145,7 @@ module.exports = {
 					player.disconnect();
 					bot.music.destroyPlayer(player.guildId);
 					// check for permissions for text channel
-					const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+					const botChannelPerms = bot.guilds.cache.get(player.guildId).channels.cache.get(channel.id).permissionsFor(bot.user.id);
 					if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 					channel.send({
 						embeds: [
@@ -171,7 +171,7 @@ module.exports = {
 					p.disconnect();
 					bot.music.destroyPlayer(p.guildId);
 					// check for permissions for text channel
-					const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+					const botChannelPerms = bot.guilds.cache.get(p.guildId).channels.cache.get(channel.id).permissionsFor(bot.user.id);
 					if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 					channel.send({
 						embeds: [
@@ -182,7 +182,7 @@ module.exports = {
 					});
 				}, 300000, player);
 				// check for permissions for text channel
-				const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
+				const botChannelPerms = bot.guilds.cache.get(player.guildId).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
 				if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 				await player.queue.channel.send({
 					embeds: [
@@ -199,7 +199,7 @@ module.exports = {
 				clearTimeout(player.pauseTimeout);
 				delete player.pauseTimeout;
 				// check for permissions for text channel
-				const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
+				const botChannelPerms = bot.guilds.cache.get(player.guildId).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
 				if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 				await player.queue.channel.send({
 					embeds: [
@@ -221,7 +221,7 @@ module.exports = {
 				delete player.pauseTimeout;
 			}
 			// check for permissions for text channel
-			const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
+			const botChannelPerms = bot.guilds.cache.get(player.guildId).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
 			if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 			await player.queue.channel.send({
 				embeds: [
@@ -251,7 +251,7 @@ module.exports = {
 			player.disconnect();
 			bot.music.destroyPlayer(player.guildId);
 			// check for permissions for text channel
-			const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+			const botChannelPerms = bot.guilds.cache.get(player.guildId).channels.cache.get(channel.id).permissionsFor(bot.user.id);
 			if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 			channel.send({
 				embeds: [
@@ -274,7 +274,7 @@ module.exports = {
 			p.disconnect();
 			bot.music.destroyPlayer(p.guildId);
 			// check for permissions for text channel
-			const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(channel.id).permissionsFor(bot.user.id);
+			const botChannelPerms = bot.guilds.cache.get(p.guildId).channels.cache.get(channel.id).permissionsFor(bot.user.id);
 			if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 			channel.send({
 				embeds: [
@@ -285,7 +285,7 @@ module.exports = {
 			});
 		}, 300000, player);
 		// check for permissions for text channel
-		const botChannelPerms = bot.guilds.cache.get(guild.id).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
+		const botChannelPerms = bot.guilds.cache.get(player.guildId).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
 		if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 		await player.queue.channel.send({
 			embeds: [
