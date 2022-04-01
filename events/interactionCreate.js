@@ -3,6 +3,7 @@ const { logger, guildData } = require('../shared.js');
 const { getLocale, paginate, msToTime, msToTimeString } = require('../functions.js');
 const { checks } = require('../enums.js');
 const { defaultLocale, defaultColor } = require('../settings.json');
+const ReplyHandler = require('../classes/ReplyHandler.js');
 
 module.exports = {
 	name: 'interactionCreate',
@@ -11,6 +12,7 @@ module.exports = {
 		if (interaction.isCommand()) {
 			const command = interaction.client.commands.get(interaction.commandName);
 			if (!command) return;
+			interaction.replyHandler = new ReplyHandler(interaction);
 			logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing command ${interaction.commandName}`, label: 'Quaver' });
 			const failedChecks = [];
 			for (const check of command.checks) {
@@ -47,14 +49,7 @@ module.exports = {
 			}
 			if (failedChecks.length > 0) {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedChecks.length} checks`, label: 'Quaver' });
-				await interaction.reply({
-					embeds: [
-						new MessageEmbed()
-							.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, failedChecks[0]))
-							.setColor('DARK_RED'),
-					],
-					ephemeral: true,
-				});
+				await interaction.replyHandler.localeErrorReply(failedChecks[0]);
 				return;
 			}
 			const failedPermissions = { user: [], bot: [] };
@@ -70,26 +65,12 @@ module.exports = {
 			}
 			if (failedPermissions.user.length > 0) {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedPermissions.user.length} user permission checks`, label: 'Quaver' });
-				await interaction.reply({
-					embeds: [
-						new MessageEmbed()
-							.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_USER_MISSING_PERMISSIONS', failedPermissions.user.map(perm => '`' + perm + '`').join(' ')))
-							.setColor('DARK_RED'),
-					],
-					ephemeral: true,
-				});
+				await interaction.replyHandler.localeErrorReply('DISCORD_USER_MISSING_PERMISSIONS', {}, failedPermissions.user.map(perm => '`' + perm + '`').join(' '));
 				return;
 			}
 			if (failedPermissions.bot.length > 0) {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedPermissions.bot.length} bot permission checks`, label: 'Quaver' });
-				await interaction.reply({
-					embeds: [
-						new MessageEmbed()
-							.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS', failedPermissions.bot.map(perm => '`' + perm + '`').join(' ')))
-							.setColor('DARK_RED'),
-					],
-					ephemeral: true,
-				});
+				await interaction.replyHandler.localeErrorReply('DISCORD_BOT_MISSING_PERMISSIONS', {}, failedPermissions.bot.map(perm => '`' + perm + '`').join(' '));
 				return;
 			}
 			try {
@@ -99,20 +80,7 @@ module.exports = {
 			catch (err) {
 				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with command ${interaction.commandName}`, label: 'Quaver' });
 				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				const replyData = {
-					embeds: [
-						new MessageEmbed()
-							.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_CMD_ERROR'))
-							.setColor('DARK_RED'),
-					],
-				};
-				if (!interaction.replied && !interaction.deferred) {
-					replyData.ephemeral = true;
-					await interaction.reply(replyData);
-				}
-				else {
-					await interaction.editReply(replyData);
-				}
+				await interaction.replyHandler.localeErrorReply('DISCORD_CMD_ERROR');
 			}
 		}
 		else if (interaction.isButton()) {

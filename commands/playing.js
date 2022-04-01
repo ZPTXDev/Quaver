@@ -20,14 +20,7 @@ module.exports = {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		// workaround: seems like current track doesn't get removed after the track, an issue with @lavaclient/queue
 		if (!player.queue.current || !player.playing && !player.paused) {
-			await interaction.reply({
-				embeds: [
-					new MessageEmbed()
-						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_NOT_PLAYING'))
-						.setColor('DARK_RED'),
-				],
-				ephemeral: true,
-			});
+			await interaction.replyHandler.localeErrorReply('MUSIC_QUEUE_NOT_PLAYING');
 			return;
 		}
 		const bar = getBar((player.accuratePosition / player.queue.current.length) * 100);
@@ -39,6 +32,7 @@ module.exports = {
 		const duration = msToTime(player.queue.current.length);
 		const durationString = msToTimeString(duration, true);
 		if (player.queue.current.isStream) {
+			// i'm not touching this
 			await interaction.reply({
 				embeds: [
 					new MessageEmbed()
@@ -48,6 +42,7 @@ module.exports = {
 			});
 			return;
 		}
+		// nor this
 		await interaction.reply({
 			embeds: [
 				new MessageEmbed()

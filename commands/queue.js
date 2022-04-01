@@ -19,14 +19,7 @@ module.exports = {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const pages = paginate(player.queue.tracks, 5);
 		if (player.queue.tracks.length === 0) {
-			await interaction.reply({
-				embeds: [
-					new MessageEmbed()
-						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_QUEUE_EMPTY'))
-						.setColor('DARK_RED'),
-				],
-				ephemeral: true,
-			});
+			await interaction.replyHandler.localeErrorReply('CMD_QUEUE_EMPTY');
 			return;
 		}
 		await interaction.reply({

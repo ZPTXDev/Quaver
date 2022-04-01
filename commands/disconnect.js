@@ -1,7 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
-const { defaultColor, defaultLocale } = require('../settings.json');
+const { defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
 const { guildData } = require('../shared.js');
 
@@ -16,14 +15,7 @@ module.exports = {
 	},
 	async execute(interaction) {
 		if (guildData.get(`${interaction.guildId}.always.enabled`)) {
-			await interaction.reply({
-				embeds: [
-					new MessageEmbed()
-						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_DISCONNECT_247_ENABLED'))
-						.setColor('DARK_RED'),
-				],
-				ephemeral: true,
-			});
+			await interaction.replyHandler.localeErrorReply('CMD_DISCONNECT_247_ENABLED');
 			return;
 		}
 		const player = interaction.client.music.players.get(interaction.guildId);
@@ -31,12 +23,6 @@ module.exports = {
 		clearTimeout(player.pauseTimeout);
 		player.disconnect();
 		interaction.client.music.destroyPlayer(interaction.guildId);
-		await interaction.reply({
-			embeds: [
-				new MessageEmbed()
-					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_DISCONNECT_SUCCESS'))
-					.setColor(defaultColor),
-			],
-		});
+		await interaction.replyHandler.localeReply('CMD_DISCONNECT_SUCCESS');
 	},
 };

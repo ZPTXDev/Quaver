@@ -1,7 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
-const { managers, defaultColor, defaultLocale } = require('../settings.json');
+const { managers, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
 const { guildData } = require('../shared.js');
 
@@ -25,24 +24,10 @@ module.exports = {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const volume = interaction.options.getInteger('new_volume');
 		if (volume > 200 && !managers.includes(interaction.user.id)) {
-			await interaction.reply({
-				embeds: [
-					new MessageEmbed()
-						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_VOLUME_NOT_IN_RANGE'))
-						.setColor('DARK_RED'),
-				],
-				ephemeral: true,
-			});
+			await interaction.replyHandler.localeErrorReply('CMD_VOLUME_NOT_IN_RANGE');
 			return;
 		}
 		await player.setVolume(volume);
-		await interaction.reply({
-			embeds: [
-				new MessageEmbed()
-					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_VOLUME_SUCCESS', volume))
-					.setFooter({ text: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_FILTERS_NOTE') })
-					.setColor(defaultColor),
-			],
-		});
+		await interaction.replyHandler.localeReply('CMD_VOLUME_SUCCESS', { footer: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_FILTERS_NOTE') }, volume);
 	},
 };

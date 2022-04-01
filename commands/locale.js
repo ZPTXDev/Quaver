@@ -27,6 +27,7 @@ module.exports = {
 		const locale = interaction.options.getString('new_locale');
 		guildData.set(`${interaction.guildId}.locale`, locale);
 		const localeCompletion = checkLocaleCompletion(locale);
+		// this is the one case where i'm just not going to use replyHandler because i cannot be bothered.
 		const additionalEmbed = localeCompletion.completion !== 100 ? [
 			new MessageEmbed()
 				.setDescription(`This locale is incomplete. Completion: \`${roundTo(localeCompletion.completion, 2)}%\`\nMissing strings:\n\`\`\`\n${localeCompletion.missing.join('\n')}\`\`\``)

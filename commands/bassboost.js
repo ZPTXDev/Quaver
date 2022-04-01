@@ -1,7 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
-const { defaultColor, defaultLocale } = require('../settings.json');
+const { defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
 const { guildData } = require('../shared.js');
 
@@ -34,13 +33,6 @@ module.exports = {
 		}
 		await player.setEqualizer(eqValues);
 		player.bassboost = boost;
-		await interaction.reply({
-			embeds: [
-				new MessageEmbed()
-					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, player.bassboost ? 'CMD_BASSBOOST_ENABLED' : 'CMD_BASSBOOST_DISABLED'))
-					.setFooter({ text: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_FILTERS_NOTE') })
-					.setColor(defaultColor),
-			],
-		});
+		await interaction.replyHandler.localeReply(player.bassboost ? 'CMD_BASSBOOST_ENABLED' : 'CMD_BASSBOOST_DISABLED', { footer: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_FILTERS_NOTE') });
 	},
 };
