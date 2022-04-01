@@ -24,7 +24,7 @@ module.exports = {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const channel = interaction.options.getChannel('new_channel');
 		if (!channel.permissionsFor(interaction.client.user.id).has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) {
-			await interaction.replyHandler.localeErrorReply('CMD_BIND_NO_PERMISSIONS');
+			await interaction.replyHandler.localeErrorReply('CMD_BIND_NO_PERMISSIONS', {}, channel.id);
 			return;
 		}
 		player.queue.channel = channel;
