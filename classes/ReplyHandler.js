@@ -20,10 +20,10 @@ module.exports = class ReplyHandler {
 		const replyData = {
 			embeds: [
 				new MessageEmbed()
-					.setTitle(embedExtras?.title)
+					.setTitle(embedExtras?.title ?? '')
 					.setDescription(localizedString)
-					.setFooter({ text: embedExtras?.footer })
-					.setThumbnail(embedExtras?.thumbnail)
+					.setFooter({ text: embedExtras?.footer ?? '' })
+					.setThumbnail(embedExtras?.thumbnail ?? '')
 					.setColor(defaultColor),
 			],
 		};
@@ -50,10 +50,10 @@ module.exports = class ReplyHandler {
 		const replyData = {
 			embeds: [
 				new MessageEmbed()
-					.setTitle(embedExtras?.title)
+					.setTitle(embedExtras?.title ?? '')
 					.setDescription(localizedString)
-					.setFooter({ text: embedExtras?.footer })
-					.setThumbnail(embedExtras?.thumbnail)
+					.setFooter({ text: embedExtras?.footer ?? '' })
+					.setThumbnail(embedExtras?.thumbnail ?? '')
 					.setColor('DARK_RED'),
 			],
 		};
