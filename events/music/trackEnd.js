@@ -12,7 +12,7 @@ module.exports = {
 		if (reason === 'LOAD_FAILED') {
 			logger.warn({ message: `[G ${queue.player.guildId}] Track skipped with reason: ${reason}`, label: 'Quaver' });
 			// check for permissions for text channel
-			const botChannelPerms = bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).permissionsFor(bot.user.id);
+			const botChannelPerms = bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.channel.id).permissionsFor(bot.user.id);
 			if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 			queue.channel.send({
 				embeds: [
@@ -27,7 +27,7 @@ module.exports = {
 			queue.player.disconnect();
 			bot.music.destroyPlayer(queue.player.guildId);
 			// check for permissions for text channel
-			const botChannelPerms = bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).permissionsFor(bot.user.id);
+			const botChannelPerms = bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.channel.id).permissionsFor(bot.user.id);
 			if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 			queue.channel.send({
 				embeds: [

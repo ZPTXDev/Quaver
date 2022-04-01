@@ -17,7 +17,7 @@ module.exports = {
 		const duration = msToTime(track.length);
 		const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
 		// check for permissions for text channel
-		const botChannelPerms = bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).permissionsFor(bot.user.id);
+		const botChannelPerms = bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.channel.id).permissionsFor(bot.user.id);
 		if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { return; }
 		await queue.channel.send({
 			embeds: [
