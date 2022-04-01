@@ -1,8 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { SpotifyItemType } = require('@lavaclient/spotify');
-const { MessageEmbed, Permissions } = require('discord.js');
+const { Permissions } = require('discord.js');
 const { checks } = require('../enums.js');
-const { defaultColor, defaultLocale } = require('../settings.json');
+const { defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
 const { logger, guildData } = require('../shared.js');
 
@@ -30,54 +30,36 @@ module.exports = {
 		// check for connect, speak permission for channel
 		const permissions = interaction.member.voice.channel.permissionsFor(interaction.client.user.id);
 		if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
-			await interaction.reply({
-				embeds: [
-					new MessageEmbed()
-						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_BASIC'))
-						.setColor('DARK_RED'),
-				],
-				ephemeral: true,
-			});
+			await interaction.replyHandler.localeErrorReply('DISCORD_BOT_MISSING_PERMISSIONS_BASIC');
 			return;
 		}
 		if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE' && !permissions.has(Permissions.STAGE_MODERATOR)) {
-			await interaction.reply({
-				embeds: [
-					new MessageEmbed()
-						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_STAGE'))
-						.setColor('DARK_RED'),
-				],
-				ephemeral: true,
-			});
+			await interaction.replyHandler.localeErrorReply('DISCORD_BOT_MISSING_PERMISSIONS_STAGE');
 			return;
 		}
 
 		await interaction.deferReply();
 		const query = interaction.options.getString('query'), insert = interaction.options.getBoolean('insert');
-		let tracks = [], msg = '';
+		let tracks = [], msg = '', extras = [];
 		if (interaction.client.music.spotify.isSpotifyUrl(query)) {
 			const item = await interaction.client.music.spotify.load(query);
 			switch (item?.type) {
 				case SpotifyItemType.Track: {
 					const track = await item.resolveYoutubeTrack();
 					tracks = [track];
-					msg = getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, insert ? 'MUSIC_QUEUE_ADDED_INSERT' : 'MUSIC_QUEUE_ADDED', item.name, query);
+					msg = insert ? 'MUSIC_QUEUE_ADDED_INSERT' : 'MUSIC_QUEUE_ADDED';
+					extras = [item.name, query];
 					break;
 				}
 				case SpotifyItemType.Album:
 				case SpotifyItemType.Playlist:
 				case SpotifyItemType.Artist:
 					tracks = await item.resolveYoutubeTracks();
-					msg = getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, insert ? 'MUSIC_QUEUE_ADDED_MULTI_INSERT' : 'MUSIC_QUEUE_ADDED_MULTI', tracks.length, item.name, query);
+					msg = insert ? 'MUSIC_QUEUE_ADDED_MULTI_INSERT' : 'MUSIC_QUEUE_ADDED_MULTI';
+					extras = [tracks.length, item.name, query];
 					break;
 				default:
-					await interaction.editReply({
-						embeds: [
-							new MessageEmbed()
-								.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_PLAY_SPOTIFY_NO_RESULTS'))
-								.setColor('DARK_RED'),
-						],
-					});
+					await interaction.replyHandler.localeErrorReply('CMD_PLAY_SPOTIFY_NO_RESULTS');
 					return;
 			}
 		}
@@ -86,23 +68,19 @@ module.exports = {
 			switch (results.loadType) {
 				case 'PLAYLIST_LOADED':
 					tracks = results.tracks;
-					msg = getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, insert ? 'MUSIC_QUEUE_ADDED_MULTI_INSERT' : 'MUSIC_QUEUE_ADDED_MULTI', tracks.length, results.playlistInfo.name, query);
+					msg = insert ? 'MUSIC_QUEUE_ADDED_MULTI_INSERT' : 'MUSIC_QUEUE_ADDED_MULTI';
+					extras = [tracks.length, results.playlistInfo.name, query];
 					break;
 				case 'TRACK_LOADED':
 				case 'SEARCH_RESULT': {
 					const [track] = results.tracks;
 					tracks = [track];
-					msg = getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, insert ? 'MUSIC_QUEUE_ADDED_INSERT' : 'MUSIC_QUEUE_ADDED', track.info.title, track.info.uri);
+					msg = insert ? 'MUSIC_QUEUE_ADDED_INSERT' : 'MUSIC_QUEUE_ADDED';
+					extras = [track.info.title, track.info.uri];
 					break;
 				}
 				default:
-					await interaction.editReply({
-						embeds: [
-							new MessageEmbed()
-								.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_CMD_ERROR'))
-								.setColor('DARK_RED'),
-						],
-					});
+					await interaction.replyHandler.localeErrorReply('DISCORD_CMD_ERROR');
 					return;
 			}
 		}
@@ -116,13 +94,7 @@ module.exports = {
 			if (!interaction.member.voice.channelId) {
 				player.disconnect();
 				interaction.client.music.destroyPlayer(interaction.guildId);
-				await interaction.editReply({
-					embeds: [
-						new MessageEmbed()
-							.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_INTERACTION_CANCELED', interaction.user.id))
-							.setColor(defaultColor),
-					],
-				});
+				await interaction.replyHandler.localeReply('DISCORD_INTERACTION_CANCELED', {}, interaction.user.id);
 				return;
 			}
 			if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE' && !interaction.member.voice.channel.stageInstance?.topic) {
@@ -141,14 +113,7 @@ module.exports = {
 		player.queue.add(tracks, { requester: interaction.user.id, next: insert });
 
 		const started = player.playing || player.paused;
-		await interaction.editReply({
-			embeds: [
-				new MessageEmbed()
-					.setDescription(msg)
-					.setColor(defaultColor)
-					.setFooter({ text: started ? `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '' }),
-			],
-		});
+		await interaction.replyHandler.localeReply(msg, { footer: started ? `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '' }, ...extras);
 		if (!started) { await player.queue.start(); }
 		const state = interaction.guild.members.cache.get(interaction.client.user.id).voice;
 		if (state.channel.type === 'GUILD_STAGE_VOICE' && state.suppress) {

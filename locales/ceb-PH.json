@@ -85,7 +85,7 @@
   "CMD_PAUSE_PAUSED": "Ang player kay napahunong na man.",
   "CMD_PAUSE_SUCCESS": "Nahunong ang player.",
   "CMD_PING_DESCRIPTION": "Susiha ang latency ug uptime ni Quaver.",
-  "CMD_PING_PONG": "Pong!",
+  "CMD_PING_PONG": "Pong!%1",
   "CMD_PING_UPTIME": "Uptime:",
   "CMD_PLAY_DESCRIPTION": "Patugtug og track.",
   "CMD_PLAY_OPTION_QUERY": "Unsay pangitaonon. Links gikan Spotify, YouTube ug daghan pa kay supported. Mangita siya sa YouTube.",

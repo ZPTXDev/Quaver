@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed, Constants } = require('discord.js');
+const { Constants } = require('discord.js');
 const { checks } = require('../enums.js');
-const { defaultColor, defaultLocale } = require('../settings.json');
+const { defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
 const { guildData } = require('../shared.js');
 
@@ -27,12 +27,6 @@ module.exports = {
 		if (guildData.get(`${interaction.guildId}.always.enabled`)) {
 			guildData.set(`${interaction.guildId}.always.text`, channel.id);
 		}
-		await interaction.reply({
-			embeds: [
-				new MessageEmbed()
-					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_BIND_SUCCESS', channel.id))
-					.setColor(defaultColor),
-			],
-		});
+		await interaction.replyHandler.localeReply('CMD_BIND_SUCCESS', {}, channel.id);
 	},
 };

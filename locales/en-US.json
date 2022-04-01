@@ -86,7 +86,7 @@
   "CMD_PAUSE_PAUSED": "The player is already paused.",
   "CMD_PAUSE_SUCCESS": "The player has been paused.",
   "CMD_PING_DESCRIPTION": "Check Quaver's latency and uptime.",
-  "CMD_PING_PONG": "Pong!",
+  "CMD_PING_PONG": "Pong!%1",
   "CMD_PING_UPTIME": "Uptime:",
   "CMD_PLAY_DESCRIPTION": "Play a track.",
   "CMD_PLAY_OPTION_QUERY": "What to search for. Links from Spotify, YouTube and more are supported. Searches YouTube by default.",

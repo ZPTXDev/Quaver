@@ -28,7 +28,6 @@ module.exports = {
 		let tracks = [];
 
 		const results = await interaction.client.music.rest.loadTracks(`ytsearch:${query}`);
-
 		switch (results.loadType) {
 			case 'SEARCH_RESULT': {
 				tracks = results.tracks;
@@ -37,15 +36,8 @@ module.exports = {
 		}
 
 		tracks = tracks.slice(0, 10);
-
 		if (tracks.length <= 1) {
-			await interaction.editReply({
-				embeds: [
-					new MessageEmbed()
-						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SEARCH_USE_PLAY_CMD'))
-						.setColor('DARK_RED'),
-				],
-			});
+			await interaction.replyHandler.localeErrorReply('CMD_SEARCH_USE_PLAY_CMD');
 			return;
 		}
 

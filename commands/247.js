@@ -1,7 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
-const { defaultColor, defaultLocale, functions } = require('../settings.json');
+const { defaultLocale, functions } = require('../settings.json');
 const { getLocale } = require('../functions.js');
 const { guildData } = require('../shared.js');
 
@@ -20,26 +19,12 @@ module.exports = {
 	},
 	async execute(interaction) {
 		if (!functions['247'].enabled) {
-			await interaction.reply({
-				embeds: [
-					new MessageEmbed()
-						.setDescription(getLocale(`${interaction.guildId}.locale` ?? defaultLocale, 'FUNCTION_DISABLED'))
-						.setColor('DARK_RED'),
-				],
-				ephemeral: true,
-			});
+			await interaction.replyHandler.localeErrorReply('FUNCTION_DISABLED');
 			return;
 		}
 		if (functions['247'].whitelist) {
 			if (!guildData.get(`${interaction.guildId}.247.whitelisted`)) {
-				await interaction.reply({
-					embeds: [
-						new MessageEmbed()
-							.setDescription(getLocale(`${interaction.guildId}.locale` ?? defaultLocale, 'CMD_247_NOT_WHITELISTED'))
-							.setColor('DARK_RED'),
-					],
-					ephemeral: true,
-				});
+				await interaction.replyHandler.localeErrorReply('CMD_247_NOT_WHITELISTED');
 				return;
 			}
 		}
@@ -63,13 +48,6 @@ module.exports = {
 		}
 		// pause timeout is theoretically impossible because the user would need to be in the same vc as Quaver
 		// and pause timeout is only set when everyone leaves
-		await interaction.reply({
-			embeds: [
-				new MessageEmbed()
-					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, always ? 'CMD_247_ENABLED' : 'CMD_247_DISABLED'))
-					.setFooter({ text: always ? getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_247_NOTE') : '' })
-					.setColor(defaultColor),
-			],
-		});
+		await interaction.replyHandler.localeReply(always ? 'CMD_247_ENABLED' : 'CMD_247_DISABLED', { footer: always ? getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_247_NOTE') : '' });
 	},
 };
