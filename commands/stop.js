@@ -1,9 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
-const { defaultColor, defaultLocale } = require('../settings.json');
+const { defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
-const { guildData } = require('../shared.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -16,15 +14,13 @@ module.exports = {
 	},
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
+		if (!player.queue.current || !player.playing && !player.paused) {
+			await interaction.replyHandler.localeErrorReply('MUSIC_QUEUE_NOT_PLAYING');
+			return;
+		}
 		player.queue.clear();
 		await player.queue.skip();
 		await player.queue.start();
-		await interaction.reply({
-			embeds: [
-				new MessageEmbed()
-					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_STOP_SUCCESS'))
-					.setColor(defaultColor),
-			],
-		});
+		await interaction.replyHandler.localeReply('CMD_STOP_SUCCESS');
 	},
 };

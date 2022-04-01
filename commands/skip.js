@@ -19,25 +19,12 @@ module.exports = {
 		if (player.queue.current.requester === interaction.user.id) {
 			const track = await player.queue.skip();
 			await player.queue.start();
-			await interaction.reply({
-				embeds: [
-					new MessageEmbed()
-						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SKIP_SUCCESS', track.title, track.uri))
-						.setColor(defaultColor),
-				],
-			});
+			await interaction.replyHandler.localeReply('CMD_SKIP_SUCCESS', {}, track.title, track.uri);
 			return;
 		}
 		const skip = player.skip ?? { required: Math.ceil(interaction.member.voice.channel.members.size / 2), users: [] };
 		if (skip.users.includes(interaction.user.id)) {
-			await interaction.reply({
-				embeds: [
-					new MessageEmbed()
-						.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SKIP_VOTED'))
-						.setColor('DARK_RED'),
-				],
-				ephemeral: true,
-			});
+			await interaction.replyHandler.localeErrorReply('CMD_SKIP_VOTED');
 			return;
 		}
 		skip.users.push(interaction.user.id);
@@ -55,12 +42,6 @@ module.exports = {
 			return;
 		}
 		player.skip = skip;
-		await interaction.reply({
-			embeds: [
-				new MessageEmbed()
-					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SKIP_VOTED_SUCCESS', player.queue.current.title, player.queue.current.uri, skip.users.length, skip.required))
-					.setColor(defaultColor),
-			],
-		});
+		await interaction.replyHandler.localeReply('CMD_SKIP_VOTED_SUCCESS', {}, player.queue.current.title, player.queue.current.uri, skip.users.length, skip.required);
 	},
 };

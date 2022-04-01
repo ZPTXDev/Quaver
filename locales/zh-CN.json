@@ -82,7 +82,7 @@
   "CMD_PAUSE_PAUSED": "播放器已被暂停。",
   "CMD_PAUSE_SUCCESS": "播放器被暂停了。",
   "CMD_PING_DESCRIPTION": "查看 Quaver 的延迟以及运行时间。",
-  "CMD_PING_PONG": "Pong!",
+  "CMD_PING_PONG": "Pong!%1",
   "CMD_PING_UPTIME": "运行时间：",
   "CMD_PLAY_DESCRIPTION": "播放一首歌曲。",
   "CMD_PLAY_OPTION_QUERY": "可用使用的歌源。Spotify 以及 YouTube 的链接，默认搜索平台是 YouTube。",

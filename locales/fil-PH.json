@@ -85,7 +85,7 @@
   "CMD_PAUSE_PAUSED": "Naka-pause na ang player.",
   "CMD_PAUSE_SUCCESS": "Na-pause ang player.",
   "CMD_PING_DESCRIPTION": "Suriin ang latency at uptime ni Quaver.",
-  "CMD_PING_PONG": "Pong!",
+  "CMD_PING_PONG": "Pong!%1",
   "CMD_PING_UPTIME": "Uptime:",
   "CMD_PLAY_DESCRIPTION": "Magpatugtog ng track.",
   "CMD_PLAY_OPTION_QUERY": "Ano ang hahanapin. Spotify, YouTube at higit pa ay supported. Naghahanap sa YouTube bilang default.",
