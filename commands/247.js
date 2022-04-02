@@ -19,12 +19,12 @@ module.exports = {
 	},
 	async execute(interaction) {
 		if (!functions['247'].enabled) {
-			await interaction.replyHandler.localeErrorReply('FUNCTION_DISABLED');
+			await interaction.replyHandler.localeError('FUNCTION_DISABLED');
 			return;
 		}
 		if (functions['247'].whitelist) {
 			if (!guildData.get(`${interaction.guildId}.247.whitelisted`)) {
-				await interaction.replyHandler.localeErrorReply('CMD_247_NOT_WHITELISTED');
+				await interaction.replyHandler.localeError('CMD_247_NOT_WHITELISTED');
 				return;
 			}
 		}
@@ -48,6 +48,6 @@ module.exports = {
 		}
 		// pause timeout is theoretically impossible because the user would need to be in the same vc as Quaver
 		// and pause timeout is only set when everyone leaves
-		await interaction.replyHandler.localeReply(always ? 'CMD_247_ENABLED' : 'CMD_247_DISABLED', { footer: always ? getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_247_NOTE') : '' });
+		await interaction.replyHandler.locale(always ? 'CMD_247_ENABLED' : 'CMD_247_DISABLED', { footer: always ? getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_247_NOTE') : '' });
 	},
 };
