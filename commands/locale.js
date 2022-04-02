@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { checks } = require('../enums.js');
-const { defaultColor, defaultLocale } = require('../settings.json');
+const { defaultLocale } = require('../settings.json');
 const { roundTo, getLocale, checkLocaleCompletion } = require('../functions.js');
 const { guildData } = require('../shared.js');
 const fs = require('fs');
@@ -27,19 +27,11 @@ module.exports = {
 		const locale = interaction.options.getString('new_locale');
 		guildData.set(`${interaction.guildId}.locale`, locale);
 		const localeCompletion = checkLocaleCompletion(locale);
-		// this is the one case where i'm just not going to use replyHandler because i cannot be bothered.
 		const additionalEmbed = localeCompletion.completion !== 100 ? [
 			new MessageEmbed()
 				.setDescription(`This locale is incomplete. Completion: \`${roundTo(localeCompletion.completion, 2)}%\`\nMissing strings:\n\`\`\`\n${localeCompletion.missing.join('\n')}\`\`\``)
 				.setColor('DARK_RED'),
 		] : [];
-		await interaction.reply({
-			embeds: [
-				new MessageEmbed()
-					.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_LOCALE_SUCCESS', interaction.guild.name, locale))
-					.setColor(defaultColor),
-				...additionalEmbed,
-			],
-		});
+		await interaction.replyHandler.locale('CMD_LOCALE_SUCCESS', { additionalEmbeds: additionalEmbed }, interaction.guild.name, locale);
 	},
 };
