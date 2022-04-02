@@ -9,22 +9,21 @@ module.exports = class ReplyHandler {
 	}
 
 	/**
-	 * Replies with a localized message.
-	 * @param {string} code - The code of the locale string to be used.
+	 * Replies with a message.
+	 * @param {string} data - The message to be used.
 	 * @param {Object} embedExtras - Extra data to be passed to the embed.
-	 * @param  {...string} args - Additional arguments to be passed to the locale string.
 	 * @returns {Promise<Message|APIMessage>} - The message that was sent.
 	 */
-	locale(code, embedExtras, ...args) {
-		const localizedString = getLocale(guildData.get(`${this.interaction.guildId}.locale`) ?? defaultLocale, code, ...args);
+	reply(data, embedExtras) {
 		const replyData = {
 			embeds: [
 				new MessageEmbed()
 					.setTitle(embedExtras?.title ?? '')
-					.setDescription(localizedString)
+					.setDescription(data)
 					.setFooter({ text: embedExtras?.footer ?? '' })
 					.setThumbnail(embedExtras?.thumbnail ?? '')
 					.setColor(defaultColor),
+				...embedExtras.additionalEmbeds ?? [],
 			],
 		};
 		if (!this.interaction.replied && !this.interaction.deferred) {
@@ -39,23 +38,22 @@ module.exports = class ReplyHandler {
 	}
 
 	/**
-	 * Replies with a localized error message.
-	 * @param {string} code - The code of the locale string to be used.
+	 * Replies with an error message.
+	 * @param {string} data - The message to be used.
 	 * @param {Object} embedExtras - Extra data to be passed to the embed.
-	 * @param  {...string} args - Additional arguments to be passed to the locale string.
 	 * @returns {Promise<Message|APIMessage>} - The message that was sent.
 	 */
-	localeError(code, embedExtras, ...args) {
-		const localizedString = getLocale(guildData.get(`${this.interaction.guildId}.locale`) ?? defaultLocale, code, ...args);
+	error(data, embedExtras) {
 		const replyData = {
 			embeds: [
 				new MessageEmbed()
 					.setTitle(embedExtras?.title ?? '')
-					.setDescription(localizedString)
+					.setDescription(data)
 					.setFooter({ text: embedExtras?.footer ?? '' })
 					.setThumbnail(embedExtras?.thumbnail ?? '')
 					.setColor('DARK_RED'),
 			],
+			...embedExtras.additionalEmbeds ?? [],
 		};
 		if (!this.interaction.replied && !this.interaction.deferred) {
 			replyData.ephemeral = true;
@@ -64,5 +62,29 @@ module.exports = class ReplyHandler {
 		else {
 			return this.interaction.editReply(replyData);
 		}
+	}
+
+	/**
+	 * Replies with a localized message.
+	 * @param {string} code - The code of the locale string to be used.
+	 * @param {Object} embedExtras - Extra data to be passed to the embed.
+	 * @param  {...string} args - Additional arguments to be passed to the locale string.
+	 * @returns {Promise<Message|APIMessage>} - The message that was sent.
+	 */
+	locale(code, embedExtras, ...args) {
+		const localizedString = getLocale(guildData.get(`${this.interaction.guildId}.locale`) ?? defaultLocale, code, ...args);
+		return this.reply(localizedString, embedExtras);
+	}
+
+	/**
+	 * Replies with a localized error message.
+	 * @param {string} code - The code of the locale string to be used.
+	 * @param {Object} embedExtras - Extra data to be passed to the embed.
+	 * @param  {...string} args - Additional arguments to be passed to the locale string.
+	 * @returns {Promise<Message|APIMessage>} - The message that was sent.
+	 */
+	localeError(code, embedExtras, ...args) {
+		const localizedString = getLocale(guildData.get(`${this.interaction.guildId}.locale`) ?? defaultLocale, code, ...args);
+		return this.error(localizedString, embedExtras);
 	}
 };
