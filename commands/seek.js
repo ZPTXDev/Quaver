@@ -33,29 +33,29 @@ module.exports = {
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		if (!player.queue.current || !player.playing && !player.paused) {
-			await interaction.replyHandler.localeErrorReply('MUSIC_QUEUE_NOT_PLAYING');
+			await interaction.replyHandler.localeError('MUSIC_QUEUE_NOT_PLAYING');
 			return;
 		}
 		if (player.queue.current.isStream) {
-			await interaction.replyHandler.localeErrorReply('CMD_SEEK_IS_STREAM');
+			await interaction.replyHandler.localeError('CMD_SEEK_IS_STREAM');
 			return;
 		}
 		const hours = interaction.options.getInteger('hours') ?? 0, minutes = interaction.options.getInteger('minutes') ?? 0, seconds = interaction.options.getInteger('seconds') ?? 0;
 		const ms = hours * 3600000 + minutes * 60000 + seconds * 1000;
 		if (interaction.options.getInteger('hours') === null && interaction.options.getInteger('minutes') === null && interaction.options.getInteger('seconds') === null) {
-			await interaction.replyHandler.localeErrorReply('CMD_SEEK_UNSPECIFIED_TIMESTAMP');
+			await interaction.replyHandler.localeError('CMD_SEEK_UNSPECIFIED_TIMESTAMP');
 			return;
 		}
 		const trackLength = player.queue.current.length;
 		const duration = msToTime(trackLength);
 		const durationString = msToTimeString(duration, true);
 		if (ms > trackLength) {
-			await interaction.replyHandler.localeErrorReply('CMD_SEEK_INVALID_TIMESTAMP', {}, durationString);
+			await interaction.replyHandler.localeError('CMD_SEEK_INVALID_TIMESTAMP', {}, durationString);
 			return;
 		}
 		const seek = msToTime(ms);
 		const seekString = msToTimeString(seek, true);
 		await player.seek(ms);
-		await interaction.replyHandler.localeReply('CMD_SEEK_SUCCESS', {}, seekString, durationString);
+		await interaction.replyHandler.locale('CMD_SEEK_SUCCESS', {}, seekString, durationString);
 	},
 };

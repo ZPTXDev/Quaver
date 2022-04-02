@@ -24,10 +24,10 @@ module.exports = {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const volume = interaction.options.getInteger('new_volume');
 		if (volume > 200 && !managers.includes(interaction.user.id)) {
-			await interaction.replyHandler.localeErrorReply('CMD_VOLUME_NOT_IN_RANGE');
+			await interaction.replyHandler.localeError('CMD_VOLUME_NOT_IN_RANGE');
 			return;
 		}
 		await player.setVolume(volume);
-		await interaction.replyHandler.localeReply('CMD_VOLUME_SUCCESS', { footer: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_FILTERS_NOTE') }, volume);
+		await interaction.replyHandler.locale('CMD_VOLUME_SUCCESS', { footer: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_FILTERS_NOTE') }, volume);
 	},
 };
