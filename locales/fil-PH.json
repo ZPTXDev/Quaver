@@ -53,6 +53,7 @@
   "CMD_BASSBOOST_DISABLED": "Ang bass boost ay **naka-disable**",
   "CMD_BIND_DESCRIPTION": "Baguhin ang text channel na ginamit ni Quaver para awtomatikong magpadala ng mga mensahe.",
   "CMD_BIND_OPTION_CHANNEL": "Ito ang text channel na maba-bind.",
+  "CMD_BIND_NO_PERMISSIONS": "Wala akong sapat na mga permission sa <#%1>.",
   "CMD_BIND_SUCCESS": "Nakabind sa <#%1>",
   "CMD_CLEAR_DESCRIPTION": "I-clear ang queue.",
   "CMD_CLEAR_EMPTY": "Walang mga track sa queue na i-clear.",
