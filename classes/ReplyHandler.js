@@ -52,8 +52,8 @@ module.exports = class ReplyHandler {
 					.setFooter({ text: embedExtras?.footer ?? '' })
 					.setThumbnail(embedExtras?.thumbnail ?? '')
 					.setColor('DARK_RED'),
-			],
 			...embedExtras.additionalEmbeds ?? [],
+			],
 		};
 		if (!this.interaction.replied && !this.interaction.deferred) {
 			replyData.ephemeral = true;
