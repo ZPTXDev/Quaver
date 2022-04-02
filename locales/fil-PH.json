@@ -21,7 +21,7 @@
   "MUSIC_STAGE_TOPIC": "Musika ni Quaver",
   "MUSIC_RESTART": "Nagre-restart si Quaver at madidiskonekta.",
   "MUSIC_RESTART_CRASH": "Nag-crash si Quaver at madidiskonekta.",
-  "MUSIC_RESTART_QUEUEDATA": "Ang iyong data ng queue ay naka-attach.",
+  "MUSIC_RESTART_QUEUEDATA": "Ang data ng iyong queue ay naka-attach.",
   "MUSIC_RESTART_SORRY": "Paumanhin para sa abalang naidulot.",
   "MUSIC_FILTERS_NOTE": "Maaaring tumagal ito ng ilang segundo bago mag-apply",
   "MUSIC_LIVE": "LIVE",
