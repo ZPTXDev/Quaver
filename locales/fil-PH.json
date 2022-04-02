@@ -1,6 +1,7 @@
 {
   "MUSIC_INACTIVITY": "Nadiskonekta mula sa kawalan ng aktibidad.",
   "MUSIC_INACTIVITY_WARNING": "Aalis ako <t:%1:R>.",
+  "MUSIC_TRACK_SKIPPED": "Nilaktawan ang **[%1](%2)** dahil may naganap na error: `%3`",
   "MUSIC_ALONE": "Nadiskonekta nang umalis ang lahat.",
   "MUSIC_ALONE_MOVED": "Nadiskonekta dahil walang tao sa target na channel.",
   "MUSIC_ALONE_WARNING": "Walang tao dito.",
