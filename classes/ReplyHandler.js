@@ -23,7 +23,7 @@ module.exports = class ReplyHandler {
 					.setFooter({ text: embedExtras?.footer ?? '' })
 					.setThumbnail(embedExtras?.thumbnail ?? '')
 					.setColor(defaultColor),
-				...embedExtras.additionalEmbeds ?? [],
+				...embedExtras?.additionalEmbeds ?? [],
 			],
 		};
 		if (embedExtras.components) replyData.components = embedExtras.components;
@@ -53,7 +53,7 @@ module.exports = class ReplyHandler {
 					.setFooter({ text: embedExtras?.footer ?? '' })
 					.setThumbnail(embedExtras?.thumbnail ?? '')
 					.setColor('DARK_RED'),
-				...embedExtras.additionalEmbeds ?? [],
+				...embedExtras?.additionalEmbeds ?? [],
 			],
 		};
 		if (embedExtras.components) replyData.components = embedExtras.components;
