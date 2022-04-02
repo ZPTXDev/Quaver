@@ -26,6 +26,7 @@ module.exports = class ReplyHandler {
 				...embedExtras.additionalEmbeds ?? [],
 			],
 		};
+		if (embedExtras.components) replyData.components = embedExtras.components;
 		if (!this.interaction.replied && !this.interaction.deferred) {
 			if (!this.interaction.channel.permissionsFor(this.interaction.client.user.id).has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) {
 				replyData.ephemeral = true;
@@ -52,9 +53,10 @@ module.exports = class ReplyHandler {
 					.setFooter({ text: embedExtras?.footer ?? '' })
 					.setThumbnail(embedExtras?.thumbnail ?? '')
 					.setColor('DARK_RED'),
-			...embedExtras.additionalEmbeds ?? [],
+				...embedExtras.additionalEmbeds ?? [],
 			],
 		};
+		if (embedExtras.components) replyData.components = embedExtras.components;
 		if (!this.interaction.replied && !this.interaction.deferred) {
 			replyData.ephemeral = true;
 			return this.interaction.reply(replyData);
