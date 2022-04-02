@@ -49,7 +49,7 @@ module.exports = {
 			}
 			if (failedChecks.length > 0) {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedChecks.length} checks`, label: 'Quaver' });
-				await interaction.replyHandler.localeErrorReply(failedChecks[0]);
+				await interaction.replyHandler.localeError(failedChecks[0]);
 				return;
 			}
 			const failedPermissions = { user: [], bot: [] };
@@ -65,12 +65,12 @@ module.exports = {
 			}
 			if (failedPermissions.user.length > 0) {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedPermissions.user.length} user permission checks`, label: 'Quaver' });
-				await interaction.replyHandler.localeErrorReply('DISCORD_USER_MISSING_PERMISSIONS', {}, failedPermissions.user.map(perm => '`' + perm + '`').join(' '));
+				await interaction.replyHandler.localeError('DISCORD_USER_MISSING_PERMISSIONS', {}, failedPermissions.user.map(perm => '`' + perm + '`').join(' '));
 				return;
 			}
 			if (failedPermissions.bot.length > 0) {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedPermissions.bot.length} bot permission checks`, label: 'Quaver' });
-				await interaction.replyHandler.localeErrorReply('DISCORD_BOT_MISSING_PERMISSIONS', {}, failedPermissions.bot.map(perm => '`' + perm + '`').join(' '));
+				await interaction.replyHandler.localeError('DISCORD_BOT_MISSING_PERMISSIONS', {}, failedPermissions.bot.map(perm => '`' + perm + '`').join(' '));
 				return;
 			}
 			try {
@@ -80,7 +80,7 @@ module.exports = {
 			catch (err) {
 				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with command ${interaction.commandName}`, label: 'Quaver' });
 				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				await interaction.replyHandler.localeErrorReply('DISCORD_CMD_ERROR');
+				await interaction.replyHandler.localeError('DISCORD_CMD_ERROR');
 			}
 		}
 		else if (interaction.isButton()) {
