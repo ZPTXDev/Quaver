@@ -15,6 +15,6 @@ module.exports = {
 	async execute(interaction) {
 		const uptime = msToTime(interaction.client.uptime);
 		const uptimeString = msToTimeString(uptime);
-		await interaction.replyHandler.localeReply('CMD_PING_PONG', { footer: `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_PING_UPTIME')} ${uptimeString}` }, interaction.guild ? ` ${interaction.guild.shard.ping}ms` : '');
+		await interaction.replyHandler.localeDefault('CMD_PING_PONG', { footer: `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_PING_UPTIME')} ${uptimeString}` }, interaction.guild ? ` ${interaction.guild.shard.ping}ms` : '');
 	},
 };

@@ -30,11 +30,11 @@ module.exports = {
 		// check for connect, speak permission for channel
 		const permissions = interaction.member.voice.channel.permissionsFor(interaction.client.user.id);
 		if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
-			await interaction.replyHandler.localeErrorReply('DISCORD_BOT_MISSING_PERMISSIONS_BASIC');
+			await interaction.replyHandler.localeError('DISCORD_BOT_MISSING_PERMISSIONS_BASIC');
 			return;
 		}
 		if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE' && !permissions.has(Permissions.STAGE_MODERATOR)) {
-			await interaction.replyHandler.localeErrorReply('DISCORD_BOT_MISSING_PERMISSIONS_STAGE');
+			await interaction.replyHandler.localeError('DISCORD_BOT_MISSING_PERMISSIONS_STAGE');
 			return;
 		}
 
@@ -59,7 +59,7 @@ module.exports = {
 					extras = [tracks.length, item.name, query];
 					break;
 				default:
-					await interaction.replyHandler.localeErrorReply('CMD_PLAY_SPOTIFY_NO_RESULTS');
+					await interaction.replyHandler.localeError('CMD_PLAY_SPOTIFY_NO_RESULTS');
 					return;
 			}
 		}
@@ -80,7 +80,7 @@ module.exports = {
 					break;
 				}
 				default:
-					await interaction.replyHandler.localeErrorReply('DISCORD_CMD_ERROR');
+					await interaction.replyHandler.localeError('DISCORD_CMD_ERROR');
 					return;
 			}
 		}
@@ -94,7 +94,7 @@ module.exports = {
 			if (!interaction.member.voice.channelId) {
 				player.disconnect();
 				interaction.client.music.destroyPlayer(interaction.guildId);
-				await interaction.replyHandler.localeReply('DISCORD_INTERACTION_CANCELED', {}, interaction.user.id);
+				await interaction.replyHandler.localeDefault('DISCORD_INTERACTION_CANCELED', {}, interaction.user.id);
 				return;
 			}
 			if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE' && !interaction.member.voice.channel.stageInstance?.topic) {
@@ -113,7 +113,7 @@ module.exports = {
 		player.queue.add(tracks, { requester: interaction.user.id, next: insert });
 
 		const started = player.playing || player.paused;
-		await interaction.replyHandler.localeReply(msg, { footer: started ? `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '' }, ...extras);
+		await interaction.replyHandler.localeDefault(msg, { footer: started ? `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '' }, ...extras);
 		if (!started) { await player.queue.start(); }
 		const state = interaction.guild.members.cache.get(interaction.client.user.id).voice;
 		if (state.channel.type === 'GUILD_STAGE_VOICE' && state.suppress) {

@@ -15,10 +15,10 @@ module.exports = {
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		if (player.paused) {
-			await interaction.replyHandler.localeErrorReply('CMD_PAUSE_PAUSED');
+			await interaction.replyHandler.localeError('CMD_PAUSE_PAUSED');
 			return;
 		}
 		player.pause();
-		await interaction.replyHandler.localeReply('CMD_PAUSE_SUCCESS');
+		await interaction.replyHandler.localeDefault('CMD_PAUSE_SUCCESS');
 	},
 };

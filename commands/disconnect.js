@@ -15,7 +15,7 @@ module.exports = {
 	},
 	async execute(interaction) {
 		if (guildData.get(`${interaction.guildId}.always.enabled`)) {
-			await interaction.replyHandler.localeErrorReply('CMD_DISCONNECT_247_ENABLED');
+			await interaction.replyHandler.localeError('CMD_DISCONNECT_247_ENABLED');
 			return;
 		}
 		const player = interaction.client.music.players.get(interaction.guildId);
@@ -23,6 +23,6 @@ module.exports = {
 		clearTimeout(player.pauseTimeout);
 		player.disconnect();
 		interaction.client.music.destroyPlayer(interaction.guildId);
-		await interaction.replyHandler.localeReply('CMD_DISCONNECT_SUCCESS');
+		await interaction.replyHandler.localeDefault('CMD_DISCONNECT_SUCCESS');
 	},
 };

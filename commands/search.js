@@ -37,7 +37,7 @@ module.exports = {
 
 		tracks = tracks.slice(0, 10);
 		if (tracks.length <= 1) {
-			await interaction.replyHandler.localeErrorReply('CMD_SEARCH_USE_PLAY_CMD');
+			await interaction.replyHandler.localeError('CMD_SEARCH_USE_PLAY_CMD');
 			return;
 		}
 
