@@ -34,6 +34,6 @@ module.exports = {
 			return;
 		}
 		const track = player.queue.remove(position - 1);
-		await interaction.replyHandler.localeDefault('CMD_REMOVE_SUCCESS', {}, track.title, track.uri);
+		await interaction.replyHandler.locale('CMD_REMOVE_SUCCESS', {}, track.title, track.uri);
 	},
 };

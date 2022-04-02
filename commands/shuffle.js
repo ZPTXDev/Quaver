@@ -24,6 +24,6 @@ module.exports = {
 			currentIndex--;
 			[player.queue.tracks[currentIndex], player.queue.tracks[randomIndex]] = [player.queue.tracks[randomIndex], player.queue.tracks[currentIndex]];
 		}
-		await interaction.replyHandler.localeDefault('CMD_SHUFFLE_SUCCESS');
+		await interaction.replyHandler.locale('CMD_SHUFFLE_SUCCESS');
 	},
 };

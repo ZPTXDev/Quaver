@@ -19,6 +19,6 @@ module.exports = {
 			return;
 		}
 		player.pause();
-		await interaction.replyHandler.localeDefault('CMD_PAUSE_SUCCESS');
+		await interaction.replyHandler.locale('CMD_PAUSE_SUCCESS');
 	},
 };

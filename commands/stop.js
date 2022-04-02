@@ -21,6 +21,6 @@ module.exports = {
 		player.queue.clear();
 		await player.queue.skip();
 		await player.queue.start();
-		await interaction.replyHandler.localeDefault('CMD_STOP_SUCCESS');
+		await interaction.replyHandler.locale('CMD_STOP_SUCCESS');
 	},
 };

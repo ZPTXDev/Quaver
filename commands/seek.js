@@ -56,6 +56,6 @@ module.exports = {
 		const seek = msToTime(ms);
 		const seekString = msToTimeString(seek, true);
 		await player.seek(ms);
-		await interaction.replyHandler.localeDefault('CMD_SEEK_SUCCESS', {}, seekString, durationString);
+		await interaction.replyHandler.locale('CMD_SEEK_SUCCESS', {}, seekString, durationString);
 	},
 };

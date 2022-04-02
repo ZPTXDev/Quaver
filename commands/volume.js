@@ -28,6 +28,6 @@ module.exports = {
 			return;
 		}
 		await player.setVolume(volume);
-		await interaction.replyHandler.localeDefault('CMD_VOLUME_SUCCESS', { footer: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_FILTERS_NOTE') }, volume);
+		await interaction.replyHandler.locale('CMD_VOLUME_SUCCESS', { footer: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_FILTERS_NOTE') }, volume);
 	},
 };

@@ -42,6 +42,6 @@ module.exports = {
 		}
 		player.queue.tracks.splice(newPosition - 1, 0, player.queue.tracks.splice(oldPosition - 1, 1)[0]);
 		const track = player.queue.tracks[newPosition - 1];
-		await interaction.replyHandler.localeDefault('CMD_MOVE_SUCCESS', {}, track.title, track.uri, oldPosition, newPosition);
+		await interaction.replyHandler.locale('CMD_MOVE_SUCCESS', {}, track.title, track.uri, oldPosition, newPosition);
 	},
 };

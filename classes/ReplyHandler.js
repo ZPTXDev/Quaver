@@ -15,7 +15,7 @@ module.exports = class ReplyHandler {
 	 * @param  {...string} args - Additional arguments to be passed to the locale string.
 	 * @returns {Promise<Message|APIMessage>} - The message that was sent.
 	 */
-	localeDefault(code, embedExtras, ...args) {
+	locale(code, embedExtras, ...args) {
 		const localizedString = getLocale(guildData.get(`${this.interaction.guildId}.locale`) ?? defaultLocale, code, ...args);
 		const replyData = {
 			embeds: [

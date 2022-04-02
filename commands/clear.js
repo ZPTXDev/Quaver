@@ -19,6 +19,6 @@ module.exports = {
 			return;
 		}
 		player.queue.clear();
-		await interaction.replyHandler.localeDefault('CMD_CLEAR_SUCCESS');
+		await interaction.replyHandler.locale('CMD_CLEAR_SUCCESS');
 	},
 };

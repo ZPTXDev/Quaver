@@ -19,7 +19,7 @@ module.exports = {
 		if (player.queue.current.requester === interaction.user.id) {
 			const track = await player.queue.skip();
 			await player.queue.start();
-			await interaction.replyHandler.localeDefault('CMD_SKIP_SUCCESS', {}, track.title, track.uri);
+			await interaction.replyHandler.locale('CMD_SKIP_SUCCESS', {}, track.title, track.uri);
 			return;
 		}
 		const skip = player.skip ?? { required: Math.ceil(interaction.member.voice.channel.members.size / 2), users: [] };
@@ -42,6 +42,6 @@ module.exports = {
 			return;
 		}
 		player.skip = skip;
-		await interaction.replyHandler.localeDefault('CMD_SKIP_VOTED_SUCCESS', {}, player.queue.current.title, player.queue.current.uri, skip.users.length, skip.required);
+		await interaction.replyHandler.locale('CMD_SKIP_VOTED_SUCCESS', {}, player.queue.current.title, player.queue.current.uri, skip.users.length, skip.required);
 	},
 };

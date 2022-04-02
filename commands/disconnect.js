@@ -23,6 +23,6 @@ module.exports = {
 		clearTimeout(player.pauseTimeout);
 		player.disconnect();
 		interaction.client.music.destroyPlayer(interaction.guildId);
-		await interaction.replyHandler.localeDefault('CMD_DISCONNECT_SUCCESS');
+		await interaction.replyHandler.locale('CMD_DISCONNECT_SUCCESS');
 	},
 };

@@ -31,6 +31,6 @@ module.exports = {
 		if (guildData.get(`${interaction.guildId}.always.enabled`)) {
 			guildData.set(`${interaction.guildId}.always.text`, channel.id);
 		}
-		await interaction.replyHandler.localeDefault('CMD_BIND_SUCCESS', {}, channel.id);
+		await interaction.replyHandler.locale('CMD_BIND_SUCCESS', {}, channel.id);
 	},
 };

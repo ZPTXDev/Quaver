@@ -42,6 +42,6 @@ module.exports = {
 		}
 		typeLocale = typeLocale.toLowerCase();
 		player.queue.setLoop(loop);
-		await interaction.replyHandler.localeDefault('CMD_LOOP_SUCCESS', {}, typeLocale);
+		await interaction.replyHandler.locale('CMD_LOOP_SUCCESS', {}, typeLocale);
 	},
 };

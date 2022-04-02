@@ -48,6 +48,6 @@ module.exports = {
 		}
 		// pause timeout is theoretically impossible because the user would need to be in the same vc as Quaver
 		// and pause timeout is only set when everyone leaves
-		await interaction.replyHandler.localeDefault(always ? 'CMD_247_ENABLED' : 'CMD_247_DISABLED', { footer: always ? getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_247_NOTE') : '' });
+		await interaction.replyHandler.locale(always ? 'CMD_247_ENABLED' : 'CMD_247_DISABLED', { footer: always ? getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_247_NOTE') : '' });
 	},
 };
