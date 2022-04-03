@@ -6,6 +6,6 @@ module.exports = {
 	once: false,
 	execute(err) {
 		logger.error({ message: 'An error occurred. Quaver will now shut down to prevent any further issues.', label: 'Lavalink' });
-		shuttingDown('Lavalink Error', err);
+		shuttingDown('lavalink', err);
 	},
 };
