@@ -39,6 +39,9 @@ module.exports = class ReplyHandler {
 	 */
 	reply(data, embedExtras) {
 		const replyData = this.replyDataConstructor(data, embedExtras);
+		if (!this.interaction.message) {
+			return this.interaction.channel.send(replyData);
+		}
 		if (!this.interaction.replied && !this.interaction.deferred) {
 			if (!this.interaction.channel.permissionsFor(this.interaction.client.user.id).has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) {
 				replyData.ephemeral = true;
@@ -58,6 +61,9 @@ module.exports = class ReplyHandler {
 	 */
 	error(data, embedExtras) {
 		const replyData = this.replyDataConstructor(data, embedExtras, true);
+		if (!this.interaction.message) {
+			return this.interaction.channel.send(replyData);
+		}
 		if (!this.interaction.replied && !this.interaction.deferred) {
 			replyData.ephemeral = true;
 			return this.interaction.reply(replyData);
