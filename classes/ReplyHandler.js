@@ -40,6 +40,9 @@ module.exports = class ReplyHandler {
 	reply(data, embedExtras) {
 		const replyData = this.replyDataConstructor(data, embedExtras);
 		if (!this.interaction.message) {
+			if (!this.interaction.channel.permissionsFor(this.interaction.client.user.id).has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) {
+				return;
+			}
 			return this.interaction.channel.send(replyData);
 		}
 		if (!this.interaction.replied && !this.interaction.deferred) {
