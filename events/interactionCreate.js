@@ -4,6 +4,7 @@ const { getLocale, paginate, msToTime, msToTimeString } = require('../functions.
 const { checks } = require('../enums.js');
 const { defaultLocale, defaultColor } = require('../settings.json');
 const ReplyHandler = require('../classes/ReplyHandler.js');
+const MusicHandler = require('../classes/MusicHandler.js');
 
 module.exports = {
 	name: 'interactionCreate',
@@ -224,12 +225,12 @@ module.exports = {
 					await interaction.deferUpdate();
 					if (!player?.connected) {
 						player = interaction.client.music.createPlayer(interaction.guildId);
+						player.musicHandler = new MusicHandler(player);
 						player.queue.channel = interaction.channel;
 						await player.connect(interaction.member.voice.channelId, { deafened: true });
 						// that kid left while we were busy bruh
 						if (!interaction.member.voice.channelId) {
-							player.disconnect();
-							interaction.client.music.destroyPlayer(interaction.guildId);
+							player.musicHandler.disconnect();
 							await interaction.editReply({
 								embeds: [
 									new MessageEmbed()

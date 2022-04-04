@@ -1,8 +1,8 @@
-const { MessageEmbed, Permissions } = require('discord.js');
+const { Permissions } = require('discord.js');
 const { logger, guildData } = require('../shared.js');
 const { getLocale } = require('../functions.js');
 const { bot } = require('../main.js');
-const { defaultLocale, defaultColor } = require('../settings.json');
+const { defaultLocale } = require('../settings.json');
 
 module.exports = {
 	name: 'voiceStateUpdate',
@@ -23,17 +23,8 @@ module.exports = {
 				if (guildData.get(`${player.guildId}.always.enabled`)) {
 					guildData.set(`${player.guildId}.always.enabled`, false);
 				}
-				const channel = player.queue.channel;
-				clearTimeout(player.timeout);
-				clearTimeout(player.pauseTimeout);
-				bot.music.destroyPlayer(player.guildId);
-				await channel.send({
-					embeds: [
-						new MessageEmbed()
-							.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_FORCED'))
-							.setColor(defaultColor),
-					],
-				});
+				player.musicHandler.disconnect();
+				await player.musicHandler.locale('MUSIC_FORCED');
 				return;
 			}
 			// channel is a stage channel, and bot is suppressed
@@ -44,24 +35,8 @@ module.exports = {
 					if (guildData.get(`${player.guildId}.always.enabled`)) {
 						guildData.set(`${player.guildId}.always.enabled`, false);
 					}
-					const channel = player.queue.channel;
-					clearTimeout(player.timeout);
-					clearTimeout(player.pauseTimeout);
-					player.disconnect();
-					bot.music.destroyPlayer(guild.id);
-					try {
-						await channel.send({
-							embeds: [
-								new MessageEmbed()
-									.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_FORCED_STAGE'))
-									.setColor(defaultColor),
-							],
-						});
-					}
-					catch (err) {
-						logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-					}
-					return;
+					player.musicHandler.disconnect();
+					await player.musicHandler.locale('MUSIC_FORCED_STAGE');
 				}
 				await newState.setSuppressed(false);
 				if (!newState.channel.stageInstance?.topic) {
@@ -81,18 +56,8 @@ module.exports = {
 						guildData.set(`${player.guildId}.always.enabled`, false);
 					}
 					logger.info({ message: `[G ${player.guildId}] Disconnecting (alone)`, label: 'Quaver' });
-					const channel = player.queue.channel;
-					clearTimeout(player.timeout);
-					clearTimeout(player.pauseTimeout);
-					player.disconnect();
-					bot.music.destroyPlayer(player.guildId);
-					channel.send({
-						embeds: [
-							new MessageEmbed()
-								.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_MOVED'))
-								.setColor(defaultColor),
-						],
-					});
+					player.musicHandler.disconnect();
+					await player.musicHandler.locale('MUSIC_ALONE_MOVED');
 					return;
 				}
 				// avoid pauseTimeout if 24/7 is enabled
@@ -105,39 +70,17 @@ module.exports = {
 				}
 				player.pauseTimeout = setTimeout(p => {
 					logger.info({ message: `[G ${p.guildId}] Disconnecting (inactivity)`, label: 'Quaver' });
-					const channel = p.queue.channel;
-					clearTimeout(p.timeout);
-					p.disconnect();
-					bot.music.destroyPlayer(p.guildId);
-					channel.send({
-						embeds: [
-							new MessageEmbed()
-								.setDescription(getLocale(guildData.get(`${p.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY'))
-								.setColor(defaultColor),
-						],
-					});
+					p.musicHandler.disconnect();
+					p.musicHandler.locale('MUSIC_INACTIVITY');
 				}, 300000, player);
-				await player.queue.channel.send({
-					embeds: [
-						new MessageEmbed()
-							.setDescription(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`)
-							.setFooter({ text: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_REJOIN') })
-							.setColor(defaultColor),
-					],
-				});
+				await player.musicHandler.send(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`, { footer: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_REJOIN') });
 			}
 			// the new vc has humans and pauseTimeout is set
 			else if (newState.channel.members.filter(m => !m.user.bot).size >= 1 && player.pauseTimeout) {
 				player.resume();
 				clearTimeout(player.pauseTimeout);
 				delete player.pauseTimeout;
-				await player.queue.channel.send({
-					embeds: [
-						new MessageEmbed()
-							.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_RESUMED'))
-							.setColor(defaultColor),
-					],
-				});
+				await player.musicHandler.locale('MUSIC_ALONE_RESUMED');
 				return;
 			}
 		}
@@ -150,13 +93,7 @@ module.exports = {
 				clearTimeout(player.pauseTimeout);
 				delete player.pauseTimeout;
 			}
-			await player.queue.channel.send({
-				embeds: [
-					new MessageEmbed()
-						.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_RESUMED'))
-						.setColor(defaultColor),
-				],
-			});
+			await player.musicHandler.locale('MUSIC_ALONE_RESUMED');
 			return;
 		}
 		// user has nothing to do with us
@@ -172,18 +109,8 @@ module.exports = {
 		// nothing is playing so we just leave
 		if (!player.queue.current || !player.playing && !player.paused) {
 			logger.info({ message: `[G ${player.guildId}] Disconnecting (alone)`, label: 'Quaver' });
-			const channel = player.queue.channel;
-			clearTimeout(player.timeout);
-			clearTimeout(player.pauseTimeout);
-			player.disconnect();
-			bot.music.destroyPlayer(player.guildId);
-			channel.send({
-				embeds: [
-					new MessageEmbed()
-						.setDescription(getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE'))
-						.setColor(defaultColor),
-				],
-			});
+			player.musicHandler.disconnect();
+			player.musicHandler.locale('MUSIC_ALONE');
 			return;
 		}
 		await player.pause();
@@ -193,25 +120,9 @@ module.exports = {
 		}
 		player.pauseTimeout = setTimeout(p => {
 			logger.info({ message: `[G ${p.guildId}] Disconnecting (inactivity)`, label: 'Quaver' });
-			const channel = p.queue.channel;
-			clearTimeout(p.timeout);
-			p.disconnect();
-			bot.music.destroyPlayer(p.guildId);
-			channel.send({
-				embeds: [
-					new MessageEmbed()
-						.setDescription(getLocale(guildData.get(`${p.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY'))
-						.setColor(defaultColor),
-				],
-			});
+			p.musicHandler.disconnect();
+			p.musicHandler.locale('MUSIC_INACTIVITY');
 		}, 300000, player);
-		await player.queue.channel.send({
-			embeds: [
-				new MessageEmbed()
-					.setDescription(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`)
-					.setFooter({ text: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_REJOIN') })
-					.setColor(defaultColor),
-			],
-		});
+		await player.musicHandler.send(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`, { footer: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_REJOIN') });
 	},
 };
