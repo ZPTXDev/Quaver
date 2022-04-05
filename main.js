@@ -102,7 +102,7 @@ async function shuttingDown(eventType, err) {
 			const player = pair[1];
 			logger.info({ message: `[G ${player.guildId}] Disconnecting (restarting)`, label: 'Quaver' });
 			const fileBuffer = [];
-			if (player.queue.tracks.length > 0 || player.queue.current && (player.playing || player.paused)) {
+			if (player.queue.current && (player.playing || player.paused)) {
 				fileBuffer.push(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'CURRENT')}:`);
 				fileBuffer.push(player.queue.current.uri);
 				if (player.queue.tracks.length > 0) {
