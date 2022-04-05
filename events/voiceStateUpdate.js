@@ -31,6 +31,12 @@ module.exports = {
 			// this also handles suppressing Quaver mid-track
 			if (newState.channel.type === 'GUILD_STAGE_VOICE' && newState.suppress) {
 				const permissions =	bot.guilds.cache.get(guild.id).channels.cache.get(newState.channelId).permissionsFor(bot.user.id);
+				// check for connect, speak permission for stage channel
+				if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
+					await player.musicHandler.locale('DISCORD_BOT_MISSING_PERMISSIONS_BASIC');
+					player.musicHandler.disconnect();
+					return;
+				}
 				if (!permissions.has(Permissions.STAGE_MODERATOR)) {
 					if (guildData.get(`${player.guildId}.always.enabled`)) {
 						guildData.set(`${player.guildId}.always.enabled`, false);
