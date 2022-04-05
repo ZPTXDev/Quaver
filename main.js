@@ -102,13 +102,13 @@ async function shuttingDown(eventType, err) {
 			const player = pair[1];
 			logger.info({ message: `[G ${player.guildId}] Disconnecting (restarting)`, label: 'Quaver' });
 			const fileBuffer = [];
-			if (player.queue.tracks.length > 0 || player.queue.current && (player.playing || player.paused)) {
+			if (player.queue.current && (player.playing || player.paused)) {
 				fileBuffer.push(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'CURRENT')}:`);
 				fileBuffer.push(player.queue.current.uri);
-				if (player.queue.tracks.length > 0) {
-					fileBuffer.push(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'QUEUE')}:`);
-					fileBuffer.push(player.queue.tracks.map(track => track.uri).join('\n'));
-				}
+			}
+			if (player.queue.tracks.length > 0) {
+				fileBuffer.push(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'QUEUE')}:`);
+				fileBuffer.push(player.queue.tracks.map(track => track.uri).join('\n'));
 			}
 			player.musicHandler.disconnect();
 			const botChannelPerms = bot.guilds.cache.get(player.guildId).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
