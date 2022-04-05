@@ -10,7 +10,7 @@ module.exports = {
 	async execute(oldState, newState) {
 		const guild = oldState.guild;
 		const player = bot.music.players.get(guild.id);
-		if (!player) return;
+		if (!player || player.disconnecting) return;
 		// Quaver voiceStateUpdate
 		if (oldState.member.user.id === bot.user.id) {
 			// just the suppress state changed
