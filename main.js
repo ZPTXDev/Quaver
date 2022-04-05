@@ -105,10 +105,10 @@ async function shuttingDown(eventType, err) {
 			if (player.queue.current && (player.playing || player.paused)) {
 				fileBuffer.push(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'CURRENT')}:`);
 				fileBuffer.push(player.queue.current.uri);
-				if (player.queue.tracks.length > 0) {
-					fileBuffer.push(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'QUEUE')}:`);
-					fileBuffer.push(player.queue.tracks.map(track => track.uri).join('\n'));
-				}
+			}
+			if (player.queue.tracks.length > 0) {
+				fileBuffer.push(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'QUEUE')}:`);
+				fileBuffer.push(player.queue.tracks.map(track => track.uri).join('\n'));
 			}
 			player.musicHandler.disconnect();
 			const botChannelPerms = bot.guilds.cache.get(player.guildId).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
