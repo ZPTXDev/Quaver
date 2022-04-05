@@ -1,5 +1,5 @@
 const { MessageEmbed } = require('discord.js');
-const { guildData } = require('../shared.js');
+const { guildData, logger } = require('../shared.js');
 const { getLocale } = require('../functions.js');
 const { defaultLocale, defaultColor } = require('../settings.json');
 
@@ -35,18 +35,30 @@ module.exports = class ReplyHandler {
 	 * Replies with a message.
 	 * @param {string} data - The message to be used.
 	 * @param {Object} embedExtras - Extra data to be passed to the embed.
-	 * @returns {Promise<Message|APIMessage>} - The message that was sent.
+	 * @returns {Message|APIMessage|boolean} - The message that was sent.
 	 */
-	reply(data, embedExtras) {
+	async reply(data, embedExtras) {
 		const replyData = this.replyDataConstructor(data, embedExtras);
 		if (!this.interaction.replied && !this.interaction.deferred) {
 			if (!this.interaction.channel.permissionsFor(this.interaction.client.user.id).has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) {
 				replyData.ephemeral = true;
 			}
-			return this.interaction.reply(replyData);
+			try {
+				return await this.interaction.reply(replyData);
+			}
+			catch (err) {
+				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+				return false;
+			}
 		}
 		else {
-			return this.interaction.editReply(replyData);
+			try {
+				return await this.interaction.editReply(replyData);
+			}
+			catch (err) {
+				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+				return false;
+			}
 		}
 	}
 
@@ -54,16 +66,28 @@ module.exports = class ReplyHandler {
 	 * Replies with an error message.
 	 * @param {string} data - The message to be used.
 	 * @param {Object} embedExtras - Extra data to be passed to the embed.
-	 * @returns {Promise<Message|APIMessage>} - The message that was sent.
+	 * @returns {Message|APIMessage|boolean} - The message that was sent.
 	 */
-	error(data, embedExtras) {
+	async error(data, embedExtras) {
 		const replyData = this.replyDataConstructor(data, embedExtras, true);
 		if (!this.interaction.replied && !this.interaction.deferred) {
 			replyData.ephemeral = true;
-			return this.interaction.reply(replyData);
+			try {
+				return await this.interaction.reply(replyData);
+			}
+			catch (err) {
+				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+				return false;
+			}
 		}
 		else {
-			return this.interaction.editReply(replyData);
+			try {
+				return await this.interaction.editReply(replyData);
+			}
+			catch (err) {
+				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+				return false;
+			}
 		}
 	}
 
@@ -72,7 +96,7 @@ module.exports = class ReplyHandler {
 	 * @param {string} code - The code of the locale string to be used.
 	 * @param {Object} embedExtras - Extra data to be passed to the embed.
 	 * @param  {...string} args - Additional arguments to be passed to the locale string.
-	 * @returns {Promise<Message|APIMessage>} - The message that was sent.
+	 * @returns {Message|APIMessage|boolean} - The message that was sent.
 	 */
 	locale(code, embedExtras, ...args) {
 		const localizedString = getLocale(guildData.get(`${this.interaction.guildId}.locale`) ?? defaultLocale, code, ...args);
@@ -84,7 +108,7 @@ module.exports = class ReplyHandler {
 	 * @param {string} code - The code of the locale string to be used.
 	 * @param {Object} embedExtras - Extra data to be passed to the embed.
 	 * @param  {...string} args - Additional arguments to be passed to the locale string.
-	 * @returns {Promise<Message|APIMessage>} - The message that was sent.
+	 * @returns {Message|APIMessage|boolean} - The message that was sent.
 	 */
 	localeError(code, embedExtras, ...args) {
 		const localizedString = getLocale(guildData.get(`${this.interaction.guildId}.locale`) ?? defaultLocale, code, ...args);
