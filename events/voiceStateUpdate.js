@@ -23,8 +23,8 @@ module.exports = {
 				if (guildData.get(`${player.guildId}.always.enabled`)) {
 					guildData.set(`${player.guildId}.always.enabled`, false);
 				}
-				player.musicHandler.disconnect();
 				await player.musicHandler.locale('MUSIC_FORCED');
+				player.musicHandler.disconnect();
 				return;
 			}
 			// channel is a stage channel, and bot is suppressed
@@ -35,8 +35,8 @@ module.exports = {
 					if (guildData.get(`${player.guildId}.always.enabled`)) {
 						guildData.set(`${player.guildId}.always.enabled`, false);
 					}
-					player.musicHandler.disconnect();
 					await player.musicHandler.locale('MUSIC_FORCED_STAGE');
+					player.musicHandler.disconnect();
 				}
 				await newState.setSuppressed(false);
 				if (!newState.channel.stageInstance?.topic) {
@@ -56,8 +56,8 @@ module.exports = {
 						guildData.set(`${player.guildId}.always.enabled`, false);
 					}
 					logger.info({ message: `[G ${player.guildId}] Disconnecting (alone)`, label: 'Quaver' });
-					player.musicHandler.disconnect();
 					await player.musicHandler.locale('MUSIC_ALONE_MOVED');
+					player.musicHandler.disconnect();
 					return;
 				}
 				// avoid pauseTimeout if 24/7 is enabled
@@ -70,8 +70,8 @@ module.exports = {
 				}
 				player.pauseTimeout = setTimeout(p => {
 					logger.info({ message: `[G ${p.guildId}] Disconnecting (inactivity)`, label: 'Quaver' });
-					p.musicHandler.disconnect();
 					p.musicHandler.locale('MUSIC_INACTIVITY');
+					p.musicHandler.disconnect();
 				}, 300000, player);
 				await player.musicHandler.send(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`, { footer: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_REJOIN') });
 			}
@@ -109,8 +109,8 @@ module.exports = {
 		// nothing is playing so we just leave
 		if (!player.queue.current || !player.playing && !player.paused) {
 			logger.info({ message: `[G ${player.guildId}] Disconnecting (alone)`, label: 'Quaver' });
-			player.musicHandler.disconnect();
 			player.musicHandler.locale('MUSIC_ALONE');
+			player.musicHandler.disconnect();
 			return;
 		}
 		await player.pause();
@@ -120,8 +120,8 @@ module.exports = {
 		}
 		player.pauseTimeout = setTimeout(p => {
 			logger.info({ message: `[G ${p.guildId}] Disconnecting (inactivity)`, label: 'Quaver' });
-			p.musicHandler.disconnect();
 			p.musicHandler.locale('MUSIC_INACTIVITY');
+			p.musicHandler.disconnect();
 		}, 300000, player);
 		await player.musicHandler.send(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`, { footer: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_REJOIN') });
 	},

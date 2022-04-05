@@ -94,8 +94,8 @@ module.exports = {
 			await player.connect(interaction.member.voice.channelId, { deafened: true });
 			// that kid left while we were busy bruh
 			if (!interaction.member.voice.channelId) {
-				player.musicHandler.disconnect();
 				await interaction.replyHandler.locale('DISCORD_INTERACTION_CANCELED', {}, interaction.user.id);
+				player.musicHandler.disconnect();
 				return;
 			}
 			if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE' && !interaction.member.voice.channel.stageInstance?.topic) {
