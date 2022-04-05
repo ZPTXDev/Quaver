@@ -32,14 +32,14 @@ module.exports = class MusicHandler {
 		return sendData;
 	}
 
-	send(data, embedExtras, error) {
+	async send(data, embedExtras, error) {
 		const sendData = this.sendDataConstructor(data, embedExtras, error);
 		const channel = this.player.queue.channel;
 		if (!channel.permissionsFor(bot.user.id).has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) {
 			return false;
 		}
 		try {
-			return channel.send(sendData);
+			return await channel.send(sendData);
 		}
 		catch (err) {
 			logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
