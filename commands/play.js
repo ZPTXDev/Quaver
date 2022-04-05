@@ -5,6 +5,7 @@ const { checks } = require('../enums.js');
 const { defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
 const { logger, guildData } = require('../shared.js');
+const MusicHandler = require('../classes/MusicHandler.js');
 
 // credit: https://github.com/lavaclient/djs-v13-example/blob/main/src/commands/Play.ts
 
@@ -88,13 +89,13 @@ module.exports = {
 		let player = interaction.client.music.players.get(interaction.guildId);
 		if (!player?.connected) {
 			player = interaction.client.music.createPlayer(interaction.guildId);
+			player.musicHandler = new MusicHandler(player);
 			player.queue.channel = interaction.channel;
 			await player.connect(interaction.member.voice.channelId, { deafened: true });
 			// that kid left while we were busy bruh
 			if (!interaction.member.voice.channelId) {
-				player.disconnect();
-				interaction.client.music.destroyPlayer(interaction.guildId);
 				await interaction.replyHandler.locale('DISCORD_INTERACTION_CANCELED', {}, interaction.user.id);
+				player.musicHandler.disconnect();
 				return;
 			}
 			if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE' && !interaction.member.voice.channel.stageInstance?.topic) {

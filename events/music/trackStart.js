@@ -1,7 +1,6 @@
-const { MessageEmbed } = require('discord.js');
 const { logger, guildData } = require('../../shared.js');
 const { getLocale, msToTime, msToTimeString } = require('../../functions.js');
-const { defaultLocale, defaultColor } = require('../../settings.json');
+const { defaultLocale } = require('../../settings.json');
 
 module.exports = {
 	name: 'trackStart',
@@ -15,12 +14,6 @@ module.exports = {
 		}
 		const duration = msToTime(track.length);
 		const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
-		await queue.channel.send({
-			embeds: [
-				new MessageEmbed()
-					.setDescription(`${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_NOW_PLAYING', track.title, track.uri, durationString)}\n${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ADDED_BY', track.requester)}`)
-					.setColor(defaultColor),
-			],
-		});
+		await queue.player.musicHandler.send(`${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_NOW_PLAYING', track.title, track.uri, durationString)}\n${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ADDED_BY', track.requester)}`);
 	},
 };
