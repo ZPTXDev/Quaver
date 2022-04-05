@@ -76,7 +76,7 @@
   "CMD_MOVE_OPTION_OLDPOSITION": "Ang posisyon sa track nga ibalhin.",
   "CMD_MOVE_OPTION_NEWPOSITION": "Ang bag-ong posisyon sa pagbalhin og track.",
   "CMD_MOVE_INSUFFICIENT": "Walay igo nga mga track sa queue aron makahimo og usa ka pagbalhin.",
-  "CMD_MOVE_NOT_IN_RANGE": "Ang usa (o pareho) sa imong mga argumento wala sa range.",
+  "CMD_MOVE_NOT_IN_RANGE": "Ang usa (o pareho) sa imong mga argumento kay wala sa range.",
   "CMD_MOVE_EQUAL": "Ang imong mga argumento dili mahimong magkapareho.",
   "CMD_MOVE_SUCCESS": "Nabalhin ang **[%1](%2)** `%3 -> %4`",
   "CMD_NIGHTCORE_DESCRIPTION": "Ang nightcore mode kay magpapaspas sa imohang musika.",
