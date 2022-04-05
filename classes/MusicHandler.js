@@ -13,7 +13,7 @@ module.exports = class MusicHandler {
 		clearTimeout(this.player.timeout);
 		clearTimeout(this.player.pauseTimeout);
 		this.player.disconnect();
-		this.player.destroy();
+		bot.music.destroyPlayer(this.player.guildId);
 	}
 
 	sendDataConstructor(data, embedExtras, error) {

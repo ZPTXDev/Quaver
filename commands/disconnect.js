@@ -19,7 +19,6 @@ module.exports = {
 			return;
 		}
 		const player = interaction.client.music.players.get(interaction.guildId);
-		player.disconnecting = true;
 		player.musicHandler.disconnect();
 		await interaction.replyHandler.locale('CMD_DISCONNECT_SUCCESS');
 	},
