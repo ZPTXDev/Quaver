@@ -55,13 +55,17 @@ module.exports = {
 			}
 			const failedPermissions = { user: [], bot: [] };
 			for (const perm of command.permissions.user) {
-				if (!interaction.channel.permissionsFor(interaction.member).has(perm)) {
-					failedPermissions.user.push(perm);
+				if (interaction.guildId) {
+					if (!interaction.channel.permissionsFor(interaction.member).has(perm)) {
+						failedPermissions.user.push(perm);
+					}
 				}
 			}
 			for (const perm of ['VIEW_CHANNEL', 'SEND_MESSAGES', ...command.permissions.bot]) {
-				if (!interaction.channel.permissionsFor(interaction.client.user.id).has(perm)) {
-					failedPermissions.bot.push(perm);
+				if (interaction.guildId) {
+					if (!interaction.channel.permissionsFor(interaction.client.user.id).has(perm)) {
+						failedPermissions.bot.push(perm);
+					}
 				}
 			}
 			if (failedPermissions.user.length > 0) {
