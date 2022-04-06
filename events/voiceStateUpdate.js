@@ -63,6 +63,10 @@ module.exports = {
 						logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
 					}
 				}
+				return;
+			}
+			if (guildData.get(`${player.guildId}.always.enabled`)) {
+				guildData.set(`${player.guildId}.always.channel`, newState.channelId);
 			}
 			// the new vc has no humans
 			if (newState.channel.members.filter(m => !m.user.bot).size < 1 && !guildData.get(`${player.guildId}.always.enabled`)) {
