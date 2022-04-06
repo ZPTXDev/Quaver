@@ -30,7 +30,7 @@ module.exports = {
 			// channel is a voice channel
 			if (newState.channel.type === 'GUILD_VOICE') {
 				// check for connect, speak permission for voice channel
-				const permissions =	bot.guilds.cache.get(guild.id).channels.cache.get(newState.channelId).permissionsFor(bot.user.id);
+				const permissions = bot.guilds.cache.get(guild.id).channels.cache.get(newState.channelId).permissionsFor(bot.user.id);
 				if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
 					await player.musicHandler.locale('DISCORD_BOT_MISSING_PERMISSIONS_BASIC');
 					player.musicHandler.disconnect();
