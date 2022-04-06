@@ -10,8 +10,10 @@ module.exports = class MusicHandler {
 	}
 
 	disconnect() {
-		clearTimeout(this.player.timeout);
-		clearTimeout(this.player.pauseTimeout);
+		if (this.player.pauseTimeout) {
+			clearTimeout(this.player.timeout);
+			clearTimeout(this.player.pauseTimeout);
+		}
 		this.player.disconnect();
 		bot.music.destroyPlayer(this.player.guildId);
 	}
