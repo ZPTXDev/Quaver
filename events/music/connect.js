@@ -2,6 +2,7 @@ const { logger, guildData } = require('../../shared.js');
 const { getLocale } = require('../../functions.js');
 const { bot } = require('../../main.js');
 const { defaultLocale } = require('../../settings.json');
+const MusicHandler = require('../../classes/MusicHandler.js');
 
 module.exports = {
 	name: 'connect',
@@ -12,6 +13,7 @@ module.exports = {
 			if (guildData.get(`${guildId}.always.enabled`)) {
 				const guild = bot.guilds.cache.get(guildId);
 				const player = bot.music.createPlayer(guildId);
+				player.musicHandler = new MusicHandler(player);
 				player.queue.channel = guild.channels.cache.get(guildData.get(`${guildId}.always.text`));
 				const voice = guild.channels.cache.get(guildData.get(`${guildId}.always.channel`));
 				if (voice.type === 'GUILD_STAGE_VOICE' && !voice.stageInstance?.topic) {
