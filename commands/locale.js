@@ -16,7 +16,7 @@ module.exports = {
 				.setName('new_locale')
 				.setDescription(getLocale(defaultLocale, 'CMD_LOCALE_OPTION_LOCALE'))
 				.setRequired(true)
-				.addChoices(fs.readdirSync(path.resolve(__dirname, '../locales')).filter(file => file.endsWith('.json')).map(file => {return [file.slice(0, -5), file.slice(0, -5)];}))),
+				.addChoices(fs.readdirSync(path.resolve(__dirname, '../locales')).map(file => {return [file, file];}))),
 	checks: [checks.GUILD_ONLY],
 	permissions: {
 		// TODO: https://msciotti.notion.site/msciotti/Command-Permissions-V2-4d113cb49090409f998f3bd80a06c3bd (when it gets released)
