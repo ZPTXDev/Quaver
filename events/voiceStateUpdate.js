@@ -36,6 +36,9 @@ module.exports = {
 					player.musicHandler.disconnect();
 					return;
 				}
+				if (guildData.get(`${player.guildId}.always.enabled`) && guildData.get(`${player.guildId}.always.channel`) !== newState.channelId) {
+					guildData.set(`${player.guildId}.always.channel`, newState.channelId);
+				}
 			}
 			// channel is a stage channel, and bot is suppressed
 			// this also handles suppressing Quaver mid-track
@@ -64,10 +67,10 @@ module.exports = {
 						logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
 					}
 				}
+				if (guildData.get(`${player.guildId}.always.enabled`) && guildData.get(`${player.guildId}.always.channel`) !== newState.channelId) {
+					guildData.set(`${player.guildId}.always.channel`, newState.channelId);
+				}
 				return;
-			}
-			if (guildData.get(`${player.guildId}.always.enabled`)) {
-				guildData.set(`${player.guildId}.always.channel`, newState.channelId);
 			}
 			// the new vc has no humans
 			if (newState.channel.members.filter(m => !m.user.bot).size < 1 && !guildData.get(`${player.guildId}.always.enabled`)) {
