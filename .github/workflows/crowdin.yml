@@ -20,15 +20,14 @@ jobs:
     - name: crowdin action
       uses: crowdin/github-action@1.4.8
       with:
-        upload_translations: true
         download_translations: true
         skip_untranslated_strings: true
+        export_only_approved: true
         commit_message: 'chore(locales): new Crowdin translations'
         localization_branch_name: 'l10n_next'
         crowdin_branch_name: 'next'
         create_pull_request: true
         pull_request_title: 'chore(locales): new Crowdin translations'
-        pull_request_body: 'New Crowdin translations'
         pull_request_labels: 'affects:locale, priority:p2'
         pull_request_base_branch_name: next
         base_url: 'https://zapsquared.crowdin.com'
