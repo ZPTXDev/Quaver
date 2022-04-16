@@ -43,7 +43,6 @@
 	"PAUSE_PAUSED": "播放器已被暂停。",
 	"PAUSE_SUCCESS": "播放器被暂停了。",
 	"PING_DESCRIPTION": "查看 Quaver 的延迟以及运行时间。",
-	"PING_PONG": "Pong!%1",
 	"PING_UPTIME": "运行时间：",
 	"PLAY_DESCRIPTION": "播放一首歌曲。",
 	"PLAY_OPTION_QUERY": "可用使用的歌源。Spotify 以及 YouTube 的链接，默认搜索平台是 YouTube。",
