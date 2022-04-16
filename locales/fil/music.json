@@ -23,7 +23,5 @@
 	"RESTART_CRASH": "Nag-crash si Quaver at madidiskonekta.",
 	"RESTART_QUEUEDATA": "Ang data ng iyong queue ay naka-attach.",
 	"RESTART_SORRY": "Paumanhin para sa abalang naidulot.",
-	"FILTERS_NOTE": "Maaaring tumagal ito ng ilang segundo bago mag-apply",
-	"LIVE": "LIVE",
-	"STREAMING": "Streaming"
+	"FILTERS_NOTE": "Maaaring tumagal ito ng ilang segundo bago mag-apply"
 }
