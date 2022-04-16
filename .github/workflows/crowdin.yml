@@ -6,8 +6,6 @@ on:
   push:
     branches:
       - next
-    paths:
-      - 'locales/**'
 
 jobs:
   synchronize-with-crowdin:
