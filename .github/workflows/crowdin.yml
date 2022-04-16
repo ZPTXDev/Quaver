@@ -31,6 +31,7 @@ jobs:
         pull_request_body: 'New Crowdin translations'
         pull_request_labels: 'affects:locale, priority:p2'
         pull_request_base_branch_name: next
+        base_url: 'https://zapsquared.crowdin.com'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
