@@ -71,7 +71,7 @@ module.exports = {
 					.addComponents(
 						new MessageButton()
 							.setCustomId(`cancel_${interaction.user.id}`)
-							.setLabel(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CANCEL'))
+							.setLabel(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_CANCEL'))
 							.setStyle('DANGER'),
 					),
 			],

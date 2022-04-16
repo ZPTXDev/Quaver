@@ -8,7 +8,7 @@ const { guildData } = require('../shared.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('queue')
+		.setName('MISC_QUEUE')
 		.setDescription(getLocale(defaultLocale, 'CMD_QUEUE_DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
@@ -29,7 +29,7 @@ module.exports = {
 				return `\`${index + 1}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 			}).join('\n'),
 			{
-				footer: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'PAGE', '1', pages.length),
+				footer: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_PAGE', '1', pages.length),
 				components: [
 					new MessageActionRow()
 						.addComponents(
@@ -47,7 +47,7 @@ module.exports = {
 								.setCustomId('queue_1')
 								.setEmoji('🔁')
 								.setStyle('SECONDARY')
-								.setLabel(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'REFRESH')),
+								.setLabel(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_REFRESH')),
 						),
 				],
 			},

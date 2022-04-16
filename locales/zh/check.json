@@ -1,0 +1,8 @@
+{
+	"GUILD_ONLY": "这个指令之能在服务器里使用。",
+	"ACTIVE_SESSION": "这个服务器里没有听歌会。",
+	"IN_VOICE": "你需要在一个音频里。",
+	"IN_SESSION_VOICE": "你需要在我的音频里。",
+	"INVALID_INDEX": "请指定一个队伍位置。",
+	"NOT_REQUESTER": "你不是要求那首歌曲的用户。"
+}

@@ -7,7 +7,7 @@ The file structure is as follows:
   "token": "Paste token here",
   "applicationId": "Paste application ID here",
   "defaultColor": "#f39bff",
-  "defaultLocale": "en-US",
+  "defaultLocale": "en",
   "managers": [
     "Paste your user ID here"
   ],

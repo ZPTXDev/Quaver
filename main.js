@@ -103,11 +103,11 @@ async function shuttingDown(eventType, err) {
 			logger.info({ message: `[G ${player.guildId}] Disconnecting (restarting)`, label: 'Quaver' });
 			const fileBuffer = [];
 			if (player.queue.current && (player.playing || player.paused)) {
-				fileBuffer.push(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'CURRENT')}:`);
+				fileBuffer.push(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MISC_CURRENT')}:`);
 				fileBuffer.push(player.queue.current.uri);
 			}
 			if (player.queue.tracks.length > 0) {
-				fileBuffer.push(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'QUEUE')}:`);
+				fileBuffer.push(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MISC_QUEUE')}:`);
 				fileBuffer.push(player.queue.tracks.map(track => track.uri).join('\n'));
 			}
 			player.musicHandler.disconnect();

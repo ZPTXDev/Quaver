@@ -1,0 +1,9 @@
+{
+	"USER_MISSING_PERMISSIONS": "You are missing permissions: %1",
+	"BOT_MISSING_PERMISSIONS": "I am missing permissions: %1",
+	"BOT_MISSING_PERMISSIONS_BASIC": "I need to be able to connect and speak in the voice channel.",
+	"BOT_MISSING_PERMISSIONS_STAGE": "I need to be a stage moderator in the stage channel.",
+	"CMD_ERROR": "There was an error while handling the command.",
+	"INTERACTION_WRONG_USER": "That is not your interaction.",
+	"INTERACTION_CANCELED": "This interaction was canceled by <@%1>."
+}

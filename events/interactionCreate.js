@@ -87,7 +87,7 @@ module.exports = {
 		else if (interaction.isButton()) {
 			const type = interaction.customId.split('_')[0];
 			switch (type) {
-				case 'queue': {
+				case 'MISC_QUEUE': {
 					const player = interaction.client.music.players.get(interaction.guildId);
 					let pages, page;
 					if (player) {
@@ -112,7 +112,7 @@ module.exports = {
 							const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
 							return `\`${(firstIndex + index).toString().padStart(largestIndexSize, ' ')}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 						}).join('\n'))
-						.setFooter({ text: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'PAGE', page, pages.length) });
+						.setFooter({ text: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_PAGE', page, pages.length) });
 					original.components[0].components = [];
 					original.components[0].components[0] = new MessageButton()
 						.setCustomId(`queue_${page - 1}`)
@@ -128,14 +128,14 @@ module.exports = {
 						.setCustomId(`queue_${page}`)
 						.setEmoji('🔁')
 						.setStyle('SECONDARY')
-						.setLabel(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'REFRESH')),
+						.setLabel(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_REFRESH')),
 					interaction.update({
 						embeds: original.embeds,
 						components: original.components,
 					});
 					break;
 				}
-				case 'cancel':
+				case 'MISC_CANCEL':
 					if (interaction.customId.split('_')[1] !== interaction.user.id) {
 						await interaction.reply({
 							embeds: [
@@ -274,7 +274,7 @@ module.exports = {
 							new MessageEmbed()
 								.setDescription(msg)
 								.setColor(defaultColor)
-								.setFooter({ text: started ? `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '' }),
+								.setFooter({ text: started ? `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '' }),
 						],
 						components: [],
 					});

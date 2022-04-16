@@ -1,3 +1,4 @@
+const fs = require('fs');
 const { defaultLocale } = require('./settings.json');
 
 /**
@@ -40,7 +41,7 @@ function msToTime(milliseconds, format) {
 function msToTimeString(msObject, simple) {
 	if (simple) {
 		if (msObject['d'] > 0) {
-			return getLocale(defaultLocale, 'MORETHANADAY');
+			return getLocale(defaultLocale, 'MISC_MORETHANADAY');
 		}
 		return `${msObject['h'] > 0 ? `${msObject['h']}:` : ''}${msObject['h'] > 0 ? msObject['m'].toString().padStart(2, '0') : msObject['m']}:${msObject['s'].toString().padStart(2, '0')}`;
 	}
@@ -130,14 +131,16 @@ function paginate(arr, size) {
  * @returns {string} - The localized string.
  */
 function getLocale(language, string, ...vars) {
-	let strings = require(`./locales/${language}.json`);
-	if (!strings) return 'LOCALE_MISSING';
-	let locale = strings[string];
+	if (!fs.existsSync(`./locales/${language}`)) return 'LOCALE_MISSING';
+	const category = string.split('_')[0].toLowerCase();
+	const key = string.substring(category.length + 1);
+	let strings = require(`./locales/${language}/${category}.json`);
+	let locale = strings[key];
 	if (!locale) {
-		// this uses en-US by default on purpose.
-		// en-US is the only locale I can confirm is 100% complete.
-		strings = require('./locales/en-US.json');
-		locale = strings[string];
+		// this uses en by default on purpose.
+		// en is the only locale I can confirm is 100% complete.
+		strings = require(`./locales/en/${category}.json`);
+		locale = strings[key];
 	}
 	vars.forEach((v, i) => {
 		locale = locale.replace(`%${i + 1}`, v);
@@ -151,13 +154,23 @@ function getLocale(language, string, ...vars) {
  * @returns {Object} - Completion percentage and missing strings.
  */
 function checkLocaleCompletion(language) {
-	const foreignStrings = require(`./locales/${language}.json`);
-	const strings = require('./locales/en-US.json');
-	const foreignStringsKeys = Object.keys(foreignStrings);
-	const stringsKeys = Object.keys(strings);
+	let foreignStringCount = 0;
+	let stringCount = 0;
+	const stringFiles = fs.readdirSync('./locales/en.json').filter(file => file.endsWith('.json'));
+	let missingStrings = [];
+	for (const file of stringFiles) {
+		const category = file.split('.')[0];
+		const strings = require(`./locales/en/${category}.json`);
+		const foreignStrings = require(`./locales/${language}/${category}.json`);
+		const stringsKeys = Object.keys(strings);
+		const foreignStringsKeys = Object.keys(foreignStrings);
+		stringCount += stringsKeys.length;
+		foreignStringCount += foreignStringsKeys.length;
+		missingStrings = [...missingStrings, ...stringsKeys.filter(key => !foreignStringsKeys.includes(key)).map(key => `${category}_${key}`)];
+	}
 	// missing strings
-	if (stringsKeys.length > foreignStringsKeys.length) {
-		return { completion: foreignStringsKeys.length / stringsKeys.length * 100, missing: stringsKeys.filter(x => !foreignStringsKeys.includes(x)) };
+	if (stringCount > foreignStringCount) {
+		return { completion: foreignStringCount / stringCount * 100, missing: missingStrings };
 	}
 	return { completion: 100, missing: [] };
 }
