@@ -9,7 +9,7 @@ module.exports = {
 		.setDescription(getLocale(defaultLocale, 'CMD_REMOVE_DESCRIPTION'))
 		.addIntegerOption(option =>
 			option
-				.setName('MISC_POSITION')
+				.setName('position')
 				.setDescription(getLocale(defaultLocale, 'CMD_REMOVE_OPTION_POSITION'))
 				.setMinValue(1)
 				.setRequired(true)),
@@ -20,7 +20,7 @@ module.exports = {
 	},
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
-		const position = interaction.options.getInteger('MISC_POSITION');
+		const position = interaction.options.getInteger('position');
 		if (player.queue.tracks.length === 0) {
 			await interaction.replyHandler.localeError('CMD_REMOVE_EMPTY');
 			return;
