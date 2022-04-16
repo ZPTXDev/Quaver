@@ -93,7 +93,7 @@ module.exports = {
 		else if (interaction.isButton()) {
 			const type = interaction.customId.split('_')[0];
 			switch (type) {
-				case 'MISC_QUEUE': {
+				case 'queue': {
 					const player = interaction.client.music.players.get(interaction.guildId);
 					let pages, page;
 					if (player) {
@@ -141,7 +141,7 @@ module.exports = {
 					});
 					break;
 				}
-				case 'MISC_CANCEL':
+				case 'cancel':
 					if (interaction.customId.split('_')[1] !== interaction.user.id) {
 						await interaction.reply({
 							embeds: [

@@ -16,7 +16,7 @@ module.exports = {
 				.setRequired(true)
 				.addChoice(getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_DISABLED'), 'disabled')
 				.addChoice(getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_TRACK'), 'track')
-				.addChoice(getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_QUEUE'), 'MISC_QUEUE')),
+				.addChoice(getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_QUEUE'), 'queue')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -35,7 +35,7 @@ module.exports = {
 				loop = LoopType.Song;
 				typeLocale = getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_LOOP_OPTION_TYPE_TRACK');
 				break;
-			case 'MISC_QUEUE':
+			case 'queue':
 				loop = LoopType.Queue;
 				typeLocale = getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_LOOP_OPTION_TYPE_QUEUE');
 				break;
