@@ -20,7 +20,7 @@
 	"ADDED_BY": "Idinagdag ni <@%1>",
 	"STAGE_TOPIC": "Musika ni Quaver",
 	"RESTART": "Nagre-restart si Quaver at madidiskonekta.",
-	"RESTART_CRASH": "Nag-crash si Quaver at madidiskonekta.",
+	"RESTART_CRASH": "Si Quaver ay nagcrash at madidiskonekta.",
 	"RESTART_QUEUEDATA": "Ang data ng iyong queue ay naka-attach.",
 	"RESTART_SORRY": "Paumanhin para sa abalang naidulot.",
 	"FILTERS_NOTE": "Maaaring tumagal ito ng ilang segundo bago mag-apply",

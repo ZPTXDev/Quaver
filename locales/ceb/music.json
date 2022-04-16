@@ -9,7 +9,7 @@
 	"ALONE_RESUMED": "Nagpadayon sa imong session.",
 	"FORCED": "Nahuman ang session kay gidiskonek ko.",
 	"FORCED_STAGE": "Nahuman ang session kay gibalhin ko sa stage channel nga dili ko stage moderator.",
-	"QUEUE_NOT_PLAYING": "Walay music nga nagpatugtug karon.",
+	"QUEUE_NOT_PLAYING": "Wala nay nagpatugtug karon.",
 	"QUEUE_EMPTY": "Wala nay nahibilin sa queue.",
 	"QUEUE_ADDED": "Gidugang ang [**%1**](%2) sa queue",
 	"QUEUE_ADDED_INSERT": "Gidugang ang [**%1**](%2) sa unahan sa queue",

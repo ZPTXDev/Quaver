@@ -1,9 +1,1 @@
-{
-	"USER_MISSING_PERMISSIONS": "你没有 %1 权力",
-	"BOT_MISSING_PERMISSIONS": "我没有 %1 权力",
-	"BOT_MISSING_PERMISSIONS_BASIC": "我需要能连接上这个音频和在里面讲话的权力。",
-	"BOT_MISSING_PERMISSIONS_STAGE": "我需要是这个讲堂音频的管理员。",
-	"CMD_ERROR": "执行这个指令是出了问题。",
-	"INTERACTION_WRONG_USER": "这不是你的指令。",
-	"INTERACTION_CANCELED": "这个指令被 <@%1> 取消了。"
-}
+{}
