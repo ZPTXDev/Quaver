@@ -54,15 +54,21 @@ module.exports = {
 				return;
 			}
 			const failedPermissions = { user: [], bot: [] };
-			for (const perm of command.permissions.user) {
-				if (!interaction.channel.permissionsFor(interaction.member).has(perm)) {
-					failedPermissions.user.push(perm);
+			if (interaction.guildId) {
+				for (const perm of command.permissions.user) {
+					if (!interaction.channel.permissionsFor(interaction.member).has(perm)) {
+						failedPermissions.user.push(perm);
+					}
+				}
+				for (const perm of ['VIEW_CHANNEL', 'SEND_MESSAGES', ...command.permissions.bot]) {
+					if (!interaction.channel.permissionsFor(interaction.client.user.id).has(perm)) {
+						failedPermissions.bot.push(perm);
+					}
 				}
 			}
-			for (const perm of ['VIEW_CHANNEL', 'SEND_MESSAGES', ...command.permissions.bot]) {
-				if (!interaction.channel.permissionsFor(interaction.client.user.id).has(perm)) {
-					failedPermissions.bot.push(perm);
-				}
+			else {
+				failedPermissions.user = command.permissions.user;
+				failedPermissions.bot = command.permissions.bot;
 			}
 			if (failedPermissions.user.length > 0) {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedPermissions.user.length} user permission check(s)`, label: 'Quaver' });

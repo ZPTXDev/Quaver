@@ -53,6 +53,7 @@ module.exports = {
 					}
 					await player.musicHandler.locale('MUSIC_FORCED_STAGE');
 					player.musicHandler.disconnect();
+					return;
 				}
 				await newState.setSuppressed(false);
 				if (!newState.channel.stageInstance?.topic) {
