@@ -1,8 +1,13 @@
 name: Crowdin Action
 
 on:
+  schedule:
+    - cron: '0 * * * *'
   push:
-    branches: [ next ]
+    branches:
+      - next
+    paths:
+      - 'locales/**'
 
 jobs:
   synchronize-with-crowdin:
