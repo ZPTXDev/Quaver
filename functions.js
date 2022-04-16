@@ -156,7 +156,7 @@ function getLocale(language, string, ...vars) {
 function checkLocaleCompletion(language) {
 	let foreignStringCount = 0;
 	let stringCount = 0;
-	const stringFiles = fs.readdirSync('./locales/en.json').filter(file => file.endsWith('.json'));
+	const stringFiles = fs.readdirSync('./locales/en').filter(file => file.endsWith('.json'));
 	let missingStrings = [];
 	for (const file of stringFiles) {
 		const category = file.split('.')[0];
