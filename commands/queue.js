@@ -8,7 +8,7 @@ const { guildData } = require('../shared.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('MISC_QUEUE')
+		.setName('queue')
 		.setDescription(getLocale(defaultLocale, 'CMD_QUEUE_DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
