@@ -8,12 +8,35 @@ module.exports = class MusicHandler {
 		this.player = player;
 	}
 
-	disconnect() {
+	async disconnect() {
 		const { bot } = require('../main.js');
+		const voiceChannel = bot.guilds.cache.get(this.player.guildId).channels.cache.get(this.player.channelId);
+		const { oldVoiceChannel } = require('../events/voiceStateUpdate.js');
 		clearTimeout(this.player.timeout);
 		clearTimeout(this.player.pauseTimeout);
 		this.player.disconnect();
 		bot.music.destroyPlayer(this.player.guildId);
+		if (voiceChannel?.type === 'GUILD_STAGE_VOICE') {
+			if (voiceChannel.stageInstance?.topic) {
+				try {
+					await voiceChannel.stageInstance.delete();
+				}
+				catch (err) {
+					logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+				}
+			}
+			return;
+		}
+		if (oldVoiceChannel.type === 'GUILD_STAGE_VOICE') {
+			if (oldVoiceChannel.stageInstance?.topic) {
+				try {
+					await oldVoiceChannel.stageInstance.delete();
+				}
+				catch (err) {
+					logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+				}
+			}
+		}
 	}
 
 	sendDataConstructor(data, embedExtras, error) {
