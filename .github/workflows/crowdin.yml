@@ -1,8 +1,6 @@
 name: Crowdin Action
 
 on:
-  schedule:
-    - cron: '0 * * * *'
   push:
     branches:
       - next
@@ -16,8 +14,6 @@ jobs:
 
     - name: Checkout
       uses: actions/checkout@v2
-      with:
-        ref: next
 
     - name: crowdin action
       uses: crowdin/github-action@1.4.8
