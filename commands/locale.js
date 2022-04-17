@@ -25,8 +25,12 @@ module.exports = {
 	},
 	async execute(interaction) {
 		const locale = interaction.options.getString('new_locale');
-		guildData.set(`${interaction.guildId}.locale`, locale);
 		const localeCompletion = checkLocaleCompletion(locale);
+		if (localeCompletion === 'LOCALE_MISSING') {
+			await interaction.replyHandler.error('That locale does not exist.');
+			return;
+		}
+		guildData.set(`${interaction.guildId}.locale`, locale);
 		const additionalEmbed = localeCompletion.completion !== 100 ? [
 			new MessageEmbed()
 				.setDescription(`This locale is incomplete. Completion: \`${roundTo(localeCompletion.completion, 2)}%\`\nMissing strings:\n\`\`\`\n${localeCompletion.missing.join('\n')}\`\`\``)

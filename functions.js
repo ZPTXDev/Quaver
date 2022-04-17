@@ -151,9 +151,10 @@ function getLocale(language, string, ...vars) {
 /**
  * Returns locale completion for a given locale.
  * @param {string} language - The locale code to check.
- * @returns {Object} - Completion percentage and missing strings.
+ * @returns {Object|string} - Completion percentage and missing strings, or 'LOCALE_MISSING' if the locale is missing.
  */
 function checkLocaleCompletion(language) {
+	if (!fs.existsSync(`./locales/${language}`)) return 'LOCALE_MISSING';
 	let foreignStringCount = 0;
 	let stringCount = 0;
 	const stringFiles = fs.readdirSync('./locales/en').filter(file => file.endsWith('.json'));
