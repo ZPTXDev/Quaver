@@ -26,7 +26,7 @@ module.exports = class MusicHandler {
 				await this.player.musicHandler.locale('DISCORD_BOT_MISSING_PERMISSIONS_STAGE');
 				return;
 			}
-			if (voiceChannel.stageInstance?.topic) {
+			if (voiceChannel.stageInstance?.topic?.includes(getLocale(guildData.get(`${this.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'))) {
 				try {
 					await voiceChannel.stageInstance.delete();
 				}
@@ -46,7 +46,7 @@ module.exports = class MusicHandler {
 				await this.player.musicHandler.locale('DISCORD_BOT_MISSING_PERMISSIONS_STAGE');
 				return;
 			}
-			if (oldVoiceChannel.stageInstance?.topic) {
+			if (oldVoiceChannel.stageInstance?.topic?.includes(getLocale(guildData.get(`${this.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'))) {
 				try {
 					await oldVoiceChannel.stageInstance.delete();
 				}
