@@ -40,7 +40,7 @@ module.exports = class ReplyHandler {
 	async reply(data, embedExtras) {
 		const replyData = this.replyDataConstructor(data, embedExtras);
 		if (!this.interaction.replied && !this.interaction.deferred) {
-			if (!this.interaction.channel.permissionsFor(this.interaction.client.user.id).has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) {
+			if (this.interaction.channel && !this.interaction.channel.permissionsFor(this.interaction.client.user.id).has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) {
 				replyData.ephemeral = true;
 			}
 			try {
