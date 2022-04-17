@@ -19,11 +19,9 @@ module.exports = class MusicHandler {
 		if (voiceChannel?.type === 'GUILD_STAGE_VOICE') {
 			const voicePerms = bot.guilds.cache.get(this.player.guildId).channels.cache.get(this.player.channelId).permissionsFor(bot.user.id);
 			if (!voicePerms.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
-				await this.player.musicHandler.locale('DISCORD_BOT_MISSING_PERMISSIONS_BASIC');
 				return;
 			}
 			if (!voicePerms.has(Permissions.STAGE_MODERATOR)) {
-				await this.player.musicHandler.locale('DISCORD_BOT_MISSING_PERMISSIONS_STAGE');
 				return;
 			}
 			if (voiceChannel.stageInstance?.topic === getLocale(guildData.get(`${this.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC')) {
