@@ -1,7 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const { guildData, logger } = require('../shared.js');
 const { getLocale } = require('../functions.js');
-const { bot } = require('../main.js');
 const { defaultLocale, defaultColor } = require('../settings.json');
 
 module.exports = class MusicHandler {
@@ -10,6 +9,7 @@ module.exports = class MusicHandler {
 	}
 
 	disconnect() {
+		const { bot } = require('../main.js');
 		clearTimeout(this.player.timeout);
 		clearTimeout(this.player.pauseTimeout);
 		this.player.disconnect();
@@ -33,6 +33,7 @@ module.exports = class MusicHandler {
 	}
 
 	async send(data, embedExtras, error) {
+		const { bot } = require('../main.js');
 		const sendData = this.sendDataConstructor(data, embedExtras, error);
 		const channel = this.player.queue.channel;
 		if (!channel.permissionsFor(bot.user.id).has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) {
