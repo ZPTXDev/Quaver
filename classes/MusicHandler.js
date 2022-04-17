@@ -36,7 +36,7 @@ module.exports = class MusicHandler {
 			}
 			return;
 		}
-		if (oldVoiceChannel.type === 'GUILD_STAGE_VOICE') {
+		if (oldVoiceChannel?.type === 'GUILD_STAGE_VOICE') {
 			const oldVoicePerms = bot.guilds.cache.get(this.player.guildId).channels.cache.get(oldVoiceChannel.id).permissionsFor(bot.user.id);
 			if (!oldVoicePerms.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
 				await this.player.musicHandler.locale('DISCORD_BOT_MISSING_PERMISSIONS_BASIC');
