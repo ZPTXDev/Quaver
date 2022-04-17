@@ -166,7 +166,7 @@ function checkLocaleCompletion(language) {
 		const foreignStringsKeys = Object.keys(foreignStrings);
 		stringCount += stringsKeys.length;
 		foreignStringCount += foreignStringsKeys.length;
-		missingStrings = [...missingStrings, ...stringsKeys.filter(key => !foreignStringsKeys.includes(key)).map(key => `${category}_${key}`)];
+		missingStrings = [...missingStrings, ...stringsKeys.filter(key => !foreignStringsKeys.includes(key)).map(key => `${category.toUpperCase()}_${key}`)];
 	}
 	// missing strings
 	if (stringCount > foreignStringCount) {
