@@ -1,5 +1,5 @@
 # Quaver
-Quaver is a simple-to-use music bot with features such as bass boost,  nightcore, seek, search, and more.
+Quaver is a simple-to-use music bot with features such as bass boost, nightcore, seek, search, and more.
 
 # Using Quaver
 Quaver utilizes slash commands, buttons, and menus. After deploying the commands, type `/` into your chat to list Quaver's commands.
