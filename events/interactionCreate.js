@@ -236,7 +236,7 @@ module.exports = {
 						await player.connect(interaction.member.voice.channelId, { deafened: true });
 						// that kid left while we were busy bruh
 						if (!interaction.member.voice.channelId) {
-							player.musicHandler.disconnect();
+							await player.musicHandler.disconnect();
 							await interaction.editReply({
 								embeds: [
 									new MessageEmbed()

@@ -13,7 +13,7 @@ module.exports = {
 		if (bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).members?.filter(m => !m.user.bot).size < 1 && !guildData.get(`${queue.player.guildId}.always.enabled`)) {
 			logger.info({ message: `[G ${queue.player.guildId}] Disconnecting (alone)`, label: 'Quaver' });
 			queue.player.musicHandler.locale('MUSIC_ALONE');
-			queue.player.musicHandler.disconnect();
+			await queue.player.musicHandler.disconnect();
 			return;
 		}
 	},
