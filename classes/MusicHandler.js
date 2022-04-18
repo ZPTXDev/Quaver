@@ -68,6 +68,7 @@ module.exports = class MusicHandler {
 		const sendData = this.sendDataConstructor(data, embedExtras, error);
 		const channel = this.player.queue.channel;
 		if (!channel.permissionsFor(bot.user.id).has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) return false;
+		if (bot.guilds.cache.get(this.player.guildId).members.cache.get(bot.user.id).isCommunicationDisabled()) return false;
 		try {
 			return await channel.send(sendData);
 		}

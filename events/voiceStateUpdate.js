@@ -21,7 +21,7 @@ module.exports = {
 				if (guildData.get(`${player.guildId}.always.enabled`)) {
 					guildData.set(`${player.guildId}.always.enabled`, false);
 				}
-				await player.musicHandler.locale('MUSIC_FORCED');
+				const success = await player.musicHandler.locale('MUSIC_FORCED');
 				await player.musicHandler.disconnect();
 				// channel was a stage channel, and bot was unsuppressed
 				if (oldState.channel.type === 'GUILD_STAGE_VOICE' && !oldState.suppress) {
@@ -35,6 +35,8 @@ module.exports = {
 						await player.musicHandler.locale('DISCORD_BOT_MISSING_PERMISSIONS_STAGE');
 						return;
 					}
+					// probably don't have perms anyway, let's not bother ending the stage
+					if (!success) return;
 					if (oldState.channel.stageInstance?.topic === getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC')) {
 						try {
 							await oldState.channel.stageInstance.delete();
