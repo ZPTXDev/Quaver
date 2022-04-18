@@ -3,6 +3,7 @@
 	"BOT_MISSING_PERMISSIONS": "Nakulangan ko og mga permission: %1",
 	"BOT_MISSING_PERMISSIONS_BASIC": "Kailangan ko maka konek og maka tabi sa voice channel.",
 	"BOT_MISSING_PERMISSIONS_STAGE": "Kailangan stage moderator ko sa stage channel.",
+	"BOT_TIMED_OUT": "Na-time out pa ko karon.",
 	"CMD_ERROR": "Adunay usa ka error samtang gidala ang command.",
 	"INTERACTION_WRONG_USER": "Dili na interaksiyon nimo.",
 	"INTERACTION_CANCELED": "Kaning interaksiyon kay gikansel ni <@%1>."

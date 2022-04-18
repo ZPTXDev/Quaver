@@ -1,1 +1,9 @@
-{}
+{
+	"PAGE": "第 %1 页，共 %2 页",
+	"POSITION": "位置",
+	"REFRESH": "刷新",
+	"CURRENT": "当前",
+	"QUEUE": "队列",
+	"CANCEL": "取消",
+	"MORETHANADAY": "超过一天"
+}
