@@ -23,6 +23,6 @@ module.exports = {
 				await player.resume();
 			}
 		}
-		client.user.setActivity(version);
+		client.user.setActivity(`music | ${version}`, { type: 'LISTENING' });
 	},
 };
