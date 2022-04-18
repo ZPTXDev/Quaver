@@ -195,6 +195,10 @@ module.exports = {
 						await interaction.replyHandler.localeError('DISCORD_BOT_MISSING_PERMISSIONS_STAGE');
 						return;
 					}
+					if (interaction.guild.members.cache.get(interaction.client.user.id).isCommunicationDisabled()) {
+						await interaction.replyHandler.localeError('DISCORD_BOT_TIMED_OUT');
+						return;
+					}
 
 					await interaction.deferUpdate();
 					if (!player?.connected) {
