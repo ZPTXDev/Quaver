@@ -22,11 +22,9 @@ module.exports = {
 			await interaction.replyHandler.localeError('FUNCTION_DISABLED');
 			return;
 		}
-		if (functions['247'].whitelist) {
-			if (!guildData.get(`${interaction.guildId}.247.whitelisted`)) {
-				await interaction.replyHandler.localeError('CMD_247_NOT_WHITELISTED');
-				return;
-			}
+		if (functions['247'].whitelist && !guildData.get(`${interaction.guildId}.247.whitelisted`)) {
+			await interaction.replyHandler.localeError('CMD_247_NOT_WHITELISTED');
+			return;
 		}
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const enabled = interaction.options.getBoolean('enabled');

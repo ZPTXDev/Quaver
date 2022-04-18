@@ -14,9 +14,7 @@ module.exports = {
 		// Quaver voiceStateUpdate
 		if (oldState.member.user.id === bot.user.id) {
 			// just the suppress state changed
-			if ((oldState.suppress !== newState.suppress || oldState.serverMute !== newState.serverMute || oldState.serverDeaf !== newState.serverDeaf) && oldState.channelId === newState.channelId) {
-				return;
-			}
+			if ((oldState.suppress !== newState.suppress || oldState.serverMute !== newState.serverMute || oldState.serverDeaf !== newState.serverDeaf) && oldState.channelId === newState.channelId) return;
 			// disconnected
 			if (!newState.channelId || !newState.channel?.members.find(m => m.user.id === bot.user.id)) {
 				logger.info({ message: `[G ${player.guildId}] Cleaning up`, label: 'Quaver' });

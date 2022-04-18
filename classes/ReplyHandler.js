@@ -51,14 +51,12 @@ module.exports = class ReplyHandler {
 				return false;
 			}
 		}
-		else {
-			try {
-				return await this.interaction.editReply(replyData);
-			}
-			catch (err) {
-				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				return false;
-			}
+		try {
+			return await this.interaction.editReply(replyData);
+		}
+		catch (err) {
+			logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+			return false;
 		}
 	}
 
@@ -80,14 +78,12 @@ module.exports = class ReplyHandler {
 				return false;
 			}
 		}
-		else {
-			try {
-				return await this.interaction.editReply(replyData);
-			}
-			catch (err) {
-				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				return false;
-			}
+		try {
+			return await this.interaction.editReply(replyData);
+		}
+		catch (err) {
+			logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+			return false;
 		}
 	}
 

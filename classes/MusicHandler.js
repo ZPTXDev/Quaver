@@ -36,9 +36,7 @@ module.exports = class MusicHandler {
 		const { bot } = require('../main.js');
 		const sendData = this.sendDataConstructor(data, embedExtras, error);
 		const channel = this.player.queue.channel;
-		if (!channel.permissionsFor(bot.user.id).has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) {
-			return false;
-		}
+		if (!channel.permissionsFor(bot.user.id).has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) return false;
 		try {
 			return await channel.send(sendData);
 		}
