@@ -16,11 +16,11 @@ module.exports = class MusicHandler {
 		this.player.disconnect();
 		bot.music.destroyPlayer(this.player.guildId);
 		if (voiceChannel?.type === 'GUILD_STAGE_VOICE') {
-			const voicePerms = bot.guilds.cache.get(this.player.guildId).channels.cache.get(this.player.channelId).permissionsFor(bot.user.id);
-			if (!voicePerms.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
+			const permissions = bot.guilds.cache.get(this.player.guildId).channels.cache.get(this.player.channelId).permissionsFor(bot.user.id);
+			if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
 				return;
 			}
-			if (!voicePerms.has(Permissions.STAGE_MODERATOR)) {
+			if (!permissions.has(Permissions.STAGE_MODERATOR)) {
 				return;
 			}
 			if (voiceChannel.stageInstance?.topic === getLocale(guildData.get(`${this.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC')) {
