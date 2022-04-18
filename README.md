@@ -2,7 +2,7 @@
 Quaver is a simple-to-use music bot with features such as bass boost,  nightcore, seek, search, and more.
 
 # Using Quaver
-Quaver utilizes slash commands, buttons, and menus. After running deploying the commands, type `/` into your chat to list Quaver's commands.
+Quaver utilizes slash commands, buttons, and menus. After deploying the commands, type `/` into your chat to list Quaver's commands.
 
 # Hosting Quaver
 Hosting Quaver is fairly simple. Make a copy of `settings.example.json`, edit the fields as necessary and rename it to `settings.json`.
