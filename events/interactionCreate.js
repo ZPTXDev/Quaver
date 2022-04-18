@@ -10,10 +10,10 @@ module.exports = {
 	name: 'interactionCreate',
 	once: false,
 	async execute(interaction) {
+		interaction.replyHandler = new ReplyHandler(interaction);
 		if (interaction.isCommand()) {
 			const command = interaction.client.commands.get(interaction.commandName);
 			if (!command) return;
-			interaction.replyHandler = new ReplyHandler(interaction);
 			logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing command ${interaction.commandName}`, label: 'Quaver' });
 			const failedChecks = [];
 			for (const check of command.checks) {
@@ -134,33 +134,36 @@ module.exports = {
 						.setCustomId(`queue_${page}`)
 						.setEmoji('🔁')
 						.setStyle('SECONDARY')
-						.setLabel(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_REFRESH')),
-					interaction.update({
-						embeds: original.embeds,
-						components: original.components,
-					});
+						.setLabel(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_REFRESH'));
+					try {
+						interaction.update({
+							embeds: original.embeds,
+							components: original.components,
+						});
+					}
+					catch (err) {
+						logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+					}
 					break;
 				}
 				case 'cancel':
 					if (interaction.customId.split('_')[1] !== interaction.user.id) {
-						await interaction.reply({
-							embeds: [
-								new MessageEmbed()
-									.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_INTERACTION_WRONG_USER'))
-									.setColor('DARK_RED'),
-							],
-							ephemeral: true,
-						});
+						await interaction.replyHandler.localeError('DISCORD_INTERACTION_WRONG_USER');
 						return;
 					}
-					await interaction.update({
-						embeds: [
-							new MessageEmbed()
-								.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_INTERACTION_CANCELED', interaction.user.id))
-								.setColor(defaultColor),
-						],
-						components: [],
-					});
+					try {
+						await interaction.update({
+							embeds: [
+								new MessageEmbed()
+									.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_INTERACTION_CANCELED', interaction.user.id))
+									.setColor(defaultColor),
+							],
+							components: [],
+						});
+					}
+					catch (err) {
+						logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+					}
 					break;
 			}
 		}
@@ -169,62 +172,27 @@ module.exports = {
 			switch (type) {
 				case 'play': {
 					if (interaction.customId.split('_')[1] !== interaction.user.id) {
-						await interaction.reply({
-							embeds: [
-								new MessageEmbed()
-									.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_INTERACTION_WRONG_USER'))
-									.setColor('DARK_RED'),
-							],
-							ephemeral: true,
-						});
+						await interaction.replyHandler.localeError('DISCORD_INTERACTION_WRONG_USER');
 						return;
 					}
 					const tracks = interaction.values;
 					let player = interaction.client.music.players.get(interaction.guildId);
 					if (!interaction.member?.voice.channelId) {
-						await interaction.reply({
-							embeds: [
-								new MessageEmbed()
-									.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, checks.IN_VOICE))
-									.setColor('DARK_RED'),
-							],
-							ephemeral: true,
-						});
+						await interaction.replyHandler.localeError(checks.IN_VOICE);
 						return;
 					}
 					if (player && interaction.member?.voice.channelId !== player.channelId) {
-						await interaction.reply({
-							embeds: [
-								new MessageEmbed()
-									.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, checks.IN_SESSION_VOICE))
-									.setColor('DARK_RED'),
-							],
-							ephemeral: true,
-						});
+						await interaction.replyHandler.localeError(checks.IN_SESSION_VOICE);
 						return;
 					}
 					// check for connect, speak permission for channel
 					const permissions = interaction.member?.voice.channel.permissionsFor(interaction.client.user.id);
 					if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
-						await interaction.reply({
-							embeds: [
-								new MessageEmbed()
-									.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_BASIC'))
-									.setColor('DARK_RED'),
-							],
-							ephemeral: true,
-						});
+						await interaction.replyHandler.localeError('DISCORD_BOT_MISSING_PERMISSIONS_BASIC');
 						return;
 					}
 					if (interaction.member?.voice.channel.type === 'GUILD_STAGE_VOICE' && !permissions.has(Permissions.STAGE_MODERATOR)) {
-						await interaction.reply({
-							embeds: [
-								new MessageEmbed()
-									.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_BOT_MISSING_PERMISSIONS_STAGE'))
-									.setColor('DARK_RED'),
-							],
-							ephemeral: true,
-						});
+						await interaction.replyHandler.localeError('DISCORD_BOT_MISSING_PERMISSIONS_STAGE');
 						return;
 					}
 
@@ -237,14 +205,7 @@ module.exports = {
 						// that kid left while we were busy bruh
 						if (!interaction.member.voice.channelId) {
 							await player.musicHandler.disconnect();
-							await interaction.editReply({
-								embeds: [
-									new MessageEmbed()
-										.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_INTERACTION_CANCELED', interaction.user.id))
-										.setColor(defaultColor),
-								],
-								components: [],
-							});
+							await interaction.replyHandler.locale('DISCORD_INTERACTION_CANCELED', { components: [] }, interaction.user.id);
 							return;
 						}
 						if (interaction.member?.voice.channel.type === 'GUILD_STAGE_VOICE' && !interaction.member?.voice.channel.stageInstance?.topic) {
@@ -275,15 +236,7 @@ module.exports = {
 					}
 					player.queue.add(resolvedTracks, { requester: interaction.user.id });
 					const started = player.playing || player.paused;
-					await interaction.editReply({
-						embeds: [
-							new MessageEmbed()
-								.setDescription(msg)
-								.setColor(defaultColor)
-								.setFooter({ text: started ? `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '' }),
-						],
-						components: [],
-					});
+					await interaction.replyHandler.reply(msg, { footer: started ? `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '', components: [] });
 					if (!started) { await player.queue.start(); }
 					const state = interaction.guild.members.cache.get(interaction.client.user.id).voice;
 					if (state.channel.type === 'GUILD_STAGE_VOICE' && state.suppress) {
