@@ -25,6 +25,25 @@ module.exports = {
 				}
 				await player.musicHandler.locale('MUSIC_FORCED');
 				await player.musicHandler.disconnect();
+				if (oldState.channel.type === 'GUILD_STAGE_VOICE') {
+					const permissions = bot.guilds.cache.get(guild.id).channels.cache.get(oldState.channelId).permissionsFor(bot.user.id);
+					if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
+						await player.musicHandler.locale('DISCORD_BOT_MISSING_PERMISSIONS_BASIC');
+						return;
+					}
+					if (!permissions.has(Permissions.STAGE_MODERATOR)) {
+						await player.musicHandler.locale('DISCORD_BOT_MISSING_PERMISSIONS_STAGE');
+						return;
+					}
+					if (oldState.channel.stageInstance?.topic === getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC')) {
+						try {
+							await oldState.channel.stageInstance.delete();
+						}
+						catch (err) {
+							logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+						}
+					}
+				}
 				return;
 			}
 			// channel is a voice channel
