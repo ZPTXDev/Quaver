@@ -1,0 +1,56 @@
+name: Automate
+on:
+  push:
+    branches: [ master, next ]
+  pull_request:
+    branches: next
+
+jobs:
+  commitlint:
+    name: lint / CommitLint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: wagoid/commitlint-github-action@v4
+  eslint:
+    name: lint / ESLint
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16.9.1'
+      - run: yarn install
+      - uses: reviewdog/action-eslint@v1
+        with:
+          reporter: github-pr-review
+  request-review:
+    name: pr / Request Review
+    needs: [ commitlint, eslint ]
+    if: github.event_name == 'pull_request' && contains(fromJson('["opened", "ready_for_review", "reopened"]'), github.event.action)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: necojackarc/auto-request-review@v0.7.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+  semantic-release:
+    name: push / Semantic Release
+    needs: commitlint
+    if: github.event_name == 'push' && github.repository_owner == 'ZapSquared'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: cycjimmy/semantic-release-action@v2
+        with:
+          branches: |
+            [
+              'master',
+              {name: 'next', prerelease: true},
+            ]
+          extra_plugins: |
+            @semantic-release/git
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
