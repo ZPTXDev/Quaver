@@ -239,7 +239,7 @@ module.exports = {
 						msg = getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_ADDED_MULTI', resolvedTracks.length, getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_SEARCH'), '');
 					}
 					// that kid disconnected me while we were busy bruh
-					const voiceChannel = interaction.member?.voice.channel;
+					const voiceChannel = interaction.member.voice.channel;
 					if (!voiceChannel.members.has(interaction.client.user.id) && interaction.member.voice.channelId) {
 						await player.musicHandler.disconnect();
 						await interaction.replyHandler.locale('DISCORD_INTERACTION_CANCELED', { components: [] }, interaction.user.id);
