@@ -117,7 +117,7 @@ module.exports = {
 		await interaction.replyHandler.locale(msg, { footer: started ? `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '' }, ...extras);
 		if (!started) { await player.queue.start(); }
 		const state = interaction.guild.members.cache.get(interaction.client.user.id).voice;
-		if (state.channel.type === 'GUILD_STAGE_VOICE' && state.suppress) {
+		if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE' && state.suppress) {
 			await state.setSuppressed(false);
 		}
 	},
