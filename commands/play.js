@@ -7,8 +7,6 @@ const { getLocale } = require('../functions.js');
 const { logger, guildData } = require('../shared.js');
 const MusicHandler = require('../classes/MusicHandler.js');
 
-// credit: https://github.com/lavaclient/djs-v13-example/blob/main/src/commands/Play.ts
-
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('play')
