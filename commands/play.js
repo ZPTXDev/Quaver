@@ -114,8 +114,7 @@ module.exports = {
 		const endPosition = firstPosition + tracks.length - 1;
 
 		// that kid disconnected me while we were busy bruh
-		const voiceChannel = interaction.member.voice.channel;
-		if (!voiceChannel.members.has(interaction.client.user.id) && interaction.member.voice.channelId) {
+		if (!interaction.member.voice.channel.members.filter(m => m.id === interaction.client.user.id)) {
 			await player.musicHandler.disconnect();
 			await interaction.replyHandler.locale('DISCORD_INTERACTION_CANCELED', { components: [] }, interaction.user.id);
 			return;
