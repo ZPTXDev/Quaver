@@ -19,8 +19,6 @@ module.exports = {
 			}
 			// disconnected
 			if (!newState.channelId || !newState.channel?.members.find(m => m.user.id === bot.user.id)) {
-				const oldVoiceChannel = oldState.channel;
-				module.exports.oldVoiceChannel = oldVoiceChannel;
 				logger.info({ message: `[G ${player.guildId}] Cleaning up`, label: 'Quaver' });
 				if (guildData.get(`${player.guildId}.always.enabled`)) {
 					guildData.set(`${player.guildId}.always.enabled`, false);

@@ -11,7 +11,6 @@ module.exports = class MusicHandler {
 	async disconnect() {
 		const { bot } = require('../main.js');
 		const voiceChannel = bot.guilds.cache.get(this.player.guildId).channels.cache.get(this.player.channelId);
-		const { oldVoiceChannel } = require('../events/voiceStateUpdate.js');
 		clearTimeout(this.player.timeout);
 		clearTimeout(this.player.pauseTimeout);
 		this.player.disconnect();
@@ -33,25 +32,6 @@ module.exports = class MusicHandler {
 				}
 			}
 			return;
-		}
-		if (oldVoiceChannel?.type === 'GUILD_STAGE_VOICE') {
-			const oldVoicePerms = bot.guilds.cache.get(this.player.guildId).channels.cache.get(oldVoiceChannel.id).permissionsFor(bot.user.id);
-			if (!oldVoicePerms.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
-				await this.player.musicHandler.locale('DISCORD_BOT_MISSING_PERMISSIONS_BASIC');
-				return;
-			}
-			if (!oldVoicePerms.has(Permissions.STAGE_MODERATOR)) {
-				await this.player.musicHandler.locale('DISCORD_BOT_MISSING_PERMISSIONS_STAGE');
-				return;
-			}
-			if (oldVoiceChannel.stageInstance?.topic === getLocale(guildData.get(`${this.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC')) {
-				try {
-					await oldVoiceChannel.stageInstance.delete();
-				}
-				catch (err) {
-					logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				}
-			}
 		}
 	}
 
