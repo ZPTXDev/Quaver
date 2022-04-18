@@ -31,7 +31,6 @@ module.exports = class MusicHandler {
 					logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
 				}
 			}
-			return;
 		}
 	}
 
