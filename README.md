@@ -45,7 +45,10 @@ key).
 ## I changed `defaultLocale`, but it isn't updating in slash command descriptions. Why?
 You need to re-deploy the commands using `node deploy-commands.js` for the new locale to take effect.
 
-Due to Discord's limitations, it is impossible for each guild to have different locales in slash command descriptions.
+Due to Discord's limitations and the localizations we have, we don't currently use Discord's localized command name & description functionality. This may be worked on in the future.
+
+# Translating
+Take a look at our [Crowdin project](https://translate.zptx.icu).
 
 # Contributing
 Refer to [CONTRIBUTING.md](CONTRIBUTING.md).
