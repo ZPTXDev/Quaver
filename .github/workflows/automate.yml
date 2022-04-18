@@ -4,10 +4,13 @@ on:
     branches: [ master, next ]
   pull_request:
     branches: next
+  pull_request_target:
+    branches: [ next ]
 
 jobs:
   commitlint:
     name: lint / CommitLint
+    if: contains(fromJson('["push", "pull_request"]'), github.event_name)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -30,7 +33,7 @@ jobs:
   request-review:
     name: pr / Request Review
     needs: [ commitlint, eslint ]
-    if: github.event_name == 'pull_request' && contains(fromJson('["opened", "ready_for_review", "reopened"]'), github.event.action)
+    if: github.event_name == 'pull_request_target' && contains(fromJson('["opened", "ready_for_review", "reopened"]'), github.event.action)
     runs-on: ubuntu-latest
     steps:
       - uses: necojackarc/auto-request-review@v0.7.0
