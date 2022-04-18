@@ -238,7 +238,9 @@ module.exports = {
 
 					const firstPosition = player.queue.tracks.length + 1;
 					const endPosition = firstPosition + resolvedTracks.length - 1;
+
 					player.queue.add(resolvedTracks, { requester: interaction.user.id });
+
 					const started = player.playing || player.paused;
 					await interaction.replyHandler.reply(msg, { footer: started ? `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '', components: [] });
 					if (!started) { await player.queue.start(); }
