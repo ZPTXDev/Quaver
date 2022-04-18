@@ -113,6 +113,13 @@ module.exports = {
 		const firstPosition = insert ? 1 : player.queue.tracks.length + 1;
 		const endPosition = firstPosition + tracks.length - 1;
 
+		// that kid disconnected me while we were busy bruh
+		const voiceChannel = interaction.member.voice.channel;
+		if (!voiceChannel.members.has(interaction.client.user.id) && interaction.member.voice.channelId) {
+			await player.musicHandler.disconnect();
+			await interaction.replyHandler.locale('DISCORD_INTERACTION_CANCELED', { components: [] }, interaction.user.id);
+			return;
+		}
 		player.queue.add(tracks, { requester: interaction.user.id, next: insert });
 
 		const started = player.playing || player.paused;
