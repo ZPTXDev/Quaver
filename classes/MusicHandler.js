@@ -8,6 +8,9 @@ module.exports = class MusicHandler {
 		this.player = player;
 	}
 
+	/**
+	 * Disconnects and cleans up the player.
+	 */
 	async disconnect() {
 		const { bot } = require('../main.js');
 		clearTimeout(this.player.timeout);
@@ -30,6 +33,13 @@ module.exports = class MusicHandler {
 		}
 	}
 
+	/**
+	 * Returns a sendData object.
+	 * @param {string} data - The message to be used.
+	 * @param {Object} embedExtras - Extra data to be passed to the embed.
+	 * @param {boolean} error - Whether or not the message is an error.
+	 * @returns {Object} - The sendData object.
+	 */
 	sendDataConstructor(data, embedExtras, error) {
 		const sendData = {
 			embeds: [
@@ -46,6 +56,13 @@ module.exports = class MusicHandler {
 		return sendData;
 	}
 
+	/**
+	 * Sends a message to the binded text channel.
+	 * @param {string} data - The message to be used.
+	 * @param {Object} embedExtras - Extra data to be passed to the embed.
+	 * @param {boolean} error - Whether or not the message is an error.
+	 * @returns {Message|APIMessage|boolean} - The message that was sent.
+	 */
 	async send(data, embedExtras, error) {
 		const { bot } = require('../main.js');
 		const sendData = this.sendDataConstructor(data, embedExtras, error);
@@ -60,6 +77,14 @@ module.exports = class MusicHandler {
 		}
 	}
 
+	/**
+	 * Sends a localized message to the binded text channel.
+	 * @param {string} code - The code of the locale string to be used.
+	 * @param {Object} embedExtras - Extra data to be passed to the embed.
+	 * @param {boolean} error - Whether or not the message is an error.
+	 * @param  {...string} args - Additional arguments to be passed to the locale string.
+	 * @returns {Message|APIMessage|boolean} - The message that was sent.
+	 */
 	locale(code, embedExtras, error, ...args) {
 		const localizedString = getLocale(guildData.get(`${this.player.guildId}.locale`) ?? defaultLocale, code, ...args);
 		return this.send(localizedString, embedExtras, error);
