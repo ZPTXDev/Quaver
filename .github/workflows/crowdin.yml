@@ -4,7 +4,8 @@ on:
     branches: next
 
 jobs:
-  synchronize-with-crowdin:
+  crowdin:
+    name: Crowdin
     runs-on: ubuntu-latest
     if: github.repository_owner == 'ZapSquared'
     steps:
