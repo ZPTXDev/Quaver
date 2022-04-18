@@ -201,6 +201,20 @@ module.exports = {
 					}
 
 					await interaction.deferUpdate();
+					const resolvedTracks = [];
+					for (const track of tracks) {
+						const results = await interaction.client.music.rest.loadTracks(track);
+						if (results.loadType === 'TRACK_LOADED') {
+							resolvedTracks.push(results.tracks[0]);
+						}
+					}
+					let msg;
+					if (resolvedTracks.length === 1) {
+						msg = getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_ADDED', resolvedTracks[0].info.title, resolvedTracks[0].info.uri);
+					}
+					else {
+						msg = getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_ADDED_MULTI', resolvedTracks.length, getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_SEARCH'), '');
+					}
 					if (!player?.connected) {
 						player = interaction.client.music.createPlayer(interaction.guildId);
 						player.musicHandler = new MusicHandler(player);
@@ -222,22 +236,8 @@ module.exports = {
 						}
 					}
 
-					const resolvedTracks = [];
-					for (const track of tracks) {
-						const results = await interaction.client.music.rest.loadTracks(track);
-						if (results.loadType === 'TRACK_LOADED') {
-							resolvedTracks.push(results.tracks[0]);
-						}
-					}
 					const firstPosition = player.queue.tracks.length + 1;
 					const endPosition = firstPosition + resolvedTracks.length - 1;
-					let msg;
-					if (resolvedTracks.length === 1) {
-						msg = getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_ADDED', resolvedTracks[0].info.title, resolvedTracks[0].info.uri);
-					}
-					else {
-						msg = getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_ADDED_MULTI', resolvedTracks.length, getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_SEARCH'), '');
-					}
 					player.queue.add(resolvedTracks, { requester: interaction.user.id });
 					const started = player.playing || player.paused;
 					await interaction.replyHandler.reply(msg, { footer: started ? `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '', components: [] });
