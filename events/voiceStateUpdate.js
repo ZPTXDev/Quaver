@@ -25,7 +25,9 @@ module.exports = {
 				}
 				await player.musicHandler.locale('MUSIC_FORCED');
 				await player.musicHandler.disconnect();
+				// channel was a stage channel, and bot is unsuppressed
 				if (oldState.channel.type === 'GUILD_STAGE_VOICE') {
+					// check for connect, speak permission for voice channel
 					const permissions = bot.guilds.cache.get(guild.id).channels.cache.get(oldState.channelId).permissionsFor(bot.user.id);
 					if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
 						await player.musicHandler.locale('DISCORD_BOT_MISSING_PERMISSIONS_BASIC');
