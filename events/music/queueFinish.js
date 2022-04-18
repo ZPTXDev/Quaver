@@ -14,10 +14,10 @@ module.exports = {
 		if (queue.player.timeout) {
 			clearTimeout(queue.player.timeout);
 		}
-		queue.player.timeout = setTimeout(async p => {
+		queue.player.timeout = setTimeout(p => {
 			logger.info({ message: `[G ${p.guildId}] Disconnecting (inactivity)`, label: 'Quaver' });
 			p.musicHandler.locale('MUSIC_INACTIVITY');
-			await p.musicHandler.disconnect();
+			p.musicHandler.disconnect();
 		}, 1800000, queue.player);
 		queue.player.musicHandler.send(`${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_EMPTY')} ${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 1800)}`);
 	},

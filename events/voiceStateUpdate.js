@@ -94,10 +94,10 @@ module.exports = {
 				if (player.pauseTimeout) {
 					clearTimeout(player.pauseTimeout);
 				}
-				player.pauseTimeout = setTimeout(async p => {
+				player.pauseTimeout = setTimeout(p => {
 					logger.info({ message: `[G ${p.guildId}] Disconnecting (inactivity)`, label: 'Quaver' });
 					p.musicHandler.locale('MUSIC_INACTIVITY');
-					await p.musicHandler.disconnect();
+					p.musicHandler.disconnect();
 				}, 300000, player);
 				await player.musicHandler.send(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`, { footer: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_REJOIN') });
 			}
@@ -144,10 +144,10 @@ module.exports = {
 		if (player.pauseTimeout) {
 			clearTimeout(player.pauseTimeout);
 		}
-		player.pauseTimeout = setTimeout(async p => {
+		player.pauseTimeout = setTimeout(p => {
 			logger.info({ message: `[G ${p.guildId}] Disconnecting (inactivity)`, label: 'Quaver' });
 			p.musicHandler.locale('MUSIC_INACTIVITY');
-			await p.musicHandler.disconnect();
+			p.musicHandler.disconnect();
 		}, 300000, player);
 		await player.musicHandler.send(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`, { footer: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ALONE_REJOIN') });
 	},
