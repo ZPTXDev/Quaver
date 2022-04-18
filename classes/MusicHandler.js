@@ -10,11 +10,11 @@ module.exports = class MusicHandler {
 
 	async disconnect() {
 		const { bot } = require('../main.js');
-		const voiceChannel = bot.guilds.cache.get(this.player.guildId).channels.cache.get(this.player.channelId);
 		clearTimeout(this.player.timeout);
 		clearTimeout(this.player.pauseTimeout);
 		this.player.disconnect();
 		bot.music.destroyPlayer(this.player.guildId);
+		const voiceChannel = bot.guilds.cache.get(this.player.guildId).channels.cache.get(this.player.channelId);
 		if (voiceChannel?.type === 'GUILD_STAGE_VOICE') {
 			const permissions = bot.guilds.cache.get(this.player.guildId).channels.cache.get(this.player.channelId).permissionsFor(bot.user.id);
 			if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
