@@ -44,6 +44,7 @@ jobs:
   auto-merge:
     name: pr / Auto Merge
     if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
     steps:
       - id: metadata
         uses: dependabot/fetch-metadata@v1.1.1
