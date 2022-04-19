@@ -5,9 +5,14 @@ on:
   pull_request_target:
     branches: next
 
+permissions:
+  pull-requests: write
+  contents: write
+
 jobs:
   commitlint:
     name: lint / CommitLint
+    if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -36,6 +41,19 @@ jobs:
       - uses: necojackarc/auto-request-review@v0.7.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+  auto-merge:
+    name: pr / Auto Merge
+    if: github.actor == 'dependabot[bot]'
+    steps:
+      - id: metadata
+        uses: dependabot/fetch-metadata@v1.1.1
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+      - if: steps.metadata.outputs.update-type != 'version-update:semver-major'
+        run: gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   semantic-release:
     name: push / Semantic Release
     needs: commitlint
