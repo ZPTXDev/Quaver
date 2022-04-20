@@ -201,6 +201,22 @@ module.exports = {
 					}
 
 					await interaction.deferUpdate();
+					const resolvedTracks = [];
+					for (const track of tracks) {
+						const results = await interaction.client.music.rest.loadTracks(track);
+						if (results.loadType === 'TRACK_LOADED') {
+							resolvedTracks.push(results.tracks[0]);
+						}
+					}
+					let msg, extras = [];
+					if (resolvedTracks.length === 1) {
+						msg = 'MUSIC_QUEUE_ADDED';
+						extras = [resolvedTracks[0].info.title, resolvedTracks[0].info.uri];
+					}
+					else {
+						msg = 'MUSIC_QUEUE_ADDED_MULTI';
+						extras = [resolvedTracks.length, getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_SEARCH'), ''] ;
+					}
 					if (!player?.connected) {
 						player = interaction.client.music.createPlayer(interaction.guildId);
 						player.musicHandler = new MusicHandler(player);
@@ -222,25 +238,10 @@ module.exports = {
 						}
 					}
 
-					const resolvedTracks = [];
-					for (const track of tracks) {
-						const results = await interaction.client.music.rest.loadTracks(track);
-						if (results.loadType === 'TRACK_LOADED') {
-							resolvedTracks.push(results.tracks[0]);
-						}
-					}
 					const firstPosition = player.queue.tracks.length + 1;
 					const endPosition = firstPosition + resolvedTracks.length - 1;
-					let msg, extras = [];
-					if (resolvedTracks.length === 1) {
-						msg = 'MUSIC_QUEUE_ADDED';
-						extras = [resolvedTracks[0].info.title, resolvedTracks[0].info.uri];
-					}
-					else {
-						msg = 'MUSIC_QUEUE_ADDED_MULTI';
-						extras = [resolvedTracks.length, getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_SEARCH'), ''] ;
-					}
 					player.queue.add(resolvedTracks, { requester: interaction.user.id });
+
 					const started = player.playing || player.paused;
 					await interaction.replyHandler.locale(msg, { footer: started ? `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '', components: [] }, ...extras);
 					if (!started) { await player.queue.start(); }
