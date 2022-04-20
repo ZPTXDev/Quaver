@@ -14,9 +14,11 @@ module.exports = {
 				.setName('type')
 				.setDescription(getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE'))
 				.setRequired(true)
-				.addChoice(getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_DISABLED'), 'disabled')
-				.addChoice(getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_TRACK'), 'track')
-				.addChoice(getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_QUEUE'), 'queue')),
+				.addChoices(
+					{ name: getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_DISABLED'), value: 'disabled' },
+					{ name: getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_TRACK'), value: 'track' },
+					{ name: getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_QUEUE'), value: 'queue' },
+				)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
