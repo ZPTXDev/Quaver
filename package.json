@@ -1,16 +1,16 @@
 {
   "name": "quaver",
-  "version": "3.4.2-next.1",
+  "version": "3.4.2-next.2",
   "engines": {
     "node": ">=16.9.0"
   },
   "dependencies": {
-    "@discordjs/builders": "^0.12.0",
-    "@discordjs/rest": "^0.3.0",
+    "@discordjs/builders": "^0.13.0",
+    "@discordjs/rest": "^0.4.1",
     "@lavaclient/queue": "^2.0.6",
     "@lavaclient/spotify": "^3.0.0",
     "data-store": "^4.0.3",
-    "discord-api-types": "^0.31.1",
+    "discord-api-types": "^0.31.2",
     "discord.js": "^13.6.0",
     "lavaclient": "^4.0.8",
     "patch-package": "^6.4.7",
