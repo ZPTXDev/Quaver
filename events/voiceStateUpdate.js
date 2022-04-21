@@ -158,6 +158,12 @@ module.exports = {
 			await player.musicHandler.disconnect();
 			return;
 		}
+		// prevent the bot set a pauset timeout when a stage ends
+		if (oldState.channel.type === 'GUILD_STAGE_VOICE') {
+			if (await !player) return;
+			if (await !player?.connected) return;
+			if (await !oldState.channel?.members.find(m => m.user.id === bot.user.id)) return;
+		}
 		await player.pause();
 		logger.info({ message: `[G ${player.guildId}] Setting pause timeout`, label: 'Quaver' });
 		if (player.pauseTimeout) {
