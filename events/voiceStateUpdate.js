@@ -16,7 +16,7 @@ module.exports = {
 			// just the suppress state changed
 			if ((oldState.suppress !== newState.suppress || oldState.serverMute !== newState.serverMute || oldState.serverDeaf !== newState.serverDeaf) && oldState.channelId === newState.channelId) return;
 			// disconnected
-			if (!newState.channelId || !newState.channel?.members.find(m => m.user.id === bot.user.id)) {
+			if (!newState.channelId || !newState.channel?.members.get(bot.user.id)) {
 				logger.info({ message: `[G ${player.guildId}] Cleaning up`, label: 'Quaver' });
 				if (guildData.get(`${player.guildId}.always.enabled`)) {
 					guildData.set(`${player.guildId}.always.enabled`, false);
@@ -162,7 +162,7 @@ module.exports = {
 		if (oldState.channel.type === 'GUILD_STAGE_VOICE') {
 			if (await !player) return;
 			if (await !player?.connected) return;
-			if (await !oldState.channel.members.find(m => m.user.id === bot.user.id)) return;
+			if (await !oldState.channel.members.get(bot.user.id)) return;
 		}
 		await player.pause();
 		logger.info({ message: `[G ${player.guildId}] Setting pause timeout`, label: 'Quaver' });
