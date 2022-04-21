@@ -57,7 +57,7 @@ module.exports = class MusicHandler {
 	}
 
 	/**
-	 * Sends a message to the binded text channel.
+	 * Sends a message to the bound text channel.
 	 * @param {string} data - The message to be used.
 	 * @param {Object} embedExtras - Extra data to be passed to the embed.
 	 * @param {boolean} error - Whether or not the message is an error.
@@ -79,7 +79,7 @@ module.exports = class MusicHandler {
 	}
 
 	/**
-	 * Sends a localized message to the binded text channel.
+	 * Sends a localized message to the bound text channel.
 	 * @param {string} code - The code of the locale string to be used.
 	 * @param {Object} embedExtras - Extra data to be passed to the embed.
 	 * @param {boolean} error - Whether or not the message is an error.
