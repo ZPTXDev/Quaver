@@ -162,7 +162,7 @@ module.exports = {
 		if (oldState.channel.type === 'GUILD_STAGE_VOICE') {
 			if (await !player) return;
 			if (await !player?.connected) return;
-			if (await !oldState.channel?.members.find(m => m.user.id === bot.user.id)) return;
+			if (await !oldState.channel.members.find(m => m.user.id === bot.user.id)) return;
 		}
 		await player.pause();
 		logger.info({ message: `[G ${player.guildId}] Setting pause timeout`, label: 'Quaver' });
