@@ -13,8 +13,8 @@ const rl = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout,
 });
-rl.on('line', line => {
-	switch (line.split(' ')[0].toLowerCase()) {
+rl.on('line', input => {
+	switch (input.split(' ')[0].toLowerCase()) {
 		case 'exit':
 			shuttingDown('exit');
 			break;
@@ -36,7 +36,7 @@ rl.on('line', line => {
 				console.log('Quaver is not initialized yet.');
 				break;
 			}
-			const guildId = line.split(' ')[1];
+			const guildId = input.split(' ')[1];
 			if (!functions['247'].whitelist) {
 				console.log('The 24/7 whitelist is not enabled.');
 				break;
