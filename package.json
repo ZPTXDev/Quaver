@@ -11,7 +11,7 @@
     "@lavaclient/spotify": "^3.0.0",
     "data-store": "^4.0.3",
     "discord-api-types": "^0.32.1",
-    "discord.js": "^13.6.0",
+    "discord.js": "^13.7.0",
     "lavaclient": "^4.0.8",
     "patch-package": "^6.4.7",
     "winston": "^3.7.2"
