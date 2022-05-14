@@ -219,7 +219,7 @@ module.exports = {
 					}
 					if (!player?.connected) {
 						player = interaction.client.music.createPlayer(interaction.guildId);
-						player.musicHandler = new MusicHandler(player);
+						player.musicHandler = new MusicHandler(interaction.client, player);
 						player.queue.channel = interaction.channel;
 						await player.connect(interaction.member.voice.channelId, { deafened: true });
 						// that kid left while we were busy bruh
