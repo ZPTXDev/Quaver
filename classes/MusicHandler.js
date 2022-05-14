@@ -13,14 +13,13 @@ module.exports = class MusicHandler {
 	 * Disconnects and cleans up the player.
 	 */
 	async disconnect() {
-		const { bot } = require('../main.js');
 		clearTimeout(this.player.timeout);
 		clearTimeout(this.player.pauseTimeout);
 		this.player.disconnect();
-		bot.music.destroyPlayer(this.player.guildId);
-		const voiceChannel = bot.guilds.cache.get(this.player.guildId)?.channels.cache.get(this.player.channelId);
+		this.client.music.destroyPlayer(this.player.guildId);
+		const voiceChannel = this.client.guilds.cache.get(this.player.guildId)?.channels.cache.get(this.player.channelId);
 		if (voiceChannel?.type === 'GUILD_STAGE_VOICE') {
-			const permissions = bot.guilds.cache.get(this.player.guildId).channels.cache.get(this.player.channelId).permissionsFor(bot.user.id);
+			const permissions = this.client.guilds.cache.get(this.player.guildId).channels.cache.get(this.player.channelId).permissionsFor(this.client.user.id);
 			if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) return;
 			if (!permissions.has(Permissions.STAGE_MODERATOR)) return;
 			if (voiceChannel.stageInstance?.topic === getLocale(guildData.get(`${this.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC')) {
@@ -65,11 +64,10 @@ module.exports = class MusicHandler {
 	 * @returns {Message|APIMessage|boolean} - The message that was sent.
 	 */
 	async send(data, embedExtras, error) {
-		const { bot } = require('../main.js');
 		const sendData = this.sendDataConstructor(data, embedExtras, error);
 		const channel = this.player.queue.channel;
-		if (!channel.permissionsFor(bot.user.id).has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) return false;
-		if (bot.guilds.cache.get(this.player.guildId).members.cache.get(bot.user.id).isCommunicationDisabled()) return false;
+		if (!channel.permissionsFor(this.client.user.id).has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) return false;
+		if (this.client.guilds.cache.get(this.player.guildId).members.cache.get(this.client.user.id).isCommunicationDisabled()) return false;
 		try {
 			return await channel.send(sendData);
 		}
