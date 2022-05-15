@@ -11,7 +11,7 @@
 	"BASSBOOST_DISABLED": "Bass boost **disabled**",
 	"BIND_DESCRIPTION": "Change the text channel used by Quaver to send messages automatically.",
 	"BIND_OPTION_CHANNEL": "The text channel to bind to.",
-	"BIND_NO_PERMISSIONS": "I do not have sufficient permissions in <#%1>.",
+	"BIND_NO_PERMISSIONS": "I do not have sufficient permission(s) in <#%1>.",
 	"BIND_SUCCESS": "Bound to <#%1>",
 	"CLEAR_DESCRIPTION": "Clear the queue.",
 	"CLEAR_EMPTY": "There are no tracks in the queue to clear.",
