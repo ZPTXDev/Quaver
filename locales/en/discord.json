@@ -1,6 +1,6 @@
 {
-	"USER_MISSING_PERMISSIONS": "You are missing permissions: %1",
-	"BOT_MISSING_PERMISSIONS": "I am missing permissions: %1",
+	"USER_MISSING_PERMISSIONS": "You are missing permission(s): %1",
+	"BOT_MISSING_PERMISSIONS": "I am missing permission(s): %1",
 	"BOT_MISSING_PERMISSIONS_BASIC": "I need to be able to connect and speak in the voice channel.",
 	"BOT_MISSING_PERMISSIONS_STAGE": "I need to be a stage moderator in the stage channel.",
 	"BOT_TIMED_OUT": "I am currently timed out.",
