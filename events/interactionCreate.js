@@ -136,7 +136,7 @@ module.exports = {
 						.setStyle('SECONDARY')
 						.setLabel(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_REFRESH'));
 					try {
-						interaction.update({
+						await interaction.update({
 							embeds: original.embeds,
 							components: original.components,
 						});
