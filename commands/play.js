@@ -26,6 +26,10 @@ module.exports = {
 		bot: [],
 	},
 	async execute(interaction) {
+		if (interaction.channel.type === 'GUILD_VOICE') {
+			await interaction.replyHandler.localeError('DISCORD_BOT_UNSUPPORTED');
+			return;
+		}
 		// check for connect, speak permission for channel
 		const permissions = interaction.member.voice.channel.permissionsFor(interaction.client.user.id);
 		if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {

@@ -23,6 +23,10 @@ module.exports = {
 		bot: [],
 	},
 	async execute(interaction) {
+		if (interaction.channel.type === 'GUILD_VOICE') {
+			await interaction.replyHandler.localeError('DISCORD_BOT_UNSUPPORTED');
+			return;
+		}
 		await interaction.deferReply();
 		const query = interaction.options.getString('query');
 		let tracks = [];
