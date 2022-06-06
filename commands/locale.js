@@ -6,6 +6,7 @@ const { roundTo, getLocale, checkLocaleCompletion } = require('../functions.js')
 const { guildData } = require('../shared.js');
 const fs = require('fs');
 const path = require('path');
+const { PermissionFlagsBits } = require('discord-api-types/v10');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -16,10 +17,11 @@ module.exports = {
 				.setName('new_locale')
 				.setDescription(getLocale(defaultLocale, 'CMD_LOCALE_OPTION_LOCALE'))
 				.setRequired(true)
-				.addChoices(...fs.readdirSync(path.resolve(__dirname, '../locales')).map(file => { return { name: file, value: file }; }))),
+				.addChoices(...fs.readdirSync(path.resolve(__dirname, '../locales')).map(file => { return { name: file, value: file }; })))
+		.setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
 	checks: [checks.GUILD_ONLY],
 	permissions: {
-		// TODO: https://msciotti.notion.site/msciotti/Command-Permissions-V2-4d113cb49090409f998f3bd80a06c3bd (when it gets released)
+		// TODO: when v14 is available, we'll replace this with PermissionFlagsBits
 		user: ['MANAGE_GUILD'],
 		bot: [],
 	},
