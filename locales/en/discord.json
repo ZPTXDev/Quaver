@@ -4,6 +4,7 @@
 	"BOT_MISSING_PERMISSIONS_BASIC": "I need to be able to connect and speak in the voice channel.",
 	"BOT_MISSING_PERMISSIONS_STAGE": "I need to be a stage moderator in the stage channel.",
 	"BOT_TIMED_OUT": "I am currently timed out.",
+	"BOT_UNSUPPORTED_CHANNEL": "I cannot start a session in this channel type.",
 	"CMD_ERROR": "There was an error while handling the command.",
 	"INTERACTION_WRONG_USER": "That is not your interaction.",
 	"INTERACTION_CANCELED": "This interaction was canceled by <@%1>."
