@@ -23,6 +23,10 @@ module.exports = {
 		bot: [],
 	},
 	async execute(interaction) {
+		if (!['GUILD_TEXT', 'GUILD_VOICE'].includes(interaction.channel.type)) {
+			await interaction.replyHandler.localeError('DISCORD_BOT_UNSUPPORTED_CHANNEL');
+			return;
+		}
 		await interaction.deferReply();
 		const query = interaction.options.getString('query');
 		let tracks = [];
