@@ -112,6 +112,10 @@ module.exports = {
 					const pageSize = pages[page - 1].length;
 					const largestIndexSize = (firstIndex + pageSize - 1).toString().length;
 					const original = { embeds: interaction.message.embeds, components: interaction.message.components };
+					if (original.embeds.length === 0) {
+						await interaction.message.delete();
+						return;
+					}
 					original.embeds[0]
 						.setDescription(pages[page - 1].map((track, index) => {
 							const duration = msToTime(track.length);
