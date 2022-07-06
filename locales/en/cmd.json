@@ -20,7 +20,7 @@
 	"DISCONNECT_247_ENABLED": "Quaver is unable to leave as 24/7 is enabled.",
 	"DISCONNECT_SUCCESS": "Left the voice channel.",
 	"INFO_DESCRIPTION": "Show information about Quaver.",
-	"INFO_DETAIL": "Open-source music bot for small communities.\nSource code available [here](https://go.zptx.icu/Quaver), invite [here](%1).\nRunning version `%2`.",
+	"INFO_DETAIL": "Open-source music bot for small communities.\nSource code available [here](https://go.zptx.dev/Quaver), invite [here](%1).\nRunning version `%2`.",
 	"LOCALE_DESCRIPTION": "Change Quaver's locale in this server.",
 	"LOCALE_OPTION_LOCALE": "The locale to use.",
 	"LOCALE_SUCCESS": "Locale for **%1** set to `%2`.",

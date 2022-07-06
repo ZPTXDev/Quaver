@@ -60,7 +60,7 @@ jobs:
   semantic-release:
     name: push / Semantic Release
     needs: commitlint
-    if: github.event_name == 'push' && github.repository_owner == 'ZapSquared'
+    if: github.event_name == 'push' && github.repository_owner == 'ZPTXDev'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

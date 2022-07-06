@@ -7,7 +7,7 @@ jobs:
   crowdin:
     name: Crowdin
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'ZapSquared'
+    if: github.repository_owner == 'ZPTXDev'
     steps:
     - uses: actions/checkout@v2
     - uses: crowdin/github-action@1.4.8

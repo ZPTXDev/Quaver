@@ -34,7 +34,7 @@ You can probably implement it yourself if you have another API in mind, but I wi
 Most probably not. They've only been targetting the larger bots so far, but if you really don't wish to take the risk, you can take a sneak peek at Discord's **Watch Together** feature [here](https://discord.gg/discordgameslab).
 
 ## Can you add x feature to Quaver?
-Yes, if it is meaningful. Submit an issue [here](https://github.com/ZapSquared/Quaver/issues) and I'll be happy to take a look.
+Yes, if it is meaningful. Submit an issue [here](https://github.com/ZPTXDev/Quaver/issues) and I'll be happy to take a look.
 
 ## I changed the locale through `/locale`. Why isn't it updating in slash commands?
 Slash commands are defined when running `node deploy-commands.js`.
@@ -48,7 +48,7 @@ You need to re-deploy the commands using `node deploy-commands.js` for the new l
 Due to Discord's limitations and the localizations we have, we don't currently use Discord's localized command name & description functionality. This may be worked on in the future.
 
 # Translating
-Take a look at our [Crowdin project](https://translate.zptx.icu).
+Take a look at our [Crowdin project](https://translate.zptx.dev).
 
 # Contributing
 Refer to [CONTRIBUTING.md](CONTRIBUTING.md).
