@@ -4,7 +4,7 @@ const { getLocale, paginate, msToTime, msToTimeString } = require('../functions.
 const { checks } = require('../enums.js');
 const { defaultLocale, defaultColor } = require('../settings.json');
 const ReplyHandler = require('../classes/ReplyHandler.js');
-const MusicHandler = require('../classes/MusicHandler.js');
+const PlayerHandler = require('../classes/PlayerHandler.js');
 
 module.exports = {
 	name: 'interactionCreate',
@@ -223,12 +223,12 @@ module.exports = {
 					}
 					if (!player?.connected) {
 						player = interaction.client.music.createPlayer(interaction.guildId);
-						player.musicHandler = new MusicHandler(interaction.client, player);
+						player.handler = new PlayerHandler(interaction.client, player);
 						player.queue.channel = interaction.channel;
 						await player.connect(interaction.member.voice.channelId, { deafened: true });
 						// that kid left while we were busy bruh
 						if (!interaction.member.voice.channelId) {
-							await player.musicHandler.disconnect();
+							await player.handler.disconnect();
 							await interaction.replyHandler.locale('DISCORD_INTERACTION_CANCELED', { components: [] }, interaction.user.id);
 							return;
 						}

@@ -3,7 +3,7 @@ const { guildData, logger } = require('../shared.js');
 const { getLocale } = require('../functions.js');
 const { defaultLocale, defaultColor } = require('../settings.json');
 
-module.exports = class MusicHandler {
+module.exports = class PlayerHandler {
 	constructor(client, player) {
 		this.client = client;
 		this.player = player;

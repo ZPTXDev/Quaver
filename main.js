@@ -110,7 +110,7 @@ async function shuttingDown(eventType, err) {
 				fileBuffer.push(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MISC_QUEUE')}:`);
 				fileBuffer.push(player.queue.tracks.map(track => track.uri).join('\n'));
 			}
-			await player.musicHandler.disconnect();
+			await player.handler.disconnect();
 			const botChannelPerms = bot.guilds.cache.get(player.guildId).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
 			if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { continue; }
 			await player.queue.channel.send({

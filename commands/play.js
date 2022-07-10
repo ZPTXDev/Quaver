@@ -5,7 +5,7 @@ const { checks } = require('../enums.js');
 const { defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
 const { logger, guildData } = require('../shared.js');
-const MusicHandler = require('../classes/MusicHandler.js');
+const PlayerHandler = require('../classes/PlayerHandler.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -95,13 +95,13 @@ module.exports = {
 		let player = interaction.client.music.players.get(interaction.guildId);
 		if (!player?.connected) {
 			player = interaction.client.music.createPlayer(interaction.guildId);
-			player.musicHandler = new MusicHandler(interaction.client, player);
+			player.handler = new PlayerHandler(interaction.client, player);
 			player.queue.channel = interaction.channel;
 			await player.connect(interaction.member.voice.channelId, { deafened: true });
 			// that kid left while we were busy bruh
 			if (!interaction.member.voice.channelId) {
 				await interaction.replyHandler.locale('DISCORD_INTERACTION_CANCELED', {}, interaction.user.id);
-				await player.musicHandler.disconnect();
+				await player.handler.disconnect();
 				return;
 			}
 			if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE' && !interaction.member.voice.channel.stageInstance?.topic) {

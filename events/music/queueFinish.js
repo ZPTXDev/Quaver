@@ -7,7 +7,7 @@ module.exports = {
 	once: false,
 	execute(queue) {
 		if (guildData.get(`${queue.player.guildId}.always.enabled`)) {
-			queue.player.musicHandler.locale('MUSIC_QUEUE_EMPTY');
+			queue.player.handler.locale('MUSIC_QUEUE_EMPTY');
 			return;
 		}
 		logger.info({ message: `[G ${queue.player.guildId}] Setting timeout`, label: 'Quaver' });
@@ -16,9 +16,9 @@ module.exports = {
 		}
 		queue.player.timeout = setTimeout(p => {
 			logger.info({ message: `[G ${p.guildId}] Disconnecting (inactivity)`, label: 'Quaver' });
-			p.musicHandler.locale('MUSIC_INACTIVITY');
-			p.musicHandler.disconnect();
+			p.handler.locale('MUSIC_INACTIVITY');
+			p.handler.disconnect();
 		}, 1800000, queue.player);
-		queue.player.musicHandler.send(`${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_EMPTY')} ${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 1800)}`);
+		queue.player.handler.send(`${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_QUEUE_EMPTY')} ${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 1800)}`);
 	},
 };
