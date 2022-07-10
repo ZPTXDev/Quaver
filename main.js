@@ -107,14 +107,15 @@ async function shuttingDown(eventType, err) {
 		logger.info({ message: 'Disconnecting from all guilds...', label: 'Quaver' });
 		for (const pair of bot.music.players) {
 			const player = pair[1];
+			const guildLocale = await data.guild.get(player.guildId, 'settings.locale');
 			logger.info({ message: `[G ${player.guildId}] Disconnecting (restarting)`, label: 'Quaver' });
 			const fileBuffer = [];
 			if (player.queue.current && (player.playing || player.paused)) {
-				fileBuffer.push(`${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MISC_CURRENT')}:`);
+				fileBuffer.push(`${getLocale(guildLocale ?? defaultLocale, 'MISC_CURRENT')}:`);
 				fileBuffer.push(player.queue.current.uri);
 			}
 			if (player.queue.tracks.length > 0) {
-				fileBuffer.push(`${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MISC_QUEUE')}:`);
+				fileBuffer.push(`${getLocale(guildLocale ?? defaultLocale, 'MISC_QUEUE')}:`);
 				fileBuffer.push(player.queue.tracks.map(track => track.uri).join('\n'));
 			}
 			await player.handler.disconnect();
@@ -123,8 +124,8 @@ async function shuttingDown(eventType, err) {
 			await player.queue.channel.send({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(`${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, ['exit', 'SIGINT', 'SIGTERM', 'lavalink'].includes(eventType) ? 'MUSIC_RESTART' : 'MUSIC_RESTART_CRASH')}${fileBuffer.length > 0 ? `\n${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_RESTART_QUEUEDATA')}` : ''}`)
-						.setFooter({ text: getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_RESTART_SORRY') })
+						.setDescription(`${getLocale(guildLocale ?? defaultLocale, ['exit', 'SIGINT', 'SIGTERM', 'lavalink'].includes(eventType) ? 'MUSIC_RESTART' : 'MUSIC_RESTART_CRASH')}${fileBuffer.length > 0 ? `\n${getLocale(guildLocale ?? defaultLocale, 'MUSIC_RESTART_QUEUEDATA')}` : ''}`)
+						.setFooter({ text: getLocale(guildLocale ?? defaultLocale, 'MUSIC_RESTART_SORRY') })
 						.setColor(defaultColor),
 				],
 				files: fileBuffer.length > 0 ? [
