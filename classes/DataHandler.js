@@ -16,6 +16,10 @@ module.exports = class DataHandler {
 		return _.set(data, item, value);
 	}
 
+	get instance() {
+		return this.cache;
+	}
+
 	get iterator() {
 		return this.cache.iterator;
 	}
