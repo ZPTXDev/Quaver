@@ -1,5 +1,5 @@
 const { MessageEmbed, Permissions } = require('discord.js');
-const { guildData, logger } = require('../shared.js');
+const { data, logger } = require('../shared.js');
 const { getLocale } = require('../functions.js');
 const { defaultLocale, defaultColor } = require('../settings.json');
 
@@ -22,7 +22,7 @@ module.exports = class PlayerHandler {
 			const permissions = this.client.guilds.cache.get(this.player.guildId).channels.cache.get(this.player.channelId).permissionsFor(this.client.user.id);
 			if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) return;
 			if (!permissions.has(Permissions.STAGE_MODERATOR)) return;
-			if (voiceChannel.stageInstance?.topic === getLocale(guildData.get(`${this.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC')) {
+			if (voiceChannel.stageInstance?.topic === getLocale(await data.guild.get(this.player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_STAGE_TOPIC')) {
 				try {
 					await voiceChannel.stageInstance.delete();
 				}
@@ -35,17 +35,17 @@ module.exports = class PlayerHandler {
 
 	/**
 	 * Returns a sendData object.
-	 * @param {string} data - The message to be used.
+	 * @param {string} msg - The message to be used.
 	 * @param {Object} embedExtras - Extra data to be passed to the embed.
 	 * @param {boolean} error - Whether or not the message is an error.
 	 * @returns {Object} - The sendData object.
 	 */
-	sendDataConstructor(data, embedExtras, error) {
+	sendDataConstructor(msg, embedExtras, error) {
 		const sendData = {
 			embeds: [
 				new MessageEmbed()
 					.setTitle(embedExtras?.title ?? '')
-					.setDescription(data)
+					.setDescription(msg)
 					.setFooter({ text: embedExtras?.footer ?? '' })
 					.setThumbnail(embedExtras?.thumbnail ?? '')
 					.setColor(error ? 'DARK_RED' : defaultColor),
@@ -58,13 +58,13 @@ module.exports = class PlayerHandler {
 
 	/**
 	 * Sends a message to the bound text channel.
-	 * @param {string} data - The message to be used.
+	 * @param {string} msg - The message to be used.
 	 * @param {Object} embedExtras - Extra data to be passed to the embed.
 	 * @param {boolean} error - Whether or not the message is an error.
 	 * @returns {Message|APIMessage|boolean} - The message that was sent.
 	 */
-	async send(data, embedExtras, error) {
-		const sendData = this.sendDataConstructor(data, embedExtras, error);
+	async send(msg, embedExtras, error) {
+		const sendData = this.sendDataConstructor(msg, embedExtras, error);
 		const channel = this.player.queue.channel;
 		if (!channel.permissionsFor(this.client.user.id).has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) return false;
 		if (this.client.guilds.cache.get(this.player.guildId).members.cache.get(this.client.user.id).isCommunicationDisabled()) return false;
@@ -85,8 +85,8 @@ module.exports = class PlayerHandler {
 	 * @param  {...string} args - Additional arguments to be passed to the locale string.
 	 * @returns {Message|APIMessage|boolean} - The message that was sent.
 	 */
-	locale(code, embedExtras, error, ...args) {
-		const localizedString = getLocale(guildData.get(`${this.player.guildId}.locale`) ?? defaultLocale, code, ...args);
+	async locale(code, embedExtras, error, ...args) {
+		const localizedString = getLocale(await data.guild.get(this.player.guildId, 'settings.locale') ?? defaultLocale, code, ...args);
 		return this.send(localizedString, embedExtras, error);
 	}
 };

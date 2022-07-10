@@ -1,8 +1,16 @@
 const { createLogger, format, transports } = require('winston');
+const Keyv = require('keyv');
+let { database } = require('./settings.json');
+const DataHandler = require('./classes/DataHandler.js');
+
+if (!database) database = 'sqlite://database.sqlite';
+
+const guildDatabase = new Keyv(database, { namespace: 'guild' });
 
 module.exports = {
-	// used for per-guild data (locales, 24/7, etc.)
-	guildData: require('data-store')({ path: 'data.json' }),
+	data: {
+		guild: new DataHandler(guildDatabase),
+	},
 	// single logger instance
 	logger: createLogger({
 		level: 'info',

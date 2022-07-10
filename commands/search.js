@@ -4,7 +4,7 @@ const { checks } = require('../enums.js');
 const { msToTime, msToTimeString } = require('../functions.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
-const { guildData } = require('../shared.js');
+const { data } = require('../shared.js');
 
 // credit: https://github.com/lavaclient/djs-v13-example/blob/main/src/commands/Play.ts
 
@@ -60,7 +60,7 @@ module.exports = {
 					.addComponents(
 						new MessageSelectMenu()
 							.setCustomId(`play_${interaction.user.id}`)
-							.setPlaceholder(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SEARCH_PICK'))
+							.setPlaceholder(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD_SEARCH_PICK'))
 							.addOptions(tracks.map((track, index) => {
 								let label = `${index + 1}. ${track.info.title}`;
 								if (label.length >= 100) {
@@ -75,7 +75,7 @@ module.exports = {
 					.addComponents(
 						new MessageButton()
 							.setCustomId(`cancel_${interaction.user.id}`)
-							.setLabel(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_CANCEL'))
+							.setLabel(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_CANCEL'))
 							.setStyle('DANGER'),
 					),
 			],

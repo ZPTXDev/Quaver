@@ -2,21 +2,21 @@ require('@lavaclient/queue/register');
 const { Client, Intents, Collection, MessageEmbed } = require('discord.js');
 const { Node } = require('lavaclient');
 const { load } = require('@lavaclient/spotify');
-const { token, lavalink, spotify, defaultColor, defaultLocale, functions } = require('./settings.json');
 const fs = require('fs');
 const fsPromises = require('fs').promises;
-const { msToTime, msToTimeString, getLocale } = require('./functions.js');
 const readline = require('readline');
-const { logger, guildData } = require('./shared.js');
+const { token, lavalink, spotify, defaultColor, defaultLocale, functions } = require('./settings.json');
+const { msToTime, msToTimeString, getLocale } = require('./functions.js');
+const { logger, data } = require('./shared.js');
 
 const rl = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout,
 });
-rl.on('line', input => {
+rl.on('line', async input => {
 	switch (input.split(' ')[0].toLowerCase()) {
 		case 'exit':
-			shuttingDown('exit');
+			await shuttingDown('exit');
 			break;
 		case 'sessions':
 			if (!module.exports.startup) {
@@ -37,7 +37,7 @@ rl.on('line', input => {
 				break;
 			}
 			const guildId = input.split(' ')[1];
-			if (!functions['247'].whitelist) {
+			if (!functions.stay.whitelist) {
 				console.log('The 24/7 whitelist is not enabled.');
 				break;
 			}
@@ -46,13 +46,13 @@ rl.on('line', input => {
 				console.log('Guild not found.');
 				break;
 			}
-			if (!guildData.get(`${guildId}.247.whitelisted`)) {
+			if (!await data.guild.get(guildId, 'features.stay.whitelisted')) {
+				await data.guild.set(guildId, 'features.stay.whitelisted', true);
 				console.log(`Added ${guild.name} to the 24/7 whitelist.`);
-				guildData.set(`${guildId}.247.whitelisted`, true);
 			}
 			else {
+				await data.guild.set(guildId, 'features.stay.whitelisted', false);
 				console.log(`Removed ${guild.name} from the 24/7 whitelist.`);
-				guildData.set(`${guildId}.247.whitelisted`, false);
 			}
 			break;
 		}
@@ -72,6 +72,13 @@ load({
 	autoResolveYoutubeTracks: false,
 });
 
+Object.keys(data).forEach(key => {
+	data[key].on('error', err => {
+		logger.error({ message: `Failed to connect to database:\n${err}`, label: 'Keyv' });
+		shuttingDown('keyv');
+	});
+});
+
 const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
 bot.commands = new Collection();
 bot.music = new Node({
@@ -87,8 +94,8 @@ bot.music = new Node({
 	},
 	sendGatewayPayload: (id, payload) => bot.guilds.cache.get(id)?.shard?.send(payload),
 });
-bot.ws.on('VOICE_SERVER_UPDATE', data => bot.music.handleVoiceUpdate(data));
-bot.ws.on('VOICE_STATE_UPDATE', data => bot.music.handleVoiceUpdate(data));
+bot.ws.on('VOICE_SERVER_UPDATE', voiceData => bot.music.handleVoiceUpdate(voiceData));
+bot.ws.on('VOICE_STATE_UPDATE', voiceData => bot.music.handleVoiceUpdate(voiceData));
 module.exports.bot = bot;
 
 let inProgress = false;
@@ -103,11 +110,11 @@ async function shuttingDown(eventType, err) {
 			logger.info({ message: `[G ${player.guildId}] Disconnecting (restarting)`, label: 'Quaver' });
 			const fileBuffer = [];
 			if (player.queue.current && (player.playing || player.paused)) {
-				fileBuffer.push(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MISC_CURRENT')}:`);
+				fileBuffer.push(`${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MISC_CURRENT')}:`);
 				fileBuffer.push(player.queue.current.uri);
 			}
 			if (player.queue.tracks.length > 0) {
-				fileBuffer.push(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MISC_QUEUE')}:`);
+				fileBuffer.push(`${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MISC_QUEUE')}:`);
 				fileBuffer.push(player.queue.tracks.map(track => track.uri).join('\n'));
 			}
 			await player.handler.disconnect();
@@ -116,8 +123,8 @@ async function shuttingDown(eventType, err) {
 			await player.queue.channel.send({
 				embeds: [
 					new MessageEmbed()
-						.setDescription(`${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, ['exit', 'SIGINT', 'SIGTERM', 'lavalink'].includes(eventType) ? 'MUSIC_RESTART' : 'MUSIC_RESTART_CRASH')}${fileBuffer.length > 0 ? `\n${getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_RESTART_QUEUEDATA')}` : ''}`)
-						.setFooter({ text: getLocale(guildData.get(`${player.guildId}.locale`) ?? defaultLocale, 'MUSIC_RESTART_SORRY') })
+						.setDescription(`${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, ['exit', 'SIGINT', 'SIGTERM', 'lavalink'].includes(eventType) ? 'MUSIC_RESTART' : 'MUSIC_RESTART_CRASH')}${fileBuffer.length > 0 ? `\n${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_RESTART_QUEUEDATA')}` : ''}`)
+						.setFooter({ text: getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_RESTART_SORRY') })
 						.setColor(defaultColor),
 				],
 				files: fileBuffer.length > 0 ? [

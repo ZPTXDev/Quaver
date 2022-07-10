@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { checks } = require('../enums.js');
 const { defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
-const { guildData } = require('../shared.js');
+const { data } = require('../shared.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -30,7 +30,7 @@ module.exports = {
 		if (skip.users.length >= skip.required) {
 			const track = await player.queue.skip();
 			await player.queue.start();
-			await interaction.replyHandler.reply(`${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_SKIP_SUCCESS_VOTED', track.title, track.uri)}\n${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_ADDED_BY', track.requester)}`);
+			await interaction.replyHandler.reply(`${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD_SKIP_SUCCESS_VOTED', track.title, track.uri)}\n${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_ADDED_BY', track.requester)}`);
 			await player.queue.next();
 			return;
 		}

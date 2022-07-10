@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { checks } = require('../enums.js');
 const { managers, defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
-const { guildData } = require('../shared.js');
+const { data } = require('../shared.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -28,6 +28,6 @@ module.exports = {
 			return;
 		}
 		await player.setVolume(volume);
-		await interaction.replyHandler.locale('CMD_VOLUME_SUCCESS', { footer: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_FILTERS_NOTE') }, volume);
+		await interaction.replyHandler.locale('CMD_VOLUME_SUCCESS', { footer: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_FILTERS_NOTE') }, volume);
 	},
 };

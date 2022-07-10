@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { checks } = require('../enums.js');
 const { defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
-const { guildData } = require('../shared.js');
+const { data } = require('../shared.js');
 const { ChannelType } = require('discord-api-types/v10');
 
 module.exports = {
@@ -28,8 +28,8 @@ module.exports = {
 			return;
 		}
 		player.queue.channel = channel;
-		if (guildData.get(`${interaction.guildId}.always.enabled`)) {
-			guildData.set(`${interaction.guildId}.always.text`, channel.id);
+		if (await data.guild.get(interaction.guildId, 'settings.stay.enabled')) {
+			await data.guild.set(interaction.guildId, 'settings.stay.text', channel.id);
 		}
 		await interaction.replyHandler.locale('CMD_BIND_SUCCESS', {}, channel.id);
 	},

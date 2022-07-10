@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { checks } = require('../enums.js');
 const { defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
-const { guildData } = require('../shared.js');
+const { data } = require('../shared.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -14,7 +14,7 @@ module.exports = {
 		bot: [],
 	},
 	async execute(interaction) {
-		if (guildData.get(`${interaction.guildId}.always.enabled`)) {
+		if (await data.guild.get(interaction.guildId, 'settings.stay.enabled')) {
 			await interaction.replyHandler.localeError('CMD_DISCONNECT_247_ENABLED');
 			return;
 		}
