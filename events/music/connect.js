@@ -10,7 +10,7 @@ module.exports = {
 	once: false,
 	async execute() {
 		logger.info({ message: 'Connected.', label: 'Lavalink' });
-		for await (const [guildId, guildData] of data.guild.iterator()) {
+		for await (const [guildId, guildData] of data.guild.instance.iterator()) {
 			if (_.get(guildData, 'settings.stay.enabled')) {
 				const guild = bot.guilds.cache.get(guildId);
 				const player = bot.music.createPlayer(guildId);

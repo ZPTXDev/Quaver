@@ -1,8 +1,12 @@
+const Keyv = require('keyv');
 const _ = require('lodash');
 
 module.exports = class DataHandler {
-	constructor(instance) {
-		this.cache = instance;
+	constructor(opts) {
+		this.cache = new Keyv({
+			uri: opts.cache,
+			namespace: opts.namespace,
+		});
 	}
 
 	async get(key, item) {
@@ -13,14 +17,10 @@ module.exports = class DataHandler {
 	async set(key, item, value) {
 		let data = await this.cache.get(key);
 		if (!data) data = {};
-		return _.set(data, item, value);
+		return await this.cache.set(key, _.set(data, item, value));
 	}
 
 	get instance() {
 		return this.cache;
-	}
-
-	get iterator() {
-		return this.cache.iterator;
 	}
 };
