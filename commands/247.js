@@ -27,6 +27,10 @@ module.exports = {
 			return;
 		}
 		const player = interaction.client.music.players.get(interaction.guildId);
+		if (!player?.queue?.channel?.id) {
+			await interaction.replyHandler.localeError('CMD_247_MISSING_CHANNEL');
+			return;
+		}
 		const enabled = interaction.options.getBoolean('enabled');
 		let always;
 		if (enabled !== null) {
@@ -38,7 +42,7 @@ module.exports = {
 		await data.guild.set(interaction.guildId, 'settings.stay.enabled', always);
 		if (always) {
 			await data.guild.set(interaction.guildId, 'settings.stay.channel', player.channelId);
-			await data.guild.set(interaction.guildId, 'settings.stay.text', player.queue.channelId);
+			await data.guild.set(interaction.guildId, 'settings.stay.text', player.queue.channel.id);
 		}
 		if (player.timeout) {
 			clearTimeout(player.timeout);
