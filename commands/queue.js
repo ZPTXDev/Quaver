@@ -4,7 +4,7 @@ const { checks } = require('../enums.js');
 const { paginate, msToTime, msToTimeString } = require('../functions.js');
 const { defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
-const { guildData } = require('../shared.js');
+const { data } = require('../shared.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -29,7 +29,7 @@ module.exports = {
 				return `\`${index + 1}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 			}).join('\n'),
 			{
-				footer: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_PAGE', '1', pages.length),
+				footer: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_PAGE', '1', pages.length),
 				components: [
 					new MessageActionRow()
 						.addComponents(
@@ -47,7 +47,7 @@ module.exports = {
 								.setCustomId('queue_1')
 								.setEmoji('🔁')
 								.setStyle('SECONDARY')
-								.setLabel(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_REFRESH')),
+								.setLabel(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_REFRESH')),
 						),
 				],
 			},

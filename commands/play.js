@@ -4,7 +4,7 @@ const { Permissions } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
-const { logger, guildData } = require('../shared.js');
+const { logger, data } = require('../shared.js');
 const PlayerHandler = require('../classes/PlayerHandler.js');
 
 module.exports = {
@@ -106,7 +106,7 @@ module.exports = {
 			}
 			if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE' && !interaction.member.voice.channel.stageInstance?.topic) {
 				try {
-					await interaction.member.voice.channel.createStageInstance({ topic: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
+					await interaction.member.voice.channel.createStageInstance({ topic: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
 				}
 				catch (err) {
 					logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
@@ -120,7 +120,7 @@ module.exports = {
 		player.queue.add(tracks, { requester: interaction.user.id, next: insert });
 
 		const started = player.playing || player.paused;
-		await interaction.replyHandler.locale(msg, { footer: started ? `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '' }, ...extras);
+		await interaction.replyHandler.locale(msg, { footer: started ? `${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '' }, ...extras);
 		if (!started) { await player.queue.start(); }
 		const state = interaction.guild.members.cache.get(interaction.client.user.id).voice;
 		if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE' && state.suppress) {

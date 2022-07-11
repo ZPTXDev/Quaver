@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { checks } = require('../enums.js');
 const { defaultLocale, functions } = require('../settings.json');
 const { getLocale } = require('../functions.js');
-const { guildData } = require('../shared.js');
+const { data } = require('../shared.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -22,23 +22,27 @@ module.exports = {
 			await interaction.replyHandler.localeError('FUNCTION_DISABLED');
 			return;
 		}
-		if (functions['247'].whitelist && !guildData.get(`${interaction.guildId}.247.whitelisted`)) {
+		if (functions['247'].whitelist && !await data.guild.get(interaction.guildId, 'features.stay.whitelisted')) {
 			await interaction.replyHandler.localeError('CMD_247_NOT_WHITELISTED');
 			return;
 		}
 		const player = interaction.client.music.players.get(interaction.guildId);
+		if (!player?.queue?.channel?.id) {
+			await interaction.replyHandler.localeError('CMD_247_MISSING_CHANNEL');
+			return;
+		}
 		const enabled = interaction.options.getBoolean('enabled');
 		let always;
 		if (enabled !== null) {
 			always = enabled;
 		}
 		else {
-			always = !guildData.get(`${interaction.guildId}.always.enabled`);
+			always = !await data.guild.get(interaction.guildId, 'settings.stay.enabled');
 		}
-		guildData.set(`${interaction.guildId}.always.enabled`, always);
+		await data.guild.set(interaction.guildId, 'settings.stay.enabled', always);
 		if (always) {
-			guildData.set(`${interaction.guildId}.always.channel`, player.channelId);
-			guildData.set(`${interaction.guildId}.always.text`, player.queue.channel.id);
+			await data.guild.set(interaction.guildId, 'settings.stay.channel', player.channelId);
+			await data.guild.set(interaction.guildId, 'settings.stay.text', player.queue.channel.id);
 		}
 		if (player.timeout) {
 			clearTimeout(player.timeout);
@@ -46,6 +50,6 @@ module.exports = {
 		}
 		// pause timeout is theoretically impossible because the user would need to be in the same vc as Quaver
 		// and pause timeout is only set when everyone leaves
-		await interaction.replyHandler.locale(always ? 'CMD_247_ENABLED' : 'CMD_247_DISABLED', { footer: always ? getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'CMD_247_NOTE') : '' });
+		await interaction.replyHandler.locale(always ? 'CMD_247_ENABLED' : 'CMD_247_DISABLED', { footer: always ? getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD_247_NOTE') : '' });
 	},
 };

@@ -109,4 +109,4 @@ dist
 
 # Settings and Data
 settings.json
-data.json
+database.sqlite

@@ -1,5 +1,5 @@
 const { MessageEmbed } = require('discord.js');
-const { guildData, logger } = require('../shared.js');
+const { data, logger } = require('../shared.js');
 const { getLocale } = require('../functions.js');
 const { defaultLocale, defaultColor } = require('../settings.json');
 
@@ -10,17 +10,17 @@ module.exports = class ReplyHandler {
 
 	/**
 	 * Returns a replyData object.
-	 * @param {string} data - The message to be used.
+	 * @param {string} msg - The message to be used.
 	 * @param {Object} embedExtras - Extra data to be passed to the embed.
 	 * @param {boolean} error - Whether or not the message is an error.
 	 * @returns {Object} - The replyData object.
 	 */
-	replyDataConstructor(data, embedExtras, error) {
+	replyDataConstructor(msg, embedExtras, error) {
 		const replyData = {
 			embeds: [
 				new MessageEmbed()
 					.setTitle(embedExtras?.title ?? '')
-					.setDescription(data)
+					.setDescription(msg)
 					.setFooter({ text: embedExtras?.footer ?? '' })
 					.setThumbnail(embedExtras?.thumbnail ?? '')
 					.setColor(error ? 'DARK_RED' : defaultColor),
@@ -33,12 +33,12 @@ module.exports = class ReplyHandler {
 
 	/**
 	 * Replies with a message.
-	 * @param {string} data - The message to be used.
+	 * @param {string} msg - The message to be used.
 	 * @param {Object} embedExtras - Extra data to be passed to the embed.
 	 * @returns {Message|APIMessage|boolean} - The message that was sent.
 	 */
-	async reply(data, embedExtras) {
-		const replyData = this.replyDataConstructor(data, embedExtras);
+	async reply(msg, embedExtras) {
+		const replyData = this.replyDataConstructor(msg, embedExtras);
 		if (!this.interaction.replied && !this.interaction.deferred) {
 			if (this.interaction.channel && !this.interaction.channel.permissionsFor(this.interaction.client.user.id).has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) {
 				replyData.ephemeral = true;
@@ -62,12 +62,12 @@ module.exports = class ReplyHandler {
 
 	/**
 	 * Replies with an error message.
-	 * @param {string} data - The message to be used.
+	 * @param {string} msg - The message to be used.
 	 * @param {Object} embedExtras - Extra data to be passed to the embed.
 	 * @returns {Message|APIMessage|boolean} - The message that was sent.
 	 */
-	async error(data, embedExtras) {
-		const replyData = this.replyDataConstructor(data, embedExtras, true);
+	async error(msg, embedExtras) {
+		const replyData = this.replyDataConstructor(msg, embedExtras, true);
 		if (!this.interaction.replied && !this.interaction.deferred) {
 			replyData.ephemeral = true;
 			try {
@@ -94,8 +94,8 @@ module.exports = class ReplyHandler {
 	 * @param  {...string} args - Additional arguments to be passed to the locale string.
 	 * @returns {Message|APIMessage|boolean} - The message that was sent.
 	 */
-	locale(code, embedExtras, ...args) {
-		const localizedString = getLocale(guildData.get(`${this.interaction.guildId}.locale`) ?? defaultLocale, code, ...args);
+	async locale(code, embedExtras, ...args) {
+		const localizedString = getLocale(await data.guild.get(this.interaction.guildId, 'settings.locale') ?? defaultLocale, code, ...args);
 		return this.reply(localizedString, embedExtras);
 	}
 
@@ -106,8 +106,8 @@ module.exports = class ReplyHandler {
 	 * @param  {...string} args - Additional arguments to be passed to the locale string.
 	 * @returns {Message|APIMessage|boolean} - The message that was sent.
 	 */
-	localeError(code, embedExtras, ...args) {
-		const localizedString = getLocale(guildData.get(`${this.interaction.guildId}.locale`) ?? defaultLocale, code, ...args);
+	async localeError(code, embedExtras, ...args) {
+		const localizedString = getLocale(await data.guild.get(this.interaction.guildId, 'settings.locale') ?? defaultLocale, code, ...args);
 		return this.error(localizedString, embedExtras);
 	}
 };

@@ -1,5 +1,5 @@
 const { MessageEmbed, MessageButton, Permissions } = require('discord.js');
-const { logger, guildData } = require('../shared.js');
+const { logger, data } = require('../shared.js');
 const { getLocale, paginate, msToTime, msToTimeString } = require('../functions.js');
 const { checks } = require('../enums.js');
 const { defaultLocale, defaultColor } = require('../settings.json');
@@ -122,7 +122,7 @@ module.exports = {
 							const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
 							return `\`${(firstIndex + index).toString().padStart(largestIndexSize, ' ')}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 						}).join('\n'))
-						.setFooter({ text: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_PAGE', page, pages.length) });
+						.setFooter({ text: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_PAGE', page, pages.length) });
 					original.components[0].components = [];
 					original.components[0].components[0] = new MessageButton()
 						.setCustomId(`queue_${page - 1}`)
@@ -138,7 +138,7 @@ module.exports = {
 						.setCustomId(`queue_${page}`)
 						.setEmoji('🔁')
 						.setStyle('SECONDARY')
-						.setLabel(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_REFRESH'));
+						.setLabel(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_REFRESH'));
 					try {
 						await interaction.update({
 							embeds: original.embeds,
@@ -159,7 +159,7 @@ module.exports = {
 						await interaction.update({
 							embeds: [
 								new MessageEmbed()
-									.setDescription(getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'DISCORD_INTERACTION_CANCELED', interaction.user.id))
+									.setDescription(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'DISCORD_INTERACTION_CANCELED', interaction.user.id))
 									.setColor(defaultColor),
 							],
 							components: [],
@@ -219,7 +219,7 @@ module.exports = {
 					}
 					else {
 						msg = 'MUSIC_QUEUE_ADDED_MULTI';
-						extras = [resolvedTracks.length, getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_SEARCH'), ''] ;
+						extras = [resolvedTracks.length, getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_SEARCH'), ''] ;
 					}
 					if (!player?.connected) {
 						player = interaction.client.music.createPlayer(interaction.guildId);
@@ -234,7 +234,7 @@ module.exports = {
 						}
 						if (interaction.member?.voice.channel.type === 'GUILD_STAGE_VOICE' && !interaction.member?.voice.channel.stageInstance?.topic) {
 							try {
-								await interaction.member.voice.channel.createStageInstance({ topic: getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
+								await interaction.member.voice.channel.createStageInstance({ topic: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
 							}
 							catch (err) {
 								logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
@@ -247,7 +247,7 @@ module.exports = {
 					player.queue.add(resolvedTracks, { requester: interaction.user.id });
 
 					const started = player.playing || player.paused;
-					await interaction.replyHandler.locale(msg, { footer: started ? `${getLocale(guildData.get(`${interaction.guildId}.locale`) ?? defaultLocale, 'MISC_POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '', components: [] }, ...extras);
+					await interaction.replyHandler.locale(msg, { footer: started ? `${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '', components: [] }, ...extras);
 					if (!started) { await player.queue.start(); }
 					const state = interaction.guild.members.cache.get(interaction.client.user.id).voice;
 					if (state.channel.type === 'GUILD_STAGE_VOICE' && state.suppress) {

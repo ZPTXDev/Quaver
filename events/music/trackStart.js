@@ -1,4 +1,4 @@
-const { logger, guildData } = require('../../shared.js');
+const { logger, data } = require('../../shared.js');
 const { getLocale, msToTime, msToTimeString } = require('../../functions.js');
 const { defaultLocale } = require('../../settings.json');
 
@@ -14,6 +14,6 @@ module.exports = {
 		}
 		const duration = msToTime(track.length);
 		const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
-		await queue.player.handler.send(`${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_NOW_PLAYING', track.title, track.uri, durationString)}\n${getLocale(guildData.get(`${queue.player.guildId}.locale`) ?? defaultLocale, 'MUSIC_ADDED_BY', track.requester)}`);
+		await queue.player.handler.send(`${getLocale(await data.guild.get(queue.player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_NOW_PLAYING', track.title, track.uri, durationString)}\n${getLocale(await data.guild.get(queue.player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_ADDED_BY', track.requester)}`);
 	},
 };

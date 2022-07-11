@@ -5,6 +5,7 @@
 	"247_DISABLED": "24/7 **disabled**",
 	"247_NOTE": "Quaver will use the same voice and text channels if it restarts.",
 	"247_NOT_WHITELISTED": "This server is not whitelisted to use 24/7.",
+	"247_MISSING_CHANNEL": "The queue channel is missing. This is probably a bug.",
 	"BASSBOOST_DESCRIPTION": "Boost the bass levels in your music.",
 	"BASSBOOST_OPTION_ENABLED": "Whether or not bass boost will be enabled. If not specified, it will be toggled.",
 	"BASSBOOST_ENABLED": "Bass boost **enabled**",
