@@ -5,7 +5,7 @@
     "node": ">=16.9.0"
   },
   "dependencies": {
-    "@discordjs/builders": "^0.16.0-dev.1657239113-e78c9c9",
+    "@discordjs/builders": "^0.16.0-dev.1657411897-f0b68d5",
     "@discordjs/rest": "^0.5.0",
     "@keyv/sqlite": "^3.5.2",
     "@lavaclient/queue": "^2.0.6",
