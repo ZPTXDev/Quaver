@@ -21,8 +21,8 @@
     "client_id": "Paste Spotify Client ID here",
     "client_secret": "Paste Spotify Client Secret here"
   },
-  "functions": {
-    "247": {
+  "features": {
+    "stay": {
       "enabled": true,
       "whitelist": false
     }

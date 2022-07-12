@@ -5,7 +5,7 @@ const { load } = require('@lavaclient/spotify');
 const fs = require('fs');
 const fsPromises = require('fs').promises;
 const readline = require('readline');
-const { token, lavalink, spotify, defaultLocale, functions } = require('./settings.json');
+const { token, lavalink, spotify, defaultLocale, features } = require('./settings.json');
 const { msToTime, msToTimeString, getLocale } = require('./functions.js');
 const { logger, data } = require('./shared.js');
 
@@ -37,7 +37,7 @@ rl.on('line', async input => {
 				break;
 			}
 			const guildId = input.split(' ')[1];
-			if (!functions.stay.whitelist) {
+			if (!features.stay.whitelist) {
 				console.log('The 24/7 whitelist is not enabled.');
 				break;
 			}

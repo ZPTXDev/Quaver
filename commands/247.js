@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { checks } = require('../enums.js');
-const { defaultLocale, functions } = require('../settings.json');
+const { defaultLocale, features } = require('../settings.json');
 const { getLocale } = require('../functions.js');
 const { data } = require('../shared.js');
 
@@ -18,11 +18,11 @@ module.exports = {
 		bot: [],
 	},
 	async execute(interaction) {
-		if (!functions['247'].enabled) {
+		if (!features.stay.enabled) {
 			await interaction.replyHandler.localeError('FUNCTION_DISABLED');
 			return;
 		}
-		if (functions['247'].whitelist && !await data.guild.get(interaction.guildId, 'features.stay.whitelisted')) {
+		if (features.stay.whitelist && !await data.guild.get(interaction.guildId, 'features.stay.whitelisted')) {
 			await interaction.replyHandler.localeError('CMD_247_NOT_WHITELISTED');
 			return;
 		}
