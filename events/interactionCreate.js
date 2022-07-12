@@ -9,9 +9,11 @@ const PlayerHandler = require('../classes/PlayerHandler.js');
 module.exports = {
 	name: 'interactionCreate',
 	once: false,
+	/** @param {import('discord.js').CommandInteraction & {replyHandler: ReplyHandler, client: import('discord.js').Client & {commands: import('discord.js').Collection, music: import('lavaclient').Node}}} interaction */
 	async execute(interaction) {
 		interaction.replyHandler = new ReplyHandler(interaction);
 		if (interaction.isCommand()) {
+			/** @type {{checks: string[]}} */
 			const command = interaction.client.commands.get(interaction.commandName);
 			if (!command) return;
 			logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing command ${interaction.commandName}`, label: 'Quaver' });

@@ -3,19 +3,25 @@ const { data, logger } = require('../shared.js');
 const { getLocale } = require('../functions.js');
 const { defaultLocale, defaultColor } = require('../settings.json');
 
+/** Class for handling replies to interactions. */
 module.exports = class ReplyHandler {
+	/**
+	 * Create an instance of ReplyHandler.
+	 * @param {import('discord.js').CommandInteraction} interaction The discord.js CommandInteraction object.
+	 */
 	constructor(interaction) {
 		this.interaction = interaction;
 	}
 
 	/**
 	 * Returns a replyData object.
-	 * @param {string} msg - The message to be used.
-	 * @param {Object} embedExtras - Extra data to be passed to the embed.
-	 * @param {boolean} error - Whether or not the message is an error.
-	 * @returns {Object} - The replyData object.
+	 * @param {string} msg The message to be used.
+	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: MessageEmbed[], components?: import('discord.js').MessageActionRow[]}} [embedExtras] Extra data to be passed to the embed.
+	 * @param {boolean} [error] Whether or not the message is an error.
+	 * @returns {Object} The replyData object.
 	 */
 	replyDataConstructor(msg, embedExtras, error) {
+		/** @type {{embeds: MessageEmbed[], components: import('discord.js').MessageActionRow[]}} */
 		const replyData = {
 			embeds: [
 				new MessageEmbed()
@@ -33,9 +39,9 @@ module.exports = class ReplyHandler {
 
 	/**
 	 * Replies with a message.
-	 * @param {string} msg - The message to be used.
-	 * @param {Object} embedExtras - Extra data to be passed to the embed.
-	 * @returns {Message|APIMessage|boolean} - The message that was sent.
+	 * @param {string} msg The message to be used.
+	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: MessageEmbed[], components?: import('discord.js').MessageActionRow[]}} [embedExtras] Extra data to be passed to the embed.
+	 * @returns {import('discord.js').Message|import('discord-api-types/v10').APIMessage|boolean} The message that was sent.
 	 */
 	async reply(msg, embedExtras) {
 		const replyData = this.replyDataConstructor(msg, embedExtras);
@@ -62,9 +68,9 @@ module.exports = class ReplyHandler {
 
 	/**
 	 * Replies with an error message.
-	 * @param {string} msg - The message to be used.
-	 * @param {Object} embedExtras - Extra data to be passed to the embed.
-	 * @returns {Message|APIMessage|boolean} - The message that was sent.
+	 * @param {string} msg The message to be used.
+	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: MessageEmbed[], components?: import('discord.js').MessageActionRow[]}} [embedExtras] Extra data to be passed to the embed.
+	 * @returns {import('discord.js').Message|import('discord-api-types/v10').APIMessage|boolean} The message that was sent.
 	 */
 	async error(msg, embedExtras) {
 		const replyData = this.replyDataConstructor(msg, embedExtras, true);
@@ -89,10 +95,10 @@ module.exports = class ReplyHandler {
 
 	/**
 	 * Replies with a localized message.
-	 * @param {string} code - The code of the locale string to be used.
-	 * @param {Object} embedExtras - Extra data to be passed to the embed.
-	 * @param  {...string} args - Additional arguments to be passed to the locale string.
-	 * @returns {Message|APIMessage|boolean} - The message that was sent.
+	 * @param {string} code The code of the locale string to be used.
+	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: MessageEmbed[], components?: import('discord.js').MessageActionRow[]}} [embedExtras] Extra data to be passed to the embed.
+	 * @param  {...string} [args] Additional arguments to be passed to the locale string.
+	 * @returns {import('discord.js').Message|import('discord-api-types/v10').APIMessage|boolean} The message that was sent.
 	 */
 	async locale(code, embedExtras, ...args) {
 		const localizedString = getLocale(await data.guild.get(this.interaction.guildId, 'settings.locale') ?? defaultLocale, code, ...args);
@@ -101,10 +107,10 @@ module.exports = class ReplyHandler {
 
 	/**
 	 * Replies with a localized error message.
-	 * @param {string} code - The code of the locale string to be used.
-	 * @param {Object} embedExtras - Extra data to be passed to the embed.
-	 * @param  {...string} args - Additional arguments to be passed to the locale string.
-	 * @returns {Message|APIMessage|boolean} - The message that was sent.
+	 * @param {string} code The code of the locale string to be used.
+	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: MessageEmbed[], components?: import('discord.js').MessageActionRow[]}} [embedExtras] Extra data to be passed to the embed.
+	 * @param  {...string} [args] Additional arguments to be passed to the locale string.
+	 * @returns {import('discord.js').Message|import('discord-api-types/v10').APIMessage|boolean} The message that was sent.
 	 */
 	async localeError(code, embedExtras, ...args) {
 		const localizedString = getLocale(await data.guild.get(this.interaction.guildId, 'settings.locale') ?? defaultLocale, code, ...args);

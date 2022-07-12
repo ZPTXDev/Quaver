@@ -5,6 +5,7 @@ const { defaultLocale } = require('../../settings.json');
 module.exports = {
 	name: 'queueFinish',
 	once: false,
+	/** @param {import('@lavaclient/queue').Queue & {player: import('lavaclient').Player & {handler: import('../../classes/PlayerHandler.js')}}} queue */
 	async execute(queue) {
 		if (await data.guild.get(queue.player.guildId, 'settings.stay.enabled')) {
 			queue.player.handler.locale('MUSIC_QUEUE_EMPTY');

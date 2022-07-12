@@ -4,6 +4,11 @@ const { bot } = require('../../main.js');
 module.exports = {
 	name: 'trackEnd',
 	once: false,
+	/**
+	 * @param {import('@lavaclient/queue').Queue & {player: import('lavaclient').Player & {handler: import('../../classes/PlayerHandler.js')}}} queue
+	 * @param {import('@lavaclient/queue').Song} track
+	 * @param {'PLAYLIST_LOADED'|'TRACK_LOADED'|'SEARCH_RESULT'|'NO_MATCHES'|'LOAD_FAILED'} reason
+	 */
 	async execute(queue, track, reason) {
 		delete queue.player.skip;
 		if (reason === 'LOAD_FAILED') {

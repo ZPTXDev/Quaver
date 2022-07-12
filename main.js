@@ -72,13 +72,18 @@ load({
 	autoResolveYoutubeTracks: false,
 });
 
-Object.keys(data).forEach(key => {
-	data[key].instance.on('error', async err => {
-		logger.error({ message: `Failed to connect to database:\n${err}`, label: 'Keyv' });
-		await shuttingDown('keyv');
-	});
-});
+/**
+ * Handles database connection errors from Keyv.
+ * @param {Error} err The error.
+ */
+async function handleDatabaseError(err) {
+	logger.error({ message: `Failed to connect to database:\n${err}`, label: 'Keyv' });
+	await shuttingDown('keyv');
+}
 
+data.guild.instance.on('error', handleDatabaseError);
+
+/** @type {Client & {commands: Collection, music: Node}} */
 const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
 bot.commands = new Collection();
 bot.music = new Node({
@@ -99,6 +104,11 @@ bot.ws.on('VOICE_STATE_UPDATE', payload => bot.music.handleVoiceUpdate(payload))
 module.exports.bot = bot;
 
 let inProgress = false;
+/**
+ * Shuts the bot down gracefully.
+ * @param {string} eventType The event type triggering the shutdown. This determines if the shutdown was caused by a crash.
+ * @param {Error} err The error object, if any.
+ */
 async function shuttingDown(eventType, err) {
 	if (inProgress) return;
 	inProgress = true;
@@ -106,7 +116,9 @@ async function shuttingDown(eventType, err) {
 	if (module.exports.startup) {
 		logger.info({ message: 'Disconnecting from all guilds...', label: 'Quaver' });
 		for (const pair of bot.music.players) {
+			/** @type {import('lavaclient').Player & {handler: import('./classes/PlayerHandler.js')}} */
 			const player = pair[1];
+			/** @type {string} */
 			const guildLocale = await data.guild.get(player.guildId, 'settings.locale');
 			logger.info({ message: `[G ${player.guildId}] Disconnecting (restarting)`, label: 'Quaver' });
 			const fileBuffer = [];
@@ -151,12 +163,14 @@ module.exports.shuttingDown = shuttingDown;
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
+	/** @type {{data: import('@discordjs/builders').SlashCommandBuilder}} */
 	const command = require(`./commands/${file}`);
 	bot.commands.set(command.data.name, command);
 }
 
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 for (const file of eventFiles) {
+	/** @type {{name: string, once: boolean, execute: function(...any)}} */
 	const event = require(`./events/${file}`);
 	if (event.once) {
 		bot.once(event.name, (...args) => event.execute(...args));

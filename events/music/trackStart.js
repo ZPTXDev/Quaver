@@ -5,6 +5,10 @@ const { defaultLocale } = require('../../settings.json');
 module.exports = {
 	name: 'trackStart',
 	once: false,
+	/**
+	 * @param {import('@lavaclient/queue').Queue} queue
+	 * @param {import('@lavaclient/queue').Song} track
+	 */
 	async execute(queue, track) {
 		logger.info({ message: `[G ${queue.player.guildId}] Starting track`, label: 'Quaver' });
 		queue.player.pause(false);
