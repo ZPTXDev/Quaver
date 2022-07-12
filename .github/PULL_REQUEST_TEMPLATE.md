@@ -4,8 +4,8 @@ Before proceeding, please review the [guidelines for contributing](https://githu
 - [ ] Are you targeting the `next` branch? (right side)
 - [ ] Did you review the guidelines for contributing?
 - [ ] Does your code pass linting checks?
-- [ ] Did you document your code?
-- [ ] Is this change necessary?
+- [ ] Is your code documented, if applicable? (Check if not applicable)
+- [ ] Does this PR have a linked issue?
 
 ### Scope of change
 - [ ] Major change
@@ -16,6 +16,12 @@ Before proceeding, please review the [guidelines for contributing](https://githu
 - [ ] Bug fix
 - [ ] Feature
 - [ ] Other
+
+### Priority
+- [ ] Critical
+- [ ] High
+- [ ] Medium
+- [ ] Low
 
 ### Description
 Please describe the changes.
