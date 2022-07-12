@@ -21,7 +21,7 @@ module.exports = class ReplyHandler {
 	 * @returns {Object} The replyData object.
 	 */
 	replyDataConstructor(msg, embedExtras, error) {
-		/** @type {{embeds: MessageEmbed[], components: import('discord.js').MessageActionRow[]}} */
+		/** @type {{embeds: MessageEmbed[], components?: import('discord.js').MessageActionRow[]}} */
 		const replyData = {
 			embeds: [
 				new MessageEmbed()

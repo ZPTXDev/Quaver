@@ -47,7 +47,7 @@ module.exports = class PlayerHandler {
 	 * @returns {Object} The sendData object.
 	 */
 	sendDataConstructor(msg, embedExtras, error) {
-		/** @type {{embeds: MessageEmbed[], files: import('discord.js').FileOptions[], components: import('discord.js').MessageActionRow[]}} */
+		/** @type {{embeds: MessageEmbed[], files?: import('discord.js').FileOptions[], components?: import('discord.js').MessageActionRow[]}} */
 		const sendData = {
 			embeds: [
 				new MessageEmbed()
