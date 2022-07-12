@@ -7,6 +7,10 @@ const { defaultLocale } = require('../settings.json');
 module.exports = {
 	name: 'voiceStateUpdate',
 	once: false,
+	/**
+	 * @param {import('discord.js').VoiceState} oldState
+	 * @param {import('discord.js').VoiceState} newState
+	 */
 	async execute(oldState, newState) {
 		const guild = oldState.guild;
 		const player = bot.music.players.get(guild.id);

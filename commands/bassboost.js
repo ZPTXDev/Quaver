@@ -17,6 +17,7 @@ module.exports = {
 		user: [],
 		bot: [],
 	},
+	/** @param {import('discord.js').CommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('../classes/ReplyHandler.js')}} interaction */
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const enabled = interaction.options.getBoolean('enabled');

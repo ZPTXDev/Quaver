@@ -25,6 +25,7 @@ module.exports = {
 		user: ['MANAGE_GUILD'],
 		bot: [],
 	},
+	/** @param {import('discord.js').CommandInteraction & {client: import('discord.js').Client, replyHandler: import('../classes/ReplyHandler.js')}} interaction */
 	async execute(interaction) {
 		const locale = interaction.options.getString('new_locale');
 		const localeCompletion = checkLocaleCompletion(locale);

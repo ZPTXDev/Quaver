@@ -4,6 +4,7 @@ const { version } = require('../package.json');
 module.exports = {
 	name: 'ready',
 	once: false,
+	/** @param {import('discord.js').Client} client */
 	async execute(client) {
 		const { startup, updateStartup } = require('../main.js');
 		if (!startup) {

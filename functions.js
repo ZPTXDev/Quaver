@@ -4,9 +4,9 @@ const { defaultLocale } = require('./settings.json');
 /**
  * Returns a time object (or a converted equivalent if a format is provided) converted from milliseconds.
  * Reference: https://gist.github.com/flangofas/714f401b63a1c3d84aaa
- * @param {number} milliseconds - The milliseconds to convert.
- * @param {string} [format] - The format to convert to. Accepts 's' for seconds, 'm' for minutes, 'h' for hours, 'd' for days.
- * @returns {(Object|number)} - Time object or the converted equivalent if a format is provided.
+ * @param {number} milliseconds The milliseconds to convert.
+ * @param {'s'|'m'|'h'|'d'} [format] The format to convert to. Accepts 's' for seconds, 'm' for minutes, 'h' for hours, 'd' for days.
+ * @returns {{d: number, h: number, m: number, s: number}|number} Time object or the converted equivalent if a format is provided.
  */
 function msToTime(milliseconds, format) {
 	const total_seconds = parseInt(Math.floor(milliseconds / 1000));
@@ -34,9 +34,9 @@ function msToTime(milliseconds, format) {
 
 /**
  * Returns a converted time object (from msToTime) in string format.
- * @param {Object} msObject - The time object provided by msToTime.
- * @param {boolean} simple - Whether to return a simple string or a more detailed one.
- * @returns {string} - The converted string.
+ * @param {{d: number, h: number, m: number, s: number}} msObject The time object provided by msToTime.
+ * @param {boolean} simple Whether to return a simple string or a more detailed one.
+ * @returns {string} The converted string.
  */
 function msToTimeString(msObject, simple) {
 	if (simple) {
@@ -51,9 +51,9 @@ function msToTimeString(msObject, simple) {
 /**
  * Returns a number rounded to the number of decimal places provided.
  * Reference: https://stackoverflow.com/a/15762794
- * @param {number} n - The number to round.
- * @param {number} digits - The number of decimal places to round to.
- * @returns {number} - The rounded number.
+ * @param {number} n The number to round.
+ * @param {number} digits The number of decimal places to round to.
+ * @returns {number} The rounded number.
  */
 function roundTo(n, digits) {
 	let negative = false;
@@ -73,8 +73,8 @@ function roundTo(n, digits) {
 /**
  * Returns seconds from a human-readable string.
  * Reference: https://stackoverflow.com/a/54897508
- * @param {string} str - The human-readable string.
- * @returns {number} - Seconds extracted from the string.
+ * @param {string} str The human-readable string.
+ * @returns {number} Seconds extracted from the string.
  */
 function getSeconds(str) {
 	let seconds = 0;
@@ -91,8 +91,8 @@ function getSeconds(str) {
 
 /**
  * Returns a progress bar based on the percentage provided.
- * @param {number} progress - The percentage of the bar to be filled.
- * @returns {string} - The progress bar.
+ * @param {number} progress The percentage of the bar to be filled.
+ * @returns {string} The progress bar.
  */
 function getBar(progress) {
 	if (isNaN(progress) || progress < 10) {return '🔘▬▬▬▬▬▬▬▬▬';}
@@ -109,9 +109,9 @@ function getBar(progress) {
 
 /**
  * Returns a paginated array.
- * @param {Array} arr - The array to paginate.
- * @param {number} size - The size of each page.
- * @returns {Array} - The paginated array.
+ * @param {Array} arr The array to paginate.
+ * @param {number} size The size of each page.
+ * @returns {Array} The paginated array.
  */
 function paginate(arr, size) {
 	return arr.reduce((acc, val, i) => {
@@ -125,10 +125,10 @@ function paginate(arr, size) {
 /**
  * Returns the localized string.
  * Reference: https://stackoverflow.com/a/63376860
- * @param {string} language - The language to use.
- * @param {string} string - The string to get.
- * @param {...string} vars - The extra variables required in some localized strings.
- * @returns {string} - The localized string.
+ * @param {string} language The language to use.
+ * @param {string} string The string to get.
+ * @param {...string} vars The extra variables required in some localized strings.
+ * @returns {string} The localized string.
  */
 function getLocale(language, string, ...vars) {
 	if (!fs.existsSync(`./locales/${language}`)) return 'LOCALE_MISSING';
@@ -150,8 +150,8 @@ function getLocale(language, string, ...vars) {
 
 /**
  * Returns locale completion for a given locale.
- * @param {string} language - The locale code to check.
- * @returns {Object|string} - Completion percentage and missing strings, or 'LOCALE_MISSING' if the locale is missing.
+ * @param {string} language The locale code to check.
+ * @returns {{completion: number, missing: string[]}|string} Completion percentage and missing strings, or 'LOCALE_MISSING' if the locale is missing.
  */
 function checkLocaleCompletion(language) {
 	if (!fs.existsSync(`./locales/${language}`)) return 'LOCALE_MISSING';

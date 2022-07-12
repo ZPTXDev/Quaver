@@ -25,6 +25,7 @@ module.exports = {
 		user: [],
 		bot: [],
 	},
+	/** @param {import('discord.js').CommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('../classes/ReplyHandler.js')}} interaction */
 	async execute(interaction) {
 		if (!['GUILD_TEXT', 'GUILD_VOICE'].includes(interaction.channel.type)) {
 			await interaction.replyHandler.localeError('DISCORD_BOT_UNSUPPORTED_CHANNEL');

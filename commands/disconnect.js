@@ -13,6 +13,7 @@ module.exports = {
 		user: [],
 		bot: [],
 	},
+	/** @param {import('discord.js').CommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('../classes/ReplyHandler.js')}} interaction */
 	async execute(interaction) {
 		if (await data.guild.get(interaction.guildId, 'settings.stay.enabled')) {
 			await interaction.replyHandler.localeError('CMD_DISCONNECT_247_ENABLED');
