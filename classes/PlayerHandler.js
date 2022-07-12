@@ -69,7 +69,7 @@ module.exports = class PlayerHandler {
 	 * @param {string} msg The message to be used.
 	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: MessageEmbed[], files?: import('discord.js').FileOptions[], components?: import('discord.js').MessageActionRow[]}} [embedExtras] Extra data to be passed to the embed.
 	 * @param {boolean} [error] Whether or not the message is an error.
-	 * @returns {import('discord.js').Message|import('discord-api-types/v10').APIMessage|boolean} The message that was sent.
+	 * @returns {Promise<import('discord.js').Message>|Promise<import('discord-api-types/v10').APIMessage>|boolean} The message that was sent.
 	 */
 	async send(msg, embedExtras, error) {
 		const sendData = this.sendDataConstructor(msg, embedExtras, error);
@@ -92,7 +92,7 @@ module.exports = class PlayerHandler {
 	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: MessageEmbed[], files?: import('discord.js').FileOptions[], components?: import('discord.js').MessageActionRow[]}} [embedExtras] Extra data to be passed to the embed.
 	 * @param {boolean} [error] Whether or not the message is an error.
 	 * @param  {...string} [args] Additional arguments to be passed to the locale string.
-	 * @returns {import('discord.js').Message|import('discord-api-types/v10').APIMessage|boolean} The message that was sent.
+	 * @returns {Promise<import('discord.js').Message>|Promise<import('discord-api-types/v10').APIMessage>|boolean} The message that was sent.
 	 */
 	async locale(code, embedExtras, error, ...args) {
 		const localizedString = getLocale(await data.guild.get(this.player.guildId, 'settings.locale') ?? defaultLocale, code, ...args);
