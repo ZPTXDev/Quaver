@@ -73,9 +73,9 @@ load({
 });
 
 Object.keys(data).forEach(key => {
-	data[key].instance.on('error', err => {
+	data[key].instance.on('error', async err => {
 		logger.error({ message: `Failed to connect to database:\n${err}`, label: 'Keyv' });
-		shuttingDown('keyv');
+		await shuttingDown('keyv');
 	});
 });
 
