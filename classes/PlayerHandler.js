@@ -51,8 +51,8 @@ module.exports = class PlayerHandler {
 					.setColor(error ? 'DARK_RED' : defaultColor),
 				...embedExtras?.additionalEmbeds ?? [],
 			],
-			...embedExtras?.additionalOptions ?? {},
 		};
+		if (embedExtras?.files) sendData.files = embedExtras.files;
 		if (embedExtras?.components) sendData.components = embedExtras.components;
 		return sendData;
 	}

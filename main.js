@@ -122,14 +122,12 @@ async function shuttingDown(eventType, err) {
 			const success = await player.handler.send(`${getLocale(guildLocale ?? defaultLocale, ['exit', 'SIGINT', 'SIGTERM', 'lavalink'].includes(eventType) ? 'MUSIC_RESTART' : 'MUSIC_RESTART_CRASH')}${fileBuffer.length > 0 ? `\n${getLocale(guildLocale ?? defaultLocale, 'MUSIC_RESTART_QUEUEDATA')}` : ''}`,
 				{
 					footer: getLocale(guildLocale ?? defaultLocale, 'MUSIC_RESTART_SORRY'),
-					additionalOptions: {
-						files: fileBuffer.length > 0 ? [
-							{
-								attachment: Buffer.from(fileBuffer.join('\n')),
-								name: 'queue.txt',
-							},
-						] : [],
-					},
+					files: fileBuffer.length > 0 ? [
+						{
+							attachment: Buffer.from(fileBuffer.join('\n')),
+							name: 'queue.txt',
+						},
+					] : [],
 				},
 			);
 			if (!success) continue;
