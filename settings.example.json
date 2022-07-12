@@ -6,7 +6,7 @@
   "managers": [
     "Paste your user ID here"
   ],
-  "database": "sqlite://database.sqlite",
+  "database_uri": "sqlite://database.sqlite",
   "lavalink": {
     "host": "localhost",
     "port": 12345,
