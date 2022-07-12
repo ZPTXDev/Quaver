@@ -7,22 +7,18 @@
 'priority:p3':
   - '- \[x] Low'
 'pr:type:feat':
-  - 'feat:'
-  - '- \[x] Feature'
+  - '(feat:|- \[x] Feature)'
 'pr:type:fix':
-  - 'fix:'
-  - '- \[x] Bug fix'
+  - '(fix:|- \[x] Bug fix)'
 'pr:docs':
   - '- \[x] Documentation only'
 'type:bug':
   - '- \[x] Bug fix'
 'type:enhancement':
-  - '- \[x] Feature'
-  - '- \[x] Other'
+  - '(- \[x] Feature|- \[x] Other)'
 'affects:functionality':
   - '\bfunctionalit(?:y|ies)\b'
 'affects:locale':
-  - '\blocale[s]?\b'
-  - '\blocali(?:s|z)(?:e[d]?|ation)\b'
+  - '(\blocale[s]?\b|\blocali(?:s|z)(?:e[d]?|ation)\b)'
 'affects:permissions':
   - '\bpermission[s]?\b'
