@@ -31,12 +31,7 @@ module.exports = {
 		let tracks = [];
 
 		const results = await interaction.client.music.rest.loadTracks(`ytsearch:${query}`);
-		switch (results.loadType) {
-			case 'SEARCH_RESULT': {
-				tracks = results.tracks;
-				break;
-			}
-		}
+		if (results.loadType === 'SEARCH_RESULT') tracks = results.tracks;
 
 		tracks = tracks.slice(0, 10);
 		if (tracks.length <= 1) {
