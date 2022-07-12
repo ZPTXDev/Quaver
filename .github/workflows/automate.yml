@@ -6,6 +6,8 @@ on:
     branches: next
   pull_request_target:
     branches: next
+  issues:
+    types: [opened]
 
 permissions:
   pull-requests: write
@@ -15,7 +17,7 @@ permissions:
 jobs:
   commitlint:
     name: lint / CommitLint
-    if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request_target'
+    if: github.actor != 'dependabot[bot]' && contains(fromJson('["push", "pull_request"]'), github.event_name)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -35,6 +37,15 @@ jobs:
       - uses: reviewdog/action-eslint@v1
         with:
           reporter: github-pr-review
+  labeler:
+    name: issues+pr / Assign Labels
+    if: github.actor != 'dependabot[bot]' && contains(fromJson('["issues", "pull_request_target"]'), github.event_name) && github.event.action == 'opened'
+    runs-on: ubuntu-latest
+    steps:
+      - id: labeler
+        uses: jimschubert/labeler-action@v2
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   request-review:
     name: pr / Request Review
     if: github.event_name == 'pull_request_target' && contains(fromJson('["opened", "ready_for_review", "reopened"]'), github.event.action)
@@ -45,7 +56,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
   auto-merge:
     name: pr / Auto Merge
-    if: github.actor == 'dependabot[bot]'
+    if: contains(fromJson('["pull_request", "pull_request_target"]'), github.event_name) && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - id: metadata
