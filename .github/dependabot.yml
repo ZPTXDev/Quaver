@@ -8,3 +8,5 @@ updates:
   open-pull-requests-limit: 10
   target-branch: next
   versioning-strategy: increase
+  labels:
+  - "pr:deps"
