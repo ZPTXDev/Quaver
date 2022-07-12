@@ -70,7 +70,7 @@ labels:
   'pr:type:fix':
     include:
       - 'fix:'
-      -'- \[x] Bug fix'
+      - '- \[x] Bug fix'
   'pr:docs':
     include:
       - '- \[x] Documentation only'
