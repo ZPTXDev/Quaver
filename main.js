@@ -119,7 +119,7 @@ async function shuttingDown(eventType, err) {
 				fileBuffer.push(player.queue.tracks.map(track => track.uri).join('\n'));
 			}
 			await player.handler.disconnect();
-			await player.handler.send(`${getLocale(guildLocale ?? defaultLocale, ['exit', 'SIGINT', 'SIGTERM', 'lavalink'].includes(eventType) ? 'MUSIC_RESTART' : 'MUSIC_RESTART_CRASH')}${fileBuffer.length > 0 ? `\n${getLocale(guildLocale ?? defaultLocale, 'MUSIC_RESTART_QUEUEDATA')}` : ''}`,
+			const success = await player.handler.send(`${getLocale(guildLocale ?? defaultLocale, ['exit', 'SIGINT', 'SIGTERM', 'lavalink'].includes(eventType) ? 'MUSIC_RESTART' : 'MUSIC_RESTART_CRASH')}${fileBuffer.length > 0 ? `\n${getLocale(guildLocale ?? defaultLocale, 'MUSIC_RESTART_QUEUEDATA')}` : ''}`,
 				{
 					footer: getLocale(guildLocale ?? defaultLocale, 'MUSIC_RESTART_SORRY'),
 					additionalOptions: {
@@ -132,6 +132,7 @@ async function shuttingDown(eventType, err) {
 					},
 				},
 			);
+			if (!success) continue;
 		}
 	}
 	if (!['exit', 'SIGINT', 'SIGTERM'].includes(eventType)) {
