@@ -94,8 +94,8 @@ bot.music = new Node({
 	},
 	sendGatewayPayload: (id, payload) => bot.guilds.cache.get(id)?.shard?.send(payload),
 });
-bot.ws.on('VOICE_SERVER_UPDATE', voiceData => bot.music.handleVoiceUpdate(voiceData));
-bot.ws.on('VOICE_STATE_UPDATE', voiceData => bot.music.handleVoiceUpdate(voiceData));
+bot.ws.on('VOICE_SERVER_UPDATE', payload => bot.music.handleVoiceUpdate(payload));
+bot.ws.on('VOICE_STATE_UPDATE', payload => bot.music.handleVoiceUpdate(payload));
 module.exports.bot = bot;
 
 let inProgress = false;
