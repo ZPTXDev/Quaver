@@ -1,11 +1,11 @@
 require('@lavaclient/queue/register');
-const { Client, Intents, Collection, MessageEmbed } = require('discord.js');
+const { Client, Intents, Collection } = require('discord.js');
 const { Node } = require('lavaclient');
 const { load } = require('@lavaclient/spotify');
 const fs = require('fs');
 const fsPromises = require('fs').promises;
 const readline = require('readline');
-const { token, lavalink, spotify, defaultColor, defaultLocale, functions } = require('./settings.json');
+const { token, lavalink, spotify, defaultLocale, functions } = require('./settings.json');
 const { msToTime, msToTimeString, getLocale } = require('./functions.js');
 const { logger, data } = require('./shared.js');
 
@@ -119,22 +119,18 @@ async function shuttingDown(eventType, err) {
 				fileBuffer.push(player.queue.tracks.map(track => track.uri).join('\n'));
 			}
 			await player.handler.disconnect();
-			const botChannelPerms = bot.guilds.cache.get(player.guildId).channels.cache.get(player.queue.channel.id).permissionsFor(bot.user.id);
-			if (!botChannelPerms.has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) { continue; }
-			await player.queue.channel.send({
-				embeds: [
-					new MessageEmbed()
-						.setDescription(`${getLocale(guildLocale ?? defaultLocale, ['exit', 'SIGINT', 'SIGTERM', 'lavalink'].includes(eventType) ? 'MUSIC_RESTART' : 'MUSIC_RESTART_CRASH')}${fileBuffer.length > 0 ? `\n${getLocale(guildLocale ?? defaultLocale, 'MUSIC_RESTART_QUEUEDATA')}` : ''}`)
-						.setFooter({ text: getLocale(guildLocale ?? defaultLocale, 'MUSIC_RESTART_SORRY') })
-						.setColor(defaultColor),
-				],
-				files: fileBuffer.length > 0 ? [
-					{
-						attachment: Buffer.from(fileBuffer.join('\n')),
-						name: 'queue.txt',
-					},
-				] : [],
-			});
+			const success = await player.handler.send(`${getLocale(guildLocale ?? defaultLocale, ['exit', 'SIGINT', 'SIGTERM', 'lavalink'].includes(eventType) ? 'MUSIC_RESTART' : 'MUSIC_RESTART_CRASH')}${fileBuffer.length > 0 ? `\n${getLocale(guildLocale ?? defaultLocale, 'MUSIC_RESTART_QUEUEDATA')}` : ''}`,
+				{
+					footer: getLocale(guildLocale ?? defaultLocale, 'MUSIC_RESTART_SORRY'),
+					files: fileBuffer.length > 0 ? [
+						{
+							attachment: Buffer.from(fileBuffer.join('\n')),
+							name: 'queue.txt',
+						},
+					] : [],
+				},
+			);
+			if (!success) continue;
 		}
 	}
 	if (!['exit', 'SIGINT', 'SIGTERM'].includes(eventType)) {

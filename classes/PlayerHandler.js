@@ -52,6 +52,7 @@ module.exports = class PlayerHandler {
 				...embedExtras?.additionalEmbeds ?? [],
 			],
 		};
+		if (embedExtras?.files) sendData.files = embedExtras.files;
 		if (embedExtras?.components) sendData.components = embedExtras.components;
 		return sendData;
 	}
