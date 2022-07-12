@@ -42,7 +42,7 @@ jobs:
     if: github.actor != 'dependabot[bot]' && contains(fromJson('["issues", "pull_request_target"]'), github.event_name) && github.event.action == 'opened'
     runs-on: ubuntu-latest
     steps:
-      - uses: github/issue-labeler@v2.0
+      - uses: ZPTXDev/issue-labeler@master
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           configuration-path: .github/labeler.yml

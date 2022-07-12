@@ -1,9 +1,4 @@
 reviewers:
-  # The default reviewers
-  defaults:
-    - zapteryx
-    - Xayanide
-
   per_author:
     'dependabot[bot]':
       - zptx-bot

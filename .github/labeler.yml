@@ -14,6 +14,11 @@
   - '- \[x] Bug fix'
 'pr:docs':
   - '- \[x] Documentation only'
+'type:bug':
+  - '- \[x] Bug fix'
+'type:enhancement':
+  - '- \[x] Feature'
+  - '- \[x] Other'
 'affects:functionality':
   - '\bfunctionalit(?:y|ies)\b'
 'affects:locale':
