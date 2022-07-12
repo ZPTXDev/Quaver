@@ -62,7 +62,7 @@ rl.on('line', async input => {
 	}
 });
 // 'close' event catches ctrl+c, therefore we pass it to shuttingDown as a ctrl+c event
-rl.on('close', () => shuttingDown('SIGINT'));
+rl.on('close', async () => await shuttingDown('SIGINT'));
 
 load({
 	client: {
@@ -184,7 +184,7 @@ for (const file of musicEventFiles) {
 bot.login(token);
 
 ['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM', 'uncaughtException', 'unhandledRejection'].forEach(eventType => {
-	process.on(eventType, err => shuttingDown(eventType, err));
+	process.on(eventType, async err => await shuttingDown(eventType, err));
 });
 
 module.exports.startup = false;
