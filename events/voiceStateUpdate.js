@@ -13,6 +13,7 @@ module.exports = {
 	 */
 	async execute(oldState, newState) {
 		const guild = oldState.guild;
+		/** @type {import('lavaclient').Player & {handler: import('../classes/PlayerHandler.js')}} */
 		const player = bot.music.players.get(guild.id);
 		if (!player) return;
 		// Quaver voiceStateUpdate
