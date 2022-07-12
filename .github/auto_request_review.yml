@@ -1,8 +1,4 @@
 reviewers:
-  # The default reviewers
-  defaults:
-    - team:development
-
   per_author:
     'dependabot[bot]':
       - zptx-bot
