@@ -1,90 +1,23 @@
-# labeler "full" schema
-
-# enable labeler on issues, prs, or both.
-enable:
-  issues: true
-  prs: true
-# comments object allows you to specify a different message for issues and prs
-
-comments:
-  issues: |
-    Thanks for opening this issue!
-    I have applied any labels matching special text in your title and description.
-
-    Please review the labels and make any necessary changes.
-  prs: |
-    Thanks for the contribution!
-    I have applied any labels matching special text in your title and description.
-
-    Please review the labels and make any necessary changes.
-
-# Labels is an object where:
-# - keys are labels
-# - values are objects of { include: [ pattern ], exclude: [ pattern ] }
-#    - pattern must be a valid regex, and is applied globally to
-#      title + description of issues and/or prs (see enabled config above)
-#    - 'include' patterns will associate a label if any of these patterns match
-#    - 'exclude' patterns will ignore this label if any of these patterns match
-labels:
-  'priority:p0':
-    include:
-      - '- \[x] Critical'
-    exclude:
-      - '- \[x] High'
-      - '- \[x] Medium'
-      - '- \[x] Low'
-  'priority:p1':
-    include:
-      - '- \[x] High'
-    exclude:
-      - '- \[x] Critical'
-      - '- \[x] Medium'
-      - '- \[x] Low'
-  'priority:p2':
-    include:
-      - '- \[x] Medium'
-    exclude:
-      - '- \[x] Critical'
-      - '- \[x] High'
-      - '- \[x] Low'
-  'priority:p3':
-    include:
-      - '- \[x] Low'
-    exclude:
-      - '- \[x] Critical'
-      - '- \[x] High'
-      - '- \[x] Medium'
-  'type:bug':
-    include:
-      - '- \[x] Bug fix'
-    exclude: []
-  'type:enhancement':
-    include:
-      - '- \[x] Feature'
-      - '- \[x] Other'
-  'pr:type:feat':
-    include:
-      - 'feat:'
-      - '- \[x] Feature'
-    exclude: []
-  'pr:type:fix':
-    include:
-      - 'fix:'
-      -'- \[x] Bug fix'
-  'pr:docs':
-    include:
-      - '- \[x] Documentation only'
-    exclude: []
-  'affects:functionality':
-    include:
-      - '\bfunctionalit(?:y|ies)\b'
-    exclude: []
-  'affects:locale':
-    include:
-      - '\blocale[s]?\b'
-      - '\blocali(?:s|z)(?:e[d]?|ation)\b'
-    exclude: []
-  'affects:permissions':
-    include:
-      - '\bpermission[s]?\b'
-    exclude: []
+'priority:p0':
+  - '- \[x] Critical'
+'priority:p1':
+  - '- \[x] High'
+'priority:p2':
+  - '- \[x] Medium'
+'priority:p3':
+  - '- \[x] Low'
+'pr:type:feat':
+  - 'feat:'
+  - '- \[x] Feature'
+'pr:type:fix':
+  - 'fix:'
+  - '- \[x] Bug fix'
+'pr:docs':
+  - '- \[x] Documentation only'
+'affects:functionality':
+  - '\bfunctionalit(?:y|ies)\b'
+'affects:locale':
+  - '\blocale[s]?\b'
+  - '\blocali(?:s|z)(?:e[d]?|ation)\b'
+'affects:permissions':
+  - '\bpermission[s]?\b'
