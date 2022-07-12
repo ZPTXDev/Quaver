@@ -37,7 +37,7 @@ jobs:
           reporter: github-pr-review
   request-review:
     name: pr / Request Review
-    if: github.actor != 'dependabot[bot]' && github.event_name == 'pull_request_target' && contains(fromJson('["opened", "ready_for_review", "reopened"]'), github.event.action)
+    if: github.event_name == 'pull_request_target' && contains(fromJson('["opened", "ready_for_review", "reopened"]'), github.event.action)
     runs-on: ubuntu-latest
     steps:
       - uses: necojackarc/auto-request-review@v0.7.0
@@ -53,10 +53,12 @@ jobs:
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
       - if: steps.metadata.outputs.update-type != 'version-update:semver-major'
-        run: gh pr merge --auto --merge "$PR_URL"
+        run: |
+             gh pr review --approve
+             gh pr merge --auto --merge "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
   semantic-release:
     name: push / Semantic Release
     needs: commitlint
@@ -74,4 +76,4 @@ jobs:
           extra_plugins: |
             @semantic-release/git
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
