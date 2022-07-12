@@ -6,11 +6,6 @@
   - '- \[x] Medium'
 'priority:p3':
   - '- \[x] Low'
-'type:bug':
-  - '- \[x] Bug fix'
-'type:enhancement':
-  - '- \[x] Feature'
-  - '- \[x] Other'
 'pr:type:feat':
   - 'feat:'
   - '- \[x] Feature'
