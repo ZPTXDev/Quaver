@@ -1,9 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { LoopType } = require('@lavaclient/queue');
 const { checks } = require('../enums.js');
-const { getBar, msToTime, msToTimeString } = require('../functions.js');
+const { getBar, getLocale, msToTime, msToTimeString } = require('../functions.js');
 const { defaultLocale } = require('../settings.json');
-const { getLocale } = require('../functions.js');
 const { data } = require('../shared.js');
 
 module.exports = {
