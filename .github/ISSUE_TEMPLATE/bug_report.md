@@ -12,10 +12,10 @@ assignees:
 What isn't working as intended, and what does it affect?
 
 **Severity**
-[ ] Critical
-[ ] High
-[ ] Medium
-[ ] Low
+- [ ] Critical
+- [ ] High
+- [ ] Medium
+- [ ] Low
 
 **Affected versions**
 What versions are affected by this bug? (e.g. >=3.0.1, 2.5.1-2.6.3, >=1.2.0)
