@@ -86,6 +86,12 @@ module.exports = {
 					extras = [track.info.title, track.info.uri];
 					break;
 				}
+				case 'NO_MATCHES':
+					await interaction.replyHandler.localeError('CMD_PLAY_NO_RESULTS');
+					break;
+				case 'LOAD_FAILED':
+					await interaction.replyHandler.localeError('CMD_PLAY_LOAD_FAILED');
+					break;
 				default:
 					await interaction.replyHandler.localeError('DISCORD_CMD_ERROR');
 					return;

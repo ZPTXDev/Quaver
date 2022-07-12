@@ -52,6 +52,8 @@
 	"PLAY_OPTION_QUERY": "What to search for. Links from Spotify, YouTube and more are supported. Searches YouTube by default.",
 	"PLAY_OPTION_INSERT": "Whether or not to play the track next.",
 	"PLAY_SPOTIFY_NO_RESULTS": "Found no results from your Spotify query.",
+	"PLAY_NO_RESULTS": "Found no results from your query.",
+	"PLAY_LOAD_FAILED": "Failed to load the track.",
 	"PLAYING_DESCRIPTION": "Show what's currently playing.",
 	"QUEUE_DESCRIPTION": "Show the queue.",
 	"QUEUE_EMPTY": "There is nothing coming up.",
