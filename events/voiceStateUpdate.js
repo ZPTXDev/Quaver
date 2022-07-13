@@ -23,13 +23,12 @@ module.exports = {
 			// disconnected
 			if (!newState.channelId || !newState.channel?.members.find(m => m.user.id === bot.user.id)) {
 				logger.info({ message: `[G ${player.guildId}] Cleaning up`, label: 'Quaver' });
-				const channelId = player.channelId;
 				player.channelId = null;
 				if (await data.guild.get(player.guildId, 'settings.stay.enabled')) {
 					await data.guild.set(player.guildId, 'settings.stay.enabled', false);
 				}
 				await player.handler.locale('MUSIC_FORCED');
-				await player.handler.disconnect(channelId);
+				await player.handler.disconnect(oldState.channelId);
 				return;
 			}
 			// channel is a voice channel
