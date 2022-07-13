@@ -140,7 +140,7 @@ module.exports = {
 		}
 		// rare case where the bot sets pause timeout after setting timeout
 		// another weird issue where pause timeout is set after stage ends
-		if (player.timeout || player.stageEnded) return;
+		if (player.timeout || !player.channelId) return;
 		await player.pause();
 		logger.info({ message: `[G ${player.guildId}] Setting pause timeout`, label: 'Quaver' });
 		if (player.pauseTimeout) {
