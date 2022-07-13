@@ -152,8 +152,6 @@ module.exports = {
 		if (newState.channelId === oldState.channelId) return;
 		// vc still has people
 		if (oldState.channel.members.filter(m => !m.user.bot).size >= 1) return;
-		// player's gone!
-		if (!player.connected) return;
 		// 24/7 mode enabled, ignore
 		if (await data.guild.get(guild.id, 'settings.stay.enabled')) return;
 		// nothing is playing so we just leave
