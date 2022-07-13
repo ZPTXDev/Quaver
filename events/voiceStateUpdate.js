@@ -23,34 +23,12 @@ module.exports = {
 			// disconnected
 			if (!newState.channelId || !newState.channel?.members.find(m => m.user.id === bot.user.id)) {
 				logger.info({ message: `[G ${player.guildId}] Cleaning up`, label: 'Quaver' });
+				player.channelId = null;
 				if (await data.guild.get(player.guildId, 'settings.stay.enabled')) {
 					await data.guild.set(player.guildId, 'settings.stay.enabled', false);
 				}
-				const success = await player.handler.locale('MUSIC_FORCED');
-				await player.handler.disconnect();
-				// channel was a stage channel, and bot was unsuppressed
-				if (oldState.channel?.type === 'GUILD_STAGE_VOICE' && !oldState.suppress) {
-					// check for connect, speak permission for voice channel
-					const permissions = bot.guilds.cache.get(guild.id).channels.cache.get(oldState.channelId).permissionsFor(bot.user.id);
-					if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
-						await player.handler.locale('DISCORD_BOT_MISSING_PERMISSIONS_BASIC');
-						return;
-					}
-					if (!permissions.has(Permissions.STAGE_MODERATOR)) {
-						await player.handler.locale('DISCORD_BOT_MISSING_PERMISSIONS_STAGE');
-						return;
-					}
-					// probably don't have perms anyway, let's not bother ending the stage
-					if (!success) return;
-					if (oldState.channel.stageInstance?.topic === getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_STAGE_TOPIC')) {
-						try {
-							await oldState.channel.stageInstance.delete();
-						}
-						catch (err) {
-							logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-						}
-					}
-				}
+				await player.handler.locale('MUSIC_FORCED');
+				await player.handler.disconnect(oldState.channelId);
 				return;
 			}
 			// channel is a voice channel
@@ -162,7 +140,10 @@ module.exports = {
 			return;
 		}
 		// rare case where the bot sets pause timeout after setting timeout
-		if (player.timeout) return;
+		// another weird issue where pause timeout is set after stage ends
+		if (player.timeout || !player.channelId) return;
+		const voiceChannel = bot.guilds.cache.get(player.guildId).channels.cache.get(player.channelId);
+		if (voiceChannel.type === 'GUILD_STAGE_VOICE' && !voiceChannel.stageInstance) return;
 		await player.pause();
 		logger.info({ message: `[G ${player.guildId}] Setting pause timeout`, label: 'Quaver' });
 		if (player.pauseTimeout) {

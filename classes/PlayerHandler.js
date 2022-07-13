@@ -17,15 +17,16 @@ module.exports = class PlayerHandler {
 
 	/**
 	 * Disconnects and cleans up the player.
+	 * @param {string} [channelId] The channel to disconnect from.
 	 */
-	async disconnect() {
+	async disconnect(channelId) {
 		clearTimeout(this.player.timeout);
 		clearTimeout(this.player.pauseTimeout);
 		this.player.disconnect();
 		this.client.music.destroyPlayer(this.player.guildId);
-		const voiceChannel = this.client.guilds.cache.get(this.player.guildId)?.channels.cache.get(this.player.channelId);
+		const voiceChannel = this.client.guilds.cache.get(this.player.guildId)?.channels.cache.get(channelId ?? this.player.channelId);
 		if (voiceChannel?.type === 'GUILD_STAGE_VOICE') {
-			const permissions = this.client.guilds.cache.get(this.player.guildId).channels.cache.get(this.player.channelId).permissionsFor(this.client.user.id);
+			const permissions = this.client.guilds.cache.get(this.player.guildId).channels.cache.get(channelId ?? this.player.channelId).permissionsFor(this.client.user.id);
 			if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) return;
 			if (!permissions.has(Permissions.STAGE_MODERATOR)) return;
 			if (voiceChannel.stageInstance?.topic === getLocale(await data.guild.get(this.player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_STAGE_TOPIC')) {
