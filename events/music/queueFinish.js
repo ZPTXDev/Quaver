@@ -11,6 +11,8 @@ module.exports = {
 			queue.player.handler.locale('MUSIC_QUEUE_EMPTY');
 			return;
 		}
+		// rare case where the bot sets timeout after setting pause timeout
+		if (queue.player.pauseTimeout) return;
 		logger.info({ message: `[G ${queue.player.guildId}] Setting timeout`, label: 'Quaver' });
 		if (queue.player.timeout) {
 			clearTimeout(queue.player.timeout);

@@ -161,9 +161,9 @@ module.exports = {
 			await player.handler.disconnect();
 			return;
 		}
-		await player.pause();
 		// rare case where the bot sets pause timeout after setting timeout
 		if (player.timeout) return;
+		await player.pause();
 		logger.info({ message: `[G ${player.guildId}] Setting pause timeout`, label: 'Quaver' });
 		if (player.pauseTimeout) {
 			clearTimeout(player.pauseTimeout);
