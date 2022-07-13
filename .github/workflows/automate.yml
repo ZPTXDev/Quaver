@@ -58,17 +58,24 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
   auto-merge:
     name: pr / Auto Merge
-    if: contains(fromJson('["pull_request", "pull_request_target"]'), github.event_name) && github.actor == 'dependabot[bot]'
+    if: contains(fromJson('["pull_request", "pull_request_target"]'), github.event_name)
     runs-on: ubuntu-latest
     steps:
       - id: metadata
+        if: steps.metadata.outputs.update-type != 'version-update:semver-major' && github.actor == 'dependabot[bot]'
         uses: dependabot/fetch-metadata@v1.1.1
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
-      - if: steps.metadata.outputs.update-type != 'version-update:semver-major'
+      - if: steps.metadata.outputs.update-type != 'version-update:semver-major' && github.actor == 'dependabot[bot]'
         run: |
-             gh pr review --approve
+             gh pr review --approve "$PR_URL"
              gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
+      - if: github.event.action == 'review_requested' && github.actor == 'zapteryx' && contains(github.event.pull_request.requested_teams.*.slug, 'development')
+        run: |
+            gh pr review --approve "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
