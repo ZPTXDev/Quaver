@@ -5,7 +5,6 @@ module.exports = {
 	async execute(stageInstance) {
 		const player = stageInstance.client.music.players.get(stageInstance.guildId);
 		if (player?.channelId !== stageInstance.channelId) return;
-		await player.handler.locale('MUSIC_FORCED');
-		await player.handler.disconnect();
+		player.stageEnded = true;
 	},
 };
