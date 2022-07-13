@@ -2,10 +2,9 @@
 const Keyv = require('keyv');
 const _ = require('lodash');
 const data = require('./data.json');
-let { database } = require('./settings.json');
+const { database_uri } = require('./settings.json');
 
-if (!database) database = 'sqlite://database.sqlite';
-const keyv = new Keyv(database, { namespace: 'guild' });
+const keyv = new Keyv(database_uri ?? 'sqlite://database.sqlite', { namespace: 'guild' });
 
 (async () => {
 	for (const [guildId, guildData] of Object.entries(data)) {
