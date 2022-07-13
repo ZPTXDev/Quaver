@@ -28,6 +28,7 @@ module.exports = {
 				}
 				const success = await player.handler.locale('MUSIC_FORCED');
 				await player.handler.disconnect();
+				player.ended = true;
 				// channel was a stage channel, and bot was unsuppressed
 				if (oldState.channel?.type === 'GUILD_STAGE_VOICE' && !oldState.suppress) {
 					// check for connect, speak permission for voice channel
@@ -162,7 +163,8 @@ module.exports = {
 			return;
 		}
 		// rare case where the bot sets pause timeout after setting timeout
-		if (player.timeout) return;
+		// another weird issue where pause timeout is set after stage ends
+		if (player.timeout || player.ended) return;
 		await player.pause();
 		logger.info({ message: `[G ${player.guildId}] Setting pause timeout`, label: 'Quaver' });
 		if (player.pauseTimeout) {
