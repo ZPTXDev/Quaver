@@ -26,7 +26,6 @@ module.exports = {
 				if (await data.guild.get(player.guildId, 'settings.stay.enabled')) {
 					await data.guild.set(player.guildId, 'settings.stay.enabled', false);
 				}
-				await player.handler.locale('MUSIC_FORCED');
 				await player.handler.disconnect();
 				return;
 			}
