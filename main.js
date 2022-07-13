@@ -83,9 +83,10 @@ async function handleDatabaseError(err) {
 
 data.guild.instance.on('error', handleDatabaseError);
 
-/** @type {Client & {commands: Collection, music: Node}} */
+/** @type {Client & {commands: Collection, buttons: Collection, music: Node}} */
 const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
 bot.commands = new Collection();
+bot.buttons = new Collection();
 bot.music = new Node({
 	connection: {
 		host: lavalink.host,
@@ -166,6 +167,12 @@ for (const file of commandFiles) {
 	/** @type {{data: import('@discordjs/builders').SlashCommandBuilder}} */
 	const command = require(`./commands/${file}`);
 	bot.commands.set(command.data.name, command);
+}
+
+const buttonFiles = fs.readdirSync('./events/buttons').filter(file => file.endsWith('.js'));
+for (const file of buttonFiles) {
+	const button = require(`./events/buttons/${file}`);
+	bot.buttons.set(button.name, button);
 }
 
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
