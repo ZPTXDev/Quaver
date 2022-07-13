@@ -7,7 +7,7 @@ on:
   pull_request_target:
     branches: next
   issues:
-    types: [opened]
+    types: [opened, edited]
 
 permissions:
   pull-requests: write
@@ -39,7 +39,7 @@ jobs:
           reporter: github-pr-review
   labeler:
     name: issues+pr / Assign Labels
-    if: github.actor != 'dependabot[bot]' && contains(fromJson('["issues", "pull_request_target"]'), github.event_name) && github.event.action == 'opened'
+    if: github.actor != 'dependabot[bot]' && contains(fromJson('["issues", "pull_request"]'), github.event_name) && contains(fromJson('["opened", "edited"]'), github.event.action)
     runs-on: ubuntu-latest
     steps:
       - uses: ZPTXDev/issue-labeler@master
