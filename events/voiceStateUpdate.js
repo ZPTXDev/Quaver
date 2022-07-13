@@ -23,6 +23,7 @@ module.exports = {
 			// disconnected
 			if (!newState.channelId || !newState.channel?.members.find(m => m.user.id === bot.user.id)) {
 				logger.info({ message: `[G ${player.guildId}] Cleaning up`, label: 'Quaver' });
+				player.channelId = null;
 				if (await data.guild.get(player.guildId, 'settings.stay.enabled')) {
 					await data.guild.set(player.guildId, 'settings.stay.enabled', false);
 				}
