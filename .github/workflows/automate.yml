@@ -62,6 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: metadata
+        if: steps.metadata.outputs.update-type != 'version-update:semver-major' && github.actor == 'dependabot[bot]'
         uses: dependabot/fetch-metadata@v1.1.1
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
