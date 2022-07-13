@@ -89,10 +89,10 @@ module.exports = {
 				}
 				case 'NO_MATCHES':
 					await interaction.replyHandler.localeError('CMD_PLAY_NO_RESULTS');
-					break;
+					return;
 				case 'LOAD_FAILED':
 					await interaction.replyHandler.localeError('CMD_PLAY_LOAD_FAILED');
-					break;
+					return;
 				default:
 					await interaction.replyHandler.localeError('DISCORD_CMD_ERROR');
 					return;
