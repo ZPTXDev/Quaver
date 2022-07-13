@@ -20,7 +20,7 @@ module.exports = {
 	/** @param {import('discord.js').CommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('../classes/ReplyHandler.js')}} interaction */
 	async execute(interaction) {
 		if (!features.stay.enabled) {
-			await interaction.replyHandler.localeError('FUNCTION_DISABLED');
+			await interaction.replyHandler.localeError('FEATURE_DISABLED');
 			return;
 		}
 		if (features.stay.whitelist && !await data.guild.get(interaction.guildId, 'features.stay.whitelisted')) {
