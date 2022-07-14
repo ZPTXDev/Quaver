@@ -10,3 +10,7 @@ updates:
   versioning-strategy: increase
   labels:
   - "affects:dependencies"
+  - "priority:p2"
+  - "status:tested"
+  - "status:confirmed"
+  - "type:enhancement"
