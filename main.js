@@ -190,6 +190,7 @@ for (const file of eventFiles) {
 
 const musicEventFiles = fs.readdirSync('./events/music').filter(file => file.endsWith('.js'));
 for (const file of musicEventFiles) {
+	/** @type {{name: string, once: boolean, execute(...args): void | Promise<void>}} */
 	const event = require(`./events/music/${file}`);
 	if (event.once) {
 		bot.music.once(event.name, (...args) => event.execute(...args));
