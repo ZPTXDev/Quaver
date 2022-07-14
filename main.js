@@ -169,9 +169,9 @@ for (const file of commandFiles) {
 	bot.commands.set(command.data.name, command);
 }
 
-const buttonFiles = fs.readdirSync('./events/buttons').filter(file => file.endsWith('.js'));
+const buttonFiles = fs.readdirSync('./components/buttons').filter(file => file.endsWith('.js'));
 for (const file of buttonFiles) {
-	const button = require(`./events/buttons/${file}`);
+	const button = require(`./components/buttons/${file}`);
 	bot.buttons.set(button.name, button);
 }
 
