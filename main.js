@@ -177,7 +177,7 @@ for (const file of buttonFiles) {
 
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 for (const file of eventFiles) {
-	/** @type {{name: string, once: boolean, execute: function(...any)}} */
+	/** @type {{name: string, once: boolean, execute(...args): void | Promise<void>}} */
 	const event = require(`./events/${file}`);
 	if (event.once) {
 		bot.once(event.name, (...args) => event.execute(...args));
