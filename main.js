@@ -164,7 +164,7 @@ module.exports.shuttingDown = shuttingDown;
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
-	/** @type {{data: import('@discordjs/builders').SlashCommandBuilder}} */
+	/** @type {{data: import('@discordjs/builders').SlashCommandBuilder, checks: string[], permissions: {user: string[], bot: string[]}, execute(interaction: import('discord.js').CommandInteraction): Promise<void>}} */
 	const command = require(`./commands/${file}`);
 	bot.commands.set(command.data.name, command);
 }
