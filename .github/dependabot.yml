@@ -9,4 +9,4 @@ updates:
   target-branch: next
   versioning-strategy: increase
   labels:
-  - "pr:deps"
+  - "affects:dependencies"
