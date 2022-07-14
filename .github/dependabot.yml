@@ -9,4 +9,8 @@ updates:
   target-branch: next
   versioning-strategy: increase
   labels:
-  - "pr:deps"
+  - "affects:dependencies"
+  - "priority:p2"
+  - "status:tested"
+  - "status:confirmed"
+  - "type:enhancement"
