@@ -93,6 +93,7 @@ module.exports = {
 			}
 		}
 		else if (interaction.isButton()) {
+			/** @type {{name: string, execute(interaction: import('discord.js').ButtonInteraction): Promise<void)>}} */
 			const button = interaction.client.buttons.get(interaction.customId.split('_')[0]);
 			if (!button) return;
 			logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing button ${interaction.customId}`, label: 'Quaver' });
