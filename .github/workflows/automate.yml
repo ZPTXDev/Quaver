@@ -15,30 +15,8 @@ permissions:
   contents: write
 
 jobs:
-  commitlint:
-    name: lint / CommitLint
-    if: github.actor != 'dependabot[bot]' && contains(fromJson('["push", "pull_request"]'), github.event_name)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: wagoid/commitlint-github-action@v4
-  eslint:
-    name: lint / ESLint
-    if: github.actor != 'dependabot[bot]' && github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '16.9.1'
-      - run: yarn install
-      - uses: reviewdog/action-eslint@v1
-        with:
-          reporter: github-pr-review
   labeler:
-    name: issues+pr / Assign Labels
+    name: Assign Labels
     if: github.actor != 'dependabot[bot]' && contains(fromJson('["issues", "pull_request_target"]'), github.event_name) && contains(fromJson('["opened", "edited"]'), github.event.action)
     runs-on: ubuntu-latest
     steps:
@@ -49,7 +27,7 @@ jobs:
           enable-versioned-regex: 0
           include-title: 1
   auto-merge:
-    name: pr / Auto Merge
+    name: Auto Merge (dependabot)
     if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
@@ -65,8 +43,7 @@ jobs:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
   semantic-release:
-    name: push / Semantic Release
-    needs: commitlint
+    name: Semantic Release
     if: github.event_name == 'push' && github.repository_owner == 'ZPTXDev'
     runs-on: ubuntu-latest
     steps:
