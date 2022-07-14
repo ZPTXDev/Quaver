@@ -48,14 +48,6 @@ jobs:
           configuration-path: .github/labeler.yml
           enable-versioned-regex: 0
           include-title: 1
-  request-review:
-    name: pr / Request Review
-    if: github.event_name == 'pull_request_target' && contains(fromJson('["opened", "ready_for_review", "reopened"]'), github.event.action)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: necojackarc/auto-request-review@v0.7.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
   auto-merge:
     name: pr / Auto Merge
     if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]'
