@@ -22,5 +22,5 @@
   - '(\blocale[s]?\b|\blocali(?:s|z)(?:e[d]?|ation)\b)'
 'affects:permissions':
   - '\bpermission[s]?\b'
-'status:pending':
+'status:proposed':
   - '.*'
