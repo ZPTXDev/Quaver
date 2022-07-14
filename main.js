@@ -171,6 +171,7 @@ for (const file of commandFiles) {
 
 const buttonFiles = fs.readdirSync('./components/buttons').filter(file => file.endsWith('.js'));
 for (const file of buttonFiles) {
+	/** @type {{name: string, execute(interaction: import('discord.js').ButtonInteraction): Promise<void)>}} */
 	const button = require(`./components/buttons/${file}`);
 	bot.buttons.set(button.name, button);
 }
