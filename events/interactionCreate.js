@@ -89,7 +89,7 @@ module.exports = {
 			catch (err) {
 				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with command ${interaction.commandName}`, label: 'Quaver' });
 				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				await interaction.replyHandler.localeError('DISCORD_CMD_ERROR');
+				await interaction.replyHandler.localeError('DISCORD_GENERIC_ERROR');
 			}
 		}
 		else if (interaction.isButton()) {
@@ -103,7 +103,7 @@ module.exports = {
 			catch (err) {
 				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with button ${interaction.customId}`, label: 'Quaver' });
 				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				await interaction.replyHandler.localeError('DISCORD_BUTTON_ERROR');
+				await interaction.replyHandler.localeError('DISCORD_GENERIC_ERROR');
 			}
 		}
 		else if (interaction.isSelectMenu()) {
