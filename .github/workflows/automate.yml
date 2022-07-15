@@ -48,6 +48,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
       - uses: cycjimmy/semantic-release-action@v2
         with:
           branches: |
