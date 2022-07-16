@@ -151,7 +151,7 @@ module.exports = {
 		// Quaver was playing something - set pauseTimeout
 		await player.pause();
 		logger.info({ message: `[G ${player.guildId}] Setting pause timeout`, label: 'Quaver' });
-		// Clear any existing pauseTimeout as failsafe before setting a new one
+		// When setting a pauseTimeout, clear pauseTimeout at any cost as failsafe
 		clearTimeout(player.pauseTimeout);
 		player.pauseTimeout = setTimeout(p => {
 			logger.info({ message: `[G ${p.guildId}] Disconnecting (inactivity)`, label: 'Quaver' });
