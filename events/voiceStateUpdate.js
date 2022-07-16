@@ -20,7 +20,7 @@ module.exports = {
 		if (oldState.member.user.id === bot.user.id) {
 			// Quaver didn't leave the channel, but its voice state changes
 			if ((oldState.suppress !== newState.suppress || oldState.serverMute !== newState.serverMute || oldState.serverDeaf !== newState.serverDeaf) && oldState.channelId === newState.channelId) return;
-			/** Checks for when Quaver LEAVEs */
+			/** Checks for when Quaver leaves */
 			// Disconnected
 			if (!newState.channelId) {
 				logger.info({ message: `[G ${player.guildId}] Cleaning up`, label: 'Quaver' });
@@ -132,7 +132,7 @@ module.exports = {
 		if (oldState.channelId !== player?.channelId) return;
 		// User didn't leave the channel, but their voice state changes
 		if (newState.channelId === oldState.channelId) return;
-		/** Checks for when a user LEAVEs */
+		/** Checks for when a user leaves */
 		// Channel still has humans
 		if (oldState.channel.members.filter(m => !m.user.bot).size >= 1) return;
 		// Avoid pauseTimeout if 24/7 is enabled
