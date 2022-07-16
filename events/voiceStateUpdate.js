@@ -77,7 +77,7 @@ module.exports = {
 					await data.guild.set(player.guildId, 'settings.stay.channel', newState.channelId);
 				}
 			}
-			/** Checks for when Quaver MOVEs */
+			/** Checks for when Quaver moves */
 			// Moved to a new channel that has no humans and 24/7 is disabled
 			if (newState.channel.members.filter(m => !m.user.bot).size < 1 && !await data.guild.get(player.guildId, 'settings.stay.enabled')) {
 				// Nothing is playing so we just leave
@@ -117,7 +117,7 @@ module.exports = {
 		// Other bots' voice state changes from any channel that has nothing to do with us
 		if (oldState.member.user.bot) return;
 		// User voiceStateUpdate
-		/** Checks for when a user joins or MOVEs */
+		/** Checks for when a user joins or moves */
 		// User joined or moved to Quaver's channel, and pauseTimeout is set
 		if (newState.channelId === player?.channelId && player?.pauseTimeout) {
 			player.resume();
