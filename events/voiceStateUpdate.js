@@ -18,9 +18,10 @@ module.exports = {
 		if (!player) return;
 		// Quaver voiceStateUpdate
 		if (oldState.member.user.id === bot.user.id) {
-			// just the suppress state changed
+			// Quaver didn't leave the vc, but its voice state changes
 			if ((oldState.suppress !== newState.suppress || oldState.serverMute !== newState.serverMute || oldState.serverDeaf !== newState.serverDeaf) && oldState.channelId === newState.channelId) return;
-			// disconnected
+			/** Statements for when Quaver LEAVEs */
+			// disconnected manually
 			if (!newState.channelId) {
 				logger.info({ message: `[G ${player.guildId}] Cleaning up`, label: 'Quaver' });
 				player.channelId = null;
@@ -31,6 +32,7 @@ module.exports = {
 				await player.handler.disconnect(oldState.channelId);
 				return;
 			}
+			/** Statements for when Quaver JOINs */
 			// channel is a voice channel
 			if (newState.channel.type === 'GUILD_VOICE') {
 				// check for connect, speak permission for voice channel
@@ -44,7 +46,7 @@ module.exports = {
 					await data.guild.set(player.guildId, 'settings.stay.channel', newState.channelId);
 				}
 			}
-			// channel is a stage channel, and bot is suppressed
+			// channel is a stage channel, and Quaver is suppressed
 			// this also handles suppressing Quaver mid-track
 			if (newState.channel.type === 'GUILD_STAGE_VOICE' && newState.suppress) {
 				const permissions = bot.guilds.cache.get(guild.id).channels.cache.get(newState.channelId).permissionsFor(bot.user.id);
@@ -75,9 +77,10 @@ module.exports = {
 					await data.guild.set(player.guildId, 'settings.stay.channel', newState.channelId);
 				}
 			}
-			// the new vc has no humans
+			/** Statements for when Quaver MOVEs */
+			// moved to a new vc that has no humans and 24/7 is disabled
 			if (newState.channel.members.filter(m => !m.user.bot).size < 1 && !await data.guild.get(player.guildId, 'settings.stay.enabled')) {
-				// the bot is not playing anything - leave immediately
+				// nothing is playing so we just leave
 				if (!player.queue.current || !player.playing && !player.paused) {
 					if (await data.guild.get(player.guildId, 'settings.stay.enabled')) {
 						await data.guild.set(player.guildId, 'settings.stay.enabled', false);
@@ -102,7 +105,7 @@ module.exports = {
 				}, 300000, player);
 				await player.handler.send(`${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`, { footer: getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_ALONE_REJOIN') });
 			}
-			// the new vc has humans and pauseTimeout is set
+			// moved to a new vc that has humans and pauseTimeout is set
 			else if (newState.channel.members.filter(m => !m.user.bot).size >= 1 && player.pauseTimeout) {
 				player.resume();
 				clearTimeout(player.pauseTimeout);
@@ -111,9 +114,10 @@ module.exports = {
 				return;
 			}
 		}
-		// other bots voiceStateUpdate - ignore
+		// other bots' voice state changes from any vc that has nothing to do with us
 		if (oldState.member.user.bot) return;
-		// user voiceStateUpdate, the channel is the bot's channel, and there's a pauseTimeout
+		/** Statements for when a user JOINs or MOVEs */
+		// user joined or moved to Quaver's vc, and pauseTimeout is set
 		if (newState.channelId === player?.channelId && player?.pauseTimeout) {
 			player.resume();
 			if (player.pauseTimeout) {
@@ -123,13 +127,14 @@ module.exports = {
 			await player.handler.locale('MUSIC_ALONE_RESUMED');
 			return;
 		}
-		// user has nothing to do with us
+		// user from other vc that has nothing to do with us
 		if (oldState.channelId !== player?.channelId) return;
-		// user didn't leave the vc
+		// user didn't leave the vc, but their voice state changes
 		if (newState.channelId === oldState.channelId) return;
-		// vc still has people
+		/** Statements for when a user LEAVEs */
+		// vc still has humans
 		if (oldState.channel.members.filter(m => !m.user.bot).size >= 1) return;
-		// 24/7 mode enabled, ignore
+		// avoid pauseTimeout if 24/7 is enabled
 		if (await data.guild.get(guild.id, 'settings.stay.enabled')) return;
 		// nothing is playing so we just leave
 		if (!player.queue.current || !player.playing && !player.paused) {
@@ -143,6 +148,7 @@ module.exports = {
 		if (player.timeout || !player.channelId) return;
 		const voiceChannel = bot.guilds.cache.get(player.guildId).channels.cache.get(player.channelId);
 		if (voiceChannel.type === 'GUILD_STAGE_VOICE' && !voiceChannel.stageInstance) return;
+		// the bot was playing something - set pauseTimeout
 		await player.pause();
 		logger.info({ message: `[G ${player.guildId}] Setting pause timeout`, label: 'Quaver' });
 		if (player.pauseTimeout) {
