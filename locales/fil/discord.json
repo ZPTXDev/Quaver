@@ -5,7 +5,7 @@
 	"BOT_MISSING_PERMISSIONS_STAGE": "Kailangan kong maging stage moderator sa stage channel.",
 	"BOT_TIMED_OUT": "Timed out pa ako ngayon.",
 	"BOT_UNSUPPORTED_CHANNEL": "Hindi ako makapagsimula ng isang session sa channel type na ito.",
-	"CMD_ERROR": "Nagkaroon ng error habang naghahandle ng command.",
+	"GENERIC_ERROR": "Nagkaroon ng error habang pinoproseso ang iyong request.",
 	"INTERACTION_WRONG_USER": "Hindi iyon ang iyong interaksyon.",
 	"INTERACTION_CANCELED": "Ang interaksyon na ito ay kinansela ni <@%1>."
 }
