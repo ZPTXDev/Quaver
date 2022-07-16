@@ -1,8 +1,8 @@
-const { MessageEmbed, MessageButton, Permissions } = require('discord.js');
+const { Permissions } = require('discord.js');
 const { logger, data } = require('../shared.js');
-const { getLocale, paginate, msToTime, msToTimeString } = require('../functions.js');
+const { getLocale } = require('../functions.js');
 const { checks } = require('../enums.js');
-const { defaultLocale, defaultColor } = require('../settings.json');
+const { defaultLocale } = require('../settings.json');
 const ReplyHandler = require('../classes/ReplyHandler.js');
 const PlayerHandler = require('../classes/PlayerHandler.js');
 
@@ -13,7 +13,7 @@ module.exports = {
 	async execute(interaction) {
 		interaction.replyHandler = new ReplyHandler(interaction);
 		if (interaction.isCommand()) {
-			/** @type {{checks: string[]}} */
+			/** @type {{data: import('@discordjs/builders').SlashCommandBuilder, checks: string[], permissions: {user: string[], bot: string[]}, execute(interaction: import('discord.js').CommandInteraction): Promise<void>}} */
 			const command = interaction.client.commands.get(interaction.commandName);
 			if (!command) return;
 			logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing command ${interaction.commandName}`, label: 'Quaver' });
@@ -89,88 +89,22 @@ module.exports = {
 			catch (err) {
 				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with command ${interaction.commandName}`, label: 'Quaver' });
 				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				await interaction.replyHandler.localeError('DISCORD_CMD_ERROR');
+				await interaction.replyHandler.localeError('DISCORD_GENERIC_ERROR');
 			}
 		}
 		else if (interaction.isButton()) {
-			const type = interaction.customId.split('_')[0];
-			switch (type) {
-				case 'queue': {
-					const player = interaction.client.music.players.get(interaction.guildId);
-					let pages, page;
-					if (player) {
-						pages = paginate(player.queue.tracks, 5);
-						page = parseInt(interaction.customId.split('_')[1]);
-					}
-					if (!player || page < 1 || page > pages.length) {
-						const original = interaction.message.components;
-						original[0].components.forEach(c => c.setDisabled(true));
-						await interaction.update({
-							components: original,
-						});
-						return;
-					}
-					const firstIndex = 5 * (page - 1) + 1;
-					const pageSize = pages[page - 1].length;
-					const largestIndexSize = (firstIndex + pageSize - 1).toString().length;
-					const original = { embeds: interaction.message.embeds, components: interaction.message.components };
-					if (original.embeds.length === 0) {
-						await interaction.message.delete();
-						return;
-					}
-					original.embeds[0]
-						.setDescription(pages[page - 1].map((track, index) => {
-							const duration = msToTime(track.length);
-							const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
-							return `\`${(firstIndex + index).toString().padStart(largestIndexSize, ' ')}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
-						}).join('\n'))
-						.setFooter({ text: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_PAGE', page, pages.length) });
-					original.components[0].components = [];
-					original.components[0].components[0] = new MessageButton()
-						.setCustomId(`queue_${page - 1}`)
-						.setEmoji('⬅️')
-						.setDisabled(page - 1 < 1)
-						.setStyle('PRIMARY');
-					original.components[0].components[1] = new MessageButton()
-						.setCustomId(`queue_${page + 1}`)
-						.setEmoji('➡️')
-						.setDisabled(page + 1 > pages.length)
-						.setStyle('PRIMARY');
-					original.components[0].components[2] = new MessageButton()
-						.setCustomId(`queue_${page}`)
-						.setEmoji('🔁')
-						.setStyle('SECONDARY')
-						.setLabel(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_REFRESH'));
-					try {
-						await interaction.update({
-							embeds: original.embeds,
-							components: original.components,
-						});
-					}
-					catch (err) {
-						logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-					}
-					break;
-				}
-				case 'cancel':
-					if (interaction.customId.split('_')[1] !== interaction.user.id) {
-						await interaction.replyHandler.localeError('DISCORD_INTERACTION_WRONG_USER');
-						return;
-					}
-					try {
-						await interaction.update({
-							embeds: [
-								new MessageEmbed()
-									.setDescription(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'DISCORD_INTERACTION_CANCELED', interaction.user.id))
-									.setColor(defaultColor),
-							],
-							components: [],
-						});
-					}
-					catch (err) {
-						logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-					}
-					break;
+			/** @type {{name: string, execute(interaction: import('discord.js').ButtonInteraction): Promise<void)>}} */
+			const button = interaction.client.buttons.get(interaction.customId.split('_')[0]);
+			if (!button) return;
+			logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing button ${interaction.customId}`, label: 'Quaver' });
+			try {
+				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Executing button ${interaction.customId}`, label: 'Quaver' });
+				await button.execute(interaction);
+			}
+			catch (err) {
+				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with button ${interaction.customId}`, label: 'Quaver' });
+				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+				await interaction.replyHandler.localeError('DISCORD_GENERIC_ERROR');
 			}
 		}
 		else if (interaction.isSelectMenu()) {

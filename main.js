@@ -83,9 +83,10 @@ async function handleDatabaseError(err) {
 
 data.guild.instance.on('error', handleDatabaseError);
 
-/** @type {Client & {commands: Collection, music: Node}} */
+/** @type {Client & {commands: Collection, buttons: Collection, music: Node}} */
 const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
 bot.commands = new Collection();
+bot.buttons = new Collection();
 bot.music = new Node({
 	connection: {
 		host: lavalink.host,
@@ -163,14 +164,23 @@ module.exports.shuttingDown = shuttingDown;
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
-	/** @type {{data: import('@discordjs/builders').SlashCommandBuilder}} */
+	/** @type {{data: import('@discordjs/builders').SlashCommandBuilder, checks: string[], permissions: {user: string[], bot: string[]}, execute(interaction: import('discord.js').CommandInteraction): Promise<void>}} */
 	const command = require(`./commands/${file}`);
 	bot.commands.set(command.data.name, command);
 }
 
+const componentsFolders = fs.readdirSync('./components');
+for (const folder of componentsFolders) {
+	const componentFiles = fs.readdirSync(`./components/${folder}`).filter(file => file.endsWith('.js'));
+	for (const file of componentFiles) {
+		const component = require(`./components/${folder}/${file}`);
+		bot[folder].set(component.name, component);
+	}
+}
+
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 for (const file of eventFiles) {
-	/** @type {{name: string, once: boolean, execute: function(...any)}} */
+	/** @type {{name: string, once: boolean, execute(...args): void | Promise<void>}} */
 	const event = require(`./events/${file}`);
 	if (event.once) {
 		bot.once(event.name, (...args) => event.execute(...args));
@@ -182,6 +192,7 @@ for (const file of eventFiles) {
 
 const musicEventFiles = fs.readdirSync('./events/music').filter(file => file.endsWith('.js'));
 for (const file of musicEventFiles) {
+	/** @type {{name: string, once: boolean, execute(...args): void | Promise<void>}} */
 	const event = require(`./events/music/${file}`);
 	if (event.once) {
 		bot.music.once(event.name, (...args) => event.execute(...args));
