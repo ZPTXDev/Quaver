@@ -74,7 +74,6 @@ module.exports = {
 				if (await data.guild.get(player.guildId, 'settings.stay.enabled') && await data.guild.get(player.guildId, 'settings.stay.channel') !== newState.channelId) {
 					await data.guild.set(player.guildId, 'settings.stay.channel', newState.channelId);
 				}
-				return;
 			}
 			// the new vc has no humans
 			if (newState.channel.members.filter(m => !m.user.bot).size < 1 && !await data.guild.get(player.guildId, 'settings.stay.enabled')) {
