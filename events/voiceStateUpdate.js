@@ -97,6 +97,8 @@ module.exports = {
 				logger.info({ message: `[G ${player.guildId}] Setting pause timeout`, label: 'Quaver' });
 				// Ensure that the bot does not set a new pauseTimeout if pauseTimeout already exists
 				if (player.pauseTimeout) return;
+				// When setting a pauseTimeout, clear pauseTimeout at any cost as failsafe
+				clearTimeout(player.pauseTimeout);
 				player.pauseTimeout = setTimeout(p => {
 					logger.info({ message: `[G ${p.guildId}] Disconnecting (inactivity)`, label: 'Quaver' });
 					p.handler.locale('MUSIC_INACTIVITY');
