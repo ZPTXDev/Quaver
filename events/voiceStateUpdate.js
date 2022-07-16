@@ -140,7 +140,7 @@ module.exports = {
 		// Nothing is playing so we'll leave
 		if (!player.queue.current || !player.playing && !player.paused) {
 			logger.info({ message: `[G ${player.guildId}] Disconnecting (alone)`, label: 'Quaver' });
-			player.handler.locale('MUSIC_ALONE');
+			await player.handler.locale('MUSIC_ALONE');
 			await player.handler.disconnect();
 			return;
 		}
