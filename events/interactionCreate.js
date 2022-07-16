@@ -113,7 +113,7 @@ module.exports = {
 				await select.execute(interaction);
 			}
 			catch (err) {
-				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with button ${interaction.customId}`, label: 'Quaver' });
+				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with select menu ${interaction.customId}`, label: 'Quaver' });
 				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
 				await interaction.replyHandler.localeError('DISCORD_GENERIC_ERROR');
 			}
