@@ -21,7 +21,7 @@ module.exports = {
 			// just the suppress state changed
 			if ((oldState.suppress !== newState.suppress || oldState.serverMute !== newState.serverMute || oldState.serverDeaf !== newState.serverDeaf) && oldState.channelId === newState.channelId) return;
 			// disconnected
-			if (!newState.channelId || !newState.channel?.members.find(m => m.user.id === bot.user.id)) {
+			if (!newState.channelId || !newState.channel?.members.get(bot.user.id)) {
 				logger.info({ message: `[G ${player.guildId}] Cleaning up`, label: 'Quaver' });
 				player.channelId = null;
 				if (await data.guild.get(player.guildId, 'settings.stay.enabled')) {
@@ -74,7 +74,6 @@ module.exports = {
 				if (await data.guild.get(player.guildId, 'settings.stay.enabled') && await data.guild.get(player.guildId, 'settings.stay.channel') !== newState.channelId) {
 					await data.guild.set(player.guildId, 'settings.stay.channel', newState.channelId);
 				}
-				return;
 			}
 			// the new vc has no humans
 			if (newState.channel.members.filter(m => !m.user.bot).size < 1 && !await data.guild.get(player.guildId, 'settings.stay.enabled')) {

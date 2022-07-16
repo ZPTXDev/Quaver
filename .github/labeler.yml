@@ -10,7 +10,7 @@
   - '(feat:|- \[x] Feature)'
 'pr:type:fix':
   - '(fix:|- \[x] Bug fix)'
-'pr:docs':
+'affects:documentation':
   - '- \[x] Documentation only'
 'type:bug':
   - '- \[x] Bug fix'
@@ -22,3 +22,5 @@
   - '(\blocale[s]?\b|\blocali(?:s|z)(?:e[d]?|ation)\b)'
 'affects:permissions':
   - '\bpermission[s]?\b'
+'status:proposed':
+  - '.*'
