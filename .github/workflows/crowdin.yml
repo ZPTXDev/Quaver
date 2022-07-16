@@ -5,7 +5,7 @@ on:
 
 jobs:
   crowdin:
-    name: Crowdin
+    name: Sync translations
     runs-on: ubuntu-latest
     if: github.repository_owner == 'ZPTXDev'
     steps:
