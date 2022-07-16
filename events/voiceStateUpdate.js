@@ -32,7 +32,7 @@ module.exports = {
 				await player.handler.disconnect(oldState.channelId);
 				return;
 			}
-			/** Checks for when Quaver JOINs */
+			/** Checks for when Quaver joins */
 			// Channel is a voice channel
 			if (newState.channel.type === 'GUILD_VOICE') {
 				// Check for connect, speak permission for voice channel
@@ -117,7 +117,7 @@ module.exports = {
 		// Other bots' voice state changes from any channel that has nothing to do with us
 		if (oldState.member.user.bot) return;
 		// User voiceStateUpdate
-		/** Checks for when a user JOINs or MOVEs */
+		/** Checks for when a user joins or MOVEs */
 		// User joined or moved to Quaver's channel, and pauseTimeout is set
 		if (newState.channelId === player?.channelId && player?.pauseTimeout) {
 			player.resume();
