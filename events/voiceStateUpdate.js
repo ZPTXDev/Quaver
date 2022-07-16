@@ -18,7 +18,7 @@ module.exports = {
 		if (!player) return;
 		// Quaver voiceStateUpdate
 		if (oldState.member.user.id === bot.user.id) {
-			// Quaver didn't leave the channel, but its voice state changes
+			// Quaver didn't leave the channel, but its voice state changed
 			if ((oldState.suppress !== newState.suppress || oldState.serverMute !== newState.serverMute || oldState.serverDeaf !== newState.serverDeaf) && oldState.channelId === newState.channelId) return;
 			/** Checks for when Quaver leaves */
 			// Disconnected
@@ -80,7 +80,7 @@ module.exports = {
 			/** Checks for when Quaver moves */
 			// Moved to a new channel that has no humans and 24/7 is disabled
 			if (newState.channel.members.filter(m => !m.user.bot).size < 1 && !await data.guild.get(player.guildId, 'settings.stay.enabled')) {
-				// Nothing is playing so we just leave
+				// Nothing is playing so we'll leave
 				if (!player.queue.current || !player.playing && !player.paused) {
 					if (await data.guild.get(player.guildId, 'settings.stay.enabled')) {
 						await data.guild.set(player.guildId, 'settings.stay.enabled', false);
@@ -114,7 +114,7 @@ module.exports = {
 				return;
 			}
 		}
-		// Other bots' voice state changes from any channel that has nothing to do with us
+		// Other bots' voice state changed
 		if (oldState.member.user.bot) return;
 		// User voiceStateUpdate
 		/** Checks for when a user joins or moves */
@@ -128,24 +128,24 @@ module.exports = {
 			await player.handler.locale('MUSIC_ALONE_RESUMED');
 			return;
 		}
-		// User from other channel that has nothing to do with us
+		// User not in our channel
 		if (oldState.channelId !== player?.channelId) return;
-		// User didn't leave the channel, but their voice state changes
+		// User didn't leave the channel, but their voice state changed
 		if (newState.channelId === oldState.channelId) return;
 		/** Checks for when a user leaves */
 		// Channel still has humans
 		if (oldState.channel.members.filter(m => !m.user.bot).size >= 1) return;
 		// Avoid pauseTimeout if 24/7 is enabled
 		if (await data.guild.get(guild.id, 'settings.stay.enabled')) return;
-		// Nothing is playing so we just leave
+		// Nothing is playing so we'll leave
 		if (!player.queue.current || !player.playing && !player.paused) {
 			logger.info({ message: `[G ${player.guildId}] Disconnecting (alone)`, label: 'Quaver' });
 			player.handler.locale('MUSIC_ALONE');
 			await player.handler.disconnect();
 			return;
 		}
-		// Rare case where the bot sets pauseTimeout after setting timeout
-		// Another weird issue where pauseTimeout is set after stage ends
+		// Ensure that the bot does not set pauseTimeout if timeout already exists
+		// Ensure that the bot does not set pauseTimeout after a stage ends
 		if (player.timeout || !player.channelId) return;
 		const voiceChannel = bot.guilds.cache.get(player.guildId).channels.cache.get(player.channelId);
 		if (voiceChannel.type === 'GUILD_STAGE_VOICE' && !voiceChannel.stageInstance) return;
