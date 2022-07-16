@@ -95,9 +95,8 @@ module.exports = {
 				// Quaver was playing something - set pauseTimeout
 				await player.pause();
 				logger.info({ message: `[G ${player.guildId}] Setting pause timeout`, label: 'Quaver' });
-				if (player.pauseTimeout) {
-					clearTimeout(player.pauseTimeout);
-				}
+				// Ensure that the bot does not set a new pauseTimeout if pauseTimeout already exists
+				if (player.pauseTimeout) return;
 				player.pauseTimeout = setTimeout(p => {
 					logger.info({ message: `[G ${p.guildId}] Disconnecting (inactivity)`, label: 'Quaver' });
 					p.handler.locale('MUSIC_INACTIVITY');
@@ -152,9 +151,8 @@ module.exports = {
 		// Quaver was playing something - set pauseTimeout
 		await player.pause();
 		logger.info({ message: `[G ${player.guildId}] Setting pause timeout`, label: 'Quaver' });
-		if (player.pauseTimeout) {
-			clearTimeout(player.pauseTimeout);
-		}
+		// Ensure that the bot does not set a new pauseTimeout if pauseTimeout already exists
+		if (player.pauseTimeout) return;
 		player.pauseTimeout = setTimeout(p => {
 			logger.info({ message: `[G ${p.guildId}] Disconnecting (inactivity)`, label: 'Quaver' });
 			p.handler.locale('MUSIC_INACTIVITY');
