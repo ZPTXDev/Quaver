@@ -169,11 +169,13 @@ for (const file of commandFiles) {
 	bot.commands.set(command.data.name, command);
 }
 
-const buttonFiles = fs.readdirSync('./components/buttons').filter(file => file.endsWith('.js'));
-for (const file of buttonFiles) {
-	/** @type {{name: string, execute(interaction: import('discord.js').ButtonInteraction): Promise<void)>}} */
-	const button = require(`./components/buttons/${file}`);
-	bot.buttons.set(button.name, button);
+const componentsFolders = fs.readdirSync('./components');
+for (const folder of componentsFolders) {
+	const componentFiles = fs.readdirSync(`./components/${folder}`).filter(file => file.endsWith('.js'));
+	for (const file of componentFiles) {
+		const component = require(`./components/${folder}/${file}`);
+		bot[folder].set(component.name, component);
+	}
 }
 
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
