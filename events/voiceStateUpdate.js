@@ -21,7 +21,7 @@ module.exports = {
 			// Quaver didn't leave the vc, but its voice state changes
 			if ((oldState.suppress !== newState.suppress || oldState.serverMute !== newState.serverMute || oldState.serverDeaf !== newState.serverDeaf) && oldState.channelId === newState.channelId) return;
 			/** Statements for when Quaver LEAVEs */
-			// disconnected manually
+			// disconnected
 			if (!newState.channelId) {
 				logger.info({ message: `[G ${player.guildId}] Cleaning up`, label: 'Quaver' });
 				player.channelId = null;
