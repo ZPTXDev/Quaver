@@ -20,7 +20,7 @@ module.exports = {
 		if (oldState.member.user.id === bot.user.id) {
 			// Quaver didn't leave the channel, but its voice state changes
 			if ((oldState.suppress !== newState.suppress || oldState.serverMute !== newState.serverMute || oldState.serverDeaf !== newState.serverDeaf) && oldState.channelId === newState.channelId) return;
-			/** Statements for when Quaver LEAVEs */
+			/** Checks for when Quaver LEAVEs */
 			// Disconnected
 			if (!newState.channelId) {
 				logger.info({ message: `[G ${player.guildId}] Cleaning up`, label: 'Quaver' });
@@ -32,7 +32,7 @@ module.exports = {
 				await player.handler.disconnect(oldState.channelId);
 				return;
 			}
-			/** Statements for when Quaver JOINs */
+			/** Checks for when Quaver JOINs */
 			// Channel is a voice channel
 			if (newState.channel.type === 'GUILD_VOICE') {
 				// Check for connect, speak permission for voice channel
@@ -77,7 +77,7 @@ module.exports = {
 					await data.guild.set(player.guildId, 'settings.stay.channel', newState.channelId);
 				}
 			}
-			/** Statements for when Quaver MOVEs */
+			/** Checks for when Quaver MOVEs */
 			// Moved to a new channel that has no humans and 24/7 is disabled
 			if (newState.channel.members.filter(m => !m.user.bot).size < 1 && !await data.guild.get(player.guildId, 'settings.stay.enabled')) {
 				// Nothing is playing so we just leave
@@ -117,7 +117,7 @@ module.exports = {
 		// Other bots' voice state changes from any channel that has nothing to do with us
 		if (oldState.member.user.bot) return;
 		// User voiceStateUpdate
-		/** Statements for when a user JOINs or MOVEs */
+		/** Checks for when a user JOINs or MOVEs */
 		// User joined or moved to Quaver's channel, and pauseTimeout is set
 		if (newState.channelId === player?.channelId && player?.pauseTimeout) {
 			player.resume();
@@ -132,7 +132,7 @@ module.exports = {
 		if (oldState.channelId !== player?.channelId) return;
 		// User didn't leave the channel, but their voice state changes
 		if (newState.channelId === oldState.channelId) return;
-		/** Statements for when a user LEAVEs */
+		/** Checks for when a user LEAVEs */
 		// Channel still has humans
 		if (oldState.channel.members.filter(m => !m.user.bot).size >= 1) return;
 		// Avoid pauseTimeout if 24/7 is enabled
