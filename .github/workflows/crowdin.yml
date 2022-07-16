@@ -10,6 +10,8 @@ jobs:
     if: github.repository_owner == 'ZPTXDev'
     steps:
     - uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
     - uses: crowdin/github-action@1.4.10
       with:
         download_translations: true
@@ -24,6 +26,6 @@ jobs:
         pull_request_base_branch_name: next
         base_url: 'https://zapsquared.crowdin.com'
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
         CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
         CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
