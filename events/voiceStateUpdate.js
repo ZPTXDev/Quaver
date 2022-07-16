@@ -144,8 +144,8 @@ module.exports = {
 			await player.handler.disconnect();
 			return;
 		}
-		// Rare case where the bot sets pause timeout after setting timeout
-		// Another weird issue where pause timeout is set after stage ends
+		// Rare case where the bot sets pauseTimeout after setting timeout
+		// Another weird issue where pauseTimeout is set after stage ends
 		if (player.timeout || !player.channelId) return;
 		const voiceChannel = bot.guilds.cache.get(player.guildId).channels.cache.get(player.channelId);
 		if (voiceChannel.type === 'GUILD_STAGE_VOICE' && !voiceChannel.stageInstance) return;
