@@ -13,7 +13,7 @@
     "discord-api-types": "^0.36.2",
     "discord.js": "^13.8.1",
     "keyv": "^4.3.2",
-    "lavaclient": "^4.0.8",
+    "lavaclient": "^4.0.10",
     "lodash": "^4.17.21",
     "patch-package": "^6.4.7",
     "winston": "^3.8.1"
