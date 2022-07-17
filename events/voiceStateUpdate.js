@@ -92,8 +92,9 @@ module.exports = {
 				}
 				// Avoid pauseTimeout if 24/7 is enabled
 				if (await data.guild.get(player.guildId, 'settings.stay.enabled')) return;
+				// Ensure that the bot does not set pauseTimeout if timeout already exists
 				// Ensure that the bot does not set a new pauseTimeout if pauseTimeout already exists
-				if (player.pauseTimeout) return;
+				if (player.timeout || player.pauseTimeout) return;
 				// Quaver was playing something - set pauseTimeout
 				await player.pause();
 				logger.info({ message: `[G ${player.guildId}] Setting pause timeout`, label: 'Quaver' });
