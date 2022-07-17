@@ -42,6 +42,6 @@ jobs:
             ]
           extra_plugins: |
             @semantic-release/git
-            semantic-release-github-milestones
+            https://github.com/ZPTXDev/semantic-release-github-milestones#master
         env:
           GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
