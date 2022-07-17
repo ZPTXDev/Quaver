@@ -20,7 +20,7 @@ jobs:
       matrix:
         language: [ 'javascript' ]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: github/codeql-action/init@v2
       with:
         languages: ${{ matrix.language }}
@@ -31,7 +31,7 @@ jobs:
     if: contains(fromJson('["push", "pull_request"]'), github.event_name)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - uses: wagoid/commitlint-github-action@v5
@@ -42,7 +42,7 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
         with:
           node-version: '16.9.1'
