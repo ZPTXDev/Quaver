@@ -94,12 +94,13 @@ module.exports = {
 				if (await data.guild.get(player.guildId, 'settings.stay.enabled')) return;
 				// Ensure that the bot does not set pauseTimeout if timeout already exists
 				if (player.timeout) return;
+				// Ensure that the bot does not set a new pauseTimeout if pauseTimeout already exists
+				if (player.pauseTimeout) return;
 				// Quaver was playing something - set pauseTimeout
 				await player.pause();
 				logger.info({ message: `[G ${player.guildId}] Setting pause timeout`, label: 'Quaver' });
-				if (player.pauseTimeout) {
-					clearTimeout(player.pauseTimeout);
-				}
+				// Before setting a new pauseTimeout, clear the pauseTimeout first as a failsafe
+				clearTimeout(player.pauseTimeout);
 				player.pauseTimeout = setTimeout(p => {
 					logger.info({ message: `[G ${p.guildId}] Disconnecting (inactivity)`, label: 'Quaver' });
 					p.handler.locale('MUSIC_INACTIVITY');
@@ -109,6 +110,7 @@ module.exports = {
 			}
 			// Moved to a new channel that has humans and pauseTimeout is set
 			else if (newState.channel.members.filter(m => !m.user.bot).size >= 1 && player.pauseTimeout) {
+				logger.info({ message: `[G ${player.guildId}] Resuming session`, label: 'Quaver' });
 				player.resume();
 				clearTimeout(player.pauseTimeout);
 				delete player.pauseTimeout;
@@ -122,6 +124,7 @@ module.exports = {
 		/** Checks for when a user joins or moves */
 		// User joined or moved to Quaver's channel, and pauseTimeout is set
 		if (newState.channelId === player?.channelId && player?.pauseTimeout) {
+			logger.info({ message: `[G ${player.guildId}] Resuming session`, label: 'Quaver' });
 			player.resume();
 			if (player.pauseTimeout) {
 				clearTimeout(player.pauseTimeout);
@@ -154,9 +157,8 @@ module.exports = {
 		// Quaver was playing something - set pauseTimeout
 		await player.pause();
 		logger.info({ message: `[G ${player.guildId}] Setting pause timeout`, label: 'Quaver' });
-		if (player.pauseTimeout) {
-			clearTimeout(player.pauseTimeout);
-		}
+		// Before setting a new pauseTimeout, clear the pauseTimeout first as a failsafe
+		clearTimeout(player.pauseTimeout);
 		player.pauseTimeout = setTimeout(p => {
 			logger.info({ message: `[G ${p.guildId}] Disconnecting (inactivity)`, label: 'Quaver' });
 			p.handler.locale('MUSIC_INACTIVITY');
