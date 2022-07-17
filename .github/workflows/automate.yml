@@ -30,7 +30,7 @@ jobs:
     if: github.event_name == 'push' && github.repository_owner == 'ZPTXDev'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
       - uses: cycjimmy/semantic-release-action@v2
