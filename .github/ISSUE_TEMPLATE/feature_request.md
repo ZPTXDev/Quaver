@@ -2,7 +2,7 @@
 name: Feature request
 about: Proposal for a new feature or improvement.
 title: ''
-labels: ["type:enhancement", "priority:p2"]
+labels: ["type:enhancement"]
 assignees:
     - zapteryx
 
@@ -10,6 +10,11 @@ assignees:
 
 **Describe the feature**
 What feature are you proposing?
+
+**Priority**
+- [ ] High
+- [ ] Medium
+- [ ] Low
 
 **List the benefits of adding such a feature**
 What will you gain from this feature?
