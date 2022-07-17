@@ -2,11 +2,8 @@ name: "General Automation"
 on:
   push:
     branches: [ master, next ]
-  pull_request:
+  pull_request_target:
     branches: next
-    
-env:
-  GH_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
 
 permissions:
   pull-requests: write
@@ -16,7 +13,7 @@ permissions:
 jobs:
   auto-merge-dependabot:
     name: Auto Merge (dependabot)
-    if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]'
+    if: github.event_name == 'pull_request_target' && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - id: metadata
