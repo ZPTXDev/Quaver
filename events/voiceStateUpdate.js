@@ -108,6 +108,7 @@ module.exports = {
 			}
 			// Moved to a new channel that has humans and pauseTimeout is set
 			else if (newState.channel.members.filter(m => !m.user.bot).size >= 1 && player.pauseTimeout) {
+				logger.info({ message: `[G ${player.guildId}] Resuming (alone)`, label: 'Quaver' });
 				player.resume();
 				clearTimeout(player.pauseTimeout);
 				delete player.pauseTimeout;
@@ -121,6 +122,7 @@ module.exports = {
 		/** Checks for when a user joins or moves */
 		// User joined or moved to Quaver's channel, and pauseTimeout is set
 		if (newState.channelId === player?.channelId && player?.pauseTimeout) {
+			logger.info({ message: `[G ${player.guildId}] Resuming (alone)`, label: 'Quaver' });
 			player.resume();
 			if (player.pauseTimeout) {
 				clearTimeout(player.pauseTimeout);
