@@ -4,7 +4,7 @@ const { Permissions } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
-const { logger, data } = require('../shared.js');
+const { data } = require('../shared.js');
 const PlayerHandler = require('../classes/PlayerHandler.js');
 
 module.exports = {
@@ -110,14 +110,6 @@ module.exports = {
 				await interaction.replyHandler.locale('DISCORD_INTERACTION_CANCELED', {}, interaction.user.id);
 				await player.handler.disconnect();
 				return;
-			}
-			if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE' && !interaction.member.voice.channel.stageInstance?.topic) {
-				try {
-					await interaction.member.voice.channel.createStageInstance({ topic: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
-				}
-				catch (err) {
-					logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				}
 			}
 		}
 
