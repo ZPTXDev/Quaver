@@ -26,6 +26,7 @@ jobs:
         with:
           token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
           merge-method: squash
+          squash-commit-title: ${pull_request.title} (#${pull_request.number})
           do-not-merge-labels: 'status:proposed,status:hold'
           required-labels: 'status:confirmed,status:tested'
           pull-request: ${{ github.event.inputs.pull-request }}
