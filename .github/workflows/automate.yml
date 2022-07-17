@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
-      - uses: cycjimmy/semantic-release-action@v2
+      - uses: cycjimmy/semantic-release-action@v3
         with:
           branches: |
             [
@@ -42,5 +42,6 @@ jobs:
             ]
           extra_plugins: |
             @semantic-release/git
+            https://github.com/ZPTXDev/semantic-release-github-milestones#master
         env:
           GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
