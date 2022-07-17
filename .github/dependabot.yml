@@ -14,3 +14,17 @@ updates:
   - "status:tested"
   - "status:confirmed"
   - "type:enhancement"
+- package-ecosystem: github-actions
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "21:00"
+  open-pull-requests-limit: 10
+  target-branch: next
+  versioning-strategy: increase
+  labels:
+  - "affects:dependencies"
+  - "priority:p2"
+  - "status:tested"
+  - "status:confirmed"
+  - "type:enhancement"
