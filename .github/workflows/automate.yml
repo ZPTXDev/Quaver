@@ -4,6 +4,9 @@ on:
     branches: [ master, next ]
   pull_request:
     branches: next
+    
+env:
+  GH_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
 
 permissions:
   pull-requests: write
@@ -27,7 +30,6 @@ jobs:
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
-          GH_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
   semantic-release:
     name: Semantic Release
     if: github.event_name == 'push' && github.repository_owner == 'ZPTXDev'
