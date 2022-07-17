@@ -22,8 +22,8 @@ module.exports = {
 			await interaction.replyHandler.localeError('MUSIC_QUEUE_NOT_PLAYING');
 			return;
 		}
-		const bar = getBar((player.accuratePosition / player.queue.current.length) * 100);
-		let elapsed = msToTime(player.accuratePosition);
+		const bar = getBar((player.position / player.queue.current.length) * 100);
+		let elapsed = msToTime(player.position);
 		if (isNaN(elapsed['s']) || elapsed['s'] < 0) {
 			elapsed = { d: 0, h: 0, m: 0, s: 0 };
 		}
