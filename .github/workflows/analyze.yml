@@ -20,7 +20,7 @@ jobs:
       matrix:
         language: [ 'javascript' ]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: github/codeql-action/init@v2
       with:
         languages: ${{ matrix.language }}
@@ -31,17 +31,19 @@ jobs:
     if: contains(fromJson('["push", "pull_request"]'), github.event_name)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: wagoid/commitlint-github-action@v4
+      - uses: wagoid/commitlint-github-action@v5
+        with:
+          configFile: '.github/commitlint.config.js'
   eslint:
     name: ESLint
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '16.9.1'
       - run: yarn install
