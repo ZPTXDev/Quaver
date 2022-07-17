@@ -28,7 +28,7 @@ jobs:
     - uses: github/codeql-action/analyze@v2
   commitlint:
     name: CommitLint
-    if: github.actor != 'dependabot[bot]' && contains(fromJson('["push", "pull_request"]'), github.event_name)
+    if: contains(fromJson('["push", "pull_request"]'), github.event_name)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -37,7 +37,7 @@ jobs:
       - uses: wagoid/commitlint-github-action@v4
   eslint:
     name: ESLint
-    if: github.actor != 'dependabot[bot]' && github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

@@ -2,7 +2,7 @@ name: "General Automation"
 on:
   push:
     branches: [ master, next ]
-  pull_request:
+  pull_request_target:
     branches: next
 
 permissions:
@@ -11,19 +11,17 @@ permissions:
   contents: write
 
 jobs:
-  auto-merge-dependabot:
-    name: Auto Merge (dependabot)
-    if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]'
+  approve-pr-dependabot:
+    name: Approve PR (dependabot)
+    if: github.event_name == 'pull_request_target' && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - id: metadata
-        uses: dependabot/fetch-metadata@v1.1.1
+        uses: dependabot/fetch-metadata@v1.3.3
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
       - if: steps.metadata.outputs.update-type != 'version-update:semver-major'
-        run: |
-             gh pr review --approve "$PR_URL"
-             gh pr merge --auto --merge "$PR_URL"
+        run: gh pr review --approve "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
