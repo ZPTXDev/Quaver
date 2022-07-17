@@ -11,8 +11,8 @@ permissions:
   contents: write
 
 jobs:
-  auto-merge-dependabot:
-    name: Auto Merge (dependabot)
+  approve-pr-dependabot:
+    name: Approve PR (dependabot)
     if: github.event_name == 'pull_request_target' && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
@@ -21,9 +21,7 @@ jobs:
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
       - if: steps.metadata.outputs.update-type != 'version-update:semver-major'
-        run: |
-             gh pr review --approve "$PR_URL"
-             gh pr merge --auto --merge "$PR_URL"
+        run: gh pr review --approve "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
