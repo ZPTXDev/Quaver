@@ -42,5 +42,6 @@ jobs:
             ]
           extra_plugins: |
             @semantic-release/git
+            semantic-release-github-milestones
         env:
           GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
