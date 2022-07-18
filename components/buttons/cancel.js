@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const { logger, data } = require('../../shared.js');
 const { getLocale } = require('../../functions.js');
 const { defaultLocale, defaultColor } = require('../../settings.json');
@@ -14,7 +14,7 @@ module.exports = {
 		try {
 			await interaction.update({
 				embeds: [
-					new MessageEmbed()
+					new EmbedBuilder()
 						.setDescription(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'DISCORD_INTERACTION_CANCELED', interaction.user.id))
 						.setColor(defaultColor),
 				],

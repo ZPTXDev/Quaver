@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 const { LoopType } = require('@lavaclient/queue');
 const { checks } = require('../enums.js');
 const { defaultLocale } = require('../settings.json');

@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder, Colors, PermissionsBitField } = require('discord.js');
 const { data, logger } = require('../shared.js');
 const { getLocale } = require('../functions.js');
 const { defaultLocale, defaultColor } = require('../settings.json');
@@ -16,20 +16,20 @@ module.exports = class ReplyHandler {
 	/**
 	 * Returns a replyData object.
 	 * @param {string} msg The message to be used.
-	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: MessageEmbed[], components?: import('discord.js').MessageActionRow[]}} [embedExtras] Extra data to be passed to the embed.
+	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: EmbedBuilder[], components?: import('discord.js').ActionRowBuilder[]}} [embedExtras] Extra data to be passed to the embed.
 	 * @param {boolean} [error] Whether or not the message is an error.
 	 * @returns {Object} The replyData object.
 	 */
 	replyDataConstructor(msg, embedExtras, error) {
-		/** @type {{embeds: MessageEmbed[], components?: import('discord.js').MessageActionRow[]}} */
+		/** @type {{embeds: EmbedBuilder[], components?: import('discord.js').ActionRowBuilder[]}} */
 		const replyData = {
 			embeds: [
-				new MessageEmbed()
-					.setTitle(embedExtras?.title ?? '')
+				new EmbedBuilder()
+					.setTitle(embedExtras?.title ?? null)
 					.setDescription(msg)
-					.setFooter({ text: embedExtras?.footer ?? '' })
-					.setThumbnail(embedExtras?.thumbnail ?? '')
-					.setColor(error ? 'DARK_RED' : defaultColor),
+					.setFooter({ text: embedExtras?.footer ?? null })
+					.setThumbnail(embedExtras?.thumbnail ?? null)
+					.setColor(error ? Colors.DarkRed : defaultColor),
 				...embedExtras?.additionalEmbeds ?? [],
 			],
 		};
@@ -40,13 +40,13 @@ module.exports = class ReplyHandler {
 	/**
 	 * Replies with a message.
 	 * @param {string} msg The message to be used.
-	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: MessageEmbed[], components?: import('discord.js').MessageActionRow[]}} [embedExtras] Extra data to be passed to the embed.
+	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: EmbedBuilder[], components?: import('discord.js').ActionRowBuilder[]}} [embedExtras] Extra data to be passed to the embed.
 	 * @returns {Promise<import('discord.js').Message>|Promise<import('discord-api-types/v10').APIMessage>|boolean} The message that was sent.
 	 */
 	async reply(msg, embedExtras) {
 		const replyData = this.replyDataConstructor(msg, embedExtras);
 		if (!this.interaction.replied && !this.interaction.deferred) {
-			if (this.interaction.channel && !this.interaction.channel.permissionsFor(this.interaction.client.user.id).has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) {
+			if (this.interaction.channel && !this.interaction.channel.permissionsFor(this.interaction.client.user.id).has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages]))) {
 				replyData.ephemeral = true;
 			}
 			try {
@@ -69,7 +69,7 @@ module.exports = class ReplyHandler {
 	/**
 	 * Replies with an error message.
 	 * @param {string} msg The message to be used.
-	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: MessageEmbed[], components?: import('discord.js').MessageActionRow[]}} [embedExtras] Extra data to be passed to the embed.
+	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: EmbedBuilder[], components?: import('discord.js').ActionRowBuilder[]}} [embedExtras] Extra data to be passed to the embed.
 	 * @returns {Promise<import('discord.js').Message>|Promise<import('discord-api-types/v10').APIMessage>|boolean} The message that was sent.
 	 */
 	async error(msg, embedExtras) {
@@ -96,7 +96,7 @@ module.exports = class ReplyHandler {
 	/**
 	 * Replies with a localized message.
 	 * @param {string} code The code of the locale string to be used.
-	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: MessageEmbed[], components?: import('discord.js').MessageActionRow[]}} [embedExtras] Extra data to be passed to the embed.
+	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: EmbedBuilder[], components?: import('discord.js').ActionRowBuilder[]}} [embedExtras] Extra data to be passed to the embed.
 	 * @param  {...string} [args] Additional arguments to be passed to the locale string.
 	 * @returns {Promise<import('discord.js').Message>|Promise<import('discord-api-types/v10').APIMessage>|boolean} The message that was sent.
 	 */
@@ -108,7 +108,7 @@ module.exports = class ReplyHandler {
 	/**
 	 * Replies with a localized error message.
 	 * @param {string} code The code of the locale string to be used.
-	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: MessageEmbed[], components?: import('discord.js').MessageActionRow[]}} [embedExtras] Extra data to be passed to the embed.
+	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: EmbedBuilder[], components?: import('discord.js').ActionRowBuilder[]}} [embedExtras] Extra data to be passed to the embed.
 	 * @param  {...string} [args] Additional arguments to be passed to the locale string.
 	 * @returns {Promise<import('discord.js').Message>|Promise<import('discord-api-types/v10').APIMessage>|boolean} The message that was sent.
 	 */

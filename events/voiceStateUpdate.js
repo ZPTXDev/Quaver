@@ -1,7 +1,6 @@
-const { Permissions } = require('discord.js');
+const { PermissionsBitField, ChannelType, StageInstancePrivacyLevel } = require('discord.js');
 const { logger, data } = require('../shared.js');
 const { getLocale } = require('../functions.js');
-const { bot } = require('../main.js');
 const { defaultLocale } = require('../settings.json');
 
 module.exports = {
@@ -14,10 +13,10 @@ module.exports = {
 	async execute(oldState, newState) {
 		const guild = oldState.guild;
 		/** @type {import('lavaclient').Player & {handler: import('../classes/PlayerHandler.js')}} */
-		const player = bot.music.players.get(guild.id);
+		const player = oldState.client.music.players.get(guild.id);
 		if (!player) return;
 		// Quaver voiceStateUpdate
-		if (oldState.member.user.id === bot.user.id) {
+		if (oldState.member.user.id === oldState.client.user.id) {
 			// Quaver didn't leave the channel, but its voice state changed
 			if ((oldState.suppress !== newState.suppress || oldState.serverMute !== newState.serverMute || oldState.serverDeaf !== newState.serverDeaf) && oldState.channelId === newState.channelId) return;
 			/** Checks for when Quaver leaves */
@@ -34,10 +33,10 @@ module.exports = {
 			}
 			/** Checks for when Quaver joins */
 			// Channel is a voice channel
-			if (newState.channel.type === 'GUILD_VOICE') {
+			if (newState.channel.type === ChannelType.GuildVoice) {
 				// Check for connect, speak permission for voice channel
-				const permissions = bot.guilds.cache.get(guild.id).channels.cache.get(newState.channelId).permissionsFor(bot.user.id);
-				if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
+				const permissions = oldState.client.guilds.cache.get(guild.id).channels.cache.get(newState.channelId).permissionsFor(oldState.client.user.id);
+				if (!permissions.has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak]))) {
 					await player.handler.locale('DISCORD_BOT_MISSING_PERMISSIONS_BASIC');
 					await player.handler.disconnect();
 					return;
@@ -48,15 +47,15 @@ module.exports = {
 			}
 			// Channel is a stage channel, and Quaver is suppressed
 			// This also handles suppressing Quaver mid-track
-			if (newState.channel.type === 'GUILD_STAGE_VOICE' && newState.suppress) {
-				const permissions = bot.guilds.cache.get(guild.id).channels.cache.get(newState.channelId).permissionsFor(bot.user.id);
+			if (newState.channel.type === ChannelType.GuildStageVoice && newState.suppress) {
+				const permissions = oldState.client.guilds.cache.get(guild.id).channels.cache.get(newState.channelId).permissionsFor(oldState.client.user.id);
 				// Check for connect, speak permission for stage channel
-				if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
+				if (!permissions.has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak]))) {
 					await player.handler.locale('DISCORD_BOT_MISSING_PERMISSIONS_BASIC');
 					await player.handler.disconnect();
 					return;
 				}
-				if (!permissions.has(Permissions.STAGE_MODERATOR)) {
+				if (!permissions.has(PermissionsBitField.StageModerator)) {
 					if (await data.guild.get(player.guildId, 'settings.stay.enabled')) {
 						await data.guild.set(player.guildId, 'settings.stay.enabled', false);
 					}
@@ -67,7 +66,7 @@ module.exports = {
 				await newState.setSuppressed(false);
 				if (!newState.channel.stageInstance?.topic) {
 					try {
-						await newState.channel.createStageInstance({ topic: getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: 'GUILD_ONLY' });
+						await newState.channel.createStageInstance({ topic: getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: StageInstancePrivacyLevel.GuildOnly });
 					}
 					catch (err) {
 						logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
@@ -151,8 +150,8 @@ module.exports = {
 		// Ensure that the bot does not set pauseTimeout if timeout already exists
 		// Ensure that the bot does not set pauseTimeout after a stage ends
 		if (player.timeout || !player.channelId) return;
-		const voiceChannel = bot.guilds.cache.get(player.guildId).channels.cache.get(player.channelId);
-		if (voiceChannel.type === 'GUILD_STAGE_VOICE' && !voiceChannel.stageInstance) return;
+		const voiceChannel = oldState.client.guilds.cache.get(player.guildId).channels.cache.get(player.channelId);
+		if (voiceChannel.type === ChannelType.GuildStageVoice && !voiceChannel.stageInstance) return;
 		// Quaver was playing something - set pauseTimeout
 		await player.pause();
 		logger.info({ message: `[G ${player.guildId}] Setting pause timeout`, label: 'Quaver' });

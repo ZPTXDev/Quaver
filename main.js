@@ -1,5 +1,5 @@
 require('@lavaclient/queue/register');
-const { Client, Intents, Collection } = require('discord.js');
+const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const { Node } = require('lavaclient');
 const { load } = require('@lavaclient/spotify');
 const fs = require('fs');
@@ -84,7 +84,7 @@ async function handleDatabaseError(err) {
 data.guild.instance.on('error', handleDatabaseError);
 
 /** @type {Client & {commands: Collection, buttons: Collection, selects: Collection, music: Node}} */
-const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
+const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] });
 bot.commands = new Collection();
 bot.buttons = new Collection();
 bot.selects = new Collection();

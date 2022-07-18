@@ -1,5 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed, MessageActionRow, MessageSelectMenu, MessageButton } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, ButtonStyle, ChannelType } = require('discord.js');
 const { checks } = require('../enums.js');
 const { getLocale, msToTime, msToTimeString } = require('../functions.js');
 const { defaultColor, defaultLocale } = require('../settings.json');
@@ -23,7 +22,7 @@ module.exports = {
 	},
 	/** @param {import('discord.js').CommandInteraction & {client: import('discord.js').Client, replyHandler: import('../classes/ReplyHandler.js')}} interaction */
 	async execute(interaction) {
-		if (!['GUILD_TEXT', 'GUILD_VOICE'].includes(interaction.channel.type)) {
+		if (![ChannelType.GuildText, ChannelType.GuildVoice].includes(interaction.channel.type)) {
 			await interaction.replyHandler.localeError('DISCORD_BOT_UNSUPPORTED_CHANNEL');
 			return;
 		}
@@ -42,7 +41,7 @@ module.exports = {
 
 		await interaction.editReply({
 			embeds: [
-				new MessageEmbed()
+				new EmbedBuilder()
 					.setDescription(tracks.map((track, index) => {
 						const duration = msToTime(track.info.length);
 						const durationString = track.info.isStream ? '∞' : msToTimeString(duration, true);
@@ -51,9 +50,9 @@ module.exports = {
 					.setColor(defaultColor),
 			],
 			components: [
-				new MessageActionRow()
+				new ActionRowBuilder()
 					.addComponents(
-						new MessageSelectMenu()
+						new SelectMenuBuilder()
 							.setCustomId(`play_${interaction.user.id}`)
 							.setPlaceholder(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD_SEARCH_PICK'))
 							.addOptions(tracks.map((track, index) => {
@@ -66,12 +65,12 @@ module.exports = {
 							.setMinValues(1)
 							.setMaxValues(Math.min(tracks.length, 10)),
 					),
-				new MessageActionRow()
+				new ActionRowBuilder()
 					.addComponents(
-						new MessageButton()
+						new ButtonBuilder()
 							.setCustomId(`cancel_${interaction.user.id}`)
 							.setLabel(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_CANCEL'))
-							.setStyle('DANGER'),
+							.setStyle(ButtonStyle.Danger),
 					),
 			],
 			ephemeral: true,

@@ -1,5 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageButton } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { checks } = require('../enums.js');
 const { paginate, getLocale, msToTime, msToTimeString } = require('../functions.js');
 const { defaultLocale } = require('../settings.json');
@@ -31,22 +30,22 @@ module.exports = {
 			{
 				footer: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_PAGE', '1', pages.length),
 				components: [
-					new MessageActionRow()
+					new ActionRowBuilder()
 						.addComponents(
-							new MessageButton()
+							new ButtonBuilder()
 								.setCustomId('queue_0')
 								.setEmoji('⬅️')
 								.setDisabled(true)
-								.setStyle('PRIMARY'),
-							new MessageButton()
+								.setStyle(ButtonStyle.Primary),
+							new ButtonBuilder()
 								.setCustomId('queue_2')
 								.setEmoji('➡️')
 								.setDisabled(pages.length === 1)
-								.setStyle('PRIMARY'),
-							new MessageButton()
+								.setStyle(ButtonStyle.Primary),
+							new ButtonBuilder()
 								.setCustomId('queue_1')
 								.setEmoji('🔁')
-								.setStyle('SECONDARY')
+								.setStyle(ButtonStyle.Secondary)
 								.setLabel(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_REFRESH')),
 						),
 				],

@@ -1,9 +1,8 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder, ChannelType, PermissionsBitField } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
 const { data } = require('../shared.js');
-const { ChannelType } = require('discord-api-types/v10');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -24,7 +23,7 @@ module.exports = {
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const channel = interaction.options.getChannel('new_channel');
-		if (!channel.permissionsFor(interaction.client.user.id).has(['VIEW_CHANNEL', 'SEND_MESSAGES'])) {
+		if (!channel.permissionsFor(interaction.client.user.id).has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages]))) {
 			await interaction.replyHandler.localeError('CMD_BIND_NO_PERMISSIONS', {}, channel.id);
 			return;
 		}
