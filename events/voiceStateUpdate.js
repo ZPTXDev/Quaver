@@ -64,7 +64,7 @@ module.exports = {
 					return;
 				}
 				await newState.setSuppressed(false);
-				if (!newState.channel.stageInstance?.topic) {
+				if (!newState.channel.stageInstance) {
 					try {
 						await newState.channel.createStageInstance({ topic: getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: StageInstancePrivacyLevel.GuildOnly });
 					}
