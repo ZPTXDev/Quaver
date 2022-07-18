@@ -15,7 +15,7 @@ module.exports = {
 		}
 		if (!player || page < 1 || page > pages.length) {
 			const original = interaction.message.components;
-			original[0].components.map(c => ButtonBuilder.from(c).setDisabled(true));
+			original[0].components = original[0].components.map(c => ButtonBuilder.from(c).setDisabled(true));
 			await interaction.update({
 				components: original,
 			});
