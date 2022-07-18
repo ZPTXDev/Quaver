@@ -75,9 +75,5 @@ module.exports = {
 		const started = player.playing || player.paused;
 		await interaction.replyHandler.locale(msg, { footer: started ? `${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null, components: [] }, ...extras);
 		if (!started) { await player.queue.start(); }
-		const state = interaction.guild.members.me.voice;
-		if (state.channel.type === ChannelType.GuildStageVoice && state.suppress) {
-			await state.setSuppressed(false);
-		}
 	},
 };
