@@ -1,6 +1,5 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder, PermissionsBitField, ChannelType } = require('discord.js');
 const { SpotifyItemType } = require('@lavaclient/spotify');
-const { Permissions } = require('discord.js');
 const { checks } = require('../enums.js');
 const { defaultLocale } = require('../settings.json');
 const { getLocale } = require('../functions.js');
@@ -27,21 +26,21 @@ module.exports = {
 	},
 	/** @param {import('discord.js').CommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('../classes/ReplyHandler.js')}} interaction */
 	async execute(interaction) {
-		if (!['GUILD_TEXT', 'GUILD_VOICE'].includes(interaction.channel.type)) {
+		if (![ChannelType.GuildText, ChannelType.GuildVoice].includes(interaction.channel.type)) {
 			await interaction.replyHandler.localeError('DISCORD_BOT_UNSUPPORTED_CHANNEL');
 			return;
 		}
 		// check for connect, speak permission for channel
 		const permissions = interaction.member.voice.channel.permissionsFor(interaction.client.user.id);
-		if (!permissions.has(['VIEW_CHANNEL', 'CONNECT', 'SPEAK'])) {
+		if (!permissions.has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak]))) {
 			await interaction.replyHandler.localeError('DISCORD_BOT_MISSING_PERMISSIONS_BASIC');
 			return;
 		}
-		if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE' && !permissions.has(Permissions.STAGE_MODERATOR)) {
+		if (interaction.member.voice.channel.type === ChannelType.GuildStageVoice && !permissions.has(PermissionsBitField.StageModerator)) {
 			await interaction.replyHandler.localeError('DISCORD_BOT_MISSING_PERMISSIONS_STAGE');
 			return;
 		}
-		if (interaction.guild.members.cache.get(interaction.client.user.id).isCommunicationDisabled()) {
+		if (interaction.guild.members.me.isCommunicationDisabled()) {
 			await interaction.replyHandler.localeError('DISCORD_BOT_TIMED_OUT');
 			return;
 		}
@@ -119,10 +118,10 @@ module.exports = {
 		player.queue.add(tracks, { requester: interaction.user.id, next: insert });
 
 		const started = player.playing || player.paused;
-		await interaction.replyHandler.locale(msg, { footer: started ? `${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : '' }, ...extras);
+		await interaction.replyHandler.locale(msg, { footer: started ? `${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null }, ...extras);
 		if (!started) { await player.queue.start(); }
-		const state = interaction.guild.members.cache.get(interaction.client.user.id).voice;
-		if (interaction.member.voice.channel.type === 'GUILD_STAGE_VOICE' && state.suppress) {
+		const state = interaction.guild.members.me.voice;
+		if (interaction.member.voice.channel.type === ChannelType.GuildStageVoice && state.suppress) {
 			await state.setSuppressed(false);
 		}
 	},

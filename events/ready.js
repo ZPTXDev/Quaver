@@ -1,5 +1,6 @@
 const { logger } = require('../shared.js');
 const { version } = require('../package.json');
+const { ActivityType } = require('discord.js');
 
 module.exports = {
 	name: 'ready',
@@ -24,6 +25,6 @@ module.exports = {
 				await player.resume();
 			}
 		}
-		client.user.setActivity(`music | ${version}`, { type: 'LISTENING' });
+		client.user.setActivity(`music | ${version}`, { type: ActivityType.Listening });
 	},
 };

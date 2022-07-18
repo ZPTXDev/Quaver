@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 const { defaultLocale } = require('../settings.json');
 const { msToTime, msToTimeString, getLocale } = require('../functions.js');
 const { data } = require('../shared.js');

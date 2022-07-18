@@ -1,4 +1,4 @@
-const { MessageButton } = require('discord.js');
+const { ButtonBuilder, ButtonStyle, EmbedBuilder, ActionRowBuilder } = require('discord.js');
 const { logger, data } = require('../../shared.js');
 const { getLocale, paginate, msToTime, msToTimeString } = require('../../functions.js');
 const { defaultLocale } = require('../../settings.json');
@@ -15,7 +15,7 @@ module.exports = {
 		}
 		if (!player || page < 1 || page > pages.length) {
 			const original = interaction.message.components;
-			original[0].components.forEach(c => c.setDisabled(true));
+			original[0].components.map(c => ButtonBuilder.from(c).setDisabled(true));
 			await interaction.update({
 				components: original,
 			});
@@ -29,28 +29,28 @@ module.exports = {
 			await interaction.message.delete();
 			return;
 		}
-		original.embeds[0]
+		original.embeds[0] = EmbedBuilder.from(original.embeds[0])
 			.setDescription(pages[page - 1].map((track, index) => {
 				const duration = msToTime(track.length);
 				const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
 				return `\`${(firstIndex + index).toString().padStart(largestIndexSize, ' ')}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 			}).join('\n'))
 			.setFooter({ text: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_PAGE', page, pages.length) });
-		original.components[0].components = [];
-		original.components[0].components[0] = new MessageButton()
+		original.components[0] = ActionRowBuilder.from(original.components[0]).components = [];
+		original.components[0].components[0] = new ButtonBuilder()
 			.setCustomId(`queue_${page - 1}`)
 			.setEmoji('⬅️')
 			.setDisabled(page - 1 < 1)
-			.setStyle('PRIMARY');
-		original.components[0].components[1] = new MessageButton()
+			.setStyle(ButtonStyle.Primary);
+		original.components[0].components[1] = new ButtonBuilder()
 			.setCustomId(`queue_${page + 1}`)
 			.setEmoji('➡️')
 			.setDisabled(page + 1 > pages.length)
-			.setStyle('PRIMARY');
-		original.components[0].components[2] = new MessageButton()
+			.setStyle(ButtonStyle.Primary);
+		original.components[0].components[2] = new ButtonBuilder()
 			.setCustomId(`queue_${page}`)
 			.setEmoji('🔁')
-			.setStyle('SECONDARY')
+			.setStyle(ButtonStyle.Secondary)
 			.setLabel(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_REFRESH'));
 		try {
 			await interaction.update({

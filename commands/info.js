@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 const { Permissions } = require('discord.js');
 const { version } = require('../package.json');
 const { defaultLocale } = require('../settings.json');

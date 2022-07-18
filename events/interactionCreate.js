@@ -1,6 +1,7 @@
 const { logger } = require('../shared.js');
 const { checks } = require('../enums.js');
 const ReplyHandler = require('../classes/ReplyHandler.js');
+const { PermissionsBitField } = require('discord.js');
 
 module.exports = {
 	name: 'interactionCreate',
@@ -8,7 +9,7 @@ module.exports = {
 	/** @param {import('discord.js').CommandInteraction & {replyHandler: ReplyHandler, client: import('discord.js').Client & {commands: import('discord.js').Collection, music: import('lavaclient').Node}}} interaction */
 	async execute(interaction) {
 		interaction.replyHandler = new ReplyHandler(interaction);
-		if (interaction.isCommand()) {
+		if (interaction.isChatInputCommand()) {
 			/** @type {{data: import('@discordjs/builders').SlashCommandBuilder, checks: string[], permissions: {user: string[], bot: string[]}, execute(interaction: import('discord.js').CommandInteraction): Promise<void>}} */
 			const command = interaction.client.commands.get(interaction.commandName);
 			if (!command) return;
@@ -53,29 +54,21 @@ module.exports = {
 			}
 			const failedPermissions = { user: [], bot: [] };
 			if (interaction.guildId) {
-				for (const perm of command.permissions.user) {
-					if (!interaction.channel.permissionsFor(interaction.member).has(perm)) {
-						failedPermissions.user.push(perm);
-					}
-				}
-				for (const perm of ['VIEW_CHANNEL', 'SEND_MESSAGES', ...command.permissions.bot]) {
-					if (!interaction.channel.permissionsFor(interaction.client.user.id).has(perm)) {
-						failedPermissions.bot.push(perm);
-					}
-				}
+				failedPermissions.user = interaction.channel.permissionsFor(interaction.member).missing(command.permissions.user);
+				failedPermissions.bot = interaction.channel.permissionsFor(interaction.client.user.id).missing([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, ...command.permissions.bot]);
 			}
 			else {
-				failedPermissions.user = command.permissions.user;
-				failedPermissions.bot = command.permissions.bot;
+				failedPermissions.user = new PermissionsBitField(command.permissions.user).toArray();
+				failedPermissions.bot = new PermissionsBitField(command.permissions.bot).toArray();
 			}
 			if (failedPermissions.user.length > 0) {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedPermissions.user.length} user permission check(s)`, label: 'Quaver' });
-				await interaction.replyHandler.localeError('DISCORD_USER_MISSING_PERMISSIONS', {}, failedPermissions.user.map(perm => '`' + perm + '`').join(' '));
+				await interaction.replyHandler.localeError('DISCORD_USER_MISSING_PERMISSIONS', {}, failedPermissions.user.map(perm => `\`${perm}\``).join(' '));
 				return;
 			}
 			if (failedPermissions.bot.length > 0) {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedPermissions.bot.length} bot permission check(s)`, label: 'Quaver' });
-				await interaction.replyHandler.localeError('DISCORD_BOT_MISSING_PERMISSIONS', {}, failedPermissions.bot.map(perm => '`' + perm + '`').join(' '));
+				await interaction.replyHandler.localeError('DISCORD_BOT_MISSING_PERMISSIONS', {}, failedPermissions.bot.map(perm => `\`${perm}\``).join(' '));
 				return;
 			}
 			try {
