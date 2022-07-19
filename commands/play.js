@@ -108,8 +108,7 @@ module.exports = {
 			// Ensure that Quaver destroys the player if Quaver gets timed out by the user while Quaver is queueing tracks
 			const timedOut = interaction.guild?.members.me.isCommunicationDisabled();
 			if (!interaction.member.voice.channelId || timedOut) {
-				if (timedOut) await interaction.replyHandler.localeError('DISCORD_BOT_TIMED_OUT');
-				await interaction.replyHandler.locale('DISCORD_INTERACTION_CANCELED', {}, interaction.user.id);
+				timedOut ? await interaction.replyHandler.localeError('DISCORD_BOT_TIMED_OUT') : await interaction.replyHandler.locale('DISCORD_INTERACTION_CANCELED', {}, interaction.user.id);
 				await player.handler.disconnect();
 				return;
 			}
