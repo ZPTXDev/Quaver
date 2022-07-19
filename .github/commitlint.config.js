@@ -3,8 +3,6 @@ module.exports = {
 	rules: {
 		'body-leading-blank': [1, 'always'],
 		'footer-leading-blank': [1, 'always'],
-		'footer-max-line-length': [2, 'always', 100],
-		'header-max-length': [2, 'always', 100],
 		'subject-case': [
 			2,
 			'never',
