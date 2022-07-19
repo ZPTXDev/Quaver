@@ -29,6 +29,7 @@ module.exports = class PlayerHandler {
 			const permissions = this.client.guilds.cache.get(this.player.guildId)?.channels.cache.get(channelId ?? this.player.channelId).permissionsFor(this.client.user.id);
 			if (!permissions?.has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak]))) return;
 			if (!permissions?.has(PermissionsBitField.StageModerator)) return;
+			if (this.client.guilds.cache.get(this.player.guildId)?.members.me.isCommunicationDisabled()) return false;
 			if (voiceChannel.stageInstance?.topic === getLocale(await data.guild.get(this.player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_STAGE_TOPIC')) {
 				try {
 					await voiceChannel.stageInstance.delete();
