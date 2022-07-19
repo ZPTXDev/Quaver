@@ -11,6 +11,7 @@ module.exports = {
 		for await (const [guildId, guildData] of data.guild.instance.iterator()) {
 			if (_.get(guildData, 'settings.stay.enabled')) {
 				const guild = bot.guilds.cache.get(guildId);
+				if (!guild) continue;
 				const player = bot.music.createPlayer(guildId);
 				player.handler = new PlayerHandler(bot, player);
 				player.queue.channel = guild.channels.cache.get(_.get(guildData, 'settings.stay.text'));
