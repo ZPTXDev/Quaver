@@ -106,8 +106,10 @@ module.exports = {
 			await player.connect(interaction.member.voice.channelId, { deafened: true });
 			// Ensure that Quaver destroys the player if the user leaves the channel while Quaver is queueing tracks
 			// Ensure that Quaver destroys the player if Quaver gets timed out by the user while Quaver is queueing tracks
-			if (!interaction.member.voice.channelId || interaction.guild?.members.me.isCommunicationDisabled()) {
-				await interaction.replyHandler.locale('DISCORD_INTERACTION_CANCELED', {}, interaction.user.id);
+			const timedOut = interaction.guild?.members.me.isCommunicationDisabled();
+			if (!interaction.member.voice.channelId || timedOut) {
+				if (timedOut) await interaction.replyHandler.localeError('DISCORD_BOT_TIMED_OUT');
+				if (!timedOut) await interaction.replyHandler.locale('DISCORD_INTERACTION_CANCELED', {}, interaction.user.id);
 				await player.handler.disconnect();
 				return;
 			}
