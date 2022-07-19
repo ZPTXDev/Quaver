@@ -62,8 +62,8 @@ module.exports = {
 			await player.connect(interaction.member.voice.channelId, { deafened: true });
 			// that kid left while we were busy bruh
 			if (!interaction.member.voice.channelId) {
-				await player.handler.disconnect();
 				await interaction.replyHandler.locale('DISCORD_INTERACTION_CANCELED', { components: [] }, interaction.user.id);
+				await player.handler.disconnect();
 				return;
 			}
 		}
