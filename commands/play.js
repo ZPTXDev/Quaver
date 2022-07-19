@@ -109,7 +109,7 @@ module.exports = {
 			const timedOut = interaction.guild?.members.me.isCommunicationDisabled();
 			if (!interaction.member.voice.channelId || timedOut) {
 				if (timedOut) await interaction.replyHandler.localeError('DISCORD_BOT_TIMED_OUT');
-				if (!timedOut) await interaction.replyHandler.locale('DISCORD_INTERACTION_CANCELED', {}, interaction.user.id);
+				await interaction.replyHandler.locale('DISCORD_INTERACTION_CANCELED', {}, interaction.user.id);
 				await player.handler.disconnect();
 				return;
 			}
