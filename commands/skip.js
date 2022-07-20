@@ -16,6 +16,10 @@ module.exports = {
 	/** @param {import('discord.js').CommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('../classes/ReplyHandler.js')}} interaction */
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
+		if (!player.queue.current || !player.playing && !player.paused) {
+			await interaction.replyHandler.localeError('MUSIC_QUEUE_NOT_PLAYING');
+			return;
+		}
 		if (player.queue.current.requester === interaction.user.id) {
 			const track = await player.queue.skip();
 			await player.queue.start();
