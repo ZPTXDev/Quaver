@@ -9,7 +9,7 @@ The file structure is as follows:
   "colors": {
     "success": "DarkGreen",
     "neutral": "#f39bff",
-    "warning": "DarkOrange",
+    "warning": "Orange",
     "error": "DarkRed"
   },
   "defaultLocale": "en",
