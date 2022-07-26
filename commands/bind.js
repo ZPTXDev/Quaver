@@ -24,13 +24,13 @@ module.exports = {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const channel = interaction.options.getChannel('new_channel');
 		if (!channel.permissionsFor(interaction.client.user.id).has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages]))) {
-			await interaction.replyHandler.localeError('CMD_BIND_NO_PERMISSIONS', {}, channel.id);
+			await interaction.replyHandler.locale('CMD_BIND_NO_PERMISSIONS', {}, 'error', channel.id);
 			return;
 		}
 		player.queue.channel = channel;
 		if (await data.guild.get(interaction.guildId, 'settings.stay.enabled')) {
 			await data.guild.set(interaction.guildId, 'settings.stay.text', channel.id);
 		}
-		await interaction.replyHandler.locale('CMD_BIND_SUCCESS', {}, channel.id);
+		await interaction.replyHandler.locale('CMD_BIND_SUCCESS', {}, 'success', channel.id);
 	},
 };

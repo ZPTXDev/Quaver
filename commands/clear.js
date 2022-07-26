@@ -16,10 +16,10 @@ module.exports = {
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		if (player.queue.tracks.length === 0) {
-			await interaction.replyHandler.localeError('CMD_CLEAR_EMPTY');
+			await interaction.replyHandler.locale('CMD_CLEAR_EMPTY', {}, 'error');
 			return;
 		}
 		player.queue.clear();
-		await interaction.replyHandler.locale('CMD_CLEAR_SUCCESS');
+		await interaction.replyHandler.locale('CMD_CLEAR_SUCCESS', {}, 'success');
 	},
 };

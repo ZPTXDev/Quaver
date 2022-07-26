@@ -1,7 +1,7 @@
-const { EmbedBuilder, PermissionsBitField, ChannelType, Colors } = require('discord.js');
+const { EmbedBuilder, PermissionsBitField, ChannelType } = require('discord.js');
 const { data, logger } = require('../shared.js');
 const { getLocale } = require('../functions.js');
-const { defaultLocale, defaultColor } = require('../settings.json');
+const { defaultLocale, colors } = require('../settings.json');
 
 /** Class for handling Lavaclient's Player. */
 module.exports = class PlayerHandler {
@@ -45,10 +45,10 @@ module.exports = class PlayerHandler {
 	 * Returns a sendData object.
 	 * @param {string} msg The message to be used.
 	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: EmbedBuilder[], files?: import('discord.js').FileOptions[], components?: import('discord.js').ActionRowBuilder[]}} [embedExtras] Extra data to be passed to the embed.
-	 * @param {boolean} [error] Whether or not the message is an error.
+	 * @param {"success"|"neutral"|"warning"|"error"} [type=neutral] Type of the message.
 	 * @returns {Object} The sendData object.
 	 */
-	sendDataConstructor(msg, embedExtras, error) {
+	sendDataConstructor(msg, embedExtras, type = 'neutral') {
 		/** @type {{embeds: EmbedBuilder[], files?: import('discord.js').FileOptions[], components?: import('discord.js').ActionRowBuilder[]}} */
 		const sendData = {
 			embeds: [
@@ -57,7 +57,7 @@ module.exports = class PlayerHandler {
 					.setDescription(msg)
 					.setFooter({ text: embedExtras?.footer ?? null })
 					.setThumbnail(embedExtras?.thumbnail ?? null)
-					.setColor(error ? Colors.DarkRed : defaultColor),
+					.setColor(colors[type] ?? colors.neutral),
 				...embedExtras?.additionalEmbeds ?? [],
 			],
 		};
@@ -70,11 +70,11 @@ module.exports = class PlayerHandler {
 	 * Sends a message to the bound text channel.
 	 * @param {string} msg The message to be used.
 	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: EmbedBuilder[], files?: import('discord.js').FileOptions[], components?: import('discord.js').ActionRowBuilder[]}} [embedExtras] Extra data to be passed to the embed.
-	 * @param {boolean} [error] Whether or not the message is an error.
+	 * @param {"success"|"neutral"|"warning"|"error"} [type=neutral] Type of the message. Defaults to success.
 	 * @returns {Promise<import('discord.js').Message>|Promise<import('discord-api-types/v10').APIMessage>|boolean} The message that was sent.
 	 */
-	async send(msg, embedExtras, error) {
-		const sendData = this.sendDataConstructor(msg, embedExtras, error);
+	async send(msg, embedExtras, type) {
+		const sendData = this.sendDataConstructor(msg, embedExtras, type);
 		/** @type {import('discord.js').TextChannel} */
 		const channel = this.player.queue.channel;
 		if (!channel?.permissionsFor(this.client.user.id)?.has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages]))) return false;
@@ -92,12 +92,12 @@ module.exports = class PlayerHandler {
 	 * Sends a localized message to the bound text channel.
 	 * @param {string} code The code of the locale string to be used.
 	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: EmbedBuilder[], files?: import('discord.js').FileOptions[], components?: import('discord.js').ActionRowBuilder[]}} [embedExtras] Extra data to be passed to the embed.
-	 * @param {boolean} [error] Whether or not the message is an error.
+	 * @param {"success"|"neutral"|"warning"|"error"} [type=neutral] Type of the message. Defaults to success.
 	 * @param  {...string} [args] Additional arguments to be passed to the locale string.
 	 * @returns {Promise<import('discord.js').Message>|Promise<import('discord-api-types/v10').APIMessage>|boolean} The message that was sent.
 	 */
-	async locale(code, embedExtras, error, ...args) {
+	async locale(code, embedExtras, type, ...args) {
 		const localizedString = getLocale(await data.guild.get(this.player.guildId, 'settings.locale') ?? defaultLocale, code, ...args);
-		return this.send(localizedString, embedExtras, error);
+		return this.send(localizedString, embedExtras, type);
 	}
 };

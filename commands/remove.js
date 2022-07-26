@@ -23,18 +23,18 @@ module.exports = {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const position = interaction.options.getInteger('position');
 		if (player.queue.tracks.length === 0) {
-			await interaction.replyHandler.localeError('CMD_REMOVE_EMPTY');
+			await interaction.replyHandler.locale('CMD_REMOVE_EMPTY', {}, 'error');
 			return;
 		}
 		if (position > player.queue.tracks.length) {
-			await interaction.replyHandler.localeError('CHECK_INVALID_INDEX');
+			await interaction.replyHandler.locale('CHECK_INVALID_INDEX', {}, 'error');
 			return;
 		}
 		if (player.queue.tracks[position - 1].requester !== interaction.user.id) {
-			await interaction.replyHandler.localeError('CHECK_NOT_REQUESTER');
+			await interaction.replyHandler.locale('CHECK_NOT_REQUESTER', {}, 'error');
 			return;
 		}
 		const track = player.queue.remove(position - 1);
-		await interaction.replyHandler.locale('CMD_REMOVE_SUCCESS', {}, track.title, track.uri);
+		await interaction.replyHandler.locale('CMD_REMOVE_SUCCESS', {}, 'success', track.title, track.uri);
 	},
 };

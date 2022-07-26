@@ -18,7 +18,7 @@ module.exports = {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const pages = paginate(player.queue.tracks, 5);
 		if (player.queue.tracks.length === 0) {
-			await interaction.replyHandler.localeError('CMD_QUEUE_EMPTY');
+			await interaction.replyHandler.locale('CMD_QUEUE_EMPTY', {}, 'error');
 			return;
 		}
 		await interaction.replyHandler.reply(

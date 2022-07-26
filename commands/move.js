@@ -30,19 +30,19 @@ module.exports = {
 		const oldPosition = interaction.options.getInteger('old_position');
 		const newPosition = interaction.options.getInteger('new_position');
 		if (player.queue.tracks.length <= 1) {
-			await interaction.replyHandler.localeError('CMD_MOVE_INSUFFICIENT');
+			await interaction.replyHandler.locale('CMD_MOVE_INSUFFICIENT', {}, 'error');
 			return;
 		}
 		if (oldPosition > player.queue.tracks.length || newPosition > player.queue.tracks.length) {
-			await interaction.replyHandler.localeError('CMD_MOVE_NOT_IN_RANGE');
+			await interaction.replyHandler.locale('CMD_MOVE_NOT_IN_RANGE', {}, 'error');
 			return;
 		}
 		if (oldPosition === newPosition) {
-			await interaction.replyHandler.localeError('CMD_MOVE_EQUAL');
+			await interaction.replyHandler.locale('CMD_MOVE_EQUAL', {}, 'error');
 			return;
 		}
 		player.queue.tracks.splice(newPosition - 1, 0, player.queue.tracks.splice(oldPosition - 1, 1)[0]);
 		const track = player.queue.tracks[newPosition - 1];
-		await interaction.replyHandler.locale('CMD_MOVE_SUCCESS', {}, track.title, track.uri, oldPosition, newPosition);
+		await interaction.replyHandler.locale('CMD_MOVE_SUCCESS', {}, 'success', track.title, track.uri, oldPosition, newPosition);
 	},
 };
