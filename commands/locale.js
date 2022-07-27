@@ -1,6 +1,6 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionsBitField, Colors } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, PermissionsBitField } = require('discord.js');
 const { checks } = require('../enums.js');
-const { defaultLocale } = require('../settings.json');
+const { defaultLocale, colors } = require('../settings.json');
 const { roundTo, getLocale, checkLocaleCompletion } = require('../functions.js');
 const { data } = require('../shared.js');
 const fs = require('fs');
@@ -27,15 +27,15 @@ module.exports = {
 		const locale = interaction.options.getString('new_locale');
 		const localeCompletion = checkLocaleCompletion(locale);
 		if (localeCompletion === 'LOCALE_MISSING') {
-			await interaction.replyHandler.error('That locale does not exist.');
+			await interaction.replyHandler.reply('That locale does not exist.', {}, 'error');
 			return;
 		}
 		await data.guild.set(interaction.guildId, 'settings.locale', locale);
 		const additionalEmbed = localeCompletion.completion !== 100 ? [
 			new EmbedBuilder()
 				.setDescription(`This locale is incomplete. Completion: \`${roundTo(localeCompletion.completion, 2)}%\`\nMissing strings:\n\`\`\`\n${localeCompletion.missing.join('\n')}\`\`\``)
-				.setColor(Colors.DarkRed),
+				.setColor(colors.warning),
 		] : [];
-		await interaction.replyHandler.locale('CMD_LOCALE_SUCCESS', { additionalEmbeds: additionalEmbed }, interaction.guild.name, locale);
+		await interaction.replyHandler.locale('CMD_LOCALE_SUCCESS', { additionalEmbeds: additionalEmbed }, 'success', interaction.guild.name, locale);
 	},
 };

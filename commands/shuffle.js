@@ -16,7 +16,7 @@ module.exports = {
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		if (player.queue.tracks.length <= 1) {
-			await interaction.replyHandler.localeError('CMD_SHUFFLE_INSUFFICIENT');
+			await interaction.replyHandler.locale('CMD_SHUFFLE_INSUFFICIENT', {}, 'error');
 			return;
 		}
 		let currentIndex = player.queue.tracks.length, randomIndex;
@@ -25,6 +25,6 @@ module.exports = {
 			currentIndex--;
 			[player.queue.tracks[currentIndex], player.queue.tracks[randomIndex]] = [player.queue.tracks[randomIndex], player.queue.tracks[currentIndex]];
 		}
-		await interaction.replyHandler.locale('CMD_SHUFFLE_SUCCESS');
+		await interaction.replyHandler.locale('CMD_SHUFFLE_SUCCESS', {}, 'success');
 	},
 };

@@ -6,7 +6,12 @@ The file structure is as follows:
 {
   "token": "Paste token here",
   "applicationId": "Paste application ID here",
-  "defaultColor": "#f39bff",
+  "colors": {
+    "success": "DarkGreen",
+    "neutral": "#f39bff",
+    "warning": "Orange",
+    "error": "DarkRed"
+  },
   "defaultLocale": "en",
   "managers": [
     "Paste your user ID here"
@@ -41,8 +46,17 @@ The file structure is as follows:
 `applicationId`
 > The Discord application ID for your bot. Usually the same as your bot's user ID. You can also get this from [here](https://discord.com/developers/applications).
 
-`defaultColor`
-> A [`ColorResolvable`](https://discord.js.org/#/docs/main/stable/typedef/ColorResolvable) color. Used in every non-error message embed from Quaver.
+`colors.success`
+> A [`ColorResolvable`](https://discord.js.org/#/docs/discord.js/main/typedef/ColorResolvable) color. Used in every success message embed from Quaver.
+
+`colors.neutral`
+> A [`ColorResolvable`](https://discord.js.org/#/docs/discord.js/main/typedef/ColorResolvable) color. Used in every neutral message embed from Quaver.
+
+`colors.warning`
+> A [`ColorResolvable`](https://discord.js.org/#/docs/discord.js/main/typedef/ColorResolvable) color. Used in every warning message embed from Quaver.
+
+`colors.error`
+> A [`ColorResolvable`](https://discord.js.org/#/docs/discord.js/main/typedef/ColorResolvable) color. Used in every error message embed from Quaver.
 
 `defaultLocale`
 > Any locale from [locales](locales) without the file extension. Quaver will not start if an invalid locale is selected.

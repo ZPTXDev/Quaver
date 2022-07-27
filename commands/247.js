@@ -20,16 +20,16 @@ module.exports = {
 	/** @param {import('discord.js').CommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('../classes/ReplyHandler.js')}} interaction */
 	async execute(interaction) {
 		if (!features.stay.enabled) {
-			await interaction.replyHandler.localeError('FEATURE_DISABLED');
+			await interaction.replyHandler.locale('FEATURE_DISABLED', {}, 'error');
 			return;
 		}
 		if (features.stay.whitelist && !await data.guild.get(interaction.guildId, 'features.stay.whitelisted')) {
-			await interaction.replyHandler.localeError('CMD_247_NOT_WHITELISTED');
+			await interaction.replyHandler.locale('CMD_247_NOT_WHITELISTED', {}, 'error');
 			return;
 		}
 		const player = interaction.client.music.players.get(interaction.guildId);
 		if (!player?.queue?.channel?.id) {
-			await interaction.replyHandler.localeError('CMD_247_MISSING_CHANNEL');
+			await interaction.replyHandler.locale('CMD_247_MISSING_CHANNEL', {}, 'error');
 			return;
 		}
 		const enabled = interaction.options.getBoolean('enabled');

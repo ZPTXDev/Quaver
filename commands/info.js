@@ -14,6 +14,6 @@ module.exports = {
 	},
 	/** @param {import('discord.js').CommandInteraction & {client: import('discord.js').Client, replyHandler: import('../classes/ReplyHandler.js')}} interaction */
 	async execute(interaction) {
-		await interaction.replyHandler.locale('CMD_INFO_DETAIL', { title: 'Quaver', thumbnail: interaction.client.user.avatarURL({ format: 'png' }) }, interaction.client.generateInvite({ permissions: [PermissionsBitField.Flags.Administrator], scopes: ['bot', 'applications.commands'] }), version);
+		await interaction.replyHandler.locale('CMD_INFO_DETAIL', { title: 'Quaver', thumbnail: interaction.client.user.avatarURL({ format: 'png' }) }, 'neutral', interaction.client.generateInvite({ permissions: [PermissionsBitField.Flags.Administrator], scopes: ['bot', 'applications.commands'] }), version);
 	},
 };
