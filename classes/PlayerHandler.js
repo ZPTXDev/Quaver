@@ -70,10 +70,10 @@ module.exports = class PlayerHandler {
 	 * Sends a message to the bound text channel.
 	 * @param {string} msg The message to be used.
 	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: EmbedBuilder[], files?: import('discord.js').FileOptions[], components?: import('discord.js').ActionRowBuilder[]}} [embedExtras] Extra data to be passed to the embed.
-	 * @param {"success"|"neutral"|"warning"|"error"} [type=neutral] Type of the message. Defaults to success.
+	 * @param {"success"|"neutral"|"warning"|"error"} [type=neutral] Type of the message.
 	 * @returns {Promise<import('discord.js').Message>|Promise<import('discord-api-types/v10').APIMessage>|boolean} The message that was sent.
 	 */
-	async send(msg, embedExtras, type) {
+	async send(msg, embedExtras, type = 'neutral') {
 		const sendData = this.sendDataConstructor(msg, embedExtras, type);
 		/** @type {import('discord.js').TextChannel} */
 		const channel = this.player.queue.channel;
@@ -92,11 +92,11 @@ module.exports = class PlayerHandler {
 	 * Sends a localized message to the bound text channel.
 	 * @param {string} code The code of the locale string to be used.
 	 * @param {{title?: string, footer?: string, thumbnail?: string, additionalEmbeds?: EmbedBuilder[], files?: import('discord.js').FileOptions[], components?: import('discord.js').ActionRowBuilder[]}} [embedExtras] Extra data to be passed to the embed.
-	 * @param {"success"|"neutral"|"warning"|"error"} [type=neutral] Type of the message. Defaults to success.
+	 * @param {"success"|"neutral"|"warning"|"error"} [type=neutral] Type of the message.
 	 * @param  {...string} [args] Additional arguments to be passed to the locale string.
 	 * @returns {Promise<import('discord.js').Message>|Promise<import('discord-api-types/v10').APIMessage>|boolean} The message that was sent.
 	 */
-	async locale(code, embedExtras, type, ...args) {
+	async locale(code, embedExtras, type = 'neutral', ...args) {
 		const localizedString = getLocale(await data.guild.get(this.player.guildId, 'settings.locale') ?? defaultLocale, code, ...args);
 		return this.send(localizedString, embedExtras, type);
 	}

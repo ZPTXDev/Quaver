@@ -37,7 +37,7 @@ module.exports = {
 				// Check for connect, speak permission for voice channel
 				const permissions = oldState.client.guilds.cache.get(guild.id).channels.cache.get(newState.channelId).permissionsFor(oldState.client.user.id);
 				if (!permissions.has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak]))) {
-					await player.handler.locale('DISCORD_BOT_MISSING_PERMISSIONS_BASIC', {}, 'warning');
+					await player.handler.locale('DISCORD_BOT_MISSING_PERMISSIONS_BASIC', {}, 'error');
 					await player.handler.disconnect();
 					return;
 				}
@@ -51,7 +51,7 @@ module.exports = {
 				const permissions = oldState.client.guilds.cache.get(guild.id).channels.cache.get(newState.channelId).permissionsFor(oldState.client.user.id);
 				// Check for connect, speak permission for stage channel
 				if (!permissions.has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak]))) {
-					await player.handler.locale('DISCORD_BOT_MISSING_PERMISSIONS_BASIC', {}, 'warning');
+					await player.handler.locale('DISCORD_BOT_MISSING_PERMISSIONS_BASIC', {}, 'error');
 					await player.handler.disconnect();
 					return;
 				}
