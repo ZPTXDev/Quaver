@@ -17,7 +17,7 @@ module.exports = {
 		if (!player) return;
 		// Quaver voiceStateUpdate
 		if (oldState.member.user.id === oldState.client.user.id) {
-			// Quaver didn't leave the channel, but its voice state changed
+			// Quaver didn't leave the channel, but their voice state changed
 			if ((oldState.suppress !== newState.suppress || oldState.serverMute !== newState.serverMute || oldState.serverDeaf !== newState.serverDeaf) && oldState.channelId === newState.channelId) return;
 			/** Checks for when Quaver leaves */
 			// Disconnected
@@ -31,7 +31,7 @@ module.exports = {
 				await player.handler.disconnect(oldState.channelId);
 				return;
 			}
-			/** Checks for when Quaver joins */
+			/** Checks for when Quaver joins or moves */
 			// Channel is a voice channel
 			if (newState.channel.type === ChannelType.GuildVoice) {
 				// Check for connect, speak permission for voice channel
@@ -76,7 +76,6 @@ module.exports = {
 					await data.guild.set(player.guildId, 'settings.stay.channel', newState.channelId);
 				}
 			}
-			/** Checks for when Quaver moves */
 			// Moved to a new channel that has no humans and 24/7 is disabled
 			if (newState.channel.members.filter(m => !m.user.bot).size < 1 && !await data.guild.get(player.guildId, 'settings.stay.enabled')) {
 				// Nothing is playing so we'll leave
@@ -91,8 +90,8 @@ module.exports = {
 				}
 				// Avoid pauseTimeout if 24/7 is enabled
 				if (await data.guild.get(player.guildId, 'settings.stay.enabled')) return;
-				// Ensure that the bot does not set pauseTimeout if timeout already exists
-				// Ensure that the bot does not set a new pauseTimeout if pauseTimeout already exists
+				// Ensure that Quaver does not set pauseTimeout if timeout already exists
+				// Ensure that Quaver does not set a new pauseTimeout if pauseTimeout already exists
 				if (player.timeout || player.pauseTimeout) return;
 				// Quaver was playing something - set pauseTimeout
 				await player.pause();
@@ -131,7 +130,7 @@ module.exports = {
 			await player.handler.locale('MUSIC_ALONE_RESUMED', {}, 'success');
 			return;
 		}
-		// User not in our channel
+		// User not in Quaver's channel
 		if (oldState.channelId !== player?.channelId) return;
 		// User didn't leave the channel, but their voice state changed
 		if (newState.channelId === oldState.channelId) return;
@@ -147,8 +146,8 @@ module.exports = {
 			await player.handler.disconnect();
 			return;
 		}
-		// Ensure that the bot does not set pauseTimeout if timeout already exists
-		// Ensure that the bot does not set pauseTimeout after a stage ends
+		// Ensure that Quaver does not set pauseTimeout if timeout already exists
+		// Ensure that Quaver does not set pauseTimeout after a stage ends
 		if (player.timeout || !player.channelId) return;
 		const voiceChannel = oldState.client.guilds.cache.get(player.guildId).channels.cache.get(player.channelId);
 		if (voiceChannel.type === ChannelType.GuildStageVoice && !voiceChannel.stageInstance) return;
