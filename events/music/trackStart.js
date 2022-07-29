@@ -6,7 +6,7 @@ module.exports = {
 	name: 'trackStart',
 	once: false,
 	/**
-	 * @param {import('@lavaclient/queue').Queue} queue
+	 * @param {import('@lavaclient/queue').Queue & {player: import('lavaclient').Player & {handler: import('../../classes/PlayerHandler.js')}}} queue
 	 * @param {import('@lavaclient/queue').Song} track
 	 */
 	async execute(queue, track) {
