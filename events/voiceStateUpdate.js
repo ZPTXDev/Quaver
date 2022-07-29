@@ -79,6 +79,8 @@ module.exports = {
 			/** Checks for when Quaver moves */
 			// Moved to a new channel that has no humans and 24/7 is disabled
 			if (newState.channel.members.filter(m => !m.user.bot).size < 1 && !await data.guild.get(player.guildId, 'settings.stay.enabled')) {
+				// Avoid pauseTimeout if 24/7 is enabled
+				if (await data.guild.get(player.guildId, 'settings.stay.enabled')) return;
 				// Nothing is playing so we'll leave
 				if (!player.queue.current || !player.playing && !player.paused) {
 					if (await data.guild.get(player.guildId, 'settings.stay.enabled')) {
@@ -89,8 +91,6 @@ module.exports = {
 					await player.handler.disconnect();
 					return;
 				}
-				// Avoid pauseTimeout if 24/7 is enabled
-				if (await data.guild.get(player.guildId, 'settings.stay.enabled')) return;
 				// Ensure that the bot does not set pauseTimeout if timeout already exists
 				// Ensure that the bot does not set a new pauseTimeout if pauseTimeout already exists
 				if (player.timeout || player.pauseTimeout) return;
@@ -136,10 +136,10 @@ module.exports = {
 		// User didn't leave the channel, but their voice state changed
 		if (newState.channelId === oldState.channelId) return;
 		/** Checks for when a user leaves */
-		// Channel still has humans
-		if (oldState.channel.members.filter(m => !m.user.bot).size >= 1) return;
 		// Avoid pauseTimeout if 24/7 is enabled
 		if (await data.guild.get(guild.id, 'settings.stay.enabled')) return;
+		// Channel still has humans
+		if (oldState.channel.members.filter(m => !m.user.bot).size >= 1) return;
 		// Nothing is playing so we'll leave
 		if (!player.queue.current || !player.playing && !player.paused) {
 			logger.info({ message: `[G ${player.guildId}] Disconnecting (alone)`, label: 'Quaver' });
