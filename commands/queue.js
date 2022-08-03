@@ -16,11 +16,11 @@ module.exports = {
 	/** @param {import('discord.js').CommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('../classes/ReplyHandler.js')}} interaction */
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
-		const pages = paginate(player.queue.tracks, 5);
 		if (player.queue.tracks.length === 0) {
 			await interaction.replyHandler.locale('CMD_QUEUE_EMPTY', {}, 'error');
 			return;
 		}
+		const pages = paginate(player.queue.tracks, 5);
 		await interaction.replyHandler.reply(
 			pages[0].map((track, index) => {
 				const duration = msToTime(track.length);
