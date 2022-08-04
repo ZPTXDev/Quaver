@@ -149,6 +149,11 @@ async function shuttingDown(eventType, err) {
 				if (!success) continue;
 			}
 		}
+	}
+	catch (error) {
+		logger.error({ message: `Encountered error while shutting down.\n${error.message}\n${error.stack}`, label: 'Quaver' });
+	}
+	finally {
 		if (!['exit', 'SIGINT', 'SIGTERM'].includes(eventType)) {
 			logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
 			logger.info({ message: 'Logging additional output to error.log.', label: 'Quaver' });
@@ -160,11 +165,6 @@ async function shuttingDown(eventType, err) {
 				logger.error({ message: `${e.message}\n${e.stack}`, label: 'Quaver' });
 			}
 		}
-	}
-	catch (error) {
-		logger.error({ message: `Encountered error while shutting down.\n${error.message}\n${error.stack}`, label: 'Quaver' });
-	}
-	finally {
 		bot.destroy();
 		process.exit();
 	}
