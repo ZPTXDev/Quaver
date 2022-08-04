@@ -20,6 +20,7 @@ module.exports = {
 			return;
 		}
 		player.resume();
+		if (!player.playing && player.queue.tracks.length > 0) { await player.queue.start(); }
 		await interaction.replyHandler.locale('CMD_RESUME_SUCCESS', {}, 'success');
 	},
 };
