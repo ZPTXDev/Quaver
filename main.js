@@ -161,8 +161,8 @@ async function shuttingDown(eventType, err) {
 			}
 		}
 	}
-	catch (err) {
-		logger.error({ message: `Encountered error while shutting down.\n${err.message}\n${err.stack}`, label: 'Quaver' });
+	catch (error) {
+		logger.error({ message: `Encountered error while shutting down.\n${error.message}\n${error.stack}`, label: 'Quaver' });
 	}
 	finally {
 		bot.destroy();
