@@ -151,7 +151,8 @@ async function shuttingDown(eventType, err) {
 		}
 	}
 	catch (error) {
-		logger.error({ message: `Encountered error while shutting down.\n${error.message}\n${error.stack}`, label: 'Quaver' });
+		logger.error({ message: 'Encountered error while shutting down.', label: 'Quaver' });
+		logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
 	}
 	finally {
 		if (!['exit', 'SIGINT', 'SIGTERM'].includes(eventType)) {
