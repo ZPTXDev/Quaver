@@ -1,11 +1,11 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { LoopType } = require('@lavaclient/queue');
-const { defaultLocale } = require('#settings');
-const { checks } = require('#lib/util/constants.js');
-const { getLocale } = require('#lib/util/util.js');
-const { data } = require('#lib/util/common.js');
+import { SlashCommandBuilder } from 'discord.js';
+import { LoopType } from '@lavaclient/queue';
+import { defaultLocale } from '#settings';
+import { checks } from '#lib/util/constants.js';
+import { getLocale } from '#lib/util/util.js';
+import { data } from '#lib/util/common.js';
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('loop')
 		.setDescription(getLocale(defaultLocale, 'CMD_LOOP_DESCRIPTION'))

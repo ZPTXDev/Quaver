@@ -1,9 +1,9 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { defaultLocale } = require('#settings');
-const { checks } = require('#lib/util/constants.js');
-const { getLocale, msToTime, msToTimeString } = require('#lib/util/util.js');
+import { SlashCommandBuilder } from 'discord.js';
+import { defaultLocale } from '#settings';
+import { checks } from '#lib/util/constants.js';
+import { getLocale, msToTime, msToTimeString } from '#lib/util/util.js';
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('seek')
 		.setDescription(getLocale(defaultLocale, 'CMD_SEEK_DESCRIPTION'))

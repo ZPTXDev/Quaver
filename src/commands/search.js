@@ -1,12 +1,12 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, ButtonStyle, ChannelType } = require('discord.js');
-const { colors, defaultLocale } = require('#settings');
-const { checks } = require('#lib/util/constants.js');
-const { getLocale, msToTime, msToTimeString } = require('#lib/util/util.js');
-const { data } = require('#lib/util/common.js');
+import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, ButtonStyle, ChannelType } from 'discord.js';
+import { colors, defaultLocale } from '#settings';
+import { checks } from '#lib/util/constants.js';
+import { getLocale, msToTime, msToTimeString } from '#lib/util/util.js';
+import { data } from '#lib/util/common.js';
 
 // credit: https://github.com/lavaclient/djs-v13-example/blob/main/src/commands/Play.ts
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('search')
 		.setDescription(getLocale(defaultLocale, 'CMD_SEARCH_DESCRIPTION'))

@@ -1,8 +1,8 @@
-const { defaultLocale } = require('#settings');
-const { logger, data } = require('#lib/util/common.js');
-const { getLocale } = require('#lib/util/util.js');
+import { defaultLocale } from '#settings';
+import { logger, data } from '#lib/util/common.js';
+import { getLocale } from '#lib/util/util.js';
 
-module.exports = {
+export default {
 	name: 'queueFinish',
 	once: false,
 	/** @param {import('@lavaclient/queue').Queue & {player: import('lavaclient').Player & {handler: import('#lib/PlayerHandler.js')}}} queue */

@@ -1,8 +1,8 @@
 // To be run once.
 
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
-const { applicationId, token } = require('#settings');
+import { REST } from '@discordjs/rest';
+import { Routes } from 'discord-api-types/v9';
+import { applicationId, token } from '#settings';
 
 const rest = new REST({ version: '9' }).setToken(token);
 

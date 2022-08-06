@@ -1,10 +1,10 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { defaultLocale } = require('#settings');
-const { checks } = require('#lib/util/constants.js');
-const { paginate, getLocale, msToTime, msToTimeString } = require('#lib/util/util.js');
-const { data } = require('#lib/util/common.js');
+import { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
+import { defaultLocale } from '#settings';
+import { checks } from '#lib/util/constants.js';
+import { paginate, getLocale, msToTime, msToTimeString } from '#lib/util/util.js';
+import { data } from '#lib/util/common.js';
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('queue')
 		.setDescription(getLocale(defaultLocale, 'CMD_QUEUE_DESCRIPTION')),

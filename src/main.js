@@ -1,13 +1,16 @@
-require('@lavaclient/queue/register');
-const { Client, GatewayIntentBits, Collection } = require('discord.js');
-const { Node } = require('lavaclient');
-const { load } = require('@lavaclient/spotify');
-const fs = require('fs'), fsPromises = require('fs/promises'), readline = require('readline'), path = require('path');
-const { token, lavalink, spotify, defaultLocale, features } = require('#settings');
-const { msToTime, msToTimeString, getLocale } = require('#lib/util/util.js');
-const { logger, data } = require('#lib/util/common.js');
+import '@lavaclient/queue/register';
+import { Client, GatewayIntentBits, Collection } from 'discord.js';
+import { Node } from 'lavaclient';
+import { load } from '@lavaclient/spotify';
+import { readdirSync } from 'fs';
+import { writeFile } from 'fs/promises';
+import { createInterface } from 'readline';
+import { join } from 'path';
+import { token, lavalink, spotify, defaultLocale, features } from '#settings';
+import { msToTime, msToTimeString, getLocale } from '#lib/util/util.js';
+import { logger, data } from '#lib/util/common.js';
 
-const rl = readline.createInterface({
+const rl = createInterface({
 	input: process.stdin,
 	output: process.stdout,
 });
@@ -17,7 +20,7 @@ rl.on('line', async input => {
 			await shuttingDown('exit');
 			break;
 		case 'sessions':
-			if (!module.exports.startup) {
+			if (!startup) {
 				console.log('Quaver is not initialized yet.');
 				break;
 			}
@@ -30,7 +33,7 @@ rl.on('line', async input => {
 			break;
 		}
 		case 'whitelist': {
-			if (!module.exports.startup) {
+			if (!startup) {
 				console.log('Quaver is not initialized yet.');
 				break;
 			}
@@ -82,7 +85,7 @@ async function handleDatabaseError(err) {
 data.guild.instance.on('error', handleDatabaseError);
 
 /** @type {Client & {commands: Collection, buttons: Collection, selects: Collection, music: Node}} */
-const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] });
+export const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] });
 bot.commands = new Collection();
 bot.music = new Node({
 	connection: {
@@ -99,7 +102,6 @@ bot.music = new Node({
 });
 bot.ws.on('VOICE_SERVER_UPDATE', payload => bot.music.handleVoiceUpdate(payload));
 bot.ws.on('VOICE_STATE_UPDATE', payload => bot.music.handleVoiceUpdate(payload));
-module.exports.bot = bot;
 
 let inProgress = false;
 /**
@@ -107,12 +109,12 @@ let inProgress = false;
  * @param {string} eventType The event type triggering the shutdown. This determines if the shutdown was caused by a crash.
  * @param {Error} err The error object, if any.
  */
-async function shuttingDown(eventType, err) {
+export async function shuttingDown(eventType, err) {
 	if (inProgress) return;
 	inProgress = true;
 	logger.info({ message: 'Shutting down...', label: 'Quaver' });
 	try {
-		if (module.exports.startup) {
+		if (startup) {
 			logger.info({ message: 'Disconnecting from all guilds...', label: 'Quaver' });
 			for (const pair of bot.music.players) {
 			/** @type {import('lavaclient').Player & {handler: import('#lib/PlayerHandler.js')}} */
@@ -155,7 +157,7 @@ async function shuttingDown(eventType, err) {
 			logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
 			logger.info({ message: 'Logging additional output to error.log.', label: 'Quaver' });
 			try {
-				await fsPromises.writeFile('error.log', `${eventType}${err.message ? `\n${err.message}` : ''}${err.stack ? `\n${err.stack}` : ''}`);
+				await writeFile('error.log', `${eventType}${err.message ? `\n${err.message}` : ''}${err.stack ? `\n${err.stack}` : ''}`);
 			}
 			catch (e) {
 				logger.error({ message: 'Encountered error while writing to error.log.', label: 'Quaver' });
@@ -166,29 +168,28 @@ async function shuttingDown(eventType, err) {
 		process.exit();
 	}
 }
-module.exports.shuttingDown = shuttingDown;
 
-const commandFiles = fs.readdirSync(path.join(__dirname, 'commands')).filter(file => file.endsWith('.js'));
+const commandFiles = readdirSync(join(__dirname, 'commands')).filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
 	/** @type {{data: import('@discordjs/builders').SlashCommandBuilder, checks: string[], permissions: {user: string[], bot: string[]}, execute(interaction: import('discord.js').CommandInteraction): Promise<void>}} */
-	const command = require(path.join(__dirname, 'commands', file));
+	const command = require(join(__dirname, 'commands', file));
 	bot.commands.set(command.data.name, command);
 }
 
-const componentsFolders = fs.readdirSync(path.join(__dirname, 'components'));
+const componentsFolders = readdirSync(join(__dirname, 'components'));
 for (const folder of componentsFolders) {
-	const componentFiles = fs.readdirSync(path.join(__dirname, 'components', folder)).filter(file => file.endsWith('.js'));
+	const componentFiles = readdirSync(join(__dirname, 'components', folder)).filter(file => file.endsWith('.js'));
 	for (const file of componentFiles) {
-		const component = require(path.join(__dirname, 'components', folder, file));
+		const component = require(join(__dirname, 'components', folder, file));
 		if (!bot[folder]) bot[folder] = new Collection();
 		bot[folder].set(component.name, component);
 	}
 }
 
-const eventFiles = fs.readdirSync(path.join(__dirname, 'events')).filter(file => file.endsWith('.js'));
+const eventFiles = readdirSync(join(__dirname, 'events')).filter(file => file.endsWith('.js'));
 for (const file of eventFiles) {
 	/** @type {{name: string, once: boolean, execute(...args): void | Promise<void>}} */
-	const event = require(path.join(__dirname, 'events', file));
+	const event = require(join(__dirname, 'events', file));
 	if (event.once) {
 		bot.once(event.name, (...args) => event.execute(...args));
 	}
@@ -197,10 +198,10 @@ for (const file of eventFiles) {
 	}
 }
 
-const musicEventFiles = fs.readdirSync(path.join(__dirname, 'events', 'music')).filter(file => file.endsWith('.js'));
+const musicEventFiles = readdirSync(join(__dirname, 'events', 'music')).filter(file => file.endsWith('.js'));
 for (const file of musicEventFiles) {
 	/** @type {{name: string, once: boolean, execute(...args): void | Promise<void>}} */
-	const event = require(path.join(__dirname, 'events', 'music', file));
+	const event = require(join(__dirname, 'events', 'music', file));
 	if (event.once) {
 		bot.music.once(event.name, (...args) => event.execute(...args));
 	}
@@ -215,7 +216,7 @@ bot.login(token);
 	process.on(eventType, async err => await shuttingDown(eventType, err));
 });
 
-module.exports.startup = false;
-module.exports.updateStartup = () => {
-	module.exports.startup = true;
-};
+export let startup = false;
+export function updateStartup() {
+	startup = true;
+}

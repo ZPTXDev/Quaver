@@ -1,9 +1,9 @@
-const { ButtonBuilder, ButtonStyle, EmbedBuilder, ActionRowBuilder } = require('discord.js');
-const { defaultLocale } = require('#settings');
-const { logger, data } = require('#lib/util/common.js');
-const { getLocale, paginate, msToTime, msToTimeString } = require('#lib/util/util.js');
+import { ButtonBuilder, ButtonStyle, EmbedBuilder, ActionRowBuilder } from 'discord.js';
+import { defaultLocale } from '#settings';
+import { logger, data } from '#lib/util/common.js';
+import { getLocale, paginate, msToTime, msToTimeString } from '#lib/util/util.js';
 
-module.exports = {
+export default {
 	name: 'queue',
 	/** @param {import('discord.js').ButtonInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}}} interaction */
 	async execute(interaction) {

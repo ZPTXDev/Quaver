@@ -1,9 +1,9 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { defaultLocale } = require('#settings');
-const { msToTime, msToTimeString, getLocale } = require('#lib/util/util.js');
-const { data } = require('#lib/util/common.js');
+import { SlashCommandBuilder } from 'discord.js';
+import { defaultLocale } from '#settings';
+import { msToTime, msToTimeString, getLocale } from '#lib/util/util.js';
+import { data } from '#lib/util/common.js';
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('ping')
 		.setDescription(getLocale(defaultLocale, 'CMD_PING_DESCRIPTION')),

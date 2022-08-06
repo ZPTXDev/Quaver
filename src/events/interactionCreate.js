@@ -1,9 +1,9 @@
-const { logger } = require('#lib/util/common.js');
-const { checks } = require('#lib/util/constants.js');
-const ReplyHandler = require('#lib/ReplyHandler.js');
-const { PermissionsBitField } = require('discord.js');
+import { PermissionsBitField } from 'discord.js';
+import { logger } from '#lib/util/common.js';
+import { checks } from '#lib/util/constants.js';
+import ReplyHandler from '#lib/ReplyHandler.js';
 
-module.exports = {
+export default {
 	name: 'interactionCreate',
 	once: false,
 	/** @param {import('discord.js').CommandInteraction & {replyHandler: ReplyHandler, client: import('discord.js').Client & {commands: import('discord.js').Collection, music: import('lavaclient').Node}}} interaction */

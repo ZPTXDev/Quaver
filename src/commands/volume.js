@@ -1,10 +1,10 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { managers, defaultLocale } = require('#settings');
-const { checks } = require('#lib/util/constants.js');
-const { getLocale } = require('#lib/util/util.js');
-const { data } = require('#lib/util/common.js');
+import { SlashCommandBuilder } from 'discord.js';
+import { managers, defaultLocale } from '#settings';
+import { checks } from '#lib/util/constants.js';
+import { getLocale } from '#lib/util/util.js';
+import { data } from '#lib/util/common.js';
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('volume')
 		.setDescription(getLocale(defaultLocale, 'CMD_VOLUME_DESCRIPTION'))

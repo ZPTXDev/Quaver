@@ -1,11 +1,11 @@
-const { PermissionsBitField, ChannelType } = require('discord.js');
-const { defaultLocale } = require('#settings');
-const { data } = require('#lib/util/common.js');
-const { getLocale } = require('#lib/util/util.js');
-const { checks } = require('#lib/util/constants.js');
-const PlayerHandler = require('#lib/PlayerHandler.js');
+import { PermissionsBitField, ChannelType } from 'discord.js';
+import { defaultLocale } from '#settings';
+import { data } from '#lib/util/common.js';
+import { getLocale } from '#lib/util/util.js';
+import { checks } from '#lib/util/constants.js';
+import PlayerHandler from '#lib/PlayerHandler.js';
 
-module.exports = {
+export default {
 	name: 'play',
 	/** @param {import('discord.js').SelectMenuInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js')}} interaction */
 	async execute(interaction) {

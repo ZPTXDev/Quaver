@@ -1,8 +1,8 @@
-const { defaultLocale } = require('#settings');
-const { logger, data } = require('#lib/util/common.js');
-const { getLocale, msToTime, msToTimeString } = require('#lib/util/util.js');
+import { defaultLocale } from '#settings';
+import { logger, data } from '#lib/util/common.js';
+import { getLocale, msToTime, msToTimeString } from '#lib/util/util.js';
 
-module.exports = {
+export default {
 	name: 'trackStart',
 	once: false,
 	/**

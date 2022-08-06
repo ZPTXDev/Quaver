@@ -1,7 +1,7 @@
-const { logger, data } = require('#lib/util/common.js');
-const { bot } = require('#src/main.js');
+import { logger, data } from '#lib/util/common.js';
+import { bot } from '#src/main.js';
 
-module.exports = {
+export default {
 	name: 'trackEnd',
 	once: false,
 	/**

@@ -1,9 +1,9 @@
-const { PermissionsBitField, ChannelType, StageInstancePrivacyLevel } = require('discord.js');
-const { logger, data } = require('#lib/util/common.js');
-const { getLocale } = require('#lib/util/util.js');
-const { defaultLocale } = require('#settings');
+import { PermissionsBitField, ChannelType, StageInstancePrivacyLevel } from 'discord.js';
+import { logger, data } from '#lib/util/common.js';
+import { getLocale } from '#lib/util/util.js';
+import { defaultLocale } from '#settings';
 
-module.exports = {
+export default {
 	name: 'voiceStateUpdate',
 	once: false,
 	/**

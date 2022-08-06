@@ -1,9 +1,9 @@
-const { SlashCommandBuilder, PermissionsBitField } = require('discord.js');
-const { version } = require('#package');
-const { defaultLocale } = require('#settings');
-const { getLocale } = require('#lib/util/util.js');
+import { SlashCommandBuilder, PermissionsBitField } from 'discord.js';
+import { version } from '#package';
+import { defaultLocale } from '#settings';
+import { getLocale } from '#lib/util/util.js';
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('info')
 		.setDescription(getLocale(defaultLocale, 'CMD_INFO_DESCRIPTION')),

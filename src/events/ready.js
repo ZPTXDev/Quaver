@@ -1,8 +1,8 @@
-const { logger } = require('#lib/util/common.js');
-const { version } = require('#package');
-const { ActivityType } = require('discord.js');
+import { logger } from '#lib/util/common.js';
+import { version } from '#package';
+import { ActivityType } from 'discord.js';
 
-module.exports = {
+export default {
 	name: 'ready',
 	once: false,
 	/** @param {import('discord.js').Client} client */

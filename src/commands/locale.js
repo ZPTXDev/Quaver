@@ -1,12 +1,12 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionsBitField } = require('discord.js');
-const { defaultLocale, colors } = require('#settings');
-const { checks } = require('#lib/util/constants.js');
-const { roundTo, getLocale, checkLocaleCompletion } = require('#lib/util/util.js');
-const { data } = require('#lib/util/common.js');
-const fs = require('fs');
-const path = require('path');
+import { SlashCommandBuilder, EmbedBuilder, PermissionsBitField } from 'discord.js';
+import { defaultLocale, colors } from '#settings';
+import { checks } from '#lib/util/constants.js';
+import { roundTo, getLocale, checkLocaleCompletion } from '#lib/util/util.js';
+import { data } from '#lib/util/common.js';
+import fs from 'fs';
+import path from 'path';
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('locale')
 		.setDescription(getLocale(defaultLocale, 'CMD_LOCALE_DESCRIPTION'))

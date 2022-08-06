@@ -2,16 +2,17 @@
 // Commands are deployed globally by default.
 // This means that it may take a little bit of time before your commands can be seen on all guilds.
 
-const fs = require('fs'), path = require('path');
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
-const { applicationId, token } = require('#settings');
+import { readdirSync } from 'fs';
+import { join } from 'path';
+import { REST } from '@discordjs/rest';
+import { Routes } from 'discord-api-types/v9';
+import { applicationId, token } from '#settings';
 
 const commands = [];
-const commandFiles = fs.readdirSync(path.join(__dirname, '..', 'src', 'commands')).filter(file => file.endsWith('.js'));
+const commandFiles = readdirSync(join(__dirname, '..', 'src', 'commands')).filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
-	const command = require(path.join(__dirname, '..', 'src', 'commands', file));
+	const command = require(join(__dirname, '..', 'src', 'commands', file));
 	commands.push(command.data.toJSON());
 }
 

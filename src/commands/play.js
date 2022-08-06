@@ -1,12 +1,12 @@
-const { SlashCommandBuilder, PermissionsBitField, ChannelType } = require('discord.js');
-const { SpotifyItemType } = require('@lavaclient/spotify');
-const { defaultLocale } = require('#settings');
-const { checks } = require('#lib/util/constants.js');
-const { getLocale } = require('#lib/util/util.js');
-const { data } = require('#lib/util/common.js');
-const PlayerHandler = require('#lib/PlayerHandler.js');
+import { SlashCommandBuilder, PermissionsBitField, ChannelType } from 'discord.js';
+import { SpotifyItemType } from '@lavaclient/spotify';
+import { defaultLocale } from '#settings';
+import { checks } from '#lib/util/constants.js';
+import { getLocale } from '#lib/util/util.js';
+import { data } from '#lib/util/common.js';
+import PlayerHandler from '#lib/PlayerHandler.js';
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('play')
 		.setDescription(getLocale(defaultLocale, 'CMD_PLAY_DESCRIPTION'))
