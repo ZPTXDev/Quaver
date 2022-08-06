@@ -2,7 +2,7 @@ require('@lavaclient/queue/register');
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const { Node } = require('lavaclient');
 const { load } = require('@lavaclient/spotify');
-const fs = require('fs'), fsPromises = require('fs').promises, readline = require('readline'), path = require('path');
+const fs = require('fs'), fsPromises = require('fs/promises'), readline = require('readline'), path = require('path');
 const { token, lavalink, spotify, defaultLocale, features } = require('#settings');
 const { msToTime, msToTimeString, getLocale } = require('#lib/util/util.js');
 const { logger, data } = require('#lib/util/common.js');
