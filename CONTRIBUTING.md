@@ -1,5 +1,5 @@
 # Contributing to Quaver
-Hi! I'm glad to see that you're interested in helping to make Quaver better for everyone.
+Hi! I'm glad to see that you're interested in helping to make Quaver better.
 
 Before we proceed, there are a few things to take note of.
 
@@ -8,7 +8,7 @@ It will make the development process a lot simpler and easier to understand.
 ## Prerequisites
 In order to ensure that Quaver runs during development, the prerequisites in [README.md](README.md#prerequisites) must be satisfied first.
 
-I highly recommend using [Visual Studio Code](https://code.visualstudio.com/) if you do not have an IDE of choice.
+I highly recommend using [Visual Studio Code](https://code.visualstudio.com/) if you do not currently use an IDE.
 
 Here are the additional prerequisites for development:
 - [Git](https://git-scm.com/) ([setup steps here](https://docs.github.com/en/get-started/quickstart/set-up-git))
@@ -21,7 +21,7 @@ You don't need to make a folder/directory as it will be generated when you run t
 
 Run `git clone https://github.com/ZPTXDev/Quaver.git` to clone the repository to the 'Quaver' folder/directory.
 
-Then, navigate to the newly created folder/directory through your terminal and run `npm install` to install all dependencies.
+Then, navigate to the newly created folder/directory through your terminal and run `npm ci` to install all dependencies.
 
 You may follow [this](README.md#starting-quaver-for-the-first-time) to verify Quaver is installed correctly.
 
@@ -51,11 +51,11 @@ ESLint is already integrated into your IDE.
 ### Other IDEs
 I can't guarantee that the steps are the same, but it should be similar.
 
-Try searching for ESLint installation steps on Google for your IDE of choice.
+Try searching for ESLint installation steps on Google for your IDE.
 
 ## Documentation and References
 discord.js
-- https://discord.js.org/#/docs/main/stable/general/welcome
+- https://discord.js.org/#/docs/discord.js/main/general/welcome
 
 ## Commit messages
 This project uses [Semantic Commit Messages](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716).

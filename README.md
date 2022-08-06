@@ -20,9 +20,9 @@ For a detailed explanation on configuration, view [CONFIGURATION.md](CONFIGURATI
 ## Starting Quaver for the first time
 Run `npm ci` to install packages required to run Quaver.
 
-Then, run `node deploy-commands.js` **after** you've configured your `settings.json` in order to register your commands on Discord.
+Then, run `npm run slash-deploy` **after** you've configured your `settings.json` in order to register your commands on Discord.
 
-Once that's done, run `node main.js` to start the bot. This will be the only command you execute whenever you want to start Quaver from now on.
+Once that's done, run `npm start` to start the bot. This will be the only command you execute when starting Quaver from now on.
 
 # FAQ
 ## What happened to Lyrics?
@@ -37,13 +37,12 @@ Most probably not. They've only been targetting the larger bots so far, but if y
 Yes, if it is meaningful. Submit an issue [here](https://github.com/ZPTXDev/Quaver/issues) and I'll be happy to take a look.
 
 ## I changed the locale through `/locale`. Why isn't it updating in slash commands?
-Slash commands are defined when running `node deploy-commands.js`.
+Slash commands are defined when running `npm run slash-deploy`.
 
-This means that slash command descriptions will follow the locale set in `settings.json` (`defaultLocale` 
-key).
+This means that slash command descriptions will follow the locale set in `settings.json` (`defaultLocale` key).
 
 ## I changed `defaultLocale`, but it isn't updating in slash command descriptions. Why?
-You need to re-deploy the commands using `node deploy-commands.js` for the new locale to take effect.
+You need to re-deploy the commands using `npm run slash-deploy` for the new locale to take effect.
 
 Due to Discord's limitations and the localizations we have, we don't currently use Discord's localized command name & description functionality. This may be worked on in the future.
 
