@@ -1,0 +1,17 @@
+// To be run once.
+
+const { REST } = require('@discordjs/rest');
+const { Routes } = require('discord-api-types/v9');
+const { applicationId, token } = require('#settings');
+
+const rest = new REST({ version: '9' }).setToken(token);
+
+(async () => {
+	const data = await rest.get(Routes.applicationCommands(applicationId));
+	const promises = [];
+	for (const command of data) {
+		const deleteUrl = `${Routes.applicationCommands(applicationId)}/${command.id}`;
+		promises.push(rest.delete(deleteUrl));
+	}
+	return Promise.all(promises);
+})();

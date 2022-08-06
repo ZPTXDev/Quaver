@@ -20,9 +20,19 @@
   "devDependencies": {
     "eslint": "^8.21.0"
   },
-  "main": "main.js",
+  "main": "src/main.js",
   "scripts": {
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "slash-deploy": "node scripts/deploy-commands.js",
+    "slash-delete": "node scripts/delete-commands.js",
+    "migrate": "node scripts/migrate.js",
+    "start": "node ."
+  },
+  "imports": {
+    "#lib/*": "./lib/*",
+    "#src/*": "./src/*",
+    "#settings": "./settings.json",
+    "#package": "./package.json"
   },
   "release": {
     "tagFormat": "${version}",
