@@ -179,6 +179,7 @@ const componentsFolders = fs.readdirSync(path.join(__dirname, 'components'));
 for (const folder of componentsFolders) {
 	const componentFiles = fs.readdirSync(path.join(__dirname, 'components', folder)).filter(file => file.endsWith('.js'));
 	for (const file of componentFiles) {
+		/** @type {{name: string, execute(interaction: import('discord.js').ButtonInteraction | import('discord.js').SelectMenuInteraction): Promise<void>}} */
 		const component = require(path.join(__dirname, 'components', folder, file));
 		if (!bot[folder]) bot[folder] = new Collection();
 		bot[folder].set(component.name, component);
