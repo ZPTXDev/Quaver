@@ -6,7 +6,7 @@ module.exports = {
 	once: false,
 	/** @param {Error} err */
 	async execute(err) {
-		logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+		logger.error({ message: 'An error occurred. Quaver will now shut down to prevent any further issues.', label: 'Discord' });
 		await shuttingDown('discord', err);
 	},
 };
