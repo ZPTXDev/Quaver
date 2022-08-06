@@ -115,52 +115,60 @@ async function shuttingDown(eventType, err) {
 	if (inProgress) return;
 	inProgress = true;
 	logger.info({ message: 'Shutting down...', label: 'Quaver' });
-	if (module.exports.startup) {
-		logger.info({ message: 'Disconnecting from all guilds...', label: 'Quaver' });
-		for (const pair of bot.music.players) {
+	try {
+		if (module.exports.startup) {
+			logger.info({ message: 'Disconnecting from all guilds...', label: 'Quaver' });
+			for (const pair of bot.music.players) {
 			/** @type {import('lavaclient').Player & {handler: import('./classes/PlayerHandler.js')}} */
-			const player = pair[1];
-			/** @type {string} */
-			const guildLocale = await data.guild.get(player.guildId, 'settings.locale');
-			logger.info({ message: `[G ${player.guildId}] Disconnecting (restarting)`, label: 'Quaver' });
-			const fileBuffer = [];
-			if (player.queue.current && (player.playing || player.paused)) {
-				fileBuffer.push(`${getLocale(guildLocale ?? defaultLocale, 'MISC_CURRENT')}:`);
-				fileBuffer.push(player.queue.current.uri);
+				const player = pair[1];
+				/** @type {string} */
+				const guildLocale = await data.guild.get(player.guildId, 'settings.locale');
+				logger.info({ message: `[G ${player.guildId}] Disconnecting (restarting)`, label: 'Quaver' });
+				const fileBuffer = [];
+				if (player.queue.current && (player.playing || player.paused)) {
+					fileBuffer.push(`${getLocale(guildLocale ?? defaultLocale, 'MISC_CURRENT')}:`);
+					fileBuffer.push(player.queue.current.uri);
+				}
+				if (player.queue.tracks.length > 0) {
+					fileBuffer.push(`${getLocale(guildLocale ?? defaultLocale, 'MISC_QUEUE')}:`);
+					fileBuffer.push(player.queue.tracks.map(track => track.uri).join('\n'));
+				}
+				await player.handler.disconnect();
+				const success = await player.handler.send(`${getLocale(guildLocale ?? defaultLocale, ['exit', 'SIGINT', 'SIGTERM', 'lavalink'].includes(eventType) ? 'MUSIC_RESTART' : 'MUSIC_RESTART_CRASH')}${fileBuffer.length > 0 ? `\n${getLocale(guildLocale ?? defaultLocale, 'MUSIC_RESTART_QUEUEDATA')}` : ''}`,
+					{
+						footer: getLocale(guildLocale ?? defaultLocale, 'MUSIC_RESTART_SORRY'),
+						files: fileBuffer.length > 0 ? [
+							{
+								attachment: Buffer.from(fileBuffer.join('\n')),
+								name: 'queue.txt',
+							},
+						] : [],
+					},
+					'warning',
+				);
+				if (!success) continue;
 			}
-			if (player.queue.tracks.length > 0) {
-				fileBuffer.push(`${getLocale(guildLocale ?? defaultLocale, 'MISC_QUEUE')}:`);
-				fileBuffer.push(player.queue.tracks.map(track => track.uri).join('\n'));
-			}
-			await player.handler.disconnect();
-			const success = await player.handler.send(`${getLocale(guildLocale ?? defaultLocale, ['exit', 'SIGINT', 'SIGTERM', 'lavalink'].includes(eventType) ? 'MUSIC_RESTART' : 'MUSIC_RESTART_CRASH')}${fileBuffer.length > 0 ? `\n${getLocale(guildLocale ?? defaultLocale, 'MUSIC_RESTART_QUEUEDATA')}` : ''}`,
-				{
-					footer: getLocale(guildLocale ?? defaultLocale, 'MUSIC_RESTART_SORRY'),
-					files: fileBuffer.length > 0 ? [
-						{
-							attachment: Buffer.from(fileBuffer.join('\n')),
-							name: 'queue.txt',
-						},
-					] : [],
-				},
-				'warning',
-			);
-			if (!success) continue;
 		}
 	}
-	if (!['exit', 'SIGINT', 'SIGTERM'].includes(eventType)) {
-		logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-		logger.info({ message: 'Logging additional output to error.log.', label: 'Quaver' });
-		try {
-			await fsPromises.writeFile('error.log', `${eventType}${err.message ? `\n${err.message}` : ''}${err.stack ? `\n${err.stack}` : ''}`);
-		}
-		catch (e) {
-			logger.error({ message: 'Encountered error while writing to error.log.', label: 'Quaver' });
-			logger.error({ message: `${e.message}\n${e.stack}`, label: 'Quaver' });
-		}
+	catch (error) {
+		logger.error({ message: 'Encountered error while shutting down.', label: 'Quaver' });
+		logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
 	}
-	bot.destroy();
-	process.exit();
+	finally {
+		if (!['exit', 'SIGINT', 'SIGTERM'].includes(eventType)) {
+			logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+			logger.info({ message: 'Logging additional output to error.log.', label: 'Quaver' });
+			try {
+				await fsPromises.writeFile('error.log', `${eventType}${err.message ? `\n${err.message}` : ''}${err.stack ? `\n${err.stack}` : ''}`);
+			}
+			catch (e) {
+				logger.error({ message: 'Encountered error while writing to error.log.', label: 'Quaver' });
+				logger.error({ message: `${e.message}\n${e.stack}`, label: 'Quaver' });
+			}
+		}
+		bot.destroy();
+		process.exit();
+	}
 }
 module.exports.shuttingDown = shuttingDown;
 
