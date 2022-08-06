@@ -20,7 +20,7 @@ module.exports = {
 		user: [],
 		bot: [],
 	},
-	/** @param {import('discord.js').CommandInteraction & {client: import('discord.js').Client, replyHandler: import('#lib/ReplyHandler.js')}} interaction */
+	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client, replyHandler: import('#lib/ReplyHandler.js')}} interaction */
 	async execute(interaction) {
 		if (![ChannelType.GuildText, ChannelType.GuildVoice].includes(interaction.channel.type)) {
 			await interaction.replyHandler.locale('DISCORD_BOT_UNSUPPORTED_CHANNEL', {}, 'error');

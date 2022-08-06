@@ -22,7 +22,7 @@ module.exports = {
 		user: [PermissionsBitField.Flags.ManageGuild],
 		bot: [],
 	},
-	/** @param {import('discord.js').CommandInteraction & {client: import('discord.js').Client, replyHandler: import('#lib/ReplyHandler.js')}} interaction */
+	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client, replyHandler: import('#lib/ReplyHandler.js')}} interaction */
 	async execute(interaction) {
 		const locale = interaction.options.getString('new_locale');
 		const localeCompletion = checkLocaleCompletion(locale);
