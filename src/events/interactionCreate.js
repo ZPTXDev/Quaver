@@ -98,12 +98,12 @@ module.exports = {
 		}
 		else if (interaction.isSelectMenu()) {
 			/** @type {{name: string, execute(interaction: import('discord.js').SelectMenuInteraction): Promise<void)>}} */
-			const select = interaction.client.selectmenus.get(interaction.customId.split('_')[0]);
-			if (!select) return;
+			const selectmenu = interaction.client.selectmenus.get(interaction.customId.split('_')[0]);
+			if (!selectmenu) return;
 			logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing select menu ${interaction.customId}`, label: 'Quaver' });
 			try {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Executing select menu ${interaction.customId}`, label: 'Quaver' });
-				await select.execute(interaction);
+				await selectmenu.execute(interaction);
 			}
 			catch (err) {
 				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with select menu ${interaction.customId}`, label: 'Quaver' });
