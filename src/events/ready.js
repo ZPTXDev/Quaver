@@ -5,7 +5,7 @@ const { ActivityType } = require('discord.js');
 module.exports = {
 	name: 'ready',
 	once: false,
-	/** @param {import('discord.js').Client} client */
+	/** @param {import('discord.js').Client & {music: import('lavaclient').Node}} client */
 	async execute(client) {
 		const { startup, updateStartup } = require('#src/main.js');
 		if (!startup) {

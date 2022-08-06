@@ -6,7 +6,7 @@ const { PermissionsBitField } = require('discord.js');
 module.exports = {
 	name: 'interactionCreate',
 	once: false,
-	/** @param {import('discord.js').CommandInteraction & {replyHandler: ReplyHandler, client: import('discord.js').Client & {commands: import('discord.js').Collection, music: import('lavaclient').Node}}} interaction */
+	/** @param {import('discord.js').Interaction & {replyHandler: ReplyHandler, client: import('discord.js').Client & {commands: import('discord.js').Collection<string, unknown>, buttons: import('discord.js').Collection<string, unknown>, selectmenus: import('discord.js').Collection<string, unknown>, music: Node}}} interaction */
 	async execute(interaction) {
 		interaction.replyHandler = new ReplyHandler(interaction);
 		if (interaction.isChatInputCommand()) {
