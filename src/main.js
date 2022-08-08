@@ -88,7 +88,6 @@ async function handleDatabaseError(err) {
 
 data.guild.instance.on('error', handleDatabaseError);
 
-
 /** @type {Client & {commands: Collection<string, unknown>, buttons: Collection<string, unknown>, selectmenus: Collection<string, unknown>, music: Node}} */
 export const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] });
 bot.commands = new Collection();
