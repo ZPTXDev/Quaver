@@ -1,19 +1,19 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, ButtonStyle, ChannelType } = require('discord.js');
-const { colors, defaultLocale } = require('#settings');
-const { checks } = require('#lib/util/constants.js');
-const { getLocale, msToTime, msToTimeString } = require('#lib/util/util.js');
-const { data } = require('#lib/util/common.js');
+import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, ButtonStyle, ChannelType } from 'discord.js';
+import { defaultLocale, colors } from '#settings';
+import { checks } from '#lib/util/constants.js';
+import { getLocale, msToTime, msToTimeString } from '#lib/util/util.js';
+import { data } from '#lib/util/common.js';
 
 // credit: https://github.com/lavaclient/djs-v13-example/blob/main/src/commands/Play.ts
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('search')
-		.setDescription(getLocale(defaultLocale, 'CMD_SEARCH_DESCRIPTION'))
+		.setDescription(getLocale(defaultLocale, 'CMD.SEARCH.DESCRIPTION'))
 		.addStringOption(option =>
 			option
 				.setName('query')
-				.setDescription(getLocale(defaultLocale, 'CMD_SEARCH_OPTION_QUERY'))
+				.setDescription(getLocale(defaultLocale, 'CMD.SEARCH.OPTION.QUERY'))
 				.setRequired(true)),
 	checks: [checks.GUILD_ONLY],
 	permissions: {
@@ -23,7 +23,7 @@ module.exports = {
 	/** @param {import('discord.js').CommandInteraction & {client: import('discord.js').Client, replyHandler: import('#lib/ReplyHandler.js')}} interaction */
 	async execute(interaction) {
 		if (![ChannelType.GuildText, ChannelType.GuildVoice].includes(interaction.channel.type)) {
-			await interaction.replyHandler.locale('DISCORD_BOT_UNSUPPORTED_CHANNEL', {}, 'error');
+			await interaction.replyHandler.locale('DISCORD.CHANNEL_UNSUPPORTED', {}, 'error');
 			return;
 		}
 		await interaction.deferReply();
@@ -35,7 +35,7 @@ module.exports = {
 
 		tracks = tracks.slice(0, 10);
 		if (tracks.length <= 1) {
-			await interaction.replyHandler.locale('CMD_SEARCH_USE_PLAY_CMD', {}, 'error');
+			await interaction.replyHandler.locale('CMD.SEARCH.RESPONSE.USE_PLAY_CMD', {}, 'error');
 			return;
 		}
 
@@ -54,7 +54,7 @@ module.exports = {
 					.addComponents(
 						new SelectMenuBuilder()
 							.setCustomId(`play_${interaction.user.id}`)
-							.setPlaceholder(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD_SEARCH_PICK'))
+							.setPlaceholder(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD.SEARCH.MISC.PICK'))
 							.addOptions(tracks.map((track, index) => {
 								let label = `${index + 1}. ${track.info.title}`;
 								if (label.length >= 100) {
@@ -69,7 +69,7 @@ module.exports = {
 					.addComponents(
 						new ButtonBuilder()
 							.setCustomId(`cancel_${interaction.user.id}`)
-							.setLabel(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_CANCEL'))
+							.setLabel(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.CANCEL'))
 							.setStyle(ButtonStyle.Danger),
 					),
 			],
