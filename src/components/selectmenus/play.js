@@ -48,11 +48,11 @@ export default {
 		}
 		let msg, extras = [];
 		if (resolvedTracks.length === 1) {
-			msg = 'MUSIC_QUEUE_ADDED';
+			msg = 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
 			extras = [resolvedTracks[0].info.title, resolvedTracks[0].info.uri];
 		}
 		else {
-			msg = 'MUSIC_QUEUE_ADDED_MULTI';
+			msg = 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
 			extras = [resolvedTracks.length, getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.YOUR_SEARCH'), ''] ;
 		}
 		if (!player?.connected) {
