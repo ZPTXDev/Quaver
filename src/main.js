@@ -102,8 +102,8 @@ bot.music = new Node({
 	},
 	sendGatewayPayload: (id, payload) => bot.guilds.cache.get(id)?.shard?.send(payload),
 });
-bot.ws.on('VOICE_SERVER_UPDATE', async payload => await bot.music.handleVoiceUpdate(payload));
-bot.ws.on('VOICE_STATE_UPDATE', async payload => await bot.music.handleVoiceUpdate(payload));
+bot.ws.on('VOICE_SERVER_UPDATE', async payload => bot.music.handleVoiceUpdate(payload));
+bot.ws.on('VOICE_STATE_UPDATE', async payload => bot.music.handleVoiceUpdate(payload));
 
 let inProgress = false;
 /**
