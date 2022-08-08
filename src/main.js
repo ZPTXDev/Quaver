@@ -1,13 +1,20 @@
-require('@lavaclient/queue/register');
-const { Client, GatewayIntentBits, Collection } = require('discord.js');
-const { Node } = require('lavaclient');
-const { load } = require('@lavaclient/spotify');
-const fs = require('fs'), fsPromises = require('fs/promises'), readline = require('readline'), path = require('path');
-const { token, lavalink, spotify, defaultLocale, features } = require('#settings');
-const { msToTime, msToTimeString, getLocale } = require('#lib/util/util.js');
-const { logger, data } = require('#lib/util/common.js');
+import '@lavaclient/queue/register';
+import { Client, GatewayIntentBits, Collection } from 'discord.js';
+import { Node } from 'lavaclient';
+import { load } from '@lavaclient/spotify';
+import { readdirSync } from 'fs';
+import { writeFile } from 'fs/promises';
+import { createInterface } from 'readline';
+import { defaultLocale, features, spotify, lavalink, token } from '#settings';
+import { msToTime, msToTimeString, getLocale, getAbsoluteFileURL } from '#lib/util/util.js';
+import { logger, data, setLocales } from '#lib/util/common.js';
 
-const rl = readline.createInterface({
+export let startup = false;
+export function updateStartup() {
+	startup = true;
+}
+
+const rl = createInterface({
 	input: process.stdin,
 	output: process.stdout,
 });
@@ -17,7 +24,7 @@ rl.on('line', async input => {
 			await shuttingDown('exit');
 			break;
 		case 'sessions':
-			if (!module.exports.startup) {
+			if (!startup) {
 				console.log('Quaver is not initialized yet.');
 				break;
 			}
@@ -30,7 +37,7 @@ rl.on('line', async input => {
 			break;
 		}
 		case 'whitelist': {
-			if (!module.exports.startup) {
+			if (!startup) {
 				console.log('Quaver is not initialized yet.');
 				break;
 			}
@@ -80,7 +87,7 @@ data.guild.instance.on('error', async err => {
 });
 
 /** @type {Client & {commands: Collection, buttons: Collection, selects: Collection, music: Node}} */
-const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] });
+export const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] });
 bot.commands = new Collection();
 bot.music = new Node({
 	connection: {
@@ -97,7 +104,6 @@ bot.music = new Node({
 });
 bot.ws.on('VOICE_SERVER_UPDATE', payload => bot.music.handleVoiceUpdate(payload));
 bot.ws.on('VOICE_STATE_UPDATE', payload => bot.music.handleVoiceUpdate(payload));
-module.exports.bot = bot;
 
 let inProgress = false;
 /**
@@ -105,12 +111,12 @@ let inProgress = false;
  * @param {string} eventType The event type triggering the shutdown. This determines if the shutdown was caused by a crash.
  * @param {Error} err The error object, if any.
  */
-async function shuttingDown(eventType, err) {
+export async function shuttingDown(eventType, err) {
 	if (inProgress) return;
 	inProgress = true;
 	logger.info({ message: 'Shutting down...', label: 'Quaver' });
 	try {
-		if (module.exports.startup) {
+		if (startup) {
 			logger.info({ message: 'Disconnecting from all guilds...', label: 'Quaver' });
 			for (const pair of bot.music.players) {
 			/** @type {import('lavaclient').Player & {handler: import('#lib/PlayerHandler.js')}} */
@@ -120,17 +126,17 @@ async function shuttingDown(eventType, err) {
 				logger.info({ message: `[G ${player.guildId}] Disconnecting (restarting)`, label: 'Quaver' });
 				const fileBuffer = [];
 				if (player.queue.current && (player.playing || player.paused)) {
-					fileBuffer.push(`${getLocale(guildLocale ?? defaultLocale, 'MISC_CURRENT')}:`);
+					fileBuffer.push(`${getLocale(guildLocale ?? defaultLocale, 'MISC.CURRENT')}:`);
 					fileBuffer.push(player.queue.current.uri);
 				}
 				if (player.queue.tracks.length > 0) {
-					fileBuffer.push(`${getLocale(guildLocale ?? defaultLocale, 'MISC_QUEUE')}:`);
+					fileBuffer.push(`${getLocale(guildLocale ?? defaultLocale, 'MISC.QUEUE')}:`);
 					fileBuffer.push(player.queue.tracks.map(track => track.uri).join('\n'));
 				}
 				await player.handler.disconnect();
-				const success = await player.handler.send(`${getLocale(guildLocale ?? defaultLocale, ['exit', 'SIGINT', 'SIGTERM', 'lavalink'].includes(eventType) ? 'MUSIC_RESTART' : 'MUSIC_RESTART_CRASH')}${fileBuffer.length > 0 ? `\n${getLocale(guildLocale ?? defaultLocale, 'MUSIC_RESTART_QUEUEDATA')}` : ''}`,
+				const success = await player.handler.send(`${getLocale(guildLocale ?? defaultLocale, ['exit', 'SIGINT', 'SIGTERM', 'lavalink'].includes(eventType) ? 'MUSIC.PLAYER.RESTARTING.DEFAULT' : 'MUSIC.PLAYER.RESTARTING.CRASHED')}${fileBuffer.length > 0 ? `\n${getLocale(guildLocale ?? defaultLocale, 'MUSIC.PLAYER.RESTARTING.QUEUE_DATA_ATTACHED')}` : ''}`,
 					{
-						footer: getLocale(guildLocale ?? defaultLocale, 'MUSIC_RESTART_SORRY'),
+						footer: getLocale(guildLocale ?? defaultLocale, 'MUSIC.PLAYER.RESTARTING.APOLOGY'),
 						files: fileBuffer.length > 0 ? [
 							{
 								attachment: Buffer.from(fileBuffer.join('\n')),
@@ -153,7 +159,7 @@ async function shuttingDown(eventType, err) {
 			logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
 			logger.info({ message: 'Logging additional output to error.log.', label: 'Quaver' });
 			try {
-				await fsPromises.writeFile('error.log', `${eventType}${err.message ? `\n${err.message}` : ''}${err.stack ? `\n${err.stack}` : ''}`);
+				await writeFile('error.log', `${eventType}${err.message ? `\n${err.message}` : ''}${err.stack ? `\n${err.stack}` : ''}`);
 			}
 			catch (e) {
 				logger.error({ message: 'Encountered error while writing to error.log.', label: 'Quaver' });
@@ -164,46 +170,58 @@ async function shuttingDown(eventType, err) {
 		process.exit();
 	}
 }
-module.exports.shuttingDown = shuttingDown;
 
-const commandFiles = fs.readdirSync(path.join(__dirname, 'commands')).filter(file => file.endsWith('.js'));
-for (const file of commandFiles) {
+const locales = new Collection();
+const localeFolders = readdirSync(getAbsoluteFileURL(import.meta.url, ['..', 'locales']));
+for await (const folder of localeFolders) {
+	const localeFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['..', 'locales', folder]));
+	const localeData = {};
+	for await (const file of localeFiles) {
+		const locale = await import(getAbsoluteFileURL(import.meta.url, ['..', 'locales', folder, file]));
+		localeData[file.split('.')[0].toUpperCase()] = locale.default;
+	}
+	locales.set(folder, localeData);
+}
+setLocales(locales);
+
+const commandFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['commands'])).filter(file => file.endsWith('.js'));
+for await (const file of commandFiles) {
 	/** @type {{data: import('@discordjs/builders').SlashCommandBuilder, checks: string[], permissions: {user: string[], bot: string[]}, execute(interaction: import('discord.js').CommandInteraction): Promise<void>}} */
-	const command = require(path.join(__dirname, 'commands', file));
-	bot.commands.set(command.data.name, command);
+	const command = await import(getAbsoluteFileURL(import.meta.url, ['commands', file]));
+	bot.commands.set(command.default.data.name, command.default);
 }
 
-const componentsFolders = fs.readdirSync(path.join(__dirname, 'components'));
-for (const folder of componentsFolders) {
-	const componentFiles = fs.readdirSync(path.join(__dirname, 'components', folder)).filter(file => file.endsWith('.js'));
-	for (const file of componentFiles) {
-		const component = require(path.join(__dirname, 'components', folder, file));
+const componentsFolders = readdirSync(getAbsoluteFileURL(import.meta.url, ['components']));
+for await (const folder of componentsFolders) {
+	const componentFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['components', folder])).filter(file => file.endsWith('.js'));
+	for await (const file of componentFiles) {
+		const component = await import(getAbsoluteFileURL(import.meta.url, ['components', folder, file]));
 		if (!bot[folder]) bot[folder] = new Collection();
-		bot[folder].set(component.name, component);
+		bot[folder].set(component.default.name, component.default);
 	}
 }
 
-const eventFiles = fs.readdirSync(path.join(__dirname, 'events')).filter(file => file.endsWith('.js'));
-for (const file of eventFiles) {
+const eventFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['events'])).filter(file => file.endsWith('.js'));
+for await (const file of eventFiles) {
 	/** @type {{name: string, once: boolean, execute(...args): void | Promise<void>}} */
-	const event = require(path.join(__dirname, 'events', file));
-	if (event.once) {
-		bot.once(event.name, (...args) => event.execute(...args));
+	const event = await import(getAbsoluteFileURL(import.meta.url, ['events', file]));
+	if (event.default.once) {
+		bot.once(event.default.name, (...args) => event.default.execute(...args));
 	}
 	else {
-		bot.on(event.name, (...args) => event.execute(...args));
+		bot.on(event.default.name, (...args) => event.default.execute(...args));
 	}
 }
 
-const musicEventFiles = fs.readdirSync(path.join(__dirname, 'events', 'music')).filter(file => file.endsWith('.js'));
-for (const file of musicEventFiles) {
+const musicEventFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['events', 'music'])).filter(file => file.endsWith('.js'));
+for await (const file of musicEventFiles) {
 	/** @type {{name: string, once: boolean, execute(...args): void | Promise<void>}} */
-	const event = require(path.join(__dirname, 'events', 'music', file));
-	if (event.once) {
-		bot.music.once(event.name, (...args) => event.execute(...args));
+	const event = await import(getAbsoluteFileURL(import.meta.url, ['events', 'music', file]));
+	if (event.default.once) {
+		bot.music.once(event.default.name, (...args) => event.default.execute(...args));
 	}
 	else {
-		bot.music.on(event.name, (...args) => event.execute(...args));
+		bot.music.on(event.default.name, (...args) => event.default.execute(...args));
 	}
 }
 
@@ -212,8 +230,3 @@ bot.login(token);
 ['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM', 'uncaughtException', 'unhandledRejection'].forEach(eventType => {
 	process.on(eventType, async err => await shuttingDown(eventType, err));
 });
-
-module.exports.startup = false;
-module.exports.updateStartup = () => {
-	module.exports.startup = true;
-};
