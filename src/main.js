@@ -67,7 +67,7 @@ rl.on('line', async input => {
 	}
 });
 // 'close' event catches ctrl+c, therefore we pass it to shuttingDown as a ctrl+c event
-rl.on('close', async () => await shuttingDown('SIGINT'));
+rl.on('close', async () => shuttingDown('SIGINT'));
 
 load({
 	client: {
@@ -104,8 +104,8 @@ bot.music = new Node({
 	},
 	sendGatewayPayload: (id, payload) => bot.guilds.cache.get(id)?.shard?.send(payload),
 });
-bot.ws.on('VOICE_SERVER_UPDATE', payload => bot.music.handleVoiceUpdate(payload));
-bot.ws.on('VOICE_STATE_UPDATE', payload => bot.music.handleVoiceUpdate(payload));
+bot.ws.on('VOICE_SERVER_UPDATE', async payload => await bot.music.handleVoiceUpdate(payload));
+bot.ws.on('VOICE_STATE_UPDATE', async payload => await bot.music.handleVoiceUpdate(payload));
 
 let inProgress = false;
 /**
@@ -230,5 +230,5 @@ for await (const file of musicEventFiles) {
 bot.login(token);
 
 ['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM', 'uncaughtException', 'unhandledRejection'].forEach(eventType => {
-	process.on(eventType, async err => await shuttingDown(eventType, err));
+	process.on(eventType, async err => shuttingDown(eventType, err));
 });
