@@ -114,7 +114,7 @@ let inProgress = false;
 export async function shuttingDown(eventType, err) {
 	if (inProgress) return;
 	inProgress = true;
-	logger.info({ message: 'Shutting down...', label: 'Quaver' });
+	logger.info({ message: `Shutting down${eventType ? ` due to ${eventType}` : ''}...`, label: 'Quaver' });
 	try {
 		if (startup) {
 			logger.info({ message: 'Disconnecting from all guilds...', label: 'Quaver' });
