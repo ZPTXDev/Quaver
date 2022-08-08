@@ -30,9 +30,9 @@ export default {
 			return;
 		}
 		original.embeds[0] = EmbedBuilder.from(original.embeds[0])
-			.setDescription(pages[page - 1].map(async (track, index) => {
+			.setDescription(pages[page - 1].map((track, index) => {
 				const duration = msToTime(track.length);
-				const durationString = track.isStream ? '∞' : await msToTimeString(duration, true);
+				const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
 				return `\`${(firstIndex + index).toString().padStart(largestIndexSize, ' ')}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 			}).join('\n'))
 			.setFooter({ text: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.PAGE', page, pages.length) });

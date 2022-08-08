@@ -17,7 +17,7 @@ export default {
 			delete queue.player.timeout;
 		}
 		const duration = msToTime(track.length);
-		const durationString = track.isStream ? '∞' : await msToTimeString(duration, true);
+		const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
 		await queue.player.handler.send(`${getLocale(await data.guild.get(queue.player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.PLAYER.PLAYING.NOW', track.title, track.uri, durationString)}\n${getLocale(await data.guild.get(queue.player.guildId, 'settings.locale') ?? defaultLocale, 'MISC.ADDED_BY', track.requester)}`, {}, 'neutral');
 	},
 };

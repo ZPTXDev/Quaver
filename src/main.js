@@ -32,7 +32,7 @@ rl.on('line', async input => {
 			break;
 		case 'stats': {
 			const uptime = msToTime(bot.uptime);
-			const uptimeString = await msToTimeString(uptime);
+			const uptimeString = msToTimeString(uptime);
 			console.log(`Statistics:\nGuilds: ${bot.guilds.cache.size}\nUptime: ${uptimeString}`);
 			break;
 		}

@@ -15,7 +15,7 @@ export default {
 	/** @param {import('discord.js').CommandInteraction & {client: import('discord.js').Client, replyHandler: import('#lib/ReplyHandler.js')}} interaction */
 	async execute(interaction) {
 		const uptime = msToTime(interaction.client.uptime);
-		const uptimeString = await msToTimeString(uptime);
+		const uptimeString = msToTimeString(uptime);
 		await interaction.replyHandler.locale('CMD.PING.RESPONSE.SUCCESS', { footer: `${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD.PING.MISC.UPTIME')} ${uptimeString}` }, 'neutral', interaction.guild ? ` ${interaction.guild.shard.ping}ms` : '');
 	},
 };

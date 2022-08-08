@@ -42,9 +42,9 @@ export default {
 		await interaction.editReply({
 			embeds: [
 				new EmbedBuilder()
-					.setDescription(tracks.map(async (track, index) => {
+					.setDescription(tracks.map((track, index) => {
 						const duration = msToTime(track.info.length);
-						const durationString = track.info.isStream ? '∞' : await msToTimeString(duration, true);
+						const durationString = track.info.isStream ? '∞' : msToTimeString(duration, true);
 						return `\`${(index + 1).toString().padStart(tracks.length.toString().length, ' ')}.\` **[${track.info.title}](${track.info.uri})** \`[${durationString}]\``;
 					}).join('\n'))
 					.setColor(colors.neutral),

@@ -22,9 +22,9 @@ export default {
 		}
 		const pages = paginate(player.queue.tracks, 5);
 		await interaction.replyHandler.reply(
-			pages[0].map(async (track, index) => {
+			pages[0].map((track, index) => {
 				const duration = msToTime(track.length);
-				const durationString = track.isStream ? '∞' : await msToTimeString(duration, true);
+				const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
 				return `\`${index + 1}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 			}).join('\n'),
 			{
