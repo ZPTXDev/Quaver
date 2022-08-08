@@ -6,7 +6,7 @@ import { data } from '#lib/util/common.js';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('ping')
-		.setDescription(getLocale(defaultLocale, 'CMD_PING_DESCRIPTION')),
+		.setDescription(getLocale(defaultLocale, 'CMD.PING.DESCRIPTION')),
 	checks: [],
 	permissions: {
 		user: [],
@@ -15,7 +15,7 @@ export default {
 	/** @param {import('discord.js').CommandInteraction & {client: import('discord.js').Client, replyHandler: import('#lib/ReplyHandler.js')}} interaction */
 	async execute(interaction) {
 		const uptime = msToTime(interaction.client.uptime);
-		const uptimeString = msToTimeString(uptime);
-		await interaction.replyHandler.locale('CMD_PING_PONG', { footer: `${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD_PING_UPTIME')} ${uptimeString}` }, 'neutral', interaction.guild ? ` ${interaction.guild.shard.ping}ms` : '');
+		const uptimeString = await msToTimeString(uptime);
+		await interaction.replyHandler.locale('CMD.PING.RESPONSE.SUCCESS', { footer: `${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD.PING.MISC.UPTIME')} ${uptimeString}` }, 'neutral', interaction.guild ? ` ${interaction.guild.shard.ping}ms` : '');
 	},
 };

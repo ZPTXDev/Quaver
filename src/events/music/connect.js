@@ -1,12 +1,12 @@
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { logger, data } from '#lib/util/common.js';
-import { bot } from '#src/main.js';
 import PlayerHandler from '#lib/PlayerHandler.js';
 
 export default {
 	name: 'connect',
 	once: false,
 	async execute() {
+		const { bot } = await import('#src/main.js');
 		logger.info({ message: 'Connected.', label: 'Lavalink' });
 		for await (const [guildId, guildData] of data.guild.instance.iterator()) {
 			if (get(guildData, 'settings.stay.enabled')) {

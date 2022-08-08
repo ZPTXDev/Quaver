@@ -8,16 +8,16 @@ import { data } from '#lib/util/common.js';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('loop')
-		.setDescription(getLocale(defaultLocale, 'CMD_LOOP_DESCRIPTION'))
+		.setDescription(getLocale(defaultLocale, 'CMD.LOOP.DESCRIPTION'))
 		.addStringOption(option =>
 			option
 				.setName('type')
-				.setDescription(getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE'))
+				.setDescription(getLocale(defaultLocale, 'CMD.LOOP.OPTION.TYPE.DESCRIPTION'))
 				.setRequired(true)
 				.addChoices(
-					{ name: getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_DISABLED'), value: 'disabled' },
-					{ name: getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_TRACK'), value: 'track' },
-					{ name: getLocale(defaultLocale, 'CMD_LOOP_OPTION_TYPE_QUEUE'), value: 'queue' },
+					{ name: getLocale(defaultLocale, 'CMD.LOOP.OPTION.TYPE.OPTION.DISABLED'), value: 'disabled' },
+					{ name: getLocale(defaultLocale, 'CMD.LOOP.OPTION.TYPE.OPTION.TRACK'), value: 'track' },
+					{ name: getLocale(defaultLocale, 'CMD.LOOP.OPTION.TYPE.OPTION.QUEUE'), value: 'queue' },
 				)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
@@ -32,19 +32,19 @@ export default {
 		switch (type) {
 			case 'disabled':
 				loop = LoopType.None;
-				typeLocale = getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD_LOOP_OPTION_TYPE_DISABLED');
+				typeLocale = getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD.LOOP.OPTION.TYPE.OPTION.DISABLED');
 				break;
 			case 'track':
 				loop = LoopType.Song;
-				typeLocale = getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD_LOOP_OPTION_TYPE_TRACK');
+				typeLocale = getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD.LOOP.OPTION.TYPE.OPTION.TRACK');
 				break;
 			case 'queue':
 				loop = LoopType.Queue;
-				typeLocale = getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD_LOOP_OPTION_TYPE_QUEUE');
+				typeLocale = getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD.LOOP.OPTION.TYPE.OPTION.QUEUE');
 				break;
 		}
 		typeLocale = typeLocale.toLowerCase();
 		player.queue.setLoop(loop);
-		await interaction.replyHandler.locale('CMD_LOOP_SUCCESS', {}, 'neutral', typeLocale);
+		await interaction.replyHandler.locale('CMD.LOOP.RESPONSE.SUCCESS', {}, 'neutral', typeLocale);
 	},
 };

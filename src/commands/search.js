@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, ButtonStyle, ChannelType } from 'discord.js';
-import { colors, defaultLocale } from '#settings';
+import { defaultLocale, colors } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getLocale, msToTime, msToTimeString } from '#lib/util/util.js';
 import { data } from '#lib/util/common.js';
@@ -9,11 +9,11 @@ import { data } from '#lib/util/common.js';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('search')
-		.setDescription(getLocale(defaultLocale, 'CMD_SEARCH_DESCRIPTION'))
+		.setDescription(getLocale(defaultLocale, 'CMD.SEARCH.DESCRIPTION'))
 		.addStringOption(option =>
 			option
 				.setName('query')
-				.setDescription(getLocale(defaultLocale, 'CMD_SEARCH_OPTION_QUERY'))
+				.setDescription(getLocale(defaultLocale, 'CMD.SEARCH.OPTION.QUERY'))
 				.setRequired(true)),
 	checks: [checks.GUILD_ONLY],
 	permissions: {
@@ -23,7 +23,7 @@ export default {
 	/** @param {import('discord.js').CommandInteraction & {client: import('discord.js').Client, replyHandler: import('#lib/ReplyHandler.js')}} interaction */
 	async execute(interaction) {
 		if (![ChannelType.GuildText, ChannelType.GuildVoice].includes(interaction.channel.type)) {
-			await interaction.replyHandler.locale('DISCORD_BOT_UNSUPPORTED_CHANNEL', {}, 'error');
+			await interaction.replyHandler.locale('DISCORD.CHANNEL_UNSUPPORTED', {}, 'error');
 			return;
 		}
 		await interaction.deferReply();
@@ -35,16 +35,16 @@ export default {
 
 		tracks = tracks.slice(0, 10);
 		if (tracks.length <= 1) {
-			await interaction.replyHandler.locale('CMD_SEARCH_USE_PLAY_CMD', {}, 'error');
+			await interaction.replyHandler.locale('CMD.SEARCH.RESPONSE.USE_PLAY_CMD', {}, 'error');
 			return;
 		}
 
 		await interaction.editReply({
 			embeds: [
 				new EmbedBuilder()
-					.setDescription(tracks.map((track, index) => {
+					.setDescription(tracks.map(async (track, index) => {
 						const duration = msToTime(track.info.length);
-						const durationString = track.info.isStream ? '∞' : msToTimeString(duration, true);
+						const durationString = track.info.isStream ? '∞' : await msToTimeString(duration, true);
 						return `\`${(index + 1).toString().padStart(tracks.length.toString().length, ' ')}.\` **[${track.info.title}](${track.info.uri})** \`[${durationString}]\``;
 					}).join('\n'))
 					.setColor(colors.neutral),
@@ -54,7 +54,7 @@ export default {
 					.addComponents(
 						new SelectMenuBuilder()
 							.setCustomId(`play_${interaction.user.id}`)
-							.setPlaceholder(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD_SEARCH_PICK'))
+							.setPlaceholder(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD.SEARCH.MISC.PICK'))
 							.addOptions(tracks.map((track, index) => {
 								let label = `${index + 1}. ${track.info.title}`;
 								if (label.length >= 100) {
@@ -69,7 +69,7 @@ export default {
 					.addComponents(
 						new ButtonBuilder()
 							.setCustomId(`cancel_${interaction.user.id}`)
-							.setLabel(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_CANCEL'))
+							.setLabel(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.CANCEL'))
 							.setStyle(ButtonStyle.Danger),
 					),
 			],

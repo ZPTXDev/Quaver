@@ -7,11 +7,11 @@ import { data } from '#lib/util/common.js';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('nightcore')
-		.setDescription(getLocale(defaultLocale, 'CMD_NIGHTCORE_DESCRIPTION'))
+		.setDescription(getLocale(defaultLocale, 'CMD.NIGHTCORE.DESCRIPTION'))
 		.addBooleanOption(option =>
 			option
 				.setName('enabled')
-				.setDescription(getLocale(defaultLocale, 'CMD_NIGHTCORE_OPTION_ENABLED'))),
+				.setDescription(getLocale(defaultLocale, 'CMD.NIGHTCORE.OPTION.ENABLED'))),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -31,6 +31,6 @@ export default {
 		player.filters.timescale = nightcore ? { speed: 1.125, pitch: 1.125, rate: 1 } : undefined;
 		await player.setFilters();
 		player.nightcore = nightcore;
-		await interaction.replyHandler.locale(player.nightcore ? 'CMD_NIGHTCORE_ENABLED' : 'CMD_NIGHTCORE_DISABLED', { footer: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_FILTERS_NOTE') }, 'neutral');
+		await interaction.replyHandler.locale(player.nightcore ? 'CMD.NIGHTCORE.RESPONSE.ENABLED' : 'CMD.NIGHTCORE.RESPONSE.DISABLED', { footer: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.PLAYER.FILTER_NOTE') }, 'neutral');
 	},
 };

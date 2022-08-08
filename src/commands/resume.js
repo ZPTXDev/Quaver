@@ -6,7 +6,7 @@ import { getLocale } from '#lib/util/util.js';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('resume')
-		.setDescription(getLocale(defaultLocale, 'CMD_RESUME_DESCRIPTION')),
+		.setDescription(getLocale(defaultLocale, 'CMD.RESUME.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -16,11 +16,11 @@ export default {
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		if (!player.paused) {
-			await interaction.replyHandler.locale('CMD_RESUME_UNPAUSED', {}, 'error');
+			await interaction.replyHandler.locale('CMD.RESUME.STATE_UNCHANGED', {}, 'error');
 			return;
 		}
 		player.resume();
 		if (!player.playing && player.queue.tracks.length > 0) { await player.queue.start(); }
-		await interaction.replyHandler.locale('CMD_RESUME_SUCCESS', {}, 'success');
+		await interaction.replyHandler.locale('CMD.RESUME.RESPONSE.SUCCESS', {}, 'success');
 	},
 };

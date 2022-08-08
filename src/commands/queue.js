@@ -7,7 +7,7 @@ import { data } from '#lib/util/common.js';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('queue')
-		.setDescription(getLocale(defaultLocale, 'CMD_QUEUE_DESCRIPTION')),
+		.setDescription(getLocale(defaultLocale, 'CMD.QUEUE.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -17,18 +17,18 @@ export default {
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		if (player.queue.tracks.length === 0) {
-			await interaction.replyHandler.locale('CMD_QUEUE_EMPTY', {}, 'error');
+			await interaction.replyHandler.locale('CMD.QUEUE.RESPONSE.QUEUE_EMPTY', {}, 'error');
 			return;
 		}
 		const pages = paginate(player.queue.tracks, 5);
 		await interaction.replyHandler.reply(
-			pages[0].map((track, index) => {
+			pages[0].map(async (track, index) => {
 				const duration = msToTime(track.length);
-				const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
+				const durationString = track.isStream ? '∞' : await msToTimeString(duration, true);
 				return `\`${index + 1}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 			}).join('\n'),
 			{
-				footer: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_PAGE', '1', pages.length),
+				footer: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.PAGE', '1', pages.length),
 				components: [
 					new ActionRowBuilder()
 						.addComponents(
@@ -46,7 +46,7 @@ export default {
 								.setCustomId('queue_1')
 								.setEmoji('🔁')
 								.setStyle(ButtonStyle.Secondary)
-								.setLabel(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_REFRESH')),
+								.setLabel(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.REFRESH')),
 						),
 				],
 			},

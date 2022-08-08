@@ -1,9 +1,10 @@
 // Running this will migrate your data.json to the new database.sqlite.
 import Keyv from 'keyv';
-import { set } from 'lodash';
+import { set } from 'lodash-es';
 import data from '../data.json';
 import { database_uri } from '#settings';
 
+// TODO: this needs to be changed because database.sqlite is one directory above
 const keyv = new Keyv(database_uri ?? 'sqlite://database.sqlite', { namespace: 'guild' });
 
 (async () => {

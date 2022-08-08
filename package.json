@@ -12,9 +12,10 @@
     "@lavaclient/spotify": "^3.1.0",
     "discord-api-types": "^0.37.1",
     "discord.js": "^14.1.2",
+    "genversion": "^3.1.1",
     "keyv": "^4.3.3",
     "lavaclient": "^4.1.1",
-    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
     "patch-package": "^6.4.7",
     "winston": "^3.8.1"
   },
@@ -27,13 +28,12 @@
     "slash-deploy": "node scripts/deploy-commands.js",
     "slash-delete": "node scripts/delete-commands.js",
     "migrate": "node scripts/migrate.js",
-    "start": "node ."
+    "start": "genversion --es6 --semi lib/util/version.js && node ."
   },
   "imports": {
     "#lib/*": "./lib/*",
     "#src/*": "./src/*",
-    "#settings": "./settings.json",
-    "#package": "./package.json"
+    "#settings": "./settings.js"
   },
   "release": {
     "tagFormat": "${version}",

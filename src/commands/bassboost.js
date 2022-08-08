@@ -7,11 +7,11 @@ import { data } from '#lib/util/common.js';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('bassboost')
-		.setDescription(getLocale(defaultLocale, 'CMD_BASSBOOST_DESCRIPTION'))
+		.setDescription(getLocale(defaultLocale, 'CMD.BASSBOOST.DESCRIPTION'))
 		.addBooleanOption(option =>
 			option
 				.setName('enabled')
-				.setDescription(getLocale(defaultLocale, 'CMD_BASSBOOST_OPTION_ENABLED'))),
+				.setDescription(getLocale(defaultLocale, 'CMD.BASSBOOST.OPTION.ENABLED'))),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -34,6 +34,6 @@ export default {
 		}
 		await player.setEqualizer(eqValues);
 		player.bassboost = boost;
-		await interaction.replyHandler.locale(player.bassboost ? 'CMD_BASSBOOST_ENABLED' : 'CMD_BASSBOOST_DISABLED', { footer: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_FILTERS_NOTE') });
+		await interaction.replyHandler.locale(player.bassboost ? 'CMD.BASSBOOST.RESPONSE.ENABLED' : 'CMD.BASSBOOST.RESPONSE.DISABLED', { footer: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.PLAYER.FILTER_NOTE') });
 	},
 };

@@ -6,7 +6,7 @@ import { getLocale } from '#lib/util/util.js';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('pause')
-		.setDescription(getLocale(defaultLocale, 'CMD_PAUSE_DESCRIPTION')),
+		.setDescription(getLocale(defaultLocale, 'CMD.PAUSE.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -16,10 +16,10 @@ export default {
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		if (player.paused) {
-			await interaction.replyHandler.locale('CMD_PAUSE_PAUSED', {}, 'error');
+			await interaction.replyHandler.locale('CMD.RESPONSE.PAUSE.STATE_UNCHANGED', {}, 'error');
 			return;
 		}
 		player.pause();
-		await interaction.replyHandler.locale('CMD_PAUSE_SUCCESS', {}, 'success');
+		await interaction.replyHandler.locale('CMD.RESPONSE.PAUSE.SUCCESS', {}, 'success');
 	},
 };

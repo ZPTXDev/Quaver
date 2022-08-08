@@ -5,10 +5,14 @@ import { load } from '@lavaclient/spotify';
 import { readdirSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import { createInterface } from 'readline';
-import { join } from 'path';
-import { token, lavalink, spotify, defaultLocale, features } from '#settings';
-import { msToTime, msToTimeString, getLocale } from '#lib/util/util.js';
-import { logger, data } from '#lib/util/common.js';
+import { defaultLocale, features, spotify, lavalink, token } from '#settings';
+import { msToTime, msToTimeString, getLocale, getAbsoluteFileURL } from '#lib/util/util.js';
+import { logger, data, setLocales } from '#lib/util/common.js';
+
+export let startup = false;
+export function updateStartup() {
+	startup = true;
+}
 
 const rl = createInterface({
 	input: process.stdin,
@@ -28,7 +32,7 @@ rl.on('line', async input => {
 			break;
 		case 'stats': {
 			const uptime = msToTime(bot.uptime);
-			const uptimeString = msToTimeString(uptime);
+			const uptimeString = await msToTimeString(uptime);
 			console.log(`Statistics:\nGuilds: ${bot.guilds.cache.size}\nUptime: ${uptimeString}`);
 			break;
 		}
@@ -124,17 +128,17 @@ export async function shuttingDown(eventType, err) {
 				logger.info({ message: `[G ${player.guildId}] Disconnecting (restarting)`, label: 'Quaver' });
 				const fileBuffer = [];
 				if (player.queue.current && (player.playing || player.paused)) {
-					fileBuffer.push(`${getLocale(guildLocale ?? defaultLocale, 'MISC_CURRENT')}:`);
+					fileBuffer.push(`${getLocale(guildLocale ?? defaultLocale, 'MISC.CURRENT')}:`);
 					fileBuffer.push(player.queue.current.uri);
 				}
 				if (player.queue.tracks.length > 0) {
-					fileBuffer.push(`${getLocale(guildLocale ?? defaultLocale, 'MISC_QUEUE')}:`);
+					fileBuffer.push(`${getLocale(guildLocale ?? defaultLocale, 'MISC.QUEUE')}:`);
 					fileBuffer.push(player.queue.tracks.map(track => track.uri).join('\n'));
 				}
 				await player.handler.disconnect();
-				const success = await player.handler.send(`${getLocale(guildLocale ?? defaultLocale, ['exit', 'SIGINT', 'SIGTERM', 'lavalink'].includes(eventType) ? 'MUSIC_RESTART' : 'MUSIC_RESTART_CRASH')}${fileBuffer.length > 0 ? `\n${getLocale(guildLocale ?? defaultLocale, 'MUSIC_RESTART_QUEUEDATA')}` : ''}`,
+				const success = await player.handler.send(`${getLocale(guildLocale ?? defaultLocale, ['exit', 'SIGINT', 'SIGTERM', 'lavalink'].includes(eventType) ? 'MUSIC.PLAYER.RESTARTING.DEFAULT' : 'MUSIC.PLAYER.RESTARTING.CRASHED')}${fileBuffer.length > 0 ? `\n${getLocale(guildLocale ?? defaultLocale, 'MUSIC.PLAYER.RESTARTING.QUEUE_DATA_ATTACHED')}` : ''}`,
 					{
-						footer: getLocale(guildLocale ?? defaultLocale, 'MUSIC_RESTART_SORRY'),
+						footer: getLocale(guildLocale ?? defaultLocale, 'MUSIC.PLAYER.RESTARTING.APOLOGY'),
 						files: fileBuffer.length > 0 ? [
 							{
 								attachment: Buffer.from(fileBuffer.join('\n')),
@@ -169,44 +173,57 @@ export async function shuttingDown(eventType, err) {
 	}
 }
 
-const commandFiles = readdirSync(join(__dirname, 'commands')).filter(file => file.endsWith('.js'));
-for (const file of commandFiles) {
+const locales = new Collection();
+const localeFolders = readdirSync(getAbsoluteFileURL(import.meta.url, ['..', 'locales']));
+for await (const folder of localeFolders) {
+	const localeFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['..', 'locales', folder]));
+	const localeData = {};
+	for await (const file of localeFiles) {
+		const locale = await import(getAbsoluteFileURL(import.meta.url, ['..', 'locales', folder, file]));
+		localeData[file.split('.')[0].toUpperCase()] = locale.default;
+	}
+	locales.set(folder, localeData);
+}
+setLocales(locales);
+
+const commandFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['commands'])).filter(file => file.endsWith('.js'));
+for await (const file of commandFiles) {
 	/** @type {{data: import('@discordjs/builders').SlashCommandBuilder, checks: string[], permissions: {user: string[], bot: string[]}, execute(interaction: import('discord.js').CommandInteraction): Promise<void>}} */
-	const command = require(join(__dirname, 'commands', file));
-	bot.commands.set(command.data.name, command);
+	const command = await import(getAbsoluteFileURL(import.meta.url, ['commands', file]));
+	bot.commands.set(command.default.data.name, command.default);
 }
 
-const componentsFolders = readdirSync(join(__dirname, 'components'));
-for (const folder of componentsFolders) {
-	const componentFiles = readdirSync(join(__dirname, 'components', folder)).filter(file => file.endsWith('.js'));
-	for (const file of componentFiles) {
-		const component = require(join(__dirname, 'components', folder, file));
+const componentsFolders = readdirSync(getAbsoluteFileURL(import.meta.url, ['components']));
+for await (const folder of componentsFolders) {
+	const componentFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['components', folder])).filter(file => file.endsWith('.js'));
+	for await (const file of componentFiles) {
+		const component = await import(getAbsoluteFileURL(import.meta.url, ['components', folder, file]));
 		if (!bot[folder]) bot[folder] = new Collection();
-		bot[folder].set(component.name, component);
+		bot[folder].set(component.default.name, component.default);
 	}
 }
 
-const eventFiles = readdirSync(join(__dirname, 'events')).filter(file => file.endsWith('.js'));
-for (const file of eventFiles) {
+const eventFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['events'])).filter(file => file.endsWith('.js'));
+for await (const file of eventFiles) {
 	/** @type {{name: string, once: boolean, execute(...args): void | Promise<void>}} */
-	const event = require(join(__dirname, 'events', file));
-	if (event.once) {
-		bot.once(event.name, (...args) => event.execute(...args));
+	const event = await import(getAbsoluteFileURL(import.meta.url, ['events', file]));
+	if (event.default.once) {
+		bot.once(event.default.name, (...args) => event.default.execute(...args));
 	}
 	else {
-		bot.on(event.name, (...args) => event.execute(...args));
+		bot.on(event.default.name, (...args) => event.default.execute(...args));
 	}
 }
 
-const musicEventFiles = readdirSync(join(__dirname, 'events', 'music')).filter(file => file.endsWith('.js'));
-for (const file of musicEventFiles) {
+const musicEventFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['events', 'music'])).filter(file => file.endsWith('.js'));
+for await (const file of musicEventFiles) {
 	/** @type {{name: string, once: boolean, execute(...args): void | Promise<void>}} */
-	const event = require(join(__dirname, 'events', 'music', file));
-	if (event.once) {
-		bot.music.once(event.name, (...args) => event.execute(...args));
+	const event = await import(getAbsoluteFileURL(import.meta.url, ['events', 'music', file]));
+	if (event.default.once) {
+		bot.music.once(event.default.name, (...args) => event.default.execute(...args));
 	}
 	else {
-		bot.music.on(event.name, (...args) => event.execute(...args));
+		bot.music.on(event.default.name, (...args) => event.default.execute(...args));
 	}
 }
 
@@ -215,8 +232,3 @@ bot.login(token);
 ['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM', 'uncaughtException', 'unhandledRejection'].forEach(eventType => {
 	process.on(eventType, async err => await shuttingDown(eventType, err));
 });
-
-export let startup = false;
-export function updateStartup() {
-	startup = true;
-}

@@ -10,7 +10,7 @@ export default {
 	/** @param {import('discord.js').SelectMenuInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js')}} interaction */
 	async execute(interaction) {
 		if (interaction.customId.split('_')[1] !== interaction.user.id) {
-			await interaction.replyHandler.locale('DISCORD_INTERACTION_WRONG_USER', {}, 'error');
+			await interaction.replyHandler.locale('DISCORD.INTERACTION.USER_MISMATCH', {}, 'error');
 			return;
 		}
 		const tracks = interaction.values;
@@ -26,15 +26,15 @@ export default {
 		// check for connect, speak permission for channel
 		const permissions = interaction.member?.voice.channel.permissionsFor(interaction.client.user.id);
 		if (!permissions.has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak]))) {
-			await interaction.replyHandler.locale('DISCORD_BOT_MISSING_PERMISSIONS_BASIC', {}, 'error');
+			await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC', {}, 'error');
 			return;
 		}
 		if (interaction.member?.voice.channel.type === ChannelType.GuildStageVoice && !permissions.has(PermissionsBitField.StageModerator)) {
-			await interaction.replyHandler.locale('DISCORD_BOT_MISSING_PERMISSIONS_STAGE', {}, 'error');
+			await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE', {}, 'error');
 			return;
 		}
 		if (interaction.guild.members.me.isCommunicationDisabled()) {
-			await interaction.replyHandler.locale('DISCORD_BOT_TIMED_OUT', {}, 'error');
+			await interaction.replyHandler.locale('DISCORD.TIMED_OUT', {}, 'error');
 			return;
 		}
 
@@ -53,7 +53,7 @@ export default {
 		}
 		else {
 			msg = 'MUSIC_QUEUE_ADDED_MULTI';
-			extras = [resolvedTracks.length, getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_SEARCH'), ''] ;
+			extras = [resolvedTracks.length, getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.YOUR_SEARCH'), ''] ;
 		}
 		if (!player?.connected) {
 			player = interaction.client.music.createPlayer(interaction.guildId);
@@ -65,7 +65,7 @@ export default {
 			// Ensure that Quaver destroys the player if Quaver gets kicked or banned by the user while Quaver is queuing tracks
 			const timedOut = interaction.guild?.members.me.isCommunicationDisabled();
 			if (!interaction.member.voice.channelId || timedOut || !interaction.guild) {
-				if (interaction.guild) timedOut ? await interaction.replyHandler.locale('DISCORD_BOT_TIMED_OUT', { components: [] }, 'error') : await interaction.replyHandler.locale('DISCORD_INTERACTION_CANCELED', { components: [] }, 'neutral', interaction.user.id);
+				if (interaction.guild) timedOut ? await interaction.replyHandler.locale('DISCORD.TIMED_OUT', { components: [] }, 'error') : await interaction.replyHandler.locale('DISCORD.INTERACTION.CANCELED', { components: [] }, 'neutral', interaction.user.id);
 				await player.handler.disconnect();
 				return;
 			}
@@ -76,7 +76,7 @@ export default {
 		player.queue.add(resolvedTracks, { requester: interaction.user.id });
 
 		const started = player.playing || player.paused;
-		await interaction.replyHandler.locale(msg, { footer: started ? `${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null, components: [] }, 'success', ...extras);
+		await interaction.replyHandler.locale(msg, { footer: started ? `${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null, components: [] }, 'success', ...extras);
 		if (!started) { await player.queue.start(); }
 	},
 };

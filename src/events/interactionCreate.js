@@ -63,12 +63,12 @@ export default {
 			}
 			if (failedPermissions.user.length > 0) {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedPermissions.user.length} user permission check(s)`, label: 'Quaver' });
-				await interaction.replyHandler.locale('DISCORD_USER_MISSING_PERMISSIONS', {}, 'error', failedPermissions.user.map(perm => `\`${perm}\``).join(' '));
+				await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.USER', {}, 'error', failedPermissions.user.map(perm => `\`${perm}\``).join(' '));
 				return;
 			}
 			if (failedPermissions.bot.length > 0) {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedPermissions.bot.length} bot permission check(s)`, label: 'Quaver' });
-				await interaction.replyHandler.locale('DISCORD_BOT_MISSING_PERMISSIONS', {}, 'error', failedPermissions.bot.map(perm => `\`${perm}\``).join(' '));
+				await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.DEFAULT', {}, 'error', failedPermissions.bot.map(perm => `\`${perm}\``).join(' '));
 				return;
 			}
 			try {
@@ -78,7 +78,7 @@ export default {
 			catch (err) {
 				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with command ${interaction.commandName}`, label: 'Quaver' });
 				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				await interaction.replyHandler.locale('DISCORD_GENERIC_ERROR', {}, 'error');
+				await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', {}, 'error');
 			}
 		}
 		else if (interaction.isButton()) {
@@ -93,7 +93,7 @@ export default {
 			catch (err) {
 				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with button ${interaction.customId}`, label: 'Quaver' });
 				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				await interaction.replyHandler.locale('DISCORD_GENERIC_ERROR', {}, 'error');
+				await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', {}, 'error');
 			}
 		}
 		else if (interaction.isSelectMenu()) {
@@ -108,7 +108,7 @@ export default {
 			catch (err) {
 				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with select menu ${interaction.customId}`, label: 'Quaver' });
 				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				await interaction.replyHandler.locale('DISCORD_GENERIC_ERROR', {}, 'error');
+				await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', {}, 'error');
 			}
 		}
 	},

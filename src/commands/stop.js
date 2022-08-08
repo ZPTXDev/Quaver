@@ -6,7 +6,7 @@ import { getLocale } from '#lib/util/util.js';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('stop')
-		.setDescription(getLocale(defaultLocale, 'CMD_STOP_DESCRIPTION')),
+		.setDescription(getLocale(defaultLocale, 'CMD.STOP.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -16,12 +16,12 @@ export default {
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		if (!player.queue.current || !player.playing && !player.paused) {
-			await interaction.replyHandler.locale('MUSIC_QUEUE_NOT_PLAYING', {}, 'error');
+			await interaction.replyHandler.locale('MUSIC.PLAYER.PLAYING.NOTHING', {}, 'error');
 			return;
 		}
 		player.queue.clear();
 		await player.queue.skip();
 		await player.queue.start();
-		await interaction.replyHandler.locale('CMD_STOP_SUCCESS', {}, 'success');
+		await interaction.replyHandler.locale('CMD.STOP.RESPONSE.SUCCESS', {}, 'success');
 	},
 };

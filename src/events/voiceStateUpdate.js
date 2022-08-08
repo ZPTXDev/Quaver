@@ -27,7 +27,7 @@ export default {
 				if (await data.guild.get(player.guildId, 'settings.stay.enabled')) {
 					await data.guild.set(player.guildId, 'settings.stay.enabled', false);
 				}
-				await player.handler.locale('MUSIC_FORCED', {}, 'warning');
+				await player.handler.locale('MUSIC.SESSION_ENDED.FORCED.DISCONNECTED', {}, 'warning');
 				await player.handler.disconnect(oldState.channelId);
 				return;
 			}
@@ -37,7 +37,7 @@ export default {
 				// Check for connect, speak permission for voice channel
 				const permissions = oldState.client.guilds.cache.get(guild.id).channels.cache.get(newState.channelId).permissionsFor(oldState.client.user.id);
 				if (!permissions.has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak]))) {
-					await player.handler.locale('DISCORD_BOT_MISSING_PERMISSIONS_BASIC', {}, 'error');
+					await player.handler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC', {}, 'error');
 					await player.handler.disconnect();
 					return;
 				}
@@ -51,7 +51,7 @@ export default {
 				const permissions = oldState.client.guilds.cache.get(guild.id).channels.cache.get(newState.channelId).permissionsFor(oldState.client.user.id);
 				// Check for connect, speak permission for stage channel
 				if (!permissions.has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak]))) {
-					await player.handler.locale('DISCORD_BOT_MISSING_PERMISSIONS_BASIC', {}, 'error');
+					await player.handler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC', {}, 'error');
 					await player.handler.disconnect();
 					return;
 				}
@@ -59,14 +59,14 @@ export default {
 					if (await data.guild.get(player.guildId, 'settings.stay.enabled')) {
 						await data.guild.set(player.guildId, 'settings.stay.enabled', false);
 					}
-					await player.handler.locale('MUSIC_FORCED_STAGE', {}, 'warning');
+					await player.handler.locale('MUSIC.SESSION_ENDED.FORCED.STAGE_NOT_MODERATOR', {}, 'warning');
 					await player.handler.disconnect();
 					return;
 				}
 				await newState.setSuppressed(false);
 				if (!newState.channel.stageInstance) {
 					try {
-						await newState.channel.createStageInstance({ topic: getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_STAGE_TOPIC'), privacyLevel: StageInstancePrivacyLevel.GuildOnly });
+						await newState.channel.createStageInstance({ topic: getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MISC.STAGE_TOPIC'), privacyLevel: StageInstancePrivacyLevel.GuildOnly });
 					}
 					catch (err) {
 						logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
@@ -86,7 +86,7 @@ export default {
 						await data.guild.set(player.guildId, 'settings.stay.enabled', false);
 					}
 					logger.info({ message: `[G ${player.guildId}] Disconnecting (alone)`, label: 'Quaver' });
-					await player.handler.locale('MUSIC_ALONE_MOVED', {}, 'warning');
+					await player.handler.locale('MUSIC.DISCONNECT.ALONE.DISCONNECTED.MOVED', {}, 'warning');
 					await player.handler.disconnect();
 					return;
 				}
@@ -100,10 +100,10 @@ export default {
 				clearTimeout(player.pauseTimeout);
 				player.pauseTimeout = setTimeout(p => {
 					logger.info({ message: `[G ${p.guildId}] Disconnecting (inactivity)`, label: 'Quaver' });
-					p.handler.locale('MUSIC_INACTIVITY', {}, 'warning');
+					p.handler.locale('MUSIC.DISCONNECT.INACTIVITY.DISCONNECTED', {}, 'warning');
 					p.handler.disconnect();
 				}, 300000, player);
-				await player.handler.send(`${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`, { footer: getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_ALONE_REJOIN') }, 'warning');
+				await player.handler.send(`${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.DISCONNECT.ALONE.WARNING')} ${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.DISCONNECT.INACTIVITY.WARNING', Math.floor(Date.now() / 1000) + 300)}`, { footer: getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME') }, 'warning');
 			}
 			// Moved to a new channel that has humans and pauseTimeout is set
 			else if (newState.channel.members.filter(m => !m.user.bot).size >= 1 && player.pauseTimeout) {
@@ -111,7 +111,7 @@ export default {
 				player.resume();
 				clearTimeout(player.pauseTimeout);
 				delete player.pauseTimeout;
-				await player.handler.locale('MUSIC_ALONE_RESUMED', {}, 'success');
+				await player.handler.locale('MUSIC.DISCONNECT.ALONE.RESUMING', {}, 'success');
 				return;
 			}
 		}
@@ -127,7 +127,7 @@ export default {
 				clearTimeout(player.pauseTimeout);
 				delete player.pauseTimeout;
 			}
-			await player.handler.locale('MUSIC_ALONE_RESUMED', {}, 'success');
+			await player.handler.locale('MUSIC.DISCONNECT.ALONE.RESUMING', {}, 'success');
 			return;
 		}
 		// User not in Quaver's channel
@@ -142,7 +142,7 @@ export default {
 		// Nothing is playing so we'll leave
 		if (!player.queue.current || !player.playing && !player.paused) {
 			logger.info({ message: `[G ${player.guildId}] Disconnecting (alone)`, label: 'Quaver' });
-			await player.handler.locale('MUSIC_ALONE', {}, 'warning');
+			await player.handler.locale('MUSIC.DISCONNECT.ALONE.DISCONNECTED.DEFAULT', {}, 'warning');
 			await player.handler.disconnect();
 			return;
 		}
@@ -158,9 +158,9 @@ export default {
 		clearTimeout(player.pauseTimeout);
 		player.pauseTimeout = setTimeout(p => {
 			logger.info({ message: `[G ${p.guildId}] Disconnecting (inactivity)`, label: 'Quaver' });
-			p.handler.locale('MUSIC_INACTIVITY', {}, 'warning');
+			p.handler.locale('MUSIC.DISCONNECT.INACTIVITY.DISCONNECTED', {}, 'warning');
 			p.handler.disconnect();
 		}, 300000, player);
-		await player.handler.send(`${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_ALONE_WARNING')} ${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_INACTIVITY_WARNING', Math.floor(Date.now() / 1000) + 300)}`, { footer: getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_ALONE_REJOIN') }, 'warning');
+		await player.handler.send(`${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.DISCONNECT.ALONE.WARNING')} ${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.DISCONNECT.INACTIVITY.WARNING', Math.floor(Date.now() / 1000) + 300)}`, { footer: getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME') }, 'warning');
 	},
 };
