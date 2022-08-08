@@ -1,13 +1,13 @@
-const { logger } = require('#lib/util/common.js');
-const { version } = require('#package');
-const { ActivityType } = require('discord.js');
+import { logger } from '#lib/util/common.js';
+import { version } from '#lib/util/version.js';
+import { ActivityType } from 'discord.js';
 
-module.exports = {
+export default {
 	name: 'ready',
 	once: false,
 	/** @param {import('discord.js').Client & {music: import('lavaclient').Node}} client */
 	async execute(client) {
-		const { startup, updateStartup } = require('#src/main.js');
+		const { startup, updateStartup } = await import('#src/main.js');
 		if (!startup) {
 			logger.info({ message: `Connected. Logged in as ${client.user.tag}.`, label: 'Discord' });
 			logger.info({ message: `Running version ${version}. For help, see https://github.com/ZPTXDev/Quaver/issues.`, label: 'Quaver' });
