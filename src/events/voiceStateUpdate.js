@@ -108,7 +108,7 @@ export default {
 			// Moved to a new channel that has humans and pauseTimeout is set
 			else if (newState.channel.members.filter(m => !m.user.bot).size >= 1 && player.pauseTimeout) {
 				logger.info({ message: `[G ${player.guildId}] Resuming session`, label: 'Quaver' });
-				player.resume();
+				await player.resume();
 				clearTimeout(player.pauseTimeout);
 				delete player.pauseTimeout;
 				await player.handler.locale('MUSIC.DISCONNECT.ALONE.RESUMING', {}, 'success');
@@ -122,7 +122,7 @@ export default {
 		// User joined or moved to Quaver's channel, and pauseTimeout is set
 		if (newState.channelId === player?.channelId && player?.pauseTimeout) {
 			logger.info({ message: `[G ${player.guildId}] Resuming session`, label: 'Quaver' });
-			player.resume();
+			await player.resume();
 			if (player.pauseTimeout) {
 				clearTimeout(player.pauseTimeout);
 				delete player.pauseTimeout;

@@ -19,7 +19,7 @@ export default {
 			await interaction.replyHandler.locale('CMD.PAUSE.RESPONSE.STATE_UNCHANGED', {}, 'error');
 			return;
 		}
-		player.pause();
+		await player.pause();
 		await interaction.replyHandler.locale('CMD.PAUSE.RESPONSE.SUCCESS', {}, 'success');
 	},
 };

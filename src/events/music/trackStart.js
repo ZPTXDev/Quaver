@@ -11,7 +11,7 @@ export default {
 	 */
 	async execute(queue, track) {
 		logger.info({ message: `[G ${queue.player.guildId}] Starting track`, label: 'Quaver' });
-		queue.player.pause(false);
+		await queue.player.pause(false);
 		if (queue.player.timeout) {
 			clearTimeout(queue.player.timeout);
 			delete queue.player.timeout;
