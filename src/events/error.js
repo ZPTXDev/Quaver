@@ -1,7 +1,7 @@
-const { logger } = require('#lib/util/common.js');
-const { shuttingDown } = require('#src/main.js');
+import { logger } from '#lib/util/common.js';
+import { shuttingDown } from '#src/main.js';
 
-module.exports = {
+export default {
 	name: 'error',
 	once: false,
 	/** @param {Error} err */

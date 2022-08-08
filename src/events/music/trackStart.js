@@ -1,8 +1,8 @@
-const { defaultLocale } = require('#settings');
-const { logger, data } = require('#lib/util/common.js');
-const { getLocale, msToTime, msToTimeString } = require('#lib/util/util.js');
+import { defaultLocale } from '#settings';
+import { logger, data } from '#lib/util/common.js';
+import { getLocale, msToTime, msToTimeString } from '#lib/util/util.js';
 
-module.exports = {
+export default {
 	name: 'trackStart',
 	once: false,
 	/**
@@ -18,6 +18,6 @@ module.exports = {
 		}
 		const duration = msToTime(track.length);
 		const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
-		await queue.player.handler.send(`${getLocale(await data.guild.get(queue.player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_NOW_PLAYING', track.title, track.uri, durationString)}\n${getLocale(await data.guild.get(queue.player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_ADDED_BY', track.requester)}`, {}, 'neutral');
+		await queue.player.handler.send(`${getLocale(await data.guild.get(queue.player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.PLAYER.PLAYING.NOW', track.title, track.uri, durationString)}\n${getLocale(await data.guild.get(queue.player.guildId, 'settings.locale') ?? defaultLocale, 'MISC.ADDED_BY', track.requester)}`, {}, 'neutral');
 	},
 };

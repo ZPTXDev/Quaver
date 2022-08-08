@@ -1,6 +1,6 @@
-const { logger } = require('#lib/util/common.js');
+import { logger } from '#lib/util/common.js';
 
-module.exports = {
+export default {
 	name: 'guildCreate',
 	once: false,
 	/** @param {import('discord.js').Guild} guild */

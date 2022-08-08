@@ -11,8 +11,7 @@
 'pr:type:fix':
   - '(fix:|- \[x] Bug fix)'
 'affects:documentation':
-  - '- \[x] Documentation only'
-  - '(\bdoc[s]\b|\bdocumentation[s]\b)'
+  - '(- \[x] Documentation only|\bdoc[s]\b|\bdocumentation[s]\b)'
 'type:bug':
   - '- \[x] Bug fix'
 'type:enhancement':
