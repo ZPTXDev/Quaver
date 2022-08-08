@@ -81,12 +81,10 @@ load({
  * Handles database connection errors from Keyv.
  * @param {Error} err The error.
  */
-async function handleDatabaseError(err) {
+data.guild.instance.on('error', async err => {
 	logger.error({ message: `Failed to connect to database:\n${err}`, label: 'Keyv' });
 	await shuttingDown('keyv');
-}
-
-data.guild.instance.on('error', handleDatabaseError);
+});
 
 /** @type {Client & {commands: Collection, buttons: Collection, selects: Collection, music: Node}} */
 export const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] });
