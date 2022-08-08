@@ -1,9 +1,9 @@
-const { logger } = require('#lib/util/common.js');
-const { checks } = require('#lib/util/constants.js');
-const ReplyHandler = require('#lib/ReplyHandler.js');
-const { PermissionsBitField } = require('discord.js');
+import { PermissionsBitField } from 'discord.js';
+import { logger } from '#lib/util/common.js';
+import { checks } from '#lib/util/constants.js';
+import ReplyHandler from '#lib/ReplyHandler.js';
 
-module.exports = {
+export default {
 	name: 'interactionCreate',
 	once: false,
 	/** @param {import('discord.js').CommandInteraction & {replyHandler: ReplyHandler, client: import('discord.js').Client & {commands: import('discord.js').Collection, music: import('lavaclient').Node}}} interaction */
@@ -63,12 +63,12 @@ module.exports = {
 			}
 			if (failedPermissions.user.length > 0) {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedPermissions.user.length} user permission check(s)`, label: 'Quaver' });
-				await interaction.replyHandler.locale('DISCORD_USER_MISSING_PERMISSIONS', {}, 'error', failedPermissions.user.map(perm => `\`${perm}\``).join(' '));
+				await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.USER', {}, 'error', failedPermissions.user.map(perm => `\`${perm}\``).join(' '));
 				return;
 			}
 			if (failedPermissions.bot.length > 0) {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedPermissions.bot.length} bot permission check(s)`, label: 'Quaver' });
-				await interaction.replyHandler.locale('DISCORD_BOT_MISSING_PERMISSIONS', {}, 'error', failedPermissions.bot.map(perm => `\`${perm}\``).join(' '));
+				await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.DEFAULT', {}, 'error', failedPermissions.bot.map(perm => `\`${perm}\``).join(' '));
 				return;
 			}
 			try {
@@ -78,7 +78,7 @@ module.exports = {
 			catch (err) {
 				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with command ${interaction.commandName}`, label: 'Quaver' });
 				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				await interaction.replyHandler.locale('DISCORD_GENERIC_ERROR', {}, 'error');
+				await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', {}, 'error');
 			}
 		}
 		else if (interaction.isButton()) {
@@ -93,7 +93,7 @@ module.exports = {
 			catch (err) {
 				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with button ${interaction.customId}`, label: 'Quaver' });
 				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				await interaction.replyHandler.locale('DISCORD_GENERIC_ERROR', {}, 'error');
+				await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', {}, 'error');
 			}
 		}
 		else if (interaction.isSelectMenu()) {
@@ -108,7 +108,7 @@ module.exports = {
 			catch (err) {
 				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with select menu ${interaction.customId}`, label: 'Quaver' });
 				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				await interaction.replyHandler.locale('DISCORD_GENERIC_ERROR', {}, 'error');
+				await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', {}, 'error');
 			}
 		}
 	},

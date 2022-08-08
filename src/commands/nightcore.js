@@ -1,17 +1,17 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { defaultLocale } = require('#settings');
-const { checks } = require('#lib/util/constants.js');
-const { getLocale } = require('#lib/util/util.js');
-const { data } = require('#lib/util/common.js');
+import { SlashCommandBuilder } from 'discord.js';
+import { defaultLocale } from '#settings';
+import { checks } from '#lib/util/constants.js';
+import { getLocale } from '#lib/util/util.js';
+import { data } from '#lib/util/common.js';
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('nightcore')
-		.setDescription(getLocale(defaultLocale, 'CMD_NIGHTCORE_DESCRIPTION'))
+		.setDescription(getLocale(defaultLocale, 'CMD.NIGHTCORE.DESCRIPTION'))
 		.addBooleanOption(option =>
 			option
 				.setName('enabled')
-				.setDescription(getLocale(defaultLocale, 'CMD_NIGHTCORE_OPTION_ENABLED'))),
+				.setDescription(getLocale(defaultLocale, 'CMD.NIGHTCORE.OPTION.ENABLED'))),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -31,6 +31,6 @@ module.exports = {
 		player.filters.timescale = nightcore ? { speed: 1.125, pitch: 1.125, rate: 1 } : undefined;
 		await player.setFilters();
 		player.nightcore = nightcore;
-		await interaction.replyHandler.locale(player.nightcore ? 'CMD_NIGHTCORE_ENABLED' : 'CMD_NIGHTCORE_DISABLED', { footer: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_FILTERS_NOTE') }, 'neutral');
+		await interaction.replyHandler.locale(player.nightcore ? 'CMD.NIGHTCORE.RESPONSE.ENABLED' : 'CMD.NIGHTCORE.RESPONSE.DISABLED', { footer: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.PLAYER.FILTER_NOTE') }, 'neutral');
 	},
 };

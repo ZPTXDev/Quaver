@@ -1,17 +1,17 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { managers, defaultLocale } = require('#settings');
-const { checks } = require('#lib/util/constants.js');
-const { getLocale } = require('#lib/util/util.js');
-const { data } = require('#lib/util/common.js');
+import { SlashCommandBuilder } from 'discord.js';
+import { defaultLocale, managers } from '#settings';
+import { checks } from '#lib/util/constants.js';
+import { getLocale } from '#lib/util/util.js';
+import { data } from '#lib/util/common.js';
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('volume')
-		.setDescription(getLocale(defaultLocale, 'CMD_VOLUME_DESCRIPTION'))
+		.setDescription(getLocale(defaultLocale, 'CMD.VOLUME.DESCRIPTION'))
 		.addIntegerOption(option =>
 			option
 				.setName('new_volume')
-				.setDescription(getLocale(defaultLocale, 'CMD_VOLUME_OPTION_NEWVOLUME'))
+				.setDescription(getLocale(defaultLocale, 'CMD.VOLUME.OPTION.NEW_VOLUME'))
 				.setMinValue(0)
 				.setMaxValue(1000)
 				.setRequired(true)),
@@ -25,10 +25,10 @@ module.exports = {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const volume = interaction.options.getInteger('new_volume');
 		if (volume > 200 && !managers.includes(interaction.user.id)) {
-			await interaction.replyHandler.locale('CMD_VOLUME_NOT_IN_RANGE', {}, 'error');
+			await interaction.replyHandler.locale('CMD.VOLUME.RESPONSE.OUT_OF_RANGE', {}, 'error');
 			return;
 		}
 		await player.setVolume(volume);
-		await interaction.replyHandler.locale('CMD_VOLUME_SUCCESS', { footer: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC_FILTERS_NOTE') }, 'neutral', volume);
+		await interaction.replyHandler.locale('CMD.VOLUME.RESPONSE.SUCCESS', { footer: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.PLAYER.FILTER_NOTE') }, 'neutral', volume);
 	},
 };
