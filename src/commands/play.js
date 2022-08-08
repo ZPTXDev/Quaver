@@ -1,24 +1,24 @@
-const { SlashCommandBuilder, PermissionsBitField, ChannelType } = require('discord.js');
-const { SpotifyItemType } = require('@lavaclient/spotify');
-const { defaultLocale } = require('#settings');
-const { checks } = require('#lib/util/constants.js');
-const { getLocale } = require('#lib/util/util.js');
-const { data } = require('#lib/util/common.js');
-const PlayerHandler = require('#lib/PlayerHandler.js');
+import { SlashCommandBuilder, PermissionsBitField, ChannelType } from 'discord.js';
+import { SpotifyItemType } from '@lavaclient/spotify';
+import { defaultLocale } from '#settings';
+import { checks } from '#lib/util/constants.js';
+import { getLocale } from '#lib/util/util.js';
+import { data } from '#lib/util/common.js';
+import PlayerHandler from '#lib/PlayerHandler.js';
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('play')
-		.setDescription(getLocale(defaultLocale, 'CMD_PLAY_DESCRIPTION'))
+		.setDescription(getLocale(defaultLocale, 'CMD.PLAY.DESCRIPTION'))
 		.addStringOption(option =>
 			option
 				.setName('query')
-				.setDescription(getLocale(defaultLocale, 'CMD_PLAY_OPTION_QUERY'))
+				.setDescription(getLocale(defaultLocale, 'CMD.PLAY.OPTION.QUERY'))
 				.setRequired(true))
 		.addBooleanOption(option =>
 			option
 				.setName('insert')
-				.setDescription(getLocale(defaultLocale, 'CMD_PLAY_OPTION_INSERT'))),
+				.setDescription(getLocale(defaultLocale, 'CMD.PLAY.OPTION.INSERT'))),
 	checks: [checks.GUILD_ONLY, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -27,21 +27,21 @@ module.exports = {
 	/** @param {import('discord.js').CommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js')}} interaction */
 	async execute(interaction) {
 		if (![ChannelType.GuildText, ChannelType.GuildVoice].includes(interaction.channel.type)) {
-			await interaction.replyHandler.locale('DISCORD_BOT_UNSUPPORTED_CHANNEL', {}, 'error');
+			await interaction.replyHandler.locale('DISCORD.CHANNEL_UNSUPPORTED', {}, 'error');
 			return;
 		}
 		// check for connect, speak permission for channel
 		const permissions = interaction.member.voice.channel.permissionsFor(interaction.client.user.id);
 		if (!permissions.has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak]))) {
-			await interaction.replyHandler.locale('DISCORD_BOT_MISSING_PERMISSIONS_BASIC', {}, 'error');
+			await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC', {}, 'error');
 			return;
 		}
 		if (interaction.member.voice.channel.type === ChannelType.GuildStageVoice && !permissions.has(PermissionsBitField.StageModerator)) {
-			await interaction.replyHandler.locale('DISCORD_BOT_MISSING_PERMISSIONS_STAGE', {}, 'error');
+			await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE', {}, 'error');
 			return;
 		}
 		if (interaction.guild.members.me.isCommunicationDisabled()) {
-			await interaction.replyHandler.locale('DISCORD_BOT_TIMED_OUT', {}, 'error');
+			await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT', {}, 'error');
 			return;
 		}
 
@@ -54,7 +54,7 @@ module.exports = {
 				case SpotifyItemType.Track: {
 					const track = await item.resolveYoutubeTrack();
 					tracks = [track];
-					msg = insert ? 'MUSIC_QUEUE_ADDED_INSERT' : 'MUSIC_QUEUE_ADDED';
+					msg = insert ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.INSERTED' : 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
 					extras = [item.name, query];
 					break;
 				}
@@ -62,11 +62,11 @@ module.exports = {
 				case SpotifyItemType.Playlist:
 				case SpotifyItemType.Artist:
 					tracks = await item.resolveYoutubeTracks();
-					msg = insert ? 'MUSIC_QUEUE_ADDED_MULTI_INSERT' : 'MUSIC_QUEUE_ADDED_MULTI';
+					msg = insert ? 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.INSERTED' : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
 					extras = [tracks.length, item.name, query];
 					break;
 				default:
-					await interaction.replyHandler.locale('CMD_PLAY_SPOTIFY_NO_RESULTS', {}, 'error');
+					await interaction.replyHandler.locale('CMD.PLAY.RESPONSE.NO_RESULTS.SPOTIFY', {}, 'error');
 					return;
 			}
 		}
@@ -75,25 +75,25 @@ module.exports = {
 			switch (results.loadType) {
 				case 'PLAYLIST_LOADED':
 					tracks = results.tracks;
-					msg = insert ? 'MUSIC_QUEUE_ADDED_MULTI_INSERT' : 'MUSIC_QUEUE_ADDED_MULTI';
+					msg = insert ? 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.INSERTED' : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
 					extras = [tracks.length, results.playlistInfo.name, query];
 					break;
 				case 'TRACK_LOADED':
 				case 'SEARCH_RESULT': {
 					const [track] = results.tracks;
 					tracks = [track];
-					msg = insert ? 'MUSIC_QUEUE_ADDED_INSERT' : 'MUSIC_QUEUE_ADDED';
+					msg = insert ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.INSERTED' : 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
 					extras = [track.info.title, track.info.uri];
 					break;
 				}
 				case 'NO_MATCHES':
-					await interaction.replyHandler.locale('CMD_PLAY_NO_RESULTS', {}, 'error');
+					await interaction.replyHandler.locale('CMD.PLAY.RESPONSE.NO_RESULTS.DEFAULT', {}, 'error');
 					return;
 				case 'LOAD_FAILED':
-					await interaction.replyHandler.locale('CMD_PLAY_LOAD_FAILED', {}, 'error');
+					await interaction.replyHandler.locale('CMD.PLAY.RESPONSE.LOAD_FAILED', {}, 'error');
 					return;
 				default:
-					await interaction.replyHandler.locale('DISCORD_CMD_ERROR', {}, 'error');
+					await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', {}, 'error');
 					return;
 			}
 		}
@@ -109,7 +109,7 @@ module.exports = {
 			// Ensure that Quaver destroys the player if Quaver gets kicked or banned by the user while Quaver is queuing tracks
 			const timedOut = interaction.guild?.members.me.isCommunicationDisabled();
 			if (!interaction.member.voice.channelId || timedOut || !interaction.guild) {
-				if (interaction.guild) timedOut ? await interaction.replyHandler.locale('DISCORD_BOT_TIMED_OUT', {}, 'error') : await interaction.replyHandler.locale('DISCORD_INTERACTION_CANCELED', {}, 'neutral', interaction.user.id);
+				if (interaction.guild) timedOut ? await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT', {}, 'error') : await interaction.replyHandler.locale('DISCORD.INTERACTION.CANCELED', {}, 'neutral', interaction.user.id);
 				await player.handler.disconnect();
 				return;
 			}
@@ -121,7 +121,7 @@ module.exports = {
 		player.queue.add(tracks, { requester: interaction.user.id, next: insert });
 
 		const started = player.playing || player.paused;
-		await interaction.replyHandler.locale(msg, { footer: started ? `${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null }, 'success', ...extras);
+		await interaction.replyHandler.locale(msg, { footer: started ? `${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null }, 'success', ...extras);
 		if (!started) { await player.queue.start(); }
 	},
 };

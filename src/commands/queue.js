@@ -1,13 +1,13 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { defaultLocale } = require('#settings');
-const { checks } = require('#lib/util/constants.js');
-const { paginate, getLocale, msToTime, msToTimeString } = require('#lib/util/util.js');
-const { data } = require('#lib/util/common.js');
+import { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
+import { defaultLocale } from '#settings';
+import { checks } from '#lib/util/constants.js';
+import { paginate, getLocale, msToTime, msToTimeString } from '#lib/util/util.js';
+import { data } from '#lib/util/common.js';
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('queue')
-		.setDescription(getLocale(defaultLocale, 'CMD_QUEUE_DESCRIPTION')),
+		.setDescription(getLocale(defaultLocale, 'CMD.QUEUE.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -17,7 +17,7 @@ module.exports = {
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		if (player.queue.tracks.length === 0) {
-			await interaction.replyHandler.locale('CMD_QUEUE_EMPTY', {}, 'error');
+			await interaction.replyHandler.locale('CMD.QUEUE.RESPONSE.QUEUE_EMPTY', {}, 'error');
 			return;
 		}
 		const pages = paginate(player.queue.tracks, 5);
@@ -28,7 +28,7 @@ module.exports = {
 				return `\`${index + 1}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 			}).join('\n'),
 			{
-				footer: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_PAGE', '1', pages.length),
+				footer: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.PAGE', '1', pages.length),
 				components: [
 					new ActionRowBuilder()
 						.addComponents(
@@ -46,7 +46,7 @@ module.exports = {
 								.setCustomId('queue_1')
 								.setEmoji('🔁')
 								.setStyle(ButtonStyle.Secondary)
-								.setLabel(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_REFRESH')),
+								.setLabel(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.REFRESH')),
 						),
 				],
 			},
