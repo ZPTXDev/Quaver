@@ -1,6 +1,0 @@
-{
-	"MOVE_NOT_IN_RANGE": "一个 (或更多) 你指定的队列位置不在范围之内。",
-	"SEARCH_PICK": "选择歌曲",
-	"SHUFFLE_SUCCESS": "打乱队列成功。",
-	"STOP_SUCCESS": "暂停了正在播放的歌曲和清空了队列。"
-}

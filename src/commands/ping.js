@@ -1,12 +1,12 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { defaultLocale } = require('#settings');
-const { msToTime, msToTimeString, getLocale } = require('#lib/util/util.js');
-const { data } = require('#lib/util/common.js');
+import { SlashCommandBuilder } from 'discord.js';
+import { defaultLocale } from '#settings';
+import { msToTime, msToTimeString, getLocale } from '#lib/util/util.js';
+import { data } from '#lib/util/common.js';
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('ping')
-		.setDescription(getLocale(defaultLocale, 'CMD_PING_DESCRIPTION')),
+		.setDescription(getLocale(defaultLocale, 'CMD.PING.DESCRIPTION')),
 	checks: [],
 	permissions: {
 		user: [],
@@ -16,6 +16,6 @@ module.exports = {
 	async execute(interaction) {
 		const uptime = msToTime(interaction.client.uptime);
 		const uptimeString = msToTimeString(uptime);
-		await interaction.replyHandler.locale('CMD_PING_PONG', { footer: `${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD_PING_UPTIME')} ${uptimeString}` }, 'neutral', interaction.guild ? ` ${interaction.guild.shard.ping}ms` : '');
+		await interaction.replyHandler.locale('CMD.PING.RESPONSE.SUCCESS', { footer: `${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD.PING.MISC.UPTIME')} ${uptimeString}` }, 'neutral', interaction.guild ? ` ${interaction.guild.shard.ping}ms` : '');
 	},
 };

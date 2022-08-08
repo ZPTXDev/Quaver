@@ -1,21 +1,20 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionsBitField } = require('discord.js');
-const { defaultLocale, colors } = require('#settings');
-const { checks } = require('#lib/util/constants.js');
-const { roundTo, getLocale, checkLocaleCompletion } = require('#lib/util/util.js');
-const { data } = require('#lib/util/common.js');
-const fs = require('fs');
-const path = require('path');
+import { SlashCommandBuilder, EmbedBuilder, PermissionsBitField } from 'discord.js';
+import { defaultLocale, colors } from '#settings';
+import { checks } from '#lib/util/constants.js';
+import { roundTo, getLocale, checkLocaleCompletion, getAbsoluteFileURL } from '#lib/util/util.js';
+import { data } from '#lib/util/common.js';
+import fs from 'fs';
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('locale')
-		.setDescription(getLocale(defaultLocale, 'CMD_LOCALE_DESCRIPTION'))
+		.setDescription(getLocale(defaultLocale, 'CMD.LOCALE.DESCRIPTION'))
 		.addStringOption(option =>
 			option
 				.setName('new_locale')
-				.setDescription(getLocale(defaultLocale, 'CMD_LOCALE_OPTION_LOCALE'))
+				.setDescription(getLocale(defaultLocale, 'CMD.LOCALE.OPTION.NEW_LOCALE'))
 				.setRequired(true)
-				.addChoices(...fs.readdirSync(path.resolve(__dirname, '..', '..', 'locales')).map(file => { return { name: file, value: file }; })))
+				.addChoices(...fs.readdirSync(getAbsoluteFileURL(import.meta.url, ['..', '..', 'locales'])).map(file => { return { name: file, value: file }; })))
 		.setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild),
 	checks: [checks.GUILD_ONLY],
 	permissions: {
@@ -36,6 +35,6 @@ module.exports = {
 				.setDescription(`This locale is incomplete. Completion: \`${roundTo(localeCompletion.completion, 2)}%\`\nMissing strings:\n\`\`\`\n${localeCompletion.missing.join('\n')}\`\`\``)
 				.setColor(colors.warning),
 		] : [];
-		await interaction.replyHandler.locale('CMD_LOCALE_SUCCESS', { additionalEmbeds: additionalEmbed }, 'success', interaction.guild.name, locale);
+		await interaction.replyHandler.locale('CMD.LOCALE.RESPONSE.SUCCESS', { additionalEmbeds: additionalEmbed }, 'success', interaction.guild.name, locale);
 	},
 };

@@ -1,9 +1,9 @@
-const { ButtonBuilder, ButtonStyle, EmbedBuilder, ActionRowBuilder } = require('discord.js');
-const { defaultLocale } = require('#settings');
-const { logger, data } = require('#lib/util/common.js');
-const { getLocale, paginate, msToTime, msToTimeString } = require('#lib/util/util.js');
+import { ButtonBuilder, ButtonStyle, EmbedBuilder, ActionRowBuilder } from 'discord.js';
+import { defaultLocale } from '#settings';
+import { logger, data } from '#lib/util/common.js';
+import { getLocale, paginate, msToTime, msToTimeString } from '#lib/util/util.js';
 
-module.exports = {
+export default {
 	name: 'queue',
 	/** @param {import('discord.js').ButtonInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}}} interaction */
 	async execute(interaction) {
@@ -35,7 +35,7 @@ module.exports = {
 				const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
 				return `\`${(firstIndex + index).toString().padStart(largestIndexSize, ' ')}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 			}).join('\n'))
-			.setFooter({ text: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_PAGE', page, pages.length) });
+			.setFooter({ text: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.PAGE', page, pages.length) });
 		original.components[0] = ActionRowBuilder.from(original.components[0]);
 		original.components[0].components = [];
 		original.components[0].components[0] = new ButtonBuilder()
@@ -52,7 +52,7 @@ module.exports = {
 			.setCustomId(`queue_${page}`)
 			.setEmoji('🔁')
 			.setStyle(ButtonStyle.Secondary)
-			.setLabel(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC_REFRESH'));
+			.setLabel(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.REFRESH'));
 		try {
 			await interaction.update({
 				embeds: original.embeds,

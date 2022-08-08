@@ -36,7 +36,7 @@ jobs:
           fetch-depth: 0
       - uses: wagoid/commitlint-github-action@v5
         with:
-          configFile: '.github/commitlint.config.js'
+          configFile: '.github/commitlint.config.cjs'
   eslint:
     name: ESLint
     if: github.event_name == 'pull_request'
