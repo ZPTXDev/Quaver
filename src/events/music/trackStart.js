@@ -6,7 +6,7 @@ export default {
 	name: 'trackStart',
 	once: false,
 	/**
-	 * @param {import('@lavaclient/queue').Queue & {player: import('lavaclient').Player & {handler: import('#lib/PlayerHandler.js')}}} queue
+	 * @param {import('@lavaclient/queue').Queue & {player: import('lavaclient').Player & {handler: import('#lib/PlayerHandler.js').default}}} queue
 	 * @param {import('@lavaclient/queue').Song} track
 	 */
 	async execute(queue, track) {

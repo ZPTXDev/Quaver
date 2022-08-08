@@ -17,7 +17,7 @@ export default {
 		user: [],
 		bot: [],
 	},
-	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js')}} interaction */
+	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
 		if (!features.stay.enabled) {
 			await interaction.replyHandler.locale('FEATURE.DISABLED.DEFAULT', {}, 'error');

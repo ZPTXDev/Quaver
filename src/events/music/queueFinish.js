@@ -5,7 +5,7 @@ import { getLocale } from '#lib/util/util.js';
 export default {
 	name: 'queueFinish',
 	once: false,
-	/** @param {import('@lavaclient/queue').Queue & {player: import('lavaclient').Player & {handler: import('#lib/PlayerHandler.js')}}} queue */
+	/** @param {import('@lavaclient/queue').Queue & {player: import('lavaclient').Player & {handler: import('#lib/PlayerHandler.js').default}}} queue */
 	async execute(queue) {
 		if (await data.guild.get(queue.player.guildId, 'settings.stay.enabled')) {
 			await queue.player.handler.locale('MUSIC.QUEUE.EMPTY', {}, 'neutral');

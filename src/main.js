@@ -121,7 +121,7 @@ export async function shuttingDown(eventType, err) {
 		if (startup) {
 			logger.info({ message: 'Disconnecting from all guilds...', label: 'Quaver' });
 			for (const pair of bot.music.players) {
-			/** @type {import('lavaclient').Player & {handler: import('#lib/PlayerHandler.js')}} */
+			/** @type {import('lavaclient').Player & {handler: import('#lib/PlayerHandler.js').default}} */
 				const player = pair[1];
 				/** @type {string} */
 				const guildLocale = await data.guild.get(player.guildId, 'settings.locale');
