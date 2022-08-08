@@ -20,6 +20,6 @@ export default {
 			return;
 		}
 		player.pause();
-		await interaction.replyHandler.locale('CMD.RESPONSE.PAUSE.SUCCESS', {}, 'success');
+		await interaction.replyHandler.locale('CMD.PAUSE.RESPONSE.SUCCESS', {}, 'success');
 	},
 };
