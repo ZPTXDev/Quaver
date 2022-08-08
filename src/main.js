@@ -84,7 +84,7 @@ load({
 data.guild.instance.on('error', async err => {
 	logger.error({ message: `Failed to connect to database:\n${err}`, label: 'Keyv' });
 	await shuttingDown('keyv');
-}
+});
 
 /** @type {Client & {commands: Collection, buttons: Collection, selects: Collection, music: Node}} */
 export const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] });
