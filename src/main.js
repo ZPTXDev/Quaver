@@ -86,8 +86,6 @@ data.guild.instance.on('error', async err => {
 	await shuttingDown('keyv');
 }
 
-data.guild.instance.on('error', handleDatabaseError);
-
 /** @type {Client & {commands: Collection, buttons: Collection, selects: Collection, music: Node}} */
 export const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] });
 bot.commands = new Collection();
