@@ -117,8 +117,10 @@ export async function shuttingDown(eventType, err) {
 	logger.info({ message: `Shutting down${eventType ? ` due to ${eventType}` : ''}...`, label: 'Quaver' });
 	try {
 		if (startup) {
+			const players = bot.music.players;
+			if (players.size < 1) return;
 			logger.info({ message: 'Disconnecting from all guilds...', label: 'Quaver' });
-			for (const pair of bot.music.players) {
+			for (const pair of players) {
 			/** @type {import('lavaclient').Player & {handler: import('#lib/PlayerHandler.js')}} */
 				const player = pair[1];
 				/** @type {string} */
