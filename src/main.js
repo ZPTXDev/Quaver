@@ -67,7 +67,7 @@ rl.on('line', async input => {
 	}
 });
 // 'close' event catches ctrl+c, therefore we pass it to shuttingDown as a ctrl+c event
-rl.on('close', async () => await shuttingDown('SIGINT'));
+rl.on('close', async () => shuttingDown('SIGINT'));
 
 load({
 	client: {
@@ -81,12 +81,10 @@ load({
  * Handles database connection errors from Keyv.
  * @param {Error} err The error.
  */
-async function handleDatabaseError(err) {
+data.guild.instance.on('error', async err => {
 	logger.error({ message: `Failed to connect to database:\n${err}`, label: 'Keyv' });
 	await shuttingDown('keyv');
-}
-
-data.guild.instance.on('error', handleDatabaseError);
+});
 
 /** @type {Client & {commands: Collection, buttons: Collection, selects: Collection, music: Node}} */
 export const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] });
@@ -104,8 +102,8 @@ bot.music = new Node({
 	},
 	sendGatewayPayload: (id, payload) => bot.guilds.cache.get(id)?.shard?.send(payload),
 });
-bot.ws.on('VOICE_SERVER_UPDATE', payload => bot.music.handleVoiceUpdate(payload));
-bot.ws.on('VOICE_STATE_UPDATE', payload => bot.music.handleVoiceUpdate(payload));
+bot.ws.on('VOICE_SERVER_UPDATE', async payload => await bot.music.handleVoiceUpdate(payload));
+bot.ws.on('VOICE_STATE_UPDATE', async payload => await bot.music.handleVoiceUpdate(payload));
 
 let inProgress = false;
 /**
@@ -116,7 +114,7 @@ let inProgress = false;
 export async function shuttingDown(eventType, err) {
 	if (inProgress) return;
 	inProgress = true;
-	logger.info({ message: 'Shutting down...', label: 'Quaver' });
+	logger.info({ message: `Shutting down${eventType ? ` due to ${eventType}` : ''}...`, label: 'Quaver' });
 	try {
 		if (startup) {
 			const players = bot.music.players;
@@ -232,5 +230,5 @@ for await (const file of musicEventFiles) {
 bot.login(token);
 
 ['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM', 'uncaughtException', 'unhandledRejection'].forEach(eventType => {
-	process.on(eventType, async err => await shuttingDown(eventType, err));
+	process.on(eventType, async err => shuttingDown(eventType, err));
 });
