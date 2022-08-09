@@ -12,7 +12,7 @@ export default {
 	 */
 	async execute(oldState, newState) {
 		const guild = oldState.guild;
-		/** @type {import('lavaclient').Player & {handler: import('#lib/PlayerHandler.js')}} */
+		/** @type {import('lavaclient').Player & {handler: import('#lib/PlayerHandler.js').default}} */
 		const player = oldState.client.music.players.get(guild.id);
 		if (!player) return;
 		// Quaver voiceStateUpdate

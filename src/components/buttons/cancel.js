@@ -5,7 +5,7 @@ import { getLocale } from '#lib/util/util.js';
 
 export default {
 	name: 'cancel',
-	/** @param {import('discord.js').ButtonInteraction & {replyHandler: import('#lib/ReplyHandler.js')}} interaction */
+	/** @param {import('discord.js').ButtonInteraction & {replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
 		if (interaction.customId.split('_')[1] !== interaction.user.id) {
 			await interaction.replyHandler.locale('DISCORD.INTERACTION.USER_MISMATCH', {}, 'error');

@@ -24,7 +24,7 @@ export default {
 		user: [],
 		bot: [],
 	},
-	/** @param {import('discord.js').CommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js')}} interaction */
+	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const oldPosition = interaction.options.getInteger('old_position');

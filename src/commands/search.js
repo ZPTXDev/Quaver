@@ -20,7 +20,7 @@ export default {
 		user: [],
 		bot: [],
 	},
-	/** @param {import('discord.js').CommandInteraction & {client: import('discord.js').Client, replyHandler: import('#lib/ReplyHandler.js')}} interaction */
+	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
 		if (![ChannelType.GuildText, ChannelType.GuildVoice].includes(interaction.channel.type)) {
 			await interaction.replyHandler.locale('DISCORD.CHANNEL_UNSUPPORTED', {}, 'error');

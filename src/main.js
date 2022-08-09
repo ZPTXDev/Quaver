@@ -121,7 +121,7 @@ export async function shuttingDown(eventType, err) {
 			if (players.size < 1) return;
 			logger.info({ message: 'Disconnecting from all guilds...', label: 'Quaver' });
 			for (const pair of players) {
-			/** @type {import('lavaclient').Player & {handler: import('#lib/PlayerHandler.js')}} */
+				/** @type {import('lavaclient').Player & {handler: import('#lib/PlayerHandler.js').default}} */
 				const player = pair[1];
 				/** @type {string} */
 				const guildLocale = await data.guild.get(player.guildId, 'settings.locale');
@@ -188,7 +188,7 @@ setLocales(locales);
 
 const commandFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['commands'])).filter(file => file.endsWith('.js'));
 for await (const file of commandFiles) {
-	/** @type {{data: import('@discordjs/builders').SlashCommandBuilder, checks: string[], permissions: {user: string[], bot: string[]}, execute(interaction: import('discord.js').CommandInteraction): Promise<void>}} */
+	/** @type {{data: import('@discordjs/builders').SlashCommandBuilder, checks: string[], permissions: {user: string[], bot: string[]}, execute(interaction: import('discord.js').ChatInputCommandInteraction): Promise<void>}} */
 	const command = await import(getAbsoluteFileURL(import.meta.url, ['commands', file]));
 	bot.commands.set(command.default.data.name, command.default);
 }
@@ -197,6 +197,7 @@ const componentsFolders = readdirSync(getAbsoluteFileURL(import.meta.url, ['comp
 for await (const folder of componentsFolders) {
 	const componentFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['components', folder])).filter(file => file.endsWith('.js'));
 	for await (const file of componentFiles) {
+		/** @type {{name: string, execute(interaction: import('discord.js').ButtonInteraction | import('discord.js').SelectMenuInteraction): Promise<void>}} */
 		const component = await import(getAbsoluteFileURL(import.meta.url, ['components', folder, file]));
 		if (!bot[folder]) bot[folder] = new Collection();
 		bot[folder].set(component.default.name, component.default);

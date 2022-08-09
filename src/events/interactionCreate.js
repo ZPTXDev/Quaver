@@ -6,11 +6,11 @@ import ReplyHandler from '#lib/ReplyHandler.js';
 export default {
 	name: 'interactionCreate',
 	once: false,
-	/** @param {import('discord.js').CommandInteraction & {replyHandler: ReplyHandler, client: import('discord.js').Client & {commands: import('discord.js').Collection, music: import('lavaclient').Node}}} interaction */
+	/** @param {import('discord.js').Interaction & {replyHandler: ReplyHandler, client: import('discord.js').Client & {commands: import('discord.js').Collection<string, unknown>, buttons: import('discord.js').Collection<string, unknown>, selectmenus: import('discord.js').Collection<string, unknown>, music: Node}}} interaction */
 	async execute(interaction) {
 		interaction.replyHandler = new ReplyHandler(interaction);
 		if (interaction.isChatInputCommand()) {
-			/** @type {{data: import('@discordjs/builders').SlashCommandBuilder, checks: string[], permissions: {user: string[], bot: string[]}, execute(interaction: import('discord.js').CommandInteraction): Promise<void>}} */
+			/** @type {{data: import('@discordjs/builders').SlashCommandBuilder, checks: string[], permissions: {user: string[], bot: string[]}, execute(interaction: import('discord.js').ChatInputCommandInteraction): Promise<void>}} */
 			const command = interaction.client.commands.get(interaction.commandName);
 			if (!command) return;
 			logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing command ${interaction.commandName}`, label: 'Quaver' });
