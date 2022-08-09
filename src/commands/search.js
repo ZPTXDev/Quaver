@@ -1,5 +1,5 @@
-import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, ButtonStyle, ChannelType } from 'discord.js';
-import { defaultLocale, colors } from '#settings';
+import { SlashCommandBuilder, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, ButtonStyle, ChannelType } from 'discord.js';
+import { defaultLocale } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getLocale, msToTime, msToTimeString } from '#lib/util/util.js';
 import { data } from '#lib/util/common.js';
@@ -39,16 +39,11 @@ export default {
 			return;
 		}
 
-		await interaction.editReply({
-			embeds: [
-				new EmbedBuilder()
-					.setDescription(tracks.map((track, index) => {
-						const duration = msToTime(track.info.length);
-						const durationString = track.info.isStream ? '∞' : msToTimeString(duration, true);
-						return `\`${(index + 1).toString().padStart(tracks.length.toString().length, ' ')}.\` **[${track.info.title}](${track.info.uri})** \`[${durationString}]\``;
-					}).join('\n'))
-					.setColor(colors.neutral),
-			],
+		await interaction.replyHandler.reply(tracks.map((track, index) => {
+			const duration = msToTime(track.info.length);
+			const durationString = track.info.isStream ? '∞' : msToTimeString(duration, true);
+			return `\`${(index + 1).toString().padStart(tracks.length.toString().length, ' ')}.\` **[${track.info.title}](${track.info.uri})** \`[${durationString}]\``;
+		}).join('\n'), {
 			components: [
 				new ActionRowBuilder()
 					.addComponents(
@@ -73,6 +68,6 @@ export default {
 							.setStyle(ButtonStyle.Danger),
 					),
 			],
-		});
+		}, 'neutral');
 	},
 };
