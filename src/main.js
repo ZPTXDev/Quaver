@@ -82,8 +82,8 @@ load({
  * @param {Error} err The error.
  */
 data.guild.instance.on('error', async err => {
-	logger.error({ message: `Failed to connect to database:\n${err}`, label: 'Keyv' });
-	await shuttingDown('keyv');
+	logger.error({ message: 'Failed to connect to database.', label: 'Keyv' });
+	await shuttingDown('keyv', err);
 });
 
 /** @type {Client & {commands: Collection, buttons: Collection, selects: Collection, music: Node}} */
