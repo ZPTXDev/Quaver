@@ -2,6 +2,7 @@ name: Crowdin
 on:
   push:
     branches: next
+  workflow_dispatch:
 
 jobs:
   crowdin:
