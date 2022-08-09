@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, PermissionsBitField, ChannelType } from 'discord.js';
 import { SpotifyItemType } from '@lavaclient/spotify';
-import { defaultLocale } from '#settings';
+import { defaultLocale, spotify } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getLocale } from '#lib/util/util.js';
 import { data } from '#lib/util/common.js';
@@ -49,6 +49,10 @@ export default {
 		const query = interaction.options.getString('query'), insert = interaction.options.getBoolean('insert');
 		let tracks = [], msg = '', extras = [];
 		if (interaction.client.music.spotify.isSpotifyUrl(query)) {
+			if (!spotify.client_id || !spotify.client_secret) {
+				await interaction.replyHandler.locale('FEATURE.DISABLED.DEFAULT', {}, 'error');
+				return;
+			}
 			const item = await interaction.client.music.spotify.load(query);
 			switch (item?.type) {
 				case SpotifyItemType.Track: {
