@@ -42,7 +42,7 @@ export default {
 	},
 	INFO: {
 		DESCRIPTION: 'Magpakita ng impormasyon tungkol kay Quaver.',
-		RESPONSE: { SUCCESS: 'Open-source na music bot para sa maliliit na mga komunidad.\\nAng source code ay available [dito](https://go.zptx.dev/Quaver), invite [dito](%1).\\nTumatakbo sa bersyong `%2`.' }
+		RESPONSE: { SUCCESS: 'Open-source na music bot para sa maliliit na mga komunidad.\nAng source code ay available [dito](https://go.zptx.dev/Quaver), invite [dito](%1).\nTumatakbo sa bersyong `%2`.' }
 	},
 	LOCALE: {
 		DESCRIPTION: 'Baguhin ang locale ni Quaver sa server na ito.',
@@ -107,6 +107,7 @@ export default {
 				DEFAULT: 'Walang nahanap na mga resulta mula sa iyong query.',
 				SPOTIFY: 'Walang nahanap na resulta mula sa iyong query sa Spotify.'
 			},
+			DISABLED: { SPOTIFY: 'Ang integration ng Spotify ay hindi na-configure.' },
 			LOAD_FAILED: 'Nabigong i-load ang track.'
 		}
 	},
