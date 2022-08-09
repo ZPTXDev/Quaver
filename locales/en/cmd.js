@@ -130,7 +130,7 @@ export default {
 				SPOTIFY: 'Found no results from your Spotify query.'
 			},
 			DISABLED: {
-				SPOTIFY: 'Spotify feature is currently disabled.'
+				SPOTIFY: 'Spotify integration is not configured.'
 			},
 			LOAD_FAILED: 'Failed to load the track.'
 		}
