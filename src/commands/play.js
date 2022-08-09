@@ -50,7 +50,7 @@ export default {
 		let tracks = [], msg = '', extras = [];
 		if (interaction.client.music.spotify.isSpotifyUrl(query)) {
 			if (!spotify.client_id || !spotify.client_secret) {
-				await interaction.replyHandler.locale('FEATURE.DISABLED.DEFAULT', {}, 'error');
+				await interaction.replyHandler.locale('CMD.PLAY.RESPONSE.DISABLED.SPOTIFY', {}, 'error');
 				return;
 			}
 			const item = await interaction.client.music.spotify.load(query);
