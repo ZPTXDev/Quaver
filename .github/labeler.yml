@@ -24,7 +24,7 @@
   - '\bpermission[s]?\b'
 'status:proposed':
   - '.*'
-'branch:stable'
+'branch:stable':
   - '- \[x] Stable'
-'branch:next'
+'branch:next':
   - '- \[x] Next'
