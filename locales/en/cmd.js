@@ -129,6 +129,9 @@ export default {
 				DEFAULT: 'Found no results from your query.',
 				SPOTIFY: 'Found no results from your Spotify query.'
 			},
+			DISABLED: {
+				SPOTIFY: 'Spotify integration is not configured.'
+			},
 			LOAD_FAILED: 'Failed to load the track.'
 		}
 	},
