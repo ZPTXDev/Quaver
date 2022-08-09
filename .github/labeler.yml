@@ -10,12 +10,12 @@
   - '(feat:|- \[x] Feature)'
 'pr:type:fix':
   - '(fix:|- \[x] Bug fix)'
-'affects:documentation':
-  - '(- \[x] Documentation only|\bdoc[s]\b|\bdocumentation[s]\b)'
 'type:bug':
   - '- \[x] Bug fix'
 'type:enhancement':
   - '(- \[x] Feature|- \[x] Other)'
+'affects:documentation':
+  - '(- \[x] Documentation only|\bdoc[s]\b|\bdocumentation[s]\b)'
 'affects:functionality':
   - '\bfunctionalit(?:y|ies)\b'
 'affects:locale':
@@ -24,3 +24,7 @@
   - '\bpermission[s]?\b'
 'status:proposed':
   - '.*'
+'branch:stable'
+  - '- \[x] Stable'
+'branch:next'
+  - '- \[x] Next'
