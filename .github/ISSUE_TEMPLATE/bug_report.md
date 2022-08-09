@@ -17,8 +17,9 @@ What isn't working as intended, and what does it affect?
 - [ ] Medium
 - [ ] Low
 
-**Affected versions**
-What versions are affected by this bug? (e.g. >=3.0.1, 2.5.1-2.6.3, >=1.2.0)
+**Affected branches**
+- [ ] Stable
+- [ ] Next
 
 **Steps to reproduce**
 Steps to reproduce the behavior. (e.g. click on a button, enter a value, etc. and see error)
