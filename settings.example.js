@@ -19,8 +19,13 @@ export const defaultLocale = 'en';
 export const managers = [
 	'Paste your user ID here',
 ];
-// The URI for the SQLite database.
-export const database_uri = 'sqlite://database.sqlite';
+// The database to use.
+export const database = {
+	// The protocol. For example, sqlite would use sqlite://.
+	protocol: 'sqlite',
+	// The location. For example, database.sqlite would use the database.sqlite file.
+	location: 'database.sqlite',
+};
 // Lavalink settings.
 export const lavalink = {
 	// The host IP of the Lavalink instance.

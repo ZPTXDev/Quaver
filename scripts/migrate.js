@@ -1,11 +1,13 @@
 // Running this will migrate your data.json to the new database.sqlite.
 import Keyv from 'keyv';
 import { set } from 'lodash-es';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import data from '../data.json';
-import { database_uri } from '#settings';
+import { database } from '#settings';
 
-// TODO: this needs to be changed because database.sqlite is one directory above
-const keyv = new Keyv(database_uri ?? 'sqlite://database.sqlite', { namespace: 'guild' });
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const keyv = new Keyv(database ? `${database.protocol}://${resolve(__dirname, '..', database.path)}` : `sqlite://${resolve(__dirname, '..', 'database.sqlite')}`, { namespace: 'guild' });
 
 (async () => {
 	for (const [guildId, guildData] of Object.entries(data)) {
