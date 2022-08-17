@@ -23,8 +23,8 @@ export const managers = [
 export const database = {
 	// The protocol. For example, sqlite would use sqlite://.
 	protocol: 'sqlite',
-	// The location. For example, database.sqlite would use the database.sqlite file.
-	location: 'database.sqlite',
+	// The path relative to the base directory. For example, database.sqlite would use the database.sqlite file.
+	path: 'database.sqlite',
 };
 // Lavalink settings.
 export const lavalink = {
