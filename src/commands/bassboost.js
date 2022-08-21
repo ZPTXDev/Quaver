@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { defaultLocale } from '#settings';
+import { defaultLocale, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getLocale } from '#lib/util/util.js';
 import { data } from '#lib/util/common.js';
@@ -19,6 +19,7 @@ export default {
 	},
 	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
+		const { io } = await import('#src/main.js');
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const enabled = interaction.options.getBoolean('enabled');
 		let boost;
@@ -34,6 +35,7 @@ export default {
 		}
 		await player.setEqualizer(eqValues);
 		player.bassboost = boost;
+		if (features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('filterUpdate', { bassboost: player.bassboost, nightcore: player.nightcore });
 		await interaction.replyHandler.locale(player.bassboost ? 'CMD.BASSBOOST.RESPONSE.ENABLED' : 'CMD.BASSBOOST.RESPONSE.DISABLED', { footer: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.PLAYER.FILTER_NOTE') });
 	},
 };

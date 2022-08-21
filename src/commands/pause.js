@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { defaultLocale } from '#settings';
+import { defaultLocale, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getLocale } from '#lib/util/util.js';
 
@@ -14,12 +14,14 @@ export default {
 	},
 	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
+		const { io } = await import('#src/main.js');
 		const player = interaction.client.music.players.get(interaction.guildId);
 		if (player.paused) {
 			await interaction.replyHandler.locale('CMD.PAUSE.RESPONSE.STATE_UNCHANGED', {}, 'error');
 			return;
 		}
 		await player.pause();
+		if (features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('pauseUpdate', player.paused);
 		await interaction.replyHandler.locale('CMD.PAUSE.RESPONSE.SUCCESS', {}, 'success');
 	},
 };

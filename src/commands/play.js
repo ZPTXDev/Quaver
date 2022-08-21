@@ -26,6 +26,7 @@ export default {
 	},
 	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
+		const { bot, io } = await import('#src/main.js');
 		if (![ChannelType.GuildText, ChannelType.GuildVoice].includes(interaction.channel.type)) {
 			await interaction.replyHandler.locale('DISCORD.CHANNEL_UNSUPPORTED', {}, 'error');
 			return;
@@ -127,5 +128,11 @@ export default {
 		const started = player.playing || player.paused;
 		await interaction.replyHandler.locale(msg, { footer: started ? `${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null }, 'success', ...extras);
 		if (!started) { await player.queue.start(); }
+		if (features.web.enabled) {
+			io.to(`guild:${interaction.guildId}`).emit('queueUpdate', player.queue.tracks.map(track => {
+				track.requesterTag = bot.users.cache.get(track.requester)?.tag;
+				return track;
+			}));
+		}
 	},
 };

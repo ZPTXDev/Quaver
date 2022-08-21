@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { LoopType } from '@lavaclient/queue';
-import { defaultLocale } from '#settings';
+import { defaultLocale, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getLocale } from '#lib/util/util.js';
 import { data } from '#lib/util/common.js';
@@ -26,6 +26,7 @@ export default {
 	},
 	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
+		const { io } = await import('#src/main.js');
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const type = interaction.options.getString('type');
 		let loop, typeLocale;
@@ -45,6 +46,7 @@ export default {
 		}
 		typeLocale = typeLocale.toLowerCase();
 		player.queue.setLoop(loop);
+		if (features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('loopUpdate', loop);
 		await interaction.replyHandler.locale('CMD.LOOP.RESPONSE.SUCCESS', {}, 'neutral', typeLocale);
 	},
 };
