@@ -6,7 +6,7 @@
     "node": ">=16.9.0"
   },
   "dependencies": {
-    "@discordjs/rest": "^1.0.1",
+    "@discordjs/rest": "^1.1.0",
     "@keyv/sqlite": "^3.5.3",
     "@lavaclient/queue": "^2.1.0",
     "@lavaclient/spotify": "^3.1.0",
