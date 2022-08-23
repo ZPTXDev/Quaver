@@ -74,8 +74,8 @@ rl.on('close', async () => shuttingDown('SIGINT'));
 let httpServer;
 if (features.web.https) {
 	httpServer = createServer({
-		key: readFileSync(getAbsoluteFileURL(import.meta.url, ['..', features.web.https.key.split('/')])),
-		cert: readFileSync(getAbsoluteFileURL(import.meta.url, ['..', features.web.https.cert.split('/')])),
+		key: readFileSync(getAbsoluteFileURL(import.meta.url, ['..', ...features.web.https.key.split('/')])),
+		cert: readFileSync(getAbsoluteFileURL(import.meta.url, ['..', ...features.web.https.cert.split('/')])),
 	});
 }
 export const io = features.web.enabled ? new Server(httpServer ?? features.web.port, { cors: { origin: features.web.allowedOrigins } }) : undefined;
