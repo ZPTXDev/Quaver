@@ -78,5 +78,10 @@ export const features = {
 		],
 		// Encryption key for securing access tokens.
 		encryptionKey: 'Type an encryption key here',
+		// Key and cert files for HTTPS (remove this property if you do not need HTTPS).
+		https: {
+			key: 'key.pem',
+			cert: 'cert.pem',
+		},
 	},
 };

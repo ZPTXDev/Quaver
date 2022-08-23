@@ -3,12 +3,13 @@ import { Client, GatewayIntentBits, Collection } from 'discord.js';
 import { Node } from 'lavaclient';
 import { Server } from 'socket.io';
 import { load } from '@lavaclient/spotify';
-import { readdirSync } from 'fs';
+import { readdirSync, readFileSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import { createInterface } from 'readline';
 import { defaultLocale, features, lavalink, token } from '#settings';
 import { msToTime, msToTimeString, getLocale, getAbsoluteFileURL } from '#lib/util/util.js';
 import { logger, data, setLocales } from '#lib/util/common.js';
+import { createServer } from 'https';
 
 export let startup = false;
 export function updateStartup() {
@@ -70,7 +71,14 @@ rl.on('line', async input => {
 // 'close' event catches ctrl+c, therefore we pass it to shuttingDown as a ctrl+c event
 rl.on('close', async () => shuttingDown('SIGINT'));
 
-export const io = features.web.enabled ? new Server(features.web.port, { cors: { origin: features.web.allowedOrigins } }) : undefined;
+let httpServer;
+if (features.web.https) {
+	httpServer = createServer({
+		key: readFileSync(getAbsoluteFileURL(import.meta.url, features.web.https.key.split('/'))),
+		cert: readFileSync(getAbsoluteFileURL(import.meta.url, features.web.https.cert.split('/'))),
+	});
+}
+export const io = features.web.enabled ? new Server(httpServer ?? features.web.port, { cors: { origin: features.web.allowedOrigins } }) : undefined;
 if (io) {
 	io.on('connection', async socket => {
 		const webEventFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['events', 'web'])).filter(file => file.endsWith('.js'));
@@ -86,7 +94,7 @@ if (io) {
 		}
 	});
 }
-
+if (httpServer) httpServer.listen(features.web.port);
 
 if (features.spotify.enabled) {
 	load({
