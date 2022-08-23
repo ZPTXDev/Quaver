@@ -23,7 +23,8 @@ export default {
 			p.handler.locale('MUSIC.DISCONNECT.INACTIVITY.DISCONNECTED', {}, 'warning');
 			p.handler.disconnect();
 		}, 30 * 60 * 1000, queue.player);
-		if (features.web.enabled) io.to(`guild:${queue.player.guildId}`).emit('timeoutUpdate', !!queue.player.timeout);
-		await queue.player.handler.send(`${getLocale(await data.guild.get(queue.player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.QUEUE.EMPTY')} ${getLocale(await data.guild.get(queue.player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.DISCONNECT.INACTIVITY.WARNING', Math.floor(Date.now() / 1000) + 1800)}`, {}, 'warning');
+		queue.player.timeoutEnd = Date.now() + (30 * 60 * 1000);
+		if (features.web.enabled) io.to(`guild:${queue.player.guildId}`).emit('timeoutUpdate', queue.player.timeoutEnd);
+		await queue.player.handler.send(`${getLocale(await data.guild.get(queue.player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.QUEUE.EMPTY')} ${getLocale(await data.guild.get(queue.player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.DISCONNECT.INACTIVITY.WARNING', Math.floor(Date.now() / 1000) + (30 * 60))}`, {}, 'warning');
 	},
 };

@@ -27,8 +27,9 @@ export default {
 						skip: player.skip,
 						nothingPlaying: !player.queue.current || !player.playing && !player.paused,
 					},
-					timeout: !!player.timeout,
-					pauseTimeout: !!player.pauseTimeout,
+					timeout: player.timeout ? player.timeoutEnd : false,
+					pauseTimeout: player.pauseTimeout ? player.timeoutEnd : false,
+					textChannel: player.queue.channel.name,
 					channel: bot.guilds.cache.get(guildId).members.me.voice.channel?.name,
 				} : null;
 				break;
