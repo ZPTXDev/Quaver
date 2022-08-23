@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, ChannelType, PermissionsBitField } from 'discord.js';
-import { defaultLocale } from '#settings';
+import { defaultLocale, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getLocale } from '#lib/util/util.js';
 import { data } from '#lib/util/common.js';
@@ -21,6 +21,7 @@ export default {
 	},
 	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
+		const { io } = await import('#src/main.js');
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const channel = interaction.options.getChannel('new_channel');
 		if (!channel.permissionsFor(interaction.client.user.id).has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages]))) {
@@ -28,6 +29,7 @@ export default {
 			return;
 		}
 		player.queue.channel = channel;
+		if (features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('textChannelUpdate', channel.name);
 		if (await data.guild.get(interaction.guildId, 'settings.stay.enabled')) {
 			await data.guild.set(interaction.guildId, 'settings.stay.text', channel.id);
 		}
