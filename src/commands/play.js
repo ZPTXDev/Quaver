@@ -127,7 +127,7 @@ export default {
 
 		const started = player.playing || player.paused;
 		await interaction.replyHandler.locale(msg, { footer: started ? `${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null }, 'success', ...extras);
-		if (!started) { await player.queue.start(); }
+		if (!started) await player.queue.start();
 		if (features.web.enabled) {
 			io.to(`guild:${interaction.guildId}`).emit('queueUpdate', player.queue.tracks.map(track => {
 				track.requesterTag = bot.users.cache.get(track.requester)?.tag;
