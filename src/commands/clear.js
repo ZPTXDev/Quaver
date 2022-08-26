@@ -16,10 +16,7 @@ export default {
 	async execute(interaction) {
 		const { bot, io } = await import('#src/main.js');
 		const player = interaction.client.music.players.get(interaction.guildId);
-		if (player.queue.tracks.length === 0) {
-			await interaction.replyHandler.locale('CMD.CLEAR.RESPONSE.QUEUE_EMPTY', {}, 'error');
-			return;
-		}
+		if (player.queue.tracks.length === 0) return interaction.replyHandler.locale('CMD.CLEAR.RESPONSE.QUEUE_EMPTY', {}, 'error');
 		player.queue.clear();
 		if (features.web.enabled) {
 			io.to(`guild:${interaction.guildId}`).emit('queueUpdate', player.queue.tracks.map(track => {
@@ -27,6 +24,6 @@ export default {
 				return track;
 			}));
 		}
-		await interaction.replyHandler.locale('CMD.CLEAR.RESPONSE.SUCCESS', {}, 'success');
+		return interaction.replyHandler.locale('CMD.CLEAR.RESPONSE.SUCCESS', {}, 'success');
 	},
 };

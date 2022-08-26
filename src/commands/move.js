@@ -30,18 +30,9 @@ export default {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const oldPosition = interaction.options.getInteger('old_position');
 		const newPosition = interaction.options.getInteger('new_position');
-		if (player.queue.tracks.length <= 1) {
-			await interaction.replyHandler.locale('CMD.MOVE.RESPONSE.QUEUE_INSUFFICIENT_TRACKS', {}, 'error');
-			return;
-		}
-		if (oldPosition > player.queue.tracks.length || newPosition > player.queue.tracks.length) {
-			await interaction.replyHandler.locale('CMD.MOVE.RESPONSE.OUT_OF_RANGE', {}, 'error');
-			return;
-		}
-		if (oldPosition === newPosition) {
-			await interaction.replyHandler.locale('CMD.MOVE.RESPONSE.MOVING_IN_PLACE', {}, 'error');
-			return;
-		}
+		if (player.queue.tracks.length <= 1) return interaction.replyHandler.locale('CMD.MOVE.RESPONSE.QUEUE_INSUFFICIENT_TRACKS', {}, 'error');
+		if (oldPosition > player.queue.tracks.length || newPosition > player.queue.tracks.length) return interaction.replyHandler.locale('CMD.MOVE.RESPONSE.OUT_OF_RANGE', {}, 'error');
+		if (oldPosition === newPosition) return interaction.replyHandler.locale('CMD.MOVE.RESPONSE.MOVING_IN_PLACE', {}, 'error');
 		player.queue.tracks.splice(newPosition - 1, 0, player.queue.tracks.splice(oldPosition - 1, 1)[0]);
 		const track = player.queue.tracks[newPosition - 1];
 		if (features.web.enabled) {
@@ -50,6 +41,6 @@ export default {
 				return t;
 			}));
 		}
-		await interaction.replyHandler.locale('CMD.MOVE.RESPONSE.SUCCESS', {}, 'success', track.title, track.uri, oldPosition, newPosition);
+		return interaction.replyHandler.locale('CMD.MOVE.RESPONSE.SUCCESS', {}, 'success', track.title, track.uri, oldPosition, newPosition);
 	},
 };

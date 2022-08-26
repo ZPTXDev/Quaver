@@ -7,6 +7,6 @@ export default {
 	async execute(err) {
 		const { shuttingDown } = await import('#src/main.js');
 		logger.error({ message: 'An error occurred. Quaver will now shut down to prevent any further issues.', label: 'Lavalink' });
-		await shuttingDown('lavalink', err);
+		return shuttingDown('lavalink', err);
 	},
 };

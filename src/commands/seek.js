@@ -33,30 +33,18 @@ export default {
 	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
-		if (!player.queue.current || !player.playing && !player.paused) {
-			await interaction.replyHandler.locale('MUSIC.PLAYER.PLAYING.NOTHING', {}, 'error');
-			return;
-		}
-		if (player.queue.current.isStream) {
-			await interaction.replyHandler.locale('CMD.SEEK.RESPONSE.STREAM_CANNOT_SEEK', {}, 'error');
-			return;
-		}
+		if (!player.queue.current || !player.playing && !player.paused) return interaction.replyHandler.locale('MUSIC.PLAYER.PLAYING.NOTHING', {}, 'error');
+		if (player.queue.current.isStream) return interaction.replyHandler.locale('CMD.SEEK.RESPONSE.STREAM_CANNOT_SEEK', {}, 'error');
 		const hours = interaction.options.getInteger('hours') ?? 0, minutes = interaction.options.getInteger('minutes') ?? 0, seconds = interaction.options.getInteger('seconds') ?? 0;
 		const ms = hours * 3600000 + minutes * 60000 + seconds * 1000;
-		if (interaction.options.getInteger('hours') === null && interaction.options.getInteger('minutes') === null && interaction.options.getInteger('seconds') === null) {
-			await interaction.replyHandler.locale('CMD.SEEK.RESPONSE.TIMESTAMP_MISSING', {}, 'error');
-			return;
-		}
+		if (interaction.options.getInteger('hours') === null && interaction.options.getInteger('minutes') === null && interaction.options.getInteger('seconds') === null) return interaction.replyHandler.locale('CMD.SEEK.RESPONSE.TIMESTAMP_MISSING', {}, 'error');
 		const trackLength = player.queue.current.length;
 		const duration = msToTime(trackLength);
 		const durationString = msToTimeString(duration, true);
-		if (ms > trackLength) {
-			await interaction.replyHandler.locale('CMD.SEEK.RESPONSE.TIMESTAMP_INVALID', {}, 'error', durationString);
-			return;
-		}
+		if (ms > trackLength) return interaction.replyHandler.locale('CMD.SEEK.RESPONSE.TIMESTAMP_INVALID', {}, 'error', durationString);
 		const seek = msToTime(ms);
 		const seekString = msToTimeString(seek, true);
 		await player.seek(ms);
-		await interaction.replyHandler.locale('CMD.SEEK.RESPONSE.SUCCESS', {}, 'neutral', seekString, durationString);
+		return interaction.replyHandler.locale('CMD.SEEK.RESPONSE.SUCCESS', {}, 'neutral', seekString, durationString);
 	},
 };

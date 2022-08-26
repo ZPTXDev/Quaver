@@ -34,13 +34,7 @@ export default {
 			return;
 		}
 		const enabled = interaction.options.getBoolean('enabled');
-		let always;
-		if (enabled !== null) {
-			always = enabled;
-		}
-		else {
-			always = !await data.guild.get(interaction.guildId, 'settings.stay.enabled');
-		}
+		const always = enabled !== null ? enabled : !await data.guild.get(interaction.guildId, 'settings.stay.enabled');
 		await data.guild.set(interaction.guildId, 'settings.stay.enabled', always);
 		if (always) {
 			await data.guild.set(interaction.guildId, 'settings.stay.channel', player.channelId);

@@ -24,15 +24,10 @@ export default {
 		const { io } = await import('#src/main.js');
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const channel = interaction.options.getChannel('new_channel');
-		if (!channel.permissionsFor(interaction.client.user.id).has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages]))) {
-			await interaction.replyHandler.locale('CMD.BIND.RESPONSE.PERMISSIONS_INSUFFICIENT', {}, 'error', channel.id);
-			return;
-		}
+		if (!channel.permissionsFor(interaction.client.user.id).has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages]))) return interaction.replyHandler.locale('CMD.BIND.RESPONSE.PERMISSIONS_INSUFFICIENT', {}, 'error', channel.id);
 		player.queue.channel = channel;
 		if (features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('textChannelUpdate', channel.name);
-		if (await data.guild.get(interaction.guildId, 'settings.stay.enabled')) {
-			await data.guild.set(interaction.guildId, 'settings.stay.text', channel.id);
-		}
-		await interaction.replyHandler.locale('CMD.BIND.RESPONSE.SUCCESS', {}, 'success', channel.id);
+		if (await data.guild.get(interaction.guildId, 'settings.stay.enabled')) await data.guild.set(interaction.guildId, 'settings.stay.text', channel.id);
+		return interaction.replyHandler.locale('CMD.BIND.RESPONSE.SUCCESS', {}, 'success', channel.id);
 	},
 };

@@ -16,10 +16,7 @@ export default {
 	async execute(interaction) {
 		const { bot, io } = await import('#src/main.js');
 		const player = interaction.client.music.players.get(interaction.guildId);
-		if (!player.queue.current || !player.playing && !player.paused) {
-			await interaction.replyHandler.locale('MUSIC.PLAYER.PLAYING.NOTHING', {}, 'error');
-			return;
-		}
+		if (!player.queue.current || !player.playing && !player.paused) return interaction.replyHandler.locale('MUSIC.PLAYER.PLAYING.NOTHING', {}, 'error');
 		player.queue.clear();
 		await player.queue.skip();
 		await player.queue.start();
@@ -29,6 +26,6 @@ export default {
 				return track;
 			}));
 		}
-		await interaction.replyHandler.locale('CMD.STOP.RESPONSE.SUCCESS', {}, 'success');
+		return interaction.replyHandler.locale('CMD.STOP.RESPONSE.SUCCESS', {}, 'success');
 	},
 };

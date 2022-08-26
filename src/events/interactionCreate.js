@@ -19,38 +19,29 @@ export default {
 				switch (check) {
 					// Only allowed in guild
 					case checks.GUILD_ONLY:
-						if (!interaction.guildId) {
-							failedChecks.push(check);
-						}
+						if (!interaction.guildId) failedChecks.push(check);
 						break;
 					// Must have an active session
 					case checks.ACTIVE_SESSION: {
 						const player = interaction.client.music.players.get(interaction.guildId);
-						if (!player) {
-							failedChecks.push(check);
-						}
+						if (!player) failedChecks.push(check);
 						break;
 					}
 					// Must be in a voice channel
 					case checks.IN_VOICE:
-						if (!interaction.member?.voice.channelId) {
-							failedChecks.push(check);
-						}
+						if (!interaction.member?.voice.channelId) failedChecks.push(check);
 						break;
 					// Must be in the same voice channel (will not fail if the bot is not in a voice channel)
 					case checks.IN_SESSION_VOICE: {
 						const player = interaction.client.music.players.get(interaction.guildId);
-						if (player && interaction.member?.voice.channelId !== player.channelId) {
-							failedChecks.push(check);
-						}
+						if (player && interaction.member?.voice.channelId !== player.channelId) failedChecks.push(check);
 						break;
 					}
 				}
 			}
 			if (failedChecks.length > 0) {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedChecks.length} check(s)`, label: 'Quaver' });
-				await interaction.replyHandler.locale(failedChecks[0], {}, 'error');
-				return;
+				return interaction.replyHandler.locale(failedChecks[0], {}, 'error');
 			}
 			const failedPermissions = { user: [], bot: [] };
 			if (interaction.guildId) {
@@ -63,57 +54,55 @@ export default {
 			}
 			if (failedPermissions.user.length > 0) {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedPermissions.user.length} user permission check(s)`, label: 'Quaver' });
-				await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.USER', {}, 'error', failedPermissions.user.map(perm => `\`${perm}\``).join(' '));
-				return;
+				return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.USER', {}, 'error', failedPermissions.user.map(perm => `\`${perm}\``).join(' '));
 			}
 			if (failedPermissions.bot.length > 0) {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedPermissions.bot.length} bot permission check(s)`, label: 'Quaver' });
-				await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.DEFAULT', {}, 'error', failedPermissions.bot.map(perm => `\`${perm}\``).join(' '));
-				return;
+				return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.DEFAULT', {}, 'error', failedPermissions.bot.map(perm => `\`${perm}\``).join(' '));
 			}
 			try {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Executing command ${interaction.commandName}`, label: 'Quaver' });
-				await command.execute(interaction);
+				return command.execute(interaction);
 			}
 			catch (err) {
 				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with command ${interaction.commandName}`, label: 'Quaver' });
 				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', {}, 'error');
+				return interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', {}, 'error');
 			}
 		}
-		else if (interaction.isAutocomplete()) {
+		if (interaction.isAutocomplete()) {
 			const autocomplete = interaction.client.autocomplete.get(interaction.commandName);
 			if (!autocomplete) return;
-			await autocomplete.execute(interaction);
+			return autocomplete.execute(interaction);
 		}
-		else if (interaction.isButton()) {
+		if (interaction.isButton()) {
 			/** @type {{name: string, execute(interaction: import('discord.js').ButtonInteraction): Promise<void)>}} */
 			const button = interaction.client.buttons.get(interaction.customId.split('_')[0]);
 			if (!button) return;
 			logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing button ${interaction.customId}`, label: 'Quaver' });
 			try {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Executing button ${interaction.customId}`, label: 'Quaver' });
-				await button.execute(interaction);
+				return button.execute(interaction);
 			}
 			catch (err) {
 				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with button ${interaction.customId}`, label: 'Quaver' });
 				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', {}, 'error');
+				return interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', {}, 'error');
 			}
 		}
-		else if (interaction.isSelectMenu()) {
+		if (interaction.isSelectMenu()) {
 			/** @type {{name: string, execute(interaction: import('discord.js').SelectMenuInteraction): Promise<void)>}} */
 			const selectmenu = interaction.client.selectmenus.get(interaction.customId.split('_')[0]);
 			if (!selectmenu) return;
 			logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing select menu ${interaction.customId}`, label: 'Quaver' });
 			try {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Executing select menu ${interaction.customId}`, label: 'Quaver' });
-				await selectmenu.execute(interaction);
+				return selectmenu.execute(interaction);
 			}
 			catch (err) {
 				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with select menu ${interaction.customId}`, label: 'Quaver' });
 				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', {}, 'error');
+				return interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', {}, 'error');
 			}
 		}
 	},

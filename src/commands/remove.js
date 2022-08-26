@@ -24,18 +24,9 @@ export default {
 		const { bot, io } = await import('#src/main.js');
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const position = interaction.options.getInteger('position');
-		if (player.queue.tracks.length === 0) {
-			await interaction.replyHandler.locale('CMD.REMOVE.RESPONSE.QUEUE_EMPTY', {}, 'error');
-			return;
-		}
-		if (position > player.queue.tracks.length) {
-			await interaction.replyHandler.locale('CHECK.INVALID_INDEX', {}, 'error');
-			return;
-		}
-		if (player.queue.tracks[position - 1].requester !== interaction.user.id) {
-			await interaction.replyHandler.locale('CHECK.NOT_REQUESTER', {}, 'error');
-			return;
-		}
+		if (player.queue.tracks.length === 0) return interaction.replyHandler.locale('CMD.REMOVE.RESPONSE.QUEUE_EMPTY', {}, 'error');
+		if (position > player.queue.tracks.length) return interaction.replyHandler.locale('CHECK.INVALID_INDEX', {}, 'error');
+		if (player.queue.tracks[position - 1].requester !== interaction.user.id) return interaction.replyHandler.locale('CHECK.NOT_REQUESTER', {}, 'error');
 		const track = player.queue.remove(position - 1);
 		if (features.web.enabled) {
 			io.to(`guild:${interaction.guildId}`).emit('queueUpdate', player.queue.tracks.map(t => {
@@ -43,6 +34,6 @@ export default {
 				return t;
 			}));
 		}
-		await interaction.replyHandler.locale('CMD.REMOVE.RESPONSE.SUCCESS', {}, 'success', track.title, track.uri);
+		return interaction.replyHandler.locale('CMD.REMOVE.RESPONSE.SUCCESS', {}, 'success', track.title, track.uri);
 	},
 };

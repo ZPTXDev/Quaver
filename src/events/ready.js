@@ -17,15 +17,14 @@ export default {
 			}
 			client.music.connect(client.user.id);
 			updateStartup();
+			return;
 		}
-		else {
-			logger.info({ message: 'Reconnected.', label: 'Discord' });
-			logger.warn({ message: 'Attempting to resume sessions.', label: 'Quaver' });
-			for (const pair of client.music.players) {
-				const player = pair[1];
-				await player.resume();
-				if (features.web.enabled) io.to(`guild:${player.guildId}`).emit('pauseUpdate', player.paused);
-			}
+		logger.info({ message: 'Reconnected.', label: 'Discord' });
+		logger.warn({ message: 'Attempting to resume sessions.', label: 'Quaver' });
+		for (const pair of client.music.players) {
+			const player = pair[1];
+			await player.resume();
+			if (features.web.enabled) io.to(`guild:${player.guildId}`).emit('pauseUpdate', player.paused);
 		}
 		client.user.setActivity(`music | ${version}`, { type: ActivityType.Listening });
 	},

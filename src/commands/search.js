@@ -22,10 +22,7 @@ export default {
 	},
 	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
-		if (![ChannelType.GuildText, ChannelType.GuildVoice].includes(interaction.channel.type)) {
-			await interaction.replyHandler.locale('DISCORD.CHANNEL_UNSUPPORTED', {}, 'error');
-			return;
-		}
+		if (![ChannelType.GuildText, ChannelType.GuildVoice].includes(interaction.channel.type)) return interaction.replyHandler.locale('DISCORD.CHANNEL_UNSUPPORTED', {}, 'error');
 		await interaction.deferReply();
 		const query = interaction.options.getString('query');
 		let tracks = [];
@@ -34,12 +31,9 @@ export default {
 		if (results.loadType === 'SEARCH_RESULT') tracks = results.tracks;
 
 		tracks = tracks.slice(0, 10);
-		if (tracks.length <= 1) {
-			await interaction.replyHandler.locale('CMD.SEARCH.RESPONSE.USE_PLAY_CMD', {}, 'error');
-			return;
-		}
+		if (tracks.length <= 1) return interaction.replyHandler.locale('CMD.SEARCH.RESPONSE.USE_PLAY_CMD', {}, 'error');
 
-		await interaction.replyHandler.reply(tracks.map((track, index) => {
+		return interaction.replyHandler.reply(tracks.map((track, index) => {
 			const duration = msToTime(track.info.length);
 			const durationString = track.info.isStream ? '∞' : msToTimeString(duration, true);
 			return `\`${(index + 1).toString().padStart(tracks.length.toString().length, ' ')}.\` **[${track.info.title}](${track.info.uri})** \`[${durationString}]\``;

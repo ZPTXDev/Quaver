@@ -34,31 +34,25 @@ export default {
 				if (player.queue.current.requester === socket.user.id) {
 					await player.queue.skip();
 					await player.queue.start();
+					break;
 				}
-				else {
-					const skip = player.skip ?? { required: Math.ceil(bot.guilds.cache.get(guildId).members.me.voice.channel.members.filter(m => !m.user.bot).size / 2), users: [] };
-					if (skip.users.includes(socket.user.id)) {
-						return { status: 'error-generic' };
-					}
-					skip.users.push(socket.user.id);
-					if (skip.users.length >= skip.required) {
-						await player.queue.skip();
-						await player.queue.start();
-						await player.queue.next();
-					}
-					else {
-						player.skip = skip;
-					}
+				const skip = player.skip ?? { required: Math.ceil(bot.guilds.cache.get(guildId).members.me.voice.channel.members.filter(m => !m.user.bot).size / 2), users: [] };
+				if (skip.users.includes(socket.user.id)) return { status: 'error-generic' };
+				skip.users.push(socket.user.id);
+				if (skip.users.length >= skip.required) {
+					await player.queue.skip();
+					await player.queue.start();
+					await player.queue.next();
+					break;
 				}
+				player.skip = skip;
 				break;
 			}
 			case 'bassboost': {
 				const player = bot.music.players.get(guildId);
 				if (!player) return callback({ status: 'error-generic' });
 				let eqValues = new Array(15).fill(0);
-				if (item.value) {
-					eqValues = [0.2, 0.15, 0.1, 0.05, 0.0, ...new Array(10).fill(-0.05)];
-				}
+				if (item.value) eqValues = [0.2, 0.15, 0.1, 0.05, 0.0, ...new Array(10).fill(-0.05)];
 				await player.setEqualizer(eqValues);
 				player.bassboost = item.value;
 				io.to(`guild:${guildId}`).emit('filterUpdate', { bassboost: player.bassboost, nightcore: player.nightcore });

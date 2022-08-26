@@ -25,12 +25,9 @@ export default {
 		const { io } = await import('#src/main.js');
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const volume = interaction.options.getInteger('new_volume');
-		if (volume > 200 && !managers.includes(interaction.user.id)) {
-			await interaction.replyHandler.locale('CMD.VOLUME.RESPONSE.OUT_OF_RANGE', {}, 'error');
-			return;
-		}
+		if (volume > 200 && !managers.includes(interaction.user.id)) return interaction.replyHandler.locale('CMD.VOLUME.RESPONSE.OUT_OF_RANGE', {}, 'error');
 		await player.setVolume(volume);
 		if (features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('volumeUpdate', volume);
-		await interaction.replyHandler.locale('CMD.VOLUME.RESPONSE.SUCCESS', { footer: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.PLAYER.FILTER_NOTE') }, 'neutral', volume);
+		return interaction.replyHandler.locale('CMD.VOLUME.RESPONSE.SUCCESS', { footer: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.PLAYER.FILTER_NOTE') }, 'neutral', volume);
 	},
 };

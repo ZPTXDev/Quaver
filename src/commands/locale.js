@@ -25,16 +25,13 @@ export default {
 	async execute(interaction) {
 		const locale = interaction.options.getString('new_locale');
 		const localeCompletion = checkLocaleCompletion(locale);
-		if (localeCompletion === 'LOCALE_MISSING') {
-			await interaction.replyHandler.reply('That locale does not exist.', {}, 'error');
-			return;
-		}
+		if (localeCompletion === 'LOCALE_MISSING') return interaction.replyHandler.reply('That locale does not exist.', {}, 'error');
 		await data.guild.set(interaction.guildId, 'settings.locale', locale);
 		const additionalEmbed = localeCompletion.completion !== 100 ? [
 			new EmbedBuilder()
 				.setDescription(`This locale is incomplete. Completion: \`${roundTo(localeCompletion.completion, 2)}%\`\nMissing strings:\n\`\`\`\n${localeCompletion.missing.join('\n')}\`\`\``)
 				.setColor(colors.warning),
 		] : [];
-		await interaction.replyHandler.locale('CMD.LOCALE.RESPONSE.SUCCESS', { additionalEmbeds: additionalEmbed }, 'success', interaction.guild.name, locale);
+		return interaction.replyHandler.locale('CMD.LOCALE.RESPONSE.SUCCESS', { additionalEmbeds: additionalEmbed }, 'success', interaction.guild.name, locale);
 	},
 };

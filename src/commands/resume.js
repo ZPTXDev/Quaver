@@ -16,13 +16,10 @@ export default {
 	async execute(interaction) {
 		const { io } = await import('#src/main.js');
 		const player = interaction.client.music.players.get(interaction.guildId);
-		if (!player.paused) {
-			await interaction.replyHandler.locale('CMD.RESUME.RESPONSE.STATE_UNCHANGED', {}, 'error');
-			return;
-		}
+		if (!player.paused) return interaction.replyHandler.locale('CMD.RESUME.RESPONSE.STATE_UNCHANGED', {}, 'error');
 		await player.resume();
-		if (!player.playing && player.queue.tracks.length > 0) { await player.queue.start(); }
+		if (!player.playing && player.queue.tracks.length > 0) await player.queue.start();
 		if (features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('pauseUpdate', player.paused);
-		await interaction.replyHandler.locale('CMD.RESUME.RESPONSE.SUCCESS', {}, 'success');
+		return interaction.replyHandler.locale('CMD.RESUME.RESPONSE.SUCCESS', {}, 'success');
 	},
 };

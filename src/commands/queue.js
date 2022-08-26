@@ -16,12 +16,9 @@ export default {
 	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
-		if (player.queue.tracks.length === 0) {
-			await interaction.replyHandler.locale('CMD.QUEUE.RESPONSE.QUEUE_EMPTY', {}, 'error');
-			return;
-		}
+		if (player.queue.tracks.length === 0) return interaction.replyHandler.locale('CMD.QUEUE.RESPONSE.QUEUE_EMPTY', {}, 'error');
 		const pages = paginate(player.queue.tracks, 5);
-		await interaction.replyHandler.reply(
+		return interaction.replyHandler.reply(
 			pages[0].map((track, index) => {
 				const duration = msToTime(track.length);
 				const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
