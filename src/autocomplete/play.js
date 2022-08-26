@@ -3,9 +3,8 @@ import { request } from 'undici';
 export default {
 	name: 'play',
 	async execute(interaction) {
-		const focusedOption = interaction.options.getFocused(true);
-		if (focusedOption.name !== 'query') return;
-		const { body } = await request(`https://clients1.google.com/complete/search?client=youtube&gs_ri=youtube&ds=yt&q=${focusedOption.value}`);
+		const focused = interaction.options.getFocused();
+		const { body } = await request(`https://clients1.google.com/complete/search?client=youtube&gs_ri=youtube&ds=yt&q=${focused}`);
 		let data;
 		try {
 			data = await body.text();
