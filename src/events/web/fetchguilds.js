@@ -2,6 +2,7 @@ import CryptoJS from 'crypto-js';
 import { request } from 'undici';
 import { features } from '#settings';
 import { getJSONResponse } from '#lib/util/util.js';
+import { version } from '#lib/util/version.js';
 
 export default {
 	name: 'fetchguilds',
@@ -22,6 +23,6 @@ export default {
 			return guild;
 		});
 		socket.guilds = response;
-		return callback({ status: 'success', guilds: response });
+		return callback({ status: 'success', guilds: response, version });
 	},
 };

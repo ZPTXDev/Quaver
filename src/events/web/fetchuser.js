@@ -2,6 +2,7 @@ import CryptoJS from 'crypto-js';
 import { request } from 'undici';
 import { features } from '#settings';
 import { getJSONResponse } from '#lib/util/util.js';
+import { version } from '#lib/util/version.js';
 
 export default {
 	name: 'fetchuser',
@@ -17,6 +18,6 @@ export default {
 		const response = await getJSONResponse(user.body);
 		if (user.message) return callback({ status: 'error-auth' });
 		socket.user = response;
-		return callback({ status: 'success', user: response });
+		return callback({ status: 'success', user: response, version });
 	},
 };

@@ -1,3 +1,5 @@
+import { version } from '#lib/util/version.js';
+
 export default {
 	name: 'request',
 	once: false,
@@ -35,6 +37,6 @@ export default {
 				break;
 			}
 		}
-		return callback({ status: 'success', response });
+		return callback({ status: 'success', response, version });
 	},
 };
