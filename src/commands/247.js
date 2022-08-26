@@ -52,6 +52,6 @@ export default {
 		// pause timeout is theoretically impossible because the user would need to be in the same vc as Quaver
 		// and pause timeout is only set when everyone leaves
 		await interaction.replyHandler.locale(always ? 'CMD.247.RESPONSE.ENABLED' : 'CMD.247.RESPONSE.DISABLED', { footer: always ? getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD.247.MISC.NOTE') : null });
-		if (!always && !player.playing) { player.queue.emit('finish'); }
+		if (!always && !player.playing) player.queue.emit('finish');
 	},
 };
