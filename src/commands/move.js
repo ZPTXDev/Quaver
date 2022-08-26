@@ -12,7 +12,8 @@ export default {
 				.setName('old_position')
 				.setDescription(getLocale(defaultLocale, 'CMD.MOVE.OPTION.OLD_POSITION'))
 				.setMinValue(1)
-				.setRequired(true))
+				.setRequired(true)
+				.setAutocomplete(true))
 		.addIntegerOption(option =>
 			option
 				.setName('new_position')
