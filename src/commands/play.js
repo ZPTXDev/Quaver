@@ -14,7 +14,8 @@ export default {
 			option
 				.setName('query')
 				.setDescription(getLocale(defaultLocale, 'CMD.PLAY.OPTION.QUERY'))
-				.setRequired(true))
+				.setRequired(true)
+				.setAutocomplete(true))
 		.addBooleanOption(option =>
 			option
 				.setName('insert')
