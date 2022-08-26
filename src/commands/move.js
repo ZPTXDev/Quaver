@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { defaultLocale } from '#settings';
+import { defaultLocale, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getLocale } from '#lib/util/util.js';
 
@@ -26,6 +26,7 @@ export default {
 	},
 	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
+		const { bot, io } = await import('#src/main.js');
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const oldPosition = interaction.options.getInteger('old_position');
 		const newPosition = interaction.options.getInteger('new_position');
@@ -43,6 +44,12 @@ export default {
 		}
 		player.queue.tracks.splice(newPosition - 1, 0, player.queue.tracks.splice(oldPosition - 1, 1)[0]);
 		const track = player.queue.tracks[newPosition - 1];
+		if (features.web.enabled) {
+			io.to(`guild:${interaction.guildId}`).emit('queueUpdate', player.queue.tracks.map(t => {
+				t.requesterTag = bot.users.cache.get(t.requester)?.tag;
+				return t;
+			}));
+		}
 		await interaction.replyHandler.locale('CMD.MOVE.RESPONSE.SUCCESS', {}, 'success', track.title, track.uri, oldPosition, newPosition);
 	},
 };

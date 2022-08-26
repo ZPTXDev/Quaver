@@ -1,5 +1,5 @@
 import { PermissionsBitField, ChannelType } from 'discord.js';
-import { defaultLocale } from '#settings';
+import { defaultLocale, features } from '#settings';
 import { data } from '#lib/util/common.js';
 import { getLocale } from '#lib/util/util.js';
 import { checks } from '#lib/util/constants.js';
@@ -9,6 +9,7 @@ export default {
 	name: 'play',
 	/** @param {import('discord.js').SelectMenuInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
+		const { bot, io } = await import('#src/main.js');
 		if (interaction.customId.split('_')[1] !== interaction.user.id) {
 			await interaction.replyHandler.locale('DISCORD.INTERACTION.USER_MISMATCH', {}, 'error');
 			return;
@@ -78,5 +79,11 @@ export default {
 		const started = player.playing || player.paused;
 		await interaction.replyHandler.locale(msg, { footer: started ? `${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null, components: [] }, 'success', ...extras);
 		if (!started) { await player.queue.start(); }
+		if (features.web.enabled) {
+			io.to(`guild:${interaction.guildId}`).emit('queueUpdate', player.queue.tracks.map(track => {
+				track.requesterTag = bot.users.cache.get(track.requester)?.tag;
+				return track;
+			}));
+		}
 	},
 };

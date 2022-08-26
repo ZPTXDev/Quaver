@@ -26,7 +26,7 @@ export default {
 			await interaction.replyHandler.locale('CMD.SKIP.RESPONSE.SUCCESS.DEFAULT', {}, 'success', track.title, track.uri);
 			return;
 		}
-		const skip = player.skip ?? { required: Math.ceil(interaction.member.voice.channel.members.size / 2), users: [] };
+		const skip = player.skip ?? { required: Math.ceil(interaction.member.voice.channel.members.filter(m => !m.user.bot).size / 2), users: [] };
 		if (skip.users.includes(interaction.user.id)) {
 			await interaction.replyHandler.locale('CMD.SKIP.RESPONSE.VOTED.STATE_UNCHANGED', {}, 'error');
 			return;

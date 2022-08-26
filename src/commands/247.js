@@ -19,6 +19,7 @@ export default {
 	},
 	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
+		const { io } = await import('#src/main.js');
 		if (!features.stay.enabled) {
 			await interaction.replyHandler.locale('FEATURE.DISABLED.DEFAULT', {}, 'error');
 			return;
@@ -48,6 +49,7 @@ export default {
 		if (player.timeout) {
 			clearTimeout(player.timeout);
 			delete player.timeout;
+			if (features.web.enabled) io.to(`guild:${player.guildId}`).emit('timeoutUpdate', !!player.timeout);
 		}
 		// pause timeout is theoretically impossible because the user would need to be in the same vc as Quaver
 		// and pause timeout is only set when everyone leaves
