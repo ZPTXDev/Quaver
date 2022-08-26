@@ -12,7 +12,8 @@ export default {
 				.setName('position')
 				.setDescription(getLocale(defaultLocale, 'CMD.REMOVE.OPTION.POSITION'))
 				.setMinValue(1)
-				.setRequired(true)),
+				.setRequired(true)
+				.setAutocomplete(true)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],

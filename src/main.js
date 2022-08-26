@@ -118,6 +118,7 @@ data.guild.instance.on('error', async err => {
 /** @type {Client & {commands: Collection, buttons: Collection, selects: Collection, music: Node}} */
 export const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] });
 bot.commands = new Collection();
+bot.autocomplete = new Collection();
 bot.music = new Node({
 	connection: {
 		host: lavalink.host,
@@ -220,6 +221,13 @@ for await (const file of commandFiles) {
 	/** @type {{data: import('@discordjs/builders').SlashCommandBuilder, checks: string[], permissions: {user: string[], bot: string[]}, execute(interaction: import('discord.js').ChatInputCommandInteraction): Promise<void>}} */
 	const command = await import(getAbsoluteFileURL(import.meta.url, ['commands', file]));
 	bot.commands.set(command.default.data.name, command.default);
+}
+
+const autocompleteFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['autocomplete'])).filter(file => file.endsWith('.js'));
+for await (const file of autocompleteFiles) {
+	/** @type {{name: string, execute(interaction: import('discord.js').ApplicationCommandAutocompleteInteraction): Promise<void>}} */
+	const autocomplete = await import(getAbsoluteFileURL(import.meta.url, ['autocomplete', file]));
+	bot.autocomplete.set(autocomplete.default.name, autocomplete.default);
 }
 
 const componentsFolders = readdirSync(getAbsoluteFileURL(import.meta.url, ['components']));

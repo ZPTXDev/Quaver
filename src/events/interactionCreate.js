@@ -81,6 +81,11 @@ export default {
 				await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', {}, 'error');
 			}
 		}
+		else if (interaction.isAutocomplete()) {
+			const autocomplete = interaction.client.autocomplete.get(interaction.commandName);
+			if (!autocomplete) return;
+			await autocomplete.execute(interaction);
+		}
 		else if (interaction.isButton()) {
 			/** @type {{name: string, execute(interaction: import('discord.js').ButtonInteraction): Promise<void)>}} */
 			const button = interaction.client.buttons.get(interaction.customId.split('_')[0]);
