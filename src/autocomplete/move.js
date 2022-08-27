@@ -7,7 +7,7 @@ export default {
 		return interaction.respond(
 			player.queue.tracks
 				.filter(track => track.title.toLowerCase().startsWith(focused.toLowerCase()))
-				.map((track, index) => ({ name: `${index + 1}. ${track.title}`, value: track.value })),
+				.map((track, index) => ({ name: `${index + 1}. ${track.title}`, value: index + 1 })),
 		);
 	},
 };
