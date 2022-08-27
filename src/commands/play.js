@@ -2,8 +2,7 @@ import { SlashCommandBuilder, PermissionsBitField, ChannelType } from 'discord.j
 import { SpotifyItemType } from '@lavaclient/spotify';
 import { defaultLocale, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getLocale } from '#lib/util/util.js';
-import { data } from '#lib/util/common.js';
+import { getGuildLocale, getLocale } from '#lib/util/util.js';
 import PlayerHandler from '#lib/PlayerHandler.js';
 
 export default {
@@ -108,7 +107,7 @@ export default {
 		player.queue.add(tracks, { requester: interaction.user.id, next: insert });
 
 		const started = player.playing || player.paused;
-		await interaction.replyHandler.locale(msg, { footer: started ? `${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null }, 'success', ...extras);
+		await interaction.replyHandler.locale(msg, { footer: started ? `${await getGuildLocale(interaction.guildId, 'MISC.POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null }, 'success', ...extras);
 		if (!started) await player.queue.start();
 		if (features.web.enabled) {
 			io.to(`guild:${interaction.guildId}`).emit('queueUpdate', player.queue.tracks.map(track => {

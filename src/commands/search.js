@@ -1,8 +1,7 @@
 import { SlashCommandBuilder, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, ButtonStyle, ChannelType } from 'discord.js';
 import { defaultLocale } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getLocale, msToTime, msToTimeString } from '#lib/util/util.js';
-import { data } from '#lib/util/common.js';
+import { getGuildLocale, getLocale, msToTime, msToTimeString } from '#lib/util/util.js';
 
 // credit: https://github.com/lavaclient/djs-v13-example/blob/main/src/commands/Play.ts
 
@@ -43,7 +42,7 @@ export default {
 					.addComponents(
 						new SelectMenuBuilder()
 							.setCustomId(`play_${interaction.user.id}`)
-							.setPlaceholder(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD.SEARCH.MISC.PICK'))
+							.setPlaceholder(await getGuildLocale(interaction.guildId, 'CMD.SEARCH.MISC.PICK'))
 							.addOptions(tracks.map((track, index) => {
 								let label = `${index + 1}. ${track.info.title}`;
 								if (label.length >= 100) {
@@ -58,7 +57,7 @@ export default {
 					.addComponents(
 						new ButtonBuilder()
 							.setCustomId(`cancel_${interaction.user.id}`)
-							.setLabel(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.CANCEL'))
+							.setLabel(await getGuildLocale(interaction.guildId, 'MISC.CANCEL'))
 							.setStyle(ButtonStyle.Danger),
 					),
 			],

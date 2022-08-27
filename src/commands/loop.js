@@ -2,8 +2,7 @@ import { SlashCommandBuilder } from 'discord.js';
 import { LoopType } from '@lavaclient/queue';
 import { defaultLocale, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getLocale } from '#lib/util/util.js';
-import { data } from '#lib/util/common.js';
+import { getGuildLocale, getLocale } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -33,15 +32,15 @@ export default {
 		switch (type) {
 			case 'disabled':
 				loop = LoopType.None;
-				typeLocale = getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD.LOOP.OPTION.TYPE.OPTION.DISABLED');
+				typeLocale = await getGuildLocale(interaction.guildId, 'CMD.LOOP.OPTION.TYPE.OPTION.DISABLED');
 				break;
 			case 'track':
 				loop = LoopType.Song;
-				typeLocale = getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD.LOOP.OPTION.TYPE.OPTION.TRACK');
+				typeLocale = await getGuildLocale(interaction.guildId, 'CMD.LOOP.OPTION.TYPE.OPTION.TRACK');
 				break;
 			case 'queue':
 				loop = LoopType.Queue;
-				typeLocale = getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD.LOOP.OPTION.TYPE.OPTION.QUEUE');
+				typeLocale = await getGuildLocale(interaction.guildId, 'CMD.LOOP.OPTION.TYPE.OPTION.QUEUE');
 				break;
 		}
 		typeLocale = typeLocale.toLowerCase();
