@@ -1,7 +1,6 @@
 import { ButtonBuilder, ButtonStyle, EmbedBuilder, ActionRowBuilder } from 'discord.js';
-import { defaultLocale } from '#settings';
-import { logger, data } from '#lib/util/common.js';
-import { getLocale, paginate, msToTime, msToTimeString } from '#lib/util/util.js';
+import { logger } from '#lib/util/common.js';
+import { paginate, msToTime, msToTimeString, getGuildLocale } from '#lib/util/util.js';
 
 export default {
 	name: 'queue',
@@ -31,7 +30,7 @@ export default {
 				const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
 				return `\`${(firstIndex + index).toString().padStart(largestIndexSize, ' ')}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 			}).join('\n'))
-			.setFooter({ text: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.PAGE', page, pages.length) });
+			.setFooter({ text: await getGuildLocale(interaction.guildId, 'MISC.PAGE', page, pages.length) });
 		original.components[0] = ActionRowBuilder.from(original.components[0]);
 		original.components[0].components = [];
 		original.components[0].components[0] = new ButtonBuilder()
@@ -48,7 +47,7 @@ export default {
 			.setCustomId(`queue_${page}`)
 			.setEmoji('🔁')
 			.setStyle(ButtonStyle.Secondary)
-			.setLabel(getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.REFRESH'));
+			.setLabel(await getGuildLocale(interaction.guildId, 'MISC.REFRESH'));
 		try {
 			return await interaction.update({
 				embeds: original.embeds,

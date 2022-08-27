@@ -1,8 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { defaultLocale } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getLocale } from '#lib/util/util.js';
-import { data } from '#lib/util/common.js';
+import { getGuildLocale, getLocale } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -28,7 +27,7 @@ export default {
 		if (skip.users.length >= skip.required) {
 			const track = await player.queue.skip();
 			await player.queue.start();
-			await interaction.replyHandler.reply(`${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD.SKIP.RESPONSE.SUCCESS.VOTED', track.title, track.uri)}\n${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.ADDED_BY', track.requester)}`);
+			await interaction.replyHandler.reply(`${await getGuildLocale(interaction.guildId, 'CMD.SKIP.RESPONSE.SUCCESS.VOTED', track.title, track.uri)}\n${await getGuildLocale(interaction.guildId, 'MISC.ADDED_BY', track.requester)}`);
 			return player.queue.next();
 		}
 		player.skip = skip;

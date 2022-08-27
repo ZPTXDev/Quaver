@@ -1,8 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { defaultLocale, features, managers } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getLocale } from '#lib/util/util.js';
-import { data } from '#lib/util/common.js';
+import { getGuildLocale, getLocale } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -28,6 +27,6 @@ export default {
 		if (volume > 200 && !managers.includes(interaction.user.id)) return interaction.replyHandler.locale('CMD.VOLUME.RESPONSE.OUT_OF_RANGE', {}, 'error');
 		await player.setVolume(volume);
 		if (features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('volumeUpdate', volume);
-		return interaction.replyHandler.locale('CMD.VOLUME.RESPONSE.SUCCESS', { footer: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.PLAYER.FILTER_NOTE') }, 'neutral', volume);
+		return interaction.replyHandler.locale('CMD.VOLUME.RESPONSE.SUCCESS', { footer: await getGuildLocale(interaction.guildId, 'MUSIC.PLAYER.FILTER_NOTE') }, 'neutral', volume);
 	},
 };

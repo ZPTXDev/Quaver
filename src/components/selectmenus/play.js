@@ -1,7 +1,6 @@
 import { PermissionsBitField, ChannelType } from 'discord.js';
-import { defaultLocale, features } from '#settings';
-import { data } from '#lib/util/common.js';
-import { getLocale } from '#lib/util/util.js';
+import { features } from '#settings';
+import { getGuildLocale } from '#lib/util/util.js';
 import { checks } from '#lib/util/constants.js';
 import PlayerHandler from '#lib/PlayerHandler.js';
 
@@ -36,7 +35,7 @@ export default {
 		}
 		else {
 			msg = 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
-			extras = [resolvedTracks.length, getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.YOUR_SEARCH'), ''] ;
+			extras = [resolvedTracks.length, await getGuildLocale(interaction.guildId, 'MISC.YOUR_SEARCH'), ''] ;
 		}
 		if (!player?.connected) {
 			player = interaction.client.music.createPlayer(interaction.guildId);
@@ -58,7 +57,7 @@ export default {
 		player.queue.add(resolvedTracks, { requester: interaction.user.id });
 
 		const started = player.playing || player.paused;
-		await interaction.replyHandler.locale(msg, { footer: started ? `${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MISC.POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null, components: [] }, 'success', ...extras);
+		await interaction.replyHandler.locale(msg, { footer: started ? `${await getGuildLocale(interaction.guildId, 'MISC.POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null, components: [] }, 'success', ...extras);
 		if (!started) await player.queue.start();
 		if (features.web.enabled) {
 			io.to(`guild:${interaction.guildId}`).emit('queueUpdate', player.queue.tracks.map(track => {

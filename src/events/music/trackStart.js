@@ -1,6 +1,6 @@
-import { defaultLocale, features } from '#settings';
-import { logger, data } from '#lib/util/common.js';
-import { getLocale, msToTime, msToTimeString } from '#lib/util/util.js';
+import { features } from '#settings';
+import { logger } from '#lib/util/common.js';
+import { getGuildLocale, msToTime, msToTimeString } from '#lib/util/util.js';
 
 export default {
 	name: 'trackStart',
@@ -28,6 +28,6 @@ export default {
 				return t;
 			}));
 		}
-		return queue.player.handler.send(`${getLocale(await data.guild.get(queue.player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.PLAYER.PLAYING.NOW', track.title, track.uri, durationString)}\n${getLocale(await data.guild.get(queue.player.guildId, 'settings.locale') ?? defaultLocale, 'MISC.ADDED_BY', track.requester)}`, {}, 'neutral');
+		return queue.player.handler.send(`${await getGuildLocale(queue.player.guildId, 'MUSIC.PLAYER.PLAYING.NOW', track.title, track.uri, durationString)}\n${await getGuildLocale(queue.player.guildId, 'MISC.ADDED_BY', track.requester)}`, {}, 'neutral');
 	},
 };

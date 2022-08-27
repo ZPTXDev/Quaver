@@ -1,7 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { defaultLocale } from '#settings';
-import { msToTime, msToTimeString, getLocale } from '#lib/util/util.js';
-import { data } from '#lib/util/common.js';
+import { msToTime, msToTimeString, getLocale, getGuildLocale } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -16,6 +15,6 @@ export default {
 	async execute(interaction) {
 		const uptime = msToTime(interaction.client.uptime);
 		const uptimeString = msToTimeString(uptime);
-		return interaction.replyHandler.locale('CMD.PING.RESPONSE.SUCCESS', { footer: `${getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'CMD.PING.MISC.UPTIME')} ${uptimeString}` }, 'neutral', interaction.guild ? ` ${interaction.guild.shard.ping}ms` : '');
+		return interaction.replyHandler.locale('CMD.PING.RESPONSE.SUCCESS', { footer: `${await getGuildLocale(interaction.guildId, 'CMD.PING.MISC.UPTIME')} ${uptimeString}` }, 'neutral', interaction.guild ? ` ${interaction.guild.shard.ping}ms` : '');
 	},
 };

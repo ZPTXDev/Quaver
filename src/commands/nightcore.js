@@ -1,8 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { defaultLocale, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getLocale } from '#lib/util/util.js';
-import { data } from '#lib/util/common.js';
+import { getGuildLocale, getLocale } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -27,6 +26,6 @@ export default {
 		await player.setFilters();
 		player.nightcore = nightcore;
 		if (features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('filterUpdate', { bassboost: player.bassboost, nightcore: player.nightcore });
-		return interaction.replyHandler.locale(player.nightcore ? 'CMD.NIGHTCORE.RESPONSE.ENABLED' : 'CMD.NIGHTCORE.RESPONSE.DISABLED', { footer: getLocale(await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.PLAYER.FILTER_NOTE') }, 'neutral');
+		return interaction.replyHandler.locale(player.nightcore ? 'CMD.NIGHTCORE.RESPONSE.ENABLED' : 'CMD.NIGHTCORE.RESPONSE.DISABLED', { footer: await getGuildLocale(interaction.guildId, 'MUSIC.PLAYER.FILTER_NOTE') }, 'neutral');
 	},
 };

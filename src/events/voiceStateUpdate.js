@@ -1,7 +1,7 @@
 import { PermissionsBitField, ChannelType, StageInstancePrivacyLevel } from 'discord.js';
 import { logger, data } from '#lib/util/common.js';
-import { getLocale } from '#lib/util/util.js';
-import { defaultLocale, features } from '#settings';
+import { getGuildLocale } from '#lib/util/util.js';
+import { features } from '#settings';
 
 export default {
 	name: 'voiceStateUpdate',
@@ -63,7 +63,7 @@ export default {
 				await newState.setSuppressed(false);
 				if (!newState.channel.stageInstance) {
 					try {
-						await newState.channel.createStageInstance({ topic: getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MISC.STAGE_TOPIC'), privacyLevel: StageInstancePrivacyLevel.GuildOnly });
+						await newState.channel.createStageInstance({ topic: await getGuildLocale(player.guildId, 'MISC.STAGE_TOPIC'), privacyLevel: StageInstancePrivacyLevel.GuildOnly });
 					}
 					catch (err) {
 						logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
@@ -98,7 +98,7 @@ export default {
 				}, 5 * 60 * 1000, player);
 				player.timeoutEnd = Date.now() + (5 * 60 * 1000);
 				if (features.web.enabled) io.to(`guild:${player.guildId}`).emit('pauseTimeoutUpdate', player.timeoutEnd);
-				return player.handler.send(`${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.DISCONNECT.ALONE.WARNING')} ${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.DISCONNECT.INACTIVITY.WARNING', Math.floor(Date.now() / 1000) + (5 * 60))}`, { footer: getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME') }, 'warning');
+				return player.handler.send(`${await getGuildLocale(player.guildId, 'MUSIC.DISCONNECT.ALONE.WARNING')} ${await getGuildLocale(player.guildId, 'MUSIC.DISCONNECT.INACTIVITY.WARNING', Math.floor(Date.now() / 1000) + (5 * 60))}`, { footer: await getGuildLocale(player.guildId, 'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME') }, 'warning');
 			}
 			// Moved to a new channel that has humans and pauseTimeout is set
 			if (newState.channel.members.filter(m => !m.user.bot).size >= 1 && player.pauseTimeout) {
@@ -162,6 +162,6 @@ export default {
 		}, 5 * 60 * 1000, player);
 		player.timeoutEnd = Date.now() + (5 * 60 * 1000);
 		if (features.web.enabled) io.to(`guild:${player.guildId}`).emit('pauseTimeoutUpdate', player.timeoutEnd);
-		return player.handler.send(`${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.DISCONNECT.ALONE.WARNING')} ${getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.DISCONNECT.INACTIVITY.WARNING', Math.floor(Date.now() / 1000) + (5 * 60))}`, { footer: getLocale(await data.guild.get(player.guildId, 'settings.locale') ?? defaultLocale, 'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME') }, 'warning');
+		return player.handler.send(`${await getGuildLocale(player.guildId, 'MUSIC.DISCONNECT.ALONE.WARNING')} ${await getGuildLocale(player.guildId, 'MUSIC.DISCONNECT.INACTIVITY.WARNING', Math.floor(Date.now() / 1000) + (5 * 60))}`, { footer: await getGuildLocale(player.guildId, 'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME') }, 'warning');
 	},
 };
