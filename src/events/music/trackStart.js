@@ -28,6 +28,6 @@ export default {
 				return t;
 			}));
 		}
-		return queue.player.handler.send(`${await getGuildLocale(queue.player.guildId, 'MUSIC.PLAYER.PLAYING.NOW', track.title, track.uri, durationString)}\n${await getGuildLocale(queue.player.guildId, 'MISC.ADDED_BY', track.requester)}`, {}, 'neutral');
+		return queue.player.handler.send(`${await getGuildLocale(queue.player.guildId, 'MUSIC.PLAYER.PLAYING.NOW', track.title, track.uri, durationString)}\n${await getGuildLocale(queue.player.guildId, 'MISC.ADDED_BY', track.requester)}`);
 	},
 };

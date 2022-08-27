@@ -1,5 +1,5 @@
 import '@lavaclient/queue/register';
-import { Client, GatewayIntentBits, Collection } from 'discord.js';
+import { Client, GatewayIntentBits, Collection, EmbedBuilder } from 'discord.js';
 import { Node } from 'lavaclient';
 import { Server } from 'socket.io';
 import { load } from '@lavaclient/spotify';
@@ -166,9 +166,12 @@ export async function shuttingDown(eventType, err) {
 					fileBuffer.push(player.queue.tracks.map(track => track.uri).join('\n'));
 				}
 				await player.handler.disconnect();
-				const success = await player.handler.send(`${getLocale(guildLocale ?? defaultLocale, ['exit', 'SIGINT', 'SIGTERM', 'lavalink'].includes(eventType) ? 'MUSIC.PLAYER.RESTARTING.DEFAULT' : 'MUSIC.PLAYER.RESTARTING.CRASHED')}${fileBuffer.length > 0 ? `\n${getLocale(guildLocale ?? defaultLocale, 'MUSIC.PLAYER.RESTARTING.QUEUE_DATA_ATTACHED')}` : ''}`,
+				const success = await player.handler.send(
+					new EmbedBuilder()
+						.setDescription(`${getLocale(guildLocale ?? defaultLocale, ['exit', 'SIGINT', 'SIGTERM', 'lavalink'].includes(eventType) ? 'MUSIC.PLAYER.RESTARTING.DEFAULT' : 'MUSIC.PLAYER.RESTARTING.CRASHED')}${fileBuffer.length > 0 ? `\n${getLocale(guildLocale ?? defaultLocale, 'MUSIC.PLAYER.RESTARTING.QUEUE_DATA_ATTACHED')}` : ''}`)
+						.setFooter({ text: getLocale(guildLocale ?? defaultLocale, 'MUSIC.PLAYER.RESTARTING.APOLOGY') }),
 					{
-						footer: getLocale(guildLocale ?? defaultLocale, 'MUSIC.PLAYER.RESTARTING.APOLOGY'),
+						type: 'warning',
 						files: fileBuffer.length > 0 ? [
 							{
 								attachment: Buffer.from(fileBuffer.join('\n')),
@@ -176,7 +179,6 @@ export async function shuttingDown(eventType, err) {
 							},
 						] : [],
 					},
-					'warning',
 				);
 				if (!success) continue;
 			}

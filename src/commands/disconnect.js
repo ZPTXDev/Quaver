@@ -15,9 +15,9 @@ export default {
 	},
 	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
-		if (await data.guild.get(interaction.guildId, 'settings.stay.enabled')) return interaction.replyHandler.locale('CMD.DISCONNECT.RESPONSE.FEATURE_247_ENABLED', {}, 'error');
+		if (await data.guild.get(interaction.guildId, 'settings.stay.enabled')) return interaction.replyHandler.locale('CMD.DISCONNECT.RESPONSE.FEATURE_247_ENABLED', { type: 'error' });
 		const player = interaction.client.music.players.get(interaction.guildId);
 		await player.handler.disconnect();
-		return interaction.replyHandler.locale('CMD.DISCONNECT.RESPONSE.SUCCESS', {}, 'success');
+		return interaction.replyHandler.locale('CMD.DISCONNECT.RESPONSE.SUCCESS', { type: 'success' });
 	},
 };

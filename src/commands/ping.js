@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { defaultLocale } from '#settings';
 import { msToTime, msToTimeString, getLocale, getGuildLocale } from '#lib/util/util.js';
 
@@ -15,6 +15,10 @@ export default {
 	async execute(interaction) {
 		const uptime = msToTime(interaction.client.uptime);
 		const uptimeString = msToTimeString(uptime);
-		return interaction.replyHandler.locale('CMD.PING.RESPONSE.SUCCESS', { footer: `${await getGuildLocale(interaction.guildId, 'CMD.PING.MISC.UPTIME')} ${uptimeString}` }, 'neutral', interaction.guild ? ` ${interaction.guild.shard.ping}ms` : '');
+		return interaction.replyHandler.reply(
+			new EmbedBuilder()
+				.setDescription(await getGuildLocale(interaction.guildId, 'CMD.PING.RESPONSE.SUCCESS', interaction.guild ? ` ${interaction.guild.shard.ping}ms` : ''))
+				.setFooter({ text: `${await getGuildLocale(interaction.guildId, 'CMD.PING.MISC.UPTIME')} ${uptimeString}` }),
+		);
 	},
 };

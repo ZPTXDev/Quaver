@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder, PermissionsBitField } from 'discord.js';
 import { defaultLocale, colors } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { roundTo, getLocale, checkLocaleCompletion, getAbsoluteFileURL } from '#lib/util/util.js';
+import { roundTo, getLocale, checkLocaleCompletion, getAbsoluteFileURL, getGuildLocale } from '#lib/util/util.js';
 import { data } from '#lib/util/common.js';
 import fs from 'fs';
 
@@ -25,13 +25,20 @@ export default {
 	async execute(interaction) {
 		const locale = interaction.options.getString('new_locale');
 		const localeCompletion = checkLocaleCompletion(locale);
-		if (localeCompletion === 'LOCALE_MISSING') return interaction.replyHandler.reply('That locale does not exist.', {}, 'error');
+		if (localeCompletion === 'LOCALE_MISSING') return interaction.replyHandler.reply('That locale does not exist.', { type: 'error' });
 		await data.guild.set(interaction.guildId, 'settings.locale', locale);
 		const additionalEmbed = localeCompletion.completion !== 100 ? [
 			new EmbedBuilder()
 				.setDescription(`This locale is incomplete. Completion: \`${roundTo(localeCompletion.completion, 2)}%\`\nMissing strings:\n\`\`\`\n${localeCompletion.missing.join('\n')}\`\`\``)
 				.setColor(colors.warning),
 		] : [];
-		return interaction.replyHandler.locale('CMD.LOCALE.RESPONSE.SUCCESS', { additionalEmbeds: additionalEmbed }, 'success', interaction.guild.name, locale);
+		return interaction.replyHandler.reply(
+			[
+				new EmbedBuilder()
+					.setDescription(await getGuildLocale(interaction.guildId, 'CMD.LOCALE.RESPONSE.SUCCESS', interaction.guild.name, locale)),
+				...additionalEmbed,
+			],
+			{ type: 'success' },
+		);
 	},
 };

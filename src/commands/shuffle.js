@@ -16,7 +16,7 @@ export default {
 	async execute(interaction) {
 		const { bot, io } = await import('#src/main.js');
 		const player = interaction.client.music.players.get(interaction.guildId);
-		if (player.queue.tracks.length <= 1) return interaction.replyHandler.locale('CMD.SHUFFLE.RESPONSE.QUEUE_INSUFFICIENT_TRACKS', {}, 'error');
+		if (player.queue.tracks.length <= 1) return interaction.replyHandler.locale('CMD.SHUFFLE.RESPONSE.QUEUE_INSUFFICIENT_TRACKS', { type: 'error' });
 		let currentIndex = player.queue.tracks.length, randomIndex;
 		while (currentIndex !== 0) {
 			randomIndex = Math.floor(Math.random() * currentIndex);
@@ -29,6 +29,6 @@ export default {
 				return t;
 			}));
 		}
-		return interaction.replyHandler.locale('CMD.SHUFFLE.RESPONSE.SUCCESS', {}, 'success');
+		return interaction.replyHandler.locale('CMD.SHUFFLE.RESPONSE.SUCCESS', { type: 'success' });
 	},
 };

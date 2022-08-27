@@ -7,7 +7,7 @@ export default {
 	name: 'cancel',
 	/** @param {import('discord.js').ButtonInteraction & {replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
-		if (interaction.customId.split('_')[1] !== interaction.user.id) return interaction.replyHandler.locale('DISCORD.INTERACTION.USER_MISMATCH', {}, 'error');
+		if (interaction.customId.split('_')[1] !== interaction.user.id) return interaction.replyHandler.locale('DISCORD.INTERACTION.USER_MISMATCH', { type: 'error' });
 		try {
 			return await interaction.update({
 				embeds: [
