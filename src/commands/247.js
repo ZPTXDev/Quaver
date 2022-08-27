@@ -20,19 +20,10 @@ export default {
 	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
 		const { io } = await import('#src/main.js');
-		if (!features.stay.enabled) {
-			await interaction.replyHandler.locale('FEATURE.DISABLED.DEFAULT', {}, 'error');
-			return;
-		}
-		if (features.stay.whitelist && !await data.guild.get(interaction.guildId, 'features.stay.whitelisted')) {
-			await interaction.replyHandler.locale('CMD.247.RESPONSE.FEATURE_NOT_WHITELISTED', {}, 'error');
-			return;
-		}
+		if (!features.stay.enabled) return interaction.replyHandler.locale('FEATURE.DISABLED.DEFAULT', {}, 'error');
+		if (features.stay.whitelist && !await data.guild.get(interaction.guildId, 'features.stay.whitelisted')) return interaction.replyHandler.locale('CMD.247.RESPONSE.FEATURE_NOT_WHITELISTED', {}, 'error');
 		const player = interaction.client.music.players.get(interaction.guildId);
-		if (!player?.queue?.channel?.id) {
-			await interaction.replyHandler.locale('CMD.247.RESPONSE.QUEUE_CHANNEL_MISSING', {}, 'error');
-			return;
-		}
+		if (!player?.queue?.channel?.id) return interaction.replyHandler.locale('CMD.247.RESPONSE.QUEUE_CHANNEL_MISSING', {}, 'error');
 		const enabled = interaction.options.getBoolean('enabled');
 		const always = enabled !== null ? enabled : !await data.guild.get(interaction.guildId, 'settings.stay.enabled');
 		await data.guild.set(interaction.guildId, 'settings.stay.enabled', always);
