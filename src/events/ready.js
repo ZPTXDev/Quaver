@@ -17,7 +17,6 @@ export default {
 			}
 			client.music.connect(client.user.id);
 			updateStartup();
-			return;
 		}
 		logger.info({ message: 'Reconnected.', label: 'Discord' });
 		logger.warn({ message: 'Attempting to resume sessions.', label: 'Quaver' });
