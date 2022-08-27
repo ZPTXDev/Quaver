@@ -1,8 +1,8 @@
 export default {
 	'247': {
-		DESCRIPTION: 'Keep Quaver in your channel.',
+		DESCRIPTION: '24/7 mode prevents Quaver from leaving.',
 		OPTION: {
-			ENABLED: 'Whether or not 24/7 will be enabled. If not specified, it will be toggled.'
+			ENABLED: 'Whether or not 24/7 mode is enabled. If not specified, it will be toggled.'
 		},
 		RESPONSE: {
 			ENABLED: '24/7 **enabled**',
@@ -15,9 +15,9 @@ export default {
 		}
 	},
 	BASSBOOST: {
-		DESCRIPTION: 'Boost the bass levels in your music.',
+		DESCRIPTION: 'Bass boost mode amplifies the bass levels.',
 		OPTION: {
-			ENABLED: 'Whether or not bass boost will be enabled. If not specified, it will be toggled.'
+			ENABLED: 'Whether or not bass boost mode is enabled. If not specified, it will be toggled.'
 		},
 		RESPONSE: {
 			ENABLED: 'Bass boost **enabled**',
@@ -25,9 +25,9 @@ export default {
 		}
 	},
 	BIND: {
-		DESCRIPTION: 'Change the text channel used by Quaver to send messages automatically.',
+		DESCRIPTION: 'Change the channel used by Quaver to send messages automatically.',
 		OPTION: {
-			NEW_CHANNEL: 'The text channel to bind to.'
+			NEW_CHANNEL: 'The channel to bind to.'
 		},
 		RESPONSE: {
 			SUCCESS: 'Bound to <#%1>',
@@ -64,7 +64,7 @@ export default {
 		}
 	},
 	LOOP: {
-		DESCRIPTION: 'Loop the queue.',
+		DESCRIPTION: 'Change the looping mode.',
 		OPTION: {
 			TYPE: {
 				DESCRIPTION: 'The looping mode.',
@@ -88,14 +88,14 @@ export default {
 		RESPONSE: {
 			SUCCESS: 'Moved **[%1](%2)** `%3 -> %4`',
 			QUEUE_INSUFFICIENT_TRACKS: 'There aren\'t enough tracks in the queue to perform a move.',
-			OUT_OF_RANGE: 'One (or both) of your arguments are out of range.',
-			MOVING_IN_PLACE: 'Your arguments cannot be the same.'
+			OUT_OF_RANGE: 'Your input was invalid.',
+			MOVING_IN_PLACE: 'You can\'t move a track to the same position it is already in.'
 		}
 	},
 	NIGHTCORE: {
 		DESCRIPTION: 'Nightcore mode speeds up your music.',
 		OPTION: {
-			ENABLED: 'Whether or not nightcore will be enabled. If not specified, it will be toggled.'
+			ENABLED: 'Whether or not nightcore mode is enabled. If not specified, it will be toggled.'
 		},
 		RESPONSE: {
 			ENABLED: 'Nightcore **enabled**',
@@ -110,7 +110,7 @@ export default {
 		}
 	},
 	PING: {
-		DESCRIPTION: 'Check Quaver\'s latency and uptime.',
+		DESCRIPTION: 'Show Quaver\'s latency and uptime.',
 		RESPONSE: {
 			SUCCESS: 'Pong!%1'
 		},
@@ -119,9 +119,9 @@ export default {
 		}
 	},
 	PLAY: {
-		DESCRIPTION: 'Play a track.',
+		DESCRIPTION: 'Add a track to the queue.',
 		OPTION: {
-			QUERY: 'What to search for. Links from Spotify, YouTube and more are supported. Searches YouTube by default.',
+			QUERY: 'YouTube search query or a link from Spotify or YouTube.',
 			INSERT: 'Whether or not to play the track next.'
 		},
 		RESPONSE: {
@@ -164,7 +164,7 @@ export default {
 	SEARCH: {
 		DESCRIPTION: 'Search YouTube for a track.',
 		OPTION: {
-			QUERY: 'What to search for.'
+			QUERY: 'YouTube search query.'
 		},
 		RESPONSE: {
 			USE_PLAY_CMD: 'Try using the `play` command instead.'
