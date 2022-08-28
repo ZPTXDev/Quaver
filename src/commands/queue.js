@@ -37,15 +37,14 @@ export default {
 								.setDisabled(true)
 								.setStyle(ButtonStyle.Primary),
 							new ButtonBuilder()
+								.setCustomId('queue_goto')
+								.setStyle(ButtonStyle.Secondary)
+								.setLabel(await getGuildLocale(interaction.guildId, 'MISC.GO_TO')),
+							new ButtonBuilder()
 								.setCustomId('queue_2')
 								.setEmoji('➡️')
 								.setDisabled(pages.length === 1)
 								.setStyle(ButtonStyle.Primary),
-							new ButtonBuilder()
-								.setCustomId('queue_1')
-								.setEmoji('🔁')
-								.setStyle(ButtonStyle.Secondary)
-								.setLabel(await getGuildLocale(interaction.guildId, 'MISC.REFRESH')),
 						),
 				],
 				ephemeral: true,

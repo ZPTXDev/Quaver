@@ -141,7 +141,12 @@ export default {
 	QUEUE: {
 		DESCRIPTION: 'Show the queue.',
 		RESPONSE: {
-			QUEUE_EMPTY: 'There is nothing coming up.'
+			QUEUE_EMPTY: 'There is nothing coming up.',
+			OUT_OF_RANGE: 'Your input was invalid.'
+		},
+		MISC: {
+			PAGE: 'Page',
+			MODAL_TITLE: 'Go to page',
 		}
 	},
 	REMOVE: {

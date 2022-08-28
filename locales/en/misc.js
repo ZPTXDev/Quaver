@@ -1,7 +1,7 @@
 export default {
 	PAGE: 'Page %1 of %2',
 	POSITION: 'Position',
-	REFRESH: 'Refresh',
+	GO_TO: 'Go to',
 	CURRENT: 'Current',
 	QUEUE: 'Queue',
 	CANCEL: 'Cancel',
