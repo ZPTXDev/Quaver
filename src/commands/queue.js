@@ -48,6 +48,7 @@ export default {
 								.setLabel(await getGuildLocale(interaction.guildId, 'MISC.REFRESH')),
 						),
 				],
+				ephemeral: true,
 			},
 		);
 	},
