@@ -105,5 +105,19 @@ export default {
 				return interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', { type: 'error' });
 			}
 		}
+		if (interaction.isModalSubmit()) {
+			const modal = interaction.client.modals.get(interaction.customId.split('_')[0]);
+			if (!modal) return;
+			logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing modal ${interaction.customId}`, label: 'Quaver' });
+			try {
+				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Executing modal ${interaction.customId}`, label: 'Quaver' });
+				return modal.execute(interaction);
+			}
+			catch (err) {
+				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with modal ${interaction.customId}`, label: 'Quaver' });
+				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+				return interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', { type: 'error' });
+			}
+		}
 	},
 };

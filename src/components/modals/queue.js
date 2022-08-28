@@ -1,30 +1,21 @@
-import { ButtonBuilder, ButtonStyle, EmbedBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from 'discord.js';
+import { ButtonBuilder, ButtonStyle, EmbedBuilder, ActionRowBuilder } from 'discord.js';
 import { paginate, msToTime, msToTimeString, getGuildLocale } from '#lib/util/util.js';
 
 export default {
 	name: 'queue',
 	/** @param {import('discord.js').ButtonInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}}} interaction */
 	async execute(interaction) {
-		const player = interaction.client.music.players.get(interaction.guildId), pages = player ? paginate(player.queue.tracks, 5) : [];
-		let page = interaction.customId.split('_')[1];
-		if (player && page === 'goto' && pages.length !== 0) {
-			return interaction.showModal(
-				new ModalBuilder()
-					.setTitle(await getGuildLocale(interaction.guildId, 'CMD.QUEUE.MISC.MODAL_TITLE'))
-					.setCustomId('queue_goto')
-					.addComponents(
-						new ActionRowBuilder()
-							.addComponents(
-								new TextInputBuilder()
-									.setCustomId('queue_goto_input')
-									.setLabel(await getGuildLocale(interaction.guildId, 'CMD.QUEUE.MISC.PAGE'))
-									.setStyle(TextInputStyle.Short),
-							),
-					),
-			);
+		const player = interaction.client.music.players.get(interaction.guildId), page = parseInt(interaction.fields.getTextInputValue('queue_goto_input'));
+		let pages;
+		if (isNaN(page)) return interaction.replyHandler.locale('CMD.QUEUE.RESPONSE.OUT_OF_RANGE', { type: 'error' });
+		if (player) pages = paginate(player.queue.tracks, 5);
+		if (!player) {
+			const original = interaction.message.components;
+			original[0].components = original[0].components.map(c => ButtonBuilder.from(c).setDisabled(true));
+			original[1].components = original[1].components.map(c => ButtonBuilder.from(c).setDisabled(true));
+			return interaction.update({ components: original });
 		}
-		page = parseInt(page);
-		if (!player || pages.length === 0 || page < 1 || page > pages.length) return interaction.replyHandler.locale('CMD.QUEUE.RESPONSE.QUEUE_EMPTY', { type: 'error', components: [], force: 'update' });
+		if (page < 1 || page > pages.length) return interaction.replyHandler.locale('CMD.QUEUE.RESPONSE.OUT_OF_RANGE', { type: 'error' });
 		const firstIndex = 5 * (page - 1) + 1;
 		const pageSize = pages[page - 1].length;
 		const largestIndexSize = (firstIndex + pageSize - 1).toString().length;
