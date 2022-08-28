@@ -38,14 +38,16 @@ export default {
 		DESCRIPTION: 'Clear the queue.',
 		RESPONSE: {
 			SUCCESS: 'The queue has been cleared.',
-			QUEUE_EMPTY: 'There are no tracks in the queue to clear.'
+			QUEUE_EMPTY: 'There are no tracks in the queue to clear.',
+			CONFIRMATION: 'Are you sure you want to clear the queue?'
 		}
 	},
 	DISCONNECT: {
 		DESCRIPTION: 'Disconnect Quaver.',
 		RESPONSE: {
 			SUCCESS: 'Left the voice channel.',
-			FEATURE_247_ENABLED: 'Quaver is unable to leave as 24/7 is enabled.'
+			FEATURE_247_ENABLED: 'Quaver is unable to leave as 24/7 is enabled.',
+			CONFIRMATION: 'Are you sure you want Quaver to disconnect? This will also clear the queue.'
 		}
 	},
 	INFO: {
@@ -210,7 +212,8 @@ export default {
 	STOP: {
 		DESCRIPTION: 'Stop the current track and clear the queue.',
 		RESPONSE: {
-			SUCCESS: 'Stopped the current track and cleared the queue.'
+			SUCCESS: 'Stopped the current track and cleared the queue.',
+			CONFIRMATION: 'Are you sure you want to stop the current track and clear the queue?'
 		}
 	},
 	VOLUME: {
