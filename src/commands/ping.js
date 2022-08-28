@@ -19,6 +19,7 @@ export default {
 			new EmbedBuilder()
 				.setDescription(await getGuildLocale(interaction.guildId, 'CMD.PING.RESPONSE.SUCCESS', interaction.guild ? ` ${interaction.guild.shard.ping}ms` : ''))
 				.setFooter({ text: `${await getGuildLocale(interaction.guildId, 'CMD.PING.MISC.UPTIME')} ${uptimeString}` }),
+			{ ephemeral: true },
 		);
 	},
 };

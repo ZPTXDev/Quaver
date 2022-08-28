@@ -1,7 +1,7 @@
 import { request } from 'undici';
 
 export default {
-	name: 'play',
+	name: 'search',
 	async execute(interaction) {
 		const focused = interaction.options.getFocused();
 		const { body } = await request(`https://clients1.google.com/complete/search?client=youtube&gs_ri=youtube&ds=yt&q=${focused}`);

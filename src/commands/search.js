@@ -13,7 +13,8 @@ export default {
 			option
 				.setName('query')
 				.setDescription(getLocale(defaultLocale, 'CMD.SEARCH.OPTION.QUERY'))
-				.setRequired(true)),
+				.setRequired(true)
+				.setAutocomplete(true)),
 	checks: [checks.GUILD_ONLY],
 	permissions: {
 		user: [],
