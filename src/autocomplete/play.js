@@ -16,12 +16,7 @@ export default {
 			searchSuggestions.pop();
 			return interaction.respond(
 				searchSuggestions
-					.map(suggestion =>
-						suggestion
-							.replace(/\\u([0-9a-f]{4})/g, (whole, grp) =>
-								String.fromCharCode(parseInt(grp, 16)),
-							),
-					)
+					.map(suggestion => suggestion.replace(/\\u([0-9a-fA-F]{4})/g, (whole, grp) => String.fromCharCode(parseInt(grp, 16))))
 					.map(suggestion => ({ name: suggestion, value: suggestion })),
 			);
 		}
