@@ -44,9 +44,9 @@ export default {
 		DESCRIPTION: 'Ipakita ang impormasyon bahin ni Quaver.',
 		RESPONSE: { SUCCESS: 'Open-source nga music bot for para sa ginagmay na mga komunidad.\nAng source code kay available [dinhi](https://go.zptx.dev/Quaver), invite [dinhi](%1).\nNagdagan sa bersyong `%2`.' }
 	},
-	LOCALE: {
+	LANGUAGE: {
 		DESCRIPTION: 'Usban ang locale ni Quaver dinhi nga server.',
-		OPTION: { NEW_LOCALE: 'Ang locale na gamiton.' },
+		OPTION: { NEW_LANGUAGE: 'Ang locale na gamiton.' },
 		RESPONSE: { SUCCESS: 'Ang locale para sa **%1** kay na usban og `%2`.' }
 	},
 	LOOP: {
