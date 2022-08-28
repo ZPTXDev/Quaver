@@ -30,7 +30,7 @@ export default {
 		return interaction.replyHandler.reply(
 			new EmbedBuilder()
 				.setDescription(await getGuildLocale(interaction.guildId, 'CMD.VOLUME.RESPONSE.SUCCESS', volume))
-				.setFooter(await getGuildLocale(interaction.guildId, 'MUSIC.PLAYER.FILTER_NOTE')),
+				.setFooter({ text: await getGuildLocale(interaction.guildId, 'MUSIC.PLAYER.FILTER_NOTE') }),
 		);
 	},
 };

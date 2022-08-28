@@ -60,7 +60,7 @@ export default {
 		await interaction.replyHandler.reply(
 			new EmbedBuilder()
 				.setDescription(await getGuildLocale(interaction.guildId, msg, ...extras))
-				.setFooter(started ? `${await getGuildLocale(interaction.guildId, 'MISC.POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null),
+				.setFooter({ text: started ? `${await getGuildLocale(interaction.guildId, 'MISC.POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null }),
 			{ type: 'success', components: [] },
 		);
 		if (!started) await player.queue.start();
