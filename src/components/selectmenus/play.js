@@ -9,7 +9,6 @@ export default {
 	/** @param {import('discord.js').SelectMenuInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
 		const { bot, io } = await import('#src/main.js');
-		if (interaction.customId.split('_')[1] !== interaction.user.id) return interaction.replyHandler.locale('DISCORD.INTERACTION.USER_MISMATCH', { type: 'error' });
 		const tracks = interaction.values;
 		let player = interaction.client.music.players.get(interaction.guildId);
 		if (!interaction.member?.voice.channelId) return interaction.replyHandler.locale(checks.IN_VOICE, { type: 'error' });
@@ -20,7 +19,7 @@ export default {
 		if (interaction.member?.voice.channel.type === ChannelType.GuildStageVoice && !permissions.has(PermissionsBitField.StageModerator)) return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE', { type: 'error' });
 		if (interaction.guild.members.me.isCommunicationDisabled()) return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT', { type: 'error' });
 
-		await interaction.deferUpdate();
+		await interaction.replyHandler.locale('MISC.LOADING', { components: [], force: 'update' });
 		const resolvedTracks = [];
 		for (const track of tracks) {
 			const results = await interaction.client.music.rest.loadTracks(track);

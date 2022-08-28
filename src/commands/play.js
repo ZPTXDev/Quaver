@@ -34,7 +34,7 @@ export default {
 		if (interaction.member.voice.channel.type === ChannelType.GuildStageVoice && !permissions.has(PermissionsBitField.StageModerator)) return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE', { type: 'error' });
 		if (interaction.guild.members.me.isCommunicationDisabled()) return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT', { type: 'error' });
 
-		await interaction.deferReply();
+		await interaction.replyHandler.locale('MISC.LOADING', { ephemeral: true });
 		const query = interaction.options.getString('query'), insert = interaction.options.getBoolean('insert');
 		let tracks = [], msg = '', extras = [];
 		if (interaction.client.music.spotify.isSpotifyUrl(query)) {
@@ -111,7 +111,7 @@ export default {
 			new EmbedBuilder()
 				.setDescription(await getGuildLocale(interaction.guildId, msg, ...extras))
 				.setFooter({ text: started ? `${await getGuildLocale(interaction.guildId, 'MISC.POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null }),
-			{ type: 'success' },
+			{ type: 'success', ephemeral: true },
 		);
 		if (!started) await player.queue.start();
 		if (features.web.enabled) {
