@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { defaultLocale, features, managers } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getGuildLocale, getLocale } from '#lib/util/util.js';
@@ -24,9 +24,13 @@ export default {
 		const { io } = await import('#src/main.js');
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const volume = interaction.options.getInteger('new_volume');
-		if (volume > 200 && !managers.includes(interaction.user.id)) return interaction.replyHandler.locale('CMD.VOLUME.RESPONSE.OUT_OF_RANGE', {}, 'error');
+		if (volume > 200 && !managers.includes(interaction.user.id)) return interaction.replyHandler.locale('CMD.VOLUME.RESPONSE.OUT_OF_RANGE', { type: 'error' });
 		await player.setVolume(volume);
 		if (features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('volumeUpdate', volume);
-		return interaction.replyHandler.locale('CMD.VOLUME.RESPONSE.SUCCESS', { footer: await getGuildLocale(interaction.guildId, 'MUSIC.PLAYER.FILTER_NOTE') }, 'neutral', volume);
+		return interaction.replyHandler.reply(
+			new EmbedBuilder()
+				.setDescription(await getGuildLocale(interaction.guildId, 'CMD.VOLUME.RESPONSE.SUCCESS', volume))
+				.setFooter(await getGuildLocale(interaction.guildId, 'MUSIC.PLAYER.FILTER_NOTE')),
+		);
 	},
 };

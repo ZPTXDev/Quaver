@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, PermissionsBitField, ChannelType } from 'discord.js';
+import { SlashCommandBuilder, PermissionsBitField, ChannelType, EmbedBuilder } from 'discord.js';
 import { SpotifyItemType } from '@lavaclient/spotify';
 import { defaultLocale, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
@@ -27,18 +27,18 @@ export default {
 	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
 		const { bot, io } = await import('#src/main.js');
-		if (![ChannelType.GuildText, ChannelType.GuildVoice].includes(interaction.channel.type)) return interaction.replyHandler.locale('DISCORD.CHANNEL_UNSUPPORTED', {}, 'error');
+		if (![ChannelType.GuildText, ChannelType.GuildVoice].includes(interaction.channel.type)) return interaction.replyHandler.locale('DISCORD.CHANNEL_UNSUPPORTED', { type: 'error' });
 		// check for connect, speak permission for channel
 		const permissions = interaction.member.voice.channel.permissionsFor(interaction.client.user.id);
-		if (!permissions.has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak]))) return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC', {}, 'error');
-		if (interaction.member.voice.channel.type === ChannelType.GuildStageVoice && !permissions.has(PermissionsBitField.StageModerator)) return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE', {}, 'error');
-		if (interaction.guild.members.me.isCommunicationDisabled()) return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT', {}, 'error');
+		if (!permissions.has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak]))) return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC', { type: 'error' });
+		if (interaction.member.voice.channel.type === ChannelType.GuildStageVoice && !permissions.has(PermissionsBitField.StageModerator)) return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE', { type: 'error' });
+		if (interaction.guild.members.me.isCommunicationDisabled()) return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT', { type: 'error' });
 
 		await interaction.deferReply();
 		const query = interaction.options.getString('query'), insert = interaction.options.getBoolean('insert');
 		let tracks = [], msg = '', extras = [];
 		if (interaction.client.music.spotify.isSpotifyUrl(query)) {
-			if (!features.spotify.enabled || !features.spotify.client_id || !features.spotify.client_secret) return interaction.replyHandler.locale('CMD.PLAY.RESPONSE.DISABLED.SPOTIFY', {}, 'error');
+			if (!features.spotify.enabled || !features.spotify.client_id || !features.spotify.client_secret) return interaction.replyHandler.locale('CMD.PLAY.RESPONSE.DISABLED.SPOTIFY', { type: 'error' });
 			const item = await interaction.client.music.spotify.load(query);
 			switch (item?.type) {
 				case SpotifyItemType.Track: {
@@ -56,7 +56,7 @@ export default {
 					extras = [tracks.length, item.name, query];
 					break;
 				default:
-					await interaction.replyHandler.locale('CMD.PLAY.RESPONSE.NO_RESULTS.SPOTIFY', {}, 'error');
+					await interaction.replyHandler.locale('CMD.PLAY.RESPONSE.NO_RESULTS.SPOTIFY', { type: 'error' });
 					return;
 			}
 		}
@@ -77,11 +77,11 @@ export default {
 					break;
 				}
 				case 'NO_MATCHES':
-					return interaction.replyHandler.locale('CMD.PLAY.RESPONSE.NO_RESULTS.DEFAULT', {}, 'error');
+					return interaction.replyHandler.locale('CMD.PLAY.RESPONSE.NO_RESULTS.DEFAULT', { type: 'error' });
 				case 'LOAD_FAILED':
-					return interaction.replyHandler.locale('CMD.PLAY.RESPONSE.LOAD_FAILED', {}, 'error');
+					return interaction.replyHandler.locale('CMD.PLAY.RESPONSE.LOAD_FAILED', { type: 'error' });
 				default:
-					return interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', {}, 'error');
+					return interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', { type: 'error' });
 			}
 		}
 
@@ -96,7 +96,7 @@ export default {
 			// Ensure that Quaver destroys the player if Quaver gets kicked or banned by the user while Quaver is queuing tracks
 			const timedOut = interaction.guild?.members.me.isCommunicationDisabled();
 			if (!interaction.member.voice.channelId || timedOut || !interaction.guild) {
-				if (interaction.guild) timedOut ? await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT', {}, 'error') : await interaction.replyHandler.locale('DISCORD.INTERACTION.CANCELED', {}, 'neutral', interaction.user.id);
+				if (interaction.guild) timedOut ? await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT', { type: 'error' }) : await interaction.replyHandler.locale('DISCORD.INTERACTION.CANCELED', { args: [interaction.user.id] });
 				return player.handler.disconnect();
 			}
 		}
@@ -107,7 +107,12 @@ export default {
 		player.queue.add(tracks, { requester: interaction.user.id, next: insert });
 
 		const started = player.playing || player.paused;
-		await interaction.replyHandler.locale(msg, { footer: started ? `${await getGuildLocale(interaction.guildId, 'MISC.POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null }, 'success', ...extras);
+		await interaction.replyHandler.reply(
+			new EmbedBuilder()
+				.setDescription(await getGuildLocale(interaction.guildId, msg, ...extras))
+				.setFooter({ text: started ? `${await getGuildLocale(interaction.guildId, 'MISC.POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null }),
+			{ type: 'success' },
+		);
 		if (!started) await player.queue.start();
 		if (features.web.enabled) {
 			io.to(`guild:${interaction.guildId}`).emit('queueUpdate', player.queue.tracks.map(track => {

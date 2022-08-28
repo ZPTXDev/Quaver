@@ -1,4 +1,4 @@
-import { PermissionsBitField, ChannelType } from 'discord.js';
+import { PermissionsBitField, ChannelType, EmbedBuilder } from 'discord.js';
 import { features } from '#settings';
 import { getGuildLocale } from '#lib/util/util.js';
 import { checks } from '#lib/util/constants.js';
@@ -9,16 +9,16 @@ export default {
 	/** @param {import('discord.js').SelectMenuInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
 		const { bot, io } = await import('#src/main.js');
-		if (interaction.customId.split('_')[1] !== interaction.user.id) return interaction.replyHandler.locale('DISCORD.INTERACTION.USER_MISMATCH', {}, 'error');
+		if (interaction.customId.split('_')[1] !== interaction.user.id) return interaction.replyHandler.locale('DISCORD.INTERACTION.USER_MISMATCH', { type: 'error' });
 		const tracks = interaction.values;
 		let player = interaction.client.music.players.get(interaction.guildId);
-		if (!interaction.member?.voice.channelId) return interaction.replyHandler.locale(checks.IN_VOICE, {}, 'error');
-		if (player && interaction.member?.voice.channelId !== player.channelId) return interaction.replyHandler.locale(checks.IN_SESSION_VOICE, {}, 'error');
+		if (!interaction.member?.voice.channelId) return interaction.replyHandler.locale(checks.IN_VOICE, { type: 'error' });
+		if (player && interaction.member?.voice.channelId !== player.channelId) return interaction.replyHandler.locale(checks.IN_SESSION_VOICE, { type: 'error' });
 		// check for connect, speak permission for channel
 		const permissions = interaction.member?.voice.channel.permissionsFor(interaction.client.user.id);
-		if (!permissions.has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak]))) return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC', {}, 'error');
-		if (interaction.member?.voice.channel.type === ChannelType.GuildStageVoice && !permissions.has(PermissionsBitField.StageModerator)) return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE', {}, 'error');
-		if (interaction.guild.members.me.isCommunicationDisabled()) return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT', {}, 'error');
+		if (!permissions.has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak]))) return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC', { type: 'error' });
+		if (interaction.member?.voice.channel.type === ChannelType.GuildStageVoice && !permissions.has(PermissionsBitField.StageModerator)) return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE', { type: 'error' });
+		if (interaction.guild.members.me.isCommunicationDisabled()) return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT', { type: 'error' });
 
 		await interaction.deferUpdate();
 		const resolvedTracks = [];
@@ -47,7 +47,7 @@ export default {
 			// Ensure that Quaver destroys the player if Quaver gets kicked or banned by the user while Quaver is queuing tracks
 			const timedOut = interaction.guild?.members.me.isCommunicationDisabled();
 			if (!interaction.member.voice.channelId || timedOut || !interaction.guild) {
-				if (interaction.guild) timedOut ? await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT', { components: [] }, 'error') : await interaction.replyHandler.locale('DISCORD.INTERACTION.CANCELED', { components: [] }, 'neutral', interaction.user.id);
+				if (interaction.guild) timedOut ? await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT', { type: 'error', components: [] }) : await interaction.replyHandler.locale('DISCORD.INTERACTION.CANCELED', { args: [interaction.user.id], components: [] });
 				return player.handler.disconnect();
 			}
 		}
@@ -57,7 +57,12 @@ export default {
 		player.queue.add(resolvedTracks, { requester: interaction.user.id });
 
 		const started = player.playing || player.paused;
-		await interaction.replyHandler.locale(msg, { footer: started ? `${await getGuildLocale(interaction.guildId, 'MISC.POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null, components: [] }, 'success', ...extras);
+		await interaction.replyHandler.reply(
+			new EmbedBuilder()
+				.setDescription(await getGuildLocale(interaction.guildId, msg, ...extras))
+				.setFooter(started ? `${await getGuildLocale(interaction.guildId, 'MISC.POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null),
+			{ type: 'success', components: [] },
+		);
 		if (!started) await player.queue.start();
 		if (features.web.enabled) {
 			io.to(`guild:${interaction.guildId}`).emit('queueUpdate', player.queue.tracks.map(track => {

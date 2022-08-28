@@ -17,7 +17,7 @@ export default {
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		// workaround: seems like current track doesn't get removed after the track, an issue with @lavaclient/queue
-		if (!player.queue.current || !player.playing && !player.paused) return interaction.replyHandler.locale('MUSIC.PLAYER.PLAYING.NOTHING', {}, 'error');
+		if (!player.queue.current || !player.playing && !player.paused) return interaction.replyHandler.locale('MUSIC.PLAYER.PLAYING.NOTHING', { type: 'error' });
 		const bar = getBar((player.position / player.queue.current.length) * 100);
 		let elapsed = msToTime(player.position);
 		if (isNaN(elapsed['s']) || elapsed['s'] < 0) elapsed = { d: 0, h: 0, m: 0, s: 0 };
