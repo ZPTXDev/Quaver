@@ -1,7 +1,7 @@
-import { SlashCommandBuilder } from 'discord.js';
-import { defaultLocale, features } from '#settings';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
+import { defaultLocale } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getLocale } from '#lib/util/util.js';
+import { getGuildLocale, getLocale } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -14,18 +14,28 @@ export default {
 	},
 	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
-		const { bot, io } = await import('#src/main.js');
 		const player = interaction.client.music.players.get(interaction.guildId);
 		if (!player.queue.current || !player.playing && !player.paused) return interaction.replyHandler.locale('MUSIC.PLAYER.PLAYING.NOTHING', { type: 'error' });
-		player.queue.clear();
-		await player.queue.skip();
-		await player.queue.start();
-		if (features.web.enabled) {
-			io.to(`guild:${interaction.guildId}`).emit('queueUpdate', player.queue.tracks.map(track => {
-				track.requesterTag = bot.users.cache.get(track.requester)?.tag;
-				return track;
-			}));
-		}
-		return interaction.replyHandler.locale('CMD.STOP.RESPONSE.SUCCESS', { type: 'success' });
+		return interaction.replyHandler.reply(
+			new EmbedBuilder()
+				.setDescription(await getGuildLocale(interaction.guildId, 'CMD.STOP.RESPONSE.CONFIRMATION'))
+				.setFooter({ text: await getGuildLocale(interaction.guildId, 'MISC.ACTION_IRREVERSIBLE') }),
+			{
+				type: 'warning',
+				components: [
+					new ActionRowBuilder()
+						.addComponents(
+							new ButtonBuilder()
+								.setCustomId('stop')
+								.setStyle(ButtonStyle.Danger)
+								.setLabel(await getGuildLocale(interaction.guildId, 'MISC.CONFIRM')),
+							new ButtonBuilder()
+								.setCustomId('cancel')
+								.setStyle(ButtonStyle.Secondary)
+								.setLabel(await getGuildLocale(interaction.guildId, 'MISC.CANCEL')),
+						),
+				],
+			},
+		);
 	},
 };

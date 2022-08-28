@@ -1,7 +1,7 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { defaultLocale } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getLocale } from '#lib/util/util.js';
+import { getGuildLocale, getLocale } from '#lib/util/util.js';
 import { data } from '#lib/util/common.js';
 
 export default {
@@ -17,7 +17,30 @@ export default {
 	async execute(interaction) {
 		if (await data.guild.get(interaction.guildId, 'settings.stay.enabled')) return interaction.replyHandler.locale('CMD.DISCONNECT.RESPONSE.FEATURE_247_ENABLED', { type: 'error' });
 		const player = interaction.client.music.players.get(interaction.guildId);
-		await player.handler.disconnect();
-		return interaction.replyHandler.locale('CMD.DISCONNECT.RESPONSE.SUCCESS', { type: 'success' });
+		if (player.queue.tracks.length === 0) {
+			await player.handler.disconnect();
+			return interaction.replyHandler.locale('CMD.DISCONNECT.RESPONSE.SUCCESS', { type: 'success' });
+		}
+		return interaction.replyHandler.reply(
+			new EmbedBuilder()
+				.setDescription(await getGuildLocale(interaction.guildId, 'CMD.DISCONNECT.RESPONSE.CONFIRMATION'))
+				.setFooter({ text: await getGuildLocale(interaction.guildId, 'MISC.ACTION_IRREVERSIBLE') }),
+			{
+				type: 'warning',
+				components: [
+					new ActionRowBuilder()
+						.addComponents(
+							new ButtonBuilder()
+								.setCustomId('disconnect')
+								.setStyle(ButtonStyle.Danger)
+								.setLabel(await getGuildLocale(interaction.guildId, 'MISC.CONFIRM')),
+							new ButtonBuilder()
+								.setCustomId('cancel')
+								.setStyle(ButtonStyle.Secondary)
+								.setLabel(await getGuildLocale(interaction.guildId, 'MISC.CANCEL')),
+						),
+				],
+			},
+		);
 	},
 };

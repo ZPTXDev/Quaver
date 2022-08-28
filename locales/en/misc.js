@@ -10,5 +10,7 @@ export default {
 	ADDED_BY: 'Added by <@%1>',
 	STAGE_TOPIC: 'Music by Quaver',
 	LIVE: 'LIVE',
-	STREAMING: 'Streaming'
+	STREAMING: 'Streaming',
+	ACTION_IRREVERSIBLE: 'This action is irreversible.',
+	CONFIRM: 'Confirm'
 };
