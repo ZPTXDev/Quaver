@@ -91,7 +91,7 @@ export default {
 			}
 		}
 		if (interaction.isSelectMenu()) {
-			/** @type {{name: string, execute(interaction: import('discord.js').SelectMenuInteraction): Promise<void)>}} */
+			/** @type {{name: string, execute(interaction: import('discord.js').SelectMenuInteraction): Promise<void>}} */
 			const selectmenu = interaction.client.selectmenus.get(interaction.customId.split('_')[0]);
 			if (!selectmenu) return;
 			logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing select menu ${interaction.customId}`, label: 'Quaver' });
