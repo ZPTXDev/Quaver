@@ -54,13 +54,13 @@ export default {
 			SUCCESS: 'Open-source music bot for small communities.\nSource code available [here](https://go.zptx.dev/Quaver), invite [here](%1).\nRunning version `%2`.'
 		}
 	},
-	LOCALE: {
-		DESCRIPTION: 'Change Quaver\'s locale in this server.',
+	LANGUAGE: {
+		DESCRIPTION: 'Change Quaver\'s language in this server.',
 		OPTION: {
-			NEW_LOCALE: 'The locale to use.'
+			NEW_LANGUAGE: 'The language to use.'
 		},
 		RESPONSE: {
-			SUCCESS: 'Locale for **%1** set to `%2`.'
+			SUCCESS: 'Language for **%1** set to `%2`.'
 		}
 	},
 	LOOP: {
