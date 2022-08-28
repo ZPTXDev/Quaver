@@ -7,12 +7,12 @@ import fs from 'fs';
 
 export default {
 	data: new SlashCommandBuilder()
-		.setName('locale')
-		.setDescription(getLocale(defaultLocale, 'CMD.LOCALE.DESCRIPTION'))
+		.setName('language')
+		.setDescription(getLocale(defaultLocale, 'CMD.LANGUAGE.DESCRIPTION'))
 		.addStringOption(option =>
 			option
-				.setName('new_locale')
-				.setDescription(getLocale(defaultLocale, 'CMD.LOCALE.OPTION.NEW_LOCALE'))
+				.setName('new_language')
+				.setDescription(getLocale(defaultLocale, 'CMD.LANGUAGE.OPTION.NEW_LOCALE'))
 				.setRequired(true)
 				.addChoices(...fs.readdirSync(getAbsoluteFileURL(import.meta.url, ['..', '..', 'locales'])).map(file => { return { name: file, value: file }; })))
 		.setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild),
@@ -23,7 +23,7 @@ export default {
 	},
 	/** @param {import('discord.js').ChatInputCommandInteraction & {client: import('discord.js').Client, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
-		const locale = interaction.options.getString('new_locale');
+		const locale = interaction.options.getString('new_language');
 		const localeCompletion = checkLocaleCompletion(locale);
 		if (localeCompletion === 'LOCALE_MISSING') return interaction.replyHandler.reply('That locale does not exist.', { type: 'error' });
 		await data.guild.set(interaction.guildId, 'settings.locale', locale);
@@ -35,7 +35,7 @@ export default {
 		return interaction.replyHandler.reply(
 			[
 				new EmbedBuilder()
-					.setDescription(await getGuildLocale(interaction.guildId, 'CMD.LOCALE.RESPONSE.SUCCESS', interaction.guild.name, locale)),
+					.setDescription(await getGuildLocale(interaction.guildId, 'CMD.LANGUAGE.RESPONSE.SUCCESS', interaction.guild.name, locale)),
 				...additionalEmbed,
 			],
 			{ type: 'success' },
