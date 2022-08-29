@@ -12,6 +12,7 @@ export default {
 	GENERIC_ERROR: 'Adunay usa ka error samtang nagproseso sa imong request.',
 	INTERACTION: {
 		USER_MISMATCH: 'Dili na interaksiyon nimo.',
-		CANCELED: 'Kaning interaksiyon kay gikansel ni <@%1>.'
+		CANCELED: 'Kaning interaksiyon kay gikansel ni <@%1>.',
+		EXPIRED: 'Kini nga interaksyon kay na-expire na.'
 	}
 };
