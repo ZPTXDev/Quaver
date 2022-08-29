@@ -1,7 +1,7 @@
 export default {
 	'247': {
-		DESCRIPTION: 'Panatilihin si Quaver sa iyong channel.',
-		OPTION: { ENABLED: 'Naka-enable man o hindi ang 24/7. Kung hindi natukoy, ito ay matoggle.' },
+		DESCRIPTION: 'Pinipigilan ng 24/7 na mode si Quaver mula sa pag-alis.',
+		OPTION: { ENABLED: 'Naka-enable man o hindi ang 24/7 na mode. Kung hindi natukoy, ito ay ma-toggle.' },
 		RESPONSE: {
 			ENABLED: 'Ang 24/7 ay **naka-enable**',
 			DISABLED: 'Ang 24/7 ay **naka-disable**',
@@ -11,16 +11,16 @@ export default {
 		MISC: { NOTE: 'Gagamitin pa rin ni Quaver ang parehong mga voice at text channel kung nag-restart ito.' }
 	},
 	BASSBOOST: {
-		DESCRIPTION: 'I-boost ang bass levels sa iyong musika.',
-		OPTION: { ENABLED: 'Naka-enable man o hindi ang bass boost. Kung hindi natukoy, ito ay matoggle.' },
+		DESCRIPTION: 'Pinapalakas ng bass boost na mode ang mga level ng bass.',
+		OPTION: { ENABLED: 'Naka-enable man o hindi ang bass boost na mode. Kung hindi natukoy, ito ay ma-toggle.' },
 		RESPONSE: {
 			ENABLED: 'Ang bass boost ay **naka-enable**',
 			DISABLED: 'Ang bass boost ay **naka-disable**'
 		}
 	},
 	BIND: {
-		DESCRIPTION: 'Baguhin ang text channel na ginamit ni Quaver para awtomatikong magpadala ng mga mensahe.',
-		OPTION: { NEW_CHANNEL: 'Ito ang text channel na maba-bind.' },
+		DESCRIPTION: 'Baguhin ang channel na ginagamit ni Quaver para awtomatikong magpadala ng mga mensahe.',
+		OPTION: { NEW_CHANNEL: 'Ang channel kung saan maba-bind.' },
 		RESPONSE: {
 			SUCCESS: 'Nakabind sa <#%1>',
 			PERMISSIONS_INSUFFICIENT: 'Wala akong sapat na (mga) permission sa <#%1>.'
@@ -30,14 +30,16 @@ export default {
 		DESCRIPTION: 'I-clear ang queue.',
 		RESPONSE: {
 			SUCCESS: 'Na-clear na ang queue.',
-			QUEUE_EMPTY: 'Walang mga track sa queue upang mai-clear.'
+			QUEUE_EMPTY: 'Walang mga track sa queue upang mai-clear.',
+			CONFIRMATION: 'Sigurado ka bang gusto mong i-clear ang queue?'
 		}
 	},
 	DISCONNECT: {
 		DESCRIPTION: 'Idiskonekta si Quaver.',
 		RESPONSE: {
 			SUCCESS: 'Umalis sa voice channel.',
-			FEATURE_247_ENABLED: 'Si Quaver ay hindi makaalis dahil ang 24/7 ay naka-enable.'
+			FEATURE_247_ENABLED: 'Si Quaver ay hindi makaalis dahil ang 24/7 ay naka-enable.',
+			CONFIRMATION: 'Sigurado ka bang gusto mong idiskonekta si Quaver? I-clear din nito ang queue.'
 		}
 	},
 	INFO: {
@@ -45,12 +47,15 @@ export default {
 		RESPONSE: { SUCCESS: 'Open-source na music bot para sa maliliit na mga komunidad.\nAng source code ay available [dito](https://go.zptx.dev/Quaver), invite [dito](%1).\nTumatakbo sa bersyong `%2`.' }
 	},
 	LANGUAGE: {
-		DESCRIPTION: 'Baguhin ang locale ni Quaver sa server na ito.',
-		OPTION: { NEW_LANGUAGE: 'Ang locale na gagamitin.' },
-		RESPONSE: { SUCCESS: 'Ang locale para sa **%1** ay itinakda sa `%2`.' }
+		DESCRIPTION: 'Baguhin ang wika ni Quaver sa server na ito.',
+		OPTION: { NEW_LANGUAGE: 'Ang wika na gagamitin.' },
+		RESPONSE: {
+			SUCCESS: 'Ang wika para sa **%1** ay itinakda sa `%2`.',
+			LANGUAGE_NOT_CHANGED: 'Ang wika para sa **%1** ay itinakda sa `%2`.'
+		}
 	},
 	LOOP: {
-		DESCRIPTION: 'I-loop ang queue.',
+		DESCRIPTION: 'Baguhin ang mode sa paglo-loop.',
 		OPTION: {
 			TYPE: {
 				DESCRIPTION: 'Ang looping mode.',
@@ -72,13 +77,13 @@ export default {
 		RESPONSE: {
 			SUCCESS: 'Nailipat ang **[%1](%2)** `%3 -> %4`',
 			QUEUE_INSUFFICIENT_TRACKS: 'Walang sapat na mga track sa queue upang magsagawa ng isang paglipat.',
-			OUT_OF_RANGE: 'Isa (o pareho) sa iyong mga argumento ay wala sa range.',
-			MOVING_IN_PLACE: 'Ang iyong mga argumento ay hindi maaaring magkapareho.'
+			OUT_OF_RANGE: 'Ang iyong input ay hindi wasto.',
+			MOVING_IN_PLACE: 'Hindi mo maaaring ilipat ang isang track sa parehong posisyon kung nasaan na ito.'
 		}
 	},
 	NIGHTCORE: {
 		DESCRIPTION: 'Pinapabilis ng nightcore mode ang iyong musika.',
-		OPTION: { ENABLED: 'Naka-enable man ang nightcore o hindi. Kung hindi natukoy, ito ay matoggle.' },
+		OPTION: { ENABLED: 'Naka-enable man ang nightcore na mode o hindi. Kung hindi natukoy, ito ay ma-toggle.' },
 		RESPONSE: {
 			ENABLED: 'Ang nightcore ay **naka-enable**',
 			DISABLED: 'Ang nightcore ay **naka-disable**'
@@ -92,14 +97,14 @@ export default {
 		}
 	},
 	PING: {
-		DESCRIPTION: 'Suriin ang latency at uptime ni Quaver.',
+		DESCRIPTION: 'Ipakita ang latency at uptime ni Quaver.',
 		RESPONSE: { SUCCESS: 'Pong!%1' },
 		MISC: { UPTIME: 'Uptime:' }
 	},
 	PLAY: {
-		DESCRIPTION: 'Magpatugtog ng isang track.',
+		DESCRIPTION: 'Magdagdag ng isang track sa queue.',
 		OPTION: {
-			QUERY: 'Ano ang hahanapin. Spotify, YouTube at higit pa ay supported. Naghahanap sa YouTube bilang default.',
+			QUERY: 'YouTube na search query o isang link mula sa Spotify o YouTube.',
 			INSERT: 'Magpe-play man o hindi sa susunod na track.'
 		},
 		RESPONSE: {
@@ -114,7 +119,14 @@ export default {
 	PLAYING: { DESCRIPTION: 'Ipakita kung ano ang kasalukuyang nagpe-play.' },
 	QUEUE: {
 		DESCRIPTION: 'Ipakita ang queue.',
-		RESPONSE: { QUEUE_EMPTY: 'Walang paparating.' }
+		RESPONSE: {
+			QUEUE_EMPTY: 'Walang paparating.',
+			OUT_OF_RANGE: 'Ang iyong input ay hindi wasto.'
+		},
+		MISC: {
+			PAGE: 'Pahina',
+			MODAL_TITLE: 'Pumunta sa pahinang'
+		}
 	},
 	REMOVE: {
 		DESCRIPTION: 'Mag-alis ng track mula sa queue.',
@@ -133,7 +145,7 @@ export default {
 	},
 	SEARCH: {
 		DESCRIPTION: 'Maghanap sa YouTube ng isang track.',
-		OPTION: { QUERY: 'Ano ang hahanapin.' },
+		OPTION: { QUERY: 'YouTube na search query.' },
 		RESPONSE: { USE_PLAY_CMD: 'Subukang gamitin ang play command sa halip.' },
 		MISC: { PICK: 'Pumili ng (mga) track' }
 	},
@@ -173,7 +185,10 @@ export default {
 	},
 	STOP: {
 		DESCRIPTION: 'Ipahinto ang kasalukuyang track at i-clear ang queue.',
-		RESPONSE: { SUCCESS: 'Itinigil ang kasalukuyang track at na clear ang queue.' }
+		RESPONSE: {
+			SUCCESS: 'Itinigil ang kasalukuyang track at na clear ang queue.',
+			CONFIRMATION: 'Sigurado ka bang gusto mong ihinto ang kasalukuyang track at i-clear ang queue?'
+		}
 	},
 	VOLUME: {
 		DESCRIPTION: 'I-adjust ang volume ni Quaver.',

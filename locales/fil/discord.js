@@ -12,6 +12,7 @@ export default {
 	GENERIC_ERROR: 'Nagkaroon ng error habang pinoproseso ang iyong request.',
 	INTERACTION: {
 		USER_MISMATCH: 'Hindi iyon ang iyong interaksyon.',
-		CANCELED: 'Ang interaksyon na ito ay kinansela ni <@%1>.'
+		CANCELED: 'Ang interaksyon na ito ay kinansela ni <@%1>.',
+		EXPIRED: 'Ang interaksyon na ito ay nag-expire na.'
 	}
 };
