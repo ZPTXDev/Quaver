@@ -96,15 +96,13 @@ if (io) {
 }
 if (httpServer) httpServer.listen(features.web.port);
 
-if (features.spotify.enabled) {
-	load({
-		client: {
-			id: features.spotify.client_id,
-			secret: features.spotify.client_secret,
-		},
-		autoResolveYoutubeTracks: false,
-	});
-}
+load({
+	client: {
+		id: features.spotify.client_id,
+		secret: features.spotify.client_secret,
+	},
+	autoResolveYoutubeTracks: false,
+});
 
 /**
  * Handles database connection errors from Keyv.
