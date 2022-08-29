@@ -73,7 +73,7 @@ export default {
 					const [track] = results.tracks;
 					tracks = [track];
 					msg = insert ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.INSERTED' : 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
-					extras = [track.info.title, track.info.uri];
+					extras = [track.info.title.length >= 50 ? `${track.info.title.substring(0, 47)}...` : track.info.title, track.info.uri];
 					break;
 				}
 				case 'NO_MATCHES':

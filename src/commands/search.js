@@ -39,7 +39,7 @@ export default {
 					tracks.map((track, index) => {
 						const duration = msToTime(track.info.length);
 						const durationString = track.info.isStream ? '∞' : msToTimeString(duration, true);
-						return `\`${(index + 1).toString().padStart(tracks.length.toString().length, ' ')}.\` **[${track.info.title}](${track.info.uri})** \`[${durationString}]\``;
+						return `\`${(index + 1).toString().padStart(tracks.length.toString().length, ' ')}.\` **[${track.info.title.length >= 50 ? `${track.info.title.substring(0, 47)}...` : track.info.title}](${track.info.uri})** \`[${durationString}]\``;
 					}).join('\n'),
 				),
 			{

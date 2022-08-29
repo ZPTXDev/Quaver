@@ -30,7 +30,7 @@ export default {
 		let msg, extras = [];
 		if (resolvedTracks.length === 1) {
 			msg = 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
-			extras = [resolvedTracks[0].info.title, resolvedTracks[0].info.uri];
+			extras = [resolvedTracks[0].info.title.length >= 50 ? `${resolvedTracks[0].info.title.substring(0, 47)}...` : resolvedTracks[0].info.title, resolvedTracks[0].info.uri];
 		}
 		else {
 			msg = 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';

@@ -34,6 +34,6 @@ export default {
 				return t;
 			}));
 		}
-		return interaction.replyHandler.locale('CMD.REMOVE.RESPONSE.SUCCESS', { args: [track.title, track.uri], type: 'success', ephemeral: true });
+		return interaction.replyHandler.locale('CMD.REMOVE.RESPONSE.SUCCESS', { args: [track.title.length >= 50 ? `${track.title.substring(0, 47)}...` : track.titletitle, track.uri], type: 'success', ephemeral: true });
 	},
 };
