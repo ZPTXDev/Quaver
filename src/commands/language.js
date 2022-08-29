@@ -25,6 +25,7 @@ export default {
 		const locale = interaction.options.getString('new_language');
 		const localeCompletion = checkLocaleCompletion(locale);
 		if (localeCompletion === 'LOCALE_MISSING') return interaction.replyHandler.reply('That language does not exist.', { type: 'error' });
+		if (await data.guild.get(interaction.guild.id, 'settings.locale') === locale) return interaction.replyHandler.locale('CMD.LANGUAGE.RESPONSE.LANGUAGE_NOT_CHANGED', { args: [interaction.guild.name, `${languageName[locale] ?? 'Unknown'} (${locale})`], type: 'error' });
 		await data.guild.set(interaction.guildId, 'settings.locale', locale);
 		const additionalEmbed = localeCompletion.completion !== 100 ? [
 			new EmbedBuilder()

@@ -62,7 +62,8 @@ export default {
 			NEW_LANGUAGE: 'The language to use.'
 		},
 		RESPONSE: {
-			SUCCESS: 'Language for **%1** set to `%2`.'
+			SUCCESS: 'Language for **%1** set to `%2`.',
+			LANGUAGE_NOT_CHANGED: 'Language for **%1** is already `%2`.',
 		}
 	},
 	LOOP: {
