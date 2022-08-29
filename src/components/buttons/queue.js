@@ -34,7 +34,7 @@ export default {
 			.setDescription(pages[page - 1].map((track, index) => {
 				const duration = msToTime(track.length);
 				const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
-				return `\`${(firstIndex + index).toString().padStart(largestIndexSize, ' ')}.\` **[${track.title.length >= 50 ? `${track.title.substring(0, 47)}...` : track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
+				return `\`${(firstIndex + index).toString().padStart(largestIndexSize, ' ')}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 			}).join('\n'))
 			.setFooter({ text: await getGuildLocale(interaction.guildId, 'MISC.PAGE', page, pages.length) });
 		original.components[0] = ActionRowBuilder.from(original.components[0]);
