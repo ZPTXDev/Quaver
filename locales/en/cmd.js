@@ -175,10 +175,13 @@ export default {
 			QUERY: 'YouTube search query.'
 		},
 		RESPONSE: {
-			USE_PLAY_CMD: 'Try using the `play` command instead.'
+			USE_PLAY_CMD: 'Try using the `play` command instead.',
+			OUT_OF_RANGE: 'Your input was invalid.'
 		},
 		MISC: {
-			PICK: 'Pick track(s)'
+			PICK: 'Pick track(s)',
+			PAGE: 'Page',
+			MODAL_TITLE: 'Go to page'
 		}
 	},
 	SEEK: {
