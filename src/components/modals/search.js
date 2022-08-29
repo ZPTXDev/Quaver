@@ -1,12 +1,29 @@
 import { ButtonBuilder, ButtonStyle, EmbedBuilder, ActionRowBuilder, SelectMenuBuilder } from 'discord.js';
 import { msToTime, msToTimeString, getGuildLocale } from '#lib/util/util.js';
+import { searchPage } from '#lib/util/common.js';
 
 export default {
 	name: 'search',
 	/** @param {import('discord.js').ModalSubmitInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
 		const page = parseInt(interaction.fields.getTextInputValue('search_goto_input'));
-		const pages = interaction.client.music.pages;
+		const pages = searchPage[interaction.message.id];
+		if (!pages) return interaction.replyHandler.locale('DISCORD.INTERACTION.EXPIRED', { ephemeral: true });
+		if (pages.timeout) {
+			clearTimeout(pages.timeout);
+			pages.timeout = setTimeout(async message => {
+				message.components.map(actionRow => {
+					for (const component of actionRow.components) {
+						if ([1, 2, 3].includes(component.data.type)) {
+							component.data.disabled = true;
+						}
+					}
+				});
+				clearTimeout(pages.timeout);
+				delete searchPage[interaction.message.id];
+				await interaction.replyHandler.reply(message.embeds, { components: message.components });
+			}, 120000, interaction.message);
+		}
 		if (isNaN(page)) return interaction.replyHandler.locale('CMD.SEARCH.RESPONSE.OUT_OF_RANGE', { type: 'error' });
 		if (page < 1 || page > pages.length) return interaction.replyHandler.locale('CMD.SEARCH.RESPONSE.OUT_OF_RANGE', { type: 'error' });
 		const firstIndex = 10 * (page - 1) + 1;

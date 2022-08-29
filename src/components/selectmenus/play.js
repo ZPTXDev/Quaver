@@ -3,11 +3,18 @@ import { features } from '#settings';
 import { getGuildLocale } from '#lib/util/util.js';
 import { checks } from '#lib/util/constants.js';
 import PlayerHandler from '#lib/PlayerHandler.js';
+import { searchPage } from '#lib/util/common.js';
 
 export default {
 	name: 'play',
 	/** @param {import('discord.js').SelectMenuInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
+		const pages = searchPage[interaction.message.id];
+		if (!pages) return interaction.replyHandler.locale('DISCORD.INTERACTION.EXPIRED', { ephemeral: true });
+		if (pages.timeout) {
+			clearTimeout(pages.timeout);
+			delete searchPage[interaction.message.id];
+		}
 		const { bot, io } = await import('#src/main.js');
 		const tracks = interaction.values;
 		let player = interaction.client.music.players.get(interaction.guildId);

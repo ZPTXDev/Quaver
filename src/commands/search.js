@@ -2,6 +2,7 @@ import { SlashCommandBuilder, ActionRowBuilder, SelectMenuBuilder, ChannelType, 
 import { defaultLocale } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getGuildLocale, getLocale, msToTime, msToTimeString, paginate } from '#lib/util/util.js';
+import { searchPage } from '#lib/util/common.js';
 
 // credit: https://github.com/lavaclient/djs-v13-example/blob/main/src/commands/Play.ts
 
@@ -33,8 +34,7 @@ export default {
 		if (tracks.length <= 1) return interaction.replyHandler.locale('CMD.SEARCH.RESPONSE.USE_PLAY_CMD', { type: 'error' });
 
 		const pages = paginate(tracks, 10);
-		interaction.client.music.pages = pages;
-		return interaction.replyHandler.reply(
+		const msg = await interaction.replyHandler.reply(
 			new EmbedBuilder()
 				.setDescription(
 					pages[0].map((track, index) => {
@@ -79,5 +79,18 @@ export default {
 				],
 			},
 		);
+		searchPage[msg.id] = pages;
+		searchPage[msg.id].timeout = setTimeout(async message => {
+			message.components.map(actionRow => {
+				for (const component of actionRow.components) {
+					if ([1, 2, 3].includes(component.data.type)) {
+						component.data.disabled = true;
+					}
+				}
+			});
+			clearTimeout(searchPage[msg.id].timeout);
+			delete searchPage[msg.id];
+			await interaction.replyHandler.reply(message.embeds, { components: message.components });
+		}, 120000, msg);
 	},
 };

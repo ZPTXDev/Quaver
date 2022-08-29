@@ -1,12 +1,29 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, ModalBuilder, SelectMenuBuilder, TextInputBuilder, TextInputStyle } from 'discord.js';
 import { getGuildLocale, msToTime, msToTimeString } from '#lib/util/util.js';
+import { searchPage } from '#lib/util/common.js';
 
 export default {
 	name: 'search',
 	/** @param {import('discord.js').ButtonInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
 		const page = parseInt(interaction.customId.split('_')[1]);
-		const pages = interaction.client.music.pages;
+		const pages = searchPage[interaction.message.id];
+		if (!pages) return interaction.replyHandler.locale('DISCORD.INTERACTION.EXPIRED', { ephemeral: true });
+		if (pages.timeout) {
+			clearTimeout(pages.timeout);
+			pages.timeout = setTimeout(async message => {
+				message.components.map(actionRow => {
+					for (const component of actionRow.components) {
+						if ([1, 2, 3].includes(component.data.type)) {
+							component.data.disabled = true;
+						}
+					}
+				});
+				clearTimeout(pages.timeout);
+				delete searchPage[interaction.message.id];
+				await interaction.replyHandler.reply(message.embeds, { components: message.components });
+			}, 120000, interaction.message);
+		}
 		const gotoString = interaction.customId.split('_')[1];
 		if (gotoString === 'goto' && pages.length !== 0) {
 			return interaction.showModal(
