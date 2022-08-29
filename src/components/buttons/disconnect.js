@@ -1,3 +1,4 @@
+import { confirmationTimeout } from '#lib/util/common.js';
 import { checks } from '#lib/util/constants.js';
 
 export default {
@@ -8,6 +9,8 @@ export default {
 		if (!player) return interaction.replyHandler.locale(checks.ACTIVE_SESSION, { type: 'error' });
 		if (!interaction.member?.voice.channelId) return interaction.replyHandler.locale(checks.IN_VOICE, { type: 'error' });
 		if (player && interaction.member?.voice.channelId !== player.channelId) return interaction.replyHandler.locale(checks.IN_SESSION_VOICE, { type: 'error' });
+		clearTimeout(confirmationTimeout[interaction.message.id]);
+		delete confirmationTimeout[interaction.message.id];
 		await player.handler.disconnect();
 		return interaction.replyHandler.locale('CMD.DISCONNECT.RESPONSE.SUCCESS', { type: 'success', components: [], force: 'update' });
 	},

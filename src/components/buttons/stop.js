@@ -1,3 +1,4 @@
+import { confirmationTimeout } from '#lib/util/common.js';
 import { checks } from '#lib/util/constants.js';
 import { features } from '#settings';
 
@@ -10,6 +11,8 @@ export default {
 		if (!player) return interaction.replyHandler.locale(checks.ACTIVE_SESSION, { type: 'error' });
 		if (!interaction.member?.voice.channelId) return interaction.replyHandler.locale(checks.IN_VOICE, { type: 'error' });
 		if (player && interaction.member?.voice.channelId !== player.channelId) return interaction.replyHandler.locale(checks.IN_SESSION_VOICE, { type: 'error' });
+		clearTimeout(confirmationTimeout[interaction.message.id]);
+		delete confirmationTimeout[interaction.message.id];
 		if (!player.queue.current || !player.playing && !player.paused) return interaction.replyHandler.locale('MUSIC.PLAYER.PLAYING.NOTHING', { type: 'error', components: [], force: 'update' });
 		player.queue.clear();
 		await player.queue.skip();

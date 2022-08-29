@@ -1,7 +1,8 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { defaultLocale } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getGuildLocale, getLocale } from '#lib/util/util.js';
+import { getGuildLocale, getLocale, messageDataBuilder } from '#lib/util/util.js';
+import { confirmationTimeout } from '#lib/util/common.js';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -16,7 +17,7 @@ export default {
 	async execute(interaction) {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		if (!player.queue.current || !player.playing && !player.paused) return interaction.replyHandler.locale('MUSIC.PLAYER.PLAYING.NOTHING', { type: 'error' });
-		return interaction.replyHandler.reply(
+		const msg = await interaction.replyHandler.reply(
 			new EmbedBuilder()
 				.setDescription(await getGuildLocale(interaction.guildId, 'CMD.STOP.RESPONSE.CONFIRMATION'))
 				.setFooter({ text: await getGuildLocale(interaction.guildId, 'MISC.ACTION_IRREVERSIBLE') }),
@@ -35,7 +36,17 @@ export default {
 								.setLabel(await getGuildLocale(interaction.guildId, 'MISC.CANCEL')),
 						),
 				],
+				fetchReply: true,
 			},
 		);
+		confirmationTimeout[msg.id] = setTimeout(async message => {
+			await message.edit(
+				messageDataBuilder(
+					new EmbedBuilder()
+						.setDescription(await getGuildLocale(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
+					{ components: [] },
+				),
+			);
+		}, 5000, msg);
 	},
 };

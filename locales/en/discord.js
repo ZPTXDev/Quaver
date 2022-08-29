@@ -12,6 +12,7 @@ export default {
 	GENERIC_ERROR: 'There was an error while processing your request.',
 	INTERACTION: {
 		USER_MISMATCH: 'That is not your interaction.',
-		CANCELED: 'This interaction was canceled by <@%1>.'
+		CANCELED: 'This interaction was canceled by <@%1>.',
+		EXPIRED: 'This interaction has expired.'
 	}
 };

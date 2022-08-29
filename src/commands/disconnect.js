@@ -1,8 +1,8 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { defaultLocale } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getGuildLocale, getLocale } from '#lib/util/util.js';
-import { data } from '#lib/util/common.js';
+import { getGuildLocale, getLocale, messageDataBuilder } from '#lib/util/util.js';
+import { confirmationTimeout, data } from '#lib/util/common.js';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -21,7 +21,7 @@ export default {
 			await player.handler.disconnect();
 			return interaction.replyHandler.locale('CMD.DISCONNECT.RESPONSE.SUCCESS', { type: 'success' });
 		}
-		return interaction.replyHandler.reply(
+		const msg = await interaction.replyHandler.reply(
 			new EmbedBuilder()
 				.setDescription(await getGuildLocale(interaction.guildId, 'CMD.DISCONNECT.RESPONSE.CONFIRMATION'))
 				.setFooter({ text: await getGuildLocale(interaction.guildId, 'MISC.ACTION_IRREVERSIBLE') }),
@@ -40,7 +40,17 @@ export default {
 								.setLabel(await getGuildLocale(interaction.guildId, 'MISC.CANCEL')),
 						),
 				],
+				fetchReply: true,
 			},
 		);
+		confirmationTimeout[msg.id] = setTimeout(async message => {
+			await message.edit(
+				messageDataBuilder(
+					new EmbedBuilder()
+						.setDescription(await getGuildLocale(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
+					{ components: [] },
+				),
+			);
+		}, 5000, msg);
 	},
 };
