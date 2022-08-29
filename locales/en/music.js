@@ -23,6 +23,7 @@ export default {
 	PLAYER: {
 		FILTER_NOTE: 'This may take a few seconds to apply',
 		TRACK_SKIPPED_ERROR: 'Skipped **[%1](%2)** as an error occurred: `%3`',
+		QUEUE_CLEARED_ERROR: 'Cleared queue as an error occurred multiple times consecutively.',
 		PLAYING: {
 			NOTHING: 'There is nothing playing right now.',
 			NOW: 'Now playing [**%1**](%2) `[%3]`'
