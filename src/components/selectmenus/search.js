@@ -3,11 +3,18 @@ import { features } from '#settings';
 import { getGuildLocale } from '#lib/util/util.js';
 import { checks } from '#lib/util/constants.js';
 import PlayerHandler from '#lib/PlayerHandler.js';
+import { searchState } from '#lib/util/common.js';
 
 export default {
-	name: 'play',
+	name: 'search',
 	/** @param {import('discord.js').SelectMenuInteraction & {client: import('discord.js').Client & {music: import('lavaclient').Node}, replyHandler: import('#lib/ReplyHandler.js').default}} interaction */
 	async execute(interaction) {
+		if (interaction.message.interaction.user.id !== interaction.user.id) return interaction.replyHandler.locale('DISCORD.INTERACTION.USER_MISMATCH', { type: 'error' });
+		const state = searchState[interaction.message.id];
+		if (state) {
+			clearTimeout(state.timeout);
+			delete searchState[interaction.message.id];
+		}
 		const { bot, io } = await import('#src/main.js');
 		const tracks = interaction.values;
 		let player = interaction.client.music.players.get(interaction.guildId);
