@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, PermissionsBitField, ChannelType, EmbedBuilder } from 'discord.js';
+import { SlashCommandBuilder, PermissionsBitField, ChannelType, EmbedBuilder, escapeMarkdown } from 'discord.js';
 import { SpotifyItemType } from '@lavaclient/spotify';
 import { defaultLocale, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
@@ -45,7 +45,7 @@ export default {
 					const track = await item.resolveYoutubeTrack();
 					tracks = [track];
 					msg = insert ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.INSERTED' : 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
-					extras = [item.name, query];
+					extras = [escapeMarkdown(item.name), query];
 					break;
 				}
 				case SpotifyItemType.Album:
@@ -53,7 +53,7 @@ export default {
 				case SpotifyItemType.Artist:
 					tracks = await item.resolveYoutubeTracks();
 					msg = insert ? 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.INSERTED' : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
-					extras = [tracks.length, item.name, query];
+					extras = [tracks.length, escapeMarkdown(item.name), query];
 					break;
 				default:
 					await interaction.replyHandler.locale('CMD.PLAY.RESPONSE.NO_RESULTS.SPOTIFY', { type: 'error' });
@@ -66,14 +66,14 @@ export default {
 				case 'PLAYLIST_LOADED':
 					tracks = results.tracks;
 					msg = insert ? 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.INSERTED' : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
-					extras = [tracks.length, results.playlistInfo.name, query];
+					extras = [tracks.length, escapeMarkdown(results.playlistInfo.name), query];
 					break;
 				case 'TRACK_LOADED':
 				case 'SEARCH_RESULT': {
 					const [track] = results.tracks;
 					tracks = [track];
 					msg = insert ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.INSERTED' : 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
-					extras = [track.info.title, track.info.uri];
+					extras = [escapeMarkdown(track.info.title), track.info.uri];
 					break;
 				}
 				case 'NO_MATCHES':

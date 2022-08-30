@@ -1,4 +1,4 @@
-import { ButtonBuilder, ButtonStyle, EmbedBuilder, ActionRowBuilder } from 'discord.js';
+import { ButtonBuilder, ButtonStyle, EmbedBuilder, ActionRowBuilder, escapeMarkdown } from 'discord.js';
 import { paginate, msToTime, msToTimeString, getGuildLocale } from '#lib/util/util.js';
 
 export default {
@@ -25,7 +25,7 @@ export default {
 			.setDescription(pages[page - 1].map((track, index) => {
 				const duration = msToTime(track.length);
 				const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
-				return `\`${(firstIndex + index).toString().padStart(largestIndexSize, ' ')}.\` **[${track.title}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
+				return `\`${(firstIndex + index).toString().padStart(largestIndexSize, ' ')}.\` **[${escapeMarkdown(track.title)}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 			}).join('\n'))
 			.setFooter({ text: await getGuildLocale(interaction.guildId, 'MISC.PAGE', page, pages.length) });
 		original.components[0] = ActionRowBuilder.from(original.components[0]);

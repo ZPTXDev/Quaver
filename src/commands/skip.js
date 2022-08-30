@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
 import { defaultLocale } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getGuildLocale, getLocale } from '#lib/util/util.js';
@@ -19,7 +19,7 @@ export default {
 		if (player.queue.current.requester === interaction.user.id) {
 			const track = await player.queue.skip();
 			await player.queue.start();
-			return interaction.replyHandler.locale('CMD.SKIP.RESPONSE.SUCCESS.DEFAULT', { args: [track.title, track.uri], type: 'success' });
+			return interaction.replyHandler.locale('CMD.SKIP.RESPONSE.SUCCESS.DEFAULT', { args: [escapeMarkdown(track.title), track.uri], type: 'success' });
 		}
 		const skip = player.skip ?? { required: Math.ceil(interaction.member.voice.channel.members.filter(m => !m.user.bot).size / 2), users: [] };
 		if (skip.users.includes(interaction.user.id)) return interaction.replyHandler.locale('CMD.SKIP.RESPONSE.VOTED.STATE_UNCHANGED', { type: 'error' });
@@ -27,10 +27,10 @@ export default {
 		if (skip.users.length >= skip.required) {
 			const track = await player.queue.skip();
 			await player.queue.start();
-			await interaction.replyHandler.reply(`${await getGuildLocale(interaction.guildId, 'CMD.SKIP.RESPONSE.SUCCESS.VOTED', track.title, track.uri)}\n${await getGuildLocale(interaction.guildId, 'MISC.ADDED_BY', track.requester)}`);
+			await interaction.replyHandler.reply(`${await getGuildLocale(interaction.guildId, 'CMD.SKIP.RESPONSE.SUCCESS.VOTED', escapeMarkdown(track.title), track.uri)}\n${await getGuildLocale(interaction.guildId, 'MISC.ADDED_BY', track.requester)}`);
 			return player.queue.next();
 		}
 		player.skip = skip;
-		return interaction.replyHandler.locale('CMD.SKIP.RESPONSE.VOTED.SUCCESS', { args: [player.queue.current.title, player.queue.current.uri, skip.users.length, skip.required], type: 'success' });
+		return interaction.replyHandler.locale('CMD.SKIP.RESPONSE.VOTED.SUCCESS', { args: [escapeMarkdown(player.queue.current.title), player.queue.current.uri, skip.users.length, skip.required], type: 'success' });
 	},
 };

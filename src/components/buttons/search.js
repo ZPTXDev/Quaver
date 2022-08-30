@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, EmbedBuilder, escapeMarkdown, SelectMenuBuilder } from 'discord.js';
 import { getGuildLocale, messageDataBuilder, msToTime, msToTimeString } from '#lib/util/util.js';
 import { searchState } from '#lib/util/common.js';
 
@@ -31,7 +31,7 @@ export default {
 			.setDescription(pages[page - 1].map((track, index) => {
 				const duration = msToTime(track.info.length);
 				const durationString = track.info.isStream ? '∞' : msToTimeString(duration, true);
-				return `\`${(firstIndex + index).toString().padStart(largestIndexSize, ' ')}.\` **[${track.info.title}](${track.info.uri})** \`[${durationString}]\``;
+				return `\`${(firstIndex + index).toString().padStart(largestIndexSize, ' ')}.\` **[${escapeMarkdown(track.info.title)}](${track.info.uri})** \`[${durationString}]\``;
 			}).join('\n'))
 			.setFooter({ text: await getGuildLocale(interaction.guildId, 'MISC.PAGE', page, pages.length) });
 		original.components[0] = ActionRowBuilder.from(original.components[0]);

@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, ActionRowBuilder, SelectMenuBuilder, ChannelType, EmbedBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
+import { SlashCommandBuilder, ActionRowBuilder, SelectMenuBuilder, ChannelType, EmbedBuilder, ButtonBuilder, ButtonStyle, escapeMarkdown } from 'discord.js';
 import { defaultLocale } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getGuildLocale, getLocale, messageDataBuilder, msToTime, msToTimeString, paginate } from '#lib/util/util.js';
@@ -40,7 +40,7 @@ export default {
 					pages[0].map((track, index) => {
 						const duration = msToTime(track.info.length);
 						const durationString = track.info.isStream ? '∞' : msToTimeString(duration, true);
-						return `\`${(index + 1).toString().padStart(tracks.length.toString().length, ' ')}.\` **[${track.info.title}](${track.info.uri})** \`[${durationString}]\``;
+						return `\`${(index + 1).toString().padStart(tracks.length.toString().length, ' ')}.\` **[${escapeMarkdown(track.info.title)}](${track.info.uri})** \`[${durationString}]\``;
 					}).join('\n'),
 				)
 				.setFooter({ text: await getGuildLocale(interaction.guildId, 'MISC.PAGE', '1', pages.length) }),

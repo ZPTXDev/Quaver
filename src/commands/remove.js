@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
 import { defaultLocale, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getLocale } from '#lib/util/util.js';
@@ -34,6 +34,6 @@ export default {
 				return t;
 			}));
 		}
-		return interaction.replyHandler.locale('CMD.REMOVE.RESPONSE.SUCCESS', { args: [track.title, track.uri], type: 'success' });
+		return interaction.replyHandler.locale('CMD.REMOVE.RESPONSE.SUCCESS', { args: [escapeMarkdown(track.title), track.uri], type: 'success' });
 	},
 };

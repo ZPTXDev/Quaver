@@ -1,4 +1,5 @@
 import { logger, data } from '#lib/util/common.js';
+import { escapeMarkdown } from 'discord.js';
 
 export default {
 	name: 'trackEnd',
@@ -13,7 +14,7 @@ export default {
 		delete queue.player.skip;
 		if (reason === 'LOAD_FAILED') {
 			logger.warn({ message: `[G ${queue.player.guildId}] Track skipped with reason: ${reason}`, label: 'Quaver' });
-			await queue.player.handler.locale('MUSIC.PLAYER.TRACK_SKIPPED_ERROR', { args: [track.title, track.uri, reason], type: 'warning' });
+			await queue.player.handler.locale('MUSIC.PLAYER.TRACK_SKIPPED_ERROR', { args: [escapeMarkdown(track.title), track.uri, reason], type: 'warning' });
 			if (!queue.player.failed) queue.player.failed = 0;
 			queue.player.failed++;
 			if (queue.player.failed >= 3) {

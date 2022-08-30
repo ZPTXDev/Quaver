@@ -1,4 +1,4 @@
-import { PermissionsBitField, ChannelType, EmbedBuilder } from 'discord.js';
+import { PermissionsBitField, ChannelType, EmbedBuilder, escapeMarkdown } from 'discord.js';
 import { features } from '#settings';
 import { getGuildLocale } from '#lib/util/util.js';
 import { checks } from '#lib/util/constants.js';
@@ -35,7 +35,7 @@ export default {
 		let msg, extras = [];
 		if (resolvedTracks.length === 1) {
 			msg = 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
-			extras = [resolvedTracks[0].info.title, resolvedTracks[0].info.uri];
+			extras = [escapeMarkdown(resolvedTracks[0].info.title), resolvedTracks[0].info.uri];
 		}
 		else {
 			msg = 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';

@@ -1,6 +1,7 @@
 import { features } from '#settings';
 import { logger } from '#lib/util/common.js';
 import { getGuildLocale, msToTime, msToTimeString } from '#lib/util/util.js';
+import { escapeMarkdown } from 'discord.js';
 
 export default {
 	name: 'trackStart',
@@ -28,6 +29,6 @@ export default {
 				return t;
 			}));
 		}
-		return queue.player.handler.send(`${await getGuildLocale(queue.player.guildId, 'MUSIC.PLAYER.PLAYING.NOW', track.title, track.uri, durationString)}\n${await getGuildLocale(queue.player.guildId, 'MISC.ADDED_BY', track.requester)}`);
+		return queue.player.handler.send(`${await getGuildLocale(queue.player.guildId, 'MUSIC.PLAYER.PLAYING.NOW', escapeMarkdown(track.title), track.uri, durationString)}\n${await getGuildLocale(queue.player.guildId, 'MISC.ADDED_BY', track.requester)}`);
 	},
 };
