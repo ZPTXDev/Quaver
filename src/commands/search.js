@@ -56,8 +56,8 @@ export default {
 									if (label.length >= 100) label = `${label.substring(0, 97)}...`;
 									return { label: label, description: track.info.author, value: track.info.identifier };
 								}))
-								.setMinValues(1)
-								.setMaxValues(Math.min(pages[0].length, 10)),
+								.setMinValues(0)
+								.setMaxValues(pages[0].length),
 						),
 					new ActionRowBuilder()
 						.addComponents(
@@ -71,6 +71,11 @@ export default {
 								.setEmoji('➡️')
 								.setDisabled(pages.length === 1)
 								.setStyle(ButtonStyle.Primary),
+							new ButtonBuilder()
+								.setCustomId('search_add')
+								.setStyle(ButtonStyle.Success)
+								.setDisabled(true)
+								.setLabel(await getGuildLocale(interaction.guildId, 'MISC.ADD')),
 							new ButtonBuilder()
 								.setCustomId('cancel')
 								.setStyle(ButtonStyle.Secondary)
@@ -92,5 +97,6 @@ export default {
 			);
 			delete searchState[message.id];
 		}, 30 * 1000, msg);
+		searchState[msg.id].selected = [];
 	},
 };

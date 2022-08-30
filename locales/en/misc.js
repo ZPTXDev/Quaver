@@ -13,5 +13,6 @@ export default {
 	LIVE: 'LIVE',
 	STREAMING: 'Streaming',
 	ACTION_IRREVERSIBLE: 'This action is irreversible.',
-	CONFIRM: 'Confirm'
+	CONFIRM: 'Confirm',
+	ADD: 'Add'
 };
