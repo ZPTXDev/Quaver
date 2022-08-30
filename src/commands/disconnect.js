@@ -51,6 +51,7 @@ export default {
 					{ components: [] },
 				),
 			);
-		}, 5000, msg);
+			delete confirmationTimeout[message.id];
+		}, 5 * 1000, msg);
 	},
 };
