@@ -30,9 +30,7 @@ export default {
 		const resolvedTracks = [];
 		for (const track of tracks) {
 			const results = await interaction.client.music.rest.loadTracks(track);
-			if (results.loadType === 'TRACK_LOADED') {
-				resolvedTracks.push(results.tracks[0]);
-			}
+			if (results.loadType === 'TRACK_LOADED') resolvedTracks.push(results.tracks[0]);
 		}
 		let msg, extras = [];
 		if (resolvedTracks.length === 1) {
