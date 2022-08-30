@@ -37,9 +37,9 @@ export default {
 		await interaction.deferReply();
 		const query = interaction.options.getString('query'), insert = interaction.options.getBoolean('insert');
 		let tracks = [], msg = '', extras = [];
-		if (interaction.client.music.spotify.isSpotifyUrl(query)) {
+		if (interaction.client.music.spotify.isSpotifyUrl(query.replace('embed/', ''))) {
 			if (!features.spotify.enabled || !features.spotify.client_id || !features.spotify.client_secret) return interaction.replyHandler.locale('CMD.PLAY.RESPONSE.DISABLED.SPOTIFY', { type: 'error' });
-			const item = await interaction.client.music.spotify.load(query);
+			const item = await interaction.client.music.spotify.load(query.replace('embed/', ''));
 			switch (item?.type) {
 				case SpotifyItemType.Track: {
 					const track = await item.resolveYoutubeTrack();
