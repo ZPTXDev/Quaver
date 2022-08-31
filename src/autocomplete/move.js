@@ -6,8 +6,9 @@ export default {
 		if (!player) return interaction.respond([]);
 		return interaction.respond(
 			player.queue.tracks
+				.map((track, index) => ({ name: `${index + 1}. ${track.title}`, value: index + 1 }))
 				.filter(track => track.title.toLowerCase().startsWith(focused.toLowerCase()))
-				.map((track, index) => ({ name: `${index + 1}. ${track.title}`, value: index + 1 })),
+				.map(track => ({ name: track.name.length >= 100 ? `${track.name.substring(0, 97)}...` : track.name, value: track.value })),
 		);
 	},
 };

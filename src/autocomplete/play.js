@@ -20,6 +20,7 @@ export default {
 				searchSuggestions
 					.filter(ele => ele !== '')
 					.map(suggestion => suggestion.replace(/\\u([0-9a-fA-F]{4})/g, (whole, grp) => String.fromCharCode(parseInt(grp, 16))))
+					.filter(suggestion => suggestion.length <= 100)
 					.map(suggestion => ({ name: suggestion, value: suggestion })),
 			);
 		}
