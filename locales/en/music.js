@@ -26,7 +26,15 @@ export default {
 		QUEUE_CLEARED_ERROR: 'Cleared queue as an error occurred multiple times consecutively.',
 		PLAYING: {
 			NOTHING: 'There is nothing playing right now.',
-			NOW: 'Now playing [**%1**](%2) `[%3]`'
+			NOW: {
+				SIMPLE: 'Now playing [**%1**](%2) `[%3]`',
+				DETAILED: {
+					TITLE: 'Now playing',
+					DURATION: 'Duration',
+					UPLOADER: 'Uploader',
+					ADDED_BY: 'Added by'
+				}
+			}
 		},
 		RESTARTING: {
 			DEFAULT: 'Quaver is restarting and will disconnect.',

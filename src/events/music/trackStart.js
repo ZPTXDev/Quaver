@@ -1,7 +1,7 @@
 import { features } from '#settings';
-import { logger } from '#lib/util/common.js';
+import { data, logger } from '#lib/util/common.js';
 import { getGuildLocale, msToTime, msToTimeString } from '#lib/util/util.js';
-import { escapeMarkdown } from 'discord.js';
+import { EmbedBuilder, escapeMarkdown } from 'discord.js';
 
 export default {
 	name: 'trackStart',
@@ -29,6 +29,19 @@ export default {
 				return t;
 			}));
 		}
-		return queue.player.handler.send(`${await getGuildLocale(queue.player.guildId, 'MUSIC.PLAYER.PLAYING.NOW', escapeMarkdown(track.title), track.uri, durationString)}\n${await getGuildLocale(queue.player.guildId, 'MISC.ADDED_BY', track.requester)}`);
+		const format = await data.guild.get(queue.player.guildId, 'settings.format') ?? 'simple';
+		return format === 'simple'
+			? queue.player.handler.send(`${await getGuildLocale(queue.player.guildId, 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE', escapeMarkdown(track.title), track.uri, durationString)}\n${await getGuildLocale(queue.player.guildId, 'MISC.ADDED_BY', track.requester)}`)
+			: queue.player.handler.send(
+				new EmbedBuilder()
+					.setTitle(await getGuildLocale(queue.player.guildId, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE'))
+					.setDescription(`**[${escapeMarkdown(track.title)}](${track.uri})**`)
+					.addFields([
+						{ name: await getGuildLocale(queue.player.guildId, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.DURATION'), value: `\`${durationString}\``, inline: true },
+						{ name: await getGuildLocale(queue.player.guildId, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.UPLOADER'), value: track.author, inline: true },
+						{ name: await getGuildLocale(queue.player.guildId, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.ADDED_BY'), value: `<@${track.requester}>`, inline: true },
+					])
+					.setThumbnail(`https://i.ytimg.com/vi/${track.identifier}/hqdefault.jpg`),
+			);
 	},
 };

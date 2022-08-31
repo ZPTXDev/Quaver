@@ -56,16 +56,6 @@ export default {
 			SUCCESS: 'Open-source music bot for small communities.\nSource code available [here](https://go.zptx.dev/Quaver), invite [here](%1).\nRunning version `%2`.'
 		}
 	},
-	LANGUAGE: {
-		DESCRIPTION: 'Change Quaver\'s language in this server.',
-		OPTION: {
-			NEW_LANGUAGE: 'The language to use.'
-		},
-		RESPONSE: {
-			SUCCESS: 'Language for **%1** set to `%2`.',
-			LANGUAGE_NOT_CHANGED: 'Language for **%1** is already `%2`.',
-		}
-	},
 	LOOP: {
 		DESCRIPTION: 'Change the looping mode.',
 		OPTION: {
@@ -193,6 +183,26 @@ export default {
 			TIMESTAMP_MISSING: 'Please specify a timestamp to seek to.',
 			TIMESTAMP_INVALID: 'The timestamp provided exceeds the track\'s duration of `%1`.',
 			STREAM_CANNOT_SEEK: 'Seek cannot be used for streams.'
+		}
+	},
+	SETTINGS: {
+		DESCRIPTION: 'Change Quaver\'s settings in this server.',
+		RESPONSE: {
+			HEADER: 'Settings for **%1**'
+		},
+		MISC: {
+			LANGUAGE: {
+				NAME: 'Language',
+				DESCRIPTION: 'The language to use for this server.'
+			},
+			FORMAT: {
+				NAME: 'Format',
+				DESCRIPTION: 'The "Now playing" format to use for this server.',
+				EXAMPLE: {
+					SIMPLE: 'Simple Format Display',
+					DETAILED: 'Detailed Format Display'
+				}
+			}
 		}
 	},
 	SHUFFLE: {
