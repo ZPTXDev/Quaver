@@ -169,6 +169,10 @@ export default {
 				EXAMPLE: {
 					SIMPLE: 'Simpleng Pagpapakita ng Pormat',
 					DETAILED: 'Detalyadong Pagpapakita ng Pormat'
+				},
+				OPTIONS: {
+					SIMPLE: 'Simple',
+					DETAILED: 'Detalyado'
 				}
 			}
 		}
