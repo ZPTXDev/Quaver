@@ -15,7 +15,7 @@
     "discord.js": "^14.3.0",
     "genversion": "^3.1.1",
     "jsonwebtoken": "^8.5.1",
-    "keyv": "^4.4.1",
+    "keyv": "^4.5.0",
     "lavaclient": "^4.1.1",
     "lodash-es": "^4.17.21",
     "patch-package": "^6.4.7",
