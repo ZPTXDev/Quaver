@@ -1,5 +1,5 @@
 import { ButtonBuilder, EmbedBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, escapeMarkdown } from 'discord.js';
-import { paginate, msToTime, msToTimeString, getGuildLocale } from '#lib/util/util.js';
+import { paginate, msToTime, msToTimeString, getGuildLocaleString } from '#lib/util/util.js';
 
 export default {
 	name: 'queue',
@@ -10,14 +10,14 @@ export default {
 		if (player && page === 'goto' && pages.length !== 0) {
 			return interaction.showModal(
 				new ModalBuilder()
-					.setTitle(await getGuildLocale(interaction.guildId, 'CMD.QUEUE.MISC.MODAL_TITLE'))
+					.setTitle(await getGuildLocaleString(interaction.guildId, 'CMD.QUEUE.MISC.MODAL_TITLE'))
 					.setCustomId('queue_goto')
 					.addComponents(
 						new ActionRowBuilder()
 							.addComponents(
 								new TextInputBuilder()
 									.setCustomId('queue_goto_input')
-									.setLabel(await getGuildLocale(interaction.guildId, 'CMD.QUEUE.MISC.PAGE'))
+									.setLabel(await getGuildLocaleString(interaction.guildId, 'CMD.QUEUE.MISC.PAGE'))
 									.setStyle(TextInputStyle.Short),
 							),
 					),
@@ -36,7 +36,7 @@ export default {
 				const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
 				return `\`${(firstIndex + index).toString().padStart(largestIndexSize, ' ')}.\` **[${escapeMarkdown(track.title)}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 			}).join('\n'))
-			.setFooter({ text: await getGuildLocale(interaction.guildId, 'MISC.PAGE', page, pages.length) });
+			.setFooter({ text: await getGuildLocaleString(interaction.guildId, 'MISC.PAGE', page, pages.length) });
 		original.components[0] = ActionRowBuilder.from(original.components[0]);
 		original.components[0].components[0] = ButtonBuilder.from(original.components[0].components[0])
 			.setCustomId(`queue_${page - 1}`)

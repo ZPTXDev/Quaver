@@ -1,16 +1,16 @@
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { defaultLocale, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getGuildLocale, getLocale } from '#lib/util/util.js';
+import { getGuildLocaleString, getLocaleString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('bassboost')
-		.setDescription(getLocale(defaultLocale, 'CMD.BASSBOOST.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocale, 'CMD.BASSBOOST.DESCRIPTION'))
 		.addBooleanOption(option =>
 			option
 				.setName('enabled')
-				.setDescription(getLocale(defaultLocale, 'CMD.BASSBOOST.OPTION.ENABLED'))),
+				.setDescription(getLocaleString(defaultLocale, 'CMD.BASSBOOST.OPTION.ENABLED'))),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -29,8 +29,8 @@ export default {
 		if (features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('filterUpdate', { bassboost: player.bassboost, nightcore: player.nightcore });
 		return interaction.replyHandler.reply(
 			new EmbedBuilder()
-				.setDescription(await getGuildLocale(interaction.guildId, player.bassboost ? 'CMD.BASSBOOST.RESPONSE.ENABLED' : 'CMD.BASSBOOST.RESPONSE.DISABLED'))
-				.setFooter({ text: await getGuildLocale(interaction.guildId, 'MUSIC.PLAYER.FILTER_NOTE') }),
+				.setDescription(await getGuildLocaleString(interaction.guildId, player.bassboost ? 'CMD.BASSBOOST.RESPONSE.ENABLED' : 'CMD.BASSBOOST.RESPONSE.DISABLED'))
+				.setFooter({ text: await getGuildLocaleString(interaction.guildId, 'MUSIC.PLAYER.FILTER_NOTE') }),
 		);
 	},
 };

@@ -1,12 +1,12 @@
 import { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, escapeMarkdown } from 'discord.js';
 import { defaultLocale } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { paginate, getLocale, msToTime, msToTimeString, getGuildLocale } from '#lib/util/util.js';
+import { paginate, getLocaleString, msToTime, msToTimeString, getGuildLocaleString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('queue')
-		.setDescription(getLocale(defaultLocale, 'CMD.QUEUE.DESCRIPTION')),
+		.setDescription(getLocaleString(defaultLocale, 'CMD.QUEUE.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -26,7 +26,7 @@ export default {
 						return `\`${index + 1}.\` **[${escapeMarkdown(track.title)}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 					}).join('\n'),
 				)
-				.setFooter({ text: await getGuildLocale(interaction.guildId, 'MISC.PAGE', '1', pages.length) }),
+				.setFooter({ text: await getGuildLocaleString(interaction.guildId, 'MISC.PAGE', '1', pages.length) }),
 			{
 				components: [
 					new ActionRowBuilder()
@@ -39,7 +39,7 @@ export default {
 							new ButtonBuilder()
 								.setCustomId('queue_goto')
 								.setStyle(ButtonStyle.Secondary)
-								.setLabel(await getGuildLocale(interaction.guildId, 'MISC.GO_TO')),
+								.setLabel(await getGuildLocaleString(interaction.guildId, 'MISC.GO_TO')),
 							new ButtonBuilder()
 								.setCustomId('queue_2')
 								.setEmoji('➡️')

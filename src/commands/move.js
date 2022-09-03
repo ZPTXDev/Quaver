@@ -1,23 +1,23 @@
 import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
 import { defaultLocale, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getLocale } from '#lib/util/util.js';
+import { getLocaleString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('move')
-		.setDescription(getLocale(defaultLocale, 'CMD.MOVE.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocale, 'CMD.MOVE.DESCRIPTION'))
 		.addIntegerOption(option =>
 			option
 				.setName('old_position')
-				.setDescription(getLocale(defaultLocale, 'CMD.MOVE.OPTION.OLD_POSITION'))
+				.setDescription(getLocaleString(defaultLocale, 'CMD.MOVE.OPTION.OLD_POSITION'))
 				.setMinValue(1)
 				.setRequired(true)
 				.setAutocomplete(true))
 		.addIntegerOption(option =>
 			option
 				.setName('new_position')
-				.setDescription(getLocale(defaultLocale, 'CMD.MOVE.OPTION.NEW_POSITION'))
+				.setDescription(getLocaleString(defaultLocale, 'CMD.MOVE.OPTION.NEW_POSITION'))
 				.setMinValue(1)
 				.setRequired(true)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],

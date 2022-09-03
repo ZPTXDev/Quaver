@@ -1,6 +1,6 @@
 import { PermissionsBitField, ChannelType, StageInstancePrivacyLevel, EmbedBuilder } from 'discord.js';
 import { logger, data } from '#lib/util/common.js';
-import { getGuildLocale } from '#lib/util/util.js';
+import { getGuildLocaleString } from '#lib/util/util.js';
 import { features } from '#settings';
 
 export default {
@@ -63,7 +63,7 @@ export default {
 				await newState.setSuppressed(false);
 				if (!newState.channel.stageInstance) {
 					try {
-						await newState.channel.createStageInstance({ topic: await getGuildLocale(player.guildId, 'MISC.STAGE_TOPIC'), privacyLevel: StageInstancePrivacyLevel.GuildOnly });
+						await newState.channel.createStageInstance({ topic: await getGuildLocaleString(player.guildId, 'MISC.STAGE_TOPIC'), privacyLevel: StageInstancePrivacyLevel.GuildOnly });
 					}
 					catch (err) {
 						logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
@@ -100,8 +100,8 @@ export default {
 				if (features.web.enabled) io.to(`guild:${player.guildId}`).emit('pauseTimeoutUpdate', player.timeoutEnd);
 				return player.handler.send(
 					new EmbedBuilder()
-						.setDescription(`${await getGuildLocale(player.guildId, 'MUSIC.DISCONNECT.ALONE.WARNING')} ${await getGuildLocale(player.guildId, 'MUSIC.DISCONNECT.INACTIVITY.WARNING', Math.floor(Date.now() / 1000) + (5 * 60))}`)
-						.setFooter({ text: await getGuildLocale(player.guildId, 'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME') }),
+						.setDescription(`${await getGuildLocaleString(player.guildId, 'MUSIC.DISCONNECT.ALONE.WARNING')} ${await getGuildLocaleString(player.guildId, 'MUSIC.DISCONNECT.INACTIVITY.WARNING', Math.floor(Date.now() / 1000) + (5 * 60))}`)
+						.setFooter({ text: await getGuildLocaleString(player.guildId, 'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME') }),
 					{ type: 'warning' },
 				);
 			}
@@ -169,8 +169,8 @@ export default {
 		if (features.web.enabled) io.to(`guild:${player.guildId}`).emit('pauseTimeoutUpdate', player.timeoutEnd);
 		return player.handler.send(
 			new EmbedBuilder()
-				.setDescription(`${await getGuildLocale(player.guildId, 'MUSIC.DISCONNECT.ALONE.WARNING')} ${await getGuildLocale(player.guildId, 'MUSIC.DISCONNECT.INACTIVITY.WARNING', Math.floor(Date.now() / 1000) + (5 * 60))}`)
-				.setFooter({ text: await getGuildLocale(player.guildId, 'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME') }),
+				.setDescription(`${await getGuildLocaleString(player.guildId, 'MUSIC.DISCONNECT.ALONE.WARNING')} ${await getGuildLocaleString(player.guildId, 'MUSIC.DISCONNECT.INACTIVITY.WARNING', Math.floor(Date.now() / 1000) + (5 * 60))}`)
+				.setFooter({ text: await getGuildLocaleString(player.guildId, 'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME') }),
 			{ type: 'warning' },
 		);
 	},

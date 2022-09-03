@@ -1,17 +1,17 @@
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { defaultLocale, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getGuildLocale, getLocale } from '#lib/util/util.js';
+import { getGuildLocaleString, getLocaleString } from '#lib/util/util.js';
 import { data } from '#lib/util/common.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('247')
-		.setDescription(getLocale(defaultLocale, 'CMD.247.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocale, 'CMD.247.DESCRIPTION'))
 		.addBooleanOption(option =>
 			option
 				.setName('enabled')
-				.setDescription(getLocale(defaultLocale, 'CMD.247.OPTION.ENABLED'))),
+				.setDescription(getLocaleString(defaultLocale, 'CMD.247.OPTION.ENABLED'))),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -40,8 +40,8 @@ export default {
 		// and pause timeout is only set when everyone leaves
 		await interaction.replyHandler.reply(
 			new EmbedBuilder()
-				.setDescription(await getGuildLocale(interaction.guildId, always ? 'CMD.247.RESPONSE.ENABLED' : 'CMD.247.RESPONSE.DISABLED'))
-				.setFooter({ text: always ? await getGuildLocale(interaction.guildId, 'CMD.247.MISC.NOTE') : null }),
+				.setDescription(await getGuildLocaleString(interaction.guildId, always ? 'CMD.247.RESPONSE.ENABLED' : 'CMD.247.RESPONSE.DISABLED'))
+				.setFooter({ text: always ? await getGuildLocaleString(interaction.guildId, 'CMD.247.MISC.NOTE') : null }),
 		);
 		if (!always && !player.playing) player.queue.emit('finish');
 	},

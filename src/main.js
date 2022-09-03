@@ -7,7 +7,7 @@ import { readdirSync, readFileSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import { createInterface } from 'readline';
 import { features, lavalink, token } from '#settings';
-import { msToTime, msToTimeString, getGuildLocale, getAbsoluteFileURL } from '#lib/util/util.js';
+import { msToTime, msToTimeString, getGuildLocaleString, getAbsoluteFileURL } from '#lib/util/util.js';
 import { logger, data, setLocales } from '#lib/util/common.js';
 import { createServer } from 'https';
 
@@ -152,18 +152,18 @@ export async function shuttingDown(eventType, err) {
 				logger.info({ message: `[G ${player.guildId}] Disconnecting (restarting)`, label: 'Quaver' });
 				const fileBuffer = [];
 				if (player.queue.current && (player.playing || player.paused)) {
-					fileBuffer.push(`${await getGuildLocale(player.guildId, 'MISC.CURRENT')}:`);
+					fileBuffer.push(`${await getGuildLocaleString(player.guildId, 'MISC.CURRENT')}:`);
 					fileBuffer.push(player.queue.current.uri);
 				}
 				if (player.queue.tracks.length > 0) {
-					fileBuffer.push(`${await getGuildLocale(player.guildId, 'MISC.QUEUE')}:`);
+					fileBuffer.push(`${await getGuildLocaleString(player.guildId, 'MISC.QUEUE')}:`);
 					fileBuffer.push(player.queue.tracks.map(track => track.uri).join('\n'));
 				}
 				await player.handler.disconnect();
 				const success = await player.handler.send(
 					new EmbedBuilder()
-						.setDescription(`${await getGuildLocale(player.guildId, ['exit', 'SIGINT', 'SIGTERM', 'lavalink'].includes(eventType) ? 'MUSIC.PLAYER.RESTARTING.DEFAULT' : 'MUSIC.PLAYER.RESTARTING.CRASHED')}${fileBuffer.length > 0 ? `\n${await getGuildLocale(player.guildId, 'MUSIC.PLAYER.RESTARTING.QUEUE_DATA_ATTACHED')}` : ''}`)
-						.setFooter({ text: await getGuildLocale(player.guildId, 'MUSIC.PLAYER.RESTARTING.APOLOGY') }),
+						.setDescription(`${await getGuildLocaleString(player.guildId, ['exit', 'SIGINT', 'SIGTERM', 'lavalink'].includes(eventType) ? 'MUSIC.PLAYER.RESTARTING.DEFAULT' : 'MUSIC.PLAYER.RESTARTING.CRASHED')}${fileBuffer.length > 0 ? `\n${await getGuildLocaleString(player.guildId, 'MUSIC.PLAYER.RESTARTING.QUEUE_DATA_ATTACHED')}` : ''}`)
+						.setFooter({ text: await getGuildLocaleString(player.guildId, 'MUSIC.PLAYER.RESTARTING.APOLOGY') }),
 					{
 						type: 'warning',
 						files: fileBuffer.length > 0 ? [

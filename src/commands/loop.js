@@ -2,21 +2,21 @@ import { SlashCommandBuilder } from 'discord.js';
 import { LoopType } from '@lavaclient/queue';
 import { defaultLocale, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getGuildLocale, getLocale } from '#lib/util/util.js';
+import { getGuildLocaleString, getLocaleString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('loop')
-		.setDescription(getLocale(defaultLocale, 'CMD.LOOP.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocale, 'CMD.LOOP.DESCRIPTION'))
 		.addStringOption(option =>
 			option
 				.setName('type')
-				.setDescription(getLocale(defaultLocale, 'CMD.LOOP.OPTION.TYPE.DESCRIPTION'))
+				.setDescription(getLocaleString(defaultLocale, 'CMD.LOOP.OPTION.TYPE.DESCRIPTION'))
 				.setRequired(true)
 				.addChoices(
-					{ name: getLocale(defaultLocale, 'CMD.LOOP.OPTION.TYPE.OPTION.DISABLED'), value: 'disabled' },
-					{ name: getLocale(defaultLocale, 'CMD.LOOP.OPTION.TYPE.OPTION.TRACK'), value: 'track' },
-					{ name: getLocale(defaultLocale, 'CMD.LOOP.OPTION.TYPE.OPTION.QUEUE'), value: 'queue' },
+					{ name: getLocaleString(defaultLocale, 'CMD.LOOP.OPTION.TYPE.OPTION.DISABLED'), value: 'disabled' },
+					{ name: getLocaleString(defaultLocale, 'CMD.LOOP.OPTION.TYPE.OPTION.TRACK'), value: 'track' },
+					{ name: getLocaleString(defaultLocale, 'CMD.LOOP.OPTION.TYPE.OPTION.QUEUE'), value: 'queue' },
 				)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
@@ -32,15 +32,15 @@ export default {
 		switch (type) {
 			case 'disabled':
 				loop = LoopType.None;
-				typeLocale = await getGuildLocale(interaction.guildId, 'CMD.LOOP.OPTION.TYPE.OPTION.DISABLED');
+				typeLocale = await getGuildLocaleString(interaction.guildId, 'CMD.LOOP.OPTION.TYPE.OPTION.DISABLED');
 				break;
 			case 'track':
 				loop = LoopType.Song;
-				typeLocale = await getGuildLocale(interaction.guildId, 'CMD.LOOP.OPTION.TYPE.OPTION.TRACK');
+				typeLocale = await getGuildLocaleString(interaction.guildId, 'CMD.LOOP.OPTION.TYPE.OPTION.TRACK');
 				break;
 			case 'queue':
 				loop = LoopType.Queue;
-				typeLocale = await getGuildLocale(interaction.guildId, 'CMD.LOOP.OPTION.TYPE.OPTION.QUEUE');
+				typeLocale = await getGuildLocaleString(interaction.guildId, 'CMD.LOOP.OPTION.TYPE.OPTION.QUEUE');
 				break;
 		}
 		typeLocale = typeLocale.toLowerCase();

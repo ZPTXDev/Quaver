@@ -2,23 +2,23 @@ import { SlashCommandBuilder, PermissionsBitField, ChannelType, EmbedBuilder, es
 import { SpotifyItemType } from '@lavaclient/spotify';
 import { defaultLocale, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getGuildLocale, getLocale } from '#lib/util/util.js';
+import { getGuildLocaleString, getLocaleString } from '#lib/util/util.js';
 import PlayerHandler from '#lib/PlayerHandler.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('play')
-		.setDescription(getLocale(defaultLocale, 'CMD.PLAY.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocale, 'CMD.PLAY.DESCRIPTION'))
 		.addStringOption(option =>
 			option
 				.setName('query')
-				.setDescription(getLocale(defaultLocale, 'CMD.PLAY.OPTION.QUERY'))
+				.setDescription(getLocaleString(defaultLocale, 'CMD.PLAY.OPTION.QUERY'))
 				.setRequired(true)
 				.setAutocomplete(true))
 		.addBooleanOption(option =>
 			option
 				.setName('insert')
-				.setDescription(getLocale(defaultLocale, 'CMD.PLAY.OPTION.INSERT'))),
+				.setDescription(getLocaleString(defaultLocale, 'CMD.PLAY.OPTION.INSERT'))),
 	checks: [checks.GUILD_ONLY, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -109,8 +109,8 @@ export default {
 		const started = player.playing || player.paused;
 		await interaction.replyHandler.reply(
 			new EmbedBuilder()
-				.setDescription(await getGuildLocale(interaction.guildId, msg, ...extras))
-				.setFooter({ text: started ? `${await getGuildLocale(interaction.guildId, 'MISC.POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null }),
+				.setDescription(await getGuildLocaleString(interaction.guildId, msg, ...extras))
+				.setFooter({ text: started ? `${await getGuildLocaleString(interaction.guildId, 'MISC.POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null }),
 			{ type: 'success', ephemeral: true },
 		);
 		if (!started) await player.queue.start();

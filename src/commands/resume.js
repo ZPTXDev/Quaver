@@ -1,12 +1,12 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { defaultLocale, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getLocale } from '#lib/util/util.js';
+import { getLocaleString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('resume')
-		.setDescription(getLocale(defaultLocale, 'CMD.RESUME.DESCRIPTION')),
+		.setDescription(getLocaleString(defaultLocale, 'CMD.RESUME.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],

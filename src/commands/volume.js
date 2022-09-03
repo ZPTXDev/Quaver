@@ -1,16 +1,16 @@
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { defaultLocale, features, managers } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getGuildLocale, getLocale } from '#lib/util/util.js';
+import { getGuildLocaleString, getLocaleString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('volume')
-		.setDescription(getLocale(defaultLocale, 'CMD.VOLUME.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocale, 'CMD.VOLUME.DESCRIPTION'))
 		.addIntegerOption(option =>
 			option
 				.setName('new_volume')
-				.setDescription(getLocale(defaultLocale, 'CMD.VOLUME.OPTION.NEW_VOLUME'))
+				.setDescription(getLocaleString(defaultLocale, 'CMD.VOLUME.OPTION.NEW_VOLUME'))
 				.setMinValue(0)
 				.setMaxValue(1000)
 				.setRequired(true)),
@@ -29,8 +29,8 @@ export default {
 		if (features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('volumeUpdate', volume);
 		return interaction.replyHandler.reply(
 			new EmbedBuilder()
-				.setDescription(await getGuildLocale(interaction.guildId, 'CMD.VOLUME.RESPONSE.SUCCESS', volume))
-				.setFooter({ text: await getGuildLocale(interaction.guildId, 'MUSIC.PLAYER.FILTER_NOTE') }),
+				.setDescription(await getGuildLocaleString(interaction.guildId, 'CMD.VOLUME.RESPONSE.SUCCESS', volume))
+				.setFooter({ text: await getGuildLocaleString(interaction.guildId, 'MUSIC.PLAYER.FILTER_NOTE') }),
 		);
 	},
 };

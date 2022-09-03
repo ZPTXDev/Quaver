@@ -1,13 +1,13 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { defaultLocale } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getGuildLocale, getLocale, messageDataBuilder } from '#lib/util/util.js';
+import { getGuildLocaleString, getLocaleString, messageDataBuilder } from '#lib/util/util.js';
 import { confirmationTimeout } from '#lib/util/common.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('clear')
-		.setDescription(getLocale(defaultLocale, 'CMD.CLEAR.DESCRIPTION')),
+		.setDescription(getLocaleString(defaultLocale, 'CMD.CLEAR.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -19,8 +19,8 @@ export default {
 		if (player.queue.tracks.length === 0) return interaction.replyHandler.locale('CMD.CLEAR.RESPONSE.QUEUE_EMPTY', { type: 'error' });
 		const msg = await interaction.replyHandler.reply(
 			new EmbedBuilder()
-				.setDescription(await getGuildLocale(interaction.guildId, 'CMD.CLEAR.RESPONSE.CONFIRMATION'))
-				.setFooter({ text: await getGuildLocale(interaction.guildId, 'MISC.ACTION_IRREVERSIBLE') }),
+				.setDescription(await getGuildLocaleString(interaction.guildId, 'CMD.CLEAR.RESPONSE.CONFIRMATION'))
+				.setFooter({ text: await getGuildLocaleString(interaction.guildId, 'MISC.ACTION_IRREVERSIBLE') }),
 			{
 				type: 'warning',
 				components: [
@@ -29,11 +29,11 @@ export default {
 							new ButtonBuilder()
 								.setCustomId('clear')
 								.setStyle(ButtonStyle.Danger)
-								.setLabel(await getGuildLocale(interaction.guildId, 'MISC.CONFIRM')),
+								.setLabel(await getGuildLocaleString(interaction.guildId, 'MISC.CONFIRM')),
 							new ButtonBuilder()
 								.setCustomId('cancel')
 								.setStyle(ButtonStyle.Secondary)
-								.setLabel(await getGuildLocale(interaction.guildId, 'MISC.CANCEL')),
+								.setLabel(await getGuildLocaleString(interaction.guildId, 'MISC.CANCEL')),
 						),
 				],
 				fetchReply: true,
@@ -43,7 +43,7 @@ export default {
 			await message.edit(
 				messageDataBuilder(
 					new EmbedBuilder()
-						.setDescription(await getGuildLocale(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
+						.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
 					{ components: [] },
 				),
 			);

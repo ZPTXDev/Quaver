@@ -1,17 +1,17 @@
 import { SlashCommandBuilder, ChannelType, PermissionsBitField } from 'discord.js';
 import { defaultLocale, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getLocale } from '#lib/util/util.js';
+import { getLocaleString } from '#lib/util/util.js';
 import { data } from '#lib/util/common.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('bind')
-		.setDescription(getLocale(defaultLocale, 'CMD.BIND.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocale, 'CMD.BIND.DESCRIPTION'))
 		.addChannelOption(option =>
 			option
 				.setName('new_channel')
-				.setDescription(getLocale(defaultLocale, 'CMD.BIND.OPTION.NEW_CHANNEL'))
+				.setDescription(getLocaleString(defaultLocale, 'CMD.BIND.OPTION.NEW_CHANNEL'))
 				.addChannelTypes(ChannelType.GuildText, ChannelType.GuildVoice)
 				.setRequired(true)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
