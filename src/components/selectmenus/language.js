@@ -1,7 +1,8 @@
-import { ActionRowBuilder, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, EmbedBuilder, SelectMenuBuilder } from 'discord.js';
 import { checkLocaleCompletion, getGuildLocale, getLocale, messageDataBuilder, roundTo, settingsPage } from '#lib/util/util.js';
 import { confirmationTimeout, data } from '#lib/util/common.js';
 import { defaultLocale } from '#settings';
+import { settingsOptions } from '#lib/util/constants.js';
 
 export default {
 	name: 'language',
@@ -42,7 +43,12 @@ export default {
 				{
 					components: [
 						new ActionRowBuilder()
-							.addComponents(interaction.message.components[0].components[0]),
+							.addComponents(
+								SelectMenuBuilder.from(interaction.message.components[0].components[0])
+									.setOptions(
+										settingsOptions.map(opt => ({ label: getLocale(guildLocale, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.NAME`), description: getLocale(guildLocale, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION`), value: opt, default: opt === 'language' })),
+									),
+							),
 						actionRow,
 					],
 				},

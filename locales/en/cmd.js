@@ -201,6 +201,10 @@ export default {
 				EXAMPLE: {
 					SIMPLE: 'Simple Format Display',
 					DETAILED: 'Detailed Format Display'
+				},
+				OPTIONS: {
+					SIMPLE: 'Simple',
+					DETAILED: 'Detailed'
 				}
 			}
 		}
