@@ -26,7 +26,15 @@ export default {
 		QUEUE_CLEARED_ERROR: 'Na-clear ang queue bilang isang error na naganap nang maraming beses nang magkakasunod.',
 		PLAYING: {
 			NOTHING: 'Walang nang nagpatugtug ngayon.',
-			NOW: 'Nagpe-play ngayon ng [**%1**](%2) `[%3]`'
+			NOW: {
+				SIMPLE: 'Nagpe-play ngayon ng [**%1**](%2) `[%3]`',
+				DETAILED: {
+					TITLE: 'Nagpe-play ngayon',
+					DURATION: 'Durasyon',
+					UPLOADER: 'Taga-upload',
+					ADDED_BY: 'Idinagdag ni'
+				}
+			}
 		},
 		RESTARTING: {
 			DEFAULT: 'Nagre-restart si Quaver at madidiskonekta.',
