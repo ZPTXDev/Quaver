@@ -19,7 +19,7 @@
     "lavaclient": "^4.1.1",
     "lodash-es": "^4.17.21",
     "patch-package": "^6.4.7",
-    "socket.io": "^4.5.1",
+    "socket.io": "^4.5.2",
     "winston": "^3.8.1"
   },
   "devDependencies": {
