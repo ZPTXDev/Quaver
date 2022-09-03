@@ -13,5 +13,6 @@ export default {
 	LIVE: 'LIVE',
 	STREAMING: 'Streaming',
 	ACTION_IRREVERSIBLE: 'Ang aksyon na ito ay hindi na mababawi.',
-	CONFIRM: 'Kumpirmahin'
+	CONFIRM: 'Kumpirmahin',
+	ADD: 'Idagdag'
 };
