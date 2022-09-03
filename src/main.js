@@ -114,7 +114,7 @@ data.guild.instance.on('error', async err => {
 });
 
 /** @type {Client & {commands: Collection, buttons: Collection, selects: Collection, music: Node}} */
-export const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] });
+export const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] });
 bot.commands = new Collection();
 bot.autocomplete = new Collection();
 bot.music = new Node({
