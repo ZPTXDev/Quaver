@@ -31,28 +31,26 @@ export default {
 				{ type: 'warning', ephemeral: true },
 			);
 		}
-		else {
-			await interaction.deferUpdate();
-		}
 		const guildLocale = await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale;
 		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocale, 'language');
 		const description = `${getLocale(guildLocale, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocale(guildLocale, 'CMD.SETTINGS.MISC.LANGUAGE.NAME')}** ─ ${getLocale(guildLocale, 'CMD.SETTINGS.MISC.LANGUAGE.DESCRIPTION')}\n> ${getLocale(guildLocale, 'MISC.CURRENT')}: \`${current}\``;
-		return interaction.message.edit(
-			messageDataBuilder(
-				[description, ...embeds],
-				{
-					components: [
-						new ActionRowBuilder()
-							.addComponents(
-								SelectMenuBuilder.from(interaction.message.components[0].components[0])
-									.setOptions(
-										settingsOptions.map(opt => ({ label: getLocale(guildLocale, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.NAME`), description: getLocale(guildLocale, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION`), value: opt, default: opt === 'language' })),
-									),
-							),
-						actionRow,
-					],
-				},
-			),
-		);
+		const args = [
+			[description, ...embeds],
+			{
+				components: [
+					new ActionRowBuilder()
+						.addComponents(
+							SelectMenuBuilder.from(interaction.message.components[0].components[0])
+								.setOptions(
+									settingsOptions.map(opt => ({ label: getLocale(guildLocale, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.NAME`), description: getLocale(guildLocale, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION`), value: opt, default: opt === 'language' })),
+								),
+						),
+					actionRow,
+				],
+			},
+		];
+		return localeCompletion.completion !== 100
+			? interaction.message.edit(messageDataBuilder(...args))
+			: interaction.replyHandler.reply(args[0], { ...args[1], force: 'update' });
 	},
 };
