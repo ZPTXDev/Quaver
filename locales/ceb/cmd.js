@@ -46,14 +46,6 @@ export default {
 		DESCRIPTION: 'Ipakita ang impormasyon bahin ni Quaver.',
 		RESPONSE: { SUCCESS: 'Open-source nga music bot for para sa ginagmay na mga komunidad.\nAng source code kay available [dinhi](https://go.zptx.dev/Quaver), invite [dinhi](%1).\nNagdagan sa bersyong `%2`.' }
 	},
-	LANGUAGE: {
-		DESCRIPTION: 'Usba ang lengguwahe ni Quaver sa dinhi nga server.',
-		OPTION: { NEW_LANGUAGE: 'Ang lengguwahe na gamiton.' },
-		RESPONSE: {
-			SUCCESS: 'Ang lengguwahe para sa **%1** kay na usban og `%2`.',
-			LANGUAGE_NOT_CHANGED: 'Ang lengguwahe para sa **%1** kay `%2` naman.'
-		}
-	},
 	LOOP: {
 		DESCRIPTION: 'Usba ang mode sa pag-loop.',
 		OPTION: {
@@ -161,6 +153,24 @@ export default {
 			TIMESTAMP_MISSING: 'Palihug pagpiho ug timestamp nga i-seek.',
 			TIMESTAMP_INVALID: 'Ang timestamp nga gihatag milagpas sa duration sa track nga `%1`.',
 			STREAM_CANNOT_SEEK: 'Ang seek dili magamit para sa mga stream.'
+		}
+	},
+	SETTINGS: {
+		DESCRIPTION: 'Usba ang mga setting ni Quaver sa dinhi nga server.',
+		RESPONSE: { HEADER: 'Mga setting sa **%1**' },
+		MISC: {
+			LANGUAGE: {
+				NAME: 'Lengguwahe',
+				DESCRIPTION: 'Ang lengguwahe nga gamiton alang niini nga server.'
+			},
+			FORMAT: {
+				NAME: 'Pormat',
+				DESCRIPTION: 'Ang "Nagpatugtug karon" nga pormat nga gamiton alang niini nga server.',
+				EXAMPLE: {
+					SIMPLE: 'Simple nga Pagpakita sa Pormat',
+					DETAILED: 'Detalyado nga Pagpakita sa Pormat'
+				}
+			}
 		}
 	},
 	SHUFFLE: {
