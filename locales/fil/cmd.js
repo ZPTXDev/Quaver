@@ -46,14 +46,6 @@ export default {
 		DESCRIPTION: 'Magpakita ng impormasyon tungkol kay Quaver.',
 		RESPONSE: { SUCCESS: 'Open-source na music bot para sa maliliit na mga komunidad.\nAng source code ay available [dito](https://go.zptx.dev/Quaver), invite [dito](%1).\nTumatakbo sa bersyong `%2`.' }
 	},
-	LANGUAGE: {
-		DESCRIPTION: 'Baguhin ang wika ni Quaver sa server na ito.',
-		OPTION: { NEW_LANGUAGE: 'Ang wika na gagamitin.' },
-		RESPONSE: {
-			SUCCESS: 'Ang wika para sa **%1** ay itinakda sa `%2`.',
-			LANGUAGE_NOT_CHANGED: 'Ang wika para sa **%1** ay itinakda sa `%2`.'
-		}
-	},
 	LOOP: {
 		DESCRIPTION: 'Baguhin ang mode sa paglo-loop.',
 		OPTION: {
@@ -161,6 +153,24 @@ export default {
 			TIMESTAMP_MISSING: 'Pakiusap lang na tumukoy ng timestamp na i-seek.',
 			TIMESTAMP_INVALID: 'Ang timestamp na ibinigay ay lumampas sa duration ng track na `%1`.',
 			STREAM_CANNOT_SEEK: 'Ang seek ay hindi magagamit para sa mga stream.'
+		}
+	},
+	SETTINGS: {
+		DESCRIPTION: 'Baguhin ang mga setting ni Quaver sa server na ito.',
+		RESPONSE: { HEADER: 'Mga setting sa **%1**' },
+		MISC: {
+			LANGUAGE: {
+				NAME: 'Wika',
+				DESCRIPTION: 'Ang wikang gagamitin sa server na ito.'
+			},
+			FORMAT: {
+				NAME: 'Pormat',
+				DESCRIPTION: 'Ang pormat ng "Nagpe-play ngayon" na gagamitin para sa server na ito.',
+				EXAMPLE: {
+					SIMPLE: 'Simpleng Pagpapakita ng Pormat',
+					DETAILED: 'Detalyadong Pagpapakita ng Pormat'
+				}
+			}
 		}
 	},
 	SHUFFLE: {

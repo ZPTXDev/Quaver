@@ -26,7 +26,15 @@ export default {
 		QUEUE_CLEARED_ERROR: 'Gi-clear ang queue isip usa ka sayup nga nahitabo nga daghang beses nga sunud-sunod.',
 		PLAYING: {
 			NOTHING: 'Wala nay nagpatugtug karon.',
-			NOW: 'Nagpatugtug karon og [**%1**](%2) `[%3]`'
+			NOW: {
+				SIMPLE: 'Nagpatugtug karon og [**%1**](%2) `[%3]`',
+				DETAILED: {
+					TITLE: 'Nagpatugtug karon',
+					DURATION: 'Gidugayon',
+					UPLOADER: 'Nag-upload',
+					ADDED_BY: 'Gidugang ni'
+				}
+			}
 		},
 		RESTARTING: {
 			DEFAULT: 'Si Quaver kay nagsugod pag-usab ug madiskonekta.',
