@@ -7,7 +7,7 @@ export default {
 	CANCEL: 'Kanselahin',
 	LOADING: 'Naglo-load...',
 	MORE_THAN_A_DAY: 'higit sa isang araw',
-	YOUR_SEARCH: 'ang iyong hinahanap',
+	YOUR_SEARCH: 'iyong hinahanap',
 	ADDED_BY: 'Idinagdag ni <@%1>',
 	STAGE_TOPIC: 'Musika ni Quaver',
 	LIVE: 'LIVE',
