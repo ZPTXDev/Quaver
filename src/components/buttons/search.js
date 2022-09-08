@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ChannelType, EmbedBuilder, escapeMarkdown, PermissionsBitField, SelectMenuBuilder } from 'discord.js';
 import { getGuildLocale, messageDataBuilder, msToTime, msToTimeString } from '#lib/util/util.js';
-import { searchState } from '#lib/util/common.js';
+import { logger, searchState } from '#lib/util/common.js';
 import { checks } from '#lib/util/constants.js';
 import PlayerHandler from '#lib/PlayerHandler.js';
 import { features } from '#settings';
@@ -80,13 +80,18 @@ export default {
 		page = parseInt(page);
 		clearTimeout(state.timeout);
 		state.timeout = setTimeout(async message => {
-			await message.edit(
-				messageDataBuilder(
-					new EmbedBuilder()
-						.setDescription(await getGuildLocale(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
-					{ components: [] },
-				),
-			);
+			try {
+				await message.edit(
+					messageDataBuilder(
+						new EmbedBuilder()
+							.setDescription(await getGuildLocale(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
+						{ components: [] },
+					),
+				);
+			}
+			catch (err) {
+				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+			}
 			delete searchState[message.id];
 		}, 30 * 1000, interaction.message);
 		const pages = state.pages;
