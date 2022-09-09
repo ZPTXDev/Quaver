@@ -2,7 +2,7 @@ import { SlashCommandBuilder, PermissionsBitField, ActionRowBuilder, SelectMenuB
 import { defaultLocale } from '#settings';
 import { checks, settingsOptions } from '#lib/util/constants.js';
 import { getLocale, messageDataBuilder, getGuildLocale, settingsPage } from '#lib/util/util.js';
-import { confirmationTimeout, data } from '#lib/util/common.js';
+import { confirmationTimeout, data, logger } from '#lib/util/common.js';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -38,13 +38,18 @@ export default {
 			},
 		);
 		confirmationTimeout[msg.id] = setTimeout(async message => {
-			await message.edit(
-				messageDataBuilder(
-					new EmbedBuilder()
-						.setDescription(await getGuildLocale(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
-					{ components: [] },
-				),
-			);
+			try {
+				await message.edit(
+					messageDataBuilder(
+						new EmbedBuilder()
+							.setDescription(await getGuildLocale(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
+						{ components: [] },
+					),
+				);
+			}
+			catch (err) {
+				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+			}
 			delete confirmationTimeout[message.id];
 		}, 30 * 1000, msg);
 	},
