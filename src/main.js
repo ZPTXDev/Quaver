@@ -183,7 +183,7 @@ export async function shuttingDown(eventType, err) {
 		logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
 	}
 	finally {
-		if (!['exit', 'SIGINT', 'SIGTERM'].includes(eventType)) {
+		if (!['exit', 'SIGINT', 'SIGTERM'].includes(eventType) && err instanceof Error) {
 			logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
 			logger.info({ message: 'Logging additional output to error.log.', label: 'Quaver' });
 			try {
