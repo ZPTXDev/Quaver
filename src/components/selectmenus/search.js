@@ -1,6 +1,6 @@
 import { EmbedBuilder, ButtonBuilder, ActionRowBuilder, SelectMenuBuilder } from 'discord.js';
 import { getGuildLocaleString, messageDataBuilder } from '#lib/util/util.js';
-import { searchState } from '#lib/util/common.js';
+import { logger, searchState } from '#lib/util/common.js';
 
 export default {
 	name: 'search',
@@ -11,13 +11,18 @@ export default {
 		if (!state) return interaction.replyHandler.locale('DISCORD.INTERACTION.EXPIRED', { components: [], force: 'update' });
 		clearTimeout(state.timeout);
 		state.timeout = setTimeout(async message => {
-			await message.edit(
-				messageDataBuilder(
-					new EmbedBuilder()
-						.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
-					{ components: [] },
-				),
-			);
+			try {
+				await message.edit(
+					messageDataBuilder(
+						new EmbedBuilder()
+							.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
+						{ components: [] },
+					),
+				);
+			}
+			catch (err) {
+				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+			}
 			delete searchState[message.id];
 		}, 30 * 1000, interaction.message);
 		state.selected = interaction.values;

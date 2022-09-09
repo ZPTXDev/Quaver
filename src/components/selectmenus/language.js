@@ -1,6 +1,6 @@
 import { ActionRowBuilder, EmbedBuilder, SelectMenuBuilder } from 'discord.js';
 import { checkLocaleCompletion, getGuildLocaleString, getLocaleString, messageDataBuilder, roundTo, settingsPage } from '#lib/util/util.js';
-import { confirmationTimeout, data } from '#lib/util/common.js';
+import { confirmationTimeout, data, logger } from '#lib/util/common.js';
 import { defaultLocale } from '#settings';
 import { settingsOptions } from '#lib/util/constants.js';
 
@@ -11,13 +11,18 @@ export default {
 		if (!confirmationTimeout[interaction.message.id]) return interaction.replyHandler.locale('DISCORD.INTERACTION.EXPIRED', { components: [], force: 'update' });
 		clearTimeout(confirmationTimeout[interaction.message.id]);
 		confirmationTimeout[interaction.message.id] = setTimeout(async message => {
-			await message.edit(
-				messageDataBuilder(
-					new EmbedBuilder()
-						.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
-					{ components: [] },
-				),
-			);
+			try {
+				await message.edit(
+					messageDataBuilder(
+						new EmbedBuilder()
+							.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
+						{ components: [] },
+					),
+				);
+			}
+			catch (err) {
+				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+			}
 			delete confirmationTimeout[message.id];
 		}, 30 * 1000, interaction.message);
 		const option = interaction.values[0];

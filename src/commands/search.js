@@ -2,7 +2,7 @@ import { SlashCommandBuilder, ActionRowBuilder, SelectMenuBuilder, ChannelType, 
 import { defaultLocale } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getGuildLocaleString, getLocaleString, messageDataBuilder, msToTime, msToTimeString, paginate } from '#lib/util/util.js';
-import { searchState } from '#lib/util/common.js';
+import { logger, searchState } from '#lib/util/common.js';
 
 // credit: https://github.com/lavaclient/djs-v13-example/blob/main/src/commands/Play.ts
 
@@ -88,13 +88,18 @@ export default {
 		searchState[msg.id] = {};
 		searchState[msg.id].pages = pages;
 		searchState[msg.id].timeout = setTimeout(async message => {
-			await message.edit(
-				messageDataBuilder(
-					new EmbedBuilder()
-						.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
-					{ components: [] },
-				),
-			);
+			try {
+				await message.edit(
+					messageDataBuilder(
+						new EmbedBuilder()
+							.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
+						{ components: [] },
+					),
+				);
+			}
+			catch (err) {
+				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+			}
 			delete searchState[message.id];
 		}, 30 * 1000, msg);
 		searchState[msg.id].selected = [];
