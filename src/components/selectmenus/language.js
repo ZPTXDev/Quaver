@@ -1,5 +1,5 @@
 import { ActionRowBuilder, EmbedBuilder, SelectMenuBuilder } from 'discord.js';
-import { checkLocaleCompletion, getGuildLocale, getLocale, messageDataBuilder, roundTo, settingsPage } from '#lib/util/util.js';
+import { checkLocaleCompletion, getGuildLocaleString, getLocaleString, messageDataBuilder, roundTo, settingsPage } from '#lib/util/util.js';
 import { confirmationTimeout, data } from '#lib/util/common.js';
 import { defaultLocale } from '#settings';
 import { settingsOptions } from '#lib/util/constants.js';
@@ -14,7 +14,7 @@ export default {
 			await message.edit(
 				messageDataBuilder(
 					new EmbedBuilder()
-						.setDescription(await getGuildLocale(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
+						.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
 					{ components: [] },
 				),
 			);
@@ -33,7 +33,7 @@ export default {
 		}
 		const guildLocale = await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale;
 		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocale, 'language');
-		const description = `${getLocale(guildLocale, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocale(guildLocale, 'CMD.SETTINGS.MISC.LANGUAGE.NAME')}** ─ ${getLocale(guildLocale, 'CMD.SETTINGS.MISC.LANGUAGE.DESCRIPTION')}\n> ${getLocale(guildLocale, 'MISC.CURRENT')}: \`${current}\``;
+		const description = `${getLocaleString(guildLocale, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocale, 'CMD.SETTINGS.MISC.LANGUAGE.NAME')}** ─ ${getLocaleString(guildLocale, 'CMD.SETTINGS.MISC.LANGUAGE.DESCRIPTION')}\n> ${getLocaleString(guildLocale, 'MISC.CURRENT')}: \`${current}\``;
 		const args = [
 			[description, ...embeds],
 			{
@@ -42,7 +42,7 @@ export default {
 						.addComponents(
 							SelectMenuBuilder.from(interaction.message.components[0].components[0])
 								.setOptions(
-									settingsOptions.map(opt => ({ label: getLocale(guildLocale, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.NAME`), description: getLocale(guildLocale, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION`), value: opt, default: opt === 'language' })),
+									settingsOptions.map(opt => ({ label: getLocaleString(guildLocale, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.NAME`), description: getLocaleString(guildLocale, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION`), value: opt, default: opt === 'language' })),
 								),
 						),
 					actionRow,

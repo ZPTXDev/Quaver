@@ -1,5 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ChannelType, EmbedBuilder, escapeMarkdown, PermissionsBitField, SelectMenuBuilder } from 'discord.js';
-import { getGuildLocale, messageDataBuilder, msToTime, msToTimeString } from '#lib/util/util.js';
+import { getGuildLocaleString, messageDataBuilder, msToTime, msToTimeString } from '#lib/util/util.js';
 import { searchState } from '#lib/util/common.js';
 import { checks } from '#lib/util/constants.js';
 import PlayerHandler from '#lib/PlayerHandler.js';
@@ -39,7 +39,7 @@ export default {
 			}
 			else {
 				msg = 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
-				extras = [resolvedTracks.length, await getGuildLocale(interaction.guildId, 'MISC.YOUR_SEARCH'), ''] ;
+				extras = [resolvedTracks.length, await getGuildLocaleString(interaction.guildId, 'MISC.YOUR_SEARCH'), ''] ;
 			}
 			if (!player?.connected) {
 				player = interaction.client.music.createPlayer(interaction.guildId);
@@ -63,8 +63,8 @@ export default {
 			const started = player.playing || player.paused;
 			await interaction.replyHandler.reply(
 				new EmbedBuilder()
-					.setDescription(await getGuildLocale(interaction.guildId, msg, ...extras))
-					.setFooter({ text: started ? `${await getGuildLocale(interaction.guildId, 'MISC.POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null }),
+					.setDescription(await getGuildLocaleString(interaction.guildId, msg, ...extras))
+					.setFooter({ text: started ? `${await getGuildLocaleString(interaction.guildId, 'MISC.POSITION')}: ${firstPosition}${endPosition !== firstPosition ? ` - ${endPosition}` : ''}` : null }),
 				{ type: 'success', components: [] },
 			);
 			if (!started) await player.queue.start();
@@ -83,7 +83,7 @@ export default {
 			await message.edit(
 				messageDataBuilder(
 					new EmbedBuilder()
-						.setDescription(await getGuildLocale(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
+						.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
 					{ components: [] },
 				),
 			);
@@ -101,7 +101,7 @@ export default {
 				const durationString = track.info.isStream ? '∞' : msToTimeString(duration, true);
 				return `\`${(firstIndex + index).toString().padStart(largestIndexSize, ' ')}.\` **[${escapeMarkdown(track.info.title)}](${track.info.uri})** \`[${durationString}]\``;
 			}).join('\n'))
-			.setFooter({ text: await getGuildLocale(interaction.guildId, 'MISC.PAGE', page, pages.length) });
+			.setFooter({ text: await getGuildLocaleString(interaction.guildId, 'MISC.PAGE', page, pages.length) });
 		original.components[0] = ActionRowBuilder.from(original.components[0]);
 		original.components[0].components[0] = SelectMenuBuilder.from(original.components[0].components[0])
 			.setOptions(

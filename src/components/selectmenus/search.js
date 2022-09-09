@@ -1,5 +1,5 @@
 import { EmbedBuilder, ButtonBuilder, ActionRowBuilder, SelectMenuBuilder } from 'discord.js';
-import { getGuildLocale, messageDataBuilder } from '#lib/util/util.js';
+import { getGuildLocaleString, messageDataBuilder } from '#lib/util/util.js';
 import { searchState } from '#lib/util/common.js';
 
 export default {
@@ -14,7 +14,7 @@ export default {
 			await message.edit(
 				messageDataBuilder(
 					new EmbedBuilder()
-						.setDescription(await getGuildLocale(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
+						.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
 					{ components: [] },
 				),
 			);

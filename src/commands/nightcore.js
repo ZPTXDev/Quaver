@@ -1,16 +1,16 @@
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { defaultLocale, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getGuildLocale, getLocale } from '#lib/util/util.js';
+import { getGuildLocaleString, getLocaleString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('nightcore')
-		.setDescription(getLocale(defaultLocale, 'CMD.NIGHTCORE.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocale, 'CMD.NIGHTCORE.DESCRIPTION'))
 		.addBooleanOption(option =>
 			option
 				.setName('enabled')
-				.setDescription(getLocale(defaultLocale, 'CMD.NIGHTCORE.OPTION.ENABLED'))),
+				.setDescription(getLocaleString(defaultLocale, 'CMD.NIGHTCORE.OPTION.ENABLED'))),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -28,8 +28,8 @@ export default {
 		if (features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('filterUpdate', { bassboost: player.bassboost, nightcore: player.nightcore });
 		return interaction.replyHandler.reply(
 			new EmbedBuilder()
-				.setDescription(await getGuildLocale(interaction.guildId, player.nightcore ? 'CMD.NIGHTCORE.RESPONSE.ENABLED' : 'CMD.NIGHTCORE.RESPONSE.DISABLED'))
-				.setFooter({ text: await getGuildLocale(interaction.guildId, 'MUSIC.PLAYER.FILTER_NOTE') }),
+				.setDescription(await getGuildLocaleString(interaction.guildId, player.nightcore ? 'CMD.NIGHTCORE.RESPONSE.ENABLED' : 'CMD.NIGHTCORE.RESPONSE.DISABLED'))
+				.setFooter({ text: await getGuildLocaleString(interaction.guildId, 'MUSIC.PLAYER.FILTER_NOTE') }),
 		);
 	},
 };

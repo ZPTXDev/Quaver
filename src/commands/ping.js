@@ -1,11 +1,11 @@
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { defaultLocale } from '#settings';
-import { msToTime, msToTimeString, getLocale, getGuildLocale } from '#lib/util/util.js';
+import { msToTime, msToTimeString, getLocaleString, getGuildLocaleString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('ping')
-		.setDescription(getLocale(defaultLocale, 'CMD.PING.DESCRIPTION')),
+		.setDescription(getLocaleString(defaultLocale, 'CMD.PING.DESCRIPTION')),
 	checks: [],
 	permissions: {
 		user: [],
@@ -17,8 +17,8 @@ export default {
 		const uptimeString = msToTimeString(uptime);
 		return interaction.replyHandler.reply(
 			new EmbedBuilder()
-				.setDescription(await getGuildLocale(interaction.guildId, 'CMD.PING.RESPONSE.SUCCESS', interaction.guild ? ` ${interaction.guild.shard.ping}ms` : ''))
-				.setFooter({ text: `${await getGuildLocale(interaction.guildId, 'CMD.PING.MISC.UPTIME')} ${uptimeString}` }),
+				.setDescription(await getGuildLocaleString(interaction.guildId, 'CMD.PING.RESPONSE.SUCCESS', interaction.guild ? ` ${interaction.guild.shard.ping}ms` : ''))
+				.setFooter({ text: `${await getGuildLocaleString(interaction.guildId, 'CMD.PING.MISC.UPTIME')} ${uptimeString}` }),
 			{ ephemeral: true },
 		);
 	},

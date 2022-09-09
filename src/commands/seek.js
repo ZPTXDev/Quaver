@@ -1,28 +1,28 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { defaultLocale } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getLocale, msToTime, msToTimeString } from '#lib/util/util.js';
+import { getLocaleString, msToTime, msToTimeString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('seek')
-		.setDescription(getLocale(defaultLocale, 'CMD.SEEK.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocale, 'CMD.SEEK.DESCRIPTION'))
 		.addIntegerOption(option =>
 			option
 				.setName('hours')
-				.setDescription(getLocale(defaultLocale, 'CMD.SEEK.OPTION.HOURS'))
+				.setDescription(getLocaleString(defaultLocale, 'CMD.SEEK.OPTION.HOURS'))
 				.setMinValue(0)
 				.setMaxValue(23))
 		.addIntegerOption(option =>
 			option
 				.setName('minutes')
-				.setDescription(getLocale(defaultLocale, 'CMD.SEEK.OPTION.MINUTES'))
+				.setDescription(getLocaleString(defaultLocale, 'CMD.SEEK.OPTION.MINUTES'))
 				.setMinValue(0)
 				.setMaxValue(59))
 		.addIntegerOption(option =>
 			option
 				.setName('seconds')
-				.setDescription(getLocale(defaultLocale, 'CMD.SEEK.OPTION.SECONDS'))
+				.setDescription(getLocaleString(defaultLocale, 'CMD.SEEK.OPTION.SECONDS'))
 				.setMinValue(0)
 				.setMaxValue(59)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],

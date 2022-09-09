@@ -1,12 +1,12 @@
 import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
 import { defaultLocale } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getGuildLocale, getLocale } from '#lib/util/util.js';
+import { getGuildLocaleString, getLocaleString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('skip')
-		.setDescription(getLocale(defaultLocale, 'CMD.SKIP.DESCRIPTION')),
+		.setDescription(getLocaleString(defaultLocale, 'CMD.SKIP.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -27,7 +27,7 @@ export default {
 		if (skip.users.length >= skip.required) {
 			const track = await player.queue.skip();
 			await player.queue.start();
-			await interaction.replyHandler.reply(`${await getGuildLocale(interaction.guildId, 'CMD.SKIP.RESPONSE.SUCCESS.VOTED', escapeMarkdown(track.title), track.uri)}\n${await getGuildLocale(interaction.guildId, 'MISC.ADDED_BY', track.requester)}`);
+			await interaction.replyHandler.reply(`${await getGuildLocaleString(interaction.guildId, 'CMD.SKIP.RESPONSE.SUCCESS.VOTED', escapeMarkdown(track.title), track.uri)}\n${await getGuildLocaleString(interaction.guildId, 'MISC.ADDED_BY', track.requester)}`);
 			return player.queue.next();
 		}
 		player.skip = skip;
