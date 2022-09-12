@@ -23,7 +23,7 @@
     "winston": "^3.8.2"
   },
   "devDependencies": {
-    "eslint": "^8.23.0"
+    "eslint": "^8.23.1"
   },
   "main": "src/main.js",
   "scripts": {
