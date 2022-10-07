@@ -26,9 +26,9 @@ export default {
 			delete confirmationTimeout[message.id];
 		}, 30 * 1000, interaction.message);
 		const option = interaction.values[0];
-		const guildLocale = await data.guild.get(interaction.guild.id, 'settings.locale') ?? defaultLocaleCode;
-		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocale, option);
-		const description = `${getLocaleString(guildLocale, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocale, `CMD.SETTINGS.MISC.${option.toUpperCase()}.NAME`)}** ─ ${getLocaleString(guildLocale, `CMD.SETTINGS.MISC.${option.toUpperCase()}.DESCRIPTION`)}\n> ${getLocaleString(guildLocale, 'MISC.CURRENT')}: \`${current}\``;
+		const guildLocaleCode = await data.guild.get(interaction.guild.id, 'settings.locale') ?? defaultLocaleCode;
+		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocaleCode, option);
+		const description = `${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocaleCode, `CMD.SETTINGS.MISC.${option.toUpperCase()}.NAME`)}** ─ ${getLocaleString(guildLocaleCode, `CMD.SETTINGS.MISC.${option.toUpperCase()}.DESCRIPTION`)}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: \`${current}\``;
 		return interaction.replyHandler.reply(
 			[description, ...embeds],
 			{
@@ -38,7 +38,7 @@ export default {
 							new SelectMenuBuilder()
 								.setCustomId('settings')
 								.addOptions(
-									settingsOptions.map(opt => ({ label: getLocaleString(guildLocale, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.NAME`), description: getLocaleString(guildLocale, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION`), value: opt, default: opt === option })),
+									settingsOptions.map(opt => ({ label: getLocaleString(guildLocaleCode, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.NAME`), description: getLocaleString(guildLocaleCode, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION`), value: opt, default: opt === option })),
 								),
 						),
 					actionRow,

@@ -36,9 +36,9 @@ export default {
 				{ type: 'warning', ephemeral: true },
 			);
 		}
-		const guildLocale = await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocaleCode;
-		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocale, 'language');
-		const description = `${getLocaleString(guildLocale, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocale, 'CMD.SETTINGS.MISC.LANGUAGE.NAME')}** ─ ${getLocaleString(guildLocale, 'CMD.SETTINGS.MISC.LANGUAGE.DESCRIPTION')}\n> ${getLocaleString(guildLocale, 'MISC.CURRENT')}: \`${current}\``;
+		const guildLocaleCode = await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocaleCode;
+		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocaleCode, 'language');
+		const description = `${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.LANGUAGE.NAME')}** ─ ${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.LANGUAGE.DESCRIPTION')}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: \`${current}\``;
 		const args = [
 			[description, ...embeds],
 			{
@@ -47,7 +47,7 @@ export default {
 						.addComponents(
 							SelectMenuBuilder.from(interaction.message.components[0].components[0])
 								.setOptions(
-									settingsOptions.map(opt => ({ label: getLocaleString(guildLocale, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.NAME`), description: getLocaleString(guildLocale, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION`), value: opt, default: opt === 'language' })),
+									settingsOptions.map(opt => ({ label: getLocaleString(guildLocaleCode, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.NAME`), description: getLocaleString(guildLocaleCode, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION`), value: opt, default: opt === 'language' })),
 								),
 						),
 					actionRow,

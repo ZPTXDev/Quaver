@@ -26,9 +26,9 @@ export default {
 		}, 30 * 1000, interaction.message);
 		const option = interaction.customId.split('_')[1];
 		await data.guild.set(interaction.guildId, 'settings.format', option);
-		const guildLocale = await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocaleCode;
-		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocale, 'format');
-		const description = `${getLocaleString(guildLocale, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocale, 'CMD.SETTINGS.MISC.FORMAT.NAME')}** ─ ${getLocaleString(guildLocale, 'CMD.SETTINGS.MISC.FORMAT.DESCRIPTION')}\n> ${getLocaleString(guildLocale, 'MISC.CURRENT')}: \`${current}\``;
+		const guildLocaleCode = await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocaleCode;
+		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocaleCode, 'format');
+		const description = `${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.FORMAT.NAME')}** ─ ${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.FORMAT.DESCRIPTION')}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: \`${current}\``;
 		return interaction.replyHandler.reply(
 			[description, ...embeds],
 			{
