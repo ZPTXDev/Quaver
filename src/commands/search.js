@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, ActionRowBuilder, SelectMenuBuilder, ChannelType, EmbedBuilder, ButtonBuilder, ButtonStyle, escapeMarkdown } from 'discord.js';
 import { defaultLocale } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getGuildLocaleString, getLocaleString, messageDataBuilder, msToTime, msToTimeString, paginate } from '#lib/util/util.js';
+import { getGuildLocaleString, getLocaleString, buildMessageOptions, msToTime, msToTimeString, paginate } from '#lib/util/util.js';
 import { logger, searchState } from '#lib/util/common.js';
 
 // credit: https://github.com/lavaclient/djs-v13-example/blob/main/src/commands/Play.ts
@@ -90,7 +90,7 @@ export default {
 		searchState[msg.id].timeout = setTimeout(async message => {
 			try {
 				await message.edit(
-					messageDataBuilder(
+					buildMessageOptions(
 						new EmbedBuilder()
 							.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
 						{ components: [] },

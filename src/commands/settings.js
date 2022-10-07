@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, PermissionsBitField, ActionRowBuilder, SelectMenuBuilder, EmbedBuilder } from 'discord.js';
 import { defaultLocale } from '#settings';
 import { checks, settingsOptions } from '#lib/util/constants.js';
-import { getLocaleString, messageDataBuilder, getGuildLocaleString, settingsPage } from '#lib/util/util.js';
+import { getLocaleString, buildMessageOptions, getGuildLocaleString, settingsPage } from '#lib/util/util.js';
 import { confirmationTimeout, data, logger } from '#lib/util/common.js';
 
 export default {
@@ -40,7 +40,7 @@ export default {
 		confirmationTimeout[msg.id] = setTimeout(async message => {
 			try {
 				await message.edit(
-					messageDataBuilder(
+					buildMessageOptions(
 						new EmbedBuilder()
 							.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
 						{ components: [] },

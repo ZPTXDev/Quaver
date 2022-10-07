@@ -1,5 +1,5 @@
 import { ActionRowBuilder, EmbedBuilder, SelectMenuBuilder } from 'discord.js';
-import { checkLocaleCompletion, getGuildLocaleString, getLocaleString, messageDataBuilder, roundTo, settingsPage } from '#lib/util/util.js';
+import { checkLocaleCompletion, getGuildLocaleString, getLocaleString, buildMessageOptions, roundTo, settingsPage } from '#lib/util/util.js';
 import { confirmationTimeout, data, logger } from '#lib/util/common.js';
 import { defaultLocale } from '#settings';
 import { settingsOptions } from '#lib/util/constants.js';
@@ -13,7 +13,7 @@ export default {
 		confirmationTimeout[interaction.message.id] = setTimeout(async message => {
 			try {
 				await message.edit(
-					messageDataBuilder(
+					buildMessageOptions(
 						new EmbedBuilder()
 							.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
 						{ components: [] },
@@ -55,7 +55,7 @@ export default {
 			},
 		];
 		return localeCompletion.completion !== 100
-			? interaction.message.edit(messageDataBuilder(...args))
+			? interaction.message.edit(buildMessageOptions(...args))
 			: interaction.replyHandler.reply(args[0], { ...args[1], force: 'update' });
 	},
 };
