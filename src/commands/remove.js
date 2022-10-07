@@ -1,16 +1,16 @@
 import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
-import { defaultLocale, features } from '#settings';
+import { defaultLocaleCode, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getLocaleString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('remove')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.REMOVE.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.REMOVE.DESCRIPTION'))
 		.addIntegerOption(option =>
 			option
 				.setName('position')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.REMOVE.OPTION.POSITION'))
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.REMOVE.OPTION.POSITION'))
 				.setMinValue(1)
 				.setRequired(true)
 				.setAutocomplete(true)),

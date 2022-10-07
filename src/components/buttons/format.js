@@ -1,7 +1,7 @@
 import { ActionRowBuilder, EmbedBuilder } from 'discord.js';
 import { getGuildLocaleString, getLocaleString, buildMessageOptions, settingsPage } from '#lib/util/util.js';
 import { confirmationTimeout, data, logger } from '#lib/util/common.js';
-import { defaultLocale } from '#settings';
+import { defaultLocaleCode } from '#settings';
 
 export default {
 	name: 'format',
@@ -26,7 +26,7 @@ export default {
 		}, 30 * 1000, interaction.message);
 		const option = interaction.customId.split('_')[1];
 		await data.guild.set(interaction.guildId, 'settings.format', option);
-		const guildLocale = await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale;
+		const guildLocale = await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocaleCode;
 		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocale, 'format');
 		const description = `${getLocaleString(guildLocale, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocale, 'CMD.SETTINGS.MISC.FORMAT.NAME')}** ─ ${getLocaleString(guildLocale, 'CMD.SETTINGS.MISC.FORMAT.DESCRIPTION')}\n> ${getLocaleString(guildLocale, 'MISC.CURRENT')}: \`${current}\``;
 		return interaction.replyHandler.reply(

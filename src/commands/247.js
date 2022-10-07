@@ -1,5 +1,5 @@
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { defaultLocale, features } from '#settings';
+import { defaultLocaleCode, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getGuildLocaleString, getLocaleString } from '#lib/util/util.js';
 import { data } from '#lib/util/common.js';
@@ -7,11 +7,11 @@ import { data } from '#lib/util/common.js';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('247')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.247.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.247.DESCRIPTION'))
 		.addBooleanOption(option =>
 			option
 				.setName('enabled')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.247.OPTION.ENABLED'))),
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.247.OPTION.ENABLED'))),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],

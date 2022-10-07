@@ -1,7 +1,7 @@
 import { ActionRowBuilder, EmbedBuilder, SelectMenuBuilder } from 'discord.js';
 import { checkLocaleCompletion, getGuildLocaleString, getLocaleString, buildMessageOptions, roundTo, settingsPage } from '#lib/util/util.js';
 import { confirmationTimeout, data, logger } from '#lib/util/common.js';
-import { defaultLocale } from '#settings';
+import { defaultLocaleCode } from '#settings';
 import { settingsOptions } from '#lib/util/constants.js';
 
 export default {
@@ -36,7 +36,7 @@ export default {
 				{ type: 'warning', ephemeral: true },
 			);
 		}
-		const guildLocale = await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale;
+		const guildLocale = await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocaleCode;
 		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocale, 'language');
 		const description = `${getLocaleString(guildLocale, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocale, 'CMD.SETTINGS.MISC.LANGUAGE.NAME')}** ─ ${getLocaleString(guildLocale, 'CMD.SETTINGS.MISC.LANGUAGE.DESCRIPTION')}\n> ${getLocaleString(guildLocale, 'MISC.CURRENT')}: \`${current}\``;
 		const args = [

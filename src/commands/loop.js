@@ -1,22 +1,22 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { LoopType } from '@lavaclient/queue';
-import { defaultLocale, features } from '#settings';
+import { defaultLocaleCode, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getGuildLocaleString, getLocaleString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('loop')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.LOOP.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.LOOP.DESCRIPTION'))
 		.addStringOption(option =>
 			option
 				.setName('type')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.LOOP.OPTION.TYPE.DESCRIPTION'))
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.LOOP.OPTION.TYPE.DESCRIPTION'))
 				.setRequired(true)
 				.addChoices(
-					{ name: getLocaleString(defaultLocale, 'CMD.LOOP.OPTION.TYPE.OPTION.DISABLED'), value: 'disabled' },
-					{ name: getLocaleString(defaultLocale, 'CMD.LOOP.OPTION.TYPE.OPTION.TRACK'), value: 'track' },
-					{ name: getLocaleString(defaultLocale, 'CMD.LOOP.OPTION.TYPE.OPTION.QUEUE'), value: 'queue' },
+					{ name: getLocaleString(defaultLocaleCode, 'CMD.LOOP.OPTION.TYPE.OPTION.DISABLED'), value: 'disabled' },
+					{ name: getLocaleString(defaultLocaleCode, 'CMD.LOOP.OPTION.TYPE.OPTION.TRACK'), value: 'track' },
+					{ name: getLocaleString(defaultLocaleCode, 'CMD.LOOP.OPTION.TYPE.OPTION.QUEUE'), value: 'queue' },
 				)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {

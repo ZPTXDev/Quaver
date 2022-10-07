@@ -2,7 +2,7 @@ import { ActionRowBuilder, EmbedBuilder, SelectMenuBuilder } from 'discord.js';
 import { getGuildLocaleString, getLocaleString, buildMessageOptions, settingsPage } from '#lib/util/util.js';
 import { settingsOptions } from '#lib/util/constants.js';
 import { confirmationTimeout, data, logger } from '#lib/util/common.js';
-import { defaultLocale } from '#settings';
+import { defaultLocaleCode } from '#settings';
 
 export default {
 	name: 'settings',
@@ -26,7 +26,7 @@ export default {
 			delete confirmationTimeout[message.id];
 		}, 30 * 1000, interaction.message);
 		const option = interaction.values[0];
-		const guildLocale = await data.guild.get(interaction.guild.id, 'settings.locale') ?? defaultLocale;
+		const guildLocale = await data.guild.get(interaction.guild.id, 'settings.locale') ?? defaultLocaleCode;
 		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocale, option);
 		const description = `${getLocaleString(guildLocale, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocale, `CMD.SETTINGS.MISC.${option.toUpperCase()}.NAME`)}** ─ ${getLocaleString(guildLocale, `CMD.SETTINGS.MISC.${option.toUpperCase()}.DESCRIPTION`)}\n> ${getLocaleString(guildLocale, 'MISC.CURRENT')}: \`${current}\``;
 		return interaction.replyHandler.reply(

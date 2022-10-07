@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, PermissionsBitField, ChannelType, EmbedBuilder, escapeMarkdown } from 'discord.js';
 import { SpotifyItemType } from '@lavaclient/spotify';
-import { defaultLocale, features } from '#settings';
+import { defaultLocaleCode, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getGuildLocaleString, getLocaleString } from '#lib/util/util.js';
 import PlayerHandler from '#lib/PlayerHandler.js';
@@ -8,17 +8,17 @@ import PlayerHandler from '#lib/PlayerHandler.js';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('play')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.PLAY.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.PLAY.DESCRIPTION'))
 		.addStringOption(option =>
 			option
 				.setName('query')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.PLAY.OPTION.QUERY'))
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.PLAY.OPTION.QUERY'))
 				.setRequired(true)
 				.setAutocomplete(true))
 		.addBooleanOption(option =>
 			option
 				.setName('insert')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.PLAY.OPTION.INSERT'))),
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.PLAY.OPTION.INSERT'))),
 	checks: [checks.GUILD_ONLY, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],

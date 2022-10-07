@@ -1,12 +1,12 @@
 import { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, escapeMarkdown } from 'discord.js';
-import { defaultLocale } from '#settings';
+import { defaultLocaleCode } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { paginate, getLocaleString, msToTime, msToTimeString, getGuildLocaleString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('queue')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.QUEUE.DESCRIPTION')),
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.QUEUE.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],

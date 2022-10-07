@@ -1,16 +1,16 @@
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { defaultLocale, features } from '#settings';
+import { defaultLocaleCode, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getGuildLocaleString, getLocaleString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('bassboost')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.BASSBOOST.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.BASSBOOST.DESCRIPTION'))
 		.addBooleanOption(option =>
 			option
 				.setName('enabled')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.BASSBOOST.OPTION.ENABLED'))),
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.BASSBOOST.OPTION.ENABLED'))),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],

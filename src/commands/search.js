@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, ActionRowBuilder, SelectMenuBuilder, ChannelType, EmbedBuilder, ButtonBuilder, ButtonStyle, escapeMarkdown } from 'discord.js';
-import { defaultLocale } from '#settings';
+import { defaultLocaleCode } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getGuildLocaleString, getLocaleString, buildMessageOptions, msToTime, msToTimeString, paginate } from '#lib/util/util.js';
 import { logger, searchState } from '#lib/util/common.js';
@@ -9,11 +9,11 @@ import { logger, searchState } from '#lib/util/common.js';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('search')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.SEARCH.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.SEARCH.DESCRIPTION'))
 		.addStringOption(option =>
 			option
 				.setName('query')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.SEARCH.OPTION.QUERY'))
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.SEARCH.OPTION.QUERY'))
 				.setRequired(true)
 				.setAutocomplete(true)),
 	checks: [checks.GUILD_ONLY],

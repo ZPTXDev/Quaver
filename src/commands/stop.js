@@ -1,5 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { defaultLocale } from '#settings';
+import { defaultLocaleCode } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getGuildLocaleString, getLocaleString, buildMessageOptions } from '#lib/util/util.js';
 import { confirmationTimeout, logger } from '#lib/util/common.js';
@@ -7,7 +7,7 @@ import { confirmationTimeout, logger } from '#lib/util/common.js';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('stop')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.STOP.DESCRIPTION')),
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.STOP.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
