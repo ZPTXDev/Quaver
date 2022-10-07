@@ -42,6 +42,6 @@ export default {
 				return t;
 			}));
 		}
-		return interaction.replyHandler.locale('CMD.MOVE.RESPONSE.SUCCESS', { args: [escapeMarkdown(track.title), track.uri, oldPosition, newPosition], type: 'success' });
+		return interaction.replyHandler.locale('CMD.MOVE.RESPONSE.SUCCESS', { vars: [escapeMarkdown(track.title), track.uri, oldPosition, newPosition], type: 'success' });
 	},
 };
