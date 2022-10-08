@@ -1,5 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ChannelType, EmbedBuilder, escapeMarkdown, PermissionsBitField, SelectMenuBuilder } from 'discord.js';
-import { getGuildLocaleString, messageDataBuilder, msToTime, msToTimeString } from '#lib/util/util.js';
+import { getGuildLocaleString, buildMessageOptions, msToTime, msToTimeString } from '#lib/util/util.js';
 import { logger, searchState } from '#lib/util/common.js';
 import { checks } from '#lib/util/constants.js';
 import PlayerHandler from '#lib/PlayerHandler.js';
@@ -51,7 +51,7 @@ export default {
 				// Ensure that Quaver destroys the player if Quaver gets kicked or banned by the user while Quaver is queuing tracks
 				const timedOut = interaction.guild?.members.me.isCommunicationDisabled();
 				if (!interaction.member.voice.channelId || timedOut || !interaction.guild) {
-					if (interaction.guild) timedOut ? await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT', { type: 'error', components: [] }) : await interaction.replyHandler.locale('DISCORD.INTERACTION.CANCELED', { args: [interaction.user.id], components: [] });
+					if (interaction.guild) timedOut ? await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT', { type: 'error', components: [] }) : await interaction.replyHandler.locale('DISCORD.INTERACTION.CANCELED', { vars: [interaction.user.id], components: [] });
 					return player.handler.disconnect();
 				}
 			}
@@ -82,7 +82,7 @@ export default {
 		state.timeout = setTimeout(async message => {
 			try {
 				await message.edit(
-					messageDataBuilder(
+					buildMessageOptions(
 						new EmbedBuilder()
 							.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
 						{ components: [] },

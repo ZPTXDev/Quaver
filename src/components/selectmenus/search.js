@@ -1,5 +1,5 @@
 import { EmbedBuilder, ButtonBuilder, ActionRowBuilder, SelectMenuBuilder } from 'discord.js';
-import { getGuildLocaleString, messageDataBuilder } from '#lib/util/util.js';
+import { getGuildLocaleString, buildMessageOptions } from '#lib/util/util.js';
 import { logger, searchState } from '#lib/util/common.js';
 
 export default {
@@ -13,7 +13,7 @@ export default {
 		state.timeout = setTimeout(async message => {
 			try {
 				await message.edit(
-					messageDataBuilder(
+					buildMessageOptions(
 						new EmbedBuilder()
 							.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
 						{ components: [] },

@@ -1,23 +1,23 @@
 import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
-import { defaultLocale, features } from '#settings';
+import { defaultLocaleCode, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getLocaleString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('move')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.MOVE.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.MOVE.DESCRIPTION'))
 		.addIntegerOption(option =>
 			option
 				.setName('old_position')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.MOVE.OPTION.OLD_POSITION'))
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.MOVE.OPTION.OLD_POSITION'))
 				.setMinValue(1)
 				.setRequired(true)
 				.setAutocomplete(true))
 		.addIntegerOption(option =>
 			option
 				.setName('new_position')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.MOVE.OPTION.NEW_POSITION'))
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.MOVE.OPTION.NEW_POSITION'))
 				.setMinValue(1)
 				.setRequired(true)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
@@ -42,6 +42,6 @@ export default {
 				return t;
 			}));
 		}
-		return interaction.replyHandler.locale('CMD.MOVE.RESPONSE.SUCCESS', { args: [escapeMarkdown(track.title), track.uri, oldPosition, newPosition], type: 'success' });
+		return interaction.replyHandler.locale('CMD.MOVE.RESPONSE.SUCCESS', { vars: [escapeMarkdown(track.title), track.uri, oldPosition, newPosition], type: 'success' });
 	},
 };

@@ -1,11 +1,11 @@
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { defaultLocale } from '#settings';
+import { defaultLocaleCode } from '#settings';
 import { msToTime, msToTimeString, getLocaleString, getGuildLocaleString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('ping')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.PING.DESCRIPTION')),
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.PING.DESCRIPTION')),
 	checks: [],
 	permissions: {
 		user: [],

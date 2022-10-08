@@ -1,8 +1,8 @@
 import { ActionRowBuilder, EmbedBuilder, SelectMenuBuilder } from 'discord.js';
-import { getGuildLocaleString, getLocaleString, messageDataBuilder, settingsPage } from '#lib/util/util.js';
+import { getGuildLocaleString, getLocaleString, buildMessageOptions, settingsPage } from '#lib/util/util.js';
 import { settingsOptions } from '#lib/util/constants.js';
 import { confirmationTimeout, data, logger } from '#lib/util/common.js';
-import { defaultLocale } from '#settings';
+import { defaultLocaleCode } from '#settings';
 
 export default {
 	name: 'settings',
@@ -13,7 +13,7 @@ export default {
 		confirmationTimeout[interaction.message.id] = setTimeout(async message => {
 			try {
 				await message.edit(
-					messageDataBuilder(
+					buildMessageOptions(
 						new EmbedBuilder()
 							.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
 						{ components: [] },
@@ -26,9 +26,9 @@ export default {
 			delete confirmationTimeout[message.id];
 		}, 30 * 1000, interaction.message);
 		const option = interaction.values[0];
-		const guildLocale = await data.guild.get(interaction.guild.id, 'settings.locale') ?? defaultLocale;
-		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocale, option);
-		const description = `${getLocaleString(guildLocale, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocale, `CMD.SETTINGS.MISC.${option.toUpperCase()}.NAME`)}** ─ ${getLocaleString(guildLocale, `CMD.SETTINGS.MISC.${option.toUpperCase()}.DESCRIPTION`)}\n> ${getLocaleString(guildLocale, 'MISC.CURRENT')}: \`${current}\``;
+		const guildLocaleCode = await data.guild.get(interaction.guild.id, 'settings.locale') ?? defaultLocaleCode;
+		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocaleCode, option);
+		const description = `${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocaleCode, `CMD.SETTINGS.MISC.${option.toUpperCase()}.NAME`)}** ─ ${getLocaleString(guildLocaleCode, `CMD.SETTINGS.MISC.${option.toUpperCase()}.DESCRIPTION`)}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: \`${current}\``;
 		return interaction.replyHandler.reply(
 			[description, ...embeds],
 			{
@@ -38,7 +38,7 @@ export default {
 							new SelectMenuBuilder()
 								.setCustomId('settings')
 								.addOptions(
-									settingsOptions.map(opt => ({ label: getLocaleString(guildLocale, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.NAME`), description: getLocaleString(guildLocale, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION`), value: opt, default: opt === option })),
+									settingsOptions.map(opt => ({ label: getLocaleString(guildLocaleCode, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.NAME`), description: getLocaleString(guildLocaleCode, `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION`), value: opt, default: opt === option })),
 								),
 						),
 					actionRow,

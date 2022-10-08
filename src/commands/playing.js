@@ -1,13 +1,13 @@
 import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
 import { LoopType } from '@lavaclient/queue';
-import { defaultLocale } from '#settings';
+import { defaultLocaleCode } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getBar, getGuildLocaleString, getLocaleString, msToTime, msToTimeString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('playing')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.PLAYING.DESCRIPTION')),
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.PLAYING.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],

@@ -1,13 +1,13 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { defaultLocale } from '#settings';
+import { defaultLocaleCode } from '#settings';
 import { checks } from '#lib/util/constants.js';
-import { getGuildLocaleString, getLocaleString, messageDataBuilder } from '#lib/util/util.js';
+import { getGuildLocaleString, getLocaleString, buildMessageOptions } from '#lib/util/util.js';
 import { confirmationTimeout, data, logger } from '#lib/util/common.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('disconnect')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.DISCONNECT.DESCRIPTION')),
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.DISCONNECT.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -46,7 +46,7 @@ export default {
 		confirmationTimeout[msg.id] = setTimeout(async message => {
 			try {
 				await message.edit(
-					messageDataBuilder(
+					buildMessageOptions(
 						new EmbedBuilder()
 							.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
 						{ components: [] },

@@ -54,11 +54,11 @@ export default {
 			}
 			if (failedPermissions.user.length > 0) {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedPermissions.user.length} user permission check(s)`, label: 'Quaver' });
-				return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.USER', { args: [failedPermissions.user.map(perm => `\`${perm}\``).join(' ')], type: 'error' });
+				return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.USER', { vars: [failedPermissions.user.map(perm => `\`${perm}\``).join(' ')], type: 'error' });
 			}
 			if (failedPermissions.bot.length > 0) {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Command ${interaction.commandName} failed ${failedPermissions.bot.length} bot permission check(s)`, label: 'Quaver' });
-				return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.DEFAULT', { args: [failedPermissions.bot.map(perm => `\`${perm}\``).join(' ')], type: 'error' });
+				return interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.DEFAULT', { vars: [failedPermissions.bot.map(perm => `\`${perm}\``).join(' ')], type: 'error' });
 			}
 			try {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Executing command ${interaction.commandName}`, label: 'Quaver' });

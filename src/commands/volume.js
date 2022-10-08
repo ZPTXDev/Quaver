@@ -1,16 +1,16 @@
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { defaultLocale, features, managers } from '#settings';
+import { defaultLocaleCode, features, managers } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getGuildLocaleString, getLocaleString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('volume')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.VOLUME.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.VOLUME.DESCRIPTION'))
 		.addIntegerOption(option =>
 			option
 				.setName('new_volume')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.VOLUME.OPTION.NEW_VOLUME'))
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.VOLUME.OPTION.NEW_VOLUME'))
 				.setMinValue(0)
 				.setMaxValue(1000)
 				.setRequired(true)),
