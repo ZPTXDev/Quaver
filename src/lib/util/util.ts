@@ -242,19 +242,19 @@ export function buildMessageOptions(inputData: string | EmbedBuilder | (string |
 	return opts;
 }
 
-export async function settingsPage(interaction: Interaction, guildLocale: string, option: 'language' | 'format'): Promise<{ current: string; embeds: EmbedBuilder[]; actionRow: ActionRowBuilder; }> {
+export async function settingsPage(interaction: Interaction, guildLocaleCode: string, option: 'language' | 'format'): Promise<{ current: string; embeds: EmbedBuilder[]; actionRow: ActionRowBuilder; }> {
 	let current: string;
 	let embeds: EmbedBuilder[] = [];
 	const actionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 	switch (option) {
 		case 'language':
-			current = `${languageName[guildLocale] ?? 'Unknown'} (${guildLocale})`;
+			current = `${languageName[guildLocaleCode] ?? 'Unknown'} (${guildLocaleCode})`;
 			actionRow.addComponents(
 				new SelectMenuBuilder()
 					.setCustomId('language')
 					.addOptions(
 						fs.readdirSync(getAbsoluteFileURL(import.meta.url, ['..', '..', 'locales']))
-							.map((file): APISelectMenuOption => ({ label: `${languageName[file] ?? 'Unknown'} (${file})`, value: file, default: file === guildLocale })),
+							.map((file): APISelectMenuOption => ({ label: `${languageName[file] ?? 'Unknown'} (${file})`, value: file, default: file === guildLocaleCode })),
 					),
 			);
 			break;
@@ -263,31 +263,31 @@ export async function settingsPage(interaction: Interaction, guildLocale: string
 			actionRow.addComponents(
 				new ButtonBuilder()
 					.setCustomId('format_simple')
-					.setLabel(getLocaleString(guildLocale, 'CMD.SETTINGS.MISC.FORMAT.OPTIONS.SIMPLE'))
+					.setLabel(getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.FORMAT.OPTIONS.SIMPLE'))
 					.setStyle(current === 'simple' ? ButtonStyle.Success : ButtonStyle.Secondary)
 					.setDisabled(current === 'simple'),
 				new ButtonBuilder()
 					.setCustomId('format_detailed')
-					.setLabel(getLocaleString(guildLocale, 'CMD.SETTINGS.MISC.FORMAT.OPTIONS.DETAILED'))
+					.setLabel(getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.FORMAT.OPTIONS.DETAILED'))
 					.setStyle(current === 'detailed' ? ButtonStyle.Success : ButtonStyle.Secondary)
 					.setDisabled(current === 'detailed'),
 			);
 			embeds = current === 'simple' ? [
 				new EmbedBuilder()
-					.setDescription(`${getLocaleString(guildLocale, 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE', escapeMarkdown(getLocaleString(guildLocale, 'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.SIMPLE')), 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', '4:20')}\n${getLocaleString(guildLocale, 'MISC.ADDED_BY', interaction.user.id)}`)
+					.setDescription(`${getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE', escapeMarkdown(getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.SIMPLE')), 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', '4:20')}\n${getLocaleString(guildLocaleCode, 'MISC.ADDED_BY', interaction.user.id)}`)
 					.setColor(<ColorResolvable> colors.neutral),
 			] : [
 				new EmbedBuilder()
-					.setTitle(getLocaleString(guildLocale, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE'))
-					.setDescription(`**[${escapeMarkdown(getLocaleString(guildLocale, 'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.DETAILED'))}](https://www.youtube.com/watch?v=dQw4w9WgXcQ)**`)
+					.setTitle(getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE'))
+					.setDescription(`**[${escapeMarkdown(getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.DETAILED'))}](https://www.youtube.com/watch?v=dQw4w9WgXcQ)**`)
 					.addFields([
-						{ name: getLocaleString(guildLocale, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.DURATION'), value: '`4:20`', inline: true },
-						{ name: getLocaleString(guildLocale, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.UPLOADER'), value: 'Rick Astley', inline: true },
-						{ name: getLocaleString(guildLocale, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.ADDED_BY'), value: `<@${interaction.user.id}>`, inline: true },
+						{ name: getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.DURATION'), value: '`4:20`', inline: true },
+						{ name: getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.UPLOADER'), value: 'Rick Astley', inline: true },
+						{ name: getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.ADDED_BY'), value: `<@${interaction.user.id}>`, inline: true },
 					])
 					.setThumbnail('https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg'),
 			];
-			current = getLocaleString(guildLocale, `CMD.SETTINGS.MISC.FORMAT.OPTIONS.${current.toUpperCase()}`);
+			current = getLocaleString(guildLocaleCode, `CMD.SETTINGS.MISC.FORMAT.OPTIONS.${current.toUpperCase()}`);
 		}
 	}
 	return { current, embeds, actionRow };
