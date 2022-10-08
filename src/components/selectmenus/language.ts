@@ -49,7 +49,7 @@ export default {
 		const guildLocaleCode = <string> await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocaleCode;
 		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocaleCode, 'language');
 		const description = `${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.LANGUAGE.NAME')}** ─ ${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.LANGUAGE.DESCRIPTION')}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: \`${current}\``;
-		const vars: [string | EmbedBuilder | (string | EmbedBuilder)[], { components: ActionRowBuilder<MessageActionRowComponentBuilder>[] }] = [
+		const args: [string | EmbedBuilder | (string | EmbedBuilder)[], { components: ActionRowBuilder<MessageActionRowComponentBuilder>[] }] = [
 			[description, ...embeds],
 			{
 				components: [
