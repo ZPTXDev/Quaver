@@ -1,4 +1,4 @@
-import { AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, Client, Collection, CommandInteraction, GuildMember, MessageComponentInteraction, ModalSubmitInteraction, PermissionsBitField, SelectMenuInteraction, SlashCommandBuilder } from 'discord.js';
+import { AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, Client, Collection, GuildMember, Interaction, ModalSubmitInteraction, PermissionsBitField, SelectMenuInteraction, SlashCommandBuilder } from 'discord.js';
 import { logger } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
@@ -7,7 +7,7 @@ import { Node } from 'lavaclient';
 export default {
 	name: 'interactionCreate',
 	once: false,
-	async execute(interaction: (CommandInteraction | MessageComponentInteraction | AutocompleteInteraction | ModalSubmitInteraction) & { replyHandler: ReplyHandler, client: Client & { commands: Collection<string, unknown>, buttons: Collection<string, unknown>, selectmenus: Collection<string, unknown>, autocomplete: Collection<string, unknown>, modals: Collection<string, unknown>, music: Node } }): Promise<void> {
+	async execute(interaction: (Interaction) & { replyHandler: ReplyHandler, client: Client & { commands: Collection<string, unknown>, buttons: Collection<string, unknown>, selectmenus: Collection<string, unknown>, autocomplete: Collection<string, unknown>, modals: Collection<string, unknown>, music: Node } }): Promise<void> {
 		if (!interaction.isAutocomplete()) interaction.replyHandler = new ReplyHandler(interaction);
 		if (interaction.isChatInputCommand()) {
 			const command: {
