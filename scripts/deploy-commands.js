@@ -6,9 +6,9 @@ import { readdirSync } from 'fs';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v10';
 import { Collection } from 'discord.js';
-import { token, applicationId } from '#src/settings.js';
-import { getAbsoluteFileURL } from '#src/lib/util/util.js';
-import { setLocales } from '#src/lib/util/common.js';
+import { token, applicationId } from '../dist/settings.js';
+import { getAbsoluteFileURL } from '../dist/lib/util/util.js';
+import { setLocales } from '../dist/lib/util/common.js';
 
 const locales = new Collection();
 const localeFolders = readdirSync(getAbsoluteFileURL(import.meta.url, ['..', 'locales']));
