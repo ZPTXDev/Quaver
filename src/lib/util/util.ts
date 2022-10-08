@@ -253,7 +253,7 @@ export async function settingsPage(interaction: Interaction, guildLocaleCode: st
 				new SelectMenuBuilder()
 					.setCustomId('language')
 					.addOptions(
-						fs.readdirSync(getAbsoluteFileURL(import.meta.url, ['..', '..', 'locales']))
+						fs.readdirSync(getAbsoluteFileURL(import.meta.url, ['..', '..', '..', 'locales']))
 							.map((file): APISelectMenuOption => ({ label: `${languageName[file] ?? 'Unknown'} (${file})`, value: file, default: file === guildLocaleCode })),
 					),
 			);
