@@ -1,12 +1,12 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { defaultLocale, features } from '#settings';
+import { defaultLocaleCode, features } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getLocaleString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('shuffle')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.SHUFFLE.DESCRIPTION')),
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.SHUFFLE.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],

@@ -1,28 +1,28 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { defaultLocale } from '#settings';
+import { defaultLocaleCode } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getLocaleString, msToTime, msToTimeString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('seek')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.SEEK.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.SEEK.DESCRIPTION'))
 		.addIntegerOption(option =>
 			option
 				.setName('hours')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.SEEK.OPTION.HOURS'))
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.SEEK.OPTION.HOURS'))
 				.setMinValue(0)
 				.setMaxValue(23))
 		.addIntegerOption(option =>
 			option
 				.setName('minutes')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.SEEK.OPTION.MINUTES'))
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.SEEK.OPTION.MINUTES'))
 				.setMinValue(0)
 				.setMaxValue(59))
 		.addIntegerOption(option =>
 			option
 				.setName('seconds')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.SEEK.OPTION.SECONDS'))
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.SEEK.OPTION.SECONDS'))
 				.setMinValue(0)
 				.setMaxValue(59)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
@@ -41,10 +41,10 @@ export default {
 		const trackLength = player.queue.current.length;
 		const duration = msToTime(trackLength);
 		const durationString = msToTimeString(duration, true);
-		if (ms > trackLength) return interaction.replyHandler.locale('CMD.SEEK.RESPONSE.TIMESTAMP_INVALID', { args: [durationString], type: 'error' });
+		if (ms > trackLength) return interaction.replyHandler.locale('CMD.SEEK.RESPONSE.TIMESTAMP_INVALID', { vars: [durationString], type: 'error' });
 		const seek = msToTime(ms);
 		const seekString = msToTimeString(seek, true);
 		await player.seek(ms);
-		return interaction.replyHandler.locale('CMD.SEEK.RESPONSE.SUCCESS', { args: [seekString, durationString] });
+		return interaction.replyHandler.locale('CMD.SEEK.RESPONSE.SUCCESS', { vars: [seekString, durationString] });
 	},
 };

@@ -1,12 +1,12 @@
 import { SlashCommandBuilder, PermissionsBitField, EmbedBuilder } from 'discord.js';
 import { version } from '#lib/util/version.js';
-import { defaultLocale } from '#settings';
+import { defaultLocaleCode } from '#settings';
 import { getGuildLocaleString, getLocaleString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('info')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.INFO.DESCRIPTION')),
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.INFO.DESCRIPTION')),
 	checks: [],
 	permissions: {
 		user: [],

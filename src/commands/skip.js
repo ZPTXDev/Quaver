@@ -1,12 +1,12 @@
 import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
-import { defaultLocale } from '#settings';
+import { defaultLocaleCode } from '#settings';
 import { checks } from '#lib/util/constants.js';
 import { getGuildLocaleString, getLocaleString } from '#lib/util/util.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('skip')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.SKIP.DESCRIPTION')),
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.SKIP.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -19,7 +19,7 @@ export default {
 		if (player.queue.current.requester === interaction.user.id) {
 			const track = await player.queue.skip();
 			await player.queue.start();
-			return interaction.replyHandler.locale('CMD.SKIP.RESPONSE.SUCCESS.DEFAULT', { args: [escapeMarkdown(track.title), track.uri], type: 'success' });
+			return interaction.replyHandler.locale('CMD.SKIP.RESPONSE.SUCCESS.DEFAULT', { vars: [escapeMarkdown(track.title), track.uri], type: 'success' });
 		}
 		const skip = player.skip ?? { required: Math.ceil(interaction.member.voice.channel.members.filter(m => !m.user.bot).size / 2), users: [] };
 		if (skip.users.includes(interaction.user.id)) return interaction.replyHandler.locale('CMD.SKIP.RESPONSE.VOTED.STATE_UNCHANGED', { type: 'error' });
@@ -31,6 +31,6 @@ export default {
 			return player.queue.next();
 		}
 		player.skip = skip;
-		return interaction.replyHandler.locale('CMD.SKIP.RESPONSE.VOTED.SUCCESS', { args: [escapeMarkdown(player.queue.current.title), player.queue.current.uri, skip.users.length, skip.required], type: 'success' });
+		return interaction.replyHandler.locale('CMD.SKIP.RESPONSE.VOTED.SUCCESS', { vars: [escapeMarkdown(player.queue.current.title), player.queue.current.uri, skip.users.length, skip.required], type: 'success' });
 	},
 };
