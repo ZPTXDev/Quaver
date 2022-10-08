@@ -15,7 +15,7 @@ export default {
 		}
 		if (player) pages = paginate(player.queue.tracks, 5);
 		if (!player) {
-			await interaction.message.delete();
+			await interaction.replyHandler.locale('CMD.QUEUE.RESPONSE.QUEUE_EMPTY', { type: 'error', components: [], force: 'update' });
 			return;
 		}
 		if (page < 1 || page > pages.length) {
