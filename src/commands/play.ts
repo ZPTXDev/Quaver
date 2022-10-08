@@ -44,7 +44,8 @@ export default {
 			await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE', { type: 'error' });
 			return;
 		}
-		if (interaction.guild.members.me.isCommunicationDisabled()) {
+		let me = await interaction.guild.members.fetchMe();
+		if (me.isCommunicationDisabled()) {
 			await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT', { type: 'error' });
 			return;
 		}
@@ -113,7 +114,7 @@ export default {
 			// Ensure that Quaver destroys the player if the user leaves the channel while Quaver is queuing tracks
 			// Ensure that Quaver destroys the player if Quaver gets timed out by the user while Quaver is queuing tracks
 			// Ensure that Quaver destroys the player if Quaver gets kicked or banned by the user while Quaver is queuing tracks
-			const me = await interaction.guild?.members.fetchMe();
+			me = await interaction.guild?.members.fetchMe();
 			const timedOut = me.isCommunicationDisabled();
 			if (!interaction.member.voice.channelId || timedOut || !interaction.guild) {
 				if (interaction.guild) timedOut ? await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT', { type: 'error' }) : await interaction.replyHandler.locale('DISCORD.INTERACTION.CANCELED', { vars: [interaction.user.id] });

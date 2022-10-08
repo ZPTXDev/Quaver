@@ -36,7 +36,8 @@ export default class PlayerHandler {
 		const permissions = this.client.guilds.cache.get(this.player.guildId)?.channels.cache.get(channelId ?? this.player.channelId).permissionsFor(this.client.user.id);
 		if (!permissions?.has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak]))) return;
 		if (!permissions?.has(PermissionsBitField.StageModerator)) return;
-		if (this.client.guilds.cache.get(this.player.guildId)?.members.me.isCommunicationDisabled()) return;
+		const me = await this.client.guilds.cache.get(this.player.guildId)?.members.fetchMe();
+		if (me.isCommunicationDisabled()) return;
 		if (voiceChannel.stageInstance?.topic !== await getGuildLocaleString(this.player.guildId, 'MISC.STAGE_TOPIC')) return;
 		try {
 			await voiceChannel.stageInstance.delete();
