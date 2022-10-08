@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Client, EmbedBuilder, SlashCommandBuilder, SlashCommandIntegerOption } from 'discord.js';
-import { defaultLocale, features, managers } from '#src/settings.js';
+import { defaultLocaleCode, features, managers } from '#src/settings.js';
 import { checks } from '#src/lib/util/constants.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
@@ -8,11 +8,11 @@ import { Node } from 'lavaclient';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('volume')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.VOLUME.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.VOLUME.DESCRIPTION'))
 		.addIntegerOption((option): SlashCommandIntegerOption =>
 			option
 				.setName('new_volume')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.VOLUME.OPTION.NEW_VOLUME'))
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.VOLUME.OPTION.NEW_VOLUME'))
 				.setMinValue(0)
 				.setMaxValue(1000)
 				.setRequired(true)),

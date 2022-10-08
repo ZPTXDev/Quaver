@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, ActionRowBuilder, SelectMenuBuilder, ChannelType, EmbedBuilder, ButtonBuilder, ButtonStyle, escapeMarkdown, SlashCommandStringOption, ChatInputCommandInteraction, Client, Message, SelectMenuComponentOptionData } from 'discord.js';
-import { defaultLocale } from '#src/settings.js';
+import { defaultLocaleCode } from '#src/settings.js';
 import { checks } from '#src/lib/util/constants.js';
-import { getGuildLocaleString, getLocaleString, messageDataBuilder, msToTime, msToTimeString, paginate, TimeObject } from '#src/lib/util/util.js';
+import { getGuildLocaleString, getLocaleString, buildMessageOptions, msToTime, msToTimeString, paginate, TimeObject } from '#src/lib/util/util.js';
 import { logger, searchState } from '#src/lib/util/common.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
 import { Node } from 'lavaclient';
@@ -11,11 +11,11 @@ import { Node } from 'lavaclient';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('search')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.SEARCH.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.SEARCH.DESCRIPTION'))
 		.addStringOption((option): SlashCommandStringOption =>
 			option
 				.setName('query')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.SEARCH.OPTION.QUERY'))
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.SEARCH.OPTION.QUERY'))
 				.setRequired(true)
 				.setAutocomplete(true)),
 	checks: [checks.GUILD_ONLY],
@@ -100,7 +100,7 @@ export default {
 			timeout: setTimeout(async (message): Promise<void> => {
 				try {
 					await message.edit(
-						messageDataBuilder(
+						buildMessageOptions(
 							new EmbedBuilder()
 								.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
 							{ components: [] },

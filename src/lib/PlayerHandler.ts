@@ -1,7 +1,7 @@
 import { PermissionsBitField, ChannelType, Client, EmbedBuilder, Message, TextChannel, VoiceChannel, AttachmentBuilder, ActionRowBuilder, MessageActionRowComponentBuilder } from 'discord.js';
 import { features } from '#src/settings.js';
 import { logger } from '#src/lib/util/common.js';
-import { getGuildLocaleString, messageDataBuilder } from '#src/lib/util/util.js';
+import { getGuildLocaleString, buildMessageOptions } from '#src/lib/util/util.js';
 import { Node, Player } from 'lavaclient';
 import { Queue } from '@lavaclient/queue';
 
@@ -53,12 +53,12 @@ export default class PlayerHandler {
 	 * @returns The message that was sent.
 	 */
 	async send(inputData: string | EmbedBuilder | (string | EmbedBuilder)[], { type = 'neutral', components = null, files = null }: { type?: 'success' | 'neutral' | 'warning' | 'error'; components?: ActionRowBuilder<MessageActionRowComponentBuilder>[]; files?: AttachmentBuilder[]; } = {}): Promise<Message | false> {
-		const sendData = messageDataBuilder(inputData, { type, components, files });
+		const sendMsgOpts = buildMessageOptions(inputData, { type, components, files });
 		const channel = this.player.queue.channel;
 		if (!channel?.permissionsFor(this.client.user.id)?.has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages]))) return false;
 		if (this.client.guilds.cache.get(this.player.guildId).members.me.isCommunicationDisabled()) return false;
 		try {
-			return await channel.send(sendData);
+			return await channel.send(sendMsgOpts);
 		}
 		catch (err) {
 			logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
@@ -68,11 +68,11 @@ export default class PlayerHandler {
 
 	/**
 	 * Sends a localized message to the bound text channel.
-	 * @param code - The code of the locale string to be used.
+	 * @param stringPath - The code of the locale string to be used.
 	 * @param options - Extra data, such as type or components.
 	 * @returns The message that was sent.
 	 */
-	async locale(code: string, { args = [], type = 'neutral', components = null, files = null }: { args?: string[]; type?: 'success' | 'neutral' | 'warning' | 'error'; components?: ActionRowBuilder<MessageActionRowComponentBuilder>[]; files?: AttachmentBuilder[]; } = {}): Promise<Message | false> {
-		return this.send(await getGuildLocaleString(this.player.guildId, code, ...args), { type, components, files });
+	async locale(stringPath: string, { vars = [], type = 'neutral', components = null, files = null }: { vars?: string[]; type?: 'success' | 'neutral' | 'warning' | 'error'; components?: ActionRowBuilder<MessageActionRowComponentBuilder>[]; files?: AttachmentBuilder[]; } = {}): Promise<Message | false> {
+		return this.send(await getGuildLocaleString(this.player.guildId, stringPath, ...vars), { type, components, files });
 	}
 }

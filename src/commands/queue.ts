@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, escapeMarkdown, ChatInputCommandInteraction, Client } from 'discord.js';
-import { defaultLocale } from '#src/settings.js';
+import { defaultLocaleCode } from '#src/settings.js';
 import { checks } from '#src/lib/util/constants.js';
 import { paginate, getLocaleString, msToTime, msToTimeString, getGuildLocaleString, TimeObject } from '#src/lib/util/util.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
@@ -8,7 +8,7 @@ import { Node } from 'lavaclient';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('queue')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.QUEUE.DESCRIPTION')),
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.QUEUE.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],

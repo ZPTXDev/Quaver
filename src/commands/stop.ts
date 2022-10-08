@@ -1,7 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, EmbedBuilder, Message, SlashCommandBuilder } from 'discord.js';
-import { defaultLocale } from '#src/settings.js';
+import { defaultLocaleCode } from '#src/settings.js';
 import { checks } from '#src/lib/util/constants.js';
-import { getGuildLocaleString, getLocaleString, messageDataBuilder } from '#src/lib/util/util.js';
+import { getGuildLocaleString, getLocaleString, buildMessageOptions } from '#src/lib/util/util.js';
 import { confirmationTimeout, logger } from '#src/lib/util/common.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
 import { Node } from 'lavaclient';
@@ -9,7 +9,7 @@ import { Node } from 'lavaclient';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('stop')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.STOP.DESCRIPTION')),
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.STOP.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -47,7 +47,7 @@ export default {
 		confirmationTimeout[msg.id] = setTimeout(async (message): Promise<void> => {
 			try {
 				await message.edit(
-					messageDataBuilder(
+					buildMessageOptions(
 						new EmbedBuilder()
 							.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
 						{ components: [] },

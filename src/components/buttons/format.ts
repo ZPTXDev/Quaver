@@ -1,7 +1,7 @@
 import { ActionRowBuilder, APIButtonComponent, ButtonBuilder, ButtonInteraction, EmbedBuilder, MessageActionRowComponentBuilder } from 'discord.js';
-import { getGuildLocaleString, getLocaleString, messageDataBuilder, settingsPage } from '#src/lib/util/util.js';
+import { getGuildLocaleString, getLocaleString, buildMessageOptions, settingsPage } from '#src/lib/util/util.js';
 import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
-import { defaultLocale } from '#src/settings.js';
+import { defaultLocaleCode } from '#src/settings.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
 
 export default {
@@ -19,7 +19,7 @@ export default {
 		confirmationTimeout[interaction.message.id] = setTimeout(async (message): Promise<void> => {
 			try {
 				await message.edit(
-					messageDataBuilder(
+					buildMessageOptions(
 						new EmbedBuilder()
 							.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
 						{ components: [] },
@@ -34,9 +34,9 @@ export default {
 		const option = interaction.customId.split('_')[1];
 		await data.guild.set(interaction.guildId, 'settings.format', option);
 		// definitely need some checks here based on my own typedef, casting is not a good idea
-		const guildLocale = <string> await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocale;
-		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocale, 'format');
-		const description = `${getLocaleString(guildLocale, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocale, 'CMD.SETTINGS.MISC.FORMAT.NAME')}** ─ ${getLocaleString(guildLocale, 'CMD.SETTINGS.MISC.FORMAT.DESCRIPTION')}\n> ${getLocaleString(guildLocale, 'MISC.CURRENT')}: \`${current}\``;
+		const guildLocaleCode = <string> await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocaleCode;
+		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocaleCode, 'format');
+		const description = `${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.FORMAT.NAME')}** ─ ${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.FORMAT.DESCRIPTION')}\n> ${getLocaleString(guildLocale, 'MISC.CURRENT')}: \`${current}\``;
 		await interaction.replyHandler.reply(
 			[description, ...embeds],
 			{

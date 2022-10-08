@@ -14,12 +14,13 @@ const locales = new Collection();
 const localeFolders = readdirSync(getAbsoluteFileURL(import.meta.url, ['..', 'locales']));
 for await (const folder of localeFolders) {
 	const localeFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['..', 'locales', folder]));
-	const localeData = {};
+	const localeProps = {};
 	for await (const file of localeFiles) {
-		const locale = await import(getAbsoluteFileURL(import.meta.url, ['..', 'locales', folder, file]));
-		localeData[file.split('.')[0].toUpperCase()] = locale.default;
+		const categoryProps = await import(getAbsoluteFileURL(import.meta.url, ['..', 'locales', folder, file]));
+		const categoryName = file.split('.')[0].toUpperCase();
+		localeProps[categoryName] = categoryProps.default;
 	}
-	locales.set(folder, localeData);
+	locales.set(folder, localeProps);
 }
 setLocales(locales);
 

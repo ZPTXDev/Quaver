@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Client, EmbedBuilder, SlashCommandBooleanOption, SlashCommandBuilder, TextChannel, VoiceChannel } from 'discord.js';
-import { defaultLocale, features } from '#src/settings.js';
+import { defaultLocaleCode, features } from '#src/settings.js';
 import { checks } from '#src/lib/util/constants.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import { data } from '#src/lib/util/common.js';
@@ -10,11 +10,11 @@ import { Queue } from '@lavaclient/queue';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('247')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.247.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.247.DESCRIPTION'))
 		.addBooleanOption((option): SlashCommandBooleanOption =>
 			option
 				.setName('enabled')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.247.OPTION.ENABLED'))),
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.247.OPTION.ENABLED'))),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],

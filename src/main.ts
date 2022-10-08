@@ -206,12 +206,13 @@ const localeFolders = readdirSync(getAbsoluteFileURL(import.meta.url, ['..', 'lo
 for await (const folder of localeFolders) {
 	const localeFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['..', 'locales', folder]));
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const localeData: Record<string, any> = {};
+	const localeProps: Record<string, any> = {};
 	for await (const file of localeFiles) {
-		const locale = await import(getAbsoluteFileURL(import.meta.url, ['..', 'locales', folder, file]).toString());
-		localeData[file.split('.')[0].toUpperCase()] = locale.default;
+		const categoryProps = await import(getAbsoluteFileURL(import.meta.url, ['..', 'locales', folder, file]).toString());
+		const categoryName = file.split('.')[0].toUpperCase();
+		localeProps[categoryName] = categoryProps.default;
 	}
-	locales.set(folder, localeData);
+	locales.set(folder, localeProps);
 }
 setLocales(locales);
 

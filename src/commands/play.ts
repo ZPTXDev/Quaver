@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, PermissionsBitField, ChannelType, EmbedBuilder, escapeMarkdown, SlashCommandStringOption, SlashCommandBooleanOption, ChatInputCommandInteraction, Client, GuildMember, TextChannel, VoiceChannel } from 'discord.js';
 import { SpotifyItemType } from '@lavaclient/spotify';
-import { defaultLocale, features } from '#src/settings.js';
+import { defaultLocaleCode, features } from '#src/settings.js';
 import { checks } from '#src/lib/util/constants.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import PlayerHandler from '#src/lib/PlayerHandler.js';
@@ -11,17 +11,17 @@ import { Queue, Song } from '@lavaclient/queue';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('play')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.PLAY.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.PLAY.DESCRIPTION'))
 		.addStringOption((option): SlashCommandStringOption =>
 			option
 				.setName('query')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.PLAY.OPTION.QUERY'))
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.PLAY.OPTION.QUERY'))
 				.setRequired(true)
 				.setAutocomplete(true))
 		.addBooleanOption((option): SlashCommandBooleanOption =>
 			option
 				.setName('insert')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.PLAY.OPTION.INSERT'))),
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.PLAY.OPTION.INSERT'))),
 	checks: [checks.GUILD_ONLY, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -116,7 +116,7 @@ export default {
 			const me = await interaction.guild?.members.fetchMe();
 			const timedOut = me.isCommunicationDisabled();
 			if (!interaction.member.voice.channelId || timedOut || !interaction.guild) {
-				if (interaction.guild) timedOut ? await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT', { type: 'error' }) : await interaction.replyHandler.locale('DISCORD.INTERACTION.CANCELED', { args: [interaction.user.id] });
+				if (interaction.guild) timedOut ? await interaction.replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT', { type: 'error' }) : await interaction.replyHandler.locale('DISCORD.INTERACTION.CANCELED', { vars: [interaction.user.id] });
 				return player.handler.disconnect();
 			}
 		}
