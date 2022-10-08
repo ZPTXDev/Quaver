@@ -84,7 +84,7 @@ if ((features as Record<string, any>).web.https) {
 export const io = features.web.enabled ? new Server(httpServer ?? features.web.port, { cors: { origin: features.web.allowedOrigins } }) : undefined;
 if (io) {
 	io.on('connection', async (socket): Promise<void> => {
-		const webEventFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['events', 'web'])).filter((file): boolean => file.endsWith('.js'));
+		const webEventFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['events', 'web'])).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 		for await (const file of webEventFiles) {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const event: { default: { name: string, once: boolean, execute(socket: Socket, callback: () => void, ...args: any[]): void | Promise<void> } } = await import(getAbsoluteFileURL(import.meta.url, ['events', 'web', file]).toString());
@@ -216,13 +216,13 @@ for await (const folder of localeFolders) {
 }
 setLocales(locales);
 
-const commandFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['commands'])).filter((file): boolean => file.endsWith('.js'));
+const commandFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['commands'])).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 for await (const file of commandFiles) {
 	const command: { default: { data: SlashCommandBuilder, checks: string[], permissions: { user: PermissionsBitField[], bot: PermissionsBitField[], execute(interaction: ChatInputCommandInteraction): Promise<void> } } } = await import(getAbsoluteFileURL(import.meta.url, ['commands', file]).toString());
 	bot.commands.set(command.default.data.name, command.default);
 }
 
-const autocompleteFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['autocomplete'])).filter((file): boolean => file.endsWith('.js'));
+const autocompleteFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['autocomplete'])).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 for await (const file of autocompleteFiles) {
 	const autocomplete: { default: { name: string, execute(interaction: AutocompleteInteraction): Promise<void> } } = await import(getAbsoluteFileURL(import.meta.url, ['autocomplete', file]).toString());
 	bot.autocomplete.set(autocomplete.default.name, autocomplete.default);
@@ -230,7 +230,7 @@ for await (const file of autocompleteFiles) {
 
 const componentsFolders = readdirSync(getAbsoluteFileURL(import.meta.url, ['components']));
 for await (const folder of componentsFolders) {
-	const componentFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['components', folder])).filter((file): boolean => file.endsWith('.js'));
+	const componentFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['components', folder])).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 	for await (const file of componentFiles) {
 		const component: { default: { name: string, execute(interaction: ButtonInteraction | SelectMenuInteraction): Promise<void> } } = await import(getAbsoluteFileURL(import.meta.url, ['components', folder, file]).toString());
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -240,7 +240,7 @@ for await (const folder of componentsFolders) {
 	}
 }
 
-const eventFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['events'])).filter((file): boolean => file.endsWith('.js'));
+const eventFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['events'])).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 for await (const file of eventFiles) {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const event: { default: { name: string; once: boolean; execute(...args: any[]): void | Promise<void>; } } = await import(getAbsoluteFileURL(import.meta.url, ['events', file]).toString());
@@ -252,7 +252,7 @@ for await (const file of eventFiles) {
 	}
 }
 
-const musicEventFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['events', 'music'])).filter((file): boolean => file.endsWith('.js'));
+const musicEventFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['events', 'music'])).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 for await (const file of musicEventFiles) {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const event: { default: { name: any, once: boolean, execute(...args: any[]): void & Promise<void> } } = await import(getAbsoluteFileURL(import.meta.url, ['events', 'music', file]).toString());
