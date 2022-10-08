@@ -14,7 +14,7 @@ export default {
 			return;
 		}
 		if (player) pages = paginate(player.queue.tracks, 5);
-		if (!player) {
+		if (!player || pages) {
 			await interaction.replyHandler.locale('CMD.QUEUE.RESPONSE.QUEUE_EMPTY', { type: 'error', components: [], force: 'update' });
 			return;
 		}
