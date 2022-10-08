@@ -1,16 +1,16 @@
-import { ActionRowBuilder, AttachmentBuilder, CommandInteraction, EmbedBuilder, InteractionResponse, Message, MessageActionRowComponentBuilder, MessageComponentInteraction, PermissionsBitField } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, CommandInteraction, EmbedBuilder, InteractionResponse, Message, MessageActionRowComponentBuilder, MessageComponentInteraction, ModalSubmitInteraction, PermissionsBitField } from 'discord.js';
 import { logger } from '#src/lib/util/common.js';
 import { getGuildLocaleString, messageDataBuilder } from '#src/lib/util/util.js';
 
 /** Class for handling replies to interactions. */
 export default class ReplyHandler {
-	interaction: CommandInteraction | MessageComponentInteraction;
+	interaction: CommandInteraction | MessageComponentInteraction | ModalSubmitInteraction;
 
 	/**
 	 * Create an instance of ReplyHandler.
 	 * @param interaction - The discord.js ChatInputCommandInteraction object.
 	 */
-	constructor(interaction: CommandInteraction | MessageComponentInteraction) {
+	constructor(interaction: CommandInteraction | MessageComponentInteraction | ModalSubmitInteraction) {
 		this.interaction = interaction;
 	}
 

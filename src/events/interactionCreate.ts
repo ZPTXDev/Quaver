@@ -8,8 +8,8 @@ export default {
 	name: 'interactionCreate',
 	once: false,
 	async execute(interaction: (CommandInteraction | MessageComponentInteraction | AutocompleteInteraction | ModalSubmitInteraction) & { replyHandler: ReplyHandler, client: Client & { commands: Collection<string, unknown>, buttons: Collection<string, unknown>, selectmenus: Collection<string, unknown>, autocomplete: Collection<string, unknown>, modals: Collection<string, unknown>, music: Node } }): Promise<void> {
+		if (!interaction.isAutocomplete()) interaction.replyHandler = new ReplyHandler(interaction);
 		if (interaction.isChatInputCommand()) {
-			interaction.replyHandler = new ReplyHandler(interaction);
 			const command: {
 				data?: SlashCommandBuilder;
 				checks?: string[];
@@ -84,7 +84,6 @@ export default {
 			return autocomplete.execute(interaction);
 		}
 		if (interaction.isButton()) {
-			interaction.replyHandler = new ReplyHandler(interaction);
 			const button = <{ execute(interaction: ButtonInteraction): Promise<void> }> interaction.client.buttons.get(interaction.customId.split('_')[0]);
 			if (!button) return;
 			logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing button ${interaction.customId}`, label: 'Quaver' });
@@ -100,7 +99,6 @@ export default {
 			}
 		}
 		if (interaction.isSelectMenu()) {
-			interaction.replyHandler = new ReplyHandler(interaction);
 			const selectmenu = <{ execute(interaction: SelectMenuInteraction): Promise<void> }> interaction.client.selectmenus.get(interaction.customId.split('_')[0]);
 			if (!selectmenu) return;
 			logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing select menu ${interaction.customId}`, label: 'Quaver' });
