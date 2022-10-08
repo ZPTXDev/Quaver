@@ -1,13 +1,13 @@
 import { SlashCommandBuilder, PermissionsBitField, EmbedBuilder, ChatInputCommandInteraction, OAuth2Scopes } from 'discord.js';
 import { version } from '#src/lib/util/version.js';
-import { defaultLocale } from '#src/settings.js';
+import { defaultLocaleCode } from '#src/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('info')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.INFO.DESCRIPTION')),
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.INFO.DESCRIPTION')),
 	checks: [],
 	permissions: {
 		user: [],

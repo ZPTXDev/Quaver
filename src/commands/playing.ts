@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, Client, escapeMarkdown, SlashCommandBuilder } from 'discord.js';
 import { LoopType } from '@lavaclient/queue';
-import { defaultLocale } from '#src/settings.js';
+import { defaultLocaleCode } from '#src/settings.js';
 import { checks } from '#src/lib/util/constants.js';
 import { getBar, getGuildLocaleString, getLocaleString, msToTime, msToTimeString, TimeObject } from '#src/lib/util/util.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
@@ -9,7 +9,7 @@ import { Node, Player } from 'lavaclient';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('playing')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.PLAYING.DESCRIPTION')),
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.PLAYING.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],

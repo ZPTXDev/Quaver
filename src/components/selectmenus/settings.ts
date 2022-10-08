@@ -1,8 +1,8 @@
 import { ActionRowBuilder, EmbedBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder, SelectMenuComponentOptionData, SelectMenuInteraction } from 'discord.js';
-import { getGuildLocaleString, getLocaleString, messageDataBuilder, settingsPage } from '#src/lib/util/util.js';
+import { getGuildLocaleString, getLocaleString, buildMessageOptions, settingsPage } from '#src/lib/util/util.js';
 import { settingsOptions } from '#src/lib/util/constants.js';
 import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
-import { defaultLocale } from '#src/settings.js';
+import { defaultLocaleCode } from '#src/settings.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
 
 export default {
@@ -20,7 +20,7 @@ export default {
 		confirmationTimeout[interaction.message.id] = setTimeout(async (message): Promise<void> => {
 			try {
 				await message.edit(
-					messageDataBuilder(
+					buildMessageOptions(
 						new EmbedBuilder()
 							.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
 						{ components: [] },
@@ -33,7 +33,7 @@ export default {
 			delete confirmationTimeout[message.id];
 		}, 30 * 1000, interaction.message);
 		const option = <'language' | 'format'> interaction.values[0];
-		const guildLocale = <string> await data.guild.get(interaction.guild.id, 'settings.locale') ?? defaultLocale;
+		const guildLocale = <string> await data.guild.get(interaction.guild.id, 'settings.locale') ?? defaultLocaleCode;
 		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocale, option);
 		const description = `${getLocaleString(guildLocale, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocale, `CMD.SETTINGS.MISC.${option.toUpperCase()}.NAME`)}** ─ ${getLocaleString(guildLocale, `CMD.SETTINGS.MISC.${option.toUpperCase()}.DESCRIPTION`)}\n> ${getLocaleString(guildLocale, 'MISC.CURRENT')}: \`${current}\``;
 		await interaction.replyHandler.reply(

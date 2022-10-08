@@ -1,6 +1,6 @@
 import { ActionRowBuilder, AttachmentBuilder, CommandInteraction, EmbedBuilder, InteractionResponse, Message, MessageActionRowComponentBuilder, MessageComponentInteraction, ModalSubmitInteraction, PermissionsBitField } from 'discord.js';
 import { logger } from '#src/lib/util/common.js';
-import { getGuildLocaleString, messageDataBuilder } from '#src/lib/util/util.js';
+import { getGuildLocaleString, buildMessageOptions } from '#src/lib/util/util.js';
 
 /** Class for handling replies to interactions. */
 export default class ReplyHandler {
@@ -21,14 +21,14 @@ export default class ReplyHandler {
 	 * @returns The message that was sent.
 	 */
 	async reply(inputData: string | EmbedBuilder | (string | EmbedBuilder)[], { type = 'neutral', components = null, files = null, ephemeral = false, fetchReply = false, force = null }: { type?: 'success' | 'neutral' | 'warning' | 'error'; components?: ActionRowBuilder<MessageActionRowComponentBuilder>[]; files?: AttachmentBuilder[]; ephemeral?: boolean; fetchReply?: boolean; force?: 'reply' | 'edit' | 'update'; } = {}): Promise<InteractionResponse | Message | boolean> {
-		const replyData = messageDataBuilder(inputData, { type, components, files });
-		replyData.fetchReply = fetchReply;
+		const replyMsgOpts = buildMessageOptions(inputData, { type, components, files });
+		replyMsgOpts.fetchReply = fetchReply;
 		if (force === 'reply' || !this.interaction.replied && !this.interaction.deferred && !force) {
 			if (type === 'error' || ephemeral || this.interaction.channel && !this.interaction.channel.permissionsFor(this.interaction.client.user.id).has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages]))) {
-				replyData.ephemeral = true;
+				replyMsgOpts.ephemeral = true;
 			}
 			try {
-				return await this.interaction.reply(replyData);
+				return await this.interaction.reply(replyMsgOpts);
 			}
 			catch (err) {
 				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
@@ -37,7 +37,7 @@ export default class ReplyHandler {
 		}
 		if (force === 'update' && this.interaction.isMessageComponent()) {
 			try {
-				return await this.interaction.update(replyData);
+				return await this.interaction.update(replyMsgOpts);
 			}
 			catch (err) {
 				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
@@ -45,7 +45,7 @@ export default class ReplyHandler {
 			}
 		}
 		try {
-			return await this.interaction.editReply(replyData);
+			return await this.interaction.editReply(replyMsgOpts);
 		}
 		catch (err) {
 			logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
@@ -55,11 +55,11 @@ export default class ReplyHandler {
 
 	/**
 	 * Replies with a localized message.
-	 * @param code - The code of the locale string to be used.
+	 * @param stringPath - The code of the locale string to be used.
 	 * @param options - Extra data, such as type or components.
 	 * @returns The message that was sent.
 	 */
-	async locale(code: string, { args = [], type = 'neutral', components = null, files = null, ephemeral = false, force = null }: { args?: string[]; type?: 'success' | 'neutral' | 'warning' | 'error'; components?: ActionRowBuilder<MessageActionRowComponentBuilder>[]; files?: AttachmentBuilder[]; ephemeral?: boolean; fetchReply?: boolean; force?: 'reply' | 'edit' | 'update'; } = {}): Promise<InteractionResponse | Message | boolean> {
-		return this.reply(await getGuildLocaleString(this.interaction.guildId, code, ...args), { type, components, files, ephemeral, force });
+	async locale(stringPath: string, { vars = [], type = 'neutral', components = null, files = null, ephemeral = false, force = null }: { vars?: string[]; type?: 'success' | 'neutral' | 'warning' | 'error'; components?: ActionRowBuilder<MessageActionRowComponentBuilder>[]; files?: AttachmentBuilder[]; ephemeral?: boolean; fetchReply?: boolean; force?: 'reply' | 'edit' | 'update'; } = {}): Promise<InteractionResponse | Message | boolean> {
+		return this.reply(await getGuildLocaleString(this.interaction.guildId, stringPath, ...vars), { type, components, files, ephemeral, force });
 	}
 }

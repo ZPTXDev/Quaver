@@ -2,7 +2,7 @@ import { resolve, dirname } from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { get } from 'lodash-es';
 import { data, locales } from './common.js';
-import { colors, defaultLocale } from '#src/settings.js';
+import { colors, defaultLocaleCode } from '#src/settings.js';
 import { ActionRowBuilder, APISelectMenuOption, AttachmentBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, EmbedBuilder, escapeMarkdown, Interaction, InteractionReplyOptions, MessageActionRowComponentBuilder, MessageCreateOptions, SelectMenuBuilder } from 'discord.js';
 import * as fs from 'fs';
 import { languageName } from './constants.js';
@@ -51,7 +51,7 @@ export function msToTime(milliseconds: number, format?: 's' | 'm' | 'h' | 'd'): 
  */
 export function msToTimeString(msObject: TimeObject, simple?: boolean): string {
 	if (simple) {
-		if (msObject['d'] > 0) getLocaleString(defaultLocale, 'MISC.MORE_THAN_A_DAY');
+		if (msObject['d'] > 0) getLocaleString(defaultLocaleCode, 'MISC.MORE_THAN_A_DAY');
 		return `${msObject['h'] > 0 ? `${msObject['h']}:` : ''}${msObject['h'] > 0 ? msObject['m'].toString().padStart(2, '0') : msObject['m']}:${msObject['s'].toString().padStart(2, '0')}`;
 	}
 	return `${msObject['d'] > 0 ? `${msObject['d']} day${msObject['d'] === 1 ? '' : 's'}, ` : ''}${msObject['h'] > 0 ? `${msObject['h']} hr${msObject['h'] === 1 ? '' : 's'}, ` : ''}${msObject['m'] > 0 ? `${msObject['m']} min${msObject['m'] === 1 ? '' : 's'}, ` : ''}${msObject['s'] > 0 ? `${msObject['s']} sec${msObject['s'] === 1 ? '' : 's'}, ` : ''}`.slice(0, -2);
@@ -141,48 +141,48 @@ export function paginate(arr: Array<any>, size: number): Array<Array<any>> {
 /**
  * Returns the localized string.
  * Reference: https://stackoverflow.com/a/63376860
- * @param language - The language to use.
- * @param string - The string to get.
+ * @param localeCode - The language to use.
+ * @param stringPath - The string to get.
  * @param vars - The extra variables required in some localized strings.
  * @returns The localized string, or LOCALE_MISSING if the locale is missing, or STRING_MISSING if the string is missing.
  */
-export function getLocaleString(language: string, string: string, ...vars: string[]): string | 'LOCALE_MISSING' | 'STRING_MISSING' {
-	if (!locales.get(language)) return 'LOCALE_MISSING';
-	let strings = locales.get(language);
-	let locale: string = get(strings, string);
-	if (!locale) {
+export function getLocaleString(localeCode: string, stringPath: string, ...vars: string[]): string | 'LOCALE_MISSING' | 'STRING_MISSING' {
+	if (!locales.get(localeCode)) return 'LOCALE_MISSING';
+	let strings = locales.get(localeCode);
+	let localeString: string = get(strings, stringPath);
+	if (!localeString) {
 		// This uses 'en' on purpose.
 		// 'en' is the only locale with a guaranteed 100% completion rate.
 		strings = locales.get('en');
-		locale = get(strings, string);
+		localeString = get(strings, stringPath);
 	}
-	if (!locale) return 'STRING_MISSING';
-	vars.forEach((v, i): string => locale = locale.replace(`%${i + 1}`, v));
-	return locale;
+	if (!localeString) return 'STRING_MISSING';
+	vars.forEach((v, i): string => localeString = localeString.replace(`%${i + 1}`, v));
+	return localeString;
 }
 
 /**
  * Returns the localized string for the specified guild.
  * @param guildId - The guild ID.
- * @param string - The string to get.
+ * @param stringPath - The string to get.
  * @param vars - The extra variables required in some localized strings.
  * @returns The localized string, or LOCALE_MISSING if the locale is missing, or STRING_MISSING if the string is missing.
  */
-export async function getGuildLocaleString(guildId: string, string: string, ...vars: string[]): Promise<string | 'LOCALE_MISSING' | 'STRING_MISSING'> {
-	return getLocaleString(<string> await data.guild.get(guildId, 'settings.locale') ?? defaultLocale, string, ...vars);
+export async function getGuildLocaleString(guildId: string, stringPath: string, ...vars: string[]): Promise<string | 'LOCALE_MISSING' | 'STRING_MISSING'> {
+	return getLocaleString(<string> await data.guild.get(guildId, 'settings.locale') ?? defaultLocaleCode, stringPath, ...vars);
 }
 
 /**
  * Returns locale completion for a given locale.
- * @param language - The locale code to check.
+ * @param localeCode - The locale code to check.
  * @returns Completion percentage and missing strings, or 'LOCALE_MISSING' if the locale is missing.
  */
-export function checkLocaleCompletion(language: string): { completion: number; missing: string[]; } | 'LOCALE_MISSING' {
-	if (!locales.get(language)) return 'LOCALE_MISSING';
-	const strings = locales.get('en');
-	const foreignStrings = locales.get(language);
+export function checkLocaleCompletion(localeCode: string): { completion: number; missing: string[]; } | 'LOCALE_MISSING' {
+	if (!locales.get(localeCode)) return 'LOCALE_MISSING';
+	const englishStrings = locales.get('en');
+	const foreignStrings = locales.get(localeCode);
 	let foreignStringCount = 0;
-	let stringCount = 0;
+	let englishStringCount = 0;
 	const missingStrings: string[] = [];
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	function iterateObject(obj: Record<string, any>, path: string[] = []): void {
@@ -191,14 +191,14 @@ export function checkLocaleCompletion(language: string): { completion: number; m
 				iterateObject(obj[key], path.concat([key]));
 				return;
 			}
-			stringCount++;
+			englishStringCount++;
 			if (!get(foreignStrings, `${path.join('.')}.${key}`)) missingStrings.push(`${path.join('.')}.${key}`);
 		});
 	}
-	iterateObject(<object> strings);
-	foreignStringCount = stringCount - missingStrings.length;
+	iterateObject(<object> englishStrings);
+	foreignStringCount = englishStringCount - missingStrings.length;
 	// missing strings
-	if (stringCount > foreignStringCount) return { completion: foreignStringCount / stringCount * 100, missing: missingStrings };
+	if (englishStringCount > foreignStringCount) return { completion: foreignStringCount / englishStringCount * 100, missing: missingStrings };
 	return { completion: 100, missing: [] };
 }
 
@@ -229,7 +229,7 @@ export async function getJSONResponse(body: any): Promise<unknown> {
  * @param options - Extra data, such as type, components, or files.
  * @returns The MessageCreateOptions object.
  */
-export function messageDataBuilder(inputData: string | EmbedBuilder | (string | EmbedBuilder)[], { type = 'neutral', components = null, files = null }: { type?: 'success' | 'neutral' | 'warning' | 'error'; components?: ActionRowBuilder<MessageActionRowComponentBuilder>[]; files?: AttachmentBuilder[]; } = {}): MessageCreateOptions & InteractionReplyOptions {
+export function buildMessageOptions(inputData: string | EmbedBuilder | (string | EmbedBuilder)[], { type = 'neutral', components = null, files = null }: { type?: 'success' | 'neutral' | 'warning' | 'error'; components?: ActionRowBuilder<MessageActionRowComponentBuilder>[]; files?: AttachmentBuilder[]; } = {}): MessageCreateOptions & InteractionReplyOptions {
 	const messageData = Array.isArray(inputData) ? inputData : [inputData];
 	const embedData = messageData.map((msg): EmbedBuilder => {
 		if (typeof msg === 'string') return new EmbedBuilder().setDescription(msg).setColor(<ColorResolvable> colors[type]);

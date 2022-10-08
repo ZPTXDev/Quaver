@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Client, escapeMarkdown, SlashCommandBuilder, SlashCommandIntegerOption } from 'discord.js';
-import { defaultLocale, features } from '#src/settings.js';
+import { defaultLocaleCode, features } from '#src/settings.js';
 import { checks } from '#src/lib/util/constants.js';
 import { getLocaleString } from '#src/lib/util/util.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
@@ -9,18 +9,18 @@ import { Song } from '@lavaclient/queue';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('move')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.MOVE.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.MOVE.DESCRIPTION'))
 		.addIntegerOption((option): SlashCommandIntegerOption =>
 			option
 				.setName('old_position')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.MOVE.OPTION.OLD_POSITION'))
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.MOVE.OPTION.OLD_POSITION'))
 				.setMinValue(1)
 				.setRequired(true)
 				.setAutocomplete(true))
 		.addIntegerOption((option): SlashCommandIntegerOption =>
 			option
 				.setName('new_position')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.MOVE.OPTION.NEW_POSITION'))
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.MOVE.OPTION.NEW_POSITION'))
 				.setMinValue(1)
 				.setRequired(true)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
@@ -53,6 +53,6 @@ export default {
 				return t;
 			}));
 		}
-		await interaction.replyHandler.locale('CMD.MOVE.RESPONSE.SUCCESS', { args: [escapeMarkdown(track.title), track.uri, oldPosition.toString(), newPosition.toString()], type: 'success' });
+		await interaction.replyHandler.locale('CMD.MOVE.RESPONSE.SUCCESS', { vars: [escapeMarkdown(track.title), track.uri, oldPosition.toString(), newPosition.toString()], type: 'success' });
 	},
 };

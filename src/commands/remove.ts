@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Client, escapeMarkdown, SlashCommandBuilder, SlashCommandIntegerOption } from 'discord.js';
-import { defaultLocale, features } from '#src/settings.js';
+import { defaultLocaleCode, features } from '#src/settings.js';
 import { checks } from '#src/lib/util/constants.js';
 import { getLocaleString } from '#src/lib/util/util.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
@@ -9,11 +9,11 @@ import { Song } from '@lavaclient/queue';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('remove')
-		.setDescription(getLocaleString(defaultLocale, 'CMD.REMOVE.DESCRIPTION'))
+		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.REMOVE.DESCRIPTION'))
 		.addIntegerOption((option): SlashCommandIntegerOption =>
 			option
 				.setName('position')
-				.setDescription(getLocaleString(defaultLocale, 'CMD.REMOVE.OPTION.POSITION'))
+				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.REMOVE.OPTION.POSITION'))
 				.setMinValue(1)
 				.setRequired(true)
 				.setAutocomplete(true)),
@@ -45,6 +45,6 @@ export default {
 				return t;
 			}));
 		}
-		await interaction.replyHandler.locale('CMD.REMOVE.RESPONSE.SUCCESS', { args: [escapeMarkdown(track.title), track.uri], type: 'success' });
+		await interaction.replyHandler.locale('CMD.REMOVE.RESPONSE.SUCCESS', { vars: [escapeMarkdown(track.title), track.uri], type: 'success' });
 	},
 };

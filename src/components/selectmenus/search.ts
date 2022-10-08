@@ -1,5 +1,5 @@
 import { EmbedBuilder, ButtonBuilder, SelectMenuBuilder, SelectMenuInteraction, Client, SelectMenuComponent, SelectMenuComponentOptionData, APISelectMenuOption, ButtonComponent, ActionRowBuilder, MessageActionRowComponentBuilder } from 'discord.js';
-import { getGuildLocaleString, messageDataBuilder } from '#src/lib/util/util.js';
+import { getGuildLocaleString, buildMessageOptions } from '#src/lib/util/util.js';
 import { logger, searchState } from '#src/lib/util/common.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
 import { Node } from 'lavaclient';
@@ -21,7 +21,7 @@ export default {
 		state.timeout = setTimeout(async (message): Promise<void> => {
 			try {
 				await message.edit(
-					messageDataBuilder(
+					buildMessageOptions(
 						new EmbedBuilder()
 							.setDescription(await getGuildLocaleString(message.guildId, 'DISCORD.INTERACTION.EXPIRED')),
 						{ components: [] },
