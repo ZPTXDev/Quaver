@@ -4,7 +4,7 @@ import { get } from 'lodash-es';
 import { data, locales } from './common.js';
 import { colors, defaultLocaleCode } from '#src/settings.js';
 import { ActionRowBuilder, APISelectMenuOption, AttachmentBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, EmbedBuilder, escapeMarkdown, Interaction, InteractionReplyOptions, MessageActionRowComponentBuilder, MessageCreateOptions, SelectMenuBuilder } from 'discord.js';
-import * as fs from 'fs';
+import { readdirSync } from 'fs';
 import { languageName } from './constants.js';
 
 export type TimeObject = {
@@ -253,7 +253,7 @@ export async function settingsPage(interaction: Interaction, guildLocaleCode: st
 				new SelectMenuBuilder()
 					.setCustomId('language')
 					.addOptions(
-						fs.readdirSync(getAbsoluteFileURL(import.meta.url, ['..', '..', '..', 'locales']))
+						readdirSync(getAbsoluteFileURL(import.meta.url, ['..', '..', '..', 'locales']))
 							.map((file): APISelectMenuOption => ({ label: `${languageName[file] ?? 'Unknown'} (${file})`, value: file, default: file === guildLocaleCode })),
 					),
 			);
