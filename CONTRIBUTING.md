@@ -17,7 +17,7 @@ Here are the additional prerequisites for development:
 ## Setting up the environment
 Choose a safe place on your drive.
 
-You don't need to make a folder/directory as it will be generated when you run the commands in the next step.
+There's no need to make a folder/directory as it will be generated when you run the commands in the next step.
 
 Run `git clone https://github.com/ZPTXDev/Quaver.git` to clone the repository to the 'Quaver' folder/directory.
 

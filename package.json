@@ -19,24 +19,35 @@
     "lavaclient": "^4.1.1",
     "lodash-es": "^4.17.21",
     "patch-package": "^6.4.7",
+    "remove": "^0.1.5",
     "socket.io": "^4.5.2",
     "winston": "^3.8.2"
   },
   "devDependencies": {
-    "eslint": "^8.24.0"
+    "@types/crypto-js": "^4.1.1",
+    "@types/lodash-es": "^4.17.6",
+    "@typescript-eslint/eslint-plugin": "^5.39.0",
+    "@typescript-eslint/parser": "^5.39.0",
+    "eslint": "^8.24.0",
+    "rimraf": "^3.0.2",
+    "tsc-alias": "^1.7.0",
+    "tsconfig-paths": "^4.1.0",
+    "typescript": "^4.8.4"
   },
-  "main": "src/main.js",
+  "main": "dist/main.js",
   "scripts": {
+    "rimraf": "./node_modules/rimraf/bin.js",
     "postinstall": "patch-package",
     "slash-deploy": "node scripts/deploy-commands.js",
     "slash-delete": "node scripts/delete-commands.js",
     "migrate": "node scripts/migrate.js",
-    "start": "genversion --es6 --semi lib/util/version.js && node ."
+    "build": "rimraf dist/ && genversion --es6 --semi src/lib/util/version.ts && tsc && tsc-alias",
+    "build-start": "npm run build && node .",
+    "start": "node .",
+    "lint": "eslint . --ext .ts"
   },
   "imports": {
-    "#lib/*": "./lib/*",
-    "#src/*": "./src/*",
-    "#settings": "./settings.js"
+    "#src/*": "./src/*"
   },
   "release": {
     "tagFormat": "${version}",

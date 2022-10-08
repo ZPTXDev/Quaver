@@ -4,7 +4,7 @@ import { set } from 'lodash-es';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import data from '../data.json';
-import { database } from '#settings';
+import { database } from '#src/settings.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const keyv = new Keyv(database ? `${database.protocol}://${resolve(__dirname, '..', database.path)}` : `sqlite://${resolve(__dirname, '..', 'database.sqlite')}`, { namespace: 'guild' });
