@@ -112,7 +112,7 @@ dist
 /database.sqlite
 
 # Generated version file
-lib/util/version.ts
+src/lib/util/version.ts
 
 # TypeScript
 dist/
