@@ -102,16 +102,11 @@ load({
 	autoResolveYoutubeTracks: false,
 });
 
-/**
- * Handles database connection errors from Keyv.
- * @param {Error} err The error.
- */
-data.guild.instance.on('error', async (err): Promise<void> => {
+data.guild.instance.on('error', async (err: Error): Promise<void> => {
 	logger.error({ message: 'Failed to connect to database.', label: 'Keyv' });
 	await shuttingDown('keyv', err);
 });
 
-/** @type {Client & {commands: Collection, buttons: Collection, selects: Collection, music: Node}} */
 export const bot: Client & { music?: Node, commands?: Collection<unknown, unknown>, autocomplete?: Collection<unknown, unknown> } = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] });
 bot.commands = new Collection();
 bot.autocomplete = new Collection();
@@ -147,7 +142,7 @@ export async function shuttingDown(eventType: string, err?: Error): Promise<void
 			if (players.size < 1) return;
 			logger.info({ message: 'Disconnecting from all guilds...', label: 'Quaver' });
 			for (const pair of players) {
-				const player: Player & { handler?: PlayerHandler } = pair[1];
+				const player: Player<Node> & { handler?: PlayerHandler } = pair[1];
 				/** @type {string} */
 				logger.info({ message: `[G ${player.guildId}] Disconnecting (restarting)`, label: 'Quaver' });
 				const fileBuffer = [];
