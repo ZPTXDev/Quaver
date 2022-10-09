@@ -75,6 +75,7 @@ export default class PlayerHandler {
 	 * @returns The message that was sent.
 	 */
 	async locale(stringPath: string, { vars = [], type = 'neutral', components = null, files = null }: { vars?: string[]; type?: 'success' | 'neutral' | 'warning' | 'error'; components?: ActionRowBuilder<MessageActionRowComponentBuilder>[]; files?: AttachmentBuilder[]; } = {}): Promise<Message | false> {
-		return this.send(await getGuildLocaleString(this.player.guildId, stringPath, ...vars), { type, components, files });
+		const guildLocaleString = await getGuildLocaleString(this.player.guildId, stringPath, ...vars);
+		return this.send(guildLocaleString, { type, components, files });
 	}
 }
