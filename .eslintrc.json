@@ -57,6 +57,7 @@
 		"spaced-comment": "error",
 		"yoda": "error",
 		"@typescript-eslint/no-shadow": ["error", { "allow": ["err", "resolve", "reject"] }],
-		"@typescript-eslint/explicit-function-return-type": ["error", { "allowTypedFunctionExpressions": false }]
+		"@typescript-eslint/explicit-function-return-type": ["error", { "allowTypedFunctionExpressions": false }],
+		"@typescript-eslint/consistent-type-imports": ["error"]
 	}
 }
