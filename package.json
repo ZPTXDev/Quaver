@@ -36,7 +36,6 @@
   },
   "main": "dist/main.js",
   "scripts": {
-    "rimraf": "node ./node_modules/rimraf/bin.js",
     "postinstall": "patch-package",
     "slash-deploy": "node scripts/deploy-commands.js",
     "slash-delete": "node scripts/delete-commands.js",
