@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonComponent, ButtonInteraction, EmbedBuilder, MessageActionRowComponentBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonInteraction, EmbedBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder, SelectMenuComponent } from 'discord.js';
 import { getGuildLocaleString, getLocaleString, buildMessageOptions, settingsPage } from '#src/lib/util/util.js';
 import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
@@ -41,8 +41,8 @@ export default {
 			[description, ...embeds],
 			{
 				components: [
-					new ActionRowBuilder<ButtonBuilder>()
-						.addComponents(ButtonBuilder.from(<ButtonComponent> interaction.message.components[0].components[0])),
+					new ActionRowBuilder<SelectMenuBuilder>()
+						.addComponents(SelectMenuBuilder.from(<SelectMenuComponent> interaction.message.components[0].components[0])),
 					actionRow as ActionRowBuilder<MessageActionRowComponentBuilder>,
 				],
 				force: 'update',
