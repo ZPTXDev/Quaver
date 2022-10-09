@@ -108,7 +108,7 @@ dist
 .vscode
 
 # Settings and Data
-/settings.json
+/settings.js
 /database.sqlite
 
 # Generated version file

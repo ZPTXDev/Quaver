@@ -6,7 +6,7 @@ import { readdirSync } from 'fs';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v10';
 import { Collection } from 'discord.js';
-import settings from '../settings.json' assert { type: 'json' };
+import { token, applicationId } from '../settings.js'
 import { getAbsoluteFileURL } from '../dist/lib/util/util.js';
 import { setLocales } from '../dist/lib/util/common.js';
 
@@ -32,11 +32,11 @@ for await (const file of commandFiles) {
 	commands.push(command.default.data.toJSON());
 }
 
-const rest = new REST({ version: '10' }).setToken(settings.token);
+const rest = new REST({ version: '10' }).setToken(token);
 
 try {
 	await rest.put(
-		Routes.applicationCommands(settings.applicationId),
+		Routes.applicationCommands(applicationId),
 		{ body: commands },
 	);
 	console.log('Successfully registered application commands.');

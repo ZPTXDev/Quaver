@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'fs';
+import { existsSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 
@@ -7,7 +7,7 @@ function getAbsoluteFileURL(baseURL: string, path: string[]): URL {
 	return pathToFileURL(resolve(__dirname, ...path));
 }
 
-export let settings: {
+interface Settings {
 	token?: string,
 	applicationId?: string,
 	clientSecret?: string,
@@ -54,9 +54,11 @@ export let settings: {
 			},
 		},
 	},
-} = {};
-const path = getAbsoluteFileURL(import.meta.url, ['..', '..', '..', 'settings.json']);
-if (!existsSync(path)) {
+}
+
+const settingsPath = getAbsoluteFileURL(import.meta.url, ['..', '..', '..', 'settings.js']);
+if (!existsSync(settingsPath)) {
+	console.log(`Could not find ${settingsPath}.\nMake a copy of settings.example.js, edit the fields as necessary and rename it to settings.js`);
 	process.exit(1);
 }
-settings = JSON.parse(readFileSync(path).toString());
+export const settings: Settings = await import(settingsPath.toString());

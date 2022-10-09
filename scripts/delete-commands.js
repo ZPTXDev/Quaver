@@ -2,15 +2,15 @@
 
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v10';
-import settings from '../settings.json' assert { type: 'json' };
+import { token, applicationId } from '../settings.js'
 
-const rest = new REST({ version: '10' }).setToken(settings.token);
+const rest = new REST({ version: '10' }).setToken(token);
 
 (async () => {
-	const data = await rest.get(Routes.applicationCommands(settings.applicationId));
+	const data = await rest.get(Routes.applicationCommands(applicationId));
 	const promises = [];
 	for (const command of data) {
-		const deleteUrl = `${Routes.applicationCommands(settings.applicationId)}/${command.id}`;
+		const deleteUrl = `${Routes.applicationCommands(applicationId)}/${command.id}`;
 		promises.push(rest.delete(deleteUrl));
 	}
 	return Promise.all(promises);

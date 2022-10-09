@@ -8,7 +8,7 @@ Quaver utilizes slash commands, buttons, and menus. After deploying the commands
 Quaver is available for public use [here](https://go.zptx.dev/InviteQuaver), and its dashboard is available [here](https://quaver.zptx.dev). Keep in mind that this instance of Quaver will only run the latest stable version.
 
 # Hosting Quaver
-Hosting Quaver is fairly simple. Make a copy of `settings.example.json`, edit the fields as necessary and rename it to `settings.json`. An explanation on each property is available [here](CONFIGURATION.md).
+Hosting Quaver is fairly simple. Make a copy of `settings.example.js`, edit the fields as necessary and rename it to `settings.js`.
 
 You are required to host your own instance of [Lavalink](https://github.com/freyacodes/Lavalink) and specify the connection details in `settings.json`.
 
@@ -42,7 +42,7 @@ Yes, if it is meaningful. Submit an issue [here](https://github.com/ZPTXDev/Quav
 ## I changed the language through the `/settings` command. Why isn't it updating in slash commands?
 Slash commands are defined when running `npm run slash-deploy`.
 
-This means that slash command descriptions will follow the language set in `settings.json` (`defaultLocaleCode` key).
+This means that slash command descriptions will follow the language set in `settings.js` (`defaultLocaleCode` key).
 
 ## I changed `defaultLocaleCode`, but it isn't updating in slash command descriptions. Why?
 You need to re-deploy the commands using `npm run slash-deploy` for the new locale to take effect.
