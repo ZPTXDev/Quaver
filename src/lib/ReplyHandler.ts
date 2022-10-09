@@ -60,6 +60,7 @@ export default class ReplyHandler {
 	 * @returns The message that was sent.
 	 */
 	async locale(stringPath: string, { vars = [], type = 'neutral', components = null, files = null, ephemeral = false, force = null }: { vars?: string[]; type?: 'success' | 'neutral' | 'warning' | 'error'; components?: ActionRowBuilder<MessageActionRowComponentBuilder>[]; files?: AttachmentBuilder[]; ephemeral?: boolean; fetchReply?: boolean; force?: 'reply' | 'edit' | 'update'; } = {}): Promise<InteractionResponse | Message | boolean> {
-		return this.reply(await getGuildLocaleString(this.interaction.guildId, stringPath, ...vars), { type, components, files, ephemeral, force });
+		const guildLocaleString = await getGuildLocaleString(this.interaction.guildId, stringPath, ...vars);
+		return this.reply(guildLocaleString, { type, components, files, ephemeral, force });
 	}
 }
