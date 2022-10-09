@@ -108,8 +108,11 @@ dist
 .vscode
 
 # Settings and Data
-/settings.js
+/src/settings.ts
 /database.sqlite
 
 # Generated version file
-lib/util/version.js
+lib/util/version.ts
+
+# TypeScript
+dist/

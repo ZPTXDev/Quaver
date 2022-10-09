@@ -1,5 +1,13 @@
 {
-	"extends": "eslint:recommended",
+	"parser": "@typescript-eslint/parser",
+	"plugins": [
+		"@typescript-eslint"
+	],
+	"extends": [
+		"eslint:recommended",
+		"plugin:@typescript-eslint/eslint-recommended",
+		"plugin:@typescript-eslint/recommended"
+	],
 	"env": {
 		"node": true,
 		"es2022": true
@@ -8,7 +16,7 @@
 		"ecmaVersion": 2022,
 		"sourceType": "module"
 	},
-	"ignorePatterns": ["locales/"],
+	"ignorePatterns": ["locales/", "dist/", "scripts/"],
 	"rules": {
 		"arrow-spacing": ["warn", { "before": true, "after": true }],
 		"brace-style": ["error", "stroustrup", { "allowSingleLine": true }],
@@ -30,7 +38,7 @@
 		"no-multi-spaces": "error",
 		"no-multiple-empty-lines": ["error", { "max": 2, "maxEOF": 1, "maxBOF": 0 }],
 		"no-return-await": "error",
-		"no-shadow": ["error", { "allow": ["err", "resolve", "reject"] }],
+		"no-shadow": "off",
 		"no-trailing-spaces": ["error"],
 		"no-var": "error",
 		"object-curly-spacing": ["error", "always"],
@@ -47,6 +55,8 @@
 		"space-infix-ops": "error",
 		"space-unary-ops": "error",
 		"spaced-comment": "error",
-		"yoda": "error"
+		"yoda": "error",
+		"@typescript-eslint/no-shadow": ["error", { "allow": ["err", "resolve", "reject"] }],
+		"@typescript-eslint/explicit-function-return-type": ["error", { "allowTypedFunctionExpressions": false }]
 	}
 }

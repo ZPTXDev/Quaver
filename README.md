@@ -8,9 +8,9 @@ Quaver utilizes slash commands, buttons, and menus. After deploying the commands
 Quaver is available for public use [here](https://go.zptx.dev/InviteQuaver), and its dashboard is available [here](https://quaver.zptx.dev). Keep in mind that this instance of Quaver will only run the latest stable version.
 
 # Hosting Quaver
-Hosting Quaver is fairly simple. Make a copy of `settings.example.js`, edit the fields as necessary and rename it to `settings.js`.
+Hosting Quaver is fairly simple. Make a copy of `settings.example.ts`, edit the fields as necessary and rename it to `settings.ts`. Move this file to the `src` directory.
 
-You are required to host your own instance of [Lavalink](https://github.com/freyacodes/Lavalink) and specify the connection details in `settings.js`.
+You are required to host your own instance of [Lavalink](https://github.com/freyacodes/Lavalink) and specify the connection details in `settings.ts`.
 
 ## Prerequisites
 - Node.js v16.9.0 (or higher)
@@ -21,9 +21,11 @@ You are required to host your own instance of [Lavalink](https://github.com/frey
 ## Starting Quaver for the first time
 Run `npm ci` to install packages required to run Quaver.
 
-Then, run `npm run slash-deploy` **after** you've configured your `settings.js` in order to register your commands on Discord.
+Then, run `npm run slash-deploy` **after** you've configured your `settings.ts` in order to register your commands on Discord.
 
-Once that's done, run `npm start` to start the bot. This will be the only command you execute when starting Quaver from now on.
+Once that's done, run `npm run build` to compile the source code. Alternatively, you can run `npm run build-start` to compile the source code and start Quaver in one command.
+
+For subsequent startups, you can simply run `npm start`, which skips the compilation step.
 
 # FAQ
 ## What happened to Lyrics?
