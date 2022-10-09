@@ -1,5 +1,5 @@
-import { APIGuild } from 'discord.js';
-import { Socket } from 'socket.io';
+import type { APIGuild } from 'discord.js';
+import type { Socket } from 'socket.io';
 
 export default {
 	name: 'join',

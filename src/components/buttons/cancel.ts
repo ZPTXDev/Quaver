@@ -1,6 +1,6 @@
-import ReplyHandler from '#src/lib/ReplyHandler.js';
+import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import { confirmationTimeout, searchState } from '#src/lib/util/common.js';
-import { ButtonInteraction } from 'discord.js';
+import type { ButtonInteraction } from 'discord.js';
 
 export default {
 	name: 'cancel',

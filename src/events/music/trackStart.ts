@@ -1,10 +1,10 @@
-import PlayerHandler from '#src/lib/PlayerHandler.js';
+import type PlayerHandler from '#src/lib/PlayerHandler.js';
 import { data, logger } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, msToTime, msToTimeString } from '#src/lib/util/util.js';
-import { Queue, Song } from '@lavaclient/queue';
+import type { Queue, Song } from '@lavaclient/queue';
 import { EmbedBuilder, escapeMarkdown } from 'discord.js';
-import { Node, Player } from 'lavaclient';
+import type { Node, Player } from 'lavaclient';
 
 export default {
 	name: 'trackStart',

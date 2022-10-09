@@ -1,6 +1,7 @@
 import { logger } from '#src/lib/util/common.js';
 import { buildMessageOptions, getGuildLocaleString } from '#src/lib/util/util.js';
-import { ActionRowBuilder, AttachmentBuilder, AutocompleteInteraction, EmbedBuilder, Interaction, InteractionResponse, Message, MessageActionRowComponentBuilder, PermissionsBitField } from 'discord.js';
+import type { ActionRowBuilder, AttachmentBuilder, AutocompleteInteraction, EmbedBuilder, Interaction, InteractionResponse, Message, MessageActionRowComponentBuilder } from 'discord.js';
+import { PermissionsBitField } from 'discord.js';
 
 /** Class for handling replies to interactions. */
 export default class ReplyHandler {

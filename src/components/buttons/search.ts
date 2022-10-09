@@ -1,12 +1,13 @@
 import PlayerHandler from '#src/lib/PlayerHandler.js';
-import ReplyHandler from '#src/lib/ReplyHandler.js';
+import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import { logger, searchState } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { buildMessageOptions, getGuildLocaleString, msToTime, msToTimeString } from '#src/lib/util/util.js';
-import { Queue, Song } from '@lavaclient/queue';
-import { ActionRowBuilder, APISelectMenuOption, ButtonBuilder, ButtonComponent, ButtonInteraction, ChannelType, Client, EmbedBuilder, escapeMarkdown, GuildMember, MessageActionRowComponentBuilder, PermissionsBitField, SelectMenuBuilder, SelectMenuComponent, TextChannel, VoiceChannel } from 'discord.js';
-import { Node, Player } from 'lavaclient';
+import type { Queue, Song } from '@lavaclient/queue';
+import type { APISelectMenuOption, ButtonComponent, ButtonInteraction, Client, MessageActionRowComponentBuilder, SelectMenuComponent, TextChannel, VoiceChannel } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ChannelType, EmbedBuilder, escapeMarkdown, GuildMember, PermissionsBitField, SelectMenuBuilder } from 'discord.js';
+import type { Node, Player } from 'lavaclient';
 
 export default {
 	name: 'search',

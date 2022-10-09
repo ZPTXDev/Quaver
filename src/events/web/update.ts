@@ -1,7 +1,7 @@
-import { Song } from '@lavaclient/queue';
-import { APIGuild, APIUser } from 'discord.js';
-import { Node, Player } from 'lavaclient';
-import { Socket } from 'socket.io';
+import type { Song } from '@lavaclient/queue';
+import type { APIGuild, APIUser } from 'discord.js';
+import type { Node, Player } from 'lavaclient';
+import type { Socket } from 'socket.io';
 
 export default {
 	name: 'update',

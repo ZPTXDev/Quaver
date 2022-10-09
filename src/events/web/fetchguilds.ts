@@ -2,8 +2,8 @@ import { settings } from '#src/lib/util/settings.js';
 import { getJSONResponse } from '#src/lib/util/util.js';
 import { version } from '#src/lib/util/version.js';
 import CryptoJS from 'crypto-js';
-import { APIGuild } from 'discord.js';
-import { Socket } from 'socket.io';
+import type { APIGuild } from 'discord.js';
+import type { Socket } from 'socket.io';
 import { request } from 'undici';
 
 export default {

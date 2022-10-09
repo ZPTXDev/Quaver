@@ -1,9 +1,10 @@
-import PlayerHandler from '#src/lib/PlayerHandler.js';
-import ReplyHandler from '#src/lib/ReplyHandler.js';
+import type PlayerHandler from '#src/lib/PlayerHandler.js';
+import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import { confirmationTimeout } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
-import { ButtonInteraction, Client, GuildMember } from 'discord.js';
-import { Node, Player } from 'lavaclient';
+import type { ButtonInteraction, Client } from 'discord.js';
+import { GuildMember } from 'discord.js';
+import type { Node, Player } from 'lavaclient';
 
 export default {
 	name: 'disconnect',

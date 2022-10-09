@@ -1,9 +1,9 @@
-import PlayerHandler from '#src/lib/PlayerHandler.js';
+import type PlayerHandler from '#src/lib/PlayerHandler.js';
 import { data, logger } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString } from '#src/lib/util/util.js';
-import { Queue } from '@lavaclient/queue';
-import { Node, Player } from 'lavaclient';
+import type { Queue } from '@lavaclient/queue';
+import type { Node, Player } from 'lavaclient';
 
 export default {
 	name: 'queueFinish',

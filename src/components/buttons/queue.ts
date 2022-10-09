@@ -1,8 +1,9 @@
-import ReplyHandler from '#src/lib/ReplyHandler.js';
+import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import { getGuildLocaleString, msToTime, msToTimeString, paginate } from '#src/lib/util/util.js';
-import { Song } from '@lavaclient/queue';
-import { ActionRowBuilder, ButtonBuilder, ButtonComponent, ButtonInteraction, Client, EmbedBuilder, escapeMarkdown, MessageActionRowComponentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from 'discord.js';
-import { Node } from 'lavaclient';
+import type { Song } from '@lavaclient/queue';
+import type { ButtonComponent, ButtonInteraction, Client, MessageActionRowComponentBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, EmbedBuilder, escapeMarkdown, ModalBuilder, TextInputBuilder, TextInputStyle } from 'discord.js';
+import type { Node } from 'lavaclient';
 
 export default {
 	name: 'queue',

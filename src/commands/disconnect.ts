@@ -1,11 +1,12 @@
-import PlayerHandler from '#src/lib/PlayerHandler.js';
-import ReplyHandler from '#src/lib/ReplyHandler.js';
+import type PlayerHandler from '#src/lib/PlayerHandler.js';
+import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { buildMessageOptions, getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, EmbedBuilder, Message, SlashCommandBuilder } from 'discord.js';
-import { Node, Player } from 'lavaclient';
+import type { ChatInputCommandInteraction, Client } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message, SlashCommandBuilder } from 'discord.js';
+import type { Node, Player } from 'lavaclient';
 
 export default {
 	data: new SlashCommandBuilder()

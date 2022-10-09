@@ -1,8 +1,9 @@
 import ReplyHandler from '#src/lib/ReplyHandler.js';
 import { logger } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
-import { AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, Client, Collection, GuildMember, Interaction, ModalSubmitInteraction, PermissionsBitField, SelectMenuInteraction, SlashCommandBuilder } from 'discord.js';
-import { Node } from 'lavaclient';
+import type { AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, Client, Collection, Interaction, ModalSubmitInteraction, SelectMenuInteraction, SlashCommandBuilder } from 'discord.js';
+import { GuildMember, PermissionsBitField } from 'discord.js';
+import type { Node } from 'lavaclient';
 
 export default {
 	name: 'interactionCreate',

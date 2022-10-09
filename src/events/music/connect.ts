@@ -1,8 +1,8 @@
 import PlayerHandler from '#src/lib/PlayerHandler.js';
 import { data, logger } from '#src/lib/util/common.js';
-import { Queue } from '@lavaclient/queue';
-import { TextChannel, VoiceChannel } from 'discord.js';
-import { Node, Player } from 'lavaclient';
+import type { Queue } from '@lavaclient/queue';
+import type { TextChannel, VoiceChannel } from 'discord.js';
+import type { Node, Player } from 'lavaclient';
 import { get } from 'lodash-es';
 
 export default {

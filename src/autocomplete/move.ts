@@ -1,5 +1,5 @@
-import { ApplicationCommandOptionChoiceData, AutocompleteInteraction, Client } from 'discord.js';
-import { Node } from 'lavaclient';
+import type { ApplicationCommandOptionChoiceData, AutocompleteInteraction, Client } from 'discord.js';
+import type { Node } from 'lavaclient';
 
 export default {
 	name: 'move',
