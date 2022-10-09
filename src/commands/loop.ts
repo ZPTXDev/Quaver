@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, Client, SlashCommandBuilder, SlashCommandStringOption } from 'discord.js';
 import { LoopType } from '@lavaclient/queue';
-import { defaultLocaleCode, features } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { checks } from '#src/lib/util/constants.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
@@ -9,16 +9,16 @@ import { Node } from 'lavaclient';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('loop')
-		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.LOOP.DESCRIPTION'))
+		.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.LOOP.DESCRIPTION'))
 		.addStringOption((option): SlashCommandStringOption =>
 			option
 				.setName('type')
-				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.LOOP.OPTION.TYPE.DESCRIPTION'))
+				.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.LOOP.OPTION.TYPE.DESCRIPTION'))
 				.setRequired(true)
 				.addChoices(
-					{ name: getLocaleString(defaultLocaleCode, 'CMD.LOOP.OPTION.TYPE.OPTION.DISABLED'), value: 'disabled' },
-					{ name: getLocaleString(defaultLocaleCode, 'CMD.LOOP.OPTION.TYPE.OPTION.TRACK'), value: 'track' },
-					{ name: getLocaleString(defaultLocaleCode, 'CMD.LOOP.OPTION.TYPE.OPTION.QUEUE'), value: 'queue' },
+					{ name: getLocaleString(settings.defaultLocaleCode, 'CMD.LOOP.OPTION.TYPE.OPTION.DISABLED'), value: 'disabled' },
+					{ name: getLocaleString(settings.defaultLocaleCode, 'CMD.LOOP.OPTION.TYPE.OPTION.TRACK'), value: 'track' },
+					{ name: getLocaleString(settings.defaultLocaleCode, 'CMD.LOOP.OPTION.TYPE.OPTION.QUEUE'), value: 'queue' },
 				)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
@@ -46,7 +46,7 @@ export default {
 		}
 		typeLocale = typeLocale.toLowerCase();
 		player.queue.setLoop(loop);
-		if (features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('loopUpdate', loop);
+		if (settings.features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('loopUpdate', loop);
 		await interaction.replyHandler.locale('CMD.LOOP.RESPONSE.SUCCESS', { vars: [typeLocale] });
 	},
 };

@@ -6,7 +6,7 @@ import { load } from '@lavaclient/spotify';
 import { readdirSync, readFileSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import { createInterface } from 'readline';
-import { features, lavalink, token } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { msToTime, msToTimeString, getGuildLocaleString, getAbsoluteFileURL, TimeObject } from '#src/lib/util/util.js';
 import { logger, data, setLocales } from '#src/lib/util/common.js';
 import { createServer } from 'https';
@@ -42,7 +42,7 @@ rl.on('line', async (input): Promise<void> => {
 				break;
 			}
 			const guildId = input.split(' ')[1];
-			if (!features.stay.whitelist) {
+			if (!settings.features.stay.whitelist) {
 				console.log('The 24/7 whitelist is not enabled.');
 				break;
 			}
@@ -73,15 +73,15 @@ let httpServer;
 // haha let's just disable all of eslint's warnings because
 // why not right i'm just so cool and quirky
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-if ((features as Record<string, any>).web.https) {
+if (settings.features.web.https) {
 	httpServer = createServer({
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		key: readFileSync(getAbsoluteFileURL(import.meta.url, ['..', ...(features as Record<string, any>).web.https.key.split('/')])),
+		key: readFileSync(getAbsoluteFileURL(import.meta.url, ['..', ...settings.features.web.https.key.split('/')])),
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		cert: readFileSync(getAbsoluteFileURL(import.meta.url, ['..', ...(features as Record<string, any>).web.https.cert.split('/')])),
+		cert: readFileSync(getAbsoluteFileURL(import.meta.url, ['..', ...settings.features.web.https.cert.split('/')])),
 	});
 }
-export const io = features.web.enabled ? new Server(httpServer ?? features.web.port, { cors: { origin: features.web.allowedOrigins } }) : undefined;
+export const io = settings.features.web.enabled ? new Server(httpServer ?? settings.features.web.port, { cors: { origin: settings.features.web.allowedOrigins } }) : undefined;
 if (io) {
 	io.on('connection', async (socket): Promise<void> => {
 		const webEventFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['events', 'web'])).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
@@ -97,12 +97,12 @@ if (io) {
 		}
 	});
 }
-if (httpServer) httpServer.listen(features.web.port);
+if (httpServer) httpServer.listen(settings.features.web.port);
 
 load({
 	client: {
-		id: features.spotify.client_id,
-		secret: features.spotify.client_secret,
+		id: settings.features.spotify.client_id,
+		secret: settings.features.spotify.client_secret,
 	},
 	autoResolveYoutubeTracks: false,
 });
@@ -122,13 +122,13 @@ bot.commands = new Collection();
 bot.autocomplete = new Collection();
 bot.music = new Node({
 	connection: {
-		host: lavalink.host,
-		port: lavalink.port,
-		password: lavalink.password,
-		secure: !!lavalink.secure,
+		host: settings.lavalink.host,
+		port: settings.lavalink.port,
+		password: settings.lavalink.password,
+		secure: !!settings.lavalink.secure,
 		reconnect: {
-			delay: lavalink.reconnect.delay ?? 3000,
-			tries: lavalink.reconnect.tries ?? 5,
+			delay: settings.lavalink.reconnect.delay ?? 3000,
+			tries: settings.lavalink.reconnect.tries ?? 5,
 		},
 	},
 	sendGatewayPayload: (id, payload): void => bot.guilds.cache.get(id)?.shard?.send(payload),
@@ -266,9 +266,9 @@ for await (const file of musicEventFiles) {
 	}
 }
 
-if (features.web.enabled) setInterval((): boolean => bot.emit('timer'), 500);
+if (settings.features.web.enabled) setInterval((): boolean => bot.emit('timer'), 500);
 
-bot.login(token);
+bot.login(settings.token);
 
 ['exit', 'SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM', 'uncaughtException', 'unhandledRejection'].forEach((eventType): void => {
 	process.on(eventType, async (err): Promise<void> => shuttingDown(eventType, err));

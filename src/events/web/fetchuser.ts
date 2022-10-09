@@ -1,6 +1,6 @@
 import CryptoJS from 'crypto-js';
 import { request } from 'undici';
-import { features } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { getJSONResponse } from '#src/lib/util/util.js';
 import { version } from '#src/lib/util/version.js';
 import { Socket } from 'socket.io';
@@ -12,7 +12,7 @@ export default {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	async execute(socket: Socket & { user: APIUser }, callback: (cb: Record<string, any>) => void, token?: string): Promise<void> {
 		if (!token) return;
-		const decryptedToken = CryptoJS.AES.decrypt(token, features.web.encryptionKey).toString(CryptoJS.enc.Utf8);
+		const decryptedToken = CryptoJS.AES.decrypt(token, settings.features.web.encryptionKey).toString(CryptoJS.enc.Utf8);
 		const user = await request('https://discord.com/api/users/@me', {
 			headers: {
 				'Authorization': decryptedToken,

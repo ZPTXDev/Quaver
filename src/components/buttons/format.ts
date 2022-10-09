@@ -1,7 +1,7 @@
 import { ActionRowBuilder, APIButtonComponent, ButtonBuilder, ButtonInteraction, EmbedBuilder, MessageActionRowComponentBuilder } from 'discord.js';
 import { getGuildLocaleString, getLocaleString, buildMessageOptions, settingsPage } from '#src/lib/util/util.js';
 import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
-import { defaultLocaleCode } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
 
 export default {
@@ -34,7 +34,7 @@ export default {
 		const option = interaction.customId.split('_')[1];
 		await data.guild.set(interaction.guildId, 'settings.format', option);
 		// definitely need some checks here based on my own typedef, casting is not a good idea
-		const guildLocaleCode = <string> await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocaleCode;
+		const guildLocaleCode = <string> await data.guild.get(interaction.guildId, 'settings.locale') ?? settings.defaultLocaleCode;
 		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocaleCode, 'format');
 		const description = `${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.FORMAT.NAME')}** ─ ${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.FORMAT.DESCRIPTION')}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: \`${current}\``;
 		await interaction.replyHandler.reply(

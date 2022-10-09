@@ -1,12 +1,12 @@
 import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { defaultLocaleCode } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { msToTime, msToTimeString, getLocaleString, getGuildLocaleString, TimeObject } from '#src/lib/util/util.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('ping')
-		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.PING.DESCRIPTION')),
+		.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.PING.DESCRIPTION')),
 	checks: [],
 	permissions: {
 		user: [],

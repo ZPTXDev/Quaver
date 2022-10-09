@@ -1,4 +1,4 @@
-import { features } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { data, logger } from '#src/lib/util/common.js';
 import { getGuildLocaleString, msToTime, msToTimeString, TimeObject } from '#src/lib/util/util.js';
 import { EmbedBuilder, escapeMarkdown } from 'discord.js';
@@ -14,15 +14,15 @@ export default {
 		delete queue.player.skip;
 		logger.info({ message: `[G ${queue.player.guildId}] Starting track`, label: 'Quaver' });
 		await queue.player.pause(false);
-		if (features.web.enabled) io.to(`guild:${queue.player.guildId}`).emit('pauseUpdate', queue.player.paused);
+		if (settings.features.web.enabled) io.to(`guild:${queue.player.guildId}`).emit('pauseUpdate', queue.player.paused);
 		if (queue.player.timeout) {
 			clearTimeout(queue.player.timeout);
 			delete queue.player.timeout;
-			if (features.web.enabled) io.to(`guild:${queue.player.guildId}`).emit('timeoutUpdate', !!queue.player.timeout);
+			if (settings.features.web.enabled) io.to(`guild:${queue.player.guildId}`).emit('timeoutUpdate', !!queue.player.timeout);
 		}
 		const duration = <TimeObject> msToTime(track.length);
 		const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
-		if (features.web.enabled) {
+		if (settings.features.web.enabled) {
 			io.to(`guild:${queue.player.guildId}`).emit('queueUpdate', queue.tracks.map((t: Song & { requesterTag: string }): Song & { requesterTag: string } => {
 				t.requesterTag = bot.users.cache.get(t.requester)?.tag;
 				return t;

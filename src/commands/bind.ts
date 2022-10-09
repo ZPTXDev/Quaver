@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, ChannelType, PermissionsBitField, SlashCommandChannelOption, ChatInputCommandInteraction, Client, VoiceChannel, TextChannel } from 'discord.js';
-import { defaultLocaleCode, features } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { checks } from '#src/lib/util/constants.js';
 import { getLocaleString } from '#src/lib/util/util.js';
 import { data } from '#src/lib/util/common.js';
@@ -10,11 +10,11 @@ import { Queue } from '@lavaclient/queue';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('bind')
-		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.BIND.DESCRIPTION'))
+		.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.BIND.DESCRIPTION'))
 		.addChannelOption((option): SlashCommandChannelOption =>
 			option
 				.setName('new_channel')
-				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.BIND.OPTION.NEW_CHANNEL'))
+				.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.BIND.OPTION.NEW_CHANNEL'))
 				.addChannelTypes(ChannelType.GuildText, ChannelType.GuildVoice)
 				.setRequired(true)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
@@ -31,7 +31,7 @@ export default {
 			return;
 		}
 		player.queue.channel = channel;
-		if (features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('textChannelUpdate', channel.name);
+		if (settings.features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('textChannelUpdate', channel.name);
 		if (await data.guild.get(interaction.guildId, 'settings.stay.enabled')) await data.guild.set(interaction.guildId, 'settings.stay.text', channel.id);
 		await interaction.replyHandler.locale('CMD.BIND.RESPONSE.SUCCESS', { vars: [channel.id], type: 'success' });
 	},

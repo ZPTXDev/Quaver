@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Client, escapeMarkdown, SlashCommandBuilder, SlashCommandIntegerOption } from 'discord.js';
-import { defaultLocaleCode, features } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { checks } from '#src/lib/util/constants.js';
 import { getLocaleString } from '#src/lib/util/util.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
@@ -9,18 +9,18 @@ import { Song } from '@lavaclient/queue';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('move')
-		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.MOVE.DESCRIPTION'))
+		.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.MOVE.DESCRIPTION'))
 		.addIntegerOption((option): SlashCommandIntegerOption =>
 			option
 				.setName('old_position')
-				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.MOVE.OPTION.OLD_POSITION'))
+				.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.MOVE.OPTION.OLD_POSITION'))
 				.setMinValue(1)
 				.setRequired(true)
 				.setAutocomplete(true))
 		.addIntegerOption((option): SlashCommandIntegerOption =>
 			option
 				.setName('new_position')
-				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.MOVE.OPTION.NEW_POSITION'))
+				.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.MOVE.OPTION.NEW_POSITION'))
 				.setMinValue(1)
 				.setRequired(true)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
@@ -47,7 +47,7 @@ export default {
 		}
 		player.queue.tracks.splice(newPosition - 1, 0, player.queue.tracks.splice(oldPosition - 1, 1)[0]);
 		const track = player.queue.tracks[newPosition - 1];
-		if (features.web.enabled) {
+		if (settings.features.web.enabled) {
 			io.to(`guild:${interaction.guildId}`).emit('queueUpdate', player.queue.tracks.map((t: Song & { requesterTag: string }): Song & { requesterTag: string } => {
 				t.requesterTag = bot.users.cache.get(t.requester)?.tag;
 				return t;

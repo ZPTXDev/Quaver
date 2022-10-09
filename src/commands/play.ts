@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, PermissionsBitField, ChannelType, EmbedBuilder, escapeMarkdown, SlashCommandStringOption, SlashCommandBooleanOption, ChatInputCommandInteraction, Client, GuildMember, TextChannel, VoiceChannel } from 'discord.js';
 import { SpotifyItemType } from '@lavaclient/spotify';
-import { defaultLocaleCode, features } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { checks } from '#src/lib/util/constants.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import PlayerHandler from '#src/lib/PlayerHandler.js';
@@ -11,17 +11,17 @@ import { Queue, Song } from '@lavaclient/queue';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('play')
-		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.PLAY.DESCRIPTION'))
+		.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.PLAY.DESCRIPTION'))
 		.addStringOption((option): SlashCommandStringOption =>
 			option
 				.setName('query')
-				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.PLAY.OPTION.QUERY'))
+				.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.PLAY.OPTION.QUERY'))
 				.setRequired(true)
 				.setAutocomplete(true))
 		.addBooleanOption((option): SlashCommandBooleanOption =>
 			option
 				.setName('insert')
-				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.PLAY.OPTION.INSERT'))),
+				.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.PLAY.OPTION.INSERT'))),
 	checks: [checks.GUILD_ONLY, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -53,7 +53,7 @@ export default {
 		const query = interaction.options.getString('query'), insert = interaction.options.getBoolean('insert');
 		let tracks = [], msg = '', extras = [];
 		if (interaction.client.music.spotify.isSpotifyUrl(query.replace('embed/', ''))) {
-			if (!features.spotify.enabled || !features.spotify.client_id || !features.spotify.client_secret) {
+			if (!settings.features.spotify.enabled || !settings.features.spotify.client_id || !settings.features.spotify.client_secret) {
 				await interaction.replyHandler.locale('CMD.PLAY.RESPONSE.DISABLED.SPOTIFY', { type: 'error' });
 				return;
 			}
@@ -132,7 +132,7 @@ export default {
 			{ type: 'success', ephemeral: true },
 		);
 		if (!started) await player.queue.start();
-		if (features.web.enabled) {
+		if (settings.features.web.enabled) {
 			io.to(`guild:${interaction.guildId}`).emit('queueUpdate', player.queue.tracks.map((track: Song & { requesterTag: string }): Song & { requesterTag: string } => {
 				track.requesterTag = bot.users.cache.get(track.requester)?.tag;
 				return track;

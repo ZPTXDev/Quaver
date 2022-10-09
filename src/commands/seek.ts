@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Client, SlashCommandBuilder, SlashCommandIntegerOption } from 'discord.js';
-import { defaultLocaleCode } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { checks } from '#src/lib/util/constants.js';
 import { getLocaleString, msToTime, msToTimeString, TimeObject } from '#src/lib/util/util.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
@@ -8,23 +8,23 @@ import { Node } from 'lavaclient';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('seek')
-		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.SEEK.DESCRIPTION'))
+		.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.SEEK.DESCRIPTION'))
 		.addIntegerOption((option): SlashCommandIntegerOption =>
 			option
 				.setName('hours')
-				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.SEEK.OPTION.HOURS'))
+				.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.SEEK.OPTION.HOURS'))
 				.setMinValue(0)
 				.setMaxValue(23))
 		.addIntegerOption((option): SlashCommandIntegerOption =>
 			option
 				.setName('minutes')
-				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.SEEK.OPTION.MINUTES'))
+				.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.SEEK.OPTION.MINUTES'))
 				.setMinValue(0)
 				.setMaxValue(59))
 		.addIntegerOption((option): SlashCommandIntegerOption =>
 			option
 				.setName('seconds')
-				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.SEEK.OPTION.SECONDS'))
+				.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.SEEK.OPTION.SECONDS'))
 				.setMinValue(0)
 				.setMaxValue(59)),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],

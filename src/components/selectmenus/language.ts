@@ -1,7 +1,7 @@
 import { ActionRowBuilder, EmbedBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder, SelectMenuComponent, SelectMenuComponentOptionData, SelectMenuInteraction } from 'discord.js';
 import { checkLocaleCompletion, getGuildLocaleString, getLocaleString, buildMessageOptions, roundTo, settingsPage } from '#src/lib/util/util.js';
 import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
-import { defaultLocaleCode } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { settingsOptions } from '#src/lib/util/constants.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
 
@@ -46,7 +46,7 @@ export default {
 				{ type: 'warning', ephemeral: true },
 			);
 		}
-		const guildLocaleCode = <string> await data.guild.get(interaction.guildId, 'settings.locale') ?? defaultLocaleCode;
+		const guildLocaleCode = <string> await data.guild.get(interaction.guildId, 'settings.locale') ?? settings.defaultLocaleCode;
 		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocaleCode, 'language');
 		const description = `${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.LANGUAGE.NAME')}** ─ ${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.LANGUAGE.DESCRIPTION')}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: \`${current}\``;
 		const args: [string | EmbedBuilder | (string | EmbedBuilder)[], { components: ActionRowBuilder<MessageActionRowComponentBuilder>[] }] = [

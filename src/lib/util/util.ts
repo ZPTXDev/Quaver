@@ -2,7 +2,7 @@ import { resolve, dirname } from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { get } from 'lodash-es';
 import { data, locales } from './common.js';
-import { colors, defaultLocaleCode } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { ActionRowBuilder, APISelectMenuOption, AttachmentBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, EmbedBuilder, escapeMarkdown, Interaction, InteractionReplyOptions, MessageActionRowComponentBuilder, MessageCreateOptions, SelectMenuBuilder } from 'discord.js';
 import { readdirSync } from 'fs';
 import { languageName } from './constants.js';
@@ -51,7 +51,7 @@ export function msToTime(milliseconds: number, format?: 's' | 'm' | 'h' | 'd'): 
  */
 export function msToTimeString(msObject: TimeObject, simple?: boolean): string {
 	if (simple) {
-		if (msObject['d'] > 0) getLocaleString(defaultLocaleCode, 'MISC.MORE_THAN_A_DAY');
+		if (msObject['d'] > 0) getLocaleString(settings.defaultLocaleCode, 'MISC.MORE_THAN_A_DAY');
 		return `${msObject['h'] > 0 ? `${msObject['h']}:` : ''}${msObject['h'] > 0 ? msObject['m'].toString().padStart(2, '0') : msObject['m']}:${msObject['s'].toString().padStart(2, '0')}`;
 	}
 	return `${msObject['d'] > 0 ? `${msObject['d']} day${msObject['d'] === 1 ? '' : 's'}, ` : ''}${msObject['h'] > 0 ? `${msObject['h']} hr${msObject['h'] === 1 ? '' : 's'}, ` : ''}${msObject['m'] > 0 ? `${msObject['m']} min${msObject['m'] === 1 ? '' : 's'}, ` : ''}${msObject['s'] > 0 ? `${msObject['s']} sec${msObject['s'] === 1 ? '' : 's'}, ` : ''}`.slice(0, -2);
@@ -169,7 +169,7 @@ export function getLocaleString(localeCode: string, stringPath: string, ...vars:
  * @returns The localized string, or LOCALE_MISSING if the locale is missing, or STRING_MISSING if the string is missing.
  */
 export async function getGuildLocaleString(guildId: string, stringPath: string, ...vars: string[]): Promise<string | 'LOCALE_MISSING' | 'STRING_MISSING'> {
-	return getLocaleString(<string> await data.guild.get(guildId, 'settings.locale') ?? defaultLocaleCode, stringPath, ...vars);
+	return getLocaleString(<string> await data.guild.get(guildId, 'settings.locale') ?? settings.defaultLocaleCode, stringPath, ...vars);
 }
 
 /**
@@ -232,8 +232,8 @@ export async function getJSONResponse(body: any): Promise<unknown> {
 export function buildMessageOptions(inputData: string | EmbedBuilder | (string | EmbedBuilder)[], { type = 'neutral', components = null, files = null }: { type?: 'success' | 'neutral' | 'warning' | 'error'; components?: ActionRowBuilder<MessageActionRowComponentBuilder>[]; files?: AttachmentBuilder[]; } = {}): MessageCreateOptions & InteractionReplyOptions {
 	const messageData = Array.isArray(inputData) ? inputData : [inputData];
 	const embedData = messageData.map((msg): EmbedBuilder => {
-		if (typeof msg === 'string') return new EmbedBuilder().setDescription(msg).setColor(<ColorResolvable> colors[type]);
-		if (!msg.data.color) return msg.setColor(<ColorResolvable> colors[type]);
+		if (typeof msg === 'string') return new EmbedBuilder().setDescription(msg).setColor(<ColorResolvable> settings.colors[type]);
+		if (!msg.data.color) return msg.setColor(<ColorResolvable> settings.colors[type]);
 		return msg;
 	});
 	const opts: MessageCreateOptions & InteractionReplyOptions = { embeds: embedData };
@@ -275,7 +275,7 @@ export async function settingsPage(interaction: Interaction, guildLocaleCode: st
 			embeds = current === 'simple' ? [
 				new EmbedBuilder()
 					.setDescription(`${getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE', escapeMarkdown(getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.SIMPLE')), 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', '4:20')}\n${getLocaleString(guildLocaleCode, 'MISC.ADDED_BY', interaction.user.id)}`)
-					.setColor(<ColorResolvable> colors.neutral),
+					.setColor(<ColorResolvable> settings.colors.neutral),
 			] : [
 				new EmbedBuilder()
 					.setTitle(getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE'))

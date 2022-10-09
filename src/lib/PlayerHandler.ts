@@ -1,5 +1,5 @@
 import { PermissionsBitField, ChannelType, Client, EmbedBuilder, Message, TextChannel, VoiceChannel, AttachmentBuilder, ActionRowBuilder, MessageActionRowComponentBuilder } from 'discord.js';
-import { features } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { logger } from '#src/lib/util/common.js';
 import { getGuildLocaleString, buildMessageOptions } from '#src/lib/util/util.js';
 import { Node, Player } from 'lavaclient';
@@ -30,7 +30,7 @@ export default class PlayerHandler {
 		clearTimeout(this.player.pauseTimeout);
 		this.player.disconnect();
 		await this.client.music.destroyPlayer(this.player.guildId);
-		if (features.web.enabled) io.to(`guild:${this.player.guildId}`).emit('playerDisconnect');
+		if (settings.features.web.enabled) io.to(`guild:${this.player.guildId}`).emit('playerDisconnect');
 		const voiceChannel = this.client.guilds.cache.get(this.player.guildId)?.channels.cache.get(channelId ?? this.player.channelId);
 		if (voiceChannel?.type !== ChannelType.GuildStageVoice) return;
 		const permissions = this.client.guilds.cache.get(this.player.guildId)?.channels.cache.get(channelId ?? this.player.channelId).permissionsFor(this.client.user.id);

@@ -2,7 +2,7 @@
 
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v10';
-import { token, applicationId } from '../dist/settings.js';
+import { token, applicationId } from '../settings.json' assert { type: 'json' };
 
 const rest = new REST({ version: '10' }).setToken(token);
 

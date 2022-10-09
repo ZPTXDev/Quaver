@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Client, SlashCommandBuilder } from 'discord.js';
-import { defaultLocaleCode, features } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { checks } from '#src/lib/util/constants.js';
 import { getLocaleString } from '#src/lib/util/util.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
@@ -9,7 +9,7 @@ import { Song } from '@lavaclient/queue';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('shuffle')
-		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.SHUFFLE.DESCRIPTION')),
+		.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.SHUFFLE.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -28,7 +28,7 @@ export default {
 			currentIndex--;
 			[player.queue.tracks[currentIndex], player.queue.tracks[randomIndex]] = [player.queue.tracks[randomIndex], player.queue.tracks[currentIndex]];
 		}
-		if (features.web.enabled) {
+		if (settings.features.web.enabled) {
 			io.to(`guild:${player.guildId}`).emit('queueUpdate', player.queue.tracks.map((t: Song & { requesterTag: string }): Song & { requesterTag: string } => {
 				t.requesterTag = bot.users.cache.get(t.requester)?.tag;
 				return t;

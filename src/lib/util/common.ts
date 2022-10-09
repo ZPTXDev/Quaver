@@ -2,13 +2,13 @@ import { createLogger, format, transports } from 'winston';
 import { Collection } from 'discord.js';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { database } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import DataHandler from '#src/lib/DataHandler.js';
 import { Song } from '@lavaclient/queue';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 export const data = {
-	guild: new DataHandler({ cache: database ? `${database.protocol}://${resolve(__dirname, '..', '..', database.path)}` : `sqlite://${resolve(__dirname, '..', '..', 'database.sqlite')}`, namespace: 'guild' }),
+	guild: new DataHandler({ cache: settings.database ? `${settings.database.protocol}://${resolve(__dirname, '..', '..', settings.database.path)}` : `sqlite://${resolve(__dirname, '..', '..', 'database.sqlite')}`, namespace: 'guild' }),
 };
 export const logger = createLogger({
 	level: 'info',

@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Client, SlashCommandBuilder } from 'discord.js';
-import { defaultLocaleCode, features } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { checks } from '#src/lib/util/constants.js';
 import { getLocaleString } from '#src/lib/util/util.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
@@ -8,7 +8,7 @@ import { Node } from 'lavaclient';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('pause')
-		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.PAUSE.DESCRIPTION')),
+		.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.PAUSE.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -22,7 +22,7 @@ export default {
 			return;
 		}
 		await player.pause();
-		if (features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('pauseUpdate', player.paused);
+		if (settings.features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('pauseUpdate', player.paused);
 		await interaction.replyHandler.locale('CMD.PAUSE.RESPONSE.SUCCESS', { type: 'success' });
 	},
 };

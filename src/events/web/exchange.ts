@@ -1,6 +1,6 @@
 import CryptoJS from 'crypto-js';
 import { request } from 'undici';
-import { applicationId, clientSecret, features } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { getJSONResponse } from '#src/lib/util/util.js';
 import { Socket } from 'socket.io';
 
@@ -13,8 +13,8 @@ export default {
 			const tokenResponseData = await request('https://discord.com/api/oauth2/token', {
 				method: 'POST',
 				body: new URLSearchParams({
-					client_id: applicationId,
-					client_secret: clientSecret,
+					client_id: settings.applicationId,
+					client_secret: settings.clientSecret,
 					code: accessCode,
 					grant_type: 'authorization_code',
 					redirect_uri: redirectURI,
@@ -25,7 +25,7 @@ export default {
 				},
 			});
 			const oauthData = <{ token_type: string, access_token: string }> await getJSONResponse(tokenResponseData.body);
-			const encryptedToken = CryptoJS.AES.encrypt(`${oauthData.token_type} ${oauthData.access_token}`, features.web.encryptionKey).toString();
+			const encryptedToken = CryptoJS.AES.encrypt(`${oauthData.token_type} ${oauthData.access_token}`, settings.features.web.encryptionKey).toString();
 			return callback({ status: 'success', encryptedToken });
 		}
 		catch (err) {

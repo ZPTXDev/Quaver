@@ -1,0 +1,52 @@
+{
+    "token": "Paste token here",
+    "applicationId": "Paste application ID here",
+    "clientSecret": "Paste client secret here",
+    "colors": {
+        "success": "DarkGreen",
+        "neutral": "#f39bff",
+        "warning": "Orange",
+        "error": "DarkRed"
+    },
+    "defaultLocaleCode": "en",
+    "managers": [
+        "Paste your user ID here"
+    ],
+    "database": {
+        "protocol": "sqlite",
+        "path": "../database.sqlite"
+    },
+    "lavalink": {
+        "host": "localhost",
+        "port": 12345,
+        "password": "youshallnotpass",
+        "secure": false,
+        "reconnect": {
+            "delay": 3000,
+            "tries": 5
+        }
+    },
+    "features": {
+        "stay": {
+            "enabled": true,
+            "whitelist": false
+        },
+        "spotify": {
+            "enabled": true,
+            "client_id": "Paste Spotify Client ID here",
+            "client_secret": "Paste Spotify Client Secret here"
+        },
+        "web": {
+            "enabled": false,
+            "port": 3000,
+            "allowedOrigins": [
+                "http://localhost"
+            ],
+            "encryptionKey": "Type an encryption key here",
+            "https": {
+                "key": "key.pem",
+                "cert": "cert.pem"
+            }
+        }
+    }
+}

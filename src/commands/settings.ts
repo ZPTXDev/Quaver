@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, PermissionsBitField, ActionRowBuilder, SelectMenuBuilder, EmbedBuilder, ChatInputCommandInteraction, Message, SelectMenuComponentOptionData, MessageActionRowComponentBuilder } from 'discord.js';
-import { defaultLocaleCode } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { checks, settingsOptions } from '#src/lib/util/constants.js';
 import { getLocaleString, buildMessageOptions, getGuildLocaleString, settingsPage } from '#src/lib/util/util.js';
 import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
@@ -8,7 +8,7 @@ import ReplyHandler from '#src/lib/ReplyHandler.js';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('settings')
-		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.SETTINGS.DESCRIPTION'))
+		.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.SETTINGS.DESCRIPTION'))
 		.setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild),
 	checks: [checks.GUILD_ONLY],
 	permissions: {
@@ -17,7 +17,7 @@ export default {
 	},
 	async execute(interaction: ChatInputCommandInteraction & { replyHandler: ReplyHandler }): Promise<void> {
 		const option = <'language' | 'format'> settingsOptions[0];
-		const guildLocaleCode = <string> await data.guild.get(interaction.guild.id, 'settings.locale') ?? defaultLocaleCode;
+		const guildLocaleCode = <string> await data.guild.get(interaction.guild.id, 'settings.locale') ?? settings.defaultLocaleCode;
 		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocaleCode, option);
 		const description = `${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocaleCode, `CMD.SETTINGS.MISC.${option.toUpperCase()}.NAME`)}** ─ ${getLocaleString(guildLocaleCode, `CMD.SETTINGS.MISC.${option.toUpperCase()}.DESCRIPTION`)}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: \`${current}\``;
 		const msg = await interaction.replyHandler.reply(

@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Client, escapeMarkdown, SlashCommandBuilder, SlashCommandIntegerOption } from 'discord.js';
-import { defaultLocaleCode, features } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { checks } from '#src/lib/util/constants.js';
 import { getLocaleString } from '#src/lib/util/util.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
@@ -9,11 +9,11 @@ import { Song } from '@lavaclient/queue';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('remove')
-		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.REMOVE.DESCRIPTION'))
+		.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.REMOVE.DESCRIPTION'))
 		.addIntegerOption((option): SlashCommandIntegerOption =>
 			option
 				.setName('position')
-				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.REMOVE.OPTION.POSITION'))
+				.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.REMOVE.OPTION.POSITION'))
 				.setMinValue(1)
 				.setRequired(true)
 				.setAutocomplete(true)),
@@ -39,7 +39,7 @@ export default {
 			return;
 		}
 		const track = player.queue.remove(position - 1);
-		if (features.web.enabled) {
+		if (settings.features.web.enabled) {
 			io.to(`guild:${interaction.guildId}`).emit('queueUpdate', player.queue.tracks.map((t: Song & { requesterTag: string }): Song & { requesterTag: string } => {
 				t.requesterTag = bot.users.cache.get(t.requester)?.tag;
 				return t;

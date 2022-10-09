@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, ActionRowBuilder, SelectMenuBuilder, ChannelType, EmbedBuilder, ButtonBuilder, ButtonStyle, escapeMarkdown, SlashCommandStringOption, ChatInputCommandInteraction, Client, Message, SelectMenuComponentOptionData } from 'discord.js';
-import { defaultLocaleCode } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { checks } from '#src/lib/util/constants.js';
 import { getGuildLocaleString, getLocaleString, buildMessageOptions, msToTime, msToTimeString, paginate, TimeObject } from '#src/lib/util/util.js';
 import { logger, searchState } from '#src/lib/util/common.js';
@@ -11,11 +11,11 @@ import { Node } from 'lavaclient';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('search')
-		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.SEARCH.DESCRIPTION'))
+		.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.SEARCH.DESCRIPTION'))
 		.addStringOption((option): SlashCommandStringOption =>
 			option
 				.setName('query')
-				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.SEARCH.OPTION.QUERY'))
+				.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.SEARCH.OPTION.QUERY'))
 				.setRequired(true)
 				.setAutocomplete(true)),
 	checks: [checks.GUILD_ONLY],

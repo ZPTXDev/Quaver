@@ -1,7 +1,7 @@
 import ReplyHandler from '#src/lib/ReplyHandler.js';
 import { confirmationTimeout } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
-import { features } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { ButtonInteraction, Client, GuildMember } from 'discord.js';
 import { Node, Player } from 'lavaclient';
 
@@ -35,7 +35,7 @@ export default {
 		player.queue.clear();
 		await player.queue.skip();
 		await player.queue.start();
-		if (features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('queueUpdate', []);
+		if (settings.features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('queueUpdate', []);
 		await interaction.replyHandler.locale('CMD.STOP.RESPONSE.SUCCESS', { type: 'success', components: [], force: 'update' });
 	},
 };

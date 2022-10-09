@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Client, escapeMarkdown, GuildMember, SlashCommandBuilder } from 'discord.js';
-import { defaultLocaleCode } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { checks } from '#src/lib/util/constants.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
@@ -8,7 +8,7 @@ import { Node, Player } from 'lavaclient';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('skip')
-		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.SKIP.DESCRIPTION')),
+		.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.SKIP.DESCRIPTION')),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],

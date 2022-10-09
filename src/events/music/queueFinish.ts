@@ -1,4 +1,4 @@
-import { features } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { logger, data } from '#src/lib/util/common.js';
 import { getGuildLocaleString } from '#src/lib/util/util.js';
 import { Queue } from '@lavaclient/queue';
@@ -24,7 +24,7 @@ export default {
 			p.handler.disconnect();
 		}, 30 * 60 * 1000, queue.player);
 		queue.player.timeoutEnd = Date.now() + (30 * 60 * 1000);
-		if (features.web.enabled) io.to(`guild:${queue.player.guildId}`).emit('timeoutUpdate', queue.player.timeoutEnd);
+		if (settings.features.web.enabled) io.to(`guild:${queue.player.guildId}`).emit('timeoutUpdate', queue.player.timeoutEnd);
 		await queue.player.handler.send(`${await getGuildLocaleString(queue.player.guildId, 'MUSIC.QUEUE.EMPTY')} ${await getGuildLocaleString(queue.player.guildId, 'MUSIC.DISCONNECT.INACTIVITY.WARNING', (Math.floor(Date.now() / 1000) + (30 * 60)).toString())}`, { type: 'warning' });
 	},
 };

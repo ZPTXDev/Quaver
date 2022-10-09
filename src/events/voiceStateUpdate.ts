@@ -1,7 +1,7 @@
 import { PermissionsBitField, ChannelType, StageInstancePrivacyLevel, EmbedBuilder, VoiceState, Client, VoiceChannel, TextChannel } from 'discord.js';
 import { logger, data } from '#src/lib/util/common.js';
 import { getGuildLocaleString } from '#src/lib/util/util.js';
-import { features } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { Node, Player } from 'lavaclient';
 import PlayerHandler from '#src/lib/PlayerHandler.js';
 
@@ -39,7 +39,7 @@ export default {
 			}
 			/** Checks for when Quaver joins or moves */
 			// Channel is a voice channel
-			if (features.web.enabled) {
+			if (settings.features.web.enabled) {
 				io.to(`guild:${player.guildId}`).emit('textChannelUpdate', player.queue.channel.name);
 				io.to(`guild:${player.guildId}`).emit('channelUpdate', newState.channel?.name);
 			}
@@ -93,7 +93,7 @@ export default {
 				if (player.timeout || player.pauseTimeout) return;
 				// Quaver was playing something - set pauseTimeout
 				await player.pause();
-				if (features.web.enabled) io.to(`guild:${player.guildId}`).emit('pauseUpdate', player.paused);
+				if (settings.features.web.enabled) io.to(`guild:${player.guildId}`).emit('pauseUpdate', player.paused);
 				logger.info({ message: `[G ${player.guildId}] Setting pause timeout`, label: 'Quaver' });
 				// Before setting a new pauseTimeout, clear the pauseTimeout first as a failsafe
 				clearTimeout(player.pauseTimeout);
@@ -103,7 +103,7 @@ export default {
 					p.handler.disconnect();
 				}, 5 * 60 * 1000, player);
 				player.timeoutEnd = Date.now() + (5 * 60 * 1000);
-				if (features.web.enabled) io.to(`guild:${player.guildId}`).emit('pauseTimeoutUpdate', player.timeoutEnd);
+				if (settings.features.web.enabled) io.to(`guild:${player.guildId}`).emit('pauseTimeoutUpdate', player.timeoutEnd);
 				await player.handler.send(
 					new EmbedBuilder()
 						.setDescription(`${await getGuildLocaleString(player.guildId, 'MUSIC.DISCONNECT.ALONE.WARNING')} ${await getGuildLocaleString(player.guildId, 'MUSIC.DISCONNECT.INACTIVITY.WARNING', (Math.floor(Date.now() / 1000) + (5 * 60)).toString())}`)
@@ -118,7 +118,7 @@ export default {
 				await player.resume();
 				clearTimeout(player.pauseTimeout);
 				delete player.pauseTimeout;
-				if (features.web.enabled) {
+				if (settings.features.web.enabled) {
 					io.to(`guild:${player.guildId}`).emit('pauseUpdate', player.paused);
 					io.to(`guild:${player.guildId}`).emit('pauseTimeoutUpdate', !!player.pauseTimeout);
 				}
@@ -134,11 +134,11 @@ export default {
 		if (newState.channelId === player?.channelId && player?.pauseTimeout) {
 			logger.info({ message: `[G ${player.guildId}] Resuming session`, label: 'Quaver' });
 			await player.resume();
-			if (features.web.enabled) io.to(`guild:${player.guildId}`).emit('pauseUpdate', player.paused);
+			if (settings.features.web.enabled) io.to(`guild:${player.guildId}`).emit('pauseUpdate', player.paused);
 			if (player.pauseTimeout) {
 				clearTimeout(player.pauseTimeout);
 				delete player.pauseTimeout;
-				if (features.web.enabled) io.to(`guild:${player.guildId}`).emit('pauseTimeoutUpdate', !!player.pauseTimeout);
+				if (settings.features.web.enabled) io.to(`guild:${player.guildId}`).emit('pauseTimeoutUpdate', !!player.pauseTimeout);
 			}
 			await player.handler.locale('MUSIC.DISCONNECT.ALONE.RESUMING', { type: 'success' });
 			return;
@@ -165,7 +165,7 @@ export default {
 		if (voiceChannel.type === ChannelType.GuildStageVoice && !voiceChannel.stageInstance) return;
 		// Quaver was playing something - set pauseTimeout
 		await player.pause();
-		if (features.web.enabled) io.to(`guild:${player.guildId}`).emit('pauseUpdate', player.paused);
+		if (settings.features.web.enabled) io.to(`guild:${player.guildId}`).emit('pauseUpdate', player.paused);
 		logger.info({ message: `[G ${player.guildId}] Setting pause timeout`, label: 'Quaver' });
 		// Before setting a new pauseTimeout, clear the pauseTimeout first as a failsafe
 		clearTimeout(player.pauseTimeout);
@@ -175,7 +175,7 @@ export default {
 			p.handler.disconnect();
 		}, 5 * 60 * 1000, player);
 		player.timeoutEnd = Date.now() + (5 * 60 * 1000);
-		if (features.web.enabled) io.to(`guild:${player.guildId}`).emit('pauseTimeoutUpdate', player.timeoutEnd);
+		if (settings.features.web.enabled) io.to(`guild:${player.guildId}`).emit('pauseTimeoutUpdate', player.timeoutEnd);
 		await player.handler.send(
 			new EmbedBuilder()
 				.setDescription(`${await getGuildLocaleString(player.guildId, 'MUSIC.DISCONNECT.ALONE.WARNING')} ${await getGuildLocaleString(player.guildId, 'MUSIC.DISCONNECT.INACTIVITY.WARNING', (Math.floor(Date.now() / 1000) + (5 * 60)).toString())}`)

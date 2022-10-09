@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Client, EmbedBuilder, SlashCommandBooleanOption, SlashCommandBuilder } from 'discord.js';
-import { defaultLocaleCode, features } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import { checks } from '#src/lib/util/constants.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
@@ -8,11 +8,11 @@ import { Node, Player } from 'lavaclient';
 export default {
 	data: new SlashCommandBuilder()
 		.setName('nightcore')
-		.setDescription(getLocaleString(defaultLocaleCode, 'CMD.NIGHTCORE.DESCRIPTION'))
+		.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.NIGHTCORE.DESCRIPTION'))
 		.addBooleanOption((option): SlashCommandBooleanOption =>
 			option
 				.setName('enabled')
-				.setDescription(getLocaleString(defaultLocaleCode, 'CMD.NIGHTCORE.OPTION.ENABLED'))),
+				.setDescription(getLocaleString(settings.defaultLocaleCode, 'CMD.NIGHTCORE.OPTION.ENABLED'))),
 	checks: [checks.GUILD_ONLY, checks.ACTIVE_SESSION, checks.IN_VOICE, checks.IN_SESSION_VOICE],
 	permissions: {
 		user: [],
@@ -26,7 +26,7 @@ export default {
 		player.filters.timescale = nightcore ? { speed: 1.125, pitch: 1.125, rate: 1 } : undefined;
 		await player.setFilters();
 		player.nightcore = nightcore;
-		if (features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('filterUpdate', { bassboost: player.bassboost, nightcore: player.nightcore });
+		if (settings.features.web.enabled) io.to(`guild:${interaction.guildId}`).emit('filterUpdate', { bassboost: player.bassboost, nightcore: player.nightcore });
 		await interaction.replyHandler.reply(
 			new EmbedBuilder()
 				.setDescription(await getGuildLocaleString(interaction.guildId, player.nightcore ? 'CMD.NIGHTCORE.RESPONSE.ENABLED' : 'CMD.NIGHTCORE.RESPONSE.DISABLED'))

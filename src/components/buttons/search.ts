@@ -3,7 +3,7 @@ import { getGuildLocaleString, buildMessageOptions, msToTime, msToTimeString, Ti
 import { logger, searchState } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import PlayerHandler from '#src/lib/PlayerHandler.js';
-import { features } from '#src/settings.js';
+import { settings } from '#src/lib/util/settings.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
 import { Node, Player } from 'lavaclient';
 import { Queue, Song } from '@lavaclient/queue';
@@ -90,7 +90,7 @@ export default {
 				{ type: 'success', components: [] },
 			);
 			if (!started) await player.queue.start();
-			if (features.web.enabled) {
+			if (settings.features.web.enabled) {
 				io.to(`guild:${interaction.guildId}`).emit('queueUpdate', player.queue.tracks.map((track: Song & { requesterTag: string }): Song & { requesterTag: string } => {
 					track.requesterTag = bot.users.cache.get(track.requester)?.tag;
 					return track;
