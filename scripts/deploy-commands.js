@@ -25,10 +25,10 @@ for await (const folder of localeFolders) {
 setLocales(locales);
 
 const commands = [];
-const commandFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['..', 'src', 'commands'])).filter(file => file.endsWith('.js'));
+const commandFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['..', 'dist', 'commands'])).filter(file => file.endsWith('.js'));
 
 for await (const file of commandFiles) {
-	const command = await import(getAbsoluteFileURL(import.meta.url, ['..', 'src', 'commands', file]));
+	const command = await import(getAbsoluteFileURL(import.meta.url, ['..', 'dist', 'commands', file]));
 	commands.push(command.default.data.toJSON());
 }
 
