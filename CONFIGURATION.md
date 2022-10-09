@@ -111,6 +111,6 @@
 `features.web.https` - HTTPS configuration.
 > **Note:** If you're not using HTTPS, please remove this property entirely.
 
-`features.web.https.key` - The path to the HTTPS key file. This is relative to the `dist` folder.
+`features.web.https.key` - The path to the HTTPS key file. This is relative to the root folder.
 
-`features.web.https.cert` - The path to the HTTPS certificate file. This is relative to the `dist` folder.
+`features.web.https.cert` - The path to the HTTPS certificate file. This is relative to the root folder.

@@ -70,14 +70,9 @@ rl.on('line', async (input): Promise<void> => {
 rl.on('close', async (): Promise<void> => shuttingDown('SIGINT'));
 
 let httpServer;
-// haha let's just disable all of eslint's warnings because
-// why not right i'm just so cool and quirky
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 if (settings.features.web.https) {
 	httpServer = createServer({
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		key: readFileSync(getAbsoluteFileURL(import.meta.url, ['..', ...settings.features.web.https.key.split('/')])),
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		cert: readFileSync(getAbsoluteFileURL(import.meta.url, ['..', ...settings.features.web.https.cert.split('/')])),
 	});
 }
