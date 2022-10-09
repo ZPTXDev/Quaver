@@ -21,9 +21,9 @@ You are required to host your own instance of [Lavalink](https://github.com/frey
 ## Starting Quaver for the first time
 Run `npm ci` to install packages required to run Quaver.
 
-Then, run `npm run slash-deploy` **after** you've configured your `settings.json` in order to register your commands on Discord.
+Run `npm run build` to compile the source code. Alternatively, you can run `npm run build-start` to compile the source code and start Quaver in one command.
 
-Once that's done, run `npm run build` to compile the source code. Alternatively, you can run `npm run build-start` to compile the source code and start Quaver in one command.
+You can deploy slash commands after the build by running `npm run slash-deploy`.
 
 For subsequent startups, you can simply run `npm start`, which skips the compilation step.
 
