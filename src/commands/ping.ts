@@ -1,7 +1,7 @@
-import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { settings } from '#src/lib/util/settings.js';
-import { msToTime, msToTimeString, getLocaleString, getGuildLocaleString, TimeObject } from '#src/lib/util/util.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
+import { settings } from '#src/lib/util/settings.js';
+import { getGuildLocaleString, getLocaleString, msToTime, msToTimeString } from '#src/lib/util/util.js';
+import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 
 export default {
 	data: new SlashCommandBuilder()

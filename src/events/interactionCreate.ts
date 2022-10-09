@@ -1,7 +1,7 @@
-import { AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, Client, Collection, GuildMember, Interaction, ModalSubmitInteraction, PermissionsBitField, SelectMenuInteraction, SlashCommandBuilder } from 'discord.js';
+import ReplyHandler from '#src/lib/ReplyHandler.js';
 import { logger } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
-import ReplyHandler from '#src/lib/ReplyHandler.js';
+import { AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, Client, Collection, GuildMember, Interaction, ModalSubmitInteraction, PermissionsBitField, SelectMenuInteraction, SlashCommandBuilder } from 'discord.js';
 import { Node } from 'lavaclient';
 
 export default {

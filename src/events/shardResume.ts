@@ -1,6 +1,6 @@
-import { ActivityType } from 'discord.js';
 import { logger } from '#src/lib/util/common.js';
 import { version } from '#src/lib/util/version.js';
+import { ActivityType } from 'discord.js';
 
 export default {
 	name: 'shardResume',

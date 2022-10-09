@@ -1,7 +1,7 @@
 import { version } from '#src/lib/util/version.js';
-import { Player, Node } from 'lavaclient';
 import { Queue, Song } from '@lavaclient/queue';
 import { APIGuild, TextChannel, VoiceChannel } from 'discord.js';
+import { Node, Player } from 'lavaclient';
 import { Socket } from 'socket.io';
 
 export default {

@@ -1,8 +1,8 @@
-import { ButtonBuilder, ButtonStyle, EmbedBuilder, escapeMarkdown, Client, ModalSubmitInteraction, ActionRowBuilder, MessageActionRowComponentBuilder } from 'discord.js';
-import { paginate, msToTime, msToTimeString, getGuildLocaleString, TimeObject } from '#src/lib/util/util.js';
-import { Node } from 'lavaclient';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
+import { getGuildLocaleString, msToTime, msToTimeString, paginate } from '#src/lib/util/util.js';
 import { Song } from '@lavaclient/queue';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, EmbedBuilder, escapeMarkdown, MessageActionRowComponentBuilder, ModalSubmitInteraction } from 'discord.js';
+import { Node } from 'lavaclient';
 
 export default {
 	name: 'queue',

@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from 'fs';
-import { resolve, dirname } from 'path';
+import { dirname, resolve } from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 
 function getAbsoluteFileURL(baseURL: string, path: string[]): URL {

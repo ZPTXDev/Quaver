@@ -1,6 +1,6 @@
-import { ActivityType, Client } from 'discord.js';
 import { logger } from '#src/lib/util/common.js';
 import { version } from '#src/lib/util/version.js';
+import { ActivityType, Client } from 'discord.js';
 import { Node } from 'lavaclient';
 
 export default {

@@ -1,9 +1,9 @@
-import { ChatInputCommandInteraction, Client, SlashCommandBuilder, SlashCommandStringOption } from 'discord.js';
-import { LoopType } from '@lavaclient/queue';
-import { settings } from '#src/lib/util/settings.js';
-import { checks } from '#src/lib/util/constants.js';
-import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
+import { checks } from '#src/lib/util/constants.js';
+import { settings } from '#src/lib/util/settings.js';
+import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
+import { LoopType } from '@lavaclient/queue';
+import { ChatInputCommandInteraction, Client, SlashCommandBuilder, SlashCommandStringOption } from 'discord.js';
 import { Node } from 'lavaclient';
 
 export default {

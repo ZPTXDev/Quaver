@@ -1,10 +1,10 @@
-import { createLogger, format, transports } from 'winston';
-import { Collection } from 'discord.js';
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
-import { settings } from '#src/lib/util/settings.js';
 import DataHandler from '#src/lib/DataHandler.js';
+import { settings } from '#src/lib/util/settings.js';
 import { Song } from '@lavaclient/queue';
+import { Collection } from 'discord.js';
+import { dirname, resolve } from 'path';
+import { fileURLToPath } from 'url';
+import { createLogger, format, transports } from 'winston';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 export const data = {

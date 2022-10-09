@@ -1,8 +1,8 @@
-import { ChatInputCommandInteraction, Client, EmbedBuilder, SlashCommandBuilder, SlashCommandIntegerOption } from 'discord.js';
-import { settings } from '#src/lib/util/settings.js';
-import { checks } from '#src/lib/util/constants.js';
-import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
+import { checks } from '#src/lib/util/constants.js';
+import { settings } from '#src/lib/util/settings.js';
+import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
+import { ChatInputCommandInteraction, Client, EmbedBuilder, SlashCommandBuilder, SlashCommandIntegerOption } from 'discord.js';
 import { Node } from 'lavaclient';
 
 export default {

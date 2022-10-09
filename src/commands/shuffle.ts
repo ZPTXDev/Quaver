@@ -1,10 +1,10 @@
-import { ChatInputCommandInteraction, Client, SlashCommandBuilder } from 'discord.js';
-import { settings } from '#src/lib/util/settings.js';
-import { checks } from '#src/lib/util/constants.js';
-import { getLocaleString } from '#src/lib/util/util.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
-import { Node } from 'lavaclient';
+import { checks } from '#src/lib/util/constants.js';
+import { settings } from '#src/lib/util/settings.js';
+import { getLocaleString } from '#src/lib/util/util.js';
 import { Song } from '@lavaclient/queue';
+import { ChatInputCommandInteraction, Client, SlashCommandBuilder } from 'discord.js';
+import { Node } from 'lavaclient';
 
 export default {
 	data: new SlashCommandBuilder()

@@ -1,10 +1,10 @@
-import { resolve, dirname } from 'path';
-import { fileURLToPath, pathToFileURL } from 'url';
-import { get } from 'lodash-es';
-import { data, locales } from './common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { ActionRowBuilder, APISelectMenuOption, AttachmentBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, EmbedBuilder, escapeMarkdown, Interaction, InteractionReplyOptions, MessageActionRowComponentBuilder, MessageCreateOptions, SelectMenuBuilder } from 'discord.js';
 import { readdirSync } from 'fs';
+import { get } from 'lodash-es';
+import { dirname, resolve } from 'path';
+import { fileURLToPath, pathToFileURL } from 'url';
+import { data, locales } from './common.js';
 import { languageName } from './constants.js';
 
 export type TimeFormats = 's' | 'm' | 'h' | 'd';

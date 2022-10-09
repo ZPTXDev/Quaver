@@ -1,12 +1,12 @@
-import { SlashCommandBuilder, PermissionsBitField, ChannelType, EmbedBuilder, escapeMarkdown, SlashCommandStringOption, SlashCommandBooleanOption, ChatInputCommandInteraction, Client, GuildMember, TextChannel, VoiceChannel } from 'discord.js';
-import { SpotifyItemType } from '@lavaclient/spotify';
-import { settings } from '#src/lib/util/settings.js';
-import { checks } from '#src/lib/util/constants.js';
-import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import PlayerHandler from '#src/lib/PlayerHandler.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
-import { Node, Player } from 'lavaclient';
+import { checks } from '#src/lib/util/constants.js';
+import { settings } from '#src/lib/util/settings.js';
+import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import { Queue, Song } from '@lavaclient/queue';
+import { SpotifyItemType } from '@lavaclient/spotify';
+import { ChannelType, ChatInputCommandInteraction, Client, EmbedBuilder, escapeMarkdown, GuildMember, PermissionsBitField, SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandStringOption, TextChannel, VoiceChannel } from 'discord.js';
+import { Node, Player } from 'lavaclient';
 
 export default {
 	data: new SlashCommandBuilder()

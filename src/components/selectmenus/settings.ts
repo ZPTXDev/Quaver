@@ -1,9 +1,9 @@
-import { ActionRowBuilder, EmbedBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder, SelectMenuComponentOptionData, SelectMenuInteraction } from 'discord.js';
-import { getGuildLocaleString, getLocaleString, buildMessageOptions, settingsPage } from '#src/lib/util/util.js';
-import { settingsOptions } from '#src/lib/util/constants.js';
-import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
-import { settings } from '#src/lib/util/settings.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
+import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
+import { settingsOptions } from '#src/lib/util/constants.js';
+import { settings } from '#src/lib/util/settings.js';
+import { buildMessageOptions, getGuildLocaleString, getLocaleString, settingsPage } from '#src/lib/util/util.js';
+import { ActionRowBuilder, EmbedBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder, SelectMenuComponentOptionData, SelectMenuInteraction } from 'discord.js';
 
 export default {
 	name: 'settings',

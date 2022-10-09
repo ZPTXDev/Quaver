@@ -1,8 +1,8 @@
-import { ChatInputCommandInteraction, Client, SlashCommandBuilder, SlashCommandIntegerOption } from 'discord.js';
-import { settings } from '#src/lib/util/settings.js';
-import { checks } from '#src/lib/util/constants.js';
-import { getLocaleString, msToTime, msToTimeString, TimeObject } from '#src/lib/util/util.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
+import { checks } from '#src/lib/util/constants.js';
+import { settings } from '#src/lib/util/settings.js';
+import { getLocaleString, msToTime, msToTimeString } from '#src/lib/util/util.js';
+import { ChatInputCommandInteraction, Client, SlashCommandBuilder, SlashCommandIntegerOption } from 'discord.js';
 import { Node } from 'lavaclient';
 
 export default {

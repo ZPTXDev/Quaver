@@ -1,9 +1,9 @@
-import { PermissionsBitField, ChannelType, Client, EmbedBuilder, Message, TextChannel, VoiceChannel, AttachmentBuilder, ActionRowBuilder, MessageActionRowComponentBuilder } from 'discord.js';
-import { settings } from '#src/lib/util/settings.js';
 import { logger } from '#src/lib/util/common.js';
-import { getGuildLocaleString, buildMessageOptions } from '#src/lib/util/util.js';
-import { Node, Player } from 'lavaclient';
+import { settings } from '#src/lib/util/settings.js';
+import { buildMessageOptions, getGuildLocaleString } from '#src/lib/util/util.js';
 import { Queue } from '@lavaclient/queue';
+import { ActionRowBuilder, AttachmentBuilder, ChannelType, Client, EmbedBuilder, Message, MessageActionRowComponentBuilder, PermissionsBitField, TextChannel, VoiceChannel } from 'discord.js';
+import { Node, Player } from 'lavaclient';
 
 /** Class for handling Lavaclient's Player. */
 export default class PlayerHandler {

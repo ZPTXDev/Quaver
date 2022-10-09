@@ -1,5 +1,5 @@
 import PlayerHandler from '#src/lib/PlayerHandler.js';
-import { logger, data } from '#src/lib/util/common.js';
+import { data, logger } from '#src/lib/util/common.js';
 import { Queue, Song } from '@lavaclient/queue';
 import { Collection, escapeMarkdown, GuildMember } from 'discord.js';
 import { Player } from 'lavaclient';

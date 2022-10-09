@@ -1,8 +1,8 @@
-import CryptoJS from 'crypto-js';
-import { request } from 'undici';
 import { settings } from '#src/lib/util/settings.js';
 import { getJSONResponse } from '#src/lib/util/util.js';
+import CryptoJS from 'crypto-js';
 import { Socket } from 'socket.io';
+import { request } from 'undici';
 
 export default {
 	name: 'exchange',

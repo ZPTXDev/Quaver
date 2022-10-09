@@ -1,8 +1,8 @@
-import { SlashCommandBuilder, PermissionsBitField, EmbedBuilder, ChatInputCommandInteraction, OAuth2Scopes } from 'discord.js';
-import { version } from '#src/lib/util/version.js';
+import ReplyHandler from '#src/lib/ReplyHandler.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
-import ReplyHandler from '#src/lib/ReplyHandler.js';
+import { version } from '#src/lib/util/version.js';
+import { ChatInputCommandInteraction, EmbedBuilder, OAuth2Scopes, PermissionsBitField, SlashCommandBuilder } from 'discord.js';
 
 export default {
 	data: new SlashCommandBuilder()

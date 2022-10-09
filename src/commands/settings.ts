@@ -1,9 +1,9 @@
-import { SlashCommandBuilder, PermissionsBitField, ActionRowBuilder, SelectMenuBuilder, EmbedBuilder, ChatInputCommandInteraction, Message, SelectMenuComponentOptionData, MessageActionRowComponentBuilder } from 'discord.js';
-import { settings } from '#src/lib/util/settings.js';
-import { checks, settingsOptions } from '#src/lib/util/constants.js';
-import { getLocaleString, buildMessageOptions, getGuildLocaleString, settingsPage } from '#src/lib/util/util.js';
-import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
+import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
+import { checks, settingsOptions } from '#src/lib/util/constants.js';
+import { settings } from '#src/lib/util/settings.js';
+import { buildMessageOptions, getGuildLocaleString, getLocaleString, settingsPage } from '#src/lib/util/util.js';
+import { ActionRowBuilder, ChatInputCommandInteraction, EmbedBuilder, Message, MessageActionRowComponentBuilder, PermissionsBitField, SelectMenuBuilder, SelectMenuComponentOptionData, SlashCommandBuilder } from 'discord.js';
 
 export default {
 	data: new SlashCommandBuilder()

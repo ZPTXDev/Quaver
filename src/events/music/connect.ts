@@ -1,9 +1,9 @@
-import { get } from 'lodash-es';
-import { logger, data } from '#src/lib/util/common.js';
 import PlayerHandler from '#src/lib/PlayerHandler.js';
-import { Node, Player } from 'lavaclient';
+import { data, logger } from '#src/lib/util/common.js';
 import { Queue } from '@lavaclient/queue';
 import { TextChannel, VoiceChannel } from 'discord.js';
+import { Node, Player } from 'lavaclient';
+import { get } from 'lodash-es';
 
 export default {
 	name: 'connect',

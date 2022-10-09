@@ -1,10 +1,10 @@
-import CryptoJS from 'crypto-js';
-import { request } from 'undici';
 import { settings } from '#src/lib/util/settings.js';
 import { getJSONResponse } from '#src/lib/util/util.js';
 import { version } from '#src/lib/util/version.js';
-import { Socket } from 'socket.io';
+import CryptoJS from 'crypto-js';
 import { APIUser } from 'discord.js';
+import { Socket } from 'socket.io';
+import { request } from 'undici';
 
 export default {
 	name: 'fetchuser',
