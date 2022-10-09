@@ -47,7 +47,7 @@ export default {
 			new EmbedBuilder()
 				.setDescription(
 					pages[0].map((track, index): string => {
-						const duration = <TimeObject> msToTime(track.info.length);
+						const duration = msToTime(track.info.length);
 						const durationString = track.info.isStream ? '∞' : msToTimeString(duration, true);
 						return `\`${(index + 1).toString().padStart(tracks.length.toString().length, ' ')}.\` **[${escapeMarkdown(track.info.title)}](${track.info.uri})** \`[${durationString}]\``;
 					}).join('\n'),

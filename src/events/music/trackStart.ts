@@ -20,7 +20,7 @@ export default {
 			delete queue.player.timeout;
 			if (settings.features.web.enabled) io.to(`guild:${queue.player.guildId}`).emit('timeoutUpdate', !!queue.player.timeout);
 		}
-		const duration = <TimeObject> msToTime(track.length);
+		const duration = msToTime(track.length);
 		const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
 		if (settings.features.web.enabled) {
 			io.to(`guild:${queue.player.guildId}`).emit('queueUpdate', queue.tracks.map((t: Song & { requesterTag: string }): Song & { requesterTag: string } => {

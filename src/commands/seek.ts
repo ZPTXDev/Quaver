@@ -49,13 +49,13 @@ export default {
 			return;
 		}
 		const trackLength = player.queue.current.length;
-		const duration = <TimeObject> msToTime(trackLength);
+		const duration = msToTime(trackLength);
 		const durationString = msToTimeString(duration, true);
 		if (ms > trackLength) {
 			await interaction.replyHandler.locale('CMD.SEEK.RESPONSE.TIMESTAMP_INVALID', { vars: [durationString], type: 'error' });
 			return;
 		}
-		const seek = <TimeObject> msToTime(ms);
+		const seek = msToTime(ms);
 		const seekString = msToTimeString(seek, true);
 		await player.seek(ms);
 		await interaction.replyHandler.locale('CMD.SEEK.RESPONSE.SUCCESS', { vars: [seekString, durationString] });

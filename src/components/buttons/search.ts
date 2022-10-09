@@ -128,7 +128,7 @@ export default {
 		const updated: { embeds: EmbedBuilder[], components: ActionRowBuilder<MessageActionRowComponentBuilder>[] } = { embeds: [], components: [] };
 		updated.embeds[0] = EmbedBuilder.from(original.embeds[0])
 			.setDescription(pages[page - 1].map((track: { info: Song }, index: number): string => {
-				const duration = <TimeObject> msToTime(track.info.length);
+				const duration = msToTime(track.info.length);
 				const durationString = track.info.isStream ? '∞' : msToTimeString(duration, true);
 				return `\`${(firstIndex + index).toString().padStart(largestIndexSize, ' ')}.\` **[${escapeMarkdown(track.info.title)}](${track.info.uri})** \`[${durationString}]\``;
 			}).join('\n'))

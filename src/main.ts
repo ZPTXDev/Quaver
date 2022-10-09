@@ -31,7 +31,7 @@ rl.on('line', async (input): Promise<void> => {
 			console.log(`There are currently ${bot.music.players.size} active session(s).`);
 			break;
 		case 'stats': {
-			const uptime = <TimeObject> msToTime(bot.uptime);
+			const uptime = msToTime(bot.uptime);
 			const uptimeString = msToTimeString(uptime);
 			console.log(`Statistics:\nGuilds: ${bot.guilds.cache.size}\nUptime: ${uptimeString}`);
 			break;

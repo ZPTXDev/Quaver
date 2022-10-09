@@ -13,7 +13,7 @@ export default {
 		bot: [],
 	},
 	async execute(interaction: ChatInputCommandInteraction & { replyHandler: ReplyHandler }): Promise<void> {
-		const uptime = <TimeObject> msToTime(interaction.client.uptime);
+		const uptime = msToTime(interaction.client.uptime);
 		const uptimeString = msToTimeString(uptime);
 		await interaction.replyHandler.reply(
 			new EmbedBuilder()

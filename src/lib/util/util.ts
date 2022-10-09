@@ -7,12 +7,14 @@ import { ActionRowBuilder, APISelectMenuOption, AttachmentBuilder, ButtonBuilder
 import { readdirSync } from 'fs';
 import { languageName } from './constants.js';
 
+export type TimeFormats = 's' | 'm' | 'h' | 'd';
+
 export type TimeObject = {
 	d: number;
 	h: number;
 	m: number;
 	s: number;
-}
+};
 
 /**
  * Returns a time object (or a converted equivalent if a format is provided) converted from milliseconds.
@@ -21,7 +23,9 @@ export type TimeObject = {
  * @param format - The format to convert to. Accepts 's' for seconds, 'm' for minutes, 'h' for hours, 'd' for days.
  * @returns TimeObject or the converted equivalent if a format is provided.
  */
-export function msToTime(milliseconds: number, format?: 's' | 'm' | 'h' | 'd'): TimeObject | number {
+export function msToTime(milliseconds: number, format: TimeFormats): number
+export function msToTime(milliseconds: number): TimeObject
+export function msToTime(milliseconds: number, format?: TimeFormats): TimeObject | number {
 	const total_seconds = Math.floor(milliseconds / 1000);
 	const total_minutes = Math.floor(total_seconds / 60);
 	const total_hours = Math.floor(total_minutes / 60);
