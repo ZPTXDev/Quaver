@@ -1,8 +1,9 @@
-import ReplyHandler from '#src/lib/ReplyHandler.js';
+import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { buildMessageOptions, getGuildLocaleString, getLocaleString, settingsPage } from '#src/lib/util/util.js';
-import { ActionRowBuilder, ButtonInteraction, EmbedBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder, SelectMenuComponent } from 'discord.js';
+import type { ButtonInteraction, MessageActionRowComponentBuilder, SelectMenuComponent } from 'discord.js';
+import { ActionRowBuilder, EmbedBuilder, SelectMenuBuilder } from 'discord.js';
 
 export default {
 	name: 'format',

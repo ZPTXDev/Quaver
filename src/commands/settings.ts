@@ -1,9 +1,10 @@
-import ReplyHandler from '#src/lib/ReplyHandler.js';
+import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
 import { checks, settingsOptions } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { buildMessageOptions, getGuildLocaleString, getLocaleString, settingsPage } from '#src/lib/util/util.js';
-import { ActionRowBuilder, ChatInputCommandInteraction, EmbedBuilder, Message, MessageActionRowComponentBuilder, PermissionsBitField, SelectMenuBuilder, SelectMenuComponentOptionData, SlashCommandBuilder } from 'discord.js';
+import type { ChatInputCommandInteraction, MessageActionRowComponentBuilder, SelectMenuComponentOptionData } from 'discord.js';
+import { ActionRowBuilder, EmbedBuilder, Message, PermissionsBitField, SelectMenuBuilder, SlashCommandBuilder } from 'discord.js';
 
 export default {
 	data: new SlashCommandBuilder()

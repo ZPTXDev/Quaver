@@ -1,16 +1,19 @@
-import PlayerHandler from '#src/lib/PlayerHandler.js';
+import type PlayerHandler from '#src/lib/PlayerHandler.js';
 import { data, logger, setLocales } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getAbsoluteFileURL, getGuildLocaleString, msToTime, msToTimeString } from '#src/lib/util/util.js';
 import '@lavaclient/queue/register';
 import { load } from '@lavaclient/spotify';
-import { AttachmentBuilder, AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, Client, Collection, EmbedBuilder, GatewayDispatchEvents, GatewayIntentBits, PermissionsBitField, SelectMenuInteraction, SlashCommandBuilder } from 'discord.js';
+import type { AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, PermissionsBitField, SelectMenuInteraction, SlashCommandBuilder } from 'discord.js';
+import { AttachmentBuilder, Client, Collection, EmbedBuilder, GatewayDispatchEvents, GatewayIntentBits } from 'discord.js';
 import { readdirSync, readFileSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import { createServer } from 'https';
-import { Node, Player } from 'lavaclient';
+import type { Player } from 'lavaclient';
+import { Node } from 'lavaclient';
 import { createInterface } from 'readline';
-import { Server, Socket } from 'socket.io';
+import type { Socket } from 'socket.io';
+import { Server } from 'socket.io';
 
 export const startup = { started: false };
 

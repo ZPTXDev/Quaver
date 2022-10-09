@@ -1,9 +1,10 @@
-import ReplyHandler from '#src/lib/ReplyHandler.js';
+import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import { confirmationTimeout } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
-import { ButtonInteraction, Client, GuildMember } from 'discord.js';
-import { Node, Player } from 'lavaclient';
+import type { ButtonInteraction, Client } from 'discord.js';
+import { GuildMember } from 'discord.js';
+import type { Node, Player } from 'lavaclient';
 
 export default {
 	name: 'stop',

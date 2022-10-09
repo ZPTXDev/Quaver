@@ -1,9 +1,10 @@
-import PlayerHandler from '#src/lib/PlayerHandler.js';
+import type PlayerHandler from '#src/lib/PlayerHandler.js';
 import { data, logger } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString } from '#src/lib/util/util.js';
-import { ChannelType, Client, EmbedBuilder, PermissionsBitField, StageInstancePrivacyLevel, TextChannel, VoiceChannel, VoiceState } from 'discord.js';
-import { Node, Player } from 'lavaclient';
+import type { Client, TextChannel, VoiceChannel, VoiceState } from 'discord.js';
+import { ChannelType, EmbedBuilder, PermissionsBitField, StageInstancePrivacyLevel } from 'discord.js';
+import type { Node, Player } from 'lavaclient';
 
 export default {
 	name: 'voiceStateUpdate',

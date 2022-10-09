@@ -1,5 +1,5 @@
-import { Queue, Song } from '@lavaclient/queue';
-import { Node, Player } from 'lavaclient';
+import type { Queue, Song } from '@lavaclient/queue';
+import type { Node, Player } from 'lavaclient';
 
 export default {
 	name: 'timer',

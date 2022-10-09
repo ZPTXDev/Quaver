@@ -1,5 +1,6 @@
 import { settings } from '#src/lib/util/settings.js';
-import { ActionRowBuilder, APISelectMenuOption, AttachmentBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, EmbedBuilder, escapeMarkdown, Interaction, InteractionReplyOptions, MessageActionRowComponentBuilder, MessageCreateOptions, SelectMenuBuilder } from 'discord.js';
+import type { APISelectMenuOption, AttachmentBuilder, ColorResolvable, Interaction, InteractionReplyOptions, MessageActionRowComponentBuilder, MessageCreateOptions } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, escapeMarkdown, SelectMenuBuilder } from 'discord.js';
 import { readdirSync } from 'fs';
 import { get } from 'lodash-es';
 import { dirname, resolve } from 'path';

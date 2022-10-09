@@ -1,9 +1,10 @@
-import ReplyHandler from '#src/lib/ReplyHandler.js';
+import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import { logger, searchState } from '#src/lib/util/common.js';
 import { buildMessageOptions, getGuildLocaleString } from '#src/lib/util/util.js';
-import { Song } from '@lavaclient/queue';
-import { ActionRowBuilder, APISelectMenuOption, ButtonBuilder, ButtonComponent, Client, EmbedBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder, SelectMenuComponent, SelectMenuComponentOptionData, SelectMenuInteraction } from 'discord.js';
-import { Node } from 'lavaclient';
+import type { Song } from '@lavaclient/queue';
+import type { APISelectMenuOption, ButtonComponent, Client, MessageActionRowComponentBuilder, SelectMenuComponent, SelectMenuComponentOptionData, SelectMenuInteraction } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder } from 'discord.js';
+import type { Node } from 'lavaclient';
 
 export default {
 	name: 'search',

@@ -1,5 +1,5 @@
 import { logger } from '#src/lib/util/common.js';
-import { Guild } from 'discord.js';
+import type { Guild } from 'discord.js';
 
 export default {
 	name: 'guildCreate',

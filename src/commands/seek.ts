@@ -1,9 +1,10 @@
-import ReplyHandler from '#src/lib/ReplyHandler.js';
+import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getLocaleString, msToTime, msToTimeString } from '#src/lib/util/util.js';
-import { ChatInputCommandInteraction, Client, SlashCommandBuilder, SlashCommandIntegerOption } from 'discord.js';
-import { Node } from 'lavaclient';
+import type { ChatInputCommandInteraction, Client, SlashCommandIntegerOption } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
+import type { Node } from 'lavaclient';
 
 export default {
 	data: new SlashCommandBuilder()

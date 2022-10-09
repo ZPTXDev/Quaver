@@ -1,13 +1,13 @@
-import ReplyHandler from '#src/lib/ReplyHandler.js';
+import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import { logger, searchState } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { buildMessageOptions, getGuildLocaleString, getLocaleString, msToTime, msToTimeString, paginate } from '#src/lib/util/util.js';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, ChatInputCommandInteraction, Client, EmbedBuilder, escapeMarkdown, Message, SelectMenuBuilder, SelectMenuComponentOptionData, SlashCommandBuilder, SlashCommandStringOption } from 'discord.js';
-import { Node } from 'lavaclient';
+import type { ChatInputCommandInteraction, Client, SelectMenuComponentOptionData, SlashCommandStringOption } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, EmbedBuilder, escapeMarkdown, Message, SelectMenuBuilder, SlashCommandBuilder } from 'discord.js';
+import type { Node } from 'lavaclient';
 
 // credit: https://github.com/lavaclient/djs-v13-example/blob/main/src/commands/Play.ts
-
 export default {
 	data: new SlashCommandBuilder()
 		.setName('search')

@@ -1,11 +1,12 @@
-import ReplyHandler from '#src/lib/ReplyHandler.js';
+import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import { data } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getLocaleString } from '#src/lib/util/util.js';
-import { Queue } from '@lavaclient/queue';
-import { ChannelType, ChatInputCommandInteraction, Client, PermissionsBitField, SlashCommandBuilder, SlashCommandChannelOption, TextChannel, VoiceChannel } from 'discord.js';
-import { Node, Player } from 'lavaclient';
+import type { Queue } from '@lavaclient/queue';
+import type { ChatInputCommandInteraction, Client, SlashCommandChannelOption, TextChannel, VoiceChannel } from 'discord.js';
+import { ChannelType, PermissionsBitField, SlashCommandBuilder } from 'discord.js';
+import type { Node, Player } from 'lavaclient';
 
 export default {
 	data: new SlashCommandBuilder()

@@ -1,6 +1,6 @@
 import DataHandler from '#src/lib/DataHandler.js';
 import { settings } from '#src/lib/util/settings.js';
-import { Song } from '@lavaclient/queue';
+import type { Song } from '@lavaclient/queue';
 import { Collection } from 'discord.js';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';

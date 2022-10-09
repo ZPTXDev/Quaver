@@ -1,8 +1,9 @@
-import PlayerHandler from '#src/lib/PlayerHandler.js';
+import type PlayerHandler from '#src/lib/PlayerHandler.js';
 import { data, logger } from '#src/lib/util/common.js';
-import { Queue, Song } from '@lavaclient/queue';
-import { Collection, escapeMarkdown, GuildMember } from 'discord.js';
-import { Player } from 'lavaclient';
+import type { Queue, Song } from '@lavaclient/queue';
+import type { Collection, GuildMember } from 'discord.js';
+import { escapeMarkdown } from 'discord.js';
+import type { Player } from 'lavaclient';
 
 export default {
 	name: 'trackEnd',
