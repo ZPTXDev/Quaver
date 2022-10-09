@@ -169,7 +169,8 @@ export function getLocaleString(localeCode: string, stringPath: string, ...vars:
  * @returns The localized string, or LOCALE_MISSING if the locale is missing, or STRING_MISSING if the string is missing.
  */
 export async function getGuildLocaleString(guildId: string, stringPath: string, ...vars: string[]): Promise<string | 'LOCALE_MISSING' | 'STRING_MISSING'> {
-	return getLocaleString(<string> await data.guild.get(guildId, 'settings.locale') ?? settings.defaultLocaleCode, stringPath, ...vars);
+	const guildLocaleCode = <string> await data.guild.get(guildId, 'settings.locale') ?? settings.defaultLocaleCode;
+	return getLocaleString(guildLocaleCode, stringPath, ...vars);
 }
 
 /**
