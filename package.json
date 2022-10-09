@@ -41,7 +41,7 @@
     "slash-delete": "node scripts/delete-commands.js",
     "migrate": "node scripts/migrate.js",
     "build": "rimraf dist/ && genversion --es6 --semi src/lib/util/version.ts && tsc && tsc-alias",
-    "build-start": "npm run build && node .",
+    "build-start": "npm run build && npm start",
     "start": "node .",
     "lint": "eslint . --ext .ts"
   },
