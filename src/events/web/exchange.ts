@@ -3,7 +3,7 @@ import { getJSONResponse } from '#src/lib/util/util.js';
 import CryptoJS from 'crypto-js';
 import type { Socket } from 'socket.io';
 import { request } from 'undici';
-import type { OAuth2Data } from './exchange.types.js';
+import type { OAuth2Data } from './exchange.d.js';
 
 export default {
 	name: 'exchange',

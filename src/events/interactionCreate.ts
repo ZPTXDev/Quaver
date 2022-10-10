@@ -1,10 +1,10 @@
 import ReplyHandler from '#src/lib/ReplyHandler.js';
+import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { logger } from '#src/lib/util/common.js';
-import type { QuaverInteraction } from '#src/lib/util/common.types.js';
 import { checks } from '#src/lib/util/constants.js';
 import type { Interaction } from 'discord.js';
 import { GuildMember, PermissionsBitField } from 'discord.js';
-import type { Autocomplete, Button, ChatInputCommand, ModalSubmit, SelectMenu } from './interactionCreate.types.js';
+import type { Autocomplete, Button, ChatInputCommand, ModalSubmit, SelectMenu } from './interactionCreate.d.js';
 
 export default {
 	name: 'interactionCreate',

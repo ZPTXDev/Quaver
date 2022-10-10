@@ -1,6 +1,6 @@
 import Keyv from 'keyv';
 import { get as _get, set as _set } from 'lodash-es';
-import type { DatabaseObject } from './DataHandler.types.js';
+import type { DatabaseObject } from './DataHandler.d.js';
 
 /** Class for handling data through Keyv. */
 export default class DataHandler {

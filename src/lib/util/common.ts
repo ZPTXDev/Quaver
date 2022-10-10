@@ -5,7 +5,7 @@ import { Collection } from 'discord.js';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { createLogger, format, transports } from 'winston';
-import type { SearchStateRecord } from './common.types.js';
+import type { SearchStateRecord } from './common.d.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 export const data = {

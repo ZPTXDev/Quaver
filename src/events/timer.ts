@@ -1,4 +1,4 @@
-import type { QuaverPlayer } from '#src/lib/util/common.types.js';
+import type { QuaverPlayer } from '#src/lib/util/common.d.js';
 
 export default {
 	name: 'timer',

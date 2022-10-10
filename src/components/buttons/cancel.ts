@@ -1,5 +1,5 @@
+import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { confirmationTimeout, searchState } from '#src/lib/util/common.js';
-import type { QuaverInteraction } from '#src/lib/util/common.types.js';
 import type { ButtonInteraction } from 'discord.js';
 
 export default {

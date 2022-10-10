@@ -1,5 +1,5 @@
+import type { QuaverClient, QuaverPlayer } from '#src/lib/util/common.d.js';
 import { data, logger } from '#src/lib/util/common.js';
-import type { QuaverClient, QuaverPlayer } from '#src/lib/util/common.types.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString } from '#src/lib/util/util.js';
 import type { VoiceState } from 'discord.js';

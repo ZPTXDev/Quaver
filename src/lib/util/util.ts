@@ -5,10 +5,10 @@ import { readdirSync } from 'fs';
 import { get } from 'lodash-es';
 import { dirname, resolve } from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
+import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions, SettingsPage, SettingsPageOptions } from './common.d.js';
 import { data, locales } from './common.js';
-import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions, SettingsPage, SettingsPageOptions } from './common.types.js';
 import { languageName } from './constants.js';
-import type { LocaleCompletionState, TimeFormats, TimeObject } from './util.types.js';
+import type { LocaleCompletionState, TimeFormats, TimeObject } from './util.d.js';
 
 /**
  * Returns a time object (or a converted equivalent if a format is provided) converted from milliseconds.

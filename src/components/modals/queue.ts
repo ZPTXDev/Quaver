@@ -1,4 +1,4 @@
-import type { QuaverInteraction } from '#src/lib/util/common.types.js';
+import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { getGuildLocaleString, msToTime, msToTimeString, paginate } from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/queue';
 import type { MessageActionRowComponentBuilder, ModalSubmitInteraction } from 'discord.js';

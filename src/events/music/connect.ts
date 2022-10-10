@@ -1,6 +1,6 @@
 import PlayerHandler from '#src/lib/PlayerHandler.js';
+import type { QuaverChannels, QuaverClient, QuaverPlayer } from '#src/lib/util/common.d.js';
 import { data, logger } from '#src/lib/util/common.js';
-import type { QuaverChannels, QuaverClient, QuaverPlayer } from '#src/lib/util/common.types.js';
 import { get } from 'lodash-es';
 
 export default {

@@ -1,8 +1,8 @@
-import type { QuaverPlayer } from '#src/lib/util/common.types.js';
+import type { QuaverPlayer } from '#src/lib/util/common.d.js';
 import type { Song } from '@lavaclient/queue';
 import type { APIGuild, APIUser, Snowflake } from 'discord.js';
 import type { Socket } from 'socket.io';
-import type { UpdateItemTypes } from './update.types.js';
+import type { UpdateItemTypes } from './update.d.js';
 
 export default {
 	name: 'update',

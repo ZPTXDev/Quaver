@@ -4,7 +4,6 @@ import { settings } from '#src/lib/util/settings.js';
 import { getAbsoluteFileURL, getGuildLocaleString, msToTime, msToTimeString } from '#src/lib/util/util.js';
 import '@lavaclient/queue/register';
 import { load } from '@lavaclient/spotify';
-import type { AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, PermissionsBitField, SelectMenuInteraction, SlashCommandBuilder } from 'discord.js';
 import { AttachmentBuilder, Client, Collection, EmbedBuilder, GatewayDispatchEvents, GatewayIntentBits } from 'discord.js';
 import { readdirSync, readFileSync } from 'fs';
 import { writeFile } from 'fs/promises';
@@ -14,6 +13,7 @@ import { Node } from 'lavaclient';
 import { createInterface } from 'readline';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
+import type { Autocomplete, Button, ChatInputCommand, ModalSubmit, SelectMenu } from './events/interactionCreate.d.js';
 
 export const startup = { started: false };
 
@@ -211,13 +211,13 @@ setLocales(locales);
 
 const commandFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['commands'])).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 for await (const file of commandFiles) {
-	const command: { default: { data: SlashCommandBuilder, checks: string[], permissions: { user: PermissionsBitField[], bot: PermissionsBitField[], execute(interaction: ChatInputCommandInteraction): Promise<void> } } } = await import(getAbsoluteFileURL(import.meta.url, ['commands', file]).toString());
+	const command: { default: ChatInputCommand } = await import(getAbsoluteFileURL(import.meta.url, ['commands', file]).toString());
 	bot.commands.set(command.default.data.name, command.default);
 }
 
 const autocompleteFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['autocomplete'])).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 for await (const file of autocompleteFiles) {
-	const autocomplete: { default: { name: string, execute(interaction: AutocompleteInteraction): Promise<void> } } = await import(getAbsoluteFileURL(import.meta.url, ['autocomplete', file]).toString());
+	const autocomplete: { default: Autocomplete } = await import(getAbsoluteFileURL(import.meta.url, ['autocomplete', file]).toString());
 	bot.autocomplete.set(autocomplete.default.name, autocomplete.default);
 }
 
@@ -225,7 +225,7 @@ const componentsFolders = readdirSync(getAbsoluteFileURL(import.meta.url, ['comp
 for await (const folder of componentsFolders) {
 	const componentFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['components', folder])).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 	for await (const file of componentFiles) {
-		const component: { default: { name: string, execute(interaction: ButtonInteraction | SelectMenuInteraction): Promise<void> } } = await import(getAbsoluteFileURL(import.meta.url, ['components', folder, file]).toString());
+		const component: { default: Button | SelectMenu | ModalSubmit } = await import(getAbsoluteFileURL(import.meta.url, ['components', folder, file]).toString());
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		if (!(bot as Record<string, any>)[folder]) (bot as Record<string, any>)[folder] = new Collection();
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any

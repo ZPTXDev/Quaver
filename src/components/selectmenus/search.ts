@@ -1,5 +1,5 @@
+import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { logger, searchState } from '#src/lib/util/common.js';
-import type { QuaverInteraction } from '#src/lib/util/common.types.js';
 import { buildMessageOptions, getGuildLocaleString } from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/queue';
 import type { APISelectMenuOption, ButtonComponent, MessageActionRowComponentBuilder, SelectMenuComponent, SelectMenuComponentOptionData, SelectMenuInteraction } from 'discord.js';

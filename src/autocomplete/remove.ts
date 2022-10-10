@@ -1,4 +1,4 @@
-import type { QuaverInteraction } from '#src/lib/util/common.types.js';
+import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import type { ApplicationCommandOptionChoiceData, AutocompleteInteraction } from 'discord.js';
 
 export default {

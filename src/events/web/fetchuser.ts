@@ -1,4 +1,4 @@
-import type { JSONResponse } from '#src/lib/util/common.types.js';
+import type { JSONResponse } from '#src/lib/util/common.d.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getJSONResponse } from '#src/lib/util/util.js';
 import { version } from '#src/lib/util/version.js';

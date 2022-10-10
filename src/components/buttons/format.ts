@@ -1,5 +1,5 @@
+import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
-import type { QuaverInteraction } from '#src/lib/util/common.types.js';
 import { settings } from '#src/lib/util/settings.js';
 import { buildMessageOptions, getGuildLocaleString, getLocaleString, settingsPage } from '#src/lib/util/util.js';
 import type { ButtonInteraction, MessageActionRowComponentBuilder, SelectMenuComponent } from 'discord.js';

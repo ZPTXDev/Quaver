@@ -1,5 +1,5 @@
+import type { QuaverClient } from '#src/lib/util/common.d.js';
 import { logger } from '#src/lib/util/common.js';
-import type { QuaverClient } from '#src/lib/util/common.types.js';
 import { version } from '#src/lib/util/version.js';
 import { ActivityType } from 'discord.js';
 

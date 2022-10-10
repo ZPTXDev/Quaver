@@ -1,5 +1,5 @@
+import type { QuaverInteraction, SettingsPageOptions } from '#src/lib/util/common.d.js';
 import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
-import type { QuaverInteraction, SettingsPageOptions } from '#src/lib/util/common.types.js';
 import { settingsOptions } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { buildMessageOptions, getGuildLocaleString, getLocaleString, settingsPage } from '#src/lib/util/util.js';

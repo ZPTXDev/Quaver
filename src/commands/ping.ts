@@ -1,4 +1,4 @@
-import type { QuaverInteraction } from '#src/lib/util/common.types.js';
+import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString, msToTime, msToTimeString } from '#src/lib/util/util.js';
 import type { ChatInputCommandInteraction } from 'discord.js';

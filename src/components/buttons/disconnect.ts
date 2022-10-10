@@ -1,5 +1,5 @@
+import type { QuaverInteraction, QuaverPlayer } from '#src/lib/util/common.d.js';
 import { confirmationTimeout } from '#src/lib/util/common.js';
-import type { QuaverInteraction, QuaverPlayer } from '#src/lib/util/common.types.js';
 import { checks } from '#src/lib/util/constants.js';
 import type { ButtonInteraction } from 'discord.js';
 import { GuildMember } from 'discord.js';

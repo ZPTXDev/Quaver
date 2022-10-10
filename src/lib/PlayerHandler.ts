@@ -3,7 +3,7 @@ import { settings } from '#src/lib/util/settings.js';
 import { buildMessageOptions, getGuildLocaleString } from '#src/lib/util/util.js';
 import type { Message } from 'discord.js';
 import { ChannelType, PermissionsBitField } from 'discord.js';
-import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions, QuaverClient, QuaverPlayer } from './util/common.types.js';
+import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions, QuaverClient, QuaverPlayer } from './util/common.d.js';
 
 /** Class for handling Lavaclient's Player. */
 export default class PlayerHandler {

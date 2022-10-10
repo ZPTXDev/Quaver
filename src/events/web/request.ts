@@ -1,4 +1,4 @@
-import type { QuaverPlayer, QuaverSong } from '#src/lib/util/common.types.js';
+import type { QuaverPlayer, QuaverSong } from '#src/lib/util/common.d.js';
 import { version } from '#src/lib/util/version.js';
 import type { APIGuild } from 'discord.js';
 import type { Socket } from 'socket.io';

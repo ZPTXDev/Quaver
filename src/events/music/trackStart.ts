@@ -1,5 +1,5 @@
+import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.d.js';
 import { data, logger } from '#src/lib/util/common.js';
-import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.types.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, msToTime, msToTimeString } from '#src/lib/util/util.js';
 import { EmbedBuilder, escapeMarkdown } from 'discord.js';

@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
-import type { SettingsObject } from './settings.types.js';
+import type { SettingsObject } from './settings.d.js';
 
 function getAbsoluteFileURL(baseURL: string, path: string[]): URL {
 	const __dirname = dirname(fileURLToPath(baseURL));

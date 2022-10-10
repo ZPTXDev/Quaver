@@ -2,8 +2,8 @@ import { logger } from '#src/lib/util/common.js';
 import { buildMessageOptions, getGuildLocaleString } from '#src/lib/util/util.js';
 import type { AutocompleteInteraction, Interaction, InteractionResponse, Message } from 'discord.js';
 import { PermissionsBitField } from 'discord.js';
-import type { AdditionalBuilderOptions } from './ReplyHandler.types.js';
-import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions } from './util/common.types.js';
+import type { AdditionalBuilderOptions } from './ReplyHandler.d.js';
+import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions } from './util/common.d.js';
 
 /** Class for handling replies to interactions. */
 export default class ReplyHandler {

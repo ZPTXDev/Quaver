@@ -1,5 +1,5 @@
+import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.d.js';
 import { data, logger } from '#src/lib/util/common.js';
-import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.types.js';
 import type { Collection, GuildMember } from 'discord.js';
 import { escapeMarkdown } from 'discord.js';
 

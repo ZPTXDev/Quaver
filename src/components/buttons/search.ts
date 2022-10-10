@@ -1,6 +1,6 @@
 import PlayerHandler from '#src/lib/PlayerHandler.js';
+import type { QuaverChannels, QuaverInteraction, QuaverPlayer } from '#src/lib/util/common.d.js';
 import { logger, searchState } from '#src/lib/util/common.js';
-import type { QuaverChannels, QuaverInteraction, QuaverPlayer } from '#src/lib/util/common.types.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { buildMessageOptions, getGuildLocaleString, msToTime, msToTimeString } from '#src/lib/util/util.js';

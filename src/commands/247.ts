@@ -1,5 +1,5 @@
+import type { QuaverInteraction, QuaverPlayer } from '#src/lib/util/common.d.js';
 import { data } from '#src/lib/util/common.js';
-import type { QuaverInteraction, QuaverPlayer } from '#src/lib/util/common.types.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
