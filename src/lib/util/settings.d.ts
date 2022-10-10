@@ -1,4 +1,5 @@
 import type { ColorResolvable } from 'discord.js';
+import type { ConnectionInfo } from 'lavaclient';
 
 export type SettingsObject = {
 	token?: string;
@@ -8,7 +9,7 @@ export type SettingsObject = {
 	defaultLocaleCode?: string;
 	managers?: string[];
 	database?: DatabaseSettingsObject;
-	lavalink?: LavalinkSettingsObject;
+	lavalink?: ConnectionInfo;
 	features?: FeaturesSettingsObject;
 };
 
@@ -22,14 +23,6 @@ export type ColorsSettingsObject = {
 export type DatabaseSettingsObject = {
     protocol?: string;
     path?: string;
-};
-
-export type LavalinkSettingsObject = {
-    host?: string;
-    port?: number;
-    password?: string;
-    secure?: boolean;
-    reconnect?: LavalinkReconnectSettingsObject;
 };
 
 export type LavalinkReconnectSettingsObject = {
