@@ -1,4 +1,4 @@
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
+import type { QuaverInteraction } from '#src/lib/util/common.types.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import { version } from '#src/lib/util/version.js';
@@ -14,7 +14,7 @@ export default {
 		user: [],
 		bot: [],
 	},
-	async execute(interaction: ChatInputCommandInteraction & { replyHandler: ReplyHandler }): Promise<void> {
+	async execute(interaction: QuaverInteraction<ChatInputCommandInteraction>): Promise<void> {
 		await interaction.replyHandler.reply(
 			new EmbedBuilder()
 				.setTitle('Quaver')

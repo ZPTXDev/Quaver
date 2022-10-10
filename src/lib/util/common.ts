@@ -1,10 +1,11 @@
 import DataHandler from '#src/lib/DataHandler.js';
 import { settings } from '#src/lib/util/settings.js';
-import type { Song } from '@lavaclient/queue';
+import type { Snowflake } from 'discord.js';
 import { Collection } from 'discord.js';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { createLogger, format, transports } from 'winston';
+import type { SearchStateRecord } from './common.types.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 export const data = {
@@ -40,8 +41,8 @@ export const logger = createLogger({
 	],
 });
 export let locales = new Collection();
-export function setLocales(newLocales: Collection<unknown, unknown>): void {
+export function setLocales(newLocales: Collection<string, unknown>): void {
 	locales = newLocales;
 }
-export const confirmationTimeout: Record<string, ReturnType<typeof setTimeout>> = {};
-export const searchState: Record<string, { pages: { info: Song }[][], timeout: ReturnType<typeof setTimeout>, selected: string[] }> = {};
+export const confirmationTimeout: Record<Snowflake, ReturnType<typeof setTimeout>> = {};
+export const searchState: Record<Snowflake, SearchStateRecord> = {};

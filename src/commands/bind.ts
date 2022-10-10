@@ -1,12 +1,10 @@
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import { data } from '#src/lib/util/common.js';
+import type { QuaverChannels, QuaverInteraction, QuaverPlayer } from '#src/lib/util/common.types.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getLocaleString } from '#src/lib/util/util.js';
-import type { Queue } from '@lavaclient/queue';
-import type { ChatInputCommandInteraction, Client, SlashCommandChannelOption, TextChannel, VoiceChannel } from 'discord.js';
+import type { ChatInputCommandInteraction, SlashCommandChannelOption } from 'discord.js';
 import { ChannelType, PermissionsBitField, SlashCommandBuilder } from 'discord.js';
-import type { Node, Player } from 'lavaclient';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -23,10 +21,10 @@ export default {
 		user: [],
 		bot: [],
 	},
-	async execute(interaction: ChatInputCommandInteraction & { replyHandler: ReplyHandler, client: Client & { music: Node } }): Promise<void> {
+	async execute(interaction: QuaverInteraction<ChatInputCommandInteraction>): Promise<void> {
 		const { io } = await import('#src/main.js');
-		const player = <Player<Node> & { queue: Queue & { channel: TextChannel | VoiceChannel } }> interaction.client.music.players.get(interaction.guildId);
-		const channel = <TextChannel | VoiceChannel> interaction.options.getChannel('new_channel');
+		const player = interaction.client.music.players.get(interaction.guildId) as QuaverPlayer;
+		const channel = interaction.options.getChannel('new_channel') as QuaverChannels;
 		if (!channel.permissionsFor(interaction.client.user.id).has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages]))) {
 			await interaction.replyHandler.locale('CMD.BIND.RESPONSE.PERMISSIONS_INSUFFICIENT', { vars: [channel.id], type: 'error' });
 			return;

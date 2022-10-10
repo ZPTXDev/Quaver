@@ -1,8 +1,6 @@
 import PlayerHandler from '#src/lib/PlayerHandler.js';
 import { data, logger } from '#src/lib/util/common.js';
-import type { Queue } from '@lavaclient/queue';
-import type { TextChannel, VoiceChannel } from 'discord.js';
-import type { Node, Player } from 'lavaclient';
+import type { QuaverChannels, QuaverClient, QuaverPlayer } from '#src/lib/util/common.types.js';
 import { get } from 'lodash-es';
 
 export default {
@@ -15,9 +13,9 @@ export default {
 			if (get(guildData, 'settings.stay.enabled')) {
 				const guild = bot.guilds.cache.get(guildId);
 				if (!guild) continue;
-				const player: Player<Node> & { handler?: PlayerHandler; queue?: Queue & { channel?: TextChannel | VoiceChannel } } = bot.music.createPlayer(guildId);
-				player.handler = new PlayerHandler(bot, player);
-				player.queue.channel = <TextChannel | VoiceChannel> guild.channels.cache.get(get(guildData, 'settings.stay.text'));
+				const player = bot.music.createPlayer(guildId) as QuaverPlayer;
+				player.handler = new PlayerHandler(bot as QuaverClient, player);
+				player.queue.channel = guild.channels.cache.get(get(guildData, 'settings.stay.text')) as QuaverChannels;
 				await player.connect(get(guildData, 'settings.stay.channel'), { deafened: true });
 			}
 		}

@@ -1,11 +1,10 @@
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import { logger, searchState } from '#src/lib/util/common.js';
+import type { QuaverInteraction } from '#src/lib/util/common.types.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { buildMessageOptions, getGuildLocaleString, getLocaleString, msToTime, msToTimeString, paginate } from '#src/lib/util/util.js';
-import type { ChatInputCommandInteraction, Client, SelectMenuComponentOptionData, SlashCommandStringOption } from 'discord.js';
+import type { ChatInputCommandInteraction, SelectMenuComponentOptionData, SlashCommandStringOption } from 'discord.js';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, EmbedBuilder, escapeMarkdown, Message, SelectMenuBuilder, SlashCommandBuilder } from 'discord.js';
-import type { Node } from 'lavaclient';
 
 // credit: https://github.com/lavaclient/djs-v13-example/blob/main/src/commands/Play.ts
 export default {
@@ -23,7 +22,7 @@ export default {
 		user: [],
 		bot: [],
 	},
-	async execute(interaction: ChatInputCommandInteraction & { replyHandler: ReplyHandler, client: Client & { music: Node } }): Promise<void> {
+	async execute(interaction: QuaverInteraction<ChatInputCommandInteraction>): Promise<void> {
 		if (![ChannelType.GuildText, ChannelType.GuildVoice].includes(interaction.channel.type)) {
 			await interaction.replyHandler.locale('DISCORD.CHANNEL_UNSUPPORTED', { type: 'error' });
 			return;

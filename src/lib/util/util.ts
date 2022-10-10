@@ -1,21 +1,14 @@
 import { settings } from '#src/lib/util/settings.js';
-import type { APISelectMenuOption, AttachmentBuilder, ColorResolvable, Interaction, InteractionReplyOptions, MessageActionRowComponentBuilder, MessageCreateOptions } from 'discord.js';
+import type { APISelectMenuOption, ColorResolvable, Interaction, InteractionReplyOptions, MessageActionRowComponentBuilder, MessageCreateOptions } from 'discord.js';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, escapeMarkdown, SelectMenuBuilder } from 'discord.js';
 import { readdirSync } from 'fs';
 import { get } from 'lodash-es';
 import { dirname, resolve } from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { data, locales } from './common.js';
+import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions, SettingsPage, SettingsPageOptions } from './common.types.js';
 import { languageName } from './constants.js';
-
-export type TimeFormats = 's' | 'm' | 'h' | 'd';
-
-export type TimeObject = {
-	d: number;
-	h: number;
-	m: number;
-	s: number;
-};
+import type { LocaleCompletionState, TimeFormats, TimeObject } from './util.types.js';
 
 /**
  * Returns a time object (or a converted equivalent if a format is provided) converted from milliseconds.
@@ -133,9 +126,9 @@ export function getBar(progress: number): string {
 // i've also tried to use generic types but it's like nested and whatnot
 // please save me.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function paginate(arr: Array<any>, size: number): Array<Array<any>> {
+export function paginate(arr: any[], size: number): any[][] {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	return arr.reduce((acc: Array<any>, val: unknown, i: number): Array<any> => {
+	return arr.reduce((acc: any[], val: unknown, i: number): any[] => {
 		const idx = Math.floor(i / size);
 		const page = acc[idx] || (acc[idx] = []);
 		page.push(val);
@@ -174,7 +167,7 @@ export function getLocaleString(localeCode: string, stringPath: string, ...vars:
  * @returns The localized string, or LOCALE_MISSING if the locale is missing, or STRING_MISSING if the string is missing.
  */
 export async function getGuildLocaleString(guildId: string, stringPath: string, ...vars: string[]): Promise<string | 'LOCALE_MISSING' | 'STRING_MISSING'> {
-	const guildLocaleCode = <string> await data.guild.get(guildId, 'settings.locale') ?? settings.defaultLocaleCode;
+	const guildLocaleCode = await data.guild.get<string>(guildId, 'settings.locale') ?? settings.defaultLocaleCode;
 	return getLocaleString(guildLocaleCode, stringPath, ...vars);
 }
 
@@ -183,7 +176,7 @@ export async function getGuildLocaleString(guildId: string, stringPath: string, 
  * @param localeCode - The locale code to check.
  * @returns Completion percentage and missing strings, or 'LOCALE_MISSING' if the locale is missing.
  */
-export function checkLocaleCompletion(localeCode: string): { completion: number; missing: string[]; } | 'LOCALE_MISSING' {
+export function checkLocaleCompletion(localeCode: string): LocaleCompletionState | 'LOCALE_MISSING' {
 	if (!locales.get(localeCode)) return 'LOCALE_MISSING';
 	const englishStrings = locales.get('en');
 	const foreignStrings = locales.get(localeCode);
@@ -201,7 +194,8 @@ export function checkLocaleCompletion(localeCode: string): { completion: number;
 			if (!get(foreignStrings, `${path.join('.')}.${key}`)) missingStrings.push(`${path.join('.')}.${key}`);
 		});
 	}
-	iterateObject(<object> englishStrings);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	iterateObject(<Record<string, any>> englishStrings);
 	foreignStringCount = englishStringCount - missingStrings.length;
 	// missing strings
 	if (englishStringCount > foreignStringCount) return { completion: foreignStringCount / englishStringCount * 100, missing: missingStrings };
@@ -222,7 +216,6 @@ export function getAbsoluteFileURL(baseURL: string, path: string[]): URL {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getJSONResponse(body: any): Promise<unknown> {
 	let fullBody = '';
-
 	for await (const d of body) {
 		fullBody += d.toString();
 	}
@@ -235,11 +228,11 @@ export async function getJSONResponse(body: any): Promise<unknown> {
  * @param options - Extra data, such as type, components, or files.
  * @returns The MessageCreateOptions object.
  */
-export function buildMessageOptions(inputData: string | EmbedBuilder | (string | EmbedBuilder)[], { type = 'neutral', components = null, files = null }: { type?: 'success' | 'neutral' | 'warning' | 'error'; components?: ActionRowBuilder<MessageActionRowComponentBuilder>[]; files?: AttachmentBuilder[]; } = {}): MessageCreateOptions & InteractionReplyOptions {
+export function buildMessageOptions(inputData: MessageOptionsBuilderInputs, { type = 'neutral', components = null, files = null }: MessageOptionsBuilderOptions = {}): MessageCreateOptions & InteractionReplyOptions {
 	const messageData = Array.isArray(inputData) ? inputData : [inputData];
 	const embedData = messageData.map((msg): EmbedBuilder => {
-		if (typeof msg === 'string') return new EmbedBuilder().setDescription(msg).setColor(<ColorResolvable> settings.colors[type]);
-		if (!msg.data.color) return msg.setColor(<ColorResolvable> settings.colors[type]);
+		if (typeof msg === 'string') return new EmbedBuilder().setDescription(msg).setColor(settings.colors[type] as ColorResolvable);
+		if (!msg.data.color) return msg.setColor(settings.colors[type] as ColorResolvable);
 		return msg;
 	});
 	const opts: MessageCreateOptions & InteractionReplyOptions = { embeds: embedData };
@@ -248,9 +241,8 @@ export function buildMessageOptions(inputData: string | EmbedBuilder | (string |
 	return opts;
 }
 
-export async function settingsPage(interaction: Interaction, guildLocaleCode: string, option: 'language' | 'format'): Promise<{ current: string; embeds: EmbedBuilder[]; actionRow: ActionRowBuilder; }> {
-	let current: string;
-	let embeds: EmbedBuilder[] = [];
+export async function settingsPage(interaction: Interaction, guildLocaleCode: string, option: SettingsPageOptions): Promise<SettingsPage> {
+	let current: string, embeds: EmbedBuilder[] = [];
 	const actionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 	switch (option) {
 		case 'language':
@@ -265,7 +257,8 @@ export async function settingsPage(interaction: Interaction, guildLocaleCode: st
 			);
 			break;
 		case 'format': {
-			current = <string> await data.guild.get(interaction.guildId, 'settings.format') ?? 'simple';
+			const exampleId = 'dQw4w9WgXcQ';
+			current = await data.guild.get<string>(interaction.guildId, 'settings.format') ?? 'simple';
 			actionRow.addComponents(
 				new ButtonBuilder()
 					.setCustomId('format_simple')
@@ -281,17 +274,17 @@ export async function settingsPage(interaction: Interaction, guildLocaleCode: st
 			embeds = current === 'simple' ? [
 				new EmbedBuilder()
 					.setDescription(`${getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE', escapeMarkdown(getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.SIMPLE')), 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', '4:20')}\n${getLocaleString(guildLocaleCode, 'MISC.ADDED_BY', interaction.user.id)}`)
-					.setColor(<ColorResolvable> settings.colors.neutral),
+					.setColor(settings.colors.neutral as ColorResolvable),
 			] : [
 				new EmbedBuilder()
 					.setTitle(getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE'))
-					.setDescription(`**[${escapeMarkdown(getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.DETAILED'))}](https://www.youtube.com/watch?v=dQw4w9WgXcQ)**`)
+					.setDescription(`**[${escapeMarkdown(getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.DETAILED'))}](https://www.youtube.com/watch?v=${exampleId})**`)
 					.addFields([
 						{ name: getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.DURATION'), value: '`4:20`', inline: true },
 						{ name: getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.UPLOADER'), value: 'Rick Astley', inline: true },
 						{ name: getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.ADDED_BY'), value: `<@${interaction.user.id}>`, inline: true },
 					])
-					.setThumbnail('https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg'),
+					.setThumbnail(`https://i.ytimg.com/vi/${exampleId}/hqdefault.jpg`),
 			];
 			current = getLocaleString(guildLocaleCode, `CMD.SETTINGS.MISC.FORMAT.OPTIONS.${current.toUpperCase()}`);
 		}

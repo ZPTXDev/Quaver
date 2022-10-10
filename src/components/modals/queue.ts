@@ -1,13 +1,12 @@
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
+import type { QuaverInteraction } from '#src/lib/util/common.types.js';
 import { getGuildLocaleString, msToTime, msToTimeString, paginate } from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/queue';
-import type { Client, MessageActionRowComponentBuilder, ModalSubmitInteraction } from 'discord.js';
+import type { MessageActionRowComponentBuilder, ModalSubmitInteraction } from 'discord.js';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, escapeMarkdown } from 'discord.js';
-import type { Node } from 'lavaclient';
 
 export default {
 	name: 'queue',
-	async execute(interaction: ModalSubmitInteraction & { replyHandler: ReplyHandler, client: Client & { music: Node } }): Promise<void> {
+	async execute(interaction: QuaverInteraction<ModalSubmitInteraction>): Promise<void> {
 		const player = interaction.client.music.players.get(interaction.guildId), page = parseInt(interaction.fields.getTextInputValue('queue_goto_input'));
 		let pages;
 		if (isNaN(page)) {

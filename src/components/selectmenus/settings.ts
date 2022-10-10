@@ -1,5 +1,5 @@
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
+import type { QuaverInteraction, SettingsPageOptions } from '#src/lib/util/common.types.js';
 import { settingsOptions } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { buildMessageOptions, getGuildLocaleString, getLocaleString, settingsPage } from '#src/lib/util/util.js';
@@ -8,7 +8,7 @@ import { ActionRowBuilder, EmbedBuilder, SelectMenuBuilder } from 'discord.js';
 
 export default {
 	name: 'settings',
-	async execute(interaction: SelectMenuInteraction & { replyHandler: ReplyHandler }): Promise<void> {
+	async execute(interaction: QuaverInteraction<SelectMenuInteraction>): Promise<void> {
 		if (interaction.message.interaction.user.id !== interaction.user.id) {
 			await interaction.replyHandler.locale('DISCORD.INTERACTION.USER_MISMATCH', { type: 'error' });
 			return;
@@ -33,8 +33,8 @@ export default {
 			}
 			delete confirmationTimeout[message.id];
 		}, 30 * 1000, interaction.message);
-		const option = <'language' | 'format'> interaction.values[0];
-		const guildLocaleCode = <string> await data.guild.get(interaction.guild.id, 'settings.locale') ?? settings.defaultLocaleCode;
+		const option = interaction.values[0] as SettingsPageOptions;
+		const guildLocaleCode = await data.guild.get<string>(interaction.guild.id, 'settings.locale') ?? settings.defaultLocaleCode;
 		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocaleCode, option);
 		const description = `${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocaleCode, `CMD.SETTINGS.MISC.${option.toUpperCase()}.NAME`)}** ─ ${getLocaleString(guildLocaleCode, `CMD.SETTINGS.MISC.${option.toUpperCase()}.DESCRIPTION`)}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: \`${current}\``;
 		await interaction.replyHandler.reply(

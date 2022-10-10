@@ -1,10 +1,9 @@
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
+import type { QuaverInteraction, QuaverPlayer } from '#src/lib/util/common.types.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
-import type { ChatInputCommandInteraction, Client, SlashCommandBooleanOption } from 'discord.js';
+import type { ChatInputCommandInteraction, SlashCommandBooleanOption } from 'discord.js';
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import type { Node, Player } from 'lavaclient';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -19,9 +18,9 @@ export default {
 		user: [],
 		bot: [],
 	},
-	async execute(interaction: ChatInputCommandInteraction & { replyHandler: ReplyHandler, client: Client & { music: Node } }): Promise<void> {
+	async execute(interaction: QuaverInteraction<ChatInputCommandInteraction>): Promise<void> {
 		const { io } = await import('#src/main.js');
-		const player = <Player<Node> & { nightcore: boolean, bassboost: boolean }> interaction.client.music.players.get(interaction.guildId);
+		const player = interaction.client.music.players.get(interaction.guildId) as QuaverPlayer;
 		const enabled = interaction.options.getBoolean('enabled');
 		const nightcore = enabled !== null ? enabled : !player.nightcore;
 		player.filters.timescale = nightcore ? { speed: 1.125, pitch: 1.125, rate: 1 } : undefined;

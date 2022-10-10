@@ -1,7 +1,6 @@
+import type { QuaverPlayer, QuaverSong } from '#src/lib/util/common.types.js';
 import { version } from '#src/lib/util/version.js';
-import type { Queue, Song } from '@lavaclient/queue';
-import type { APIGuild, TextChannel, VoiceChannel } from 'discord.js';
-import type { Node, Player } from 'lavaclient';
+import type { APIGuild } from 'discord.js';
 import type { Socket } from 'socket.io';
 
 export default {
@@ -16,21 +15,13 @@ export default {
 		let response;
 		switch (item) {
 			case 'player': {
-				const player: Player<Node> & {
-					queue?: Queue & {
-						current?: Song & { requesterTag?: string };
-						channel?: TextChannel | VoiceChannel
-					};
-					bassboost?: boolean;
-					nightcore?: boolean;
-					skip?: { required: number, users: string[] };
-					timeout?: ReturnType<typeof setTimeout>;
-					pauseTimeout?: ReturnType<typeof setTimeout>;
-					timeoutEnd?: number;
-				} = bot.music.players.get(guildId);
-				player?.queue.current && (player.queue.current.requesterTag = bot.users.cache.get(player.queue.current.requester)?.tag);
+				const player = bot.music.players.get(guildId) as QuaverPlayer;
+				if (player?.queue.current) player.queue.current.requesterTag = bot.users.cache.get(player.queue.current.requester)?.tag;
 				response = player ? {
-					queue: player.queue.tracks.map((track: Song & { requesterTag: string }): Song & { requesterTag: string } => {track.requesterTag = bot.users.cache.get(track.requester)?.tag; return track;}),
+					queue: player.queue.tracks.map((track: QuaverSong): QuaverSong => {
+						track.requesterTag = bot.users.cache.get(track.requester)?.tag;
+						return track;
+					}),
 					volume: player.volume,
 					loop: player.queue.loop.type,
 					filters: {

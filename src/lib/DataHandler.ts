@@ -1,18 +1,6 @@
 import Keyv from 'keyv';
 import { get as _get, set as _set } from 'lodash-es';
-
-type Values = {
-	settings?: {
-		stay?: StayOptions;
-		locale?: string;
-	};
-}
-
-type StayOptions = {
-	enabled: boolean;
-	channel?: string;
-	text?: string;
-}
+import type { DatabaseObject } from './DataHandler.types.js';
 
 /** Class for handling data through Keyv. */
 export default class DataHandler {
@@ -35,8 +23,10 @@ export default class DataHandler {
 	 * @param item - The item to retrieve.
 	 * @returns The requested item.
 	 */
-	async get(key: string, item: string): Promise<string | boolean | undefined> {
-		const data: Values = await this.cache.get(key);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	async get<T>(key: string, item: string): Promise<T | undefined> {
+		const data: DatabaseObject = await this.cache.get(key);
+		if (!data) return undefined;
 		return _get(data, item);
 	}
 
@@ -48,7 +38,7 @@ export default class DataHandler {
 	 * @returns The updated item.
 	 */
 	async set(key: string, item: string, value: string | boolean): Promise<true> {
-		let data: Values = await this.cache.get(key);
+		let data: DatabaseObject = await this.cache.get(key);
 		if (!data) data = {};
 		return this.cache.set(key, _set(data, item, value));
 	}

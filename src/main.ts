@@ -194,7 +194,7 @@ export async function shuttingDown(eventType: string, err?: Error): Promise<void
 	}
 }
 
-const locales = new Collection();
+const locales = new Collection<string, unknown>();
 const localeFolders = readdirSync(getAbsoluteFileURL(import.meta.url, ['..', 'locales']));
 for await (const folder of localeFolders) {
 	const localeFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['..', 'locales', folder]));

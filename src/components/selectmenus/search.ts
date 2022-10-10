@@ -1,14 +1,13 @@
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import { logger, searchState } from '#src/lib/util/common.js';
+import type { QuaverInteraction } from '#src/lib/util/common.types.js';
 import { buildMessageOptions, getGuildLocaleString } from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/queue';
-import type { APISelectMenuOption, ButtonComponent, Client, MessageActionRowComponentBuilder, SelectMenuComponent, SelectMenuComponentOptionData, SelectMenuInteraction } from 'discord.js';
+import type { APISelectMenuOption, ButtonComponent, MessageActionRowComponentBuilder, SelectMenuComponent, SelectMenuComponentOptionData, SelectMenuInteraction } from 'discord.js';
 import { ActionRowBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder } from 'discord.js';
-import type { Node } from 'lavaclient';
 
 export default {
 	name: 'search',
-	async execute(interaction: SelectMenuInteraction & { replyHandler: ReplyHandler, client: Client & { music: Node } }): Promise<void> {
+	async execute(interaction: QuaverInteraction<SelectMenuInteraction>): Promise<void> {
 		if (interaction.message.interaction.user.id !== interaction.user.id) {
 			await interaction.replyHandler.locale('DISCORD.INTERACTION.USER_MISMATCH', { type: 'error' });
 			return;
@@ -42,11 +41,11 @@ export default {
 			return;
 		}
 		const updated: { components: ActionRowBuilder<MessageActionRowComponentBuilder>[] } = { components: [] };
-		updated.components[0] = <ActionRowBuilder<SelectMenuBuilder>> ActionRowBuilder.from(original.components[0]);
-		updated.components[1] = <ActionRowBuilder<ButtonBuilder>> ActionRowBuilder.from(original.components[1]);
-		updated.components[0].components[0] = SelectMenuBuilder.from(<SelectMenuComponent> original.components[0].components[0])
+		updated.components[0] = ActionRowBuilder.from(original.components[0]) as ActionRowBuilder<SelectMenuBuilder>;
+		updated.components[1] = ActionRowBuilder.from(original.components[1]) as ActionRowBuilder<ButtonBuilder>;
+		updated.components[0].components[0] = SelectMenuBuilder.from(original.components[0].components[0] as SelectMenuComponent)
 			.setOptions(
-				(<SelectMenuComponent> original.components[0].components[0]).options
+				(original.components[0].components[0] as SelectMenuComponent).options
 					.map((data: APISelectMenuOption): SelectMenuComponentOptionData => {
 						return { label: data.label, description: data.description, value: data.value, default: !!state.selected.find((identifier: string): boolean => identifier === data.value) };
 					})
@@ -64,11 +63,11 @@ export default {
 								if (label.length >= 100) label = `${label.substring(0, 97)}...`;
 								return { label: label, description: refTrack.info.author, value: identifier, default: true };
 							})
-							.filter((options): boolean => !(<SelectMenuComponent> original.components[0].components[0]).options.find((opt): boolean => opt.value === options.value)),
+							.filter((options): boolean => !(original.components[0].components[0] as SelectMenuComponent).options.find((opt): boolean => opt.value === options.value)),
 					)
 					.sort((a, b): number => parseInt(a.label.split('.')[0]) - parseInt(b.label.split('.')[0])),
 			);
-		updated.components[1].components[2] = ButtonBuilder.from(<ButtonComponent> original.components[1].components[2])
+		updated.components[1].components[2] = ButtonBuilder.from(original.components[1].components[2] as ButtonComponent)
 			.setDisabled(state.selected.length === 0);
 		await interaction.replyHandler.reply(original.embeds.map((embed): EmbedBuilder => EmbedBuilder.from(embed)), { components: updated.components, force: 'update' });
 	},

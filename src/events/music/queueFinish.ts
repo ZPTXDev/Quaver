@@ -1,14 +1,12 @@
-import type PlayerHandler from '#src/lib/PlayerHandler.js';
 import { data, logger } from '#src/lib/util/common.js';
+import type { QuaverQueue } from '#src/lib/util/common.types.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString } from '#src/lib/util/util.js';
-import type { Queue } from '@lavaclient/queue';
-import type { Node, Player } from 'lavaclient';
 
 export default {
 	name: 'queueFinish',
 	once: false,
-	async execute(queue: Queue & { player: Player<Node> & { handler: PlayerHandler, timeout: ReturnType<typeof setTimeout>, pauseTimeout: ReturnType<typeof setTimeout>, timeoutEnd: number } }): Promise<void> {
+	async execute(queue: QuaverQueue): Promise<void> {
 		const { io } = await import('#src/main.js');
 		if (await data.guild.get(queue.player.guildId, 'settings.stay.enabled')) {
 			await queue.player.handler.locale('MUSIC.QUEUE.EMPTY');

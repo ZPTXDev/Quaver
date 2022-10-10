@@ -1,12 +1,10 @@
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import { data } from '#src/lib/util/common.js';
+import type { QuaverInteraction, QuaverPlayer } from '#src/lib/util/common.types.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
-import type { Queue } from '@lavaclient/queue';
-import type { ChatInputCommandInteraction, Client, SlashCommandBooleanOption, TextChannel, VoiceChannel } from 'discord.js';
+import type { ChatInputCommandInteraction, SlashCommandBooleanOption } from 'discord.js';
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import type { Node, Player } from 'lavaclient';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -21,7 +19,7 @@ export default {
 		user: [],
 		bot: [],
 	},
-	async execute(interaction: ChatInputCommandInteraction & { replyHandler: ReplyHandler, client: Client & { music: Node } }): Promise<void> {
+	async execute(interaction: QuaverInteraction<ChatInputCommandInteraction>): Promise<void> {
 		const { io } = await import('#src/main.js');
 		if (!settings.features.stay.enabled) {
 			await interaction.replyHandler.locale('FEATURE.DISABLED.DEFAULT', { type: 'error' });
@@ -31,7 +29,7 @@ export default {
 			await interaction.replyHandler.locale('CMD.247.RESPONSE.FEATURE_NOT_WHITELISTED', { type: 'error' });
 			return;
 		}
-		const player = <Player<Node> & { queue: Queue & { channel: TextChannel | VoiceChannel }, timeout: ReturnType<typeof setTimeout> }> interaction.client.music.players.get(interaction.guildId);
+		const player = interaction.client.music.players.get(interaction.guildId) as QuaverPlayer;
 		if (!player?.queue?.channel?.id) {
 			await interaction.replyHandler.locale('CMD.247.RESPONSE.QUEUE_CHANNEL_MISSING', { type: 'error' });
 			return;

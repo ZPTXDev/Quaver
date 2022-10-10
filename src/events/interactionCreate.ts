@@ -1,22 +1,18 @@
 import ReplyHandler from '#src/lib/ReplyHandler.js';
 import { logger } from '#src/lib/util/common.js';
+import type { QuaverInteraction } from '#src/lib/util/common.types.js';
 import { checks } from '#src/lib/util/constants.js';
-import type { AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, Client, Collection, Interaction, ModalSubmitInteraction, SelectMenuInteraction, SlashCommandBuilder } from 'discord.js';
+import type { Interaction } from 'discord.js';
 import { GuildMember, PermissionsBitField } from 'discord.js';
-import type { Node } from 'lavaclient';
+import type { Autocomplete, Button, ChatInputCommand, ModalSubmit, SelectMenu } from './interactionCreate.types.js';
 
 export default {
 	name: 'interactionCreate',
 	once: false,
-	async execute(interaction: (Interaction) & { replyHandler: ReplyHandler, client: Client & { commands: Collection<string, unknown>, buttons: Collection<string, unknown>, selectmenus: Collection<string, unknown>, autocomplete: Collection<string, unknown>, modals: Collection<string, unknown>, music: Node } }): Promise<void> {
+	async execute(interaction: QuaverInteraction<Interaction>): Promise<void> {
 		if (!interaction.isAutocomplete()) interaction.replyHandler = new ReplyHandler(interaction);
 		if (interaction.isChatInputCommand()) {
-			const command: {
-				data?: SlashCommandBuilder;
-				checks?: string[];
-				permissions?: { user: bigint[], bot: bigint[] };
-				execute?(interaction: ChatInputCommandInteraction): Promise<void>;
-			} = interaction.client.commands.get(interaction.commandName);
+			const command: ChatInputCommand = interaction.client.commands.get(interaction.commandName);
 			if (!command) return;
 			logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing command ${interaction.commandName}`, label: 'Quaver' });
 			const failedChecks = [];
@@ -51,7 +47,7 @@ export default {
 			}
 			const failedPermissions: { user: string[], bot: string[] } = { user: [], bot: [] };
 			if (interaction.guildId) {
-				failedPermissions.user = interaction.channel.permissionsFor(<GuildMember> interaction.member).missing(command.permissions.user);
+				failedPermissions.user = interaction.channel.permissionsFor(interaction.member as GuildMember).missing(command.permissions.user);
 				failedPermissions.bot = interaction.channel.permissionsFor(interaction.client.user.id).missing([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, ...command.permissions.bot]);
 			}
 			else {
@@ -80,12 +76,12 @@ export default {
 			}
 		}
 		if (interaction.isAutocomplete()) {
-			const autocomplete = <{ execute(interaction: AutocompleteInteraction): Promise<void> }> interaction.client.autocomplete.get(interaction.commandName);
+			const autocomplete = interaction.client.autocomplete.get(interaction.commandName) as Autocomplete;
 			if (!autocomplete) return;
 			return autocomplete.execute(interaction);
 		}
 		if (interaction.isButton()) {
-			const button = <{ execute(interaction: ButtonInteraction): Promise<void> }> interaction.client.buttons.get(interaction.customId.split('_')[0]);
+			const button = interaction.client.buttons.get(interaction.customId.split('_')[0]) as Button;
 			if (!button) return;
 			logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing button ${interaction.customId}`, label: 'Quaver' });
 			try {
@@ -100,7 +96,7 @@ export default {
 			}
 		}
 		if (interaction.isSelectMenu()) {
-			const selectmenu = <{ execute(interaction: SelectMenuInteraction): Promise<void> }> interaction.client.selectmenus.get(interaction.customId.split('_')[0]);
+			const selectmenu = interaction.client.selectmenus.get(interaction.customId.split('_')[0]) as SelectMenu;
 			if (!selectmenu) return;
 			logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing select menu ${interaction.customId}`, label: 'Quaver' });
 			try {
@@ -115,7 +111,7 @@ export default {
 			}
 		}
 		if (interaction.isModalSubmit()) {
-			const modal = <{ execute(interaction: ModalSubmitInteraction): Promise<void> }> interaction.client.modals.get(interaction.customId.split('_')[0]);
+			const modal = interaction.client.modals.get(interaction.customId.split('_')[0]) as ModalSubmit;
 			if (!modal) return;
 			logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Processing modal ${interaction.customId}`, label: 'Quaver' });
 			try {
