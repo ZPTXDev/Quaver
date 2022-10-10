@@ -1,5 +1,5 @@
 import { settings } from '#src/lib/util/settings.js';
-import type { APISelectMenuOption, ColorResolvable, Interaction, InteractionReplyOptions, MessageActionRowComponentBuilder, MessageCreateOptions } from 'discord.js';
+import type { APISelectMenuOption, Interaction, InteractionReplyOptions, MessageActionRowComponentBuilder, MessageCreateOptions } from 'discord.js';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, escapeMarkdown, SelectMenuBuilder } from 'discord.js';
 import { readdirSync } from 'fs';
 import { get } from 'lodash-es';
@@ -231,8 +231,8 @@ export async function getJSONResponse(body: any): Promise<unknown> {
 export function buildMessageOptions(inputData: MessageOptionsBuilderInputs, { type = 'neutral', components = null, files = null }: MessageOptionsBuilderOptions = {}): MessageCreateOptions & InteractionReplyOptions {
 	const messageData = Array.isArray(inputData) ? inputData : [inputData];
 	const embedData = messageData.map((msg): EmbedBuilder => {
-		if (typeof msg === 'string') return new EmbedBuilder().setDescription(msg).setColor(settings.colors[type] as ColorResolvable);
-		if (!msg.data.color) return msg.setColor(settings.colors[type] as ColorResolvable);
+		if (typeof msg === 'string') return new EmbedBuilder().setDescription(msg).setColor(settings.colors[type]);
+		if (!msg.data.color) return msg.setColor(settings.colors[type]);
 		return msg;
 	});
 	const opts: MessageCreateOptions & InteractionReplyOptions = { embeds: embedData };
@@ -274,7 +274,7 @@ export async function settingsPage(interaction: Interaction, guildLocaleCode: st
 			embeds = current === 'simple' ? [
 				new EmbedBuilder()
 					.setDescription(`${getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE', escapeMarkdown(getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.SIMPLE')), 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', '4:20')}\n${getLocaleString(guildLocaleCode, 'MISC.ADDED_BY', interaction.user.id)}`)
-					.setColor(settings.colors.neutral as ColorResolvable),
+					.setColor(settings.colors.neutral),
 			] : [
 				new EmbedBuilder()
 					.setTitle(getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE'))

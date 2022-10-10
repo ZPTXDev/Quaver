@@ -1,3 +1,5 @@
+import type { ColorResolvable } from 'discord.js';
+
 export type SettingsObject = {
 	token?: string;
 	applicationId?: string;
@@ -11,10 +13,10 @@ export type SettingsObject = {
 };
 
 export type ColorsSettingsObject = {
-    success?: string;
-    neutral?: string;
-    warning?: string;
-    error?: string;
+    success?: ColorResolvable;
+    neutral?: ColorResolvable;
+    warning?: ColorResolvable;
+    error?: ColorResolvable;
 };
 
 export type DatabaseSettingsObject = {
