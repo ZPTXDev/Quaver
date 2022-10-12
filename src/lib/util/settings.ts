@@ -49,6 +49,7 @@ export let settings: {
 			allowedOrigins?: string[],
 			encryptionKey?: string,
 			https?: {
+				enabled?: boolean,
 				key?: string,
 				cert?: string,
 			},
