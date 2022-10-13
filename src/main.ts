@@ -73,7 +73,7 @@ rl.on('line', async (input): Promise<void> => {
 rl.on('close', async (): Promise<void> => shuttingDown('SIGINT'));
 
 let httpServer;
-if (settings.features.web.https) {
+if (settings.features.web.https.enabled) {
 	httpServer = createServer({
 		key: readFileSync(getAbsoluteFileURL(import.meta.url, ['..', ...settings.features.web.https.key.split('/')])),
 		cert: readFileSync(getAbsoluteFileURL(import.meta.url, ['..', ...settings.features.web.https.cert.split('/')])),
