@@ -147,7 +147,6 @@ export async function shuttingDown(eventType: string, err?: Error): Promise<void
 			logger.info({ message: 'Disconnecting from all guilds...', label: 'Quaver' });
 			for (const pair of players) {
 				const player: Player<Node> & { handler?: PlayerHandler } = pair[1];
-				/** @type {string} */
 				logger.info({ message: `[G ${player.guildId}] Disconnecting (restarting)`, label: 'Quaver' });
 				const fileBuffer = [];
 				if (player.queue.current && (player.playing || player.paused)) {
