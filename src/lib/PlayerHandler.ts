@@ -42,8 +42,10 @@ export default class PlayerHandler {
 		try {
 			await voiceChannel.stageInstance.delete();
 		}
-		catch (err) {
-			logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+		catch (error) {
+			if (error instanceof Error) {
+				logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+			}
 		}
 	}
 
@@ -61,8 +63,10 @@ export default class PlayerHandler {
 		try {
 			return await channel.send(sendMsgOpts);
 		}
-		catch (err) {
-			logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+		catch (error) {
+			if (error instanceof Error) {
+				logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+			}
 			return undefined;
 		}
 	}

@@ -33,8 +33,10 @@ export default class ReplyHandler {
 			try {
 				return await this.interaction.reply(replyMsgOpts);
 			}
-			catch (err) {
-				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+			catch (error) {
+				if (error instanceof Error) {
+					logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+				}
 				return undefined;
 			}
 		}
@@ -42,16 +44,20 @@ export default class ReplyHandler {
 			try {
 				return await this.interaction.update(replyMsgOpts);
 			}
-			catch (err) {
-				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+			catch (error) {
+				if (error instanceof Error) {
+					logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+				}
 				return undefined;
 			}
 		}
 		try {
 			return await this.interaction.editReply(replyMsgOpts);
 		}
-		catch (err) {
-			logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+		catch (error) {
+			if (error instanceof Error) {
+				logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+			}
 			return undefined;
 		}
 	}

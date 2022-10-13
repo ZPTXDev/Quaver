@@ -26,7 +26,7 @@ export default {
 					.map((suggestion): ApplicationCommandOptionChoiceData => ({ name: suggestion, value: suggestion })),
 			);
 		}
-		catch (err) {
+		catch {
 			return interaction.respond([]);
 		}
 	},

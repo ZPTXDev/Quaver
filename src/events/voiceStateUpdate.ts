@@ -63,8 +63,10 @@ export default {
 					try {
 						await newState.channel.createStageInstance({ topic: await getGuildLocaleString(player.guildId, 'MISC.STAGE_TOPIC'), privacyLevel: StageInstancePrivacyLevel.GuildOnly });
 					}
-					catch (err) {
-						logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+					catch (error) {
+						if (error instanceof Error) {
+							logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+						}
 					}
 				}
 				if (await data.guild.get(player.guildId, 'settings.stay.enabled') && await data.guild.get(player.guildId, 'settings.stay.channel') !== newState.channelId) await data.guild.set(player.guildId, 'settings.stay.channel', newState.channelId);

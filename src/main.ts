@@ -175,8 +175,10 @@ export async function shuttingDown(eventType: string, err?: Error): Promise<void
 		}
 	}
 	catch (error) {
-		logger.error({ message: 'Encountered error while shutting down.', label: 'Quaver' });
-		logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+		if (error instanceof Error) {
+			logger.error({ message: 'Encountered error while shutting down.', label: 'Quaver' });
+			logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+		}
 	}
 	finally {
 		if (!['exit', 'SIGINT', 'SIGTERM'].includes(eventType) && err instanceof Error) {
@@ -186,8 +188,10 @@ export async function shuttingDown(eventType: string, err?: Error): Promise<void
 				await writeFile('error.log', `${eventType}${err.message ? `\n${err.message}` : ''}${err.stack ? `\n${err.stack}` : ''}`);
 			}
 			catch (e) {
-				logger.error({ message: 'Encountered error while writing to error.log.', label: 'Quaver' });
-				logger.error({ message: `${e.message}\n${e.stack}`, label: 'Quaver' });
+				if (e instanceof Error) {
+					logger.error({ message: 'Encountered error while writing to error.log.', label: 'Quaver' });
+					logger.error({ message: `${e.message}\n${e.stack}`, label: 'Quaver' });
+				}
 			}
 		}
 		bot.destroy();

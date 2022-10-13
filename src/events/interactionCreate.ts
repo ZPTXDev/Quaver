@@ -68,10 +68,12 @@ export default {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Executing command ${interaction.commandName}`, label: 'Quaver' });
 				return command.execute(interaction);
 			}
-			catch (err) {
-				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with command ${interaction.commandName}`, label: 'Quaver' });
-				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', { type: 'error' });
+			catch (error) {
+				if (error instanceof Error) {
+					logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with command ${interaction.commandName}`, label: 'Quaver' });
+					logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+					await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', { type: 'error' });
+				}
 				return;
 			}
 		}
@@ -88,10 +90,12 @@ export default {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Executing button ${interaction.customId}`, label: 'Quaver' });
 				return button.execute(interaction);
 			}
-			catch (err) {
-				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with button ${interaction.customId}`, label: 'Quaver' });
-				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', { type: 'error' });
+			catch (error) {
+				if (error instanceof Error) {
+					logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with button ${interaction.customId}`, label: 'Quaver' });
+					logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+					await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', { type: 'error' });
+				}
 				return;
 			}
 		}
@@ -103,10 +107,12 @@ export default {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Executing select menu ${interaction.customId}`, label: 'Quaver' });
 				return selectmenu.execute(interaction);
 			}
-			catch (err) {
-				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with select menu ${interaction.customId}`, label: 'Quaver' });
-				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', { type: 'error' });
+			catch (error) {
+				if (error instanceof Error) {
+					logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with select menu ${interaction.customId}`, label: 'Quaver' });
+					logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+					await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', { type: 'error' });
+				}
 				return;
 			}
 		}
@@ -118,10 +124,12 @@ export default {
 				logger.info({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Executing modal ${interaction.customId}`, label: 'Quaver' });
 				return modal.execute(interaction);
 			}
-			catch (err) {
-				logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with modal ${interaction.customId}`, label: 'Quaver' });
-				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', { type: 'error' });
+			catch (error) {
+				if (error instanceof Error) {
+					logger.error({ message: `[${interaction.guildId ? `G ${interaction.guildId} | ` : ''}U ${interaction.user.id}] Encountered error with modal ${interaction.customId}`, label: 'Quaver' });
+					logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+					await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', { type: 'error' });
+				}
 				return;
 			}
 		}

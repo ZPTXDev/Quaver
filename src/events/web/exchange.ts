@@ -29,8 +29,10 @@ export default {
 			const encryptedToken = CryptoJS.AES.encrypt(`${oauthData.token_type} ${oauthData.access_token}`, settings.features.web.encryptionKey).toString();
 			return callback({ status: 'success', encryptedToken });
 		}
-		catch (err) {
-			return callback({ status: 'error-generic', err });
+		catch (error) {
+			if (error instanceof Error) {
+				return callback({ status: 'error-generic', error });
+			}
 		}
 	},
 };
