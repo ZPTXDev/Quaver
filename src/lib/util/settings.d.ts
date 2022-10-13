@@ -56,6 +56,7 @@ export type WebFeatureSettingsObject = {
 };
 
 export type WebFeatureHttpsSettingsObject = {
+    enabled?: boolean;
     key?: string;
     cert?: string;
 };

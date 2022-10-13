@@ -44,6 +44,7 @@
             ],
             "encryptionKey": "Type an encryption key here",
             "https": {
+                "enabled": false,
                 "key": "key.pem",
                 "cert": "cert.pem"
             }
