@@ -47,6 +47,7 @@
             ],
             "encryptionKey": "Type an encryption key here",
             "https": {
+                "enabled": false,
                 "key": "key.pem",
                 "cert": "cert.pem"
             }
@@ -109,7 +110,8 @@
 `features.web.encryptionKey` - The encryption key used to secure access tokens.
 
 `features.web.https` - HTTPS configuration.
-> **Note:** If you're not using HTTPS, please remove this property entirely.
+
+`features.web.https.enabled` - Whether or not HTTPS is enabled.
 
 `features.web.https.key` - The path to the HTTPS key file. This is relative to the root folder.
 
