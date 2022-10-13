@@ -1,10 +1,10 @@
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
+import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { confirmationTimeout, searchState } from '#src/lib/util/common.js';
 import type { ButtonInteraction } from 'discord.js';
 
 export default {
 	name: 'cancel',
-	async execute(interaction: ButtonInteraction & { replyHandler: ReplyHandler }): Promise<void> {
+	async execute(interaction: QuaverInteraction<ButtonInteraction>): Promise<void> {
 		if (interaction.message.interaction.user.id !== interaction.user.id) {
 			await interaction.replyHandler.locale('DISCORD.INTERACTION.USER_MISMATCH', { type: 'error' });
 			return;

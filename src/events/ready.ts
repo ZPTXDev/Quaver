@@ -1,13 +1,12 @@
+import type { QuaverClient } from '#src/lib/util/common.d.js';
 import { logger } from '#src/lib/util/common.js';
 import { version } from '#src/lib/util/version.js';
-import type { Client } from 'discord.js';
 import { ActivityType } from 'discord.js';
-import type { Node } from 'lavaclient';
 
 export default {
 	name: 'ready',
 	once: true,
-	async execute(client: Client & { music: Node }): Promise<void> {
+	async execute(client: QuaverClient): Promise<void> {
 		const { startup } = await import('#src/main.js');
 		startup.started = true;
 		logger.info({ message: `Connected. Logged in as ${client.user.tag}.`, label: 'Discord' });

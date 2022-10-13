@@ -1,4 +1,4 @@
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
+import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString, msToTime, msToTimeString } from '#src/lib/util/util.js';
 import type { ChatInputCommandInteraction } from 'discord.js';
@@ -13,7 +13,7 @@ export default {
 		user: [],
 		bot: [],
 	},
-	async execute(interaction: ChatInputCommandInteraction & { replyHandler: ReplyHandler }): Promise<void> {
+	async execute(interaction: QuaverInteraction<ChatInputCommandInteraction>): Promise<void> {
 		const uptime = msToTime(interaction.client.uptime);
 		const uptimeString = msToTimeString(uptime);
 		await interaction.replyHandler.reply(

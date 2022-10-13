@@ -1,4 +1,4 @@
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
+import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions, QuaverInteraction } from '#src/lib/util/common.d.js';
 import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
 import { settingsOptions } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
@@ -8,7 +8,7 @@ import { ActionRowBuilder, EmbedBuilder, SelectMenuBuilder } from 'discord.js';
 
 export default {
 	name: 'language',
-	async execute(interaction: SelectMenuInteraction & { replyHandler: ReplyHandler }): Promise<void> {
+	async execute(interaction: QuaverInteraction<SelectMenuInteraction>): Promise<void> {
 		if (interaction.message.interaction.user.id !== interaction.user.id) {
 			await interaction.replyHandler.locale('DISCORD.INTERACTION.USER_MISMATCH', { type: 'error' });
 			return;
@@ -28,8 +28,10 @@ export default {
 					),
 				);
 			}
-			catch (err) {
-				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+			catch (error) {
+				if (error instanceof Error) {
+					logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+				}
 			}
 			delete confirmationTimeout[message.id];
 		}, 30 * 1000, interaction.message);
@@ -47,10 +49,10 @@ export default {
 				{ type: 'warning', ephemeral: true },
 			);
 		}
-		const guildLocaleCode = <string> await data.guild.get(interaction.guildId, 'settings.locale') ?? settings.defaultLocaleCode;
+		const guildLocaleCode = await data.guild.get<string>(interaction.guildId, 'settings.locale') ?? settings.defaultLocaleCode;
 		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocaleCode, 'language');
 		const description = `${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.LANGUAGE.NAME')}** ─ ${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.LANGUAGE.DESCRIPTION')}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: \`${current}\``;
-		const args: [string | EmbedBuilder | (string | EmbedBuilder)[], { components: ActionRowBuilder<MessageActionRowComponentBuilder>[] }] = [
+		const args: [MessageOptionsBuilderInputs, MessageOptionsBuilderOptions] = [
 			[description, ...embeds],
 			{
 				components: [

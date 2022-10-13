@@ -3,6 +3,7 @@ import { getJSONResponse } from '#src/lib/util/util.js';
 import CryptoJS from 'crypto-js';
 import type { Socket } from 'socket.io';
 import { request } from 'undici';
+import type { OAuth2Data } from './exchange.d.js';
 
 export default {
 	name: 'exchange',
@@ -24,12 +25,14 @@ export default {
 					'Content-Type': 'application/x-www-form-urlencoded',
 				},
 			});
-			const oauthData = <{ token_type: string, access_token: string }> await getJSONResponse(tokenResponseData.body);
+			const oauthData = await getJSONResponse(tokenResponseData.body) as OAuth2Data;
 			const encryptedToken = CryptoJS.AES.encrypt(`${oauthData.token_type} ${oauthData.access_token}`, settings.features.web.encryptionKey).toString();
 			return callback({ status: 'success', encryptedToken });
 		}
-		catch (err) {
-			return callback({ status: 'error-generic', err });
+		catch (error) {
+			if (error instanceof Error) {
+				return callback({ status: 'error-generic', error });
+			}
 		}
 	},
 };

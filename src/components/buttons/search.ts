@@ -1,17 +1,16 @@
 import PlayerHandler from '#src/lib/PlayerHandler.js';
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
+import type { QuaverChannels, QuaverInteraction, QuaverPlayer } from '#src/lib/util/common.d.js';
 import { logger, searchState } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { buildMessageOptions, getGuildLocaleString, msToTime, msToTimeString } from '#src/lib/util/util.js';
-import type { Queue, Song } from '@lavaclient/queue';
-import type { APISelectMenuOption, ButtonComponent, ButtonInteraction, Client, MessageActionRowComponentBuilder, SelectMenuComponent, TextChannel, VoiceChannel } from 'discord.js';
+import type { Song } from '@lavaclient/queue';
+import type { APISelectMenuOption, ButtonComponent, ButtonInteraction, MessageActionRowComponentBuilder, SelectMenuComponent } from 'discord.js';
 import { ActionRowBuilder, ButtonBuilder, ChannelType, EmbedBuilder, escapeMarkdown, GuildMember, PermissionsBitField, SelectMenuBuilder } from 'discord.js';
-import type { Node, Player } from 'lavaclient';
 
 export default {
 	name: 'search',
-	async execute(interaction: ButtonInteraction & { replyHandler: ReplyHandler, client: Client & { music: Node } }): Promise<void> {
+	async execute(interaction: QuaverInteraction<ButtonInteraction>): Promise<void> {
 		if (interaction.message.interaction.user.id !== interaction.user.id) {
 			await interaction.replyHandler.locale('DISCORD.INTERACTION.USER_MISMATCH', { type: 'error' });
 			return;
@@ -25,7 +24,7 @@ export default {
 		if (target === 'add') {
 			const { bot, io } = await import('#src/main.js');
 			const tracks = state.selected;
-			let player: Player<Node> & { handler?: PlayerHandler, queue?: Queue & { channel?: TextChannel | VoiceChannel } } = interaction.client.music.players.get(interaction.guildId);
+			let player = interaction.client.music.players.get(interaction.guildId) as QuaverPlayer;
 			if (!(interaction.member instanceof GuildMember) || !interaction.member?.voice.channelId) {
 				await interaction.replyHandler.locale(checks.IN_VOICE, { type: 'error' });
 				return;
@@ -66,9 +65,9 @@ export default {
 				extras = [resolvedTracks.length.toString(), await getGuildLocaleString(interaction.guildId, 'MISC.YOUR_SEARCH'), ''] ;
 			}
 			if (!player?.connected) {
-				player = interaction.client.music.createPlayer(interaction.guildId);
+				player = interaction.client.music.createPlayer(interaction.guildId) as QuaverPlayer;
 				player.handler = new PlayerHandler(interaction.client, player);
-				player.queue.channel = <TextChannel | VoiceChannel> interaction.channel;
+				player.queue.channel = interaction.channel as QuaverChannels;
 				await player.connect(interaction.member.voice.channelId, { deafened: true });
 				// Ensure that Quaver destroys the player if the user leaves the channel while Quaver is queuing tracks
 				// Ensure that Quaver destroys the player if Quaver gets timed out by the user while Quaver is queuing tracks
@@ -112,8 +111,10 @@ export default {
 					),
 				);
 			}
-			catch (err) {
-				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+			catch (error) {
+				if (error instanceof Error) {
+					logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+				}
 			}
 			delete searchState[message.id];
 		}, 30 * 1000, interaction.message);

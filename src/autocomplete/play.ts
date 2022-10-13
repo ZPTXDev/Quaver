@@ -1,9 +1,10 @@
+import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import type { ApplicationCommandOptionChoiceData, AutocompleteInteraction } from 'discord.js';
 import { request } from 'undici';
 
 export default {
 	name: 'play',
-	async execute(interaction: AutocompleteInteraction): Promise<void> {
+	async execute(interaction: QuaverInteraction<AutocompleteInteraction>): Promise<void> {
 		const focused = interaction.options.getFocused();
 		const { body } = await request(`https://clients1.google.com/complete/search?client=youtube&gs_ri=youtube&ds=yt&q=${focused}`);
 		let data;
@@ -25,7 +26,7 @@ export default {
 					.map((suggestion): ApplicationCommandOptionChoiceData => ({ name: suggestion, value: suggestion })),
 			);
 		}
-		catch (err) {
+		catch {
 			return interaction.respond([]);
 		}
 	},

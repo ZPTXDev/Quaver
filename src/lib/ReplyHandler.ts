@@ -1,7 +1,9 @@
 import { logger } from '#src/lib/util/common.js';
 import { buildMessageOptions, getGuildLocaleString } from '#src/lib/util/util.js';
-import type { ActionRowBuilder, AttachmentBuilder, AutocompleteInteraction, EmbedBuilder, Interaction, InteractionResponse, Message, MessageActionRowComponentBuilder } from 'discord.js';
+import type { AutocompleteInteraction, Interaction, InteractionResponse, Message } from 'discord.js';
 import { PermissionsBitField } from 'discord.js';
+import type { AdditionalBuilderOptions } from './ReplyHandler.d.js';
+import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions } from './util/common.d.js';
 
 /** Class for handling replies to interactions. */
 export default class ReplyHandler {
@@ -21,7 +23,7 @@ export default class ReplyHandler {
 	 * @param options - Extra data, such as type or components.
 	 * @returns The message that was sent.
 	 */
-	async reply(inputData: string | EmbedBuilder | (string | EmbedBuilder)[], { type = 'neutral', components = null, files = null, ephemeral = false, fetchReply = false, force = null }: { type?: 'success' | 'neutral' | 'warning' | 'error'; components?: ActionRowBuilder<MessageActionRowComponentBuilder>[]; files?: AttachmentBuilder[]; ephemeral?: boolean; fetchReply?: boolean; force?: 'reply' | 'edit' | 'update'; } = {}): Promise<InteractionResponse | Message | boolean> {
+	async reply(inputData: MessageOptionsBuilderInputs, { type = 'neutral', components = null, files = null, ephemeral = false, fetchReply = false, force = null }: MessageOptionsBuilderOptions & AdditionalBuilderOptions = {}): Promise<InteractionResponse | Message | undefined> {
 		const replyMsgOpts = buildMessageOptions(inputData, { type, components, files });
 		replyMsgOpts.fetchReply = fetchReply;
 		if (force === 'reply' || !this.interaction.replied && !this.interaction.deferred && !force) {
@@ -31,26 +33,32 @@ export default class ReplyHandler {
 			try {
 				return await this.interaction.reply(replyMsgOpts);
 			}
-			catch (err) {
-				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				return false;
+			catch (error) {
+				if (error instanceof Error) {
+					logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+				}
+				return undefined;
 			}
 		}
 		if (force === 'update' && !this.interaction.isCommand() && (!this.interaction.isModalSubmit() || this.interaction.isFromMessage())) {
 			try {
 				return await this.interaction.update(replyMsgOpts);
 			}
-			catch (err) {
-				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-				return false;
+			catch (error) {
+				if (error instanceof Error) {
+					logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+				}
+				return undefined;
 			}
 		}
 		try {
 			return await this.interaction.editReply(replyMsgOpts);
 		}
-		catch (err) {
-			logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-			return false;
+		catch (error) {
+			if (error instanceof Error) {
+				logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+			}
+			return undefined;
 		}
 	}
 
@@ -60,7 +68,7 @@ export default class ReplyHandler {
 	 * @param options - Extra data, such as type or components.
 	 * @returns The message that was sent.
 	 */
-	async locale(stringPath: string, { vars = [], type = 'neutral', components = null, files = null, ephemeral = false, force = null }: { vars?: string[]; type?: 'success' | 'neutral' | 'warning' | 'error'; components?: ActionRowBuilder<MessageActionRowComponentBuilder>[]; files?: AttachmentBuilder[]; ephemeral?: boolean; fetchReply?: boolean; force?: 'reply' | 'edit' | 'update'; } = {}): Promise<InteractionResponse | Message | boolean> {
+	async locale(stringPath: string, { vars = [], type = 'neutral', components = null, files = null, ephemeral = false, force = null }: MessageOptionsBuilderOptions & AdditionalBuilderOptions & { vars?: string[]; } = {}): Promise<InteractionResponse | Message | undefined> {
 		const guildLocaleString = await getGuildLocaleString(this.interaction.guildId, stringPath, ...vars);
 		return this.reply(guildLocaleString, { type, components, files, ephemeral, force });
 	}

@@ -1,4 +1,4 @@
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
+import type { QuaverInteraction, SettingsPageOptions } from '#src/lib/util/common.d.js';
 import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
 import { checks, settingsOptions } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
@@ -16,9 +16,9 @@ export default {
 		user: [PermissionsBitField.Flags.ManageGuild],
 		bot: [],
 	},
-	async execute(interaction: ChatInputCommandInteraction & { replyHandler: ReplyHandler }): Promise<void> {
-		const option = <'language' | 'format'> settingsOptions[0];
-		const guildLocaleCode = <string> await data.guild.get(interaction.guild.id, 'settings.locale') ?? settings.defaultLocaleCode;
+	async execute(interaction: QuaverInteraction<ChatInputCommandInteraction>): Promise<void> {
+		const option = settingsOptions[0] as SettingsPageOptions;
+		const guildLocaleCode = await data.guild.get<string>(interaction.guild.id, 'settings.locale') ?? settings.defaultLocaleCode;
 		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocaleCode, option);
 		const description = `${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocaleCode, `CMD.SETTINGS.MISC.${option.toUpperCase()}.NAME`)}** ─ ${getLocaleString(guildLocaleCode, `CMD.SETTINGS.MISC.${option.toUpperCase()}.DESCRIPTION`)}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: \`${current}\``;
 		const msg = await interaction.replyHandler.reply(
@@ -49,8 +49,10 @@ export default {
 					),
 				);
 			}
-			catch (err) {
-				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+			catch (error) {
+				if (error instanceof Error) {
+					logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+				}
 			}
 			delete confirmationTimeout[message.id];
 		}, 30 * 1000, msg);

@@ -1,10 +1,9 @@
-import type PlayerHandler from '#src/lib/PlayerHandler.js';
+import type { QuaverClient, QuaverPlayer } from '#src/lib/util/common.d.js';
 import { data, logger } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString } from '#src/lib/util/util.js';
-import type { Client, TextChannel, VoiceChannel, VoiceState } from 'discord.js';
+import type { VoiceState } from 'discord.js';
 import { ChannelType, EmbedBuilder, PermissionsBitField, StageInstancePrivacyLevel } from 'discord.js';
-import type { Node, Player } from 'lavaclient';
 
 export default {
 	name: 'voiceStateUpdate',
@@ -12,16 +11,8 @@ export default {
 	async execute(oldState: VoiceState, newState: VoiceState): Promise<void> {
 		const { io } = await import('#src/main.js');
 		const guild = oldState.guild;
-		const client: Client & { music?: Node } = oldState.client;
-		const player: Player & {
-			handler?: PlayerHandler;
-			timeout?: ReturnType<typeof setTimeout>;
-			pauseTimeout?: ReturnType<typeof setTimeout>;
-			timeoutEnd?: number;
-			queue?: {
-				channel?: TextChannel | VoiceChannel;
-			};
-		} = client.music.players.get(guild.id);
+		const client = oldState.client as QuaverClient;
+		const player = client.music.players.get(guild.id) as QuaverPlayer;
 		if (!player) return;
 		// Quaver voiceStateUpdate
 		if (oldState.member.user.id === oldState.client.user.id) {
@@ -72,8 +63,10 @@ export default {
 					try {
 						await newState.channel.createStageInstance({ topic: await getGuildLocaleString(player.guildId, 'MISC.STAGE_TOPIC'), privacyLevel: StageInstancePrivacyLevel.GuildOnly });
 					}
-					catch (err) {
-						logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+					catch (error) {
+						if (error instanceof Error) {
+							logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+						}
 					}
 				}
 				if (await data.guild.get(player.guildId, 'settings.stay.enabled') && await data.guild.get(player.guildId, 'settings.stay.channel') !== newState.channelId) await data.guild.set(player.guildId, 'settings.stay.channel', newState.channelId);

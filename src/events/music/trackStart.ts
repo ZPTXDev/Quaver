@@ -1,15 +1,13 @@
-import type PlayerHandler from '#src/lib/PlayerHandler.js';
+import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.d.js';
 import { data, logger } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, msToTime, msToTimeString } from '#src/lib/util/util.js';
-import type { Queue, Song } from '@lavaclient/queue';
 import { EmbedBuilder, escapeMarkdown } from 'discord.js';
-import type { Node, Player } from 'lavaclient';
 
 export default {
 	name: 'trackStart',
 	once: false,
-	async execute(queue: Queue & { player: Player<Node> & { handler: PlayerHandler, skip: { required: number, users: string[] }, timeout: ReturnType<typeof setTimeout> } }, track: Song): Promise<void> {
+	async execute(queue: QuaverQueue, track: QuaverSong): Promise<void> {
 		const { bot, io } = await import('#src/main.js');
 		delete queue.player.skip;
 		logger.info({ message: `[G ${queue.player.guildId}] Starting track`, label: 'Quaver' });
@@ -23,7 +21,7 @@ export default {
 		const duration = msToTime(track.length);
 		const durationString = track.isStream ? '∞' : msToTimeString(duration, true);
 		if (settings.features.web.enabled) {
-			io.to(`guild:${queue.player.guildId}`).emit('queueUpdate', queue.tracks.map((t: Song & { requesterTag: string }): Song & { requesterTag: string } => {
+			io.to(`guild:${queue.player.guildId}`).emit('queueUpdate', queue.tracks.map((t: QuaverSong): QuaverSong => {
 				t.requesterTag = bot.users.cache.get(t.requester)?.tag;
 				return t;
 			}));

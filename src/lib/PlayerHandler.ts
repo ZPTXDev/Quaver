@@ -1,22 +1,21 @@
 import { logger } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { buildMessageOptions, getGuildLocaleString } from '#src/lib/util/util.js';
-import type { Queue } from '@lavaclient/queue';
-import type { ActionRowBuilder, AttachmentBuilder, Client, EmbedBuilder, Message, MessageActionRowComponentBuilder, TextChannel, VoiceChannel } from 'discord.js';
+import type { Message, Snowflake } from 'discord.js';
 import { ChannelType, PermissionsBitField } from 'discord.js';
-import type { Node, Player } from 'lavaclient';
+import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions, QuaverClient, QuaverPlayer } from './util/common.d.js';
 
 /** Class for handling Lavaclient's Player. */
 export default class PlayerHandler {
-	client: Client & { music?: Node };
-	player: Player & { timeout?: ReturnType<typeof setTimeout>; pauseTimeout?: ReturnType<typeof setTimeout>; queue: Queue & { channel?: TextChannel | VoiceChannel } };
+	client: QuaverClient;
+	player: QuaverPlayer;
 
 	/**
 	 * Create an instance of PlayerHandler.
 	 * @param client - The discord.js Client.
 	 * @param player - The Lavaclient Player.
 	 */
-	constructor(client: Client & { music?: Node }, player: Player) {
+	constructor(client: QuaverClient, player: QuaverPlayer) {
 		this.client = client;
 		this.player = player;
 	}
@@ -25,7 +24,7 @@ export default class PlayerHandler {
 	 * Disconnects and cleans up the player.
 	 * @param channelId - The channel to disconnect from.
 	 */
-	async disconnect(channelId?: string): Promise<void> {
+	async disconnect(channelId?: Snowflake): Promise<void> {
 		const { io } = await import('#src/main.js');
 		clearTimeout(this.player.timeout);
 		clearTimeout(this.player.pauseTimeout);
@@ -43,8 +42,10 @@ export default class PlayerHandler {
 		try {
 			await voiceChannel.stageInstance.delete();
 		}
-		catch (err) {
-			logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+		catch (error) {
+			if (error instanceof Error) {
+				logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+			}
 		}
 	}
 
@@ -54,17 +55,19 @@ export default class PlayerHandler {
 	 * @param options - Extra data, such as type or components, or files.
 	 * @returns The message that was sent.
 	 */
-	async send(inputData: string | EmbedBuilder | (string | EmbedBuilder)[], { type = 'neutral', components = null, files = null }: { type?: 'success' | 'neutral' | 'warning' | 'error'; components?: ActionRowBuilder<MessageActionRowComponentBuilder>[]; files?: AttachmentBuilder[]; } = {}): Promise<Message | false> {
+	async send(inputData: MessageOptionsBuilderInputs, { type = 'neutral', components = null, files = null }: MessageOptionsBuilderOptions = {}): Promise<Message | undefined> {
 		const sendMsgOpts = buildMessageOptions(inputData, { type, components, files });
 		const channel = this.player.queue.channel;
-		if (!channel?.permissionsFor(this.client.user.id)?.has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages]))) return false;
-		if (this.client.guilds.cache.get(this.player.guildId).members.me.isCommunicationDisabled()) return false;
+		if (!channel?.permissionsFor(this.client.user.id)?.has(new PermissionsBitField([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages]))) return undefined;
+		if (this.client.guilds.cache.get(this.player.guildId).members.me.isCommunicationDisabled()) return undefined;
 		try {
 			return await channel.send(sendMsgOpts);
 		}
-		catch (err) {
-			logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
-			return false;
+		catch (error) {
+			if (error instanceof Error) {
+				logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+			}
+			return undefined;
 		}
 	}
 
@@ -74,7 +77,7 @@ export default class PlayerHandler {
 	 * @param options - Extra data, such as type or components.
 	 * @returns The message that was sent.
 	 */
-	async locale(stringPath: string, { vars = [], type = 'neutral', components = null, files = null }: { vars?: string[]; type?: 'success' | 'neutral' | 'warning' | 'error'; components?: ActionRowBuilder<MessageActionRowComponentBuilder>[]; files?: AttachmentBuilder[]; } = {}): Promise<Message | false> {
+	async locale(stringPath: string, { vars = [], type = 'neutral', components = null, files = null }: MessageOptionsBuilderOptions & { vars?: string[]; } = {}): Promise<Message | undefined> {
 		const guildLocaleString = await getGuildLocaleString(this.player.guildId, stringPath, ...vars);
 		return this.send(guildLocaleString, { type, components, files });
 	}

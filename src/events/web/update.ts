@@ -1,13 +1,14 @@
+import type { QuaverPlayer } from '#src/lib/util/common.d.js';
 import type { Song } from '@lavaclient/queue';
-import type { APIGuild, APIUser } from 'discord.js';
-import type { Node, Player } from 'lavaclient';
+import type { APIGuild, APIUser, Snowflake } from 'discord.js';
 import type { Socket } from 'socket.io';
+import type { UpdateItemTypes } from './update.d.js';
 
 export default {
 	name: 'update',
 	once: false,
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	async execute(socket: Socket & { guilds: APIGuild[], user: APIUser }, callback: (cb: Record<string, any>) => void, guildId: string, item: { type: 'loop' | 'volume' | 'paused' | 'skip' | 'bassboost' | 'nightcore' | 'seek' | 'remove' | 'shuffle', value?: any }): Promise<void> {
+	async execute(socket: Socket & { guilds: APIGuild[], user: APIUser }, callback: (cb: Record<string, any>) => void, guildId: Snowflake, item: { type: UpdateItemTypes, value?: any }): Promise<void> {
 		const { bot, io } = await import('#src/main.js');
 		if (!socket.guilds) return callback({ status: 'error-auth' });
 		if (!socket.guilds.find((guild): boolean => guild.id === guildId)) return callback({ status: 'error-auth' });
@@ -35,7 +36,7 @@ export default {
 				break;
 			}
 			case 'skip': {
-				const player: Player<Node> & { skip?: { required: number, users: string[] } } = bot.music.players.get(guildId);
+				const player = bot.music.players.get(guildId) as QuaverPlayer;
 				if (!player) return callback({ status: 'error-generic' });
 				if (player.queue.current.requester === socket.user.id) {
 					await player.queue.skip();
@@ -55,7 +56,7 @@ export default {
 				break;
 			}
 			case 'bassboost': {
-				const player: Player<Node> & { bassboost?: boolean, nightcore?: boolean } = bot.music.players.get(guildId);
+				const player = bot.music.players.get(guildId) as QuaverPlayer;
 				if (!player) return callback({ status: 'error-generic' });
 				let eqValues: number[] = Array(15).fill(0);
 				if (item.value) eqValues = [0.2, 0.15, 0.1, 0.05, 0.0, ...new Array(10).fill(-0.05)];
@@ -66,7 +67,7 @@ export default {
 				break;
 			}
 			case 'nightcore': {
-				const player: Player<Node> & { nightcore?: boolean, bassboost?: boolean } = bot.music.players.get(guildId);
+				const player = bot.music.players.get(guildId) as QuaverPlayer;
 				if (!player) return callback({ status: 'error-generic' });
 				player.filters.timescale = item.value ? { speed: 1.125, pitch: 1.125, rate: 1 } : undefined;
 				await player.setFilters();

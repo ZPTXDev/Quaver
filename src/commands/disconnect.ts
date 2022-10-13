@@ -1,12 +1,10 @@
-import type PlayerHandler from '#src/lib/PlayerHandler.js';
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
+import type { QuaverInteraction, QuaverPlayer } from '#src/lib/util/common.d.js';
 import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { buildMessageOptions, getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
-import type { ChatInputCommandInteraction, Client } from 'discord.js';
+import type { ChatInputCommandInteraction } from 'discord.js';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message, SlashCommandBuilder } from 'discord.js';
-import type { Node, Player } from 'lavaclient';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -17,12 +15,12 @@ export default {
 		user: [],
 		bot: [],
 	},
-	async execute(interaction: ChatInputCommandInteraction & { replyHandler: ReplyHandler, client: Client & { music: Node } }): Promise<void> {
+	async execute(interaction: QuaverInteraction<ChatInputCommandInteraction>): Promise<void> {
 		if (await data.guild.get(interaction.guildId, 'settings.stay.enabled')) {
 			await interaction.replyHandler.locale('CMD.DISCONNECT.RESPONSE.FEATURE_247_ENABLED', { type: 'error' });
 			return;
 		}
-		const player = <Player<Node> & { handler: PlayerHandler }> interaction.client.music.players.get(interaction.guildId);
+		const player = interaction.client.music.players.get(interaction.guildId) as QuaverPlayer;
 		if (player.queue.tracks.length === 0) {
 			await player.handler.disconnect();
 			await interaction.replyHandler.locale('CMD.DISCONNECT.RESPONSE.SUCCESS', { type: 'success' });
@@ -61,8 +59,10 @@ export default {
 					),
 				);
 			}
-			catch (err) {
-				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+			catch (error) {
+				if (error instanceof Error) {
+					logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+				}
 			}
 			delete confirmationTimeout[message.id];
 		}, 5 * 1000, msg);

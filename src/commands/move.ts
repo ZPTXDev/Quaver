@@ -1,11 +1,10 @@
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
+import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getLocaleString } from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/queue';
-import type { ChatInputCommandInteraction, Client, SlashCommandIntegerOption } from 'discord.js';
+import type { ChatInputCommandInteraction, SlashCommandIntegerOption } from 'discord.js';
 import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
-import type { Node } from 'lavaclient';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -29,7 +28,7 @@ export default {
 		user: [],
 		bot: [],
 	},
-	async execute(interaction: ChatInputCommandInteraction & { replyHandler: ReplyHandler, client: Client & { music: Node } }): Promise<void> {
+	async execute(interaction: QuaverInteraction<ChatInputCommandInteraction>): Promise<void> {
 		const { bot, io } = await import('#src/main.js');
 		const player = interaction.client.music.players.get(interaction.guildId);
 		const oldPosition = interaction.options.getInteger('old_position');

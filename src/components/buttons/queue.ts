@@ -1,13 +1,12 @@
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
+import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { getGuildLocaleString, msToTime, msToTimeString, paginate } from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/queue';
-import type { ButtonComponent, ButtonInteraction, Client, MessageActionRowComponentBuilder } from 'discord.js';
+import type { ButtonComponent, ButtonInteraction, MessageActionRowComponentBuilder } from 'discord.js';
 import { ActionRowBuilder, ButtonBuilder, EmbedBuilder, escapeMarkdown, ModalBuilder, TextInputBuilder, TextInputStyle } from 'discord.js';
-import type { Node } from 'lavaclient';
 
 export default {
 	name: 'queue',
-	async execute(interaction: ButtonInteraction & { replyHandler: ReplyHandler, client: Client & { music: Node } }): Promise<void> {
+	async execute(interaction: QuaverInteraction<ButtonInteraction>): Promise<void> {
 		const player = interaction.client.music.players.get(interaction.guildId), pages = player ? paginate(player.queue.tracks, 5) : [];
 		const target = interaction.customId.split('_')[1];
 		if (player && target === 'goto' && pages.length !== 0) {
@@ -47,11 +46,11 @@ export default {
 				return `\`${(firstIndex + index).toString().padStart(largestIndexSize, ' ')}.\` **[${escapeMarkdown(track.title)}](${track.uri})** \`[${durationString}]\` <@${track.requester}>`;
 			}).join('\n'))
 			.setFooter({ text: await getGuildLocaleString(interaction.guildId, 'MISC.PAGE', page.toString(), pages.length.toString()) });
-		updated.components[0] = <ActionRowBuilder<ButtonBuilder>> ActionRowBuilder.from(original.components[0]);
-		updated.components[0].components[0] = ButtonBuilder.from(<ButtonComponent> original.components[0].components[0])
+		updated.components[0] = ActionRowBuilder.from(original.components[0]) as ActionRowBuilder<ButtonBuilder>;
+		updated.components[0].components[0] = ButtonBuilder.from(original.components[0].components[0] as ButtonComponent)
 			.setCustomId(`queue_${page - 1}`)
 			.setDisabled(page - 1 < 1),
-		updated.components[0].components[2] = ButtonBuilder.from(<ButtonComponent> original.components[0].components[2])
+		updated.components[0].components[2] = ButtonBuilder.from(original.components[0].components[2] as ButtonComponent)
 			.setCustomId(`queue_${page + 1}`)
 			.setDisabled(page + 1 > pages.length);
 		await interaction.replyHandler.reply(updated.embeds, { components: updated.components, force: 'update' });

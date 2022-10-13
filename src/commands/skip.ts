@@ -1,10 +1,9 @@
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
+import type { QuaverInteraction, QuaverPlayer } from '#src/lib/util/common.d.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
-import type { ChatInputCommandInteraction, Client, GuildMember } from 'discord.js';
+import type { ChatInputCommandInteraction, GuildMember } from 'discord.js';
 import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
-import type { Node, Player } from 'lavaclient';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -15,8 +14,8 @@ export default {
 		user: [],
 		bot: [],
 	},
-	async execute(interaction: ChatInputCommandInteraction & { replyHandler: ReplyHandler, client: Client & { music: Node } }): Promise<void> {
-		const player = <Player<Node> & { skip: { required: number, users: string[] } }> interaction.client.music.players.get(interaction.guildId);
+	async execute(interaction: QuaverInteraction<ChatInputCommandInteraction>): Promise<void> {
+		const player = interaction.client.music.players.get(interaction.guildId) as QuaverPlayer;
 		if (!player.queue.current || !player.playing && !player.paused) {
 			await interaction.replyHandler.locale('MUSIC.PLAYER.PLAYING.NOTHING', { type: 'error' });
 			return;

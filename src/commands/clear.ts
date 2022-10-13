@@ -1,11 +1,10 @@
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
+import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { confirmationTimeout, logger } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { buildMessageOptions, getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
-import type { ChatInputCommandInteraction, Client } from 'discord.js';
+import type { ChatInputCommandInteraction } from 'discord.js';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message, SlashCommandBuilder } from 'discord.js';
-import type { Node } from 'lavaclient';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -16,7 +15,7 @@ export default {
 		user: [],
 		bot: [],
 	},
-	async execute(interaction: ChatInputCommandInteraction & { replyHandler: ReplyHandler, client: Client & { music: Node } }): Promise<void> {
+	async execute(interaction: QuaverInteraction<ChatInputCommandInteraction>): Promise<void> {
 		const player = interaction.client.music.players.get(interaction.guildId);
 		if (player.queue.tracks.length === 0) {
 			await interaction.replyHandler.locale('CMD.CLEAR.RESPONSE.QUEUE_EMPTY', { type: 'error' });
@@ -55,8 +54,10 @@ export default {
 					),
 				);
 			}
-			catch (err) {
-				logger.error({ message: `${err.message}\n${err.stack}`, label: 'Quaver' });
+			catch (error) {
+				if (error instanceof Error) {
+					logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+				}
 			}
 			delete confirmationTimeout[message.id];
 		}, 5 * 1000, msg);

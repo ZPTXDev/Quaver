@@ -1,13 +1,11 @@
 import PlayerHandler from '#src/lib/PlayerHandler.js';
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
+import type { QuaverChannels, QuaverInteraction, QuaverPlayer, QuaverSong } from '#src/lib/util/common.d.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
-import type { Queue, Song } from '@lavaclient/queue';
 import { SpotifyItemType } from '@lavaclient/spotify';
-import type { ChatInputCommandInteraction, Client, SlashCommandBooleanOption, SlashCommandStringOption, TextChannel, VoiceChannel } from 'discord.js';
+import type { ChatInputCommandInteraction, SlashCommandBooleanOption, SlashCommandStringOption } from 'discord.js';
 import { ChannelType, EmbedBuilder, escapeMarkdown, GuildMember, PermissionsBitField, SlashCommandBuilder } from 'discord.js';
-import type { Node, Player } from 'lavaclient';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -28,7 +26,7 @@ export default {
 		user: [],
 		bot: [],
 	},
-	async execute(interaction: ChatInputCommandInteraction & { replyHandler: ReplyHandler, client: Client & { music: Node } }): Promise<void> {
+	async execute(interaction: QuaverInteraction<ChatInputCommandInteraction>): Promise<void> {
 		const { bot, io } = await import('#src/main.js');
 		if (![ChannelType.GuildText, ChannelType.GuildVoice].includes(interaction.channel.type)) {
 			await interaction.replyHandler.locale('DISCORD.CHANNEL_UNSUPPORTED', { type: 'error' });
@@ -106,11 +104,11 @@ export default {
 					return;
 			}
 		}
-		let player: Player<Node> & { handler?: PlayerHandler, queue?: Queue & { channel?: TextChannel | VoiceChannel } } = <Player<Node> & { handler: PlayerHandler }> interaction.client.music.players.get(interaction.guildId);
+		let player = interaction.client.music.players.get(interaction.guildId) as QuaverPlayer;
 		if (!player?.connected) {
-			player = interaction.client.music.createPlayer(interaction.guildId);
+			player = interaction.client.music.createPlayer(interaction.guildId) as QuaverPlayer;
 			player.handler = new PlayerHandler(interaction.client, player);
-			player.queue.channel = <TextChannel | VoiceChannel> interaction.channel;
+			player.queue.channel = interaction.channel as QuaverChannels;
 			await player.connect(interaction.member.voice.channelId, { deafened: true });
 			// Ensure that Quaver destroys the player if the user leaves the channel while Quaver is queuing tracks
 			// Ensure that Quaver destroys the player if Quaver gets timed out by the user while Quaver is queuing tracks
@@ -134,7 +132,7 @@ export default {
 		);
 		if (!started) await player.queue.start();
 		if (settings.features.web.enabled) {
-			io.to(`guild:${interaction.guildId}`).emit('queueUpdate', player.queue.tracks.map((track: Song & { requesterTag: string }): Song & { requesterTag: string } => {
+			io.to(`guild:${interaction.guildId}`).emit('queueUpdate', player.queue.tracks.map((track: QuaverSong): QuaverSong => {
 				track.requesterTag = bot.users.cache.get(track.requester)?.tag;
 				return track;
 			}));

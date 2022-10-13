@@ -4,16 +4,17 @@ import { settings } from '#src/lib/util/settings.js';
 import { getAbsoluteFileURL, getGuildLocaleString, msToTime, msToTimeString } from '#src/lib/util/util.js';
 import '@lavaclient/queue/register';
 import { load } from '@lavaclient/spotify';
-import type { AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, PermissionsBitField, SelectMenuInteraction, SlashCommandBuilder } from 'discord.js';
 import { AttachmentBuilder, Client, Collection, EmbedBuilder, GatewayDispatchEvents, GatewayIntentBits } from 'discord.js';
 import { readdirSync, readFileSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import { createServer } from 'https';
-import type { Player } from 'lavaclient';
+import type { NodeEvents, Player } from 'lavaclient';
 import { Node } from 'lavaclient';
 import { createInterface } from 'readline';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
+import type { Autocomplete, Button, ChatInputCommand, ModalSubmit, SelectMenu } from './events/interactionCreate.d.js';
+import type { QuaverEvent, QuaverMusicEvent } from './main.d.js';
 
 export const startup = { started: false };
 
@@ -146,7 +147,6 @@ export async function shuttingDown(eventType: string, err?: Error): Promise<void
 			logger.info({ message: 'Disconnecting from all guilds...', label: 'Quaver' });
 			for (const pair of players) {
 				const player: Player<Node> & { handler?: PlayerHandler } = pair[1];
-				/** @type {string} */
 				logger.info({ message: `[G ${player.guildId}] Disconnecting (restarting)`, label: 'Quaver' });
 				const fileBuffer = [];
 				if (player.queue.current && (player.playing || player.paused)) {
@@ -174,8 +174,10 @@ export async function shuttingDown(eventType: string, err?: Error): Promise<void
 		}
 	}
 	catch (error) {
-		logger.error({ message: 'Encountered error while shutting down.', label: 'Quaver' });
-		logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+		if (error instanceof Error) {
+			logger.error({ message: 'Encountered error while shutting down.', label: 'Quaver' });
+			logger.error({ message: `${error.message}\n${error.stack}`, label: 'Quaver' });
+		}
 	}
 	finally {
 		if (!['exit', 'SIGINT', 'SIGTERM'].includes(eventType) && err instanceof Error) {
@@ -185,8 +187,10 @@ export async function shuttingDown(eventType: string, err?: Error): Promise<void
 				await writeFile('error.log', `${eventType}${err.message ? `\n${err.message}` : ''}${err.stack ? `\n${err.stack}` : ''}`);
 			}
 			catch (e) {
-				logger.error({ message: 'Encountered error while writing to error.log.', label: 'Quaver' });
-				logger.error({ message: `${e.message}\n${e.stack}`, label: 'Quaver' });
+				if (e instanceof Error) {
+					logger.error({ message: 'Encountered error while writing to error.log.', label: 'Quaver' });
+					logger.error({ message: `${e.message}\n${e.stack}`, label: 'Quaver' });
+				}
 			}
 		}
 		bot.destroy();
@@ -194,7 +198,7 @@ export async function shuttingDown(eventType: string, err?: Error): Promise<void
 	}
 }
 
-const locales = new Collection();
+const locales = new Collection<string, unknown>();
 const localeFolders = readdirSync(getAbsoluteFileURL(import.meta.url, ['..', 'locales']));
 for await (const folder of localeFolders) {
 	const localeFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['..', 'locales', folder]));
@@ -211,13 +215,13 @@ setLocales(locales);
 
 const commandFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['commands'])).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 for await (const file of commandFiles) {
-	const command: { default: { data: SlashCommandBuilder, checks: string[], permissions: { user: PermissionsBitField[], bot: PermissionsBitField[], execute(interaction: ChatInputCommandInteraction): Promise<void> } } } = await import(getAbsoluteFileURL(import.meta.url, ['commands', file]).toString());
+	const command: { default: ChatInputCommand } = await import(getAbsoluteFileURL(import.meta.url, ['commands', file]).toString());
 	bot.commands.set(command.default.data.name, command.default);
 }
 
 const autocompleteFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['autocomplete'])).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 for await (const file of autocompleteFiles) {
-	const autocomplete: { default: { name: string, execute(interaction: AutocompleteInteraction): Promise<void> } } = await import(getAbsoluteFileURL(import.meta.url, ['autocomplete', file]).toString());
+	const autocomplete: { default: Autocomplete } = await import(getAbsoluteFileURL(import.meta.url, ['autocomplete', file]).toString());
 	bot.autocomplete.set(autocomplete.default.name, autocomplete.default);
 }
 
@@ -225,7 +229,7 @@ const componentsFolders = readdirSync(getAbsoluteFileURL(import.meta.url, ['comp
 for await (const folder of componentsFolders) {
 	const componentFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['components', folder])).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 	for await (const file of componentFiles) {
-		const component: { default: { name: string, execute(interaction: ButtonInteraction | SelectMenuInteraction): Promise<void> } } = await import(getAbsoluteFileURL(import.meta.url, ['components', folder, file]).toString());
+		const component: { default: Button | SelectMenu | ModalSubmit } = await import(getAbsoluteFileURL(import.meta.url, ['components', folder, file]).toString());
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		if (!(bot as Record<string, any>)[folder]) (bot as Record<string, any>)[folder] = new Collection();
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -235,8 +239,7 @@ for await (const folder of componentsFolders) {
 
 const eventFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['events'])).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 for await (const file of eventFiles) {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const event: { default: { name: string; once: boolean; execute(...args: any[]): void | Promise<void>; } } = await import(getAbsoluteFileURL(import.meta.url, ['events', file]).toString());
+	const event: { default: QuaverEvent } = await import(getAbsoluteFileURL(import.meta.url, ['events', file]).toString());
 	if (event.default.once) {
 		bot.once(event.default.name, (...args): void | Promise<void> => event.default.execute(...args));
 	}
@@ -247,15 +250,14 @@ for await (const file of eventFiles) {
 
 const musicEventFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['events', 'music'])).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 for await (const file of musicEventFiles) {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const event: { default: { name: any, once: boolean, execute(...args: any[]): void & Promise<void> } } = await import(getAbsoluteFileURL(import.meta.url, ['events', 'music', file]).toString());
+	const event: { default: QuaverMusicEvent } = await import(getAbsoluteFileURL(import.meta.url, ['events', 'music', file]).toString());
 	if (event.default.once) {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		bot.music.once(event.default.name, (...args: any[]): void => event.default.execute(...args));
+		bot.music.once(event.default.name as keyof NodeEvents, (...args: any[]): void | Promise<void> => event.default.execute(...args));
 	}
 	else {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		bot.music.on(event.default.name, (...args: any[]): void => event.default.execute(...args));
+		bot.music.on(event.default.name as keyof NodeEvents, (...args: any[]): void | Promise<void> => event.default.execute(...args));
 	}
 }
 

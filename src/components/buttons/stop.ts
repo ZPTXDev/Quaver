@@ -1,20 +1,19 @@
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
+import type { QuaverInteraction, QuaverPlayer } from '#src/lib/util/common.d.js';
 import { confirmationTimeout } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
-import type { ButtonInteraction, Client } from 'discord.js';
+import type { ButtonInteraction } from 'discord.js';
 import { GuildMember } from 'discord.js';
-import type { Node, Player } from 'lavaclient';
 
 export default {
 	name: 'stop',
-	async execute(interaction: ButtonInteraction & { replyHandler: ReplyHandler, client: Client & { music: Node } }): Promise<void> {
+	async execute(interaction: QuaverInteraction<ButtonInteraction>): Promise<void> {
 		if (interaction.message.interaction.user.id !== interaction.user.id) {
 			await interaction.replyHandler.locale('DISCORD.INTERACTION.USER_MISMATCH', { type: 'error' });
 			return;
 		}
 		const { io } = await import('#src/main.js');
-		const player: Player<Node> = interaction.client.music.players.get(interaction.guildId);
+		const player = interaction.client.music.players.get(interaction.guildId) as QuaverPlayer;
 		if (!player) {
 			await interaction.replyHandler.locale(checks.ACTIVE_SESSION, { type: 'error' });
 			return;

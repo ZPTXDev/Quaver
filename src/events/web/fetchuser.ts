@@ -1,3 +1,4 @@
+import type { JSONResponse } from '#src/lib/util/common.d.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getJSONResponse } from '#src/lib/util/util.js';
 import { version } from '#src/lib/util/version.js';
@@ -18,7 +19,7 @@ export default {
 				'Authorization': decryptedToken,
 			},
 		});
-		const response = <{ message?: string } & APIUser> await getJSONResponse(user.body);
+		const response = await getJSONResponse(user.body) as JSONResponse<APIUser>;
 		if (response.message) return callback({ status: 'error-auth' });
 		socket.user = response;
 		return callback({ status: 'success', user: response, version });

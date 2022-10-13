@@ -1,14 +1,12 @@
-import type PlayerHandler from '#src/lib/PlayerHandler.js';
+import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.d.js';
 import { data, logger } from '#src/lib/util/common.js';
-import type { Queue, Song } from '@lavaclient/queue';
-import type { Collection, GuildMember } from 'discord.js';
+import type { Collection, GuildMember, Snowflake } from 'discord.js';
 import { escapeMarkdown } from 'discord.js';
-import type { Player } from 'lavaclient';
 
 export default {
 	name: 'trackEnd',
 	once: false,
-	async execute(queue: Queue & { player: Player & { handler: PlayerHandler, skip: { required: number, users: string[] }, failed: number } }, track: Song, reason: 'PLAYLIST_LOADED' | 'TRACK_LOADED' | 'SEARCH_RESULT' | 'NO_MATCHES' | 'LOAD_FAILED'): Promise<void> {
+	async execute(queue: QuaverQueue, track: QuaverSong, reason: 'PLAYLIST_LOADED' | 'TRACK_LOADED' | 'SEARCH_RESULT' | 'NO_MATCHES' | 'LOAD_FAILED'): Promise<void> {
 		const { bot } = await import('#src/main.js');
 		delete queue.player.skip;
 		if (reason === 'LOAD_FAILED') {
@@ -22,7 +20,7 @@ export default {
 			}
 		}
 		if (queue.player.failed) delete queue.player.failed;
-		const members = <Collection<string, GuildMember>> bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).members;
+		const members = bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).members as Collection<Snowflake, GuildMember>;
 		if (members?.filter((m): boolean => !m.user.bot).size < 1 && !await data.guild.get(queue.player.guildId, 'settings.stay.enabled')) {
 			logger.info({ message: `[G ${queue.player.guildId}] Disconnecting (alone)`, label: 'Quaver' });
 			await queue.player.handler.locale('MUSIC.DISCONNECT.ALONE.DISCONNECTED.DEFAULT', { type: 'warning' });

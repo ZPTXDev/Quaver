@@ -1,9 +1,9 @@
-import type { ApplicationCommandOptionChoiceData, AutocompleteInteraction, Client } from 'discord.js';
-import type { Node } from 'lavaclient';
+import type { QuaverInteraction } from '#src/lib/util/common.d.js';
+import type { ApplicationCommandOptionChoiceData, AutocompleteInteraction } from 'discord.js';
 
 export default {
 	name: 'move',
-	async execute(interaction: AutocompleteInteraction & { client: Client & { music: Node } }): Promise<void> {
+	async execute(interaction: QuaverInteraction<AutocompleteInteraction>): Promise<void> {
 		const focused = interaction.options.getFocused();
 		const player = interaction.client.music.players.get(interaction.guildId);
 		if (!player) return interaction.respond([]);
