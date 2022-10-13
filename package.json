@@ -19,7 +19,6 @@
     "lavaclient": "^4.1.1",
     "lodash-es": "^4.17.21",
     "patch-package": "^6.4.7",
-    "remove": "^0.1.5",
     "socket.io": "^4.5.2",
     "winston": "^3.8.2"
   },
@@ -70,8 +69,7 @@
           "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
         }
       ],
-      "@semantic-release/github",
-      "semantic-release-github-milestones"
+      "@semantic-release/github"
     ]
   }
 }
