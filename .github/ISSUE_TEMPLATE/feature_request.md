@@ -2,7 +2,7 @@
 name: Feature request
 about: Proposal for a new feature or improvement.
 title: ''
-labels: ["type:enhancement"]
+labels: type:enhancement
 assignees:
     - zapteryx
 
