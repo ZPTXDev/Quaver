@@ -1,13 +1,13 @@
-import type { ColorResolvable } from 'discord.js';
+import type { ColorResolvable, Snowflake } from 'discord.js';
 import type { ConnectionInfo } from 'lavaclient';
 
 export type SettingsObject = {
 	token?: string;
-	applicationId?: string;
+	applicationId?: Snowflake;
 	clientSecret?: string;
 	colors?: ColorsSettingsObject;
 	defaultLocaleCode?: string;
-	managers?: string[];
+	managers?: Snowflake[];
 	database?: DatabaseSettingsObject;
 	lavalink?: ConnectionInfo;
 	features?: FeaturesSettingsObject;
