@@ -8,12 +8,13 @@ import { AttachmentBuilder, Client, Collection, EmbedBuilder, GatewayDispatchEve
 import { readdirSync, readFileSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import { createServer } from 'https';
-import type { Player } from 'lavaclient';
+import type { NodeEvents, Player } from 'lavaclient';
 import { Node } from 'lavaclient';
 import { createInterface } from 'readline';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
 import type { Autocomplete, Button, ChatInputCommand, ModalSubmit, SelectMenu } from './events/interactionCreate.d.js';
+import type { QuaverEvent } from './main.d.js';
 
 export const startup = { started: false };
 
@@ -236,7 +237,7 @@ for await (const folder of componentsFolders) {
 const eventFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['events'])).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 for await (const file of eventFiles) {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const event: { default: { name: string; once: boolean; execute(...args: any[]): void | Promise<void>; } } = await import(getAbsoluteFileURL(import.meta.url, ['events', file]).toString());
+	const event: { default: QuaverEvent } = await import(getAbsoluteFileURL(import.meta.url, ['events', file]).toString());
 	if (event.default.once) {
 		bot.once(event.default.name, (...args): void | Promise<void> => event.default.execute(...args));
 	}
@@ -248,14 +249,14 @@ for await (const file of eventFiles) {
 const musicEventFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['events', 'music'])).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 for await (const file of musicEventFiles) {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const event: { default: { name: any, once: boolean, execute(...args: any[]): void & Promise<void> } } = await import(getAbsoluteFileURL(import.meta.url, ['events', 'music', file]).toString());
+	const event: { default: QuaverEvent } = await import(getAbsoluteFileURL(import.meta.url, ['events', 'music', file]).toString());
 	if (event.default.once) {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		bot.music.once(event.default.name, (...args: any[]): void => event.default.execute(...args));
+		bot.music.once(event.default.name as keyof NodeEvents, (...args: any[]): void | Promise<void> => event.default.execute(...args));
 	}
 	else {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		bot.music.on(event.default.name, (...args: any[]): void => event.default.execute(...args));
+		bot.music.on(event.default.name as keyof NodeEvents, (...args: any[]): void | Promise<void> => event.default.execute(...args));
 	}
 }
 
