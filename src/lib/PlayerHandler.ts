@@ -1,7 +1,7 @@
 import { logger } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { buildMessageOptions, getGuildLocaleString } from '#src/lib/util/util.js';
-import type { Message } from 'discord.js';
+import type { Message, Snowflake } from 'discord.js';
 import { ChannelType, PermissionsBitField } from 'discord.js';
 import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions, QuaverClient, QuaverPlayer } from './util/common.d.js';
 
@@ -24,7 +24,7 @@ export default class PlayerHandler {
 	 * Disconnects and cleans up the player.
 	 * @param channelId - The channel to disconnect from.
 	 */
-	async disconnect(channelId?: string): Promise<void> {
+	async disconnect(channelId?: Snowflake): Promise<void> {
 		const { io } = await import('#src/main.js');
 		clearTimeout(this.player.timeout);
 		clearTimeout(this.player.pauseTimeout);

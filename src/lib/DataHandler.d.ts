@@ -1,3 +1,5 @@
+import type { Snowflake } from 'discord.js';
+
 export type DatabaseObject = {
     settings?: GuildSettingsObject;
 };
@@ -9,6 +11,6 @@ export type GuildSettingsObject = {
 
 export type StaySettingObject = {
 	enabled: boolean;
-	channel?: string;
-	text?: string;
+	channel?: Snowflake;
+	text?: Snowflake;
 };

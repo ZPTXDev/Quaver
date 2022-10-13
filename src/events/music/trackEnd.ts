@@ -1,6 +1,6 @@
 import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.d.js';
 import { data, logger } from '#src/lib/util/common.js';
-import type { Collection, GuildMember } from 'discord.js';
+import type { Collection, GuildMember, Snowflake } from 'discord.js';
 import { escapeMarkdown } from 'discord.js';
 
 export default {
@@ -20,7 +20,7 @@ export default {
 			}
 		}
 		if (queue.player.failed) delete queue.player.failed;
-		const members = bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).members as Collection<string, GuildMember>;
+		const members = bot.guilds.cache.get(queue.player.guildId).channels.cache.get(queue.player.channelId).members as Collection<Snowflake, GuildMember>;
 		if (members?.filter((m): boolean => !m.user.bot).size < 1 && !await data.guild.get(queue.player.guildId, 'settings.stay.enabled')) {
 			logger.info({ message: `[G ${queue.player.guildId}] Disconnecting (alone)`, label: 'Quaver' });
 			await queue.player.handler.locale('MUSIC.DISCONNECT.ALONE.DISCONNECTED.DEFAULT', { type: 'warning' });

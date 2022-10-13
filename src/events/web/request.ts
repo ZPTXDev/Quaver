@@ -1,13 +1,13 @@
 import type { QuaverPlayer, QuaverSong } from '#src/lib/util/common.d.js';
 import { version } from '#src/lib/util/version.js';
-import type { APIGuild } from 'discord.js';
+import type { APIGuild, Snowflake } from 'discord.js';
 import type { Socket } from 'socket.io';
 
 export default {
 	name: 'request',
 	once: false,
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	async execute(socket: Socket & { guilds: APIGuild[] }, callback: (cb: Record<string, any>) => void, guildId: string, item: 'player'): Promise<void> {
+	async execute(socket: Socket & { guilds: APIGuild[] }, callback: (cb: Record<string, any>) => void, guildId: Snowflake, item: 'player'): Promise<void> {
 		const { bot } = await import('#src/main.js');
 		if (!socket.guilds) return callback({ status: 'error-auth' });
 		if (!socket.guilds.find((guild): boolean => guild.id === guildId)) return callback({ status: 'error-auth' });

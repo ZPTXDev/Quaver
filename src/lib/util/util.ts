@@ -1,5 +1,5 @@
 import { settings } from '#src/lib/util/settings.js';
-import type { APISelectMenuOption, Interaction, InteractionReplyOptions, MessageActionRowComponentBuilder, MessageCreateOptions } from 'discord.js';
+import type { APISelectMenuOption, Interaction, InteractionReplyOptions, MessageActionRowComponentBuilder, MessageCreateOptions, Snowflake } from 'discord.js';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, escapeMarkdown, SelectMenuBuilder } from 'discord.js';
 import { readdirSync } from 'fs';
 import { get } from 'lodash-es';
@@ -166,7 +166,7 @@ export function getLocaleString(localeCode: string, stringPath: string, ...vars:
  * @param vars - The extra variables required in some localized strings.
  * @returns The localized string, or LOCALE_MISSING if the locale is missing, or STRING_MISSING if the string is missing.
  */
-export async function getGuildLocaleString(guildId: string, stringPath: string, ...vars: string[]): Promise<string | 'LOCALE_MISSING' | 'STRING_MISSING'> {
+export async function getGuildLocaleString(guildId: Snowflake, stringPath: string, ...vars: string[]): Promise<string | 'LOCALE_MISSING' | 'STRING_MISSING'> {
 	const guildLocaleCode = await data.guild.get<string>(guildId, 'settings.locale') ?? settings.defaultLocaleCode;
 	return getLocaleString(guildLocaleCode, stringPath, ...vars);
 }
