@@ -252,7 +252,7 @@ for await (const file of eventFiles) {
 const musicEventFiles = readdirSync(getAbsoluteFileURL(import.meta.url, ['events', 'music'])).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 for await (const file of musicEventFiles) {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const event: { default: QuaverEvent } = await import(getAbsoluteFileURL(import.meta.url, ['events', 'music', file]).toString());
+	const event: { default: QuaverMusicEvent } = await import(getAbsoluteFileURL(import.meta.url, ['events', 'music', file]).toString());
 	if (event.default.once) {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		bot.music.once(event.default.name as keyof NodeEvents, (...args: any[]): void | Promise<void> => event.default.execute(...args));
