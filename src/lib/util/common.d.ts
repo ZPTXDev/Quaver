@@ -32,11 +32,11 @@ export type QuaverChannels = TextChannel | VoiceChannel;
 
 export type QuaverClient = Client<boolean> & {
 	music?: Node;
-	commands: Collection<string, ChatInputCommand>;
-	buttons: Collection<string, Button>;
-	selectmenus: Collection<string, SelectMenu>;
-	autocomplete: Collection<string, Autocomplete>;
-	modals: Collection<string, ModalSubmit>;
+	commands?: Collection<string, ChatInputCommand>;
+	buttons?: Collection<string, Button>;
+	selectmenus?: Collection<string, SelectMenu>;
+	autocomplete?: Collection<string, Autocomplete>;
+	modals?: Collection<string, ModalSubmit>;
 };
 
 export type QuaverSong = Song & {
@@ -47,12 +47,12 @@ export type QuaverPlayer = Player<Node> & {
 	timeout?: ReturnType<typeof setTimeout>;
 	pauseTimeout?: ReturnType<typeof setTimeout>;
 	timeoutEnd?: number;
-	queue: QuaverQueue;
-	bassboost: boolean;
-	nightcore: boolean;
-	handler: PlayerHandler;
-	skip: QuaverPlayerSkipObject;
-	failed: number;
+	queue?: QuaverQueue;
+	bassboost?: boolean;
+	nightcore?: boolean;
+	handler?: PlayerHandler;
+	skip?: QuaverPlayerSkipObject;
+	failed?: number;
 };
 
 export type QuaverQueue = Queue & {
