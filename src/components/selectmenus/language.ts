@@ -2,7 +2,7 @@ import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions, QuaverI
 import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
 import { settingsOptions } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
-import { buildMessageOptions, checkLocaleCompletion, getGuildLocaleString, getLocaleString, roundTo, settingsPage } from '#src/lib/util/util.js';
+import { buildMessageOptions, buildSettingsPage, checkLocaleCompletion, getGuildLocaleString, getLocaleString, roundTo } from '#src/lib/util/util.js';
 import type { MessageActionRowComponentBuilder, SelectMenuComponent, SelectMenuComponentOptionData, SelectMenuInteraction } from 'discord.js';
 import { ActionRowBuilder, EmbedBuilder, SelectMenuBuilder } from 'discord.js';
 
@@ -50,7 +50,7 @@ export default {
 			);
 		}
 		const guildLocaleCode = await data.guild.get<string>(interaction.guildId, 'settings.locale') ?? settings.defaultLocaleCode;
-		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocaleCode, 'language');
+		const { current, embeds, actionRow } = await buildSettingsPage(interaction, guildLocaleCode, 'language');
 		const description = `${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.LANGUAGE.NAME')}** ─ ${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.LANGUAGE.DESCRIPTION')}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: \`${current}\``;
 		const args: [MessageOptionsBuilderInputs, MessageOptionsBuilderOptions] = [
 			[description, ...embeds],

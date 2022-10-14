@@ -241,7 +241,7 @@ export function buildMessageOptions(inputData: MessageOptionsBuilderInputs, { ty
 	return opts;
 }
 
-export async function settingsPage(interaction: Interaction, guildLocaleCode: string, option: SettingsPageOptions): Promise<SettingsPage> {
+export async function buildSettingsPage(interaction: Interaction, guildLocaleCode: string, option: SettingsPageOptions): Promise<SettingsPage> {
 	let current: string, embeds: EmbedBuilder[] = [];
 	const actionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 	switch (option) {

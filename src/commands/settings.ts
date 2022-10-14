@@ -2,7 +2,7 @@ import type { QuaverInteraction, SettingsPageOptions } from '#src/lib/util/commo
 import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
 import { checks, settingsOptions } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
-import { buildMessageOptions, getGuildLocaleString, getLocaleString, settingsPage } from '#src/lib/util/util.js';
+import { buildMessageOptions, buildSettingsPage, getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import type { ChatInputCommandInteraction, MessageActionRowComponentBuilder, SelectMenuComponentOptionData } from 'discord.js';
 import { ActionRowBuilder, EmbedBuilder, Message, PermissionsBitField, SelectMenuBuilder, SlashCommandBuilder } from 'discord.js';
 
@@ -19,7 +19,7 @@ export default {
 	async execute(interaction: QuaverInteraction<ChatInputCommandInteraction>): Promise<void> {
 		const option = settingsOptions[0] as SettingsPageOptions;
 		const guildLocaleCode = await data.guild.get<string>(interaction.guild.id, 'settings.locale') ?? settings.defaultLocaleCode;
-		const { current, embeds, actionRow } = await settingsPage(interaction, guildLocaleCode, option);
+		const { current, embeds, actionRow } = await buildSettingsPage(interaction, guildLocaleCode, option);
 		const description = `${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocaleCode, `CMD.SETTINGS.MISC.${option.toUpperCase()}.NAME`)}** ─ ${getLocaleString(guildLocaleCode, `CMD.SETTINGS.MISC.${option.toUpperCase()}.DESCRIPTION`)}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: \`${current}\``;
 		const msg = await interaction.replyHandler.reply(
 			[description, ...embeds],
