@@ -1,4 +1,4 @@
-import type PlayerHandler from '#src/lib/PlayerHandler.js';
+import type { Autocomplete, Button, ChatInputCommand, ModalSubmit, SelectMenu } from '#src/events/interactionCreate.d.js';
 import { data, logger, setLocales } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getAbsoluteFileURL, getGuildLocaleString, msToTime, msToTimeString } from '#src/lib/util/util.js';
@@ -8,12 +8,12 @@ import { AttachmentBuilder, Client, Collection, EmbedBuilder, GatewayDispatchEve
 import { readdirSync, readFileSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import { createServer } from 'https';
-import type { NodeEvents, Player } from 'lavaclient';
+import type { NodeEvents } from 'lavaclient';
 import { Node } from 'lavaclient';
 import { createInterface } from 'readline';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
-import type { Autocomplete, Button, ChatInputCommand, ModalSubmit, SelectMenu } from './events/interactionCreate.d.js';
+import type { QuaverClient, QuaverPlayer } from './lib/util/common.d.js';
 import type { QuaverEvent, QuaverMusicEvent } from './main.d.js';
 
 export const startup = { started: false };
@@ -111,7 +111,7 @@ data.guild.instance.on('error', async (err: Error): Promise<void> => {
 	await shuttingDown('keyv', err);
 });
 
-export const bot: Client & { music?: Node, commands?: Collection<unknown, unknown>, autocomplete?: Collection<unknown, unknown> } = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] });
+export const bot: QuaverClient = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] });
 bot.commands = new Collection();
 bot.autocomplete = new Collection();
 bot.music = new Node({
@@ -146,7 +146,7 @@ export async function shuttingDown(eventType: string, err?: Error): Promise<void
 			if (players.size < 1) return;
 			logger.info({ message: 'Disconnecting from all guilds...', label: 'Quaver' });
 			for (const pair of players) {
-				const player: Player<Node> & { handler?: PlayerHandler } = pair[1];
+				const player: QuaverPlayer = pair[1];
 				logger.info({ message: `[G ${player.guildId}] Disconnecting (restarting)`, label: 'Quaver' });
 				const fileBuffer = [];
 				if (player.queue.current && (player.playing || player.paused)) {
