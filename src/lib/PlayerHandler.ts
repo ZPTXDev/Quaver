@@ -1,9 +1,9 @@
+import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions, QuaverClient, QuaverPlayer } from '#src/lib/util/common.d.js';
 import { logger } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { buildMessageOptions, getGuildLocaleString } from '#src/lib/util/util.js';
 import type { Message, Snowflake } from 'discord.js';
 import { ChannelType, PermissionsBitField } from 'discord.js';
-import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions, QuaverClient, QuaverPlayer } from './util/common.d.js';
 
 /** Class for handling Lavaclient's Player. */
 export default class PlayerHandler {

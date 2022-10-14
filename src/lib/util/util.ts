@@ -1,3 +1,6 @@
+import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions, SettingsPage, SettingsPageOptions } from '#src/lib/util/common.d.js';
+import { data, locales } from '#src/lib/util/common.js';
+import { languageName } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import type { APISelectMenuOption, Interaction, InteractionReplyOptions, MessageActionRowComponentBuilder, MessageCreateOptions, Snowflake } from 'discord.js';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, escapeMarkdown, SelectMenuBuilder } from 'discord.js';
@@ -5,9 +8,6 @@ import { readdirSync } from 'fs';
 import { get } from 'lodash-es';
 import { dirname, resolve } from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
-import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions, SettingsPage, SettingsPageOptions } from './common.d.js';
-import { data, locales } from './common.js';
-import { languageName } from './constants.js';
 import type { LocaleCompletionState, TimeFormats, TimeObject } from './util.d.js';
 
 /**

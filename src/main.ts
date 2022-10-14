@@ -1,4 +1,5 @@
 import type { Autocomplete, Button, ChatInputCommand, ModalSubmit, SelectMenu } from '#src/events/interactionCreate.d.js';
+import type { QuaverClient, QuaverPlayer } from '#src/lib/util/common.d.js';
 import { data, logger, setLocales } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getAbsoluteFileURL, getGuildLocaleString, msToTime, msToTimeString } from '#src/lib/util/util.js';
@@ -13,7 +14,6 @@ import { Node } from 'lavaclient';
 import { createInterface } from 'readline';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
-import type { QuaverClient, QuaverPlayer } from './lib/util/common.d.js';
 import type { QuaverEvent, QuaverMusicEvent } from './main.d.js';
 
 export const startup = { started: false };

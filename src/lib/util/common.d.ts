@@ -1,8 +1,8 @@
+import type PlayerHandler from '#src/lib/PlayerHandler.js';
+import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import type { Queue, Song } from '@lavaclient/queue';
 import type { ActionRowBuilder, AttachmentBuilder, AutocompleteInteraction, Client, Collection, EmbedBuilder, MessageActionRowComponentBuilder, Snowflake, TextChannel, VoiceChannel } from 'discord.js';
 import type { Node, Player } from 'lavaclient';
-import type PlayerHandler from '../PlayerHandler.js';
-import type ReplyHandler from '../ReplyHandler.js';
 
 export type SearchStateRecord = {
 	pages: { info: Song }[][];
