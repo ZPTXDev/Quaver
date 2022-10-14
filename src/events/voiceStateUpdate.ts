@@ -30,11 +30,11 @@ export default {
 				return player.handler.disconnect(oldState.channelId);
 			}
 			/** Checks for when Quaver joins or moves */
-			// Channel is a voice channel
 			if (settings.features.web.enabled) {
 				io.to(`guild:${player.guildId}`).emit('textChannelUpdate', player.queue.channel.name);
 				io.to(`guild:${player.guildId}`).emit('channelUpdate', newState.channel?.name);
 			}
+			// Channel is a voice channel
 			if (newState.channel.type === ChannelType.GuildVoice) {
 				// Check for connect, speak permission for voice channel
 				const permissions = oldState.client.guilds.cache.get(guild.id).channels.cache.get(newState.channelId).permissionsFor(oldState.client.user.id);
