@@ -36,7 +36,6 @@ export default {
 		}, 30 * 1000, interaction.message);
 		const option = interaction.customId.split('_')[1];
 		await data.guild.set(interaction.guildId, 'settings.format', option);
-		// definitely need some checks here based on my own typedef, casting is not a good idea
 		const guildLocaleCode = await data.guild.get<string>(interaction.guildId, 'settings.locale') ?? settings.defaultLocaleCode;
 		const { current, embeds, actionRow } = await buildSettingsPage(interaction, guildLocaleCode, 'format');
 		const description = `${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.RESPONSE.HEADER', interaction.guild.name)}\n\n**${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.FORMAT.NAME')}** ─ ${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.FORMAT.DESCRIPTION')}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: \`${current}\``;
