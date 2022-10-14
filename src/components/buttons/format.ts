@@ -45,7 +45,7 @@ export default {
 			{
 				components: [
 					new ActionRowBuilder<SelectMenuBuilder>()
-						.addComponents(SelectMenuBuilder.from(<SelectMenuComponent> interaction.message.components[0].components[0])),
+						.addComponents(SelectMenuBuilder.from(interaction.message.components[0].components[0] as SelectMenuComponent)),
 					actionRow as ActionRowBuilder<MessageActionRowComponentBuilder>,
 				],
 				force: 'update',
