@@ -241,6 +241,13 @@ export function buildMessageOptions(inputData: MessageOptionsBuilderInputs, { ty
 	return opts;
 }
 
+/**
+ * Returns a SettingsPage object.
+ * @param interaction - The interaction to use for context.
+ * @param guildLocaleCode - The guild's locale code.
+ * @param option - The option to display.
+ * @returns A Promise of a SettingsPage object.
+ */
 export async function buildSettingsPage(interaction: Interaction, guildLocaleCode: string, option: SettingsPageOptions): Promise<SettingsPage> {
 	let current: string, embeds: EmbedBuilder[] = [];
 	const actionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
