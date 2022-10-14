@@ -9,6 +9,7 @@
         "error": "DarkRed"
     },
     "defaultLocaleCode": "en",
+    "disableAd": false,
     "managers": [
         "Paste your user ID here"
     ],

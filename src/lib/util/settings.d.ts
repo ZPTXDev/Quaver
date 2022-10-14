@@ -7,6 +7,7 @@ export type SettingsObject = {
 	clientSecret?: string;
 	colors?: ColorsSettingsObject;
 	defaultLocaleCode?: string;
+    disableAd?: boolean;
 	managers?: Snowflake[];
 	database?: DatabaseSettingsObject;
 	lavalink?: ConnectionInfo;

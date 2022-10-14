@@ -53,7 +53,12 @@ export default {
 	INFO: {
 		DESCRIPTION: 'Show information about Quaver.',
 		RESPONSE: {
-			SUCCESS: 'Open-source music bot for small communities.\nSource code available [here](https://go.zptx.dev/Quaver), invite [here](%1).\nRunning version `%2`.'
+			SUCCESS: 'Open-source music bot for small communities.\nRunning version `%1`.'
+		},
+		MISC: {
+			SOURCE_CODE: 'Source Code',
+			INVITE: 'Invite',
+			SPONSOR_US: 'Sponsor Us'
 		}
 	},
 	LOOP: {

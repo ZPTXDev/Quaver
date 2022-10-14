@@ -12,6 +12,7 @@
         "error": "DarkRed"
     },
     "defaultLocaleCode": "en",
+    "disableAd": false,
     "managers": [
         "Paste your user ID here"
     ],
@@ -66,6 +67,9 @@
 
 `defaultLocaleCode` - The default locale code. Valid values are available in the `locales` folder.
 > **Note:** This is used for all logs, slash command descriptions (at the time of deployment), and for all guilds without a language specified.
+
+`disableAd` - Whether to disable the ad in the `info` command (Sponsor Us button).
+> **Note:** Please do not disable the ad unless you really need to. Sponsors help keep the development of ZPTXDev projects going. Consider sponsoring us if you need to disable the ad!
 
 `managers` - The [user IDs](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-) that are given manager-level permissions on Quaver.
 
