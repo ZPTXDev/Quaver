@@ -23,6 +23,9 @@ export default class ReplyHandler {
 	 * @param options - Extra data, such as type or components.
 	 * @returns The message that was sent.
 	 */
+	async reply(inputData: MessageOptionsBuilderInputs, { type, components, files, ephemeral, fetchReply, force }?: MessageOptionsBuilderOptions & AdditionalBuilderOptions & { fetchReply?: false }): Promise<InteractionResponse>
+	async reply(inputData: MessageOptionsBuilderInputs, { type, components, files, ephemeral, fetchReply, force }?: MessageOptionsBuilderOptions & AdditionalBuilderOptions & { fetchReply: true }): Promise<Message>
+	async reply(inputData: MessageOptionsBuilderInputs, { type, components, files, ephemeral, fetchReply, force }?: MessageOptionsBuilderOptions & AdditionalBuilderOptions): Promise<InteractionResponse>
 	async reply(inputData: MessageOptionsBuilderInputs, { type = 'neutral', components = null, files = null, ephemeral = false, fetchReply = false, force = null }: MessageOptionsBuilderOptions & AdditionalBuilderOptions = {}): Promise<InteractionResponse | Message | undefined> {
 		const replyMsgOpts = buildMessageOptions(inputData, { type, components, files });
 		replyMsgOpts.fetchReply = fetchReply;
@@ -68,8 +71,11 @@ export default class ReplyHandler {
 	 * @param options - Extra data, such as type or components.
 	 * @returns The message that was sent.
 	 */
-	async locale(stringPath: string, { vars = [], type = 'neutral', components = null, files = null, ephemeral = false, force = null }: MessageOptionsBuilderOptions & AdditionalBuilderOptions & { vars?: string[]; } = {}): Promise<InteractionResponse | Message | undefined> {
+	async locale(inputData: MessageOptionsBuilderInputs, { vars, type, components, files, ephemeral, fetchReply, force }?: MessageOptionsBuilderOptions & AdditionalBuilderOptions & { vars?: string[]; fetchReply?: false }): Promise<InteractionResponse>
+	async locale(inputData: MessageOptionsBuilderInputs, { vars, type, components, files, ephemeral, fetchReply, force }?: MessageOptionsBuilderOptions & AdditionalBuilderOptions & { vars?: string[]; fetchReply: true }): Promise<Message>
+	async locale(inputData: MessageOptionsBuilderInputs, { vars, type, components, files, ephemeral, fetchReply, force }?: MessageOptionsBuilderOptions & AdditionalBuilderOptions & { vars?: string[]; }): Promise<InteractionResponse>
+	async locale(stringPath: string, { vars = [], type = 'neutral', components = null, files = null, ephemeral = false, fetchReply = false, force = null }: MessageOptionsBuilderOptions & AdditionalBuilderOptions & { vars?: string[]; } = {}): Promise<InteractionResponse | Message | undefined> {
 		const guildLocaleString = await getGuildLocaleString(this.interaction.guildId, stringPath, ...vars);
-		return this.reply(guildLocaleString, { type, components, files, ephemeral, force });
+		return this.reply(guildLocaleString, { type, components, files, ephemeral, fetchReply, force });
 	}
 }
