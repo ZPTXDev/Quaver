@@ -55,8 +55,9 @@ export default {
             return;
         }
         player.queue.clear();
-        if (settings.features.web.enabled)
+        if (settings.features.web.enabled) {
             io.to(`guild:${interaction.guildId}`).emit('queueUpdate', []);
+        }
         await interaction.replyHandler.locale('CMD.CLEAR.RESPONSE.SUCCESS', {
             type: 'success',
             components: [],

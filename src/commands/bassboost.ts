@@ -51,7 +51,7 @@ export default {
         const enabled = interaction.options.getBoolean('enabled');
         const boost = enabled !== null ? enabled : !player.bassboost;
         let eqValues: number[] = new Array(15).fill(0);
-        if (boost)
+        if (boost) {
             eqValues = [
                 0.2,
                 0.15,
@@ -60,13 +60,15 @@ export default {
                 0.0,
                 ...new Array(10).fill(-0.05),
             ];
+        }
         await player.setEqualizer(...eqValues);
         player.bassboost = boost;
-        if (settings.features.web.enabled)
+        if (settings.features.web.enabled) {
             io.to(`guild:${interaction.guildId}`).emit('filterUpdate', {
                 bassboost: player.bassboost,
                 nightcore: player.nightcore,
             });
+        }
         await interaction.replyHandler.reply(
             new EmbedBuilder()
                 .setDescription(

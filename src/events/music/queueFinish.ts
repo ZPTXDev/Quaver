@@ -36,11 +36,12 @@ export default {
             queue.player,
         );
         queue.player.timeoutEnd = Date.now() + 30 * 60 * 1000;
-        if (settings.features.web.enabled)
+        if (settings.features.web.enabled) {
             io.to(`guild:${queue.player.guildId}`).emit(
                 'timeoutUpdate',
                 queue.player.timeoutEnd,
             );
+        }
         await queue.player.handler.send(
             `${await getGuildLocaleString(
                 queue.player.guildId,

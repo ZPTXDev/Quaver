@@ -16,8 +16,9 @@ export default {
     name: 'interactionCreate',
     once: false,
     async execute(interaction: QuaverInteraction<Interaction>): Promise<void> {
-        if (!interaction.isAutocomplete())
+        if (!interaction.isAutocomplete()) {
             interaction.replyHandler = new ReplyHandler(interaction);
+        }
         if (interaction.isChatInputCommand()) {
             const command: ChatInputCommand = interaction.client.commands.get(
                 interaction.commandName,
@@ -51,8 +52,9 @@ export default {
                         if (
                             !(interaction.member instanceof GuildMember) ||
                             !interaction.member?.voice.channelId
-                        )
+                        ) {
                             failedChecks.push(check);
+                        }
                         break;
                     // Must be in the same voice channel (will not fail if the bot is not in a voice channel)
                     case checks.IN_SESSION_VOICE: {
@@ -64,8 +66,9 @@ export default {
                             interaction.member instanceof GuildMember &&
                             interaction.member?.voice.channelId !==
                                 player.channelId
-                        )
+                        ) {
                             failedChecks.push(check);
+                        }
                         break;
                     }
                 }

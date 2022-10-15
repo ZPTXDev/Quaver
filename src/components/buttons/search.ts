@@ -126,8 +126,9 @@ export default {
                 const results = await interaction.client.music.rest.loadTracks(
                     track,
                 );
-                if (results.loadType === 'TRACK_LOADED')
+                if (results.loadType === 'TRACK_LOADED') {
                     resolvedTracks.push(results.tracks[0]);
+                }
             }
             let msg,
                 extras = [];
@@ -167,7 +168,7 @@ export default {
                     timedOut ||
                     !interaction.guild
                 ) {
-                    if (interaction.guild)
+                    if (interaction.guild) {
                         timedOut
                             ? await interaction.replyHandler.locale(
                                   'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
@@ -180,6 +181,7 @@ export default {
                                       components: [],
                                   },
                               );
+                    }
                     return player.handler.disconnect();
                 }
             }
@@ -321,8 +323,9 @@ export default {
                         let label = `${firstIndex + index}. ${
                             track.info.title
                         }`;
-                        if (label.length >= 100)
+                        if (label.length >= 100) {
                             label = `${label.substring(0, 97)}...`;
+                        }
                         return {
                             label: label,
                             description: track.info.author,
@@ -355,8 +358,9 @@ export default {
                             let label = `${
                                 firstIdx + pages[refPg].indexOf(refTrack)
                             }. ${refTrack.info.title}`;
-                            if (label.length >= 100)
+                            if (label.length >= 100) {
                                 label = `${label.substring(0, 97)}...`;
+                            }
                             return {
                                 label: label,
                                 description: refTrack.info.author,

@@ -94,8 +94,9 @@ export default {
         }
         typeLocale = typeLocale.toLowerCase();
         player.queue.setLoop(loop);
-        if (settings.features.web.enabled)
+        if (settings.features.web.enabled) {
             io.to(`guild:${interaction.guildId}`).emit('loopUpdate', loop);
+        }
         await interaction.replyHandler.locale('CMD.LOOP.RESPONSE.SUCCESS', {
             vars: [typeLocale],
         });

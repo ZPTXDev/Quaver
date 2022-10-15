@@ -57,8 +57,9 @@ export default {
             return;
         }
         await player.setVolume(volume);
-        if (settings.features.web.enabled)
+        if (settings.features.web.enabled) {
             io.to(`guild:${interaction.guildId}`).emit('volumeUpdate', volume);
+        }
         await interaction.replyHandler.reply(
             new EmbedBuilder()
                 .setDescription(

@@ -134,8 +134,9 @@ export default {
                                 let label = `${
                                     firstIdx + pages[refPg].indexOf(refTrack)
                                 }. ${refTrack.info.title}`;
-                                if (label.length >= 100)
+                                if (label.length >= 100) {
                                     label = `${label.substring(0, 97)}...`;
+                                }
                                 return {
                                     label: label,
                                     description: refTrack.info.author,

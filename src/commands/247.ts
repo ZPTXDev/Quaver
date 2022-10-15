@@ -100,11 +100,12 @@ export default {
         if (player.timeout) {
             clearTimeout(player.timeout);
             delete player.timeout;
-            if (settings.features.web.enabled)
+            if (settings.features.web.enabled) {
                 io.to(`guild:${player.guildId}`).emit(
                     'timeoutUpdate',
                     !!player.timeout,
                 );
+            }
         }
         // pause timeout is theoretically impossible because the user would need to be in the same vc as Quaver
         // and pause timeout is only set when everyone leaves

@@ -19,19 +19,21 @@ export default {
             label: 'Quaver',
         });
         await queue.player.pause(false);
-        if (settings.features.web.enabled)
+        if (settings.features.web.enabled) {
             io.to(`guild:${queue.player.guildId}`).emit(
                 'pauseUpdate',
                 queue.player.paused,
             );
+        }
         if (queue.player.timeout) {
             clearTimeout(queue.player.timeout);
             delete queue.player.timeout;
-            if (settings.features.web.enabled)
+            if (settings.features.web.enabled) {
                 io.to(`guild:${queue.player.guildId}`).emit(
                     'timeoutUpdate',
                     !!queue.player.timeout,
                 );
+            }
         }
         const duration = msToTime(track.length);
         const durationString = track.isStream

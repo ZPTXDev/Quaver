@@ -60,8 +60,9 @@ export default {
         player.queue.clear();
         await player.queue.skip();
         await player.queue.start();
-        if (settings.features.web.enabled)
+        if (settings.features.web.enabled) {
             io.to(`guild:${interaction.guildId}`).emit('queueUpdate', []);
+        }
         await interaction.replyHandler.locale('CMD.STOP.RESPONSE.SUCCESS', {
             type: 'success',
             components: [],

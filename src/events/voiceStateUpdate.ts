@@ -27,8 +27,9 @@ export default {
                     oldState.serverMute !== newState.serverMute ||
                     oldState.serverDeaf !== newState.serverDeaf) &&
                 oldState.channelId === newState.channelId
-            )
+            ) {
                 return;
+            }
             /** Checks for when Quaver leaves */
             // Disconnected
             if (!newState.channelId) {
@@ -97,12 +98,13 @@ export default {
                         player.guildId,
                         'settings.stay.channel',
                     )) !== newState.channelId
-                )
+                ) {
                     await data.guild.set(
                         player.guildId,
                         'settings.stay.channel',
                         newState.channelId,
                     );
+                }
             }
             // Channel is a stage channel, and Quaver is suppressed
             // This also handles suppressing Quaver mid-track
@@ -136,12 +138,13 @@ export default {
                             player.guildId,
                             'settings.stay.enabled',
                         )
-                    )
+                    ) {
                         await data.guild.set(
                             player.guildId,
                             'settings.stay.enabled',
                             false,
                         );
+                    }
                     await player.handler.locale(
                         'MUSIC.SESSION_ENDED.FORCED.STAGE_NOT_MODERATOR',
                         { type: 'warning' },
@@ -176,12 +179,13 @@ export default {
                         player.guildId,
                         'settings.stay.channel',
                     )) !== newState.channelId
-                )
+                ) {
                     await data.guild.set(
                         player.guildId,
                         'settings.stay.channel',
                         newState.channelId,
                     );
+                }
             }
             // Moved to a new channel that has no humans and 24/7 is disabled
             if (
@@ -195,8 +199,9 @@ export default {
                         player.guildId,
                         'settings.stay.enabled',
                     )
-                )
+                ) {
                     return;
+                }
                 // Nothing is playing so we'll leave
                 if (
                     !player.queue.current ||
@@ -207,12 +212,13 @@ export default {
                             player.guildId,
                             'settings.stay.enabled',
                         )
-                    )
+                    ) {
                         await data.guild.set(
                             player.guildId,
                             'settings.stay.enabled',
                             false,
                         );
+                    }
                     logger.info({
                         message: `[G ${player.guildId}] Disconnecting (alone)`,
                         label: 'Quaver',
@@ -228,11 +234,12 @@ export default {
                 if (player.timeout || player.pauseTimeout) return;
                 // Quaver was playing something - set pauseTimeout
                 await player.pause();
-                if (settings.features.web.enabled)
+                if (settings.features.web.enabled) {
                     io.to(`guild:${player.guildId}`).emit(
                         'pauseUpdate',
                         player.paused,
                     );
+                }
                 logger.info({
                     message: `[G ${player.guildId}] Setting pause timeout`,
                     label: 'Quaver',
@@ -255,11 +262,12 @@ export default {
                     player,
                 );
                 player.timeoutEnd = Date.now() + 5 * 60 * 1000;
-                if (settings.features.web.enabled)
+                if (settings.features.web.enabled) {
                     io.to(`guild:${player.guildId}`).emit(
                         'pauseTimeoutUpdate',
                         player.timeoutEnd,
                     );
+                }
                 await player.handler.send(
                     new EmbedBuilder()
                         .setDescription(
@@ -325,19 +333,21 @@ export default {
                 label: 'Quaver',
             });
             await player.resume();
-            if (settings.features.web.enabled)
+            if (settings.features.web.enabled) {
                 io.to(`guild:${player.guildId}`).emit(
                     'pauseUpdate',
                     player.paused,
                 );
+            }
             if (player.pauseTimeout) {
                 clearTimeout(player.pauseTimeout);
                 delete player.pauseTimeout;
-                if (settings.features.web.enabled)
+                if (settings.features.web.enabled) {
                     io.to(`guild:${player.guildId}`).emit(
                         'pauseTimeoutUpdate',
                         !!player.pauseTimeout,
                     );
+                }
             }
             await player.handler.locale('MUSIC.DISCONNECT.ALONE.RESUMING', {
                 type: 'success',
@@ -355,8 +365,9 @@ export default {
         if (
             oldState.channel.members.filter((m): boolean => !m.user.bot).size >=
             1
-        )
+        ) {
             return;
+        }
         // Nothing is playing so we'll leave
         if (!player.queue.current || (!player.playing && !player.paused)) {
             logger.info({
@@ -378,12 +389,14 @@ export default {
         if (
             voiceChannel.type === ChannelType.GuildStageVoice &&
             !voiceChannel.stageInstance
-        )
+        ) {
             return;
+        }
         // Quaver was playing something - set pauseTimeout
         await player.pause();
-        if (settings.features.web.enabled)
+        if (settings.features.web.enabled) {
             io.to(`guild:${player.guildId}`).emit('pauseUpdate', player.paused);
+        }
         logger.info({
             message: `[G ${player.guildId}] Setting pause timeout`,
             label: 'Quaver',
@@ -405,11 +418,12 @@ export default {
             player,
         );
         player.timeoutEnd = Date.now() + 5 * 60 * 1000;
-        if (settings.features.web.enabled)
+        if (settings.features.web.enabled) {
             io.to(`guild:${player.guildId}`).emit(
                 'pauseTimeoutUpdate',
                 player.timeoutEnd,
             );
+        }
         await player.handler.send(
             new EmbedBuilder()
                 .setDescription(

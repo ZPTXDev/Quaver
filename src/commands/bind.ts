@@ -76,17 +76,21 @@ export default {
             return;
         }
         player.queue.channel = channel;
-        if (settings.features.web.enabled)
+        if (settings.features.web.enabled) {
             io.to(`guild:${interaction.guildId}`).emit(
                 'textChannelUpdate',
                 channel.name,
             );
-        if (await data.guild.get(interaction.guildId, 'settings.stay.enabled'))
+        }
+        if (
+            await data.guild.get(interaction.guildId, 'settings.stay.enabled')
+        ) {
             await data.guild.set(
                 interaction.guildId,
                 'settings.stay.text',
                 channel.id,
             );
+        }
         await interaction.replyHandler.locale('CMD.BIND.RESPONSE.SUCCESS', {
             vars: [channel.id],
             type: 'success',

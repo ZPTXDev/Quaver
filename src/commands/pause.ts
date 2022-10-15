@@ -39,11 +39,12 @@ export default {
             return;
         }
         await player.pause();
-        if (settings.features.web.enabled)
+        if (settings.features.web.enabled) {
             io.to(`guild:${interaction.guildId}`).emit(
                 'pauseUpdate',
                 player.paused,
             );
+        }
         await interaction.replyHandler.locale('CMD.PAUSE.RESPONSE.SUCCESS', {
             type: 'success',
         });

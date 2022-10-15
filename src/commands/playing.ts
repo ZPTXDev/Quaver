@@ -52,8 +52,9 @@ export default {
             (player.position / player.queue.current.length) * 100,
         );
         let elapsed = msToTime(player.position);
-        if (isNaN(elapsed['s']) || elapsed['s'] < 0)
+        if (isNaN(elapsed['s']) || elapsed['s'] < 0) {
             elapsed = { d: 0, h: 0, m: 0, s: 0 };
+        }
         const elapsedString = msToTimeString(elapsed, true);
         const duration = msToTime(player.queue.current.length);
         const durationString = msToTimeString(duration, true);

@@ -10,9 +10,9 @@ import { request } from 'undici';
 export default {
     name: 'fetchuser',
     once: false,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async execute(
         socket: Socket & { user: APIUser },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         callback: (cb: Record<string, any>) => void,
         token?: string,
     ): Promise<void> {

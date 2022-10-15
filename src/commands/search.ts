@@ -137,11 +137,12 @@ export default {
                                         let label = `${index + 1}. ${
                                             track.info.title
                                         }`;
-                                        if (label.length >= 100)
+                                        if (label.length >= 100) {
                                             label = `${label.substring(
                                                 0,
                                                 97,
                                             )}...`;
+                                        }
                                         return {
                                             label: label,
                                             description: track.info.author,

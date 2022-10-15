@@ -38,8 +38,9 @@ export default class PlayerHandler {
         clearTimeout(this.player.pauseTimeout);
         this.player.disconnect();
         await this.client.music.destroyPlayer(this.player.guildId);
-        if (settings.features.web.enabled)
+        if (settings.features.web.enabled) {
             io.to(`guild:${this.player.guildId}`).emit('playerDisconnect');
+        }
         const voiceChannel = this.client.guilds.cache
             .get(this.player.guildId)
             ?.channels.cache.get(channelId ?? this.player.channelId);
@@ -56,8 +57,9 @@ export default class PlayerHandler {
                     PermissionsBitField.Flags.Speak,
                 ]),
             )
-        )
+        ) {
             return;
+        }
         if (!permissions?.has(PermissionsBitField.StageModerator)) return;
         const me = await this.client.guilds.cache
             .get(this.player.guildId)
@@ -69,8 +71,9 @@ export default class PlayerHandler {
                 this.player.guildId,
                 'MISC.STAGE_TOPIC',
             ))
-        )
+        ) {
             return;
+        }
         try {
             await voiceChannel.stageInstance.delete();
         } catch (error) {
@@ -112,14 +115,16 @@ export default class PlayerHandler {
                         PermissionsBitField.Flags.SendMessages,
                     ]),
                 )
-        )
+        ) {
             return undefined;
+        }
         if (
             this.client.guilds.cache
                 .get(this.player.guildId)
                 .members.me.isCommunicationDisabled()
-        )
+        ) {
             return undefined;
+        }
         try {
             return await channel.send(sendMsgOpts);
         } catch (error) {

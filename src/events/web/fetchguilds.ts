@@ -10,9 +10,9 @@ import type { WebGuild } from './fetchguilds.d.js';
 export default {
     name: 'fetchguilds',
     once: false,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async execute(
         socket: Socket & { guilds: WebGuild[] },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         callback: (cb: Record<string, any>) => void,
         token?: string,
     ): Promise<void> {

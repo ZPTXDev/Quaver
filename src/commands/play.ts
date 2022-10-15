@@ -235,7 +235,7 @@ export default {
                 timedOut ||
                 !interaction.guild
             ) {
-                if (interaction.guild)
+                if (interaction.guild) {
                     timedOut
                         ? await interaction.replyHandler.locale(
                               'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
@@ -245,6 +245,7 @@ export default {
                               'DISCORD.INTERACTION.CANCELED',
                               { vars: [interaction.user.id] },
                           );
+                }
                 return player.handler.disconnect();
             }
         }

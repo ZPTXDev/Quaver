@@ -75,8 +75,9 @@ export function msToTime(
  */
 export function msToTimeString(msObject: TimeObject, simple?: boolean): string {
     if (simple) {
-        if (msObject['d'] > 0)
+        if (msObject['d'] > 0) {
             getLocaleString(settings.defaultLocaleCode, 'MISC.MORE_THAN_A_DAY');
+        }
         return `${msObject['h'] > 0 ? `${msObject['h']}:` : ''}${
             msObject['h'] > 0
                 ? msObject['m'].toString().padStart(2, '0')
@@ -244,8 +245,8 @@ export function checkLocaleCompletion(
     let foreignStringCount = 0;
     let englishStringCount = 0;
     const missingStrings: string[] = [];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function iterateObject(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         obj: Record<string, any>,
         path: string[] = [],
     ): void {
@@ -255,19 +256,21 @@ export function checkLocaleCompletion(
                 return;
             }
             englishStringCount++;
-            if (!get(foreignStrings, `${path.join('.')}.${key}`))
+            if (!get(foreignStrings, `${path.join('.')}.${key}`)) {
                 missingStrings.push(`${path.join('.')}.${key}`);
+            }
         });
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     iterateObject(<Record<string, any>>englishStrings);
     foreignStringCount = englishStringCount - missingStrings.length;
     // missing strings
-    if (englishStringCount > foreignStringCount)
+    if (englishStringCount > foreignStringCount) {
         return {
             completion: (foreignStringCount / englishStringCount) * 100,
             missing: missingStrings,
         };
+    }
     return { completion: 100, missing: [] };
 }
 
@@ -307,10 +310,11 @@ export function buildMessageOptions(
 ): MessageCreateOptions & InteractionReplyOptions {
     const messageData = Array.isArray(inputData) ? inputData : [inputData];
     const embedData = messageData.map((msg): EmbedBuilder => {
-        if (typeof msg === 'string')
+        if (typeof msg === 'string') {
             return new EmbedBuilder()
                 .setDescription(msg)
                 .setColor(settings.colors[type]);
+        }
         if (!msg.data.color) return msg.setColor(settings.colors[type]);
         return msg;
     });
@@ -343,26 +347,24 @@ export async function buildSettingsPage(
                 languageName[guildLocaleCode] ?? 'Unknown'
             } (${guildLocaleCode})`;
             actionRow.addComponents(
-                new SelectMenuBuilder()
-                    .setCustomId('language')
-                    .addOptions(
-                        readdirSync(
-                            getAbsoluteFileURL(import.meta.url, [
-                                '..',
-                                '..',
-                                '..',
-                                'locales',
-                            ]),
-                        ).map(
-                            (file): APISelectMenuOption => ({
-                                label: `${
-                                    languageName[file] ?? 'Unknown'
-                                } (${file})`,
-                                value: file,
-                                default: file === guildLocaleCode,
-                            }),
-                        ),
+                new SelectMenuBuilder().setCustomId('language').addOptions(
+                    readdirSync(
+                        getAbsoluteFileURL(import.meta.url, [
+                            '..',
+                            '..',
+                            '..',
+                            'locales',
+                        ]),
+                    ).map(
+                        (file): APISelectMenuOption => ({
+                            label: `${
+                                languageName[file] ?? 'Unknown'
+                            } (${file})`,
+                            value: file,
+                            default: file === guildLocaleCode,
+                        }),
                     ),
+                ),
             );
             break;
         case 'format': {

@@ -39,13 +39,15 @@ export default {
             return;
         }
         await player.resume();
-        if (!player.playing && player.queue.tracks.length > 0)
+        if (!player.playing && player.queue.tracks.length > 0) {
             await player.queue.start();
-        if (settings.features.web.enabled)
+        }
+        if (settings.features.web.enabled) {
             io.to(`guild:${interaction.guildId}`).emit(
                 'pauseUpdate',
                 player.paused,
             );
+        }
         await interaction.replyHandler.locale('CMD.RESUME.RESPONSE.SUCCESS', {
             type: 'success',
         });

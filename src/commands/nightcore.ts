@@ -55,11 +55,12 @@ export default {
             : undefined;
         await player.setFilters();
         player.nightcore = nightcore;
-        if (settings.features.web.enabled)
+        if (settings.features.web.enabled) {
             io.to(`guild:${interaction.guildId}`).emit('filterUpdate', {
                 bassboost: player.bassboost,
                 nightcore: player.nightcore,
             });
+        }
         await interaction.replyHandler.reply(
             new EmbedBuilder()
                 .setDescription(

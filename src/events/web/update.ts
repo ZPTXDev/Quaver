@@ -7,23 +7,26 @@ import type { UpdateItemTypes } from './update.d.js';
 export default {
     name: 'update',
     once: false,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async execute(
         socket: Socket & { guilds: APIGuild[]; user: APIUser },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         callback: (cb: Record<string, any>) => void,
         guildId: Snowflake,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         item: { type: UpdateItemTypes; value?: any },
     ): Promise<void> {
         const { bot, io } = await import('#src/main.js');
         if (!socket.guilds) return callback({ status: 'error-auth' });
-        if (!socket.guilds.find((guild): boolean => guild.id === guildId))
+        if (!socket.guilds.find((guild): boolean => guild.id === guildId)) {
             return callback({ status: 'error-auth' });
+        }
         if (
             bot.guilds.cache.get(guildId)?.members.cache.get(socket.user.id)
                 ?.voice.channelId !==
             bot.guilds.cache.get(guildId).members.me.voice.channelId
-        )
+        ) {
             return callback({ status: 'error-generic' });
+        }
         switch (item.type) {
             case 'loop': {
                 const player = bot.music.players.get(guildId);
@@ -64,8 +67,9 @@ export default {
                     ),
                     users: [],
                 };
-                if (skip.users.includes(socket.user.id))
+                if (skip.users.includes(socket.user.id)) {
                     return callback({ status: 'error-generic' });
+                }
                 skip.users.push(socket.user.id);
                 if (skip.users.length >= skip.required) {
                     await player.queue.skip();
@@ -80,7 +84,7 @@ export default {
                 const player = bot.music.players.get(guildId) as QuaverPlayer;
                 if (!player) return callback({ status: 'error-generic' });
                 let eqValues: number[] = Array(15).fill(0);
-                if (item.value)
+                if (item.value) {
                     eqValues = [
                         0.2,
                         0.15,
@@ -89,6 +93,7 @@ export default {
                         0.0,
                         ...new Array(10).fill(-0.05),
                     ];
+                }
                 // i don't get it, if this breaks something we know where to look
                 await player.setEqualizer(...eqValues);
                 player.bassboost = item.value;
