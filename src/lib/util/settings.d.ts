@@ -2,16 +2,16 @@ import type { ColorResolvable, Snowflake } from 'discord.js';
 import type { ConnectionInfo } from 'lavaclient';
 
 export type SettingsObject = {
-	token?: string;
-	applicationId?: Snowflake;
-	clientSecret?: string;
-	colors?: ColorsSettingsObject;
-	defaultLocaleCode?: string;
+    token?: string;
+    applicationId?: Snowflake;
+    clientSecret?: string;
+    colors?: ColorsSettingsObject;
+    defaultLocaleCode?: string;
     disableAd?: boolean;
-	managers?: Snowflake[];
-	database?: DatabaseSettingsObject;
-	lavalink?: ConnectionInfo;
-	features?: FeaturesSettingsObject;
+    managers?: Snowflake[];
+    database?: DatabaseSettingsObject;
+    lavalink?: ConnectionInfo;
+    features?: FeaturesSettingsObject;
 };
 
 export type ColorsSettingsObject = {

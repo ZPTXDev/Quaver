@@ -10,7 +10,7 @@ export type GuildSettingsObject = {
 };
 
 export type StaySettingObject = {
-	enabled: boolean;
-	channel?: Snowflake;
-	text?: Snowflake;
+    enabled: boolean;
+    channel?: Snowflake;
+    text?: Snowflake;
 };

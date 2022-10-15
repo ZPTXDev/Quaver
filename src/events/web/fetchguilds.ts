@@ -8,25 +8,37 @@ import { request } from 'undici';
 import type { WebGuild } from './fetchguilds.d.js';
 
 export default {
-	name: 'fetchguilds',
-	once: false,
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	async execute(socket: Socket & { guilds: WebGuild[] }, callback: (cb: Record<string, any>) => void, token?: string): Promise<void> {
-		const { bot } = await import('#src/main.js');
-		if (!token) return;
-		const decryptedToken = CryptoJS.AES.decrypt(token, settings.features.web.encryptionKey).toString(CryptoJS.enc.Utf8);
-		const guilds = await request('https://discord.com/api/users/@me/guilds', {
-			headers: {
-				'Authorization': decryptedToken,
-			},
-		});
-		let response = await getJSONResponse(guilds.body) as JSONResponse<WebGuild[]>;
-		if (response.message) return callback({ status: 'error-auth' });
-		response = response.map((guild): WebGuild => {
-			guild.botInGuild = !!bot.guilds.cache.get(guild.id);
-			return guild;
-		});
-		socket.guilds = response;
-		return callback({ status: 'success', guilds: response, version });
-	},
+    name: 'fetchguilds',
+    once: false,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async execute(
+        socket: Socket & { guilds: WebGuild[] },
+        callback: (cb: Record<string, any>) => void,
+        token?: string,
+    ): Promise<void> {
+        const { bot } = await import('#src/main.js');
+        if (!token) return;
+        const decryptedToken = CryptoJS.AES.decrypt(
+            token,
+            settings.features.web.encryptionKey,
+        ).toString(CryptoJS.enc.Utf8);
+        const guilds = await request(
+            'https://discord.com/api/users/@me/guilds',
+            {
+                headers: {
+                    Authorization: decryptedToken,
+                },
+            },
+        );
+        let response = (await getJSONResponse(guilds.body)) as JSONResponse<
+            WebGuild[]
+        >;
+        if (response.message) return callback({ status: 'error-auth' });
+        response = response.map((guild): WebGuild => {
+            guild.botInGuild = !!bot.guilds.cache.get(guild.id);
+            return guild;
+        });
+        socket.guilds = response;
+        return callback({ status: 'success', guilds: response, version });
+    },
 };
