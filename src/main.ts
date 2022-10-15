@@ -132,7 +132,6 @@ if (io) {
             (file): boolean => file.endsWith('.js') || file.endsWith('.ts'),
         );
         for await (const file of webEventFiles) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const event: {
                 default: {
                     name: string;
@@ -140,6 +139,7 @@ if (io) {
                     execute(
                         socket: Socket,
                         callback: () => void,
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         ...args: any[]
                     ): void | Promise<void>;
                 };
@@ -420,8 +420,10 @@ for await (const folder of componentsFolders) {
                 ]).toString()
             );
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if (!(bot as Record<string, any>)[folder])
+        if (!(bot as Record<string, any>)[folder]) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (bot as Record<string, any>)[folder] = new Collection();
+        }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (bot as Record<string, any>)[folder].set(
             component.default.name,
@@ -460,24 +462,25 @@ for await (const file of musicEventFiles) {
         ]).toString()
     );
     if (event.default.once) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         bot.music.once(
             event.default.name as keyof NodeEvents,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (...args: any[]): void | Promise<void> =>
                 event.default.execute(...args),
         );
     } else {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         bot.music.on(
             event.default.name as keyof NodeEvents,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (...args: any[]): void | Promise<void> =>
                 event.default.execute(...args),
         );
     }
 }
 
-if (settings.features.web.enabled)
+if (settings.features.web.enabled) {
     setInterval((): boolean => bot.emit('timer'), 500);
+}
 
 bot.login(settings.token);
 
