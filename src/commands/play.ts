@@ -8,6 +8,7 @@ import type {
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
+import type { Item } from '@lavaclient/spotify';
 import { SpotifyItemType } from '@lavaclient/spotify';
 import type {
     ChatInputCommandInteraction,
@@ -113,16 +114,14 @@ export default {
             return;
         }
         await interaction.deferReply();
-        const query = interaction.options.getString('query'),
+        const query = interaction.options
+                .getString('query')
+                .replace('embed/', ''),
             insert = interaction.options.getBoolean('insert');
         let tracks = [],
             msg = '',
             extras = [];
-        if (
-            interaction.client.music.spotify.isSpotifyUrl(
-                query.replace('embed/', ''),
-            )
-        ) {
+        if (interaction.client.music.spotify.isSpotifyUrl(query)) {
             if (
                 !settings.features.spotify.enabled ||
                 !settings.features.spotify.client_id ||
@@ -134,9 +133,16 @@ export default {
                 );
                 return;
             }
-            const item = await interaction.client.music.spotify.load(
-                query.replace('embed/', ''),
-            );
+            let item: Item;
+            try {
+                item = await interaction.client.music.spotify.load(query);
+            } catch (err) {
+                await interaction.replyHandler.locale(
+                    'CMD.PLAY.RESPONSE.NO_RESULTS.SPOTIFY',
+                    { type: 'error' },
+                );
+                return;
+            }
             switch (item?.type) {
                 case SpotifyItemType.Track: {
                     const track = await item.resolveYoutubeTrack();
