@@ -114,14 +114,17 @@ export default {
             return;
         }
         await interaction.deferReply();
-        const query = interaction.options
-                .getString('query')
-                .replace('embed/', ''),
-            insert = interaction.options.getBoolean('insert');
+        let query = interaction.options.getString('query');
+        const insert = interaction.options.getBoolean('insert');
         let tracks = [],
             msg = '',
             extras = [];
-        if (interaction.client.music.spotify.isSpotifyUrl(query)) {
+        if (
+            interaction.client.music.spotify.isSpotifyUrl(
+                query.replace('embed/', ''),
+            )
+        ) {
+            query = query.replace('embed/', '');
             if (
                 !settings.features.spotify.enabled ||
                 !settings.features.spotify.client_id ||
