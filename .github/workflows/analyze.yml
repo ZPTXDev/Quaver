@@ -65,10 +65,7 @@ jobs:
     if: contains(fromJson('["push", "pull_request"]'), github.event_name)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.head_ref }}
-          fetch-depth: 0
+      - uses: actions/checkout@v3
       - uses: creyD/prettier_action@v4.2
         with:
-          same_commit: true
+          commit_message: 'refactor: prettify'
