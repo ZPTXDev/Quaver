@@ -84,7 +84,7 @@ export default {
 			NEW_POSITION: 'The new position of the track.'
 		},
 		RESPONSE: {
-			SUCCESS: 'Moved **[%1](%2)** `%3 -> %4`',
+			SUCCESS: 'Moved [**%1**](%2) `%3 -> %4`',
 			QUEUE_INSUFFICIENT_TRACKS: 'There aren\'t enough tracks in the queue to perform a move.',
 			OUT_OF_RANGE: 'Your input was invalid.',
 			MOVING_IN_PLACE: 'You can\'t move a track to the same position it is already in.'
@@ -153,7 +153,7 @@ export default {
 			POSITION: 'The position of the track to remove.'
 		},
 		RESPONSE: {
-			SUCCESS: 'Removed **[%1](%2)**',
+			SUCCESS: 'Removed [**%1**](%2)',
 			QUEUE_EMPTY: 'There are no tracks in the queue to remove.'
 		}
 	},
@@ -225,11 +225,11 @@ export default {
 		DESCRIPTION: 'Skip the current track.',
 		RESPONSE: {
 			SUCCESS: {
-				DEFAULT: 'Skipped **[%1](%2)**',
-				VOTED: 'Skipped **[%1](%2)** by voting'
+				DEFAULT: 'Skipped [**%1**](%2)',
+				VOTED: 'Skipped [**%1**](%2) by voting'
 			},
 			VOTED: {
-				SUCCESS: 'Voted to skip **[%1](%2)** `[%3 / %4]`',
+				SUCCESS: 'Voted to skip [**%1**](%2) `[%3 / %4]`',
 				STATE_UNCHANGED: 'You have already voted to skip this track.'
 			}
 		}
