@@ -7,6 +7,7 @@ export type SettingsObject = {
     clientSecret?: string;
     colors?: ColorsSettingsObject;
     defaultLocaleCode?: string;
+    developerMode?: boolean;
     disableAd?: boolean;
     managers?: Snowflake[];
     database?: DatabaseSettingsObject;
