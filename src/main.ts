@@ -32,6 +32,7 @@ import { Node } from 'lavaclient';
 import { createInterface } from 'readline';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
+import { inspect } from 'util';
 import type { QuaverEvent, QuaverMusicEvent } from './main.d.js';
 
 export const startup = { started: false };
@@ -92,6 +93,26 @@ rl.on('line', async (input): Promise<void> => {
                 );
                 console.log(`Removed ${guild.name} from the 24/7 whitelist.`);
             }
+            break;
+        }
+        case 'eval': {
+            if (!settings.developerMode) {
+                console.log('Developer mode is not enabled.');
+                break;
+            }
+            if (!input.substring(5)) {
+                console.log('No input provided.');
+                break;
+            }
+            let output: string;
+            try {
+                output = await eval(input.substring(5));
+                if (typeof output !== 'string') output = inspect(output);
+            } catch (error) {
+                output = error;
+            }
+            if (!output) output = '[no output]';
+            console.log(output);
             break;
         }
         default:
