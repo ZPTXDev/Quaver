@@ -23,7 +23,6 @@ export default class DataHandler {
      * @param item - The item to retrieve.
      * @returns The requested item.
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async get<T>(key: string, item: string): Promise<T | undefined> {
         const data: DatabaseObject = await this.cache.get(key);
         if (!data) return undefined;
