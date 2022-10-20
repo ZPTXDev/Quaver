@@ -29,6 +29,15 @@ export default {
                     interaction.guildId ? `G ${interaction.guildId} | ` : ''
                 }U ${interaction.user.id}] Processing command ${
                     interaction.commandName
+                }${
+                    interaction.options.data.length > 0
+                        ? ` ${interaction.options.data
+                              .map(
+                                  (option): string =>
+                                      `${option.name}:${option.value}`,
+                              )
+                              .join(' ')}`
+                        : ''
                 }`,
                 label: 'Quaver',
             });
@@ -164,6 +173,15 @@ export default {
                         interaction.guildId ? `G ${interaction.guildId} | ` : ''
                     }U ${interaction.user.id}] Executing command ${
                         interaction.commandName
+                    }${
+                        interaction.options.data.length > 0
+                            ? ` ${interaction.options.data
+                                  .map(
+                                      (option): string =>
+                                          `${option.name}:${option.value}`,
+                                  )
+                                  .join(' ')}`
+                            : ''
                     }`,
                     label: 'Quaver',
                 });
