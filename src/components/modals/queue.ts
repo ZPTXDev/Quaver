@@ -97,12 +97,12 @@ export default {
         updated.components[0] =
             new ActionRowBuilder<ButtonBuilder>().addComponents(
                 new ButtonBuilder()
-                    .setCustomId(`queue_${page - 1}`)
+                    .setCustomId(`queue:${page - 1}`)
                     .setEmoji('⬅️')
                     .setDisabled(page - 1 < 1)
                     .setStyle(ButtonStyle.Primary),
                 new ButtonBuilder()
-                    .setCustomId('queue_goto')
+                    .setCustomId('queue:goto')
                     .setStyle(ButtonStyle.Secondary)
                     .setLabel(
                         await getGuildLocaleString(
@@ -111,7 +111,7 @@ export default {
                         ),
                     ),
                 new ButtonBuilder()
-                    .setCustomId(`queue_${page + 1}`)
+                    .setCustomId(`queue:${page + 1}`)
                     .setEmoji('➡️')
                     .setDisabled(page + 1 > pages.length)
                     .setStyle(ButtonStyle.Primary),

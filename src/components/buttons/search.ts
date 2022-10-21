@@ -52,7 +52,7 @@ export default {
             );
             return;
         }
-        const target = interaction.customId.split('_')[1];
+        const target = interaction.customId.split(':')[1];
         if (target === 'add') {
             const { bot, io } = await import('#src/main.js');
             const tracks = state.selected;
@@ -386,14 +386,14 @@ export default {
         selectComponent.setMaxValues(selectComponent.options.length);
         updated.components[0].components[0] = selectComponent;
         updated.components[1].components[0] = ButtonBuilder.from(
-            <ButtonComponent>original.components[1].components[0],
+            original.components[1].components[0] as ButtonComponent,
         )
-            .setCustomId(`search_${page - 1}`)
+            .setCustomId(`search:${page - 1}`)
             .setDisabled(page - 1 < 1);
         updated.components[1].components[1] = ButtonBuilder.from(
-            <ButtonComponent>original.components[1].components[1],
+            original.components[1].components[1] as ButtonComponent,
         )
-            .setCustomId(`search_${page + 1}`)
+            .setCustomId(`search:${page + 1}`)
             .setDisabled(page + 1 > pages.length);
         await interaction.replyHandler.reply(updated.embeds, {
             components: updated.components,

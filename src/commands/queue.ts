@@ -80,12 +80,12 @@ export default {
                 components: [
                     new ActionRowBuilder<ButtonBuilder>().addComponents(
                         new ButtonBuilder()
-                            .setCustomId('queue_0')
+                            .setCustomId('queue:0')
                             .setEmoji('⬅️')
                             .setDisabled(true)
                             .setStyle(ButtonStyle.Primary),
                         new ButtonBuilder()
-                            .setCustomId('queue_goto')
+                            .setCustomId('queue:goto')
                             .setStyle(ButtonStyle.Secondary)
                             .setLabel(
                                 await getGuildLocaleString(
@@ -94,7 +94,7 @@ export default {
                                 ),
                             ),
                         new ButtonBuilder()
-                            .setCustomId('queue_2')
+                            .setCustomId('queue:2')
                             .setEmoji('➡️')
                             .setDisabled(pages.length === 1)
                             .setStyle(ButtonStyle.Primary),

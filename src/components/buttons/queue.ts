@@ -30,7 +30,7 @@ export default {
                 interaction.guildId,
             ),
             pages = player ? paginate(player.queue.tracks, 5) : [];
-        const target = interaction.customId.split('_')[1];
+        const target = interaction.customId.split(':')[1];
         if (player && target === 'goto' && pages.length !== 0) {
             return interaction.showModal(
                 new ModalBuilder()
@@ -40,11 +40,11 @@ export default {
                             'CMD.QUEUE.MISC.MODAL_TITLE',
                         ),
                     )
-                    .setCustomId('queue_goto')
+                    .setCustomId('queue:goto')
                     .addComponents(
                         new ActionRowBuilder<TextInputBuilder>().addComponents(
                             new TextInputBuilder()
-                                .setCustomId('queue_goto_input')
+                                .setCustomId('queue:goto:input')
                                 .setLabel(
                                     await getGuildLocaleString(
                                         interaction.guildId,
@@ -112,12 +112,12 @@ export default {
         (updated.components[0].components[0] = ButtonBuilder.from(
             original.components[0].components[0] as ButtonComponent,
         )
-            .setCustomId(`queue_${page - 1}`)
+            .setCustomId(`queue:${page - 1}`)
             .setDisabled(page - 1 < 1)),
             (updated.components[0].components[2] = ButtonBuilder.from(
                 original.components[0].components[2] as ButtonComponent,
             )
-                .setCustomId(`queue_${page + 1}`)
+                .setCustomId(`queue:${page + 1}`)
                 .setDisabled(page + 1 > pages.length));
         await interaction.replyHandler.reply(updated.embeds, {
             components: updated.components,

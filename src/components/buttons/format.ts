@@ -61,7 +61,7 @@ export default {
             30 * 1000,
             interaction.message,
         );
-        const option = interaction.customId.split('_')[1];
+        const option = interaction.customId.split(':')[1];
         await data.guild.set(interaction.guildId, 'settings.format', option);
         const guildLocaleCode =
             (await data.guild.get<string>(

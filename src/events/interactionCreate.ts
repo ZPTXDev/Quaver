@@ -225,7 +225,7 @@ export default {
         }
         if (interaction.isButton()) {
             const button = interaction.client.buttons.get(
-                interaction.customId.split('_')[0],
+                interaction.customId.split(':')[0],
             ) as Button;
             if (!button) return;
             logger.info({
@@ -274,7 +274,7 @@ export default {
         }
         if (interaction.isSelectMenu()) {
             const selectmenu = interaction.client.selectmenus.get(
-                interaction.customId.split('_')[0],
+                interaction.customId.split(':')[0],
             ) as SelectMenu;
             if (!selectmenu) return;
             logger.info({
@@ -323,7 +323,7 @@ export default {
         }
         if (interaction.isModalSubmit()) {
             const modal = interaction.client.modals.get(
-                interaction.customId.split('_')[0],
+                interaction.customId.split(':')[0],
             ) as ModalSubmit;
             if (!modal) return;
             logger.info({
