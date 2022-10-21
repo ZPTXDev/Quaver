@@ -44,7 +44,12 @@ export default {
 	},
 	INFO: {
 		DESCRIPTION: 'Ipakita ang impormasyon bahin ni Quaver.',
-		RESPONSE: { SUCCESS: 'Open-source nga music bot for para sa ginagmay na mga komunidad.\nAng source code kay available [dinhi](https://go.zptx.dev/Quaver), invite [dinhi](%1).\nNagdagan sa bersyong `%2`.' }
+		RESPONSE: { SUCCESS: 'Open-source nga music bot para sa ginagmay na mga komunidad.\nNagdagan sa bersyong `%1`.' },
+		MISC: {
+			SOURCE_CODE: 'Source Code',
+			INVITE: 'I-imbitar',
+			SPONSOR_US: 'Sponsor Namo'
+		}
 	},
 	LOOP: {
 		DESCRIPTION: 'Usba ang mode sa pag-loop.',
@@ -67,7 +72,7 @@ export default {
 			NEW_POSITION: 'Ang bag-ong posisyon aron mabalhin ang track.'
 		},
 		RESPONSE: {
-			SUCCESS: 'Nabalhin ang **[%1](%2)** `%3 -> %4`',
+			SUCCESS: 'Nabalhin ang [**%1**](%2) `%3 -> %4`',
 			QUEUE_INSUFFICIENT_TRACKS: 'Walay igong mga track sa queue aron makahimo og usa ka pagbalhin.',
 			OUT_OF_RANGE: 'Ang imong input kay dili balido.',
 			MOVING_IN_PLACE: 'Dili nimo mabalhin ang usa ka track sa parehas nga posisyon nga naa na niini.'
@@ -124,7 +129,7 @@ export default {
 		DESCRIPTION: 'Pagtangtang og track gikan sa queue.',
 		OPTION: { POSITION: 'Ang posisyon sa track nga itangtang.' },
 		RESPONSE: {
-			SUCCESS: 'Gitangtang ang **[%1](%2)**',
+			SUCCESS: 'Gitangtang ang [**%1**](%2)',
 			QUEUE_EMPTY: 'Walay mga track sa queue nga tangtangonon.'
 		}
 	},
@@ -188,11 +193,11 @@ export default {
 		DESCRIPTION: 'Laktawi ang kasamtangang track.',
 		RESPONSE: {
 			SUCCESS: {
-				DEFAULT: 'Gilaktawan ang **[%1](%2)**',
-				VOTED: 'Nalaktawan ang **[%1](%2)** pinaagi sa boto'
+				DEFAULT: 'Gilaktawan ang [**%1**](%2)',
+				VOTED: 'Nalaktawan ang [**%1**](%2) pinaagi sa boto'
 			},
 			VOTED: {
-				SUCCESS: 'Giboto nga laktawan ang **[%1](%2)** `[%3 / %4]`',
+				SUCCESS: 'Giboto nga laktawan ang [**%1**](%2) `[%3 / %4]`',
 				STATE_UNCHANGED: 'Nakaboto kana nga laktawan kini nga track.'
 			}
 		}

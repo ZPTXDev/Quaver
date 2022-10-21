@@ -22,7 +22,7 @@ export default {
 	},
 	PLAYER: {
 		FILTER_NOTE: 'Mahimong molungtad kini og pipila ka segundo aron ma-apply',
-		TRACK_SKIPPED_ERROR: 'Gilaktawan **[%1](%2)** kay naay sayop nga nahitabo: `%3`',
+		TRACK_SKIPPED_ERROR: 'Gilaktawan [**%1**](%2) kay naay sayop nga nahitabo: `%3`',
 		QUEUE_CLEARED_ERROR: 'Gi-clear ang queue isip usa ka sayup nga nahitabo nga daghang beses nga sunud-sunod.',
 		PLAYING: {
 			NOTHING: 'Wala nay nagpatugtug karon.',
