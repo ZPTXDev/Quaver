@@ -376,7 +376,7 @@ export async function buildSettingsPage(
                 )) ?? 'simple';
             actionRow.addComponents(
                 new ButtonBuilder()
-                    .setCustomId('format_simple')
+                    .setCustomId('format:simple')
                     .setLabel(
                         getLocaleString(
                             guildLocaleCode,
@@ -390,7 +390,7 @@ export async function buildSettingsPage(
                     )
                     .setDisabled(current === 'simple'),
                 new ButtonBuilder()
-                    .setCustomId('format_detailed')
+                    .setCustomId('format:detailed')
                     .setLabel(
                         getLocaleString(
                             guildLocaleCode,

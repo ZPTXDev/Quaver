@@ -156,17 +156,17 @@ export default {
                     ),
                     new ActionRowBuilder<ButtonBuilder>().addComponents(
                         new ButtonBuilder()
-                            .setCustomId('search_0')
+                            .setCustomId('search:0')
                             .setEmoji('⬅️')
                             .setDisabled(true)
                             .setStyle(ButtonStyle.Primary),
                         new ButtonBuilder()
-                            .setCustomId('search_2')
+                            .setCustomId('search:2')
                             .setEmoji('➡️')
                             .setDisabled(pages.length === 1)
                             .setStyle(ButtonStyle.Primary),
                         new ButtonBuilder()
-                            .setCustomId('search_add')
+                            .setCustomId('search:add')
                             .setStyle(ButtonStyle.Success)
                             .setDisabled(true)
                             .setLabel(
