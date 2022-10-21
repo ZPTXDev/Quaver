@@ -27,7 +27,7 @@ export default {
                 interaction.guildId,
             ),
             page = parseInt(
-                interaction.fields.getTextInputValue('queue_goto_input'),
+                interaction.fields.getTextInputValue('queue:goto:input'),
             );
         let pages;
         if (isNaN(page)) {
