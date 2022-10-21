@@ -217,7 +217,11 @@ export default {
                 interaction.commandName,
             ) as Autocomplete;
             if (!autocomplete) return;
-            return autocomplete.execute(interaction);
+            try {
+                return autocomplete.execute(interaction);
+            } catch (error) {
+                return;
+            }
         }
         if (interaction.isButton()) {
             const button = interaction.client.buttons.get(
