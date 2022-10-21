@@ -44,7 +44,12 @@ export default {
 	},
 	INFO: {
 		DESCRIPTION: 'Magpakita ng impormasyon tungkol kay Quaver.',
-		RESPONSE: { SUCCESS: 'Open-source na music bot para sa maliliit na mga komunidad.\nAng source code ay available [dito](https://go.zptx.dev/Quaver), invite [dito](%1).\nTumatakbo sa bersyong `%2`.' }
+		RESPONSE: { SUCCESS: 'Open-source na music bot para sa maliliit na mga komunidad.\nTumatakbo sa bersyong `%1`.' },
+		MISC: {
+			SOURCE_CODE: 'Source Code',
+			INVITE: 'Anyayahan',
+			SPONSOR_US: 'Sponsor sa Amin'
+		}
 	},
 	LOOP: {
 		DESCRIPTION: 'Baguhin ang mode sa paglo-loop.',
@@ -67,7 +72,7 @@ export default {
 			NEW_POSITION: 'Ang bagong posisyon upang mailipat ang track.'
 		},
 		RESPONSE: {
-			SUCCESS: 'Nailipat ang **[%1](%2)** `%3 -> %4`',
+			SUCCESS: 'Nailipat ang [**%1**](%2) `%3 -> %4`',
 			QUEUE_INSUFFICIENT_TRACKS: 'Walang sapat na mga track sa queue upang magsagawa ng isang paglipat.',
 			OUT_OF_RANGE: 'Ang iyong input ay hindi wasto.',
 			MOVING_IN_PLACE: 'Hindi mo maaaring ilipat ang isang track sa parehong posisyon kung nasaan na ito.'
@@ -124,7 +129,7 @@ export default {
 		DESCRIPTION: 'Mag-alis ng track mula sa queue.',
 		OPTION: { POSITION: 'Ang posisyon ng track na aalisin.' },
 		RESPONSE: {
-			SUCCESS: 'Inalis ang **[%1](%2)**',
+			SUCCESS: 'Inalis ang [**%1**](%2)',
 			QUEUE_EMPTY: 'Walang mga track sa queue na aalisin.'
 		}
 	},
@@ -188,11 +193,11 @@ export default {
 		DESCRIPTION: 'Laktawan ang kasalukuyang track.',
 		RESPONSE: {
 			SUCCESS: {
-				DEFAULT: 'Nilaktawan ang **[%1](%2)**',
-				VOTED: 'Nilaktawan ang **[%1](%2)** sa pamamagitan ng pagboto'
+				DEFAULT: 'Nilaktawan ang [**%1**](%2)',
+				VOTED: 'Nilaktawan ang [**%1**](%2) sa pamamagitan ng pagboto'
 			},
 			VOTED: {
-				SUCCESS: 'Nakaboto upang laktawan ang **[%1](%2)** `[%3 / %4]`',
+				SUCCESS: 'Nakaboto upang laktawan ang [**%1**](%2) `[%3 / %4]`',
 				STATE_UNCHANGED: 'Nakaboto kana upang laktawan ang track na ito.'
 			}
 		}

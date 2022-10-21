@@ -22,7 +22,7 @@ export default {
 	},
 	PLAYER: {
 		FILTER_NOTE: 'Maaaring tumagal ito ng ilang segundo bago mag-apply',
-		TRACK_SKIPPED_ERROR: 'Nilaktawan ang **[%1](%2)** dahil may naganap na error: `%3`',
+		TRACK_SKIPPED_ERROR: 'Nilaktawan ang [**%1**](%2) dahil may error na naganap: `%3`',
 		QUEUE_CLEARED_ERROR: 'Na-clear ang queue bilang isang error na naganap nang maraming beses nang magkakasunod.',
 		PLAYING: {
 			NOTHING: 'Walang nang nagpatugtug ngayon.',
