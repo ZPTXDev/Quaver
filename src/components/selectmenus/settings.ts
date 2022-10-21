@@ -86,10 +86,14 @@ export default {
         )}** ─ ${getLocaleString(
             guildLocaleCode,
             `CMD.SETTINGS.MISC.${option.toUpperCase()}.DESCRIPTION`,
-        )}\n> ${getLocaleString(
-            guildLocaleCode,
-            'MISC.CURRENT',
-        )}: \`${current}\``;
+        )}${
+            current
+                ? `\n> ${getLocaleString(
+                      guildLocaleCode,
+                      'MISC.CURRENT',
+                  )}: \`${current}\``
+                : ''
+        }`;
         await interaction.replyHandler.reply([description, ...embeds], {
             components: [
                 new ActionRowBuilder<SelectMenuBuilder>().addComponents(

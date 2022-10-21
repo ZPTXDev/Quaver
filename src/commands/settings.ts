@@ -64,10 +64,14 @@ export default {
         )}** ─ ${getLocaleString(
             guildLocaleCode,
             `CMD.SETTINGS.MISC.${option.toUpperCase()}.DESCRIPTION`,
-        )}\n> ${getLocaleString(
-            guildLocaleCode,
-            'MISC.CURRENT',
-        )}: \`${current}\``;
+        )}${
+            current
+                ? `\n> ${getLocaleString(
+                      guildLocaleCode,
+                      'MISC.CURRENT',
+                  )}: \`${current}\``
+                : ''
+        }`;
         const msg = await interaction.replyHandler.reply(
             [description, ...embeds],
             {
