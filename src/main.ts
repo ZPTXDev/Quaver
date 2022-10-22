@@ -152,7 +152,7 @@ if (settings.features.web.enabled) {
                 users: bot.users.cache.size,
             },
             memory: {
-                free: freemem(),
+                used: totalmem() - freemem(),
                 total: totalmem(),
             },
         });
