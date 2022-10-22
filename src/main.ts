@@ -137,11 +137,19 @@ if (settings.features.web.enabled) {
             (player: QuaverPlayer): boolean =>
                 !player.timeout && !player.pauseTimeout,
         ).length;
+        const totalQueued = Array.from(bot.music?.players?.values()).reduce(
+            (total: number, player: QuaverPlayer): number =>
+                total + player.queue?.tracks.length,
+            0,
+        );
         res.send({
             sessions: {
                 total: totalSessions,
                 active: activeSessions,
                 idle: totalSessions - activeSessions,
+            },
+            tracks: {
+                totalQueued: totalQueued,
             },
             versions: {
                 node: process.version,
