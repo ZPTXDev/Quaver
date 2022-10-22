@@ -24,15 +24,20 @@ import {
     GatewayDispatchEvents,
     GatewayIntentBits,
 } from 'discord.js';
+import type { Express } from 'express';
+import express from 'express';
 import { readdirSync, readFileSync } from 'fs';
 import { writeFile } from 'fs/promises';
-import { createServer } from 'https';
+import * as http from 'http';
+import * as https from 'https';
 import type { NodeEvents } from 'lavaclient';
 import { Node } from 'lavaclient';
+import { freemem, totalmem } from 'os';
 import { createInterface } from 'readline';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
 import { inspect } from 'util';
+import { version } from './lib/util/version.js';
 import type { QuaverEvent, QuaverMusicEvent } from './main.d.js';
 
 export const startup = { started: false };
@@ -123,25 +128,60 @@ rl.on('line', async (input): Promise<void> => {
 // 'close' event catches ctrl+c, therefore we pass it to shuttingDown as a ctrl+c event
 rl.on('close', async (): Promise<void> => shuttingDown('SIGINT'));
 
-let httpServer;
-if (settings.features.web.https.enabled) {
-    httpServer = createServer({
-        key: readFileSync(
-            getAbsoluteFileURL(import.meta.url, [
-                '..',
-                ...settings.features.web.https.key.split('/'),
-            ]),
-        ),
-        cert: readFileSync(
-            getAbsoluteFileURL(import.meta.url, [
-                '..',
-                ...settings.features.web.https.cert.split('/'),
-            ]),
-        ),
+let app: Express, server;
+if (settings.features.web.enabled) {
+    app = express();
+    app.get('/stats', async (req, res): Promise<void> => {
+        const totalSessions = bot.music?.players?.size;
+        const activeSessions = Array.from(bot.music?.players?.values()).filter(
+            (player: QuaverPlayer): boolean =>
+                !player.timeout && !player.pauseTimeout,
+        ).length;
+        res.send({
+            sessions: {
+                total: totalSessions,
+                active: activeSessions,
+                idle: totalSessions - activeSessions,
+            },
+            versions: {
+                node: process.version,
+                quaver: version,
+            },
+            cache: {
+                guilds: bot.guilds.cache.size,
+                users: bot.users.cache.size,
+            },
+            memory: {
+                free: freemem(),
+                total: totalmem(),
+            },
+        });
     });
+    if (settings.features.web.https.enabled) {
+        server = https.createServer(
+            {
+                key: readFileSync(
+                    getAbsoluteFileURL(import.meta.url, [
+                        '..',
+                        ...settings.features.web.https.key.split('/'),
+                    ]),
+                ),
+                cert: readFileSync(
+                    getAbsoluteFileURL(import.meta.url, [
+                        '..',
+                        ...settings.features.web.https.cert.split('/'),
+                    ]),
+                ),
+            },
+            app,
+        );
+    } else {
+        server = http.createServer(app);
+    }
+    server.listen(settings.features.web.port);
 }
 export const io = settings.features.web.enabled
-    ? new Server(httpServer ?? settings.features.web.port, {
+    ? new Server(server, {
           cors: { origin: settings.features.web.allowedOrigins },
       })
     : undefined;
@@ -187,7 +227,6 @@ if (io) {
         }
     });
 }
-if (httpServer) httpServer.listen(settings.features.web.port);
 
 load({
     client: {

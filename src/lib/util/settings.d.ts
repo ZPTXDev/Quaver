@@ -10,6 +10,7 @@ export type SettingsObject = {
     developerMode?: boolean;
     disableAd?: boolean;
     managers?: Snowflake[];
+    grafanaLogging?: GrafanaLoggingSettingsObject;
     database?: DatabaseSettingsObject;
     lavalink?: ConnectionInfo;
     features?: FeaturesSettingsObject;
@@ -25,6 +26,12 @@ export type ColorsSettingsObject = {
 export type DatabaseSettingsObject = {
     protocol?: string;
     path?: string;
+};
+
+export type GrafanaLoggingSettingsObject = {
+    host?: string;
+    appName?: string;
+    basicAuth?: string;
 };
 
 export type LavalinkReconnectSettingsObject = {

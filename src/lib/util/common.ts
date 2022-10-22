@@ -4,7 +4,9 @@ import type { Snowflake } from 'discord.js';
 import { Collection } from 'discord.js';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
+import type { transport } from 'winston';
 import { createLogger, format, transports } from 'winston';
+import LokiTransport from 'winston-loki';
 import type { SearchStateRecord } from './common.d.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -56,6 +58,19 @@ export const logger = createLogger({
         }),
         new transports.File({ filename: 'logs/error.log', level: 'error' }),
         new transports.File({ filename: 'logs/log.log' }),
+        ...(settings.grafanaLogging
+            ? [
+                  new LokiTransport({
+                      host: settings.grafanaLogging.host,
+                      labels: { app: settings.grafanaLogging.appName },
+                      basicAuth: settings.grafanaLogging.basicAuth,
+                      format: format.json(),
+                      json: true,
+                      replaceTimestamp: true,
+                      onConnectionError: (error): void => console.error(error),
+                  }) as transport,
+              ]
+            : []),
     ],
 });
 export let locales = new Collection();

@@ -1,0 +1,12 @@
+diff --git a/node_modules/winston-loki/index.d.ts b/node_modules/winston-loki/index.d.ts
+index 2c0a77f..ac93248 100644
+--- a/node_modules/winston-loki/index.d.ts
++++ b/node_modules/winston-loki/index.d.ts
+@@ -8,6 +8,7 @@ declare interface LokiTransportOptions extends TransportStream.TransportStreamOp
+     json?: boolean;
+     batching?: boolean;
+     labels?: object;
++    format?: any;
+     clearOnError?: boolean,
+     replaceTimestamp?: boolean,
+     gracefulShutdown?: boolean,
