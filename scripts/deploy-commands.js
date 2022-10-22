@@ -2,13 +2,13 @@
 // Commands are deployed globally by default.
 // This means that it may take a little bit of time before your commands can be seen on all guilds.
 
-import { readdirSync } from 'fs';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v10';
 import { Collection } from 'discord.js';
-import settings from '../settings.json' assert { type: 'json' };
-import { getAbsoluteFileURL } from '../dist/lib/util/util.js';
+import { readdirSync } from 'fs';
 import { setLocales } from '../dist/lib/util/common.js';
+import { getAbsoluteFileURL } from '../dist/lib/util/util.js';
+import settings from '../settings.json' assert { type: 'json' };
 
 const locales = new Collection();
 const localeFolders = readdirSync(getAbsoluteFileURL(import.meta.url, ['..', 'locales']));
@@ -40,7 +40,9 @@ try {
 		{ body: commands },
 	);
 	console.log('Successfully registered application commands.');
+	process.exit(0);
 }
 catch (error) {
 	console.error(error);
+	process.exit(1);
 }
