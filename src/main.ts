@@ -32,7 +32,6 @@ import * as http from 'http';
 import * as https from 'https';
 import type { NodeEvents } from 'lavaclient';
 import { Node } from 'lavaclient';
-import { freemem, totalmem } from 'os';
 import { createInterface } from 'readline';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
@@ -159,10 +158,7 @@ if (settings.features.web.enabled) {
                 guilds: bot.guilds.cache.size,
                 users: bot.users.cache.size,
             },
-            memory: {
-                used: totalmem() - freemem(),
-                total: totalmem(),
-            },
+            memory: process.memoryUsage(),
         });
     });
     if (settings.features.web.https.enabled) {
