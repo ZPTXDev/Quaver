@@ -27,7 +27,7 @@ export default {
                 (element): boolean => element !== focused,
             );
             searchSuggestions.unshift(focused);
-            return interaction.respond(
+            return await interaction.respond(
                 searchSuggestions
                     .filter((element): boolean => element !== '')
                     .map((suggestion): string =>
