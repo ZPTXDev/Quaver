@@ -246,7 +246,11 @@ data.guild.instance.on('error', async (err: Error): Promise<void> => {
 });
 
 export const bot: QuaverClient = new Client({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildVoiceStates,
+        GatewayIntentBits.GuildMessages,
+    ],
 });
 bot.commands = new Collection();
 bot.autocomplete = new Collection();
