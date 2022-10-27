@@ -2,7 +2,7 @@ import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.d.js';
 import { data, logger } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
-    getGuildLocaleString,
+    getLocaleString,
     msToTime,
     msToTimeString,
 } from '#src/lib/util/util.js';
@@ -48,19 +48,24 @@ export default {
                 }),
             );
         }
+        const guildLocaleCode =
+            (await data.guild.get<string>(
+                queue.player.guildId,
+                'settings.locale',
+            )) ?? settings.defaultLocaleCode;
         const format =
             (await data.guild.get(queue.player.guildId, 'settings.format')) ??
             'simple';
         format === 'simple'
             ? await queue.player.handler.send(
-                  `${await getGuildLocaleString(
-                      queue.player.guildId,
+                  `${getLocaleString(
+                      guildLocaleCode,
                       'MUSIC.PLAYER.PLAYING.NOW.SIMPLE',
                       escapeMarkdown(track.title),
                       track.uri,
                       durationString,
-                  )}\n${await getGuildLocaleString(
-                      queue.player.guildId,
+                  )}\n${getLocaleString(
+                      guildLocaleCode,
                       'MISC.ADDED_BY',
                       track.requester,
                   )}`,
@@ -68,8 +73,8 @@ export default {
             : await queue.player.handler.send(
                   new EmbedBuilder()
                       .setTitle(
-                          await getGuildLocaleString(
-                              queue.player.guildId,
+                          getLocaleString(
+                              guildLocaleCode,
                               'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE',
                           ),
                       )
@@ -78,24 +83,24 @@ export default {
                       )
                       .addFields([
                           {
-                              name: await getGuildLocaleString(
-                                  queue.player.guildId,
+                              name: getLocaleString(
+                                  guildLocaleCode,
                                   'MUSIC.PLAYER.PLAYING.NOW.DETAILED.DURATION',
                               ),
                               value: `\`${durationString}\``,
                               inline: true,
                           },
                           {
-                              name: await getGuildLocaleString(
-                                  queue.player.guildId,
+                              name: getLocaleString(
+                                  guildLocaleCode,
                                   'MUSIC.PLAYER.PLAYING.NOW.DETAILED.UPLOADER',
                               ),
                               value: track.author,
                               inline: true,
                           },
                           {
-                              name: await getGuildLocaleString(
-                                  queue.player.guildId,
+                              name: getLocaleString(
+                                  guildLocaleCode,
                                   'MUSIC.PLAYER.PLAYING.NOW.DETAILED.ADDED_BY',
                               ),
                               value: `<@${track.requester}>`,
