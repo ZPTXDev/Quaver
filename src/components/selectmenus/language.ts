@@ -85,9 +85,13 @@ export default {
                     `This language is incomplete. Completion: \`${roundTo(
                         localeCompletion.completion,
                         2,
-                    )}%\`\nMissing strings:\n\`\`\`\n${localeCompletion.missing.join(
-                        '\n',
-                    )}\`\`\``,
+                    )}%\`${
+                        settings.managers.includes(interaction.user.id)
+                            ? `\nMissing strings:\n\`\`\`\n${localeCompletion.missing.join(
+                                  '\n',
+                              )}\`\`\``
+                            : ''
+                    }`,
                 ),
                 { type: 'warning', ephemeral: true },
             );
