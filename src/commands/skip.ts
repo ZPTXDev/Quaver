@@ -41,6 +41,7 @@ export default {
             );
             return;
         }
+        // TODO: Web does not have these bypasses yet
         if (
             player.queue.current.requester === interaction.user.id ||
             interaction.channel
