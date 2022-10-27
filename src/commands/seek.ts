@@ -8,9 +8,10 @@ import {
 } from '#src/lib/util/util.js';
 import type {
     ChatInputCommandInteraction,
+    GuildMember,
     SlashCommandIntegerOption,
 } from 'discord.js';
-import { SlashCommandBuilder } from 'discord.js';
+import { PermissionsBitField, SlashCommandBuilder } from 'discord.js';
 
 export default {
     data: new SlashCommandBuilder()
@@ -87,6 +88,19 @@ export default {
             );
             return;
         }
+        // TODO: Web does not have these permission checks yet
+        if (
+            player.queue.current.requester !== interaction.user.id &&
+            interaction.channel
+                .permissionsFor(interaction.member as GuildMember)
+                .missing(PermissionsBitField.Flags.ManageGuild).length > 0 &&
+            !settings.managers.includes(interaction.user.id)
+        ) {
+            await interaction.replyHandler.locale('CHECK.NOT_REQUESTER', {
+                type: 'error',
+            });
+            return;
+        }
         const hours = interaction.options.getInteger('hours') ?? 0,
             minutes = interaction.options.getInteger('minutes') ?? 0,
             seconds = interaction.options.getInteger('seconds') ?? 0;
@@ -115,8 +129,18 @@ export default {
         const seek = msToTime(ms);
         const seekString = msToTimeString(seek, true);
         await player.seek(ms);
-        await interaction.replyHandler.locale('CMD.SEEK.RESPONSE.SUCCESS', {
-            vars: [seekString, durationString],
-        });
+        await interaction.replyHandler.locale(
+            player.queue.current.requester === interaction.user.id
+                ? 'CMD.SEEK.RESPONSE.SUCCESS.DEFAULT'
+                : interaction.channel
+                      .permissionsFor(interaction.member as GuildMember)
+                      .missing(PermissionsBitField.Flags.ManageGuild).length ===
+                  0
+                ? 'CMD.SEEK.RESPONSE.SUCCESS.FORCED'
+                : 'CMD.SEEK.RESPONSE.SUCCESS.MANAGER',
+            {
+                vars: [seekString, durationString],
+            },
+        );
     },
 };

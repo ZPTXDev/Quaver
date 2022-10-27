@@ -184,7 +184,11 @@ export default {
 			SECONDS: 'The seconds position for the target timestamp.'
 		},
 		RESPONSE: {
-			SUCCESS: 'Seeking to `[%1 / %2]`',
+			SUCCESS: {
+				DEFAULT: 'Seeking to `[%1 / %2]`',
+				FORCED: 'Seeking to `[%1 / %2]` by force',
+				MANAGER: 'Seeking to `[%1 / %2]` by manager bypass'
+			},
 			TIMESTAMP_MISSING: 'Please specify a timestamp to seek to.',
 			TIMESTAMP_INVALID: 'The timestamp provided exceeds the track\'s duration of `%1`.',
 			STREAM_CANNOT_SEEK: 'Seek cannot be used for streams.'
