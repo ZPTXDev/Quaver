@@ -13,7 +13,7 @@ export default {
         const player = guild.client.music.players.get(guild.id) as QuaverPlayer;
         if (player) {
             logger.info({
-                message: `[G ${guild.id}] Cleaning up`,
+                message: `[G ${guild.id}] Cleaning up (left guild)`,
                 label: 'Quaver',
             });
             player.channelId = null;

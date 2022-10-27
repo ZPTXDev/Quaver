@@ -34,7 +34,7 @@ export default {
             // Disconnected
             if (!newState.channelId) {
                 logger.info({
-                    message: `[G ${player.guildId}] Cleaning up`,
+                    message: `[G ${player.guildId}] Cleaning up (disconnected)`,
                     label: 'Quaver',
                 });
                 player.channelId = null;
