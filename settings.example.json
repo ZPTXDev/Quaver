@@ -48,7 +48,8 @@
                 "enabled": false,
                 "key": "key.pem",
                 "cert": "cert.pem"
-            }
+            },
+            "dashboardURL": "http://example.com"
         }
     }
 }

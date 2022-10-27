@@ -62,6 +62,7 @@ export type WebFeatureSettingsObject = {
     allowedOrigins?: string[];
     encryptionKey?: string;
     https?: WebFeatureHttpsSettingsObject;
+    dashboardURL?: string;
 };
 
 export type WebFeatureHttpsSettingsObject = {

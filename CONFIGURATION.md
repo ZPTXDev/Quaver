@@ -51,7 +51,8 @@
                 "enabled": false,
                 "key": "key.pem",
                 "cert": "cert.pem"
-            }
+            },
+            "dashboardURL": "http://example.com"
         }
     }
 }
@@ -120,3 +121,5 @@
 `features.web.https.key` - The path to the HTTPS key file. This is relative to the root folder.
 
 `features.web.https.cert` - The path to the HTTPS certificate file. This is relative to the root folder.
+
+`features.web.dashboardURL` - The URL to the dashboard. If provided, this will be included at the bottom of the Now Playing message as a button.

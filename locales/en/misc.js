@@ -14,5 +14,6 @@ export default {
 	STREAMING: 'Streaming',
 	ACTION_IRREVERSIBLE: 'This action is irreversible.',
 	CONFIRM: 'Confirm',
-	ADD: 'Add'
+	ADD: 'Add',
+	DASHBOARD: 'Dashboard'
 };

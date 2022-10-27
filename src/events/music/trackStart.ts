@@ -6,7 +6,13 @@ import {
     msToTime,
     msToTimeString,
 } from '#src/lib/util/util.js';
-import { EmbedBuilder, escapeMarkdown } from 'discord.js';
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    EmbedBuilder,
+    escapeMarkdown,
+} from 'discord.js';
 
 export default {
     name: 'trackStart',
@@ -69,6 +75,28 @@ export default {
                       'MISC.ADDED_BY',
                       track.requester,
                   )}`,
+                  {
+                      components: settings.features.web.dashboardURL
+                          ? [
+                                new ActionRowBuilder<ButtonBuilder>().addComponents(
+                                    new ButtonBuilder()
+                                        .setURL(
+                                            `${settings.features.web.dashboardURL.replace(
+                                                /\/+$/,
+                                                '',
+                                            )}/guild/${queue.player.guildId}`,
+                                        )
+                                        .setStyle(ButtonStyle.Link)
+                                        .setLabel(
+                                            getLocaleString(
+                                                guildLocaleCode,
+                                                'MISC.DASHBOARD',
+                                            ),
+                                        ),
+                                ),
+                            ]
+                          : [],
+                  },
               )
             : await queue.player.handler.send(
                   new EmbedBuilder()
@@ -110,6 +138,28 @@ export default {
                       .setThumbnail(
                           `https://i.ytimg.com/vi/${track.identifier}/hqdefault.jpg`,
                       ),
+                  {
+                      components: settings.features.web.dashboardURL
+                          ? [
+                                new ActionRowBuilder<ButtonBuilder>().addComponents(
+                                    new ButtonBuilder()
+                                        .setURL(
+                                            `${settings.features.web.dashboardURL.replace(
+                                                /\/+$/,
+                                                '',
+                                            )}/guild/${queue.player.guildId}`,
+                                        )
+                                        .setStyle(ButtonStyle.Link)
+                                        .setLabel(
+                                            getLocaleString(
+                                                guildLocaleCode,
+                                                'MISC.DASHBOARD',
+                                            ),
+                                        ),
+                                ),
+                            ]
+                          : [],
+                  },
               );
     },
 };
