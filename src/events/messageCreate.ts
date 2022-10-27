@@ -3,12 +3,21 @@ import {
     getGuildLocaleString,
 } from '#src/lib/util/util.js';
 import type { Message } from 'discord.js';
+import { PermissionsBitField } from 'discord.js';
 
 export default {
     name: 'messageCreate',
     once: false,
     async execute(message: Message): Promise<void> {
         if (message.mentions.has(message.client.user.id)) {
+            if (
+                message.inGuild() &&
+                message.channel
+                    .permissionsFor(message.client.user.id)
+                    .missing(PermissionsBitField.Flags.SendMessages).length > 0
+            ) {
+                return;
+            }
             const applicationCommands = message.client.application?.commands;
             if (applicationCommands.cache.size === 0) {
                 await applicationCommands.fetch();
