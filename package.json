@@ -6,6 +6,7 @@
     "node": ">=16.9.0"
   },
   "dependencies": {
+    "@brandond/findthelyrics": "^2.0.3",
     "@discordjs/rest": "^1.1.0",
     "@keyv/sqlite": "^3.6.2",
     "@lavaclient/queue": "^2.1.1",
@@ -45,8 +46,8 @@
     "migrate": "node scripts/migrate.js",
     "build": "rimraf dist/ && genversion --es6 --semi src/lib/util/version.ts && tsc && tsc-alias",
     "build-start": "npm run build && npm start",
-    "start": "node .",
-    "dev": "node --enable-source-maps .",
+    "start": "node --experimental-fetch .",
+    "dev": "node --enable-source-maps --experimental-fetch .",
     "lint": "eslint . --ext .ts"
   },
   "imports": {

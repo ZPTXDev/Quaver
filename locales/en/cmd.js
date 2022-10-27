@@ -78,6 +78,16 @@ export default {
 			SUCCESS: 'Looping mode set to **%1**'
 		}
 	},
+	LYRICS: {
+		DESCRIPTION: 'Look up lyrics.',
+		OPTION: {
+			QUERY: 'Search query. If not specified, uses the currently playing track.'
+		},
+		RESPONSE: {
+			NO_QUERY: 'No search query was specified.',
+			NO_RESULTS: 'No results for that query were found.'
+		}
+	},
 	MOVE: {
 		DESCRIPTION: 'Move a track within the queue.',
 		OPTION: {

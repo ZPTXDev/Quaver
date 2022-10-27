@@ -28,11 +28,6 @@ You can deploy slash commands after the build by running `npm run slash-deploy`.
 For subsequent startups, you can simply run `npm start`, which skips the compilation step.
 
 # FAQ
-## What happened to Lyrics?
-Unfortunately, due to legal issues, the API that Quaver relied on is no longer able to provide lyrics. Instead of sourcing for an alternative, the command was removed altogether as it simply wasn't worth the effort to keep.
-
-You can probably implement it yourself if you have another API in mind, but no support will be provided for it.
-
 ## Can I get in trouble with Google for using this?
 Most probably not. They've only been targetting the larger bots so far, but if you really don't wish to take the risk, you can take a sneak peek at Discord's **Watch Together** feature [here](https://discord.gg/discordgameslab).
 
