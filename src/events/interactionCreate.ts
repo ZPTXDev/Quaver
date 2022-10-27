@@ -154,6 +154,16 @@ export default {
                     } bot permission check(s)`,
                     label: 'Quaver',
                 });
+                if (
+                    failedPermissions.bot.includes('ViewChannel') ||
+                    failedPermissions.bot.includes('SendMessages')
+                ) {
+                    await interaction.replyHandler.locale(
+                        'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.VIEW',
+                        { type: 'error' },
+                    );
+                    return;
+                }
                 await interaction.replyHandler.locale(
                     'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.DEFAULT',
                     {
