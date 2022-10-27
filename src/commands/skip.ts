@@ -81,7 +81,6 @@ export default {
                     track.requester,
                 )}`,
             );
-            await player.queue.next();
             return;
         }
         player.skip = skip;

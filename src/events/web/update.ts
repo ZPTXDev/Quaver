@@ -74,7 +74,6 @@ export default {
                 if (skip.users.length >= skip.required) {
                     await player.queue.skip();
                     await player.queue.start();
-                    await player.queue.next();
                     break;
                 }
                 player.skip = skip;
