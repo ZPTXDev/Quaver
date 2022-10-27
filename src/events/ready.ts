@@ -46,5 +46,6 @@ export default {
             type: ActivityType.Listening,
         });
         client.music.connect(client.user.id);
+        await client.application.commands.fetch();
     },
 };
