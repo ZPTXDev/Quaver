@@ -72,6 +72,8 @@
 `disableAd` - Whether to disable the ad in the `info` command (Sponsor Us button).
 > **Note:** Please do not disable the ad unless you really need to. Sponsors help keep the development of ZPTXDev projects going. Consider sponsoring us if you need to disable the ad!
 
+`geniusToken` - Your Genius API token used for lyrics (optional). You can get it from the [Genius API Dashboard](https://genius.com/api-clients).
+
 `managers` - The [user IDs](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-) that are given manager-level permissions on Quaver.
 
 `database.protocol` - The database protocol.

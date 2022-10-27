@@ -1,14 +1,13 @@
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import { logger } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getLocaleString } from '#src/lib/util/util.js';
-import { find_lyrics } from '@brandond/findthelyrics';
 import type {
     APIEmbedField,
     ChatInputCommandInteraction,
     SlashCommandStringOption,
 } from 'discord.js';
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
+import Genius from 'genius-lyrics';
 
 export default {
     data: new SlashCommandBuilder()
@@ -57,22 +56,19 @@ export default {
             query = player.queue.current.title;
         }
         await interaction.deferReply();
-        const lyrics = await find_lyrics(query);
-        if (lyrics instanceof Error) {
-            logger.error({
-                message: `Failed to fetch lyrics:\n${lyrics}`,
-                label: 'Quaver',
-            });
+        const Client = new Genius.Client(settings.geniusToken ?? '');
+        const searches = await Client.songs.search(query);
+        if (searches.length === 0) {
             await interaction.replyHandler.locale(
-                lyrics.message.startsWith('Could not find lyrics for')
-                    ? 'CMD.LYRICS.RESPONSE.NO_RESULTS'
-                    : 'DISCORD.GENERIC_ERROR',
+                'CMD.LYRICS.RESPONSE.NO_RESULTS',
                 {
                     type: 'error',
                 },
             );
             return;
         }
+        const song = searches[0];
+        const lyrics = await song.lyrics();
         let lyricsFields: APIEmbedField[] = [];
         // try method 1
         let giveUp = false;
@@ -81,14 +77,14 @@ export default {
             if (chunk.length > 1024) giveUp = true;
             if (previous.length + chunk.length > 1024) {
                 lyricsFields.push({
-                    name: lyricsFields.length === 0 ? query : '​',
+                    name: lyricsFields.length === 0 ? song.title : '​',
                     value: previous,
                 });
                 return chunk;
             }
             if (index === array.length - 1) {
                 lyricsFields.push({
-                    name: lyricsFields.length === 0 ? query : '​',
+                    name: lyricsFields.length === 0 ? song.title : '​',
                     value: previous + '\n\n' + chunk,
                 });
             }
@@ -102,14 +98,14 @@ export default {
                 .reduce((previous, line, index, array): string => {
                     if (previous.length + line.length > 1024) {
                         lyricsFields.push({
-                            name: lyricsFields.length === 0 ? query : '​',
+                            name: lyricsFields.length === 0 ? song.title : '​',
                             value: previous,
                         });
                         return line;
                     }
                     if (index === array.length - 1) {
                         lyricsFields.push({
-                            name: lyricsFields.length === 0 ? query : '​',
+                            name: lyricsFields.length === 0 ? song.title : '​',
                             value: previous + '\n' + line,
                         });
                     }
