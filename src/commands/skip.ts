@@ -6,7 +6,11 @@ import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import type { ChatInputCommandInteraction, GuildMember } from 'discord.js';
-import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
+import {
+    escapeMarkdown,
+    PermissionsBitField,
+    SlashCommandBuilder,
+} from 'discord.js';
 
 export default {
     data: new SlashCommandBuilder()
@@ -37,11 +41,24 @@ export default {
             );
             return;
         }
-        if (player.queue.current.requester === interaction.user.id) {
+        if (
+            player.queue.current.requester === interaction.user.id ||
+            interaction.channel
+                .permissionsFor(interaction.member as GuildMember)
+                .missing(PermissionsBitField.Flags.ManageGuild).length === 0 ||
+            settings.managers.includes(interaction.user.id)
+        ) {
             const track = await player.queue.skip();
             await player.queue.start();
             await interaction.replyHandler.locale(
-                'CMD.SKIP.RESPONSE.SUCCESS.DEFAULT',
+                player.queue.current.requester === interaction.user.id
+                    ? 'CMD.SKIP.RESPONSE.SUCCESS.DEFAULT'
+                    : interaction.channel
+                          .permissionsFor(interaction.member as GuildMember)
+                          .missing(PermissionsBitField.Flags.ManageGuild)
+                          .length === 0
+                    ? 'CMD.SKIP.RESPONSE.SUCCESS.FORCED'
+                    : 'CMD.SKIP.RESPONSE.SUCCESS.MANAGER',
                 {
                     vars: [escapeMarkdown(track.title), track.uri],
                     type: 'success',

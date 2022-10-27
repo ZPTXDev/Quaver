@@ -226,7 +226,9 @@ export default {
 		RESPONSE: {
 			SUCCESS: {
 				DEFAULT: 'Skipped [**%1**](%2)',
-				VOTED: 'Skipped [**%1**](%2) by voting'
+				VOTED: 'Skipped [**%1**](%2) by voting',
+				FORCED: 'Skipped [**%1**](%2) by force',
+				MANAGER: 'Skipped [**%1**](%2) by manager bypass'
 			},
 			VOTED: {
 				SUCCESS: 'Voted to skip [**%1**](%2) `[%3 / %4]`',
