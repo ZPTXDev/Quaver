@@ -46,6 +46,7 @@
     "build": "rimraf dist/ && genversion --es6 --semi src/lib/util/version.ts && tsc && tsc-alias",
     "build-start": "npm run build && npm start",
     "start": "node .",
+    "dev": "node --enable-source-maps .",
     "lint": "eslint . --ext .ts"
   },
   "imports": {
