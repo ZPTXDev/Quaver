@@ -119,6 +119,9 @@ export default {
             case 'seek': {
                 const player = bot.music.players.get(guildId);
                 if (!player) return callback({ status: 'error-generic' });
+                if (player.queue.current.requester !== socket.user.id) {
+                    return callback({ status: 'error-auth' });
+                }
                 await player.seek(item.value);
                 break;
             }
