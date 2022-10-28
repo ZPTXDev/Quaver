@@ -133,6 +133,13 @@ export default {
             lyricsFields = lyricsFields.slice(0, exceedIndex);
             lyricsFields.push({ name: '​', value: '`...`' });
         }
+        if (lyricsFields.length === 0) {
+            await interaction.replyHandler.locale(
+                'CMD.LYRICS.RESPONSE.NO_RESULTS',
+                { type: 'error' },
+            );
+            return;
+        }
         await interaction.replyHandler.reply(
             new EmbedBuilder().setFields(lyricsFields),
         );
