@@ -14,5 +14,6 @@ export default {
 	STREAMING: 'Streaming',
 	ACTION_IRREVERSIBLE: 'Kini nga aksyon kay dili na mabalik.',
 	CONFIRM: 'Kumpirma',
-	ADD: 'Idugang'
+	ADD: 'Idugang',
+	DASHBOARD: 'Dashboard'
 };

@@ -44,7 +44,10 @@ export default {
 	},
 	INFO: {
 		DESCRIPTION: 'Ipakita ang impormasyon bahin ni Quaver.',
-		RESPONSE: { SUCCESS: 'Open-source nga music bot para sa ginagmay na mga komunidad.\nNagdagan sa bersyong `%1`.' },
+		RESPONSE: {
+			SUCCESS: 'Open-source nga music bot para sa ginagmay na mga komunidad.\nNagdagan sa bersyong `%1`.',
+			MENTION: 'Hi! Si Quaver kay nigamit og [Mga slash command](https://support.discord.com/hc/en-us/articles/1500000368501-Slash-Commands-FAQ).\nAlang sa dugang impormasyon bahin ni Quaver, sulayi ang </info:%1>. Aron makapatugtog og track, sulayi ang </play:%2> o </search:%3>.'
+		},
 		MISC: {
 			SOURCE_CODE: 'Source Code',
 			INVITE: 'I-imbitar',
@@ -64,6 +67,14 @@ export default {
 			}
 		},
 		RESPONSE: { SUCCESS: 'Ang looping mode gitakda sa **%1**' }
+	},
+	LYRICS: {
+		DESCRIPTION: 'Pangita og lyrics.',
+		OPTION: { QUERY: 'Search query. Kung wala gipiho, gamiton ang nagpatugtog karon nga track.' },
+		RESPONSE: {
+			NO_QUERY: 'Walay search query nga gipiho.',
+			NO_RESULTS: 'Walay mga resulta alang sa maong query nga nakit-an.'
+		}
 	},
 	MOVE: {
 		DESCRIPTION: 'Pagbalhin og track nga naa sulod sa queue.',
@@ -154,7 +165,11 @@ export default {
 			SECONDS: 'Ang posisyon sa segundo para sa target nga timestamp.'
 		},
 		RESPONSE: {
-			SUCCESS: 'Nagseek ngadto sa `[%1 / %2]`',
+			SUCCESS: {
+				DEFAULT: 'Nagseek ngadto sa `[%1 / %2]`',
+				FORCED: 'Nagseek ngadto sa `[%1 / %2]` pinaagi og pugos',
+				MANAGER: 'Nagseek ngadto sa `[%1 / %2]` pinaagi sa manager bypass'
+			},
 			TIMESTAMP_MISSING: 'Palihug pagpiho ug timestamp nga i-seek.',
 			TIMESTAMP_INVALID: 'Ang timestamp nga gihatag milagpas sa duration sa track nga `%1`.',
 			STREAM_CANNOT_SEEK: 'Ang seek dili magamit para sa mga stream.'
@@ -194,7 +209,9 @@ export default {
 		RESPONSE: {
 			SUCCESS: {
 				DEFAULT: 'Gilaktawan ang [**%1**](%2)',
-				VOTED: 'Nalaktawan ang [**%1**](%2) pinaagi sa boto'
+				VOTED: 'Nalaktawan ang [**%1**](%2) pinaagi sa boto',
+				FORCED: 'Nalaktawan ang [**%1**](%2) pinaagi og pugos',
+				MANAGER: 'Nalaktawan ang [**%1**](%2) pinaagi sa manager bypass'
 			},
 			VOTED: {
 				SUCCESS: 'Giboto nga laktawan ang [**%1**](%2) `[%3 / %4]`',
