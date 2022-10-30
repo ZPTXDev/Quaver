@@ -14,5 +14,6 @@ export default {
 	STREAMING: 'Streaming',
 	ACTION_IRREVERSIBLE: 'Ang aksyon na ito ay hindi na mababawi.',
 	CONFIRM: 'Kumpirmahin',
-	ADD: 'Idagdag'
+	ADD: 'Idagdag',
+	DASHBOARD: 'Dashboard'
 };
