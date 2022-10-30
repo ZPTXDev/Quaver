@@ -190,13 +190,13 @@ export function paginate(arr: any[], size: number): any[][] {
  * @param localeCode - The language to use.
  * @param stringPath - The string to get.
  * @param vars - The extra variables required in some localized strings.
- * @returns The localized string, or LOCALE_MISSING if the locale is missing, or STRING_MISSING if the string is missing.
+ * @returns The localized string, or LOCALE_MISSING if the locale is missing, or stringPath if the string is missing.
  */
 export function getLocaleString(
     localeCode: string,
     stringPath: string,
     ...vars: string[]
-): string | 'LOCALE_MISSING' | 'STRING_MISSING' {
+): string | 'LOCALE_MISSING' {
     if (!locales.get(localeCode)) return 'LOCALE_MISSING';
     let strings = locales.get(localeCode);
     let localeString: string = get(strings, stringPath);
@@ -206,7 +206,7 @@ export function getLocaleString(
         strings = locales.get('en');
         localeString = get(strings, stringPath);
     }
-    if (!localeString) return 'STRING_MISSING';
+    if (!localeString) return stringPath;
     vars.forEach(
         (v, i): string => (localeString = localeString.replace(`%${i + 1}`, v)),
     );
@@ -218,13 +218,13 @@ export function getLocaleString(
  * @param guildId - The guild ID.
  * @param stringPath - The string to get.
  * @param vars - The extra variables required in some localized strings.
- * @returns The localized string, or LOCALE_MISSING if the locale is missing, or STRING_MISSING if the string is missing.
+ * @returns The localized string, or LOCALE_MISSING if the locale is missing, or stringPath if the string is missing.
  */
 export async function getGuildLocaleString(
     guildId: Snowflake,
     stringPath: string,
     ...vars: string[]
-): Promise<string | 'LOCALE_MISSING' | 'STRING_MISSING'> {
+): Promise<string | 'LOCALE_MISSING'> {
     const guildLocaleCode =
         (await data.guild.get<string>(guildId, 'settings.locale')) ??
         settings.defaultLocaleCode;
