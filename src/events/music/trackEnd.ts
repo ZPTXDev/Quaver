@@ -1,5 +1,6 @@
 import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.d.js';
 import { data, logger } from '#src/lib/util/common.js';
+import { LoopType } from '@lavaclient/queue';
 import type { Collection, GuildMember, Snowflake } from 'discord.js';
 import { escapeMarkdown } from 'discord.js';
 
@@ -34,10 +35,38 @@ export default {
             queue.player.failed++;
             if (queue.player.failed >= 3) {
                 queue.clear();
+                await queue.skip();
+                await queue.start();
                 await queue.player.handler.locale(
                     'MUSIC.PLAYER.QUEUE_CLEARED_ERROR',
                 );
             }
+            return;
+        }
+        switch (queue.loop.type) {
+            case LoopType.Song:
+                if (track.length <= 15 * 1000) {
+                    queue.setLoop(LoopType.None);
+                    await queue.player.handler.locale(
+                        'MUSIC.PLAYER.LOOP_TRACK_DISABLED',
+                    );
+                    await queue.skip();
+                    await queue.start();
+                }
+                break;
+            case LoopType.Queue:
+                if (
+                    queue.tracks.reduce(
+                        (a: number, b: QuaverSong): number => a + b.length,
+                        track.length,
+                    ) <=
+                    15 * 1000
+                ) {
+                    queue.setLoop(LoopType.None);
+                    await queue.player.handler.locale(
+                        'MUSIC.PLAYER.LOOP_QUEUE_DISABLED',
+                    );
+                }
         }
         if (queue.player.failed) delete queue.player.failed;
         const members = bot.guilds.cache
