@@ -76,26 +76,30 @@ export default {
                       track.requester,
                   )}`,
                   {
-                      components: settings.features.web.dashboardURL
-                          ? [
-                                new ActionRowBuilder<ButtonBuilder>().addComponents(
-                                    new ButtonBuilder()
-                                        .setURL(
-                                            `${settings.features.web.dashboardURL.replace(
-                                                /\/+$/,
-                                                '',
-                                            )}/guild/${queue.player.guildId}`,
-                                        )
-                                        .setStyle(ButtonStyle.Link)
-                                        .setLabel(
-                                            getLocaleString(
-                                                guildLocaleCode,
-                                                'MISC.DASHBOARD',
+                      components:
+                          settings.features.web.enabled &&
+                          settings.features.web.dashboardURL
+                              ? [
+                                    new ActionRowBuilder<ButtonBuilder>().addComponents(
+                                        new ButtonBuilder()
+                                            .setURL(
+                                                `${settings.features.web.dashboardURL.replace(
+                                                    /\/+$/,
+                                                    '',
+                                                )}/guild/${
+                                                    queue.player.guildId
+                                                }`,
+                                            )
+                                            .setStyle(ButtonStyle.Link)
+                                            .setLabel(
+                                                getLocaleString(
+                                                    guildLocaleCode,
+                                                    'MISC.DASHBOARD',
+                                                ),
                                             ),
-                                        ),
-                                ),
-                            ]
-                          : [],
+                                    ),
+                                ]
+                              : [],
                   },
               )
             : await queue.player.handler.send(
