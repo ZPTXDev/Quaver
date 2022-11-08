@@ -46,15 +46,16 @@ const rl = createInterface({
     output: process.stdout,
 });
 rl.on('line', async (input): Promise<void> => {
-    switch (input.split(' ')[0].toLowerCase()) {
+    const command = input.split(' ')[0].toLowerCase();
+    if (['sessions', 'whitelist'].includes(command) && !startup.started) {
+        console.log('Quaver is not initialized yet.');
+        return;
+    }
+    switch (command) {
         case 'exit':
             await shuttingDown('exit');
             break;
         case 'sessions':
-            if (!startup.started) {
-                console.log('Quaver is not initialized yet.');
-                break;
-            }
             console.log(
                 `There are currently ${bot.music.players.size} active session(s).`,
             );
@@ -68,35 +69,34 @@ rl.on('line', async (input): Promise<void> => {
             break;
         }
         case 'whitelist': {
-            if (!startup.started) {
-                console.log('Quaver is not initialized yet.');
-                break;
-            }
             const guildId = input.split(' ')[1];
             if (!settings.features.stay.whitelist) {
                 console.log('The 24/7 whitelist is not enabled.');
                 break;
             }
-            const guild = bot.guilds.cache.get(guildId);
+            if (!guildId) {
+                console.log('Usage: whitelist <guildId>');
+                break;
+            }
+            const guild = await bot.guilds.fetch(guildId);
             if (!guild) {
                 console.log('Guild not found.');
                 break;
             }
-            if (!(await data.guild.get(guildId, 'features.stay.whitelisted'))) {
-                await data.guild.set(
-                    guildId,
-                    'features.stay.whitelisted',
-                    true,
-                );
-                console.log(`Added ${guild.name} to the 24/7 whitelist.`);
-            } else {
-                await data.guild.set(
-                    guildId,
-                    'features.stay.whitelisted',
-                    false,
-                );
-                console.log(`Removed ${guild.name} from the 24/7 whitelist.`);
-            }
+            const whitelisted = !(await data.guild.get(
+                guildId,
+                'features.stay.whitelisted',
+            ));
+            await data.guild.set(
+                guildId,
+                'features.stay.whitelisted',
+                whitelisted,
+            );
+            console.log(
+                `${whitelisted ? 'Added' : 'Removed'} ${
+                    guild.name
+                } to the 24/7 whitelist.`,
+            );
             break;
         }
         case 'eval': {
@@ -104,14 +104,16 @@ rl.on('line', async (input): Promise<void> => {
                 console.log('Developer mode is not enabled.');
                 break;
             }
-            if (!input.substring(5)) {
+            if (!input.substring(command.length + 1)) {
                 console.log('No input provided.');
                 break;
             }
             let output: string;
             try {
-                output = await eval(input.substring(5));
-                if (typeof output !== 'string') output = inspect(output);
+                output = await eval(input.substring(command.length + 1));
+                if (typeof output !== 'string') {
+                    output = inspect(output, { depth: 1 });
+                }
             } catch (error) {
                 output = error;
             }
