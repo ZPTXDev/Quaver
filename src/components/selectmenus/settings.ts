@@ -1,3 +1,4 @@
+import { ForceType } from '#src/lib/ReplyHandler.js';
 import type {
     QuaverInteraction,
     SettingsPageOptions,
@@ -38,7 +39,7 @@ export default {
         if (!confirmationTimeout[interaction.message.id]) {
             await interaction.replyHandler.locale(
                 'DISCORD.INTERACTION.EXPIRED',
-                { components: [], force: 'update' },
+                { components: [], force: ForceType.Update },
             );
             return;
         }
@@ -121,7 +122,7 @@ export default {
                 ),
                 actionRow as ActionRowBuilder<MessageActionRowComponentBuilder>,
             ],
-            force: 'update',
+            force: ForceType.Update,
         });
     },
 };

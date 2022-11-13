@@ -1,3 +1,4 @@
+import { ForceType } from '#src/lib/ReplyHandler.js';
 import type {
     QuaverInteraction,
     QuaverPlayer,
@@ -57,7 +58,7 @@ export default {
             {
                 type: MessageOptionsBuilderType.Success,
                 components: [],
-                force: 'update',
+                force: ForceType.Update,
             },
         );
     },

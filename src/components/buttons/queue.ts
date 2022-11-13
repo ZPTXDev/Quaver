@@ -1,3 +1,4 @@
+import { ForceType } from '#src/lib/ReplyHandler.js';
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import {
@@ -64,7 +65,7 @@ export default {
                 {
                     type: MessageOptionsBuilderType.Error,
                     components: [],
-                    force: 'update',
+                    force: ForceType.Update,
                 },
             );
             return;
@@ -126,7 +127,7 @@ export default {
                 .setDisabled(page + 1 > pages.length));
         await interaction.replyHandler.reply(updated.embeds, {
             components: updated.components,
-            force: 'update',
+            force: ForceType.Update,
         });
     },
 };

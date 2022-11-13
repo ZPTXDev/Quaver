@@ -1,3 +1,4 @@
+import { ForceType } from '#src/lib/ReplyHandler.js';
 import type { QuaverPlayer } from '#src/lib/util/common.d.js';
 import type { Song } from '@lavaclient/queue';
 import type { APIGuild, APIUser, Snowflake } from 'discord.js';
@@ -5,7 +6,7 @@ import type { Socket } from 'socket.io';
 import type { UpdateItemTypes } from './update.d.js';
 
 export default {
-    name: 'update',
+    name: ForceType.Update,
     once: false,
     async execute(
         socket: Socket & { guilds: APIGuild[]; user: APIUser },

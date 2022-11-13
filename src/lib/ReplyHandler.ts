@@ -87,7 +87,7 @@ export default class ReplyHandler {
         });
         replyMsgOpts.fetchReply = fetchReply;
         if (
-            force === 'reply' ||
+            force === ForceType.Reply ||
             (!this.interaction.replied && !this.interaction.deferred && !force)
         ) {
             if (
@@ -118,7 +118,7 @@ export default class ReplyHandler {
             }
         }
         if (
-            force === 'update' &&
+            force === ForceType.Update &&
             !this.interaction.isCommand() &&
             (!this.interaction.isModalSubmit() ||
                 this.interaction.isFromMessage())
@@ -220,4 +220,10 @@ export default class ReplyHandler {
             force,
         });
     }
+}
+
+export enum ForceType {
+    Reply,
+    Edit,
+    Update,
 }

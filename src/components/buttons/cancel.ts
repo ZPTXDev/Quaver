@@ -1,3 +1,4 @@
+import { ForceType } from '#src/lib/ReplyHandler.js';
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import {
     confirmationTimeout,
@@ -25,7 +26,7 @@ export default {
         await interaction.replyHandler.locale('DISCORD.INTERACTION.CANCELED', {
             vars: [interaction.message.interaction.user.id],
             components: [],
-            force: 'update',
+            force: ForceType.Update,
         });
     },
 };

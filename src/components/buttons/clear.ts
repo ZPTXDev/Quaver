@@ -1,3 +1,4 @@
+import { ForceType } from '#src/lib/ReplyHandler.js';
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import {
     confirmationTimeout,
@@ -56,7 +57,7 @@ export default {
                 {
                     type: MessageOptionsBuilderType.Error,
                     components: [],
-                    force: 'update',
+                    force: ForceType.Update,
                 },
             );
             return;
@@ -68,7 +69,7 @@ export default {
         await interaction.replyHandler.locale('CMD.CLEAR.RESPONSE.SUCCESS', {
             type: MessageOptionsBuilderType.Success,
             components: [],
-            force: 'update',
+            force: ForceType.Update,
         });
     },
 };

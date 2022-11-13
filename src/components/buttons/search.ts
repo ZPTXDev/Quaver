@@ -1,4 +1,5 @@
 import PlayerHandler from '#src/lib/PlayerHandler.js';
+import { ForceType } from '#src/lib/ReplyHandler.js';
 import type {
     QuaverChannels,
     QuaverInteraction,
@@ -52,7 +53,7 @@ export default {
         if (!state) {
             await interaction.replyHandler.locale(
                 'DISCORD.INTERACTION.EXPIRED',
-                { components: [], force: 'update' },
+                { components: [], force: ForceType.Update },
             );
             return;
         }
@@ -123,7 +124,7 @@ export default {
             clearTimeout(state.timeout);
             await interaction.replyHandler.locale('MISC.LOADING', {
                 components: [],
-                force: 'update',
+                force: ForceType.Update,
             });
             const resolvedTracks = [];
             for (const track of tracks) {
@@ -404,7 +405,7 @@ export default {
             .setDisabled(page + 1 > pages.length);
         await interaction.replyHandler.reply(updated.embeds, {
             components: updated.components,
-            force: 'update',
+            force: ForceType.Update,
         });
     },
 };

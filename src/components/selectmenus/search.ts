@@ -1,3 +1,4 @@
+import { ForceType } from '#src/lib/ReplyHandler.js';
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import {
     logger,
@@ -40,7 +41,7 @@ export default {
         if (!state) {
             await interaction.replyHandler.locale(
                 'DISCORD.INTERACTION.EXPIRED',
-                { components: [], force: 'update' },
+                { components: [], force: ForceType.Update },
             );
             return;
         }
@@ -173,7 +174,7 @@ export default {
             original.embeds.map(
                 (embed): EmbedBuilder => EmbedBuilder.from(embed),
             ),
-            { components: updated.components, force: 'update' },
+            { components: updated.components, force: ForceType.Update },
         );
     },
 };

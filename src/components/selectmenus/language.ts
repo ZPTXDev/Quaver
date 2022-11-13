@@ -1,3 +1,4 @@
+import { ForceType } from '#src/lib/ReplyHandler.js';
 import type {
     MessageOptionsBuilderInputs,
     MessageOptionsBuilderOptions,
@@ -42,7 +43,7 @@ export default {
         if (!confirmationTimeout[interaction.message.id]) {
             await interaction.replyHandler.locale(
                 'DISCORD.INTERACTION.EXPIRED',
-                { components: [], force: 'update' },
+                { components: [], force: ForceType.Update },
             );
             return;
         }
@@ -162,7 +163,7 @@ export default {
             ? await interaction.message.edit(buildMessageOptions(...args))
             : await interaction.replyHandler.reply(args[0], {
                   ...args[1],
-                  force: 'update',
+                  force: ForceType.Update,
               });
     },
 };
