@@ -159,6 +159,18 @@ export default {
                 case SpotifyItemType.Album:
                 case SpotifyItemType.Playlist:
                 case SpotifyItemType.Artist:
+                    if (
+                        (item.type === SpotifyItemType.Artist
+                            ? item.topTracks
+                            : item.tracks
+                        ).length > 500
+                    ) {
+                        await interaction.replyHandler.locale(
+                            'CMD.PLAY.RESPONSE.LIMIT_EXCEEDED.SPOTIFY',
+                            { type: 'error' },
+                        );
+                        return;
+                    }
                     tracks = await item.resolveYoutubeTracks();
                     msg = insert
                         ? 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.INSERTED'

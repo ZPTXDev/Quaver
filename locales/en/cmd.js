@@ -141,7 +141,10 @@ export default {
 			DISABLED: {
 				SPOTIFY: 'Spotify integration is not configured.'
 			},
-			LOAD_FAILED: 'Failed to load the track.'
+			LOAD_FAILED: 'Failed to load the track.',
+			LIMIT_EXCEEDED: {
+				SPOTIFY: 'You can only play up to **500** tracks from Spotify at a time.'
+			}
 		}
 	},
 	PLAYING: {
