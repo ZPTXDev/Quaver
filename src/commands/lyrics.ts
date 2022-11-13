@@ -76,6 +76,7 @@ export default {
         let lyricsFields: APIEmbedField[] = [];
         // try method 1
         let giveUp = false;
+        if (lyrics.split('\n\n').length === 1) giveUp = true;
         lyrics.split('\n\n').reduce((previous, chunk, index, array): string => {
             if (giveUp) return;
             if (chunk.length > 1024) giveUp = true;
