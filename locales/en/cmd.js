@@ -86,6 +86,12 @@ export default {
 		RESPONSE: {
 			NO_QUERY: 'No search query was specified.',
 			NO_RESULTS: 'No results for that query were found.'
+		},
+		MISC: {
+			ROMANIZE_FROM_KOREAN: 'Romanize from Korean',
+			ROMANIZE_FROM_JAPANESE: 'Romanize from Japanese',
+			ROMANIZE_FROM_CHINESE: 'Romanize from Chinese',
+			JAPANESE_INACCURATE: 'Romanizing kanji might result in slight inaccuracies.'
 		}
 	},
 	MOVE: {

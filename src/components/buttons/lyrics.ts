@@ -1,66 +1,24 @@
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import { settings } from '#src/lib/util/settings.js';
-import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
+import { Check } from '#src/lib/util/constants.js';
+import { getGuildLocaleString } from '#src/lib/util/util.js';
 import { LyricsFinder } from '@jeve/lyrics-finder';
-import type {
-    APIEmbedField,
-    ChatInputCommandInteraction,
-    SlashCommandStringOption,
-} from 'discord.js';
-import {
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    EmbedBuilder,
-    SlashCommandBuilder,
-} from 'discord.js';
+import { pinyin as romanizeFromChinese, PINYIN_STYLE } from '@napi-rs/pinyin';
+import type { APIEmbedField, ButtonInteraction } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
+import { convert as romanizeFromKorean } from 'hangul-romanization';
+import Kuroshiro from 'kuroshiro';
+import KuromojiAnalyzer from 'kuroshiro-analyzer-kuromoji';
+import { toRomaji as romanizeFromJapanese } from 'wanakana';
 
 export default {
-    data: new SlashCommandBuilder()
-        .setName('lyrics')
-        .setDescription(
-            getLocaleString(
-                settings.defaultLocaleCode,
-                'CMD.LYRICS.DESCRIPTION',
-            ),
-        )
-        .addStringOption(
-            (option): SlashCommandStringOption =>
-                option
-                    .setName('query')
-                    .setDescription(
-                        getLocaleString(
-                            settings.defaultLocaleCode,
-                            'CMD.LYRICS.OPTION.QUERY',
-                        ),
-                    ),
-        ),
-    permissions: {
-        user: [],
-        bot: [],
-    },
+    name: 'lyrics',
+    checks: [Check.InteractionStarter],
     async execute(
-        interaction: QuaverInteraction<ChatInputCommandInteraction>,
+        interaction: QuaverInteraction<ButtonInteraction>,
     ): Promise<void> {
-        let query = interaction.options.getString('query');
-        if (!query) {
-            const player = interaction.guildId
-                ? interaction.client.music.players.get(interaction.guildId)
-                : null;
-            if (
-                !interaction.guildId ||
-                !player?.queue.current ||
-                (!player?.playing && !player?.paused)
-            ) {
-                await interaction.replyHandler.locale(
-                    'CMD.LYRICS.RESPONSE.NO_QUERY',
-                    { type: MessageOptionsBuilderType.Error },
-                );
-                return;
-            }
-            query = player.queue.current.title;
-        }
+        const romanizeFrom = interaction.customId.split(':')[1];
+        const query = interaction.message.embeds[0].fields[0].name;
         await interaction.deferReply();
         let lyrics: string | Error;
         try {
@@ -79,18 +37,33 @@ export default {
             );
             return;
         }
-        let romanizeFrom = '';
-        // use regex to check if lyrics have any korean characters
-        if (
-            lyrics.match(
-                /[\uac00-\ud7af]|[\u1100-\u11ff]|[\u3130-\u318f]|[\ua960-\ua97f]|[\ud7b0-\ud7ff]/g,
-            )
-        ) {
-            romanizeFrom = 'korean';
-        } else if (lyrics.match(/[\u3040-\u309f]|[\u30a0-\u30ff]/g)) {
-            romanizeFrom = 'japanese';
-        } else if (lyrics.match(/[\u4e00-\u9fff]/g)) {
-            romanizeFrom = 'chinese';
+        switch (romanizeFrom) {
+            case 'korean':
+                lyrics = romanizeFromKorean(lyrics);
+                break;
+            case 'japanese': {
+                const kuroshiro = new Kuroshiro();
+                await kuroshiro.init(new KuromojiAnalyzer());
+                lyrics = await kuroshiro.convert(lyrics);
+                if (lyrics instanceof Error) {
+                    await interaction.replyHandler.locale(
+                        'CMD.LYRICS.RESPONSE.NO_RESULTS',
+                        { type: MessageOptionsBuilderType.Error },
+                    );
+                    return;
+                }
+                lyrics = romanizeFromJapanese(lyrics);
+                break;
+            }
+            case 'chinese':
+                lyrics = lyrics
+                    .split('\n')
+                    .map((line): string =>
+                        romanizeFromChinese(line, {
+                            style: PINYIN_STYLE.WithTone,
+                        }).join(' '),
+                    )
+                    .join('\n');
         }
         let lyricsFields: APIEmbedField[] = [];
         // try method 1
@@ -98,7 +71,7 @@ export default {
         if (lyrics.split('\n\n').length === 1) giveUp = true;
         lyrics.split('\n\n').reduce((previous, chunk, index, array): string => {
             if (giveUp) return;
-            if (chunk.length > 1024) giveUp = true;
+            if (chunk.length > 1024 || !array) giveUp = true;
             if (previous.length + chunk.length > 1024) {
                 lyricsFields.push({
                     name: lyricsFields.length === 0 ? query : '​',
@@ -161,24 +134,15 @@ export default {
             return;
         }
         await interaction.replyHandler.reply(
-            new EmbedBuilder().setFields(lyricsFields),
-            {
-                components: romanizeFrom
-                    ? [
-                          new ActionRowBuilder<ButtonBuilder>().addComponents(
-                              new ButtonBuilder()
-                                  .setCustomId(`lyrics:${romanizeFrom}`)
-                                  .setStyle(ButtonStyle.Secondary)
-                                  .setLabel(
-                                      await getGuildLocaleString(
-                                          interaction.guildId,
-                                          `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}`,
-                                      ),
-                                  ),
-                          ),
-                      ]
-                    : [],
-            },
+            new EmbedBuilder().setFields(lyricsFields).setFooter({
+                text:
+                    romanizeFrom === 'japanese'
+                        ? await getGuildLocaleString(
+                              interaction.guildId,
+                              'CMD.LYRICS.MISC.JAPANESE_INACCURATE',
+                          )
+                        : null,
+            }),
         );
     },
 };
