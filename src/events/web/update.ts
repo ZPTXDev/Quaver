@@ -3,7 +3,7 @@ import type { QuaverPlayer } from '#src/lib/util/common.d.js';
 import type { Song } from '@lavaclient/queue';
 import type { APIGuild, APIUser, Snowflake } from 'discord.js';
 import type { Socket } from 'socket.io';
-import type { UpdateItemTypes } from './update.d.js';
+import { UpdateItemType } from './update.d.js';
 
 export default {
     name: ForceType.Update,
@@ -14,7 +14,7 @@ export default {
         callback: (cb: Record<string, any>) => void,
         guildId: Snowflake,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        item: { type: UpdateItemTypes; value?: any },
+        item: { type: UpdateItemType; value?: any },
     ): Promise<void> {
         const { bot, io } = await import('#src/main.js');
         if (!socket.guilds) return callback({ status: 'error-auth' });
@@ -29,28 +29,28 @@ export default {
             return callback({ status: 'error-generic' });
         }
         switch (item.type) {
-            case 'loop': {
+            case UpdateItemType.Loop: {
                 const player = bot.music.players.get(guildId);
                 if (!player) return callback({ status: 'error-generic' });
                 player.queue.setLoop(item.value);
                 io.to(`guild:${guildId}`).emit('loopUpdate', item.value);
                 break;
             }
-            case 'volume': {
+            case UpdateItemType.Volume: {
                 const player = bot.music.players.get(guildId);
                 if (!player) return callback({ status: 'error-generic' });
                 player.setVolume(item.value);
                 io.to(`guild:${guildId}`).emit('volumeUpdate', item.value);
                 break;
             }
-            case 'paused': {
+            case UpdateItemType.Paused: {
                 const player = bot.music.players.get(guildId);
                 if (!player) return callback({ status: 'error-generic' });
                 player.pause(item.value);
                 io.to(`guild:${guildId}`).emit('pauseUpdate', item.value);
                 break;
             }
-            case 'skip': {
+            case UpdateItemType.Skip: {
                 const player = bot.music.players.get(guildId) as QuaverPlayer;
                 if (!player) return callback({ status: 'error-generic' });
                 if (player.queue.current.requester === socket.user.id) {
@@ -80,7 +80,7 @@ export default {
                 player.skip = skip;
                 break;
             }
-            case 'bassboost': {
+            case UpdateItemType.Bassboost: {
                 const player = bot.music.players.get(guildId) as QuaverPlayer;
                 if (!player) return callback({ status: 'error-generic' });
                 let eqValues: number[] = Array(15).fill(0);
@@ -103,7 +103,7 @@ export default {
                 });
                 break;
             }
-            case 'nightcore': {
+            case UpdateItemType.Nightcore: {
                 const player = bot.music.players.get(guildId) as QuaverPlayer;
                 if (!player) return callback({ status: 'error-generic' });
                 player.filters.timescale = item.value
@@ -117,7 +117,7 @@ export default {
                 });
                 break;
             }
-            case 'seek': {
+            case UpdateItemType.Seek: {
                 const player = bot.music.players.get(guildId);
                 if (!player) return callback({ status: 'error-generic' });
                 if (player.queue.current.requester !== socket.user.id) {
@@ -126,7 +126,7 @@ export default {
                 await player.seek(item.value);
                 break;
             }
-            case 'remove': {
+            case UpdateItemType.Remove: {
                 const player = bot.music.players.get(guildId);
                 if (!player) return callback({ status: 'error-generic' });
                 player.queue.remove(item.value);
@@ -145,7 +145,7 @@ export default {
                 );
                 break;
             }
-            case 'shuffle': {
+            case UpdateItemType.Shuffle: {
                 const player = bot.music.players.get(guildId);
                 if (!player) return callback({ status: 'error-generic' });
                 let currentIndex = player.queue.tracks.length,
