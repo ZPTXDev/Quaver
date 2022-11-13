@@ -15,6 +15,10 @@ export enum Check {
      * Must be in the same voice channel (will not fail if the bot is not in a voice channel)
      */
     InSessionVoice = 'CHECK.IN_SESSION_VOICE',
+    /**
+     * (Components only) Must be the user who started the interaction
+     */
+    InteractionStarter = 'CHECK.INTERACTION_STARTER',
 }
 export enum Language {
     ceb = 'Cebuano',

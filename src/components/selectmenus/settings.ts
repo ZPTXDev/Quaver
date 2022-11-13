@@ -3,14 +3,9 @@ import type {
     QuaverInteraction,
     SettingsPageOptions,
 } from '#src/lib/util/common.d.js';
-import {
-    confirmationTimeout,
-    data,
-    logger,
-    MessageOptionsBuilderType,
-} from '#src/lib/util/common.js';
+import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
 import type { Language } from '#src/lib/util/constants.js';
-import { settingsOptions } from '#src/lib/util/constants.js';
+import { Check, settingsOptions } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
     buildMessageOptions,
@@ -27,16 +22,10 @@ import { ActionRowBuilder, EmbedBuilder, SelectMenuBuilder } from 'discord.js';
 
 export default {
     name: 'settings',
+    checks: [Check.InteractionStarter],
     async execute(
         interaction: QuaverInteraction<SelectMenuInteraction>,
     ): Promise<void> {
-        if (interaction.message.interaction.user.id !== interaction.user.id) {
-            await interaction.replyHandler.locale(
-                'DISCORD.INTERACTION.USER_MISMATCH',
-                { type: MessageOptionsBuilderType.Error },
-            );
-            return;
-        }
         if (!confirmationTimeout[interaction.message.id]) {
             await interaction.replyHandler.locale(
                 'DISCORD.INTERACTION.EXPIRED',

@@ -18,20 +18,24 @@ export type ChatInputCommand = {
 
 export type Autocomplete = {
     name: string;
+    checks?: Check[];
     execute(interaction: AutocompleteInteraction): Promise<void>;
 };
 
 export type Button = {
     name: string;
+    checks?: Check[];
     execute(interaction: ButtonInteraction): Promise<void>;
 };
 
 export type SelectMenu = {
     name: string;
+    checks?: Check[];
     execute(interaction: SelectMenuInteraction): Promise<void>;
 };
 
 export type ModalSubmit = {
     name: string;
+    checks?: Check[];
     execute(interaction: ModalSubmitInteraction): Promise<void>;
 };

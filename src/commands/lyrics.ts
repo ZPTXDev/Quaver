@@ -30,7 +30,6 @@ export default {
                         ),
                     ),
         ),
-    checks: [],
     permissions: {
         user: [],
         bot: [],

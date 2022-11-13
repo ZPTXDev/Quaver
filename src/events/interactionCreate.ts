@@ -1,9 +1,17 @@
 import ReplyHandler from '#src/lib/ReplyHandler.js';
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { logger, MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import { Check } from '#src/lib/util/constants.js';
-import type { Interaction } from 'discord.js';
-import { GuildMember, PermissionsBitField } from 'discord.js';
+import type { Check } from '#src/lib/util/constants.js';
+import { getFailedChecks } from '#src/lib/util/util.js';
+import type {
+    ButtonInteraction,
+    ChatInputCommandInteraction,
+    GuildMember,
+    Interaction,
+    ModalSubmitInteraction,
+    SelectMenuInteraction,
+} from 'discord.js';
+import { PermissionsBitField } from 'discord.js';
 import type {
     Autocomplete,
     Button,
@@ -11,6 +19,38 @@ import type {
     ModalSubmit,
     SelectMenu,
 } from './interactionCreate.d.js';
+
+async function handleFailedChecks(
+    failedChecks: Check[],
+    interaction: QuaverInteraction<
+        | ChatInputCommandInteraction
+        | ButtonInteraction
+        | SelectMenuInteraction
+        | ModalSubmitInteraction
+    >,
+): Promise<void> {
+    logger.info({
+        message: `[${
+            interaction.guildId ? `G ${interaction.guildId} | ` : ''
+        }U ${interaction.user.id}] ${
+            interaction.isChatInputCommand()
+                ? 'Command'
+                : interaction.isButton()
+                ? 'Button'
+                : interaction.isSelectMenu()
+                ? 'Select menu'
+                : 'Modal'
+        } ${
+            interaction.isChatInputCommand()
+                ? interaction.commandName
+                : interaction.customId
+        } failed ${failedChecks.length} check(s)`,
+        label: 'Quaver',
+    });
+    await interaction.replyHandler.locale(failedChecks[0], {
+        type: MessageOptionsBuilderType.Error,
+    });
+}
 
 export default {
     name: 'interactionCreate',
@@ -41,56 +81,13 @@ export default {
                 }`,
                 label: 'Quaver',
             });
-            const failedChecks = [];
-            for (const check of command.checks) {
-                switch (check) {
-                    case Check.GuildOnly:
-                        if (!interaction.guildId) failedChecks.push(check);
-                        break;
-                    case Check.ActiveSession: {
-                        const player = interaction.client.music.players.get(
-                            interaction.guildId,
-                        );
-                        if (!player) failedChecks.push(check);
-                        break;
-                    }
-                    case Check.InVoice:
-                        if (
-                            !(interaction.member instanceof GuildMember) ||
-                            !interaction.member?.voice.channelId
-                        ) {
-                            failedChecks.push(check);
-                        }
-                        break;
-                    case Check.InSessionVoice: {
-                        const player = interaction.client.music.players.get(
-                            interaction.guildId,
-                        );
-                        if (
-                            player &&
-                            interaction.member instanceof GuildMember &&
-                            interaction.member?.voice.channelId !==
-                                player.channelId
-                        ) {
-                            failedChecks.push(check);
-                        }
-                        break;
-                    }
-                }
-            }
+            const failedChecks = getFailedChecks(
+                command.checks,
+                interaction.guildId,
+                interaction.member as GuildMember,
+            );
             if (failedChecks.length > 0) {
-                logger.info({
-                    message: `[${
-                        interaction.guildId ? `G ${interaction.guildId} | ` : ''
-                    }U ${interaction.user.id}] Command ${
-                        interaction.commandName
-                    } failed ${failedChecks.length} check(s)`,
-                    label: 'Quaver',
-                });
-                await interaction.replyHandler.locale(failedChecks[0], {
-                    type: MessageOptionsBuilderType.Error,
-                });
-                return;
+                return handleFailedChecks(failedChecks, interaction);
             }
             const failedPermissions: { user: string[]; bot: string[] } = {
                 user: [],
@@ -242,6 +239,15 @@ export default {
                 }`,
                 label: 'Quaver',
             });
+            const failedChecks = getFailedChecks(
+                button.checks,
+                interaction.guildId,
+                interaction.member as GuildMember,
+                interaction,
+            );
+            if (failedChecks.length > 0) {
+                return handleFailedChecks(failedChecks, interaction);
+            }
             try {
                 logger.info({
                     message: `[${
@@ -291,6 +297,15 @@ export default {
                 }`,
                 label: 'Quaver',
             });
+            const failedChecks = getFailedChecks(
+                selectmenu.checks,
+                interaction.guildId,
+                interaction.member as GuildMember,
+                interaction,
+            );
+            if (failedChecks.length > 0) {
+                return handleFailedChecks(failedChecks, interaction);
+            }
             try {
                 logger.info({
                     message: `[${
@@ -340,6 +355,15 @@ export default {
                 }`,
                 label: 'Quaver',
             });
+            const failedChecks = getFailedChecks(
+                modal.checks,
+                interaction.guildId,
+                interaction.member as GuildMember,
+                interaction,
+            );
+            if (failedChecks.length > 0) {
+                return handleFailedChecks(failedChecks, interaction);
+            }
             try {
                 logger.info({
                     message: `[${

@@ -1,10 +1,7 @@
 import { ForceType } from '#src/lib/ReplyHandler.js';
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import {
-    logger,
-    MessageOptionsBuilderType,
-    searchState,
-} from '#src/lib/util/common.js';
+import { logger, searchState } from '#src/lib/util/common.js';
+import { Check } from '#src/lib/util/constants.js';
 import {
     buildMessageOptions,
     getGuildLocaleString,
@@ -27,16 +24,10 @@ import {
 
 export default {
     name: 'search',
+    checks: [Check.InteractionStarter],
     async execute(
         interaction: QuaverInteraction<SelectMenuInteraction>,
     ): Promise<void> {
-        if (interaction.message.interaction.user.id !== interaction.user.id) {
-            await interaction.replyHandler.locale(
-                'DISCORD.INTERACTION.USER_MISMATCH',
-                { type: MessageOptionsBuilderType.Error },
-            );
-            return;
-        }
         const state = searchState[interaction.message.id];
         if (!state) {
             await interaction.replyHandler.locale(

@@ -15,7 +15,6 @@ export default {
         .setDescription(
             getLocaleString(settings.defaultLocaleCode, 'CMD.PING.DESCRIPTION'),
         ),
-    checks: [],
     permissions: {
         user: [],
         bot: [],

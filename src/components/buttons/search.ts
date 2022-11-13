@@ -14,6 +14,7 @@ import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
     buildMessageOptions,
+    getFailedChecks,
     getGuildLocaleString,
     msToTime,
     msToTimeString,
@@ -23,6 +24,7 @@ import type {
     APISelectMenuOption,
     ButtonComponent,
     ButtonInteraction,
+    GuildMember,
     MessageActionRowComponentBuilder,
     SelectMenuComponent,
 } from 'discord.js';
@@ -32,13 +34,13 @@ import {
     ChannelType,
     EmbedBuilder,
     escapeMarkdown,
-    GuildMember,
     PermissionsBitField,
     SelectMenuBuilder,
 } from 'discord.js';
 
 export default {
     name: 'search',
+    checks: [Check.InteractionStarter],
     async execute(
         interaction: QuaverInteraction<ButtonInteraction>,
     ): Promise<void> {
@@ -64,29 +66,22 @@ export default {
             let player = interaction.client.music.players.get(
                 interaction.guildId,
             ) as QuaverPlayer;
-            if (
-                !(interaction.member instanceof GuildMember) ||
-                !interaction.member?.voice.channelId
-            ) {
-                await interaction.replyHandler.locale(Check.InVoice, {
-                    type: MessageOptionsBuilderType.Error,
-                });
-                return;
-            }
-            if (
-                player &&
-                interaction.member?.voice.channelId !== player.channelId
-            ) {
-                await interaction.replyHandler.locale(Check.InSessionVoice, {
+            const member = interaction.member as GuildMember;
+            const failedChecks: Check[] = getFailedChecks(
+                [Check.InVoice, Check.InSessionVoice],
+                interaction.guildId,
+                member,
+            );
+            if (failedChecks.length > 0) {
+                await interaction.replyHandler.locale(failedChecks[0], {
                     type: MessageOptionsBuilderType.Error,
                 });
                 return;
             }
             // check for connect, speak permission for channel
-            const permissions =
-                interaction.member?.voice.channel.permissionsFor(
-                    interaction.client.user.id,
-                );
+            const permissions = member?.voice.channel.permissionsFor(
+                interaction.client.user.id,
+            );
             if (
                 !permissions.has(
                     new PermissionsBitField([
@@ -103,8 +98,7 @@ export default {
                 return;
             }
             if (
-                interaction.member?.voice.channel.type ===
-                    ChannelType.GuildStageVoice &&
+                member?.voice.channel.type === ChannelType.GuildStageVoice &&
                 !permissions.has(PermissionsBitField.StageModerator)
             ) {
                 await interaction.replyHandler.locale(
@@ -160,7 +154,7 @@ export default {
                 ) as QuaverPlayer;
                 player.handler = new PlayerHandler(interaction.client, player);
                 player.queue.channel = interaction.channel as QuaverChannels;
-                await player.connect(interaction.member.voice.channelId, {
+                await player.connect(member.voice.channelId, {
                     deafened: true,
                 });
                 // Ensure that Quaver destroys the player if the user leaves the channel while Quaver is queuing tracks
@@ -168,11 +162,7 @@ export default {
                 // Ensure that Quaver destroys the player if Quaver gets kicked or banned by the user while Quaver is queuing tracks
                 me = await interaction.guild.members.fetchMe();
                 const timedOut = me.isCommunicationDisabled();
-                if (
-                    !interaction.member.voice.channelId ||
-                    timedOut ||
-                    !interaction.guild
-                ) {
+                if (!member.voice.channelId || timedOut || !interaction.guild) {
                     if (interaction.guild) {
                         timedOut
                             ? await interaction.replyHandler.locale(

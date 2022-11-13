@@ -19,7 +19,6 @@ export default {
         .setDescription(
             getLocaleString(settings.defaultLocaleCode, 'CMD.INFO.DESCRIPTION'),
         ),
-    checks: [],
     permissions: {
         user: [],
         bot: [],

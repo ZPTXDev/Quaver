@@ -1,6 +1,7 @@
 import type {
     MessageOptionsBuilderInputs,
     MessageOptionsBuilderOptions,
+    QuaverClient,
     SettingsPage,
     SettingsPageOptions,
 } from '#src/lib/util/common.d.js';
@@ -9,14 +10,17 @@ import {
     locales,
     MessageOptionsBuilderType,
 } from '#src/lib/util/common.js';
-import { Language } from '#src/lib/util/constants.js';
+import { Check, Language } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import type {
     APISelectMenuOption,
+    ButtonInteraction,
     Interaction,
     InteractionReplyOptions,
     MessageActionRowComponentBuilder,
     MessageCreateOptions,
+    ModalSubmitInteraction,
+    SelectMenuInteraction,
     Snowflake,
 } from 'discord.js';
 import {
@@ -25,6 +29,7 @@ import {
     ButtonStyle,
     EmbedBuilder,
     escapeMarkdown,
+    GuildMember,
     SelectMenuBuilder,
 } from 'discord.js';
 import { readdirSync } from 'fs';
@@ -296,6 +301,67 @@ export async function getJSONResponse(body: any): Promise<unknown> {
         fullBody += d.toString();
     }
     return JSON.parse(fullBody);
+}
+
+/**
+ * Returns all failed checks given a list of checks.
+ * @param checks - The checks to run.
+ * @param guildId - The guild ID.
+ * @param member - The member to check.
+ * @param interaction - The interaction, only required if checking for InteractionStarter.
+ * @returns All failed checks.
+ */
+export function getFailedChecks(
+    checks: Check[],
+    guildId: Snowflake,
+    member: GuildMember & { client: QuaverClient },
+    interaction?:
+        | ButtonInteraction
+        | SelectMenuInteraction
+        | ModalSubmitInteraction,
+): Check[] {
+    const failedChecks: Check[] = [];
+    for (const check of checks ?? []) {
+        switch (check) {
+            case Check.GuildOnly:
+                if (!guildId) failedChecks.push(check);
+                break;
+            case Check.ActiveSession: {
+                if (!guildId) {
+                    failedChecks.push(check);
+                    break;
+                }
+                const player = member.client.music.players.get(guildId);
+                if (!player) failedChecks.push(check);
+                break;
+            }
+            case Check.InVoice:
+                if (
+                    !(member instanceof GuildMember) ||
+                    !member?.voice.channelId
+                ) {
+                    failedChecks.push(check);
+                }
+                break;
+            case Check.InSessionVoice: {
+                const player = member.client.music.players.get(guildId);
+                if (
+                    player &&
+                    member instanceof GuildMember &&
+                    member?.voice.channelId !== player.channelId
+                ) {
+                    failedChecks.push(check);
+                }
+                break;
+            }
+            case Check.InteractionStarter: {
+                if (interaction.message.interaction.user.id !== member.id) {
+                    failedChecks.push(check);
+                }
+            }
+        }
+    }
+    return failedChecks;
 }
 
 /**
