@@ -1,5 +1,5 @@
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import { checks } from '#src/lib/util/constants.js';
+import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import { LoopType } from '@lavaclient/queue';
@@ -51,10 +51,10 @@ export default {
                     ),
         ),
     checks: [
-        checks.GUILD_ONLY,
-        checks.ACTIVE_SESSION,
-        checks.IN_VOICE,
-        checks.IN_SESSION_VOICE,
+        Check.GuildOnly,
+        Check.ActiveSession,
+        Check.InVoice,
+        Check.InSessionVoice,
     ],
     permissions: {
         user: [],

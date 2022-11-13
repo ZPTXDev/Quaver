@@ -4,7 +4,7 @@ import {
     MessageOptionsBuilderType,
     searchState,
 } from '#src/lib/util/common.js';
-import { checks } from '#src/lib/util/constants.js';
+import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
     buildMessageOptions,
@@ -54,7 +54,7 @@ export default {
                     .setRequired(true)
                     .setAutocomplete(true),
         ),
-    checks: [checks.GUILD_ONLY],
+    checks: [Check.GuildOnly],
     permissions: {
         user: [],
         bot: [],

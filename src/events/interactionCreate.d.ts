@@ -1,3 +1,4 @@
+import type { Check } from '#src/lib/util/constants.js';
 import type {
     AutocompleteInteraction,
     ButtonInteraction,
@@ -10,7 +11,7 @@ import type {
 
 export type ChatInputCommand = {
     data?: SlashCommandBuilder;
-    checks?: string[];
+    checks?: Check[];
     permissions?: { user: PermissionsBitField[]; bot: PermissionsBitField[] };
     execute?(interaction: ChatInputCommandInteraction): Promise<void>;
 };

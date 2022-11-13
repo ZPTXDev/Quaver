@@ -4,7 +4,7 @@ import type {
 } from '#src/lib/util/common.d.js';
 import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
 import type { Language } from '#src/lib/util/constants.js';
-import { checks, settingsOptions } from '#src/lib/util/constants.js';
+import { Check, settingsOptions } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
     buildMessageOptions,
@@ -36,7 +36,7 @@ export default {
             ),
         )
         .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild),
-    checks: [checks.GUILD_ONLY],
+    checks: [Check.GuildOnly],
     permissions: {
         user: [PermissionsBitField.Flags.ManageGuild],
         bot: [],

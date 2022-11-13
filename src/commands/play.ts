@@ -6,7 +6,7 @@ import type {
     QuaverSong,
 } from '#src/lib/util/common.d.js';
 import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import { checks } from '#src/lib/util/constants.js';
+import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import type { Item } from '@lavaclient/spotify';
@@ -55,7 +55,7 @@ export default {
                         ),
                     ),
         ),
-    checks: [checks.GUILD_ONLY, checks.IN_VOICE, checks.IN_SESSION_VOICE],
+    checks: [Check.GuildOnly, Check.InVoice, Check.InSessionVoice],
     permissions: {
         user: [],
         bot: [],

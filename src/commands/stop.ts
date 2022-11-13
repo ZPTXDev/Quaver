@@ -4,7 +4,7 @@ import {
     logger,
     MessageOptionsBuilderType,
 } from '#src/lib/util/common.js';
-import { checks } from '#src/lib/util/constants.js';
+import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
     buildMessageOptions,
@@ -28,10 +28,10 @@ export default {
             getLocaleString(settings.defaultLocaleCode, 'CMD.STOP.DESCRIPTION'),
         ),
     checks: [
-        checks.GUILD_ONLY,
-        checks.ACTIVE_SESSION,
-        checks.IN_VOICE,
-        checks.IN_SESSION_VOICE,
+        Check.GuildOnly,
+        Check.ActiveSession,
+        Check.InVoice,
+        Check.InSessionVoice,
     ],
     permissions: {
         user: [],

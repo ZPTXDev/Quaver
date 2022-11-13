@@ -7,7 +7,7 @@ import {
     confirmationTimeout,
     MessageOptionsBuilderType,
 } from '#src/lib/util/common.js';
-import { checks } from '#src/lib/util/constants.js';
+import { Check } from '#src/lib/util/constants.js';
 import type { ButtonInteraction } from 'discord.js';
 import { GuildMember } from 'discord.js';
 
@@ -27,7 +27,7 @@ export default {
             interaction.guildId,
         ) as QuaverPlayer;
         if (!player) {
-            await interaction.replyHandler.locale(checks.ACTIVE_SESSION, {
+            await interaction.replyHandler.locale(Check.ActiveSession, {
                 type: MessageOptionsBuilderType.Error,
             });
             return;
@@ -36,7 +36,7 @@ export default {
             !(interaction.member instanceof GuildMember) ||
             !interaction.member?.voice.channelId
         ) {
-            await interaction.replyHandler.locale(checks.IN_VOICE, {
+            await interaction.replyHandler.locale(Check.InVoice, {
                 type: MessageOptionsBuilderType.Error,
             });
             return;
@@ -45,7 +45,7 @@ export default {
             player &&
             interaction.member?.voice.channelId !== player.channelId
         ) {
-            await interaction.replyHandler.locale(checks.IN_SESSION_VOICE, {
+            await interaction.replyHandler.locale(Check.InSessionVoice, {
                 type: MessageOptionsBuilderType.Error,
             });
             return;
