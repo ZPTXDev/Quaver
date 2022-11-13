@@ -9,7 +9,7 @@ import {
     locales,
     MessageOptionsBuilderType,
 } from '#src/lib/util/common.js';
-import { languageName } from '#src/lib/util/constants.js';
+import { Language } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import type {
     APISelectMenuOption,
@@ -345,7 +345,7 @@ export function buildMessageOptions(
  */
 export async function buildSettingsPage(
     interaction: Interaction,
-    guildLocaleCode: string,
+    guildLocaleCode: keyof typeof Language,
     option: SettingsPageOptions,
 ): Promise<SettingsPage> {
     let current: string,
@@ -354,7 +354,7 @@ export async function buildSettingsPage(
     switch (option) {
         case 'language':
             current = `${
-                languageName[guildLocaleCode] ?? 'Unknown'
+                Language[guildLocaleCode] ?? 'Unknown'
             } (${guildLocaleCode})`;
             actionRow.addComponents(
                 new SelectMenuBuilder().setCustomId('language').addOptions(
@@ -366,10 +366,8 @@ export async function buildSettingsPage(
                             'locales',
                         ]),
                     ).map(
-                        (file): APISelectMenuOption => ({
-                            label: `${
-                                languageName[file] ?? 'Unknown'
-                            } (${file})`,
+                        (file: keyof typeof Language): APISelectMenuOption => ({
+                            label: `${Language[file] ?? 'Unknown'} (${file})`,
                             value: file,
                             default: file === guildLocaleCode,
                         }),

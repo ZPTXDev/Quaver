@@ -10,6 +10,7 @@ import {
     logger,
     MessageOptionsBuilderType,
 } from '#src/lib/util/common.js';
+import type { Language } from '#src/lib/util/constants.js';
 import { settingsOptions } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
@@ -103,10 +104,10 @@ export default {
             );
         }
         const guildLocaleCode =
-            (await data.guild.get<string>(
+            (await data.guild.get<keyof typeof Language>(
                 interaction.guildId,
                 'settings.locale',
-            )) ?? settings.defaultLocaleCode;
+            )) ?? (settings.defaultLocaleCode as keyof typeof Language);
         const { current, embeds, actionRow } = await buildSettingsPage(
             interaction,
             guildLocaleCode,

@@ -5,10 +5,10 @@ export const checks: Record<string, string> = {
     IN_SESSION_VOICE: 'CHECK.IN_SESSION_VOICE',
 };
 
-export const languageName: Record<string, string> = {
-    ceb: 'Cebuano',
-    en: 'English',
-    fil: 'Filipino',
-};
+export enum Language {
+    ceb = 'Cebuano',
+    en = 'English',
+    fil = 'Filipino',
+}
 
 export const settingsOptions = ['language', 'format'];
