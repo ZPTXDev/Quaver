@@ -89,7 +89,6 @@ export default {
             );
             return;
         }
-        // TODO: Web does not have these permission checks yet
         if (
             player.queue.current.requester !== interaction.user.id &&
             interaction.channel
