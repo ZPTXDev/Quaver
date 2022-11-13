@@ -44,11 +44,9 @@ export default {
             const failedChecks = [];
             for (const check of command.checks) {
                 switch (check) {
-                    // Only allowed in guild
                     case Check.GuildOnly:
                         if (!interaction.guildId) failedChecks.push(check);
                         break;
-                    // Must have an active session
                     case Check.ActiveSession: {
                         const player = interaction.client.music.players.get(
                             interaction.guildId,
@@ -56,7 +54,6 @@ export default {
                         if (!player) failedChecks.push(check);
                         break;
                     }
-                    // Must be in a voice channel
                     case Check.InVoice:
                         if (
                             !(interaction.member instanceof GuildMember) ||
@@ -65,7 +62,6 @@ export default {
                             failedChecks.push(check);
                         }
                         break;
-                    // Must be in the same voice channel (will not fail if the bot is not in a voice channel)
                     case Check.InSessionVoice: {
                         const player = interaction.client.music.players.get(
                             interaction.guildId,
