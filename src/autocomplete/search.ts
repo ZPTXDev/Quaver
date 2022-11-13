@@ -33,7 +33,7 @@ export default {
                     .map((suggestion): string =>
                         suggestion.replace(
                             /\\u([0-9a-fA-F]{4})/g,
-                            (whole, grp): string =>
+                            (_whole, grp): string =>
                                 String.fromCharCode(parseInt(grp, 16)),
                         ),
                     )
