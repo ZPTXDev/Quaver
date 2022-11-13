@@ -44,13 +44,6 @@ export default {
     async execute(
         interaction: QuaverInteraction<ButtonInteraction>,
     ): Promise<void> {
-        if (interaction.message.interaction.user.id !== interaction.user.id) {
-            await interaction.replyHandler.locale(
-                'DISCORD.INTERACTION.USER_MISMATCH',
-                { type: MessageOptionsBuilderType.Error },
-            );
-            return;
-        }
         const state = searchState[interaction.message.id];
         if (!state) {
             await interaction.replyHandler.locale(
