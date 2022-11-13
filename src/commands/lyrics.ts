@@ -1,4 +1,5 @@
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
+import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getLocaleString } from '#src/lib/util/util.js';
 import { LyricsFinder } from '@jeve/lyrics-finder';
@@ -49,7 +50,7 @@ export default {
             ) {
                 await interaction.replyHandler.locale(
                     'CMD.LYRICS.RESPONSE.NO_QUERY',
-                    { type: 'error' },
+                    { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             }
@@ -62,14 +63,14 @@ export default {
         } catch (error) {
             await interaction.replyHandler.locale(
                 'CMD.LYRICS.RESPONSE.NO_RESULTS',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
         if (lyrics instanceof Error) {
             await interaction.replyHandler.locale(
                 'CMD.LYRICS.RESPONSE.NO_RESULTS',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
@@ -136,7 +137,7 @@ export default {
         if (lyricsFields.length === 0) {
             await interaction.replyHandler.locale(
                 'CMD.LYRICS.RESPONSE.NO_RESULTS',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }

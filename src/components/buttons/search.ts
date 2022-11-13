@@ -4,7 +4,11 @@ import type {
     QuaverInteraction,
     QuaverPlayer,
 } from '#src/lib/util/common.d.js';
-import { logger, searchState } from '#src/lib/util/common.js';
+import {
+    logger,
+    MessageOptionsBuilderType,
+    searchState,
+} from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
@@ -40,7 +44,7 @@ export default {
         if (interaction.message.interaction.user.id !== interaction.user.id) {
             await interaction.replyHandler.locale(
                 'DISCORD.INTERACTION.USER_MISMATCH',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
@@ -64,7 +68,7 @@ export default {
                 !interaction.member?.voice.channelId
             ) {
                 await interaction.replyHandler.locale(checks.IN_VOICE, {
-                    type: 'error',
+                    type: MessageOptionsBuilderType.Error,
                 });
                 return;
             }
@@ -73,7 +77,7 @@ export default {
                 interaction.member?.voice.channelId !== player.channelId
             ) {
                 await interaction.replyHandler.locale(checks.IN_SESSION_VOICE, {
-                    type: 'error',
+                    type: MessageOptionsBuilderType.Error,
                 });
                 return;
             }
@@ -93,7 +97,7 @@ export default {
             ) {
                 await interaction.replyHandler.locale(
                     'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC',
-                    { type: 'error' },
+                    { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             }
@@ -104,7 +108,7 @@ export default {
             ) {
                 await interaction.replyHandler.locale(
                     'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE',
-                    { type: 'error' },
+                    { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             }
@@ -112,7 +116,7 @@ export default {
             if (me.isCommunicationDisabled()) {
                 await interaction.replyHandler.locale(
                     'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
-                    { type: 'error' },
+                    { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             }
@@ -172,7 +176,10 @@ export default {
                         timedOut
                             ? await interaction.replyHandler.locale(
                                   'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
-                                  { type: 'error', components: [] },
+                                  {
+                                      type: MessageOptionsBuilderType.Error,
+                                      components: [],
+                                  },
                               )
                             : await interaction.replyHandler.locale(
                                   'DISCORD.INTERACTION.CANCELED',
@@ -212,7 +219,7 @@ export default {
                               }`
                             : null,
                     }),
-                { type: 'success', components: [] },
+                { type: MessageOptionsBuilderType.Success, components: [] },
             );
             if (!started) await player.queue.start();
             if (settings.features.web.enabled) {

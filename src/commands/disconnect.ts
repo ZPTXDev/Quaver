@@ -2,7 +2,12 @@ import type {
     QuaverInteraction,
     QuaverPlayer,
 } from '#src/lib/util/common.d.js';
-import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
+import {
+    confirmationTimeout,
+    data,
+    logger,
+    MessageOptionsBuilderType,
+} from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
@@ -47,7 +52,7 @@ export default {
         ) {
             await interaction.replyHandler.locale(
                 'CMD.DISCONNECT.RESPONSE.FEATURE_247_ENABLED',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
@@ -58,7 +63,7 @@ export default {
             await player.handler.disconnect();
             await interaction.replyHandler.locale(
                 'CMD.DISCONNECT.RESPONSE.SUCCESS',
-                { type: 'success' },
+                { type: MessageOptionsBuilderType.Success },
             );
             return;
         }
@@ -77,7 +82,7 @@ export default {
                     ),
                 }),
             {
-                type: 'warning',
+                type: MessageOptionsBuilderType.Warning,
                 components: [
                     new ActionRowBuilder<ButtonBuilder>().addComponents(
                         new ButtonBuilder()

@@ -5,6 +5,7 @@ import type {
     QuaverPlayer,
     QuaverSong,
 } from '#src/lib/util/common.d.js';
+import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
@@ -70,7 +71,7 @@ export default {
         ) {
             await interaction.replyHandler.locale(
                 'DISCORD.CHANNEL_UNSUPPORTED',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
@@ -90,7 +91,7 @@ export default {
         ) {
             await interaction.replyHandler.locale(
                 'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
@@ -101,7 +102,7 @@ export default {
         ) {
             await interaction.replyHandler.locale(
                 'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
@@ -109,7 +110,7 @@ export default {
         if (me.isCommunicationDisabled()) {
             await interaction.replyHandler.locale(
                 'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
@@ -132,7 +133,7 @@ export default {
             ) {
                 await interaction.replyHandler.locale(
                     'CMD.PLAY.RESPONSE.DISABLED.SPOTIFY',
-                    { type: 'error' },
+                    { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             }
@@ -142,7 +143,7 @@ export default {
             } catch (err) {
                 await interaction.replyHandler.locale(
                     'CMD.PLAY.RESPONSE.NO_RESULTS.SPOTIFY',
-                    { type: 'error' },
+                    { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             }
@@ -167,7 +168,7 @@ export default {
                     ) {
                         await interaction.replyHandler.locale(
                             'CMD.PLAY.RESPONSE.LIMIT_EXCEEDED.SPOTIFY',
-                            { type: 'error' },
+                            { type: MessageOptionsBuilderType.Error },
                         );
                         return;
                     }
@@ -184,7 +185,7 @@ export default {
                 default:
                     await interaction.replyHandler.locale(
                         'CMD.PLAY.RESPONSE.NO_RESULTS.SPOTIFY',
-                        { type: 'error' },
+                        { type: MessageOptionsBuilderType.Error },
                     );
                     return;
             }
@@ -217,19 +218,19 @@ export default {
                 case 'NO_MATCHES':
                     await interaction.replyHandler.locale(
                         'CMD.PLAY.RESPONSE.NO_RESULTS.DEFAULT',
-                        { type: 'error' },
+                        { type: MessageOptionsBuilderType.Error },
                     );
                     return;
                 case 'LOAD_FAILED':
                     await interaction.replyHandler.locale(
                         'CMD.PLAY.RESPONSE.LOAD_FAILED',
-                        { type: 'error' },
+                        { type: MessageOptionsBuilderType.Error },
                     );
                     return;
                 default:
                     await interaction.replyHandler.locale(
                         'DISCORD.GENERIC_ERROR',
-                        { type: 'error' },
+                        { type: MessageOptionsBuilderType.Error },
                     );
                     return;
             }
@@ -260,7 +261,7 @@ export default {
                     timedOut
                         ? await interaction.replyHandler.locale(
                               'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
-                              { type: 'error' },
+                              { type: MessageOptionsBuilderType.Error },
                           )
                         : await interaction.replyHandler.locale(
                               'DISCORD.INTERACTION.CANCELED',
@@ -298,7 +299,7 @@ export default {
                           }`
                         : null,
                 }),
-            { type: 'success', ephemeral: true },
+            { type: MessageOptionsBuilderType.Success, ephemeral: true },
         );
         if (!started) await player.queue.start();
         if (settings.features.web.enabled) {

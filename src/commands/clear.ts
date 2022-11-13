@@ -1,5 +1,9 @@
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import { confirmationTimeout, logger } from '#src/lib/util/common.js';
+import {
+    confirmationTimeout,
+    logger,
+    MessageOptionsBuilderType,
+} from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
@@ -45,7 +49,7 @@ export default {
         if (player.queue.tracks.length === 0) {
             await interaction.replyHandler.locale(
                 'CMD.CLEAR.RESPONSE.QUEUE_EMPTY',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
@@ -64,7 +68,7 @@ export default {
                     ),
                 }),
             {
-                type: 'warning',
+                type: MessageOptionsBuilderType.Warning,
                 components: [
                     new ActionRowBuilder<ButtonBuilder>().addComponents(
                         new ButtonBuilder()

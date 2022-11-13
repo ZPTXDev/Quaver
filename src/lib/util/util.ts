@@ -4,7 +4,11 @@ import type {
     SettingsPage,
     SettingsPageOptions,
 } from '#src/lib/util/common.d.js';
-import { data, locales } from '#src/lib/util/common.js';
+import {
+    data,
+    locales,
+    MessageOptionsBuilderType,
+} from '#src/lib/util/common.js';
 import { languageName } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import type {
@@ -303,19 +307,25 @@ export async function getJSONResponse(body: any): Promise<unknown> {
 export function buildMessageOptions(
     inputData: MessageOptionsBuilderInputs,
     {
-        type = 'neutral',
+        type = MessageOptionsBuilderType.Neutral,
         components = null,
         files = null,
     }: MessageOptionsBuilderOptions = {},
 ): MessageCreateOptions & InteractionReplyOptions {
     const messageData = Array.isArray(inputData) ? inputData : [inputData];
+    const color: 'success' | 'neutral' | 'warning' | 'error' =
+        MessageOptionsBuilderType[type].toLowerCase() as
+            | 'success'
+            | 'neutral'
+            | 'warning'
+            | 'error';
     const embedData = messageData.map((msg): EmbedBuilder => {
         if (typeof msg === 'string') {
             return new EmbedBuilder()
                 .setDescription(msg)
-                .setColor(settings.colors[type]);
+                .setColor(settings.colors[color]);
         }
-        if (!msg.data.color) return msg.setColor(settings.colors[type]);
+        if (!msg.data.color) return msg.setColor(settings.colors[color]);
         return msg;
     });
     const opts: MessageCreateOptions & InteractionReplyOptions = {

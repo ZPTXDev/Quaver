@@ -1,4 +1,5 @@
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
+import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import {
     getGuildLocaleString,
     msToTime,
@@ -60,7 +61,11 @@ export default {
         if (!player || pages.length === 0 || page < 1 || page > pages.length) {
             await interaction.replyHandler.locale(
                 'CMD.QUEUE.RESPONSE.QUEUE_EMPTY',
-                { type: 'error', components: [], force: 'update' },
+                {
+                    type: MessageOptionsBuilderType.Error,
+                    components: [],
+                    force: 'update',
+                },
             );
             return;
         }

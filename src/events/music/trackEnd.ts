@@ -1,5 +1,9 @@
 import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.d.js';
-import { data, logger } from '#src/lib/util/common.js';
+import {
+    data,
+    logger,
+    MessageOptionsBuilderType,
+} from '#src/lib/util/common.js';
 import { LoopType } from '@lavaclient/queue';
 import type { Collection, GuildMember, Snowflake } from 'discord.js';
 import { escapeMarkdown } from 'discord.js';
@@ -28,7 +32,7 @@ export default {
                 'MUSIC.PLAYER.TRACK_SKIPPED_ERROR',
                 {
                     vars: [escapeMarkdown(track.title), track.uri, reason],
-                    type: 'warning',
+                    type: MessageOptionsBuilderType.Warning,
                 },
             );
             if (!queue.player.failed) queue.player.failed = 0;
@@ -88,7 +92,7 @@ export default {
             });
             await queue.player.handler.locale(
                 'MUSIC.DISCONNECT.ALONE.DISCONNECTED.DEFAULT',
-                { type: 'warning' },
+                { type: MessageOptionsBuilderType.Warning },
             );
             return queue.player.handler.disconnect();
         }

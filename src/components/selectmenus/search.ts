@@ -1,5 +1,9 @@
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import { logger, searchState } from '#src/lib/util/common.js';
+import {
+    logger,
+    MessageOptionsBuilderType,
+    searchState,
+} from '#src/lib/util/common.js';
 import {
     buildMessageOptions,
     getGuildLocaleString,
@@ -28,7 +32,7 @@ export default {
         if (interaction.message.interaction.user.id !== interaction.user.id) {
             await interaction.replyHandler.locale(
                 'DISCORD.INTERACTION.USER_MISMATCH',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }

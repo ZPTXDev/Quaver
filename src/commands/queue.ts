@@ -1,4 +1,5 @@
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
+import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
@@ -46,7 +47,7 @@ export default {
         if (player.queue.tracks.length === 0) {
             await interaction.replyHandler.locale(
                 'CMD.QUEUE.RESPONSE.QUEUE_EMPTY',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }

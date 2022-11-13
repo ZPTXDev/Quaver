@@ -1,5 +1,9 @@
 import type { QuaverClient, QuaverPlayer } from '#src/lib/util/common.d.js';
-import { data, logger } from '#src/lib/util/common.js';
+import {
+    data,
+    logger,
+    MessageOptionsBuilderType,
+} from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString } from '#src/lib/util/util.js';
 import type { VoiceState } from 'discord.js';
@@ -52,7 +56,7 @@ export default {
                 }
                 await player.handler.locale(
                     'MUSIC.SESSION_ENDED.FORCED.DISCONNECTED',
-                    { type: 'warning' },
+                    { type: MessageOptionsBuilderType.Warning },
                 );
                 return player.handler.disconnect(oldState.channelId);
             }
@@ -85,7 +89,7 @@ export default {
                 ) {
                     await player.handler.locale(
                         'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC',
-                        { type: 'error' },
+                        { type: MessageOptionsBuilderType.Error },
                     );
                     return player.handler.disconnect();
                 }
@@ -128,7 +132,7 @@ export default {
                 ) {
                     await player.handler.locale(
                         'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC',
-                        { type: 'error' },
+                        { type: MessageOptionsBuilderType.Error },
                     );
                     return player.handler.disconnect();
                 }
@@ -147,7 +151,7 @@ export default {
                     }
                     await player.handler.locale(
                         'MUSIC.SESSION_ENDED.FORCED.STAGE_NOT_MODERATOR',
-                        { type: 'warning' },
+                        { type: MessageOptionsBuilderType.Warning },
                     );
                     return player.handler.disconnect();
                 }
@@ -225,7 +229,7 @@ export default {
                     });
                     await player.handler.locale(
                         'MUSIC.DISCONNECT.ALONE.DISCONNECTED.MOVED',
-                        { type: 'warning' },
+                        { type: MessageOptionsBuilderType.Warning },
                     );
                     return player.handler.disconnect();
                 }
@@ -254,7 +258,7 @@ export default {
                         });
                         p.handler.locale(
                             'MUSIC.DISCONNECT.INACTIVITY.DISCONNECTED',
-                            { type: 'warning' },
+                            { type: MessageOptionsBuilderType.Warning },
                         );
                         p.handler.disconnect();
                     },
@@ -289,7 +293,7 @@ export default {
                                 'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME',
                             ),
                         }),
-                    { type: 'warning' },
+                    { type: MessageOptionsBuilderType.Warning },
                 );
                 return;
             }
@@ -317,7 +321,7 @@ export default {
                     );
                 }
                 await player.handler.locale('MUSIC.DISCONNECT.ALONE.RESUMING', {
-                    type: 'success',
+                    type: MessageOptionsBuilderType.Success,
                 });
                 return;
             }
@@ -350,7 +354,7 @@ export default {
                 }
             }
             await player.handler.locale('MUSIC.DISCONNECT.ALONE.RESUMING', {
-                type: 'success',
+                type: MessageOptionsBuilderType.Success,
             });
             return;
         }
@@ -376,7 +380,7 @@ export default {
             });
             await player.handler.locale(
                 'MUSIC.DISCONNECT.ALONE.DISCONNECTED.DEFAULT',
-                { type: 'warning' },
+                { type: MessageOptionsBuilderType.Warning },
             );
             return player.handler.disconnect();
         }
@@ -410,7 +414,7 @@ export default {
                     label: 'Quaver',
                 });
                 p.handler.locale('MUSIC.DISCONNECT.INACTIVITY.DISCONNECTED', {
-                    type: 'warning',
+                    type: MessageOptionsBuilderType.Warning,
                 });
                 p.handler.disconnect();
             },
@@ -442,7 +446,7 @@ export default {
                         'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME',
                     ),
                 }),
-            { type: 'warning' },
+            { type: MessageOptionsBuilderType.Warning },
         );
     },
 };

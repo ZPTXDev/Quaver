@@ -1,4 +1,5 @@
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
+import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getLocaleString } from '#src/lib/util/util.js';
@@ -53,13 +54,13 @@ export default {
         if (player.queue.tracks.length === 0) {
             await interaction.replyHandler.locale(
                 'CMD.REMOVE.RESPONSE.QUEUE_EMPTY',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
         if (position > player.queue.tracks.length) {
             await interaction.replyHandler.locale('CHECK.INVALID_INDEX', {
-                type: 'error',
+                type: MessageOptionsBuilderType.Error,
             });
             return;
         }
@@ -67,7 +68,7 @@ export default {
             player.queue.tracks[position - 1].requester !== interaction.user.id
         ) {
             await interaction.replyHandler.locale('CHECK.NOT_REQUESTER', {
-                type: 'error',
+                type: MessageOptionsBuilderType.Error,
             });
             return;
         }
@@ -87,7 +88,7 @@ export default {
         }
         await interaction.replyHandler.locale('CMD.REMOVE.RESPONSE.SUCCESS', {
             vars: [escapeMarkdown(track.title), track.uri],
-            type: 'success',
+            type: MessageOptionsBuilderType.Success,
         });
     },
 };

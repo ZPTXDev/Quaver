@@ -6,7 +6,12 @@ import type {
     SelectMenu,
 } from '#src/events/interactionCreate.d.js';
 import type { QuaverClient, QuaverPlayer } from '#src/lib/util/common.d.js';
-import { data, logger, setLocales } from '#src/lib/util/common.js';
+import {
+    data,
+    logger,
+    MessageOptionsBuilderType,
+    setLocales,
+} from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
     getAbsoluteFileURL,
@@ -362,7 +367,7 @@ export async function shuttingDown(
                             ),
                         }),
                     {
-                        type: 'warning',
+                        type: MessageOptionsBuilderType.Warning,
                         files:
                             fileBuffer.length > 0
                                 ? [

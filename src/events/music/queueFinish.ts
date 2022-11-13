@@ -1,5 +1,9 @@
 import type { QuaverQueue } from '#src/lib/util/common.d.js';
-import { data, logger } from '#src/lib/util/common.js';
+import {
+    data,
+    logger,
+    MessageOptionsBuilderType,
+} from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString } from '#src/lib/util/util.js';
 
@@ -28,7 +32,7 @@ export default {
                     label: 'Quaver',
                 });
                 p.handler.locale('MUSIC.DISCONNECT.INACTIVITY.DISCONNECTED', {
-                    type: 'warning',
+                    type: MessageOptionsBuilderType.Warning,
                 });
                 p.handler.disconnect();
             },
@@ -51,7 +55,7 @@ export default {
                 'MUSIC.DISCONNECT.INACTIVITY.WARNING',
                 (Math.floor(Date.now() / 1000) + 30 * 60).toString(),
             )}`,
-            { type: 'warning' },
+            { type: MessageOptionsBuilderType.Warning },
         );
     },
 };

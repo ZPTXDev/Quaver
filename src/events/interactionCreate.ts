@@ -1,6 +1,6 @@
 import ReplyHandler from '#src/lib/ReplyHandler.js';
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import { logger } from '#src/lib/util/common.js';
+import { logger, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import type { Interaction } from 'discord.js';
 import { GuildMember, PermissionsBitField } from 'discord.js';
@@ -92,7 +92,7 @@ export default {
                     label: 'Quaver',
                 });
                 await interaction.replyHandler.locale(failedChecks[0], {
-                    type: 'error',
+                    type: MessageOptionsBuilderType.Error,
                 });
                 return;
             }
@@ -138,7 +138,7 @@ export default {
                                 .map((perm): string => `\`${perm}\``)
                                 .join(' '),
                         ],
-                        type: 'error',
+                        type: MessageOptionsBuilderType.Error,
                     },
                 );
                 return;
@@ -160,7 +160,7 @@ export default {
                 ) {
                     await interaction.replyHandler.locale(
                         'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.VIEW',
-                        { type: 'error' },
+                        { type: MessageOptionsBuilderType.Error },
                     );
                     return;
                 }
@@ -172,7 +172,7 @@ export default {
                                 .map((perm): string => `\`${perm}\``)
                                 .join(' '),
                         ],
-                        type: 'error',
+                        type: MessageOptionsBuilderType.Error,
                     },
                 );
                 return;
@@ -216,7 +216,7 @@ export default {
                     });
                     await interaction.replyHandler.locale(
                         'DISCORD.GENERIC_ERROR',
-                        { type: 'error' },
+                        { type: MessageOptionsBuilderType.Error },
                     );
                 }
                 return;
@@ -276,7 +276,7 @@ export default {
                     });
                     await interaction.replyHandler.locale(
                         'DISCORD.GENERIC_ERROR',
-                        { type: 'error' },
+                        { type: MessageOptionsBuilderType.Error },
                     );
                 }
                 return;
@@ -325,7 +325,7 @@ export default {
                     });
                     await interaction.replyHandler.locale(
                         'DISCORD.GENERIC_ERROR',
-                        { type: 'error' },
+                        { type: MessageOptionsBuilderType.Error },
                     );
                 }
                 return;
@@ -374,7 +374,7 @@ export default {
                     });
                     await interaction.replyHandler.locale(
                         'DISCORD.GENERIC_ERROR',
-                        { type: 'error' },
+                        { type: MessageOptionsBuilderType.Error },
                     );
                 }
                 return;

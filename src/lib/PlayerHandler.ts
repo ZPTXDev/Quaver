@@ -4,7 +4,7 @@ import type {
     QuaverClient,
     QuaverPlayer,
 } from '#src/lib/util/common.d.js';
-import { logger } from '#src/lib/util/common.js';
+import { logger, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
     buildMessageOptions,
@@ -95,7 +95,7 @@ export default class PlayerHandler {
     async send(
         inputData: MessageOptionsBuilderInputs,
         {
-            type = 'neutral',
+            type = MessageOptionsBuilderType.Neutral,
             components = null,
             files = null,
         }: MessageOptionsBuilderOptions = {},
@@ -148,7 +148,7 @@ export default class PlayerHandler {
         stringPath: string,
         {
             vars = [],
-            type = 'neutral',
+            type = MessageOptionsBuilderType.Neutral,
             components = null,
             files = null,
         }: MessageOptionsBuilderOptions & { vars?: string[] } = {},

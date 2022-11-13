@@ -2,6 +2,7 @@ import type {
     QuaverInteraction,
     QuaverPlayer,
 } from '#src/lib/util/common.d.js';
+import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
@@ -44,7 +45,7 @@ export default {
         if (!player.queue.current || (!player.playing && !player.paused)) {
             await interaction.replyHandler.locale(
                 'MUSIC.PLAYER.PLAYING.NOTHING',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }

@@ -1,5 +1,9 @@
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import { logger, searchState } from '#src/lib/util/common.js';
+import {
+    logger,
+    MessageOptionsBuilderType,
+    searchState,
+} from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
@@ -65,7 +69,7 @@ export default {
         ) {
             await interaction.replyHandler.locale(
                 'DISCORD.CHANNEL_UNSUPPORTED',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
@@ -84,7 +88,7 @@ export default {
         if (tracks.length <= 1) {
             await interaction.replyHandler.locale(
                 'CMD.SEARCH.RESPONSE.USE_PLAY_CMD',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }

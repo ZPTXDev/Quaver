@@ -2,6 +2,7 @@ import type {
     QuaverInteraction,
     QuaverPlayer,
 } from '#src/lib/util/common.d.js';
+import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
@@ -37,7 +38,7 @@ export default {
         if (!player.queue.current || (!player.playing && !player.paused)) {
             await interaction.replyHandler.locale(
                 'MUSIC.PLAYER.PLAYING.NOTHING',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
@@ -62,7 +63,7 @@ export default {
                     : 'CMD.SKIP.RESPONSE.SUCCESS.MANAGER',
                 {
                     vars: [escapeMarkdown(track.title), track.uri],
-                    type: 'success',
+                    type: MessageOptionsBuilderType.Success,
                 },
             );
             return;
@@ -79,7 +80,7 @@ export default {
         if (skip.users.includes(interaction.user.id)) {
             await interaction.replyHandler.locale(
                 'CMD.SKIP.RESPONSE.VOTED.STATE_UNCHANGED',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
@@ -111,7 +112,7 @@ export default {
                     skip.users.length.toString(),
                     skip.required.toString(),
                 ],
-                type: 'success',
+                type: MessageOptionsBuilderType.Success,
             },
         );
     },

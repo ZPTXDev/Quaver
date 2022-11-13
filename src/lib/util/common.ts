@@ -82,3 +82,9 @@ export const confirmationTimeout: Record<
     ReturnType<typeof setTimeout>
 > = {};
 export const searchState: Record<Snowflake, SearchStateRecord> = {};
+export enum MessageOptionsBuilderType {
+    Success,
+    Neutral,
+    Warning,
+    Error,
+}

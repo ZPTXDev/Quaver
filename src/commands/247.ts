@@ -2,7 +2,7 @@ import type {
     QuaverInteraction,
     QuaverPlayer,
 } from '#src/lib/util/common.d.js';
-import { data } from '#src/lib/util/common.js';
+import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
@@ -45,7 +45,7 @@ export default {
         const { io } = await import('#src/main.js');
         if (!settings.features.stay.enabled) {
             await interaction.replyHandler.locale('FEATURE.DISABLED.DEFAULT', {
-                type: 'error',
+                type: MessageOptionsBuilderType.Error,
             });
             return;
         }
@@ -58,7 +58,7 @@ export default {
         ) {
             await interaction.replyHandler.locale(
                 'CMD.247.RESPONSE.FEATURE_NOT_WHITELISTED',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
@@ -68,7 +68,7 @@ export default {
         if (!player?.queue?.channel?.id) {
             await interaction.replyHandler.locale(
                 'CMD.247.RESPONSE.QUEUE_CHANNEL_MISSING',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }

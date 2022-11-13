@@ -1,4 +1,5 @@
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
+import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getLocaleString } from '#src/lib/util/util.js';
@@ -34,7 +35,7 @@ export default {
         if (player.paused) {
             await interaction.replyHandler.locale(
                 'CMD.PAUSE.RESPONSE.STATE_UNCHANGED',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
@@ -46,7 +47,7 @@ export default {
             );
         }
         await interaction.replyHandler.locale('CMD.PAUSE.RESPONSE.SUCCESS', {
-            type: 'success',
+            type: MessageOptionsBuilderType.Success,
         });
     },
 };

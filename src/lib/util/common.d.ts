@@ -35,7 +35,7 @@ export type MessageOptionsBuilderInputs =
     | (string | EmbedBuilder)[];
 
 export type MessageOptionsBuilderOptions = {
-    type?: 'success' | 'neutral' | 'warning' | 'error';
+    type?: MessageOptionsBuilderType;
     components?: ActionRowBuilder<MessageActionRowComponentBuilder>[];
     files?: AttachmentBuilder[];
 };

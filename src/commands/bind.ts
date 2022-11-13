@@ -3,7 +3,7 @@ import type {
     QuaverInteraction,
     QuaverPlayer,
 } from '#src/lib/util/common.d.js';
-import { data } from '#src/lib/util/common.js';
+import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getLocaleString } from '#src/lib/util/util.js';
@@ -71,7 +71,7 @@ export default {
         ) {
             await interaction.replyHandler.locale(
                 'CMD.BIND.RESPONSE.PERMISSIONS_INSUFFICIENT',
-                { vars: [channel.id], type: 'error' },
+                { vars: [channel.id], type: MessageOptionsBuilderType.Error },
             );
             return;
         }
@@ -93,7 +93,7 @@ export default {
         }
         await interaction.replyHandler.locale('CMD.BIND.RESPONSE.SUCCESS', {
             vars: [channel.id],
-            type: 'success',
+            type: MessageOptionsBuilderType.Success,
         });
     },
 };

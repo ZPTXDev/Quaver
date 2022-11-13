@@ -1,4 +1,5 @@
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
+import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getLocaleString } from '#src/lib/util/util.js';
@@ -64,7 +65,7 @@ export default {
         if (player.queue.tracks.length <= 1) {
             await interaction.replyHandler.locale(
                 'CMD.MOVE.RESPONSE.QUEUE_INSUFFICIENT_TRACKS',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
@@ -74,14 +75,14 @@ export default {
         ) {
             await interaction.replyHandler.locale(
                 'CMD.MOVE.RESPONSE.OUT_OF_RANGE',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
         if (oldPosition === newPosition) {
             await interaction.replyHandler.locale(
                 'CMD.MOVE.RESPONSE.MOVING_IN_PLACE',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
@@ -111,7 +112,7 @@ export default {
                 oldPosition.toString(),
                 newPosition.toString(),
             ],
-            type: 'success',
+            type: MessageOptionsBuilderType.Success,
         });
     },
 };

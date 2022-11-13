@@ -1,4 +1,5 @@
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
+import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { checks } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
@@ -77,14 +78,14 @@ export default {
         if (!player.queue.current || (!player.playing && !player.paused)) {
             await interaction.replyHandler.locale(
                 'MUSIC.PLAYER.PLAYING.NOTHING',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
         if (player.queue.current.isStream) {
             await interaction.replyHandler.locale(
                 'CMD.SEEK.RESPONSE.STREAM_CANNOT_SEEK',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
@@ -97,7 +98,7 @@ export default {
             !settings.managers.includes(interaction.user.id)
         ) {
             await interaction.replyHandler.locale('CHECK.NOT_REQUESTER', {
-                type: 'error',
+                type: MessageOptionsBuilderType.Error,
             });
             return;
         }
@@ -112,7 +113,7 @@ export default {
         ) {
             await interaction.replyHandler.locale(
                 'CMD.SEEK.RESPONSE.TIMESTAMP_MISSING',
-                { type: 'error' },
+                { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
@@ -122,7 +123,10 @@ export default {
         if (ms > trackLength) {
             await interaction.replyHandler.locale(
                 'CMD.SEEK.RESPONSE.TIMESTAMP_INVALID',
-                { vars: [durationString], type: 'error' },
+                {
+                    vars: [durationString],
+                    type: MessageOptionsBuilderType.Error,
+                },
             );
             return;
         }
