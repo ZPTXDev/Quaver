@@ -266,7 +266,7 @@ export function checkLocaleCompletion(
         });
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    iterateObject(<Record<string, any>>englishStrings);
+    iterateObject(englishStrings as Record<string, any>);
     foreignStringCount = englishStringCount - missingStrings.length;
     // missing strings
     if (englishStringCount > foreignStringCount) {
