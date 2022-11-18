@@ -6,9 +6,14 @@ import { getLocaleString } from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/queue';
 import type {
     ChatInputCommandInteraction,
+    GuildMember,
     SlashCommandIntegerOption,
 } from 'discord.js';
-import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
+import {
+    escapeMarkdown,
+    PermissionsBitField,
+    SlashCommandBuilder,
+} from 'discord.js';
 
 export default {
     data: new SlashCommandBuilder()
@@ -65,7 +70,12 @@ export default {
             return;
         }
         if (
-            player.queue.tracks[position - 1].requester !== interaction.user.id
+            player.queue.tracks[position - 1].requester !==
+                interaction.user.id &&
+            interaction.channel
+                .permissionsFor(interaction.member as GuildMember)
+                .missing(PermissionsBitField.Flags.ManageGuild).length !== 0 &&
+            !settings.managers.includes(interaction.user.id)
         ) {
             await interaction.replyHandler.locale('CHECK.NOT_REQUESTER', {
                 type: MessageOptionsBuilderType.Error,
@@ -86,9 +96,19 @@ export default {
                 ),
             );
         }
-        await interaction.replyHandler.locale('CMD.REMOVE.RESPONSE.SUCCESS', {
-            vars: [escapeMarkdown(track.title), track.uri],
-            type: MessageOptionsBuilderType.Success,
-        });
+        await interaction.replyHandler.locale(
+            track.requester === interaction.user.id
+                ? 'CMD.REMOVE.RESPONSE.SUCCESS.DEFAULT'
+                : interaction.channel
+                      .permissionsFor(interaction.member as GuildMember)
+                      .missing(PermissionsBitField.Flags.ManageGuild).length ===
+                  0
+                ? 'CMD.REMOVE.RESPONSE.SUCCESS.FORCED'
+                : 'CMD.REMOVE.RESPONSE.SUCCESS.MANAGER',
+            {
+                vars: [escapeMarkdown(track.title), track.uri],
+                type: MessageOptionsBuilderType.Success,
+            },
+        );
     },
 };

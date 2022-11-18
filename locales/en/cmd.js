@@ -173,7 +173,11 @@ export default {
 			POSITION: 'The position of the track to remove.'
 		},
 		RESPONSE: {
-			SUCCESS: 'Removed [**%1**](%2)',
+			SUCCESS: {
+				DEFAULT: 'Removed [**%1**](%2)',
+				FORCED: 'Removed [**%1**](%2) by force',
+				MANAGER: 'Removed [**%1**](%2) by manager bypass'
+			},
 			QUEUE_EMPTY: 'There are no tracks in the queue to remove.'
 		}
 	},
