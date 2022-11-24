@@ -59,6 +59,7 @@ export default {
 		MISC: {
 			SOURCE_CODE: 'Source Code',
 			INVITE: 'Invite',
+			SUPPORT_SERVER: 'Support Server',
 			SPONSOR_US: 'Sponsor Us'
 		}
 	},

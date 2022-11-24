@@ -10,6 +10,7 @@
     },
     "defaultLocaleCode": "en",
     "disableAd": false,
+    "supportServer": "https://discord.gg/",
     "managers": [
         "Paste your user ID here"
     ],

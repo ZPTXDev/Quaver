@@ -9,6 +9,7 @@ export type SettingsObject = {
     defaultLocaleCode?: string;
     developerMode?: boolean;
     disableAd?: boolean;
+    supportServer?: string;
     geniusToken?: string;
     managers?: Snowflake[];
     grafanaLogging?: GrafanaLoggingSettingsObject;

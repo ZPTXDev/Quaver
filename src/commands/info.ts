@@ -26,6 +26,55 @@ export default {
     async execute(
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
+        const buttons = {
+            invite: new ButtonBuilder()
+                .setLabel(
+                    await getGuildLocaleString(
+                        interaction.guildId,
+                        'CMD.INFO.MISC.INVITE',
+                    ),
+                )
+                .setStyle(ButtonStyle.Link)
+                .setURL(
+                    interaction.client.generateInvite({
+                        permissions: [PermissionsBitField.Flags.Administrator],
+                        scopes: [
+                            OAuth2Scopes.Bot,
+                            OAuth2Scopes.ApplicationsCommands,
+                        ],
+                    }),
+                ),
+            supportServer: new ButtonBuilder()
+                .setLabel(
+                    await getGuildLocaleString(
+                        interaction.guildId,
+                        await getGuildLocaleString(
+                            interaction.guildId,
+                            'CMD.INFO.MISC.SUPPORT_SERVER',
+                        ),
+                    ),
+                )
+                .setStyle(ButtonStyle.Link)
+                .setURL(settings.supportServer ?? 'https://example.com'),
+            sourceCode: new ButtonBuilder()
+                .setLabel(
+                    await getGuildLocaleString(
+                        interaction.guildId,
+                        'CMD.INFO.MISC.SOURCE_CODE',
+                    ),
+                )
+                .setStyle(ButtonStyle.Link)
+                .setURL('https://go.zptx.dev/Quaver'),
+            sponsorUs: new ButtonBuilder()
+                .setLabel(
+                    await getGuildLocaleString(
+                        interaction.guildId,
+                        'CMD.INFO.MISC.SPONSOR_US',
+                    ),
+                )
+                .setStyle(ButtonStyle.Link)
+                .setURL('https://github.com/sponsors/ZPTXDev'),
+        };
         await interaction.replyHandler.reply(
             new EmbedBuilder()
                 .setTitle('Quaver')
@@ -43,51 +92,31 @@ export default {
                 ),
             {
                 components: [
-                    new ActionRowBuilder<ButtonBuilder>().setComponents(
-                        new ButtonBuilder()
-                            .setLabel(
-                                await getGuildLocaleString(
-                                    interaction.guildId,
-                                    'CMD.INFO.MISC.SOURCE_CODE',
-                                ),
-                            )
-                            .setStyle(ButtonStyle.Link)
-                            .setURL('https://go.zptx.dev/Quaver'),
-                        new ButtonBuilder()
-                            .setLabel(
-                                await getGuildLocaleString(
-                                    interaction.guildId,
-                                    'CMD.INFO.MISC.INVITE',
-                                ),
-                            )
-                            .setStyle(ButtonStyle.Link)
-                            .setURL(
-                                interaction.client.generateInvite({
-                                    permissions: [
-                                        PermissionsBitField.Flags.Administrator,
-                                    ],
-                                    scopes: [
-                                        OAuth2Scopes.Bot,
-                                        OAuth2Scopes.ApplicationsCommands,
-                                    ],
-                                }),
-                            ),
-                        ...(!settings.disableAd
-                            ? [
-                                  new ButtonBuilder()
-                                      .setLabel(
-                                          await getGuildLocaleString(
-                                              interaction.guildId,
-                                              'CMD.INFO.MISC.SPONSOR_US',
-                                          ),
-                                      )
-                                      .setStyle(ButtonStyle.Link)
-                                      .setURL(
-                                          'https://github.com/sponsors/ZPTXDev',
-                                      ),
-                              ]
-                            : []),
-                    ),
+                    // all 4 buttons displayed, we split it into 2 and 2
+                    // otherwise, we'll show it as a straight row
+                    ...(settings.supportServer && !settings.disableAd
+                        ? [
+                              new ActionRowBuilder<ButtonBuilder>().setComponents(
+                                  buttons.invite,
+                                  buttons.supportServer,
+                              ),
+                              new ActionRowBuilder<ButtonBuilder>().setComponents(
+                                  buttons.sourceCode,
+                                  buttons.sponsorUs,
+                              ),
+                          ]
+                        : [
+                              new ActionRowBuilder<ButtonBuilder>().setComponents(
+                                  buttons.invite,
+                                  ...(settings.supportServer
+                                      ? [buttons.supportServer]
+                                      : []),
+                                  buttons.sourceCode,
+                                  ...(!settings.disableAd
+                                      ? [buttons.sponsorUs]
+                                      : []),
+                              ),
+                          ]),
                 ],
                 ephemeral: true,
             },

@@ -13,6 +13,7 @@
     },
     "defaultLocaleCode": "en",
     "disableAd": false,
+    "supportServer": "https://discord.gg/",
     "managers": [
         "Paste your user ID here"
     ],
@@ -71,6 +72,8 @@
 
 `disableAd` - Whether to disable the ad in the `info` command (Sponsor Us button).
 > **Note:** Please do not disable the ad unless you really need to. Sponsors help keep the development of ZPTXDev projects going. Consider sponsoring us if you need to disable the ad!
+
+`supportServer` - The support server invite link. This is used in the `info` command (Support Server button) and some messages in the event of an error.
 
 `managers` - The [user IDs](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-) that are given manager-level permissions on Quaver.
 
