@@ -43,7 +43,8 @@ export default {
                             name: suggestion,
                             value: suggestion,
                         }),
-                    ),
+                    )
+                    .slice(0, 25),
             );
         } catch {
             return interaction.respond([]);

@@ -46,7 +46,8 @@ export default {
                                 : track.name,
                         value: track.value,
                     }),
-                ),
+                )
+                .slice(0, 25),
         );
     },
 };
