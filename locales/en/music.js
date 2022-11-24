@@ -34,7 +34,8 @@ export default {
 					TITLE: 'Now playing',
 					DURATION: 'Duration',
 					UPLOADER: 'Uploader',
-					ADDED_BY: 'Added by'
+					ADDED_BY: 'Added by',
+					REMAINING: 'Remaining: %1'
 				}
 			}
 		},

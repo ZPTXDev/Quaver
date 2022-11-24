@@ -141,7 +141,14 @@ export default {
                       ])
                       .setThumbnail(
                           `https://i.ytimg.com/vi/${track.identifier}/hqdefault.jpg`,
-                      ),
+                      )
+                      .setFooter({
+                          text: getLocaleString(
+                              guildLocaleCode,
+                              'MUSIC.PLAYER.PLAYING.NOW.DETAILED.REMAINING',
+                              queue.tracks.length.toString(),
+                          ),
+                      }),
                   {
                       components: settings.features.web.dashboardURL
                           ? [

@@ -546,7 +546,14 @@ export async function buildSettingsPage(
                               ])
                               .setThumbnail(
                                   `https://i.ytimg.com/vi/${exampleId}/hqdefault.jpg`,
-                              ),
+                              )
+                              .setFooter({
+                                  text: getLocaleString(
+                                      guildLocaleCode,
+                                      'MUSIC.PLAYER.PLAYING.NOW.DETAILED.REMAINING',
+                                      '1',
+                                  ),
+                              }),
                       ];
             current = getLocaleString(
                 guildLocaleCode,
