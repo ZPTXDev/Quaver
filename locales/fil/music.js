@@ -24,15 +24,18 @@ export default {
 		FILTER_NOTE: 'Maaaring tumagal ito ng ilang segundo bago mag-apply',
 		TRACK_SKIPPED_ERROR: 'Nilaktawan ang [**%1**](%2) dahil may error na naganap: `%3`',
 		QUEUE_CLEARED_ERROR: 'Na-clear ang queue bilang isang error na naganap nang maraming beses nang magkakasunod.',
+		LOOP_TRACK_DISABLED: 'Naka-disable ang pag-loop dahil ang track ay mas mababa pa sa 15 ka segundo ng haba.',
+		LOOP_QUEUE_DISABLED: 'Naka-disable ang pag-loop dahil ang queue ay mas mababa pa sa 15 ka segundo ng haba.',
 		PLAYING: {
 			NOTHING: 'Walang nang nagpatugtug ngayon.',
 			NOW: {
-				SIMPLE: 'Nagpe-play ngayon ng [**%1**](%2) `[%3]`',
+				SIMPLE: 'Nagpatugtog ngayon ng [**%1**](%2) `[%3]`',
 				DETAILED: {
-					TITLE: 'Nagpe-play ngayon',
+					TITLE: 'Nagpatugtog ngayon',
 					DURATION: 'Durasyon',
 					UPLOADER: 'Taga-upload',
-					ADDED_BY: 'Idinagdag ni'
+					ADDED_BY: 'Idinagdag ni',
+					REMAINING: 'Natitira: %1'
 				}
 			}
 		},

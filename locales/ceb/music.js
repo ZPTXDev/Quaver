@@ -24,15 +24,18 @@ export default {
 		FILTER_NOTE: 'Mahimong molungtad kini og pipila ka segundo aron ma-apply',
 		TRACK_SKIPPED_ERROR: 'Gilaktawan [**%1**](%2) kay naay sayop nga nahitabo: `%3`',
 		QUEUE_CLEARED_ERROR: 'Gi-clear ang queue isip usa ka sayup nga nahitabo nga daghang beses nga sunud-sunod.',
+		LOOP_TRACK_DISABLED: 'Gi-disable ang pag-loop tungod ang track kay ubos pa sa 15 ka segundos nga gitas-on.',
+		LOOP_QUEUE_DISABLED: 'Gi-disable ang pag-loop tungod ang track kay ubos pa sa 15 ka segundos nga gitas-on.',
 		PLAYING: {
-			NOTHING: 'Wala nay nagpatugtug karon.',
+			NOTHING: 'Wala nay nagpatugtog karon.',
 			NOW: {
-				SIMPLE: 'Nagpatugtug karon og [**%1**](%2) `[%3]`',
+				SIMPLE: 'Nagpatugtog karon og [**%1**](%2) `[%3]`',
 				DETAILED: {
-					TITLE: 'Nagpatugtug karon',
+					TITLE: 'Nagpatugtog karon',
 					DURATION: 'Gidugayon',
 					UPLOADER: 'Nag-upload',
-					ADDED_BY: 'Gidugang ni'
+					ADDED_BY: 'Gidugang ni',
+					REMAINING: 'Nahibilin: %1'
 				}
 			}
 		},

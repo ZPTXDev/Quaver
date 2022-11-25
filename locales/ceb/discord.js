@@ -9,11 +9,10 @@ export default {
 			TIMED_OUT: 'Na-time out pa ko karon.'
 		}
 	},
-	CHANNEL_UNSUPPORTED: 'Dili ko makasugod og usa ka session sa ingani nga channel type.',
+	CHANNEL_UNSUPPORTED: 'Dili ko makasugod og usa ka session sa ing-ani nga channel type.',
 	GENERIC_ERROR: 'Adunay usa ka error samtang nagproseso sa imong request.',
 	INTERACTION: {
-		USER_MISMATCH: 'Dili na interaksiyon nimo.',
-		CANCELED: 'Kaning interaksiyon kay gikansel ni <@%1>.',
+		CANCELED: 'Kaning interaksyon kay gikansel ni <@%1>.',
 		EXPIRED: 'Kini nga interaksyon kay na-expire na.'
 	}
 };
