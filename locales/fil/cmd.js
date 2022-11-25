@@ -51,6 +51,7 @@ export default {
 		MISC: {
 			SOURCE_CODE: 'Source Code',
 			INVITE: 'Anyayahan',
+			SUPPORT_SERVER: 'Support Server',
 			SPONSOR_US: 'Sponsor sa Amin'
 		}
 	},
@@ -74,6 +75,12 @@ export default {
 		RESPONSE: {
 			NO_QUERY: 'Walang search query na tinukoy.',
 			NO_RESULTS: 'Walang nakitang mga resulta para sa query na iyon.'
+		},
+		MISC: {
+			ROMANIZE_FROM_KOREAN: 'I-romanize mula sa Korean',
+			ROMANIZE_FROM_JAPANESE: 'I-romanize mula sa Japanese',
+			ROMANIZE_FROM_CHINESE: 'I-romanize mula sa Chinese',
+			JAPANESE_INACCURATE: 'Ang pag-romanize ng kanji ay maaaring magresulta sa bahagyang mga kamalian.'
 		}
 	},
 	MOVE: {
@@ -121,7 +128,8 @@ export default {
 				SPOTIFY: 'Walang nahanap na resulta mula sa iyong query sa Spotify.'
 			},
 			DISABLED: { SPOTIFY: 'Ang integration ng Spotify ay hindi na-configure.' },
-			LOAD_FAILED: 'Nabigong i-load ang track.'
+			LOAD_FAILED: 'Nabigong i-load ang track.',
+			LIMIT_EXCEEDED: { SPOTIFY: 'Maaari ka lamang magpatugtog ng hanggang **500** na mga track mula sa Spotify sa isang pagkakataon.' }
 		}
 	},
 	PLAYING: { DESCRIPTION: 'Ipakita kung ano ang kasalukuyang nagpe-play.' },
@@ -140,7 +148,11 @@ export default {
 		DESCRIPTION: 'Mag-alis ng track mula sa queue.',
 		OPTION: { POSITION: 'Ang posisyon ng track na aalisin.' },
 		RESPONSE: {
-			SUCCESS: 'Inalis ang [**%1**](%2)',
+			SUCCESS: {
+				DEFAULT: 'Inalis ang [**%1**](%2)',
+				FORCED: 'Inalis ang [**%1**](%2) sa pamamagitan ng puwersa',
+				MANAGER: 'Inalis ang [**%1**](%2) sa pamamagitan ng manager bypass'
+			},
 			QUEUE_EMPTY: 'Walang mga track sa queue na aalisin.'
 		}
 	},
