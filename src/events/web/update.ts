@@ -3,7 +3,6 @@ import type { QuaverPlayer } from '#src/lib/util/common.d.js';
 import type { Song } from '@lavaclient/queue';
 import type { APIGuild, APIUser, Snowflake } from 'discord.js';
 import type { Socket } from 'socket.io';
-import { UpdateItemType } from './update.d.js';
 
 export default {
     name: ForceType.Update,
@@ -180,3 +179,15 @@ export default {
         return callback({ status: 'success' });
     },
 };
+
+export enum UpdateItemType {
+    Loop = 'loop',
+    Volume = 'volume',
+    Paused = 'paused',
+    Skip = 'skip',
+    Bassboost = 'bassboost',
+    Nightcore = 'nightcore',
+    Seek = 'seek',
+    Remove = 'remove',
+    Shuffle = 'shuffle',
+}
