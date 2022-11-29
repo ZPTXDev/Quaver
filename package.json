@@ -36,7 +36,7 @@
     "@types/lodash-es": "^4.17.6",
     "@types/node": "^18.11.9",
     "@types/wanakana": "^4.0.3",
-    "@typescript-eslint/eslint-plugin": "^5.44.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.44.0",
     "eslint": "^8.28.0",
     "rimraf": "^3.0.2",
