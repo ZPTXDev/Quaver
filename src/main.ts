@@ -75,12 +75,9 @@ rl.on('line', async (input): Promise<void> => {
         }
         case 'whitelist': {
             const guildId = input.split(' ')[1];
-            if (!settings.features.stay.whitelist) {
-                console.log('The 24/7 whitelist is not enabled.');
-                break;
-            }
-            if (!guildId) {
-                console.log('Usage: whitelist <guildId>');
+            const feature = input.split(' ')[2];
+            if (!guildId || !feature) {
+                console.log('Usage: whitelist <guildId> <feature>');
                 break;
             }
             const guild = await bot.guilds.fetch(guildId);
@@ -88,20 +85,31 @@ rl.on('line', async (input): Promise<void> => {
                 console.log('Guild not found.');
                 break;
             }
-            const whitelisted = !(await data.guild.get(
-                guildId,
-                'features.stay.whitelisted',
-            ));
-            await data.guild.set(
-                guildId,
-                'features.stay.whitelisted',
-                whitelisted,
-            );
-            console.log(
-                `${whitelisted ? 'Added' : 'Removed'} ${
-                    guild.name
-                } to the 24/7 whitelist.`,
-            );
+            switch (feature) {
+                case 'stay': {
+                    if (!settings.features.stay.whitelist) {
+                        console.log('The 24/7 whitelist is not enabled.');
+                        break;
+                    }
+                    const whitelisted = !(await data.guild.get(
+                        guildId,
+                        'features.stay.whitelisted',
+                    ));
+                    await data.guild.set(
+                        guildId,
+                        'features.stay.whitelisted',
+                        whitelisted,
+                    );
+                    console.log(
+                        `${whitelisted ? 'Added' : 'Removed'} ${
+                            guild.name
+                        } to the 24/7 whitelist.`,
+                    );
+                    break;
+                }
+                default:
+                    console.log('Available features: stay');
+            }
             break;
         }
         case 'eval': {
@@ -209,6 +217,7 @@ if (io) {
                     name: string;
                     once: boolean;
                     execute(
+                        // eslint-disable-next-line @typescript-eslint/no-shadow
                         socket: Socket,
                         callback: () => void,
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
