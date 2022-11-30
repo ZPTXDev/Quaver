@@ -327,7 +327,7 @@ export function getFailedChecks(
     for (const check of checks ?? []) {
         switch (check) {
             case Check.GuildOnly:
-                if (!interaction.inCachedGuild()) failedChecks.push(check);
+                if (!guildId) failedChecks.push(check);
                 break;
             case Check.ActiveSession: {
                 if (!guildId) {
