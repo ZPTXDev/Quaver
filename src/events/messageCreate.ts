@@ -9,7 +9,13 @@ export default {
     name: 'messageCreate',
     once: false,
     async execute(message: Message): Promise<void> {
-        if (message.mentions.has(message.client.user.id)) {
+        if (
+            message.mentions.has(message.client.user.id, {
+                ignoreRoles: true,
+                ignoreRepliedUser: true,
+                ignoreEveryone: true,
+            })
+        ) {
             if (
                 message.inGuild() &&
                 message.channel
