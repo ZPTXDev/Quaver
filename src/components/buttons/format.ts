@@ -84,10 +84,7 @@ export default {
         )}** ─ ${getLocaleString(
             guildLocaleCode,
             'CMD.SETTINGS.MISC.FORMAT.DESCRIPTION',
-        )}\n> ${getLocaleString(
-            guildLocaleCode,
-            'MISC.CURRENT',
-        )}: \`${current}\``;
+        )}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: ${current}`;
         await interaction.replyHandler.reply([description, ...embeds], {
             components: [
                 new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(

@@ -4,28 +4,21 @@ import type {
     MessageOptionsBuilderOptions,
     QuaverInteraction,
 } from '#src/lib/util/common.d.js';
-import {
-    confirmationTimeout,
-    data,
-    logger,
-    MessageOptionsBuilderType,
-} from '#src/lib/util/common.js';
+import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
 import type { Language } from '#src/lib/util/constants.js';
 import { Check, settingsOptions } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
     buildMessageOptions,
     buildSettingsPage,
-    checkLocaleCompletion,
     getGuildLocaleString,
     getLocaleString,
-    roundTo,
 } from '#src/lib/util/util.js';
 import type {
     MessageActionRowComponentBuilder,
+    RoleSelectMenuInteraction,
     SelectMenuComponentOptionData,
     StringSelectMenuComponent,
-    StringSelectMenuInteraction,
 } from 'discord.js';
 import {
     ActionRowBuilder,
@@ -34,10 +27,10 @@ import {
 } from 'discord.js';
 
 export default {
-    name: 'language',
+    name: 'dj',
     checks: [Check.InteractionStarter],
     async execute(
-        interaction: QuaverInteraction<StringSelectMenuInteraction>,
+        interaction: QuaverInteraction<RoleSelectMenuInteraction>,
     ): Promise<void> {
         if (!confirmationTimeout[interaction.message.id]) {
             await interaction.replyHandler.locale(
@@ -74,32 +67,11 @@ export default {
             30 * 1000,
             interaction.message,
         );
-        const option = interaction.values[0];
-        const localeCompletion = checkLocaleCompletion(option);
-        if (localeCompletion === 'LOCALE_MISSING') {
-            await interaction.replyHandler.reply(
-                'That language does not exist.',
-                { type: MessageOptionsBuilderType.Error },
-            );
-            return;
-        }
-        await data.guild.set(interaction.guildId, 'settings.locale', option);
-        if (localeCompletion.completion !== 100) {
-            await interaction.replyHandler.reply(
-                new EmbedBuilder().setDescription(
-                    `This language is incomplete. Completion: \`${roundTo(
-                        localeCompletion.completion,
-                        2,
-                    )}%\`${
-                        settings.managers.includes(interaction.user.id)
-                            ? `\nMissing strings:\n\`\`\`\n${localeCompletion.missing.join(
-                                  '\n',
-                              )}\`\`\``
-                            : ''
-                    }`,
-                ),
-                { type: MessageOptionsBuilderType.Warning, ephemeral: true },
-            );
+        if (interaction.values.length > 0) {
+            const option = interaction.values[0];
+            await data.guild.set(interaction.guildId, 'settings.dj', option);
+        } else {
+            await data.guild.unset(interaction.guildId, 'settings.dj');
         }
         const guildLocaleCode =
             (await data.guild.get<keyof typeof Language>(
@@ -109,7 +81,7 @@ export default {
         const { current, embeds, actionRow } = await buildSettingsPage(
             interaction,
             guildLocaleCode,
-            'language',
+            'dj',
         );
         const description = `${getLocaleString(
             guildLocaleCode,
@@ -117,10 +89,10 @@ export default {
             interaction.guild.name,
         )}\n\n**${getLocaleString(
             guildLocaleCode,
-            'CMD.SETTINGS.MISC.LANGUAGE.NAME',
+            'CMD.SETTINGS.MISC.DJ.NAME',
         )}** ─ ${getLocaleString(
             guildLocaleCode,
-            'CMD.SETTINGS.MISC.LANGUAGE.DESCRIPTION',
+            'CMD.SETTINGS.MISC.DJ.DESCRIPTION',
         )}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: ${current}`;
         const args: [
             MessageOptionsBuilderInputs,
@@ -146,7 +118,7 @@ export default {
                                         `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION`,
                                     ),
                                     value: opt,
-                                    default: opt === 'language',
+                                    default: opt === 'dj',
                                 }),
                             ),
                         ),
@@ -155,11 +127,9 @@ export default {
                 ],
             },
         ];
-        localeCompletion.completion !== 100
-            ? await interaction.message.edit(buildMessageOptions(...args))
-            : await interaction.replyHandler.reply(args[0], {
-                  ...args[1],
-                  force: ForceType.Update,
-              });
+        await interaction.replyHandler.reply(args[0], {
+            ...args[1],
+            force: ForceType.Update,
+        });
     },
 };

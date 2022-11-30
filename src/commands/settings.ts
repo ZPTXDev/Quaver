@@ -70,7 +70,7 @@ export default {
                 ? `\n> ${getLocaleString(
                       guildLocaleCode,
                       'MISC.CURRENT',
-                  )}: \`${current}\``
+                  )}: ${current}`
                 : ''
         }`;
         const msg = await interaction.replyHandler.reply(

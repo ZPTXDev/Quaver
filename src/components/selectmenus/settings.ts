@@ -91,7 +91,7 @@ export default {
                 ? `\n> ${getLocaleString(
                       guildLocaleCode,
                       'MISC.CURRENT',
-                  )}: \`${current}\``
+                  )}: ${current}`
                 : ''
         }`;
         await interaction.replyHandler.reply([description, ...embeds], {

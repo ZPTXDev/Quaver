@@ -16,5 +16,6 @@ export default {
 	CONFIRM: 'Confirm',
 	ADD: 'Add',
 	DASHBOARD: 'Dashboard',
-	GET_PREMIUM: 'Get Premium'
+	GET_PREMIUM: 'Get Premium',
+	NONE: 'None'
 };

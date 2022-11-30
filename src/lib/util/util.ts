@@ -20,6 +20,7 @@ import type {
     MessageActionRowComponentBuilder,
     MessageCreateOptions,
     ModalSubmitInteraction,
+    RoleSelectMenuInteraction,
     Snowflake,
     StringSelectMenuInteraction,
 } from 'discord.js';
@@ -30,6 +31,7 @@ import {
     EmbedBuilder,
     escapeMarkdown,
     GuildMember,
+    RoleSelectMenuBuilder,
     StringSelectMenuBuilder,
 } from 'discord.js';
 import { readdirSync } from 'fs';
@@ -318,6 +320,7 @@ export function getFailedChecks(
     interaction?:
         | ButtonInteraction
         | StringSelectMenuInteraction
+        | RoleSelectMenuInteraction
         | ModalSubmitInteraction,
 ): Check[] {
     const failedChecks: Check[] = [];
@@ -419,9 +422,9 @@ export async function buildSettingsPage(
     const actionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
     switch (option) {
         case 'language':
-            current = `${
+            current = `\`${
                 Language[guildLocaleCode] ?? 'Unknown'
-            } (${guildLocaleCode})`;
+            } (${guildLocaleCode})\``;
             actionRow.addComponents(
                 new StringSelectMenuBuilder()
                     .setCustomId('language')
@@ -561,9 +564,27 @@ export async function buildSettingsPage(
                                   ),
                               }),
                       ];
-            current = getLocaleString(
+            current = `\`${getLocaleString(
                 guildLocaleCode,
                 `CMD.SETTINGS.MISC.FORMAT.OPTIONS.${current.toUpperCase()}`,
+            )}\``;
+            break;
+        }
+        case 'dj': {
+            current = await data.guild.get<Snowflake>(
+                interaction.guildId,
+                'settings.dj',
+            );
+            if (!current) {
+                current = `\`${getLocaleString(
+                    guildLocaleCode,
+                    'MISC.NONE',
+                )}\``;
+            } else {
+                current = `<@&${current}>`;
+            }
+            actionRow.addComponents(
+                new RoleSelectMenuBuilder().setCustomId('dj').setMinValues(0),
             );
         }
     }

@@ -1,5 +1,5 @@
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
+import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getLocaleString } from '#src/lib/util/util.js';
@@ -8,6 +8,7 @@ import type {
     ChatInputCommandInteraction,
     GuildMember,
     SlashCommandIntegerOption,
+    Snowflake,
 } from 'discord.js';
 import {
     escapeMarkdown,
@@ -69,13 +70,24 @@ export default {
             });
             return;
         }
+        const djRole = await data.guild.get<Snowflake>(
+            interaction.guild.id,
+            'settings.dj',
+        );
+        const dj =
+            djRole &&
+            (interaction.member as GuildMember).roles.cache.has(djRole);
+        const guildManager =
+            interaction.channel
+                .permissionsFor(interaction.member as GuildMember)
+                .missing(PermissionsBitField.Flags.ManageGuild).length === 0;
+        const botManager = settings.managers.includes(interaction.user.id);
         if (
             player.queue.tracks[position - 1].requester !==
                 interaction.user.id &&
-            interaction.channel
-                .permissionsFor(interaction.member as GuildMember)
-                .missing(PermissionsBitField.Flags.ManageGuild).length !== 0 &&
-            !settings.managers.includes(interaction.user.id)
+            !dj &&
+            !guildManager &&
+            !botManager
         ) {
             await interaction.replyHandler.locale('CHECK.NOT_REQUESTER', {
                 type: MessageOptionsBuilderType.Error,
@@ -99,10 +111,7 @@ export default {
         await interaction.replyHandler.locale(
             track.requester === interaction.user.id
                 ? 'CMD.REMOVE.RESPONSE.SUCCESS.DEFAULT'
-                : interaction.channel
-                      .permissionsFor(interaction.member as GuildMember)
-                      .missing(PermissionsBitField.Flags.ManageGuild).length ===
-                  0
+                : dj || guildManager
                 ? 'CMD.REMOVE.RESPONSE.SUCCESS.FORCED'
                 : 'CMD.REMOVE.RESPONSE.SUCCESS.MANAGER',
             {

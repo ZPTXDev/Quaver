@@ -28,7 +28,7 @@ export type SearchStateRecord = {
     selected: Snowflake[];
 };
 
-export type SettingsPageOptions = 'language' | 'format';
+export type SettingsPageOptions = 'language' | 'format' | 'dj';
 
 export type SettingsPage = {
     current: string;

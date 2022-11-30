@@ -1,5 +1,5 @@
 import Keyv from 'keyv';
-import { get as _get, set as _set } from 'lodash-es';
+import { get as _get, set as _set, unset as _unset } from 'lodash-es';
 import type { DatabaseObject } from './DataHandler.d.js';
 
 /** Class for handling data through Keyv. */
@@ -44,6 +44,19 @@ export default class DataHandler {
         let data: DatabaseObject = await this.cache.get(key);
         if (!data) data = {};
         return this.cache.set(key, _set(data, item, value));
+    }
+
+    /**
+     * Unset an item in the database by its key.
+     * @param key - The key.
+     * @param item - The item to unset.
+     * @returns The updated item.
+     */
+    async unset(key: string, item: string): Promise<boolean> {
+        const data: DatabaseObject = await this.cache.get(key);
+        if (!data) return false;
+        _unset(data, item);
+        return this.cache.set(key, data);
     }
 
     /**

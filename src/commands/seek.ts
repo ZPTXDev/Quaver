@@ -1,5 +1,5 @@
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
+import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
@@ -11,6 +11,7 @@ import type {
     ChatInputCommandInteraction,
     GuildMember,
     SlashCommandIntegerOption,
+    Snowflake,
 } from 'discord.js';
 import { PermissionsBitField, SlashCommandBuilder } from 'discord.js';
 
@@ -89,12 +90,23 @@ export default {
             );
             return;
         }
-        if (
-            player.queue.current.requester !== interaction.user.id &&
+        const djRole = await data.guild.get<Snowflake>(
+            interaction.guild.id,
+            'settings.dj',
+        );
+        const dj =
+            djRole &&
+            (interaction.member as GuildMember).roles.cache.has(djRole);
+        const guildManager =
             interaction.channel
                 .permissionsFor(interaction.member as GuildMember)
-                .missing(PermissionsBitField.Flags.ManageGuild).length > 0 &&
-            !settings.managers.includes(interaction.user.id)
+                .missing(PermissionsBitField.Flags.ManageGuild).length === 0;
+        const botManager = settings.managers.includes(interaction.user.id);
+        if (
+            player.queue.current.requester !== interaction.user.id &&
+            !dj &&
+            !guildManager &&
+            !botManager
         ) {
             await interaction.replyHandler.locale('CHECK.NOT_REQUESTER', {
                 type: MessageOptionsBuilderType.Error,
@@ -135,10 +147,7 @@ export default {
         await interaction.replyHandler.locale(
             player.queue.current.requester === interaction.user.id
                 ? 'CMD.SEEK.RESPONSE.SUCCESS.DEFAULT'
-                : interaction.channel
-                      .permissionsFor(interaction.member as GuildMember)
-                      .missing(PermissionsBitField.Flags.ManageGuild).length ===
-                  0
+                : dj || guildManager
                 ? 'CMD.SEEK.RESPONSE.SUCCESS.FORCED'
                 : 'CMD.SEEK.RESPONSE.SUCCESS.MANAGER',
             {

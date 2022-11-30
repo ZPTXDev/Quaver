@@ -239,6 +239,10 @@ export default {
 					SIMPLE: 'Simple',
 					DETAILED: 'Detailed'
 				}
+			},
+			DJ: {
+				NAME: 'DJ Role',
+				DESCRIPTION: 'The role that allows bypassing requester checks.'
 			}
 		}
 	},

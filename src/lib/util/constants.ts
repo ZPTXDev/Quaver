@@ -25,4 +25,4 @@ export enum Language {
     en = 'English',
     fil = 'Filipino',
 }
-export const settingsOptions = ['language', 'format'];
+export const settingsOptions = ['language', 'format', 'dj'];

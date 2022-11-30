@@ -9,6 +9,7 @@ import type {
     GuildMember,
     Interaction,
     ModalSubmitInteraction,
+    RoleSelectMenuInteraction,
     StringSelectMenuInteraction,
 } from 'discord.js';
 import { PermissionsBitField } from 'discord.js';
@@ -26,6 +27,7 @@ async function handleFailedChecks(
         | ChatInputCommandInteraction
         | ButtonInteraction
         | StringSelectMenuInteraction
+        | RoleSelectMenuInteraction
         | ModalSubmitInteraction
     >,
 ): Promise<void> {
@@ -37,7 +39,8 @@ async function handleFailedChecks(
                 ? 'Command'
                 : interaction.isButton()
                 ? 'Button'
-                : interaction.isStringSelectMenu()
+                : interaction.isStringSelectMenu() ||
+                  interaction.isRoleSelectMenu()
                 ? 'Select menu'
                 : 'Modal'
         } ${
@@ -284,7 +287,10 @@ export default {
                 return;
             }
         }
-        if (interaction.isStringSelectMenu()) {
+        if (
+            interaction.isStringSelectMenu() ||
+            interaction.isRoleSelectMenu()
+        ) {
             const selectmenu = interaction.client.selectmenus.get(
                 interaction.customId.split(':')[0],
             ) as SelectMenu;

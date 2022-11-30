@@ -2,11 +2,15 @@ import type {
     QuaverInteraction,
     QuaverPlayer,
 } from '#src/lib/util/common.d.js';
-import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
+import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
-import type { ChatInputCommandInteraction, GuildMember } from 'discord.js';
+import type {
+    ChatInputCommandInteraction,
+    GuildMember,
+    Snowflake,
+} from 'discord.js';
 import {
     escapeMarkdown,
     PermissionsBitField,
@@ -42,23 +46,31 @@ export default {
             );
             return;
         }
+        const djRole = await data.guild.get<Snowflake>(
+            interaction.guild.id,
+            'settings.dj',
+        );
+        const dj =
+            djRole &&
+            (interaction.member as GuildMember).roles.cache.has(djRole);
+        const guildManager =
+            interaction.channel
+                .permissionsFor(interaction.member as GuildMember)
+                .missing(PermissionsBitField.Flags.ManageGuild).length === 0;
+        const botManager = settings.managers.includes(interaction.user.id);
         // TODO: Web does not have these bypasses yet
         if (
             player.queue.current.requester === interaction.user.id ||
-            interaction.channel
-                .permissionsFor(interaction.member as GuildMember)
-                .missing(PermissionsBitField.Flags.ManageGuild).length === 0 ||
-            settings.managers.includes(interaction.user.id)
+            dj ||
+            guildManager ||
+            botManager
         ) {
             const track = await player.queue.skip();
             await player.queue.start();
             await interaction.replyHandler.locale(
                 player.queue.current.requester === interaction.user.id
                     ? 'CMD.SKIP.RESPONSE.SUCCESS.DEFAULT'
-                    : interaction.channel
-                          .permissionsFor(interaction.member as GuildMember)
-                          .missing(PermissionsBitField.Flags.ManageGuild)
-                          .length === 0
+                    : dj || guildManager
                     ? 'CMD.SKIP.RESPONSE.SUCCESS.FORCED'
                     : 'CMD.SKIP.RESPONSE.SUCCESS.MANAGER',
                 {
