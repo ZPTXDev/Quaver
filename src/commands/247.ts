@@ -66,9 +66,21 @@ export default {
             interaction.guildId,
         ) as QuaverPlayer;
         if (!player?.queue?.channel?.id) {
+            const applicationCommands =
+                interaction.client.application?.commands;
+            if (applicationCommands.cache.size === 0) {
+                await applicationCommands.fetch();
+            }
             await interaction.replyHandler.locale(
                 'CMD.247.RESPONSE.QUEUE_CHANNEL_MISSING',
-                { type: MessageOptionsBuilderType.Error },
+                {
+                    type: MessageOptionsBuilderType.Error,
+                    vars: [
+                        applicationCommands.cache.find(
+                            (command): boolean => command.name === 'bind',
+                        )?.id ?? '1',
+                    ],
+                },
             );
             return;
         }

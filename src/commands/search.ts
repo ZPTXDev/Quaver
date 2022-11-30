@@ -86,9 +86,21 @@ export default {
         );
         if (results.loadType === 'SEARCH_RESULT') tracks = results.tracks;
         if (tracks.length <= 1) {
+            const applicationCommands =
+                interaction.client.application?.commands;
+            if (applicationCommands.cache.size === 0) {
+                await applicationCommands.fetch();
+            }
             await interaction.replyHandler.locale(
                 'CMD.SEARCH.RESPONSE.USE_PLAY_CMD',
-                { type: MessageOptionsBuilderType.Error },
+                {
+                    type: MessageOptionsBuilderType.Error,
+                    vars: [
+                        applicationCommands.cache.find(
+                            (command): boolean => command.name === 'play',
+                        )?.id ?? '1',
+                    ],
+                },
             );
             return;
         }

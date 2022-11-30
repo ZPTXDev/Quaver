@@ -8,7 +8,7 @@ export default {
 			ENABLED: '24/7 **enabled**',
 			DISABLED: '24/7 **disabled**',
 			FEATURE_NOT_WHITELISTED: 'This server is not whitelisted to use 24/7.',
-			QUEUE_CHANNEL_MISSING: 'The queue channel is missing. Try using the `bind` command.'
+			QUEUE_CHANNEL_MISSING: 'The queue channel is missing. Try using </bind:%1>.'
 		},
 		MISC: {
 			NOTE: 'Quaver will use the same voice and text channels if it restarts.'
@@ -195,7 +195,7 @@ export default {
 			QUERY: 'YouTube search query.'
 		},
 		RESPONSE: {
-			USE_PLAY_CMD: 'Try using the `play` command instead.'
+			USE_PLAY_CMD: 'Try using </play:%1> instead.'
 		},
 		MISC: {
 			PICK: 'Pick track(s)'
