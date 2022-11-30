@@ -1,0 +1,130 @@
+diff --git a/node_modules/discord.js/src/structures/ChannelSelectMenuInteraction.js b/node_modules/discord.js/src/structures/ChannelSelectMenuInteraction.js
+index 0e28c01..500cfb5 100644
+--- a/node_modules/discord.js/src/structures/ChannelSelectMenuInteraction.js
++++ b/node_modules/discord.js/src/structures/ChannelSelectMenuInteraction.js
+@@ -10,19 +10,21 @@ const MessageComponentInteraction = require('./MessageComponentInteraction');
+ class ChannelSelectMenuInteraction extends MessageComponentInteraction {
+   constructor(client, data) {
+     super(client, data);
++    const { resolved, values } = data.data;
+ 
+     /**
+      * An array of the selected channel ids
+      * @type {Snowflake[]}
+      */
+-    this.values = data.data.values ?? [];
++     this.values = values ?? [];
+ 
+     /**
+      * Collection of the selected channels
+      * @type {Collection<Snowflake, Channel|APIChannel>}
+      */
+     this.channels = new Collection();
+-    for (const channel of Object.values(data.data.resolved.channels)) {
++    
++    for (const channel of Object.values(resolved?.channels ?? {})) {
+       this.channels.set(channel.id, this.client.channels._add(channel, this.guild) ?? channel);
+     }
+   }
+diff --git a/node_modules/discord.js/src/structures/MentionableSelectMenuInteraction.js b/node_modules/discord.js/src/structures/MentionableSelectMenuInteraction.js
+index 4e14bda..2b6ad6e 100644
+--- a/node_modules/discord.js/src/structures/MentionableSelectMenuInteraction.js
++++ b/node_modules/discord.js/src/structures/MentionableSelectMenuInteraction.js
+@@ -11,14 +11,14 @@ const Events = require('../util/Events');
+ class MentionableSelectMenuInteraction extends MessageComponentInteraction {
+   constructor(client, data) {
+     super(client, data);
++    const { resolved, values } = data.data;
++    const { members, users, roles } = resolved ?? {};
+ 
+     /**
+      * An array of the selected user and role ids
+      * @type {Snowflake[]}
+      */
+-    this.values = data.data.values ?? [];
+-
+-    const { members, users, roles } = data.data.resolved ?? {};
++     this.values = values ?? [];
+ 
+     /**
+      * Collection of the selected users
+diff --git a/node_modules/discord.js/src/structures/RoleSelectMenuInteraction.js b/node_modules/discord.js/src/structures/RoleSelectMenuInteraction.js
+index 7c78963..9f0e787 100644
+--- a/node_modules/discord.js/src/structures/RoleSelectMenuInteraction.js
++++ b/node_modules/discord.js/src/structures/RoleSelectMenuInteraction.js
+@@ -10,19 +10,21 @@ const MessageComponentInteraction = require('./MessageComponentInteraction');
+ class RoleSelectMenuInteraction extends MessageComponentInteraction {
+   constructor(client, data) {
+     super(client, data);
++    const { resolved, values } = data.data;
+ 
+     /**
+      * An array of the selected role ids
+      * @type {Snowflake[]}
+      */
+-    this.values = data.data.values ?? [];
++     this.values = values ?? [];
+ 
+     /**
+      * Collection of the selected roles
+      * @type {Collection<Snowflake, Role|APIRole>}
+      */
+     this.roles = new Collection();
+-    for (const role of Object.values(data.data.resolved.roles)) {
++
++    for (const role of Object.values(resolved?.roles ?? {})) {
+       this.roles.set(role.id, this.guild?.roles._add(role) ?? role);
+     }
+   }
+diff --git a/node_modules/discord.js/src/structures/UserSelectMenuInteraction.js b/node_modules/discord.js/src/structures/UserSelectMenuInteraction.js
+index f6d2623..2875b06 100644
+--- a/node_modules/discord.js/src/structures/UserSelectMenuInteraction.js
++++ b/node_modules/discord.js/src/structures/UserSelectMenuInteraction.js
+@@ -11,12 +11,13 @@ const Events = require('../util/Events');
+ class UserSelectMenuInteraction extends MessageComponentInteraction {
+   constructor(client, data) {
+     super(client, data);
++    const { resolved, values } = data.data;
+ 
+     /**
+      * An array of the selected user ids
+      * @type {Snowflake[]}
+      */
+-    this.values = data.data.values ?? [];
++     this.values = values ?? [];
+ 
+     /**
+      * Collection of the selected users
+@@ -30,24 +31,19 @@ class UserSelectMenuInteraction extends MessageComponentInteraction {
+      */
+     this.members = new Collection();
+ 
+-    for (const user of Object.values(data.data.resolved.users)) {
++    for (const user of Object.values(resolved?.users ?? {})) {
+       this.users.set(user.id, this.client.users._add(user));
+     }
+ 
+-    if (data.data.resolved.members) {
+-      for (const [id, member] of Object.entries(data.data.resolved.members)) {
+-        const user = data.data.resolved.users[id];
+-        if (!user) {
+-          this.client.emit(
+-            Events.Debug,
+-            `[UserSelectMenuInteraction] Received a member without a user, skipping ${id}`,
+-          );
++    for (const [id, member] of Object.entries(resolved?.members ?? {})) {
++      const user = resolved.users[id];
+ 
+-          continue;
+-        }
+-
+-        this.members.set(id, this.guild?.members._add({ user, ...member }) ?? { user, ...member });
++      if (!user) {
++        this.client.emit(Events.Debug, `[UserSelectMenuInteraction] Received a member without a user, skipping ${id}`);
++        continue;
+       }
++
++      this.members.set(id, this.guild?.members._add({ user, ...member }) ?? { user, ...member });
+     }
+   }
+ }
