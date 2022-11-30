@@ -1,3 +1,10 @@
+import type {
+    Autocomplete,
+    Button,
+    ChatInputCommand,
+    ModalSubmit,
+    SelectMenu,
+} from '#src/events/interactionCreate.d.js';
 import type PlayerHandler from '#src/lib/PlayerHandler.js';
 import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import type { Queue, Song } from '@lavaclient/queue';
