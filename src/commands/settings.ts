@@ -22,8 +22,8 @@ import {
     EmbedBuilder,
     Message,
     PermissionsBitField,
-    SelectMenuBuilder,
     SlashCommandBuilder,
+    StringSelectMenuBuilder,
 } from 'discord.js';
 
 export default {
@@ -77,8 +77,8 @@ export default {
             [description, ...embeds],
             {
                 components: [
-                    new ActionRowBuilder<SelectMenuBuilder>().addComponents(
-                        new SelectMenuBuilder()
+                    new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+                        new StringSelectMenuBuilder()
                             .setCustomId('settings')
                             .addOptions(
                                 settingsOptions.map(

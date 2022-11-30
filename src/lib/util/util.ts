@@ -20,8 +20,8 @@ import type {
     MessageActionRowComponentBuilder,
     MessageCreateOptions,
     ModalSubmitInteraction,
-    SelectMenuInteraction,
     Snowflake,
+    StringSelectMenuInteraction,
 } from 'discord.js';
 import {
     ActionRowBuilder,
@@ -30,7 +30,7 @@ import {
     EmbedBuilder,
     escapeMarkdown,
     GuildMember,
-    SelectMenuBuilder,
+    StringSelectMenuBuilder,
 } from 'discord.js';
 import { readdirSync } from 'fs';
 import { get } from 'lodash-es';
@@ -317,7 +317,7 @@ export function getFailedChecks(
     member: GuildMember & { client: QuaverClient },
     interaction?:
         | ButtonInteraction
-        | SelectMenuInteraction
+        | StringSelectMenuInteraction
         | ModalSubmitInteraction,
 ): Check[] {
     const failedChecks: Check[] = [];
@@ -423,22 +423,28 @@ export async function buildSettingsPage(
                 Language[guildLocaleCode] ?? 'Unknown'
             } (${guildLocaleCode})`;
             actionRow.addComponents(
-                new SelectMenuBuilder().setCustomId('language').addOptions(
-                    readdirSync(
-                        getAbsoluteFileURL(import.meta.url, [
-                            '..',
-                            '..',
-                            '..',
-                            'locales',
-                        ]),
-                    ).map(
-                        (file: keyof typeof Language): APISelectMenuOption => ({
-                            label: `${Language[file] ?? 'Unknown'} (${file})`,
-                            value: file,
-                            default: file === guildLocaleCode,
-                        }),
+                new StringSelectMenuBuilder()
+                    .setCustomId('language')
+                    .addOptions(
+                        readdirSync(
+                            getAbsoluteFileURL(import.meta.url, [
+                                '..',
+                                '..',
+                                '..',
+                                'locales',
+                            ]),
+                        ).map(
+                            (
+                                file: keyof typeof Language,
+                            ): APISelectMenuOption => ({
+                                label: `${
+                                    Language[file] ?? 'Unknown'
+                                } (${file})`,
+                                value: file,
+                                default: file === guildLocaleCode,
+                            }),
+                        ),
                     ),
-                ),
             );
             break;
         case 'format': {

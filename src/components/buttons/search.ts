@@ -26,7 +26,7 @@ import type {
     ButtonInteraction,
     GuildMember,
     MessageActionRowComponentBuilder,
-    SelectMenuComponent,
+    StringSelectMenuComponent,
 } from 'discord.js';
 import {
     ActionRowBuilder,
@@ -35,7 +35,7 @@ import {
     EmbedBuilder,
     escapeMarkdown,
     PermissionsBitField,
-    SelectMenuBuilder,
+    StringSelectMenuBuilder,
 } from 'discord.js';
 
 export default {
@@ -296,14 +296,14 @@ export default {
                     pages.length.toString(),
                 ),
             });
-        updated.components[0] = <ActionRowBuilder<SelectMenuBuilder>>(
+        updated.components[0] = <ActionRowBuilder<StringSelectMenuBuilder>>(
             ActionRowBuilder.from(original.components[0])
         );
         updated.components[1] = <ActionRowBuilder<ButtonBuilder>>(
             ActionRowBuilder.from(original.components[1])
         );
-        const selectComponent = SelectMenuBuilder.from(
-            <SelectMenuComponent>original.components[0].components[0],
+        const selectComponent = StringSelectMenuBuilder.from(
+            <StringSelectMenuComponent>original.components[0].components[0],
         ).setOptions(
             pages[page - 1]
                 .map(

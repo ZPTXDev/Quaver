@@ -27,8 +27,8 @@ import {
     EmbedBuilder,
     escapeMarkdown,
     Message,
-    SelectMenuBuilder,
     SlashCommandBuilder,
+    StringSelectMenuBuilder,
 } from 'discord.js';
 
 // credit: https://github.com/lavaclient/djs-v13-example/blob/main/src/commands/Play.ts
@@ -135,8 +135,8 @@ export default {
                 }),
             {
                 components: [
-                    new ActionRowBuilder<SelectMenuBuilder>().addComponents(
-                        new SelectMenuBuilder()
+                    new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+                        new StringSelectMenuBuilder()
                             .setCustomId('search')
                             .setPlaceholder(
                                 await getGuildLocaleString(

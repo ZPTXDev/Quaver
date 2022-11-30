@@ -5,8 +5,8 @@ import type {
     ChatInputCommandInteraction,
     ModalSubmitInteraction,
     PermissionsBitField,
-    SelectMenuInteraction,
     SlashCommandBuilder,
+    StringSelectMenuInteraction,
 } from 'discord.js';
 
 export type ChatInputCommand = {
@@ -31,7 +31,7 @@ export type Button = {
 export type SelectMenu = {
     name: string;
     checks?: Check[];
-    execute(interaction: SelectMenuInteraction): Promise<void>;
+    execute(interaction: StringSelectMenuInteraction): Promise<void>;
 };
 
 export type ModalSubmit = {

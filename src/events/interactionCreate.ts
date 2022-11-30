@@ -9,7 +9,7 @@ import type {
     GuildMember,
     Interaction,
     ModalSubmitInteraction,
-    SelectMenuInteraction,
+    StringSelectMenuInteraction,
 } from 'discord.js';
 import { PermissionsBitField } from 'discord.js';
 import type {
@@ -25,7 +25,7 @@ async function handleFailedChecks(
     interaction: QuaverInteraction<
         | ChatInputCommandInteraction
         | ButtonInteraction
-        | SelectMenuInteraction
+        | StringSelectMenuInteraction
         | ModalSubmitInteraction
     >,
 ): Promise<void> {
@@ -37,7 +37,7 @@ async function handleFailedChecks(
                 ? 'Command'
                 : interaction.isButton()
                 ? 'Button'
-                : interaction.isSelectMenu()
+                : interaction.isStringSelectMenu()
                 ? 'Select menu'
                 : 'Modal'
         } ${
@@ -284,7 +284,7 @@ export default {
                 return;
             }
         }
-        if (interaction.isSelectMenu()) {
+        if (interaction.isStringSelectMenu()) {
             const selectmenu = interaction.client.selectmenus.get(
                 interaction.customId.split(':')[0],
             ) as SelectMenu;

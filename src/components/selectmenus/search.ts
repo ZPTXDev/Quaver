@@ -11,22 +11,22 @@ import type {
     APISelectMenuOption,
     ButtonComponent,
     MessageActionRowComponentBuilder,
-    SelectMenuComponent,
     SelectMenuComponentOptionData,
-    SelectMenuInteraction,
+    StringSelectMenuComponent,
+    StringSelectMenuInteraction,
 } from 'discord.js';
 import {
     ActionRowBuilder,
     ButtonBuilder,
     EmbedBuilder,
-    SelectMenuBuilder,
+    StringSelectMenuBuilder,
 } from 'discord.js';
 
 export default {
     name: 'search',
     checks: [Check.InteractionStarter],
     async execute(
-        interaction: QuaverInteraction<SelectMenuInteraction>,
+        interaction: QuaverInteraction<StringSelectMenuInteraction>,
     ): Promise<void> {
         const state = searchState[interaction.message.id];
         if (!state) {
@@ -79,15 +79,16 @@ export default {
         } = { components: [] };
         updated.components[0] = ActionRowBuilder.from(
             original.components[0],
-        ) as ActionRowBuilder<SelectMenuBuilder>;
+        ) as ActionRowBuilder<StringSelectMenuBuilder>;
         updated.components[1] = ActionRowBuilder.from(
             original.components[1],
         ) as ActionRowBuilder<ButtonBuilder>;
-        updated.components[0].components[0] = SelectMenuBuilder.from(
-            original.components[0].components[0] as SelectMenuComponent,
+        updated.components[0].components[0] = StringSelectMenuBuilder.from(
+            original.components[0].components[0] as StringSelectMenuComponent,
         ).setOptions(
             (
-                original.components[0].components[0] as SelectMenuComponent
+                original.components[0]
+                    .components[0] as StringSelectMenuComponent
             ).options
                 .map(
                     (
@@ -145,7 +146,7 @@ export default {
                             (options): boolean =>
                                 !(
                                     original.components[0]
-                                        .components[0] as SelectMenuComponent
+                                        .components[0] as StringSelectMenuComponent
                                 ).options.find(
                                     (opt): boolean =>
                                         opt.value === options.value,

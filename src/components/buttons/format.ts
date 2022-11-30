@@ -13,9 +13,13 @@ import {
 import type {
     ButtonInteraction,
     MessageActionRowComponentBuilder,
-    SelectMenuComponent,
+    StringSelectMenuComponent,
 } from 'discord.js';
-import { ActionRowBuilder, EmbedBuilder, SelectMenuBuilder } from 'discord.js';
+import {
+    ActionRowBuilder,
+    EmbedBuilder,
+    StringSelectMenuBuilder,
+} from 'discord.js';
 
 export default {
     name: 'format',
@@ -86,10 +90,10 @@ export default {
         )}: \`${current}\``;
         await interaction.replyHandler.reply([description, ...embeds], {
             components: [
-                new ActionRowBuilder<SelectMenuBuilder>().addComponents(
-                    SelectMenuBuilder.from(
+                new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+                    StringSelectMenuBuilder.from(
                         interaction.message.components[0]
-                            .components[0] as SelectMenuComponent,
+                            .components[0] as StringSelectMenuComponent,
                     ),
                 ),
                 actionRow as ActionRowBuilder<MessageActionRowComponentBuilder>,

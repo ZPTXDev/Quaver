@@ -23,17 +23,21 @@ import {
 } from '#src/lib/util/util.js';
 import type {
     MessageActionRowComponentBuilder,
-    SelectMenuComponent,
     SelectMenuComponentOptionData,
-    SelectMenuInteraction,
+    StringSelectMenuComponent,
+    StringSelectMenuInteraction,
 } from 'discord.js';
-import { ActionRowBuilder, EmbedBuilder, SelectMenuBuilder } from 'discord.js';
+import {
+    ActionRowBuilder,
+    EmbedBuilder,
+    StringSelectMenuBuilder,
+} from 'discord.js';
 
 export default {
     name: 'language',
     checks: [Check.InteractionStarter],
     async execute(
-        interaction: QuaverInteraction<SelectMenuInteraction>,
+        interaction: QuaverInteraction<StringSelectMenuInteraction>,
     ): Promise<void> {
         if (!confirmationTimeout[interaction.message.id]) {
             await interaction.replyHandler.locale(
@@ -128,9 +132,9 @@ export default {
             [description, ...embeds],
             {
                 components: [
-                    new ActionRowBuilder<SelectMenuBuilder>().addComponents(
-                        SelectMenuBuilder.from(
-                            <SelectMenuComponent>(
+                    new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+                        StringSelectMenuBuilder.from(
+                            <StringSelectMenuComponent>(
                                 interaction.message.components[0].components[0]
                             ),
                         ).setOptions(
