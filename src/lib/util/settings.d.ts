@@ -10,6 +10,7 @@ export type SettingsObject = {
     developerMode?: boolean;
     disableAd?: boolean;
     supportServer?: string;
+    premiumURL?: string;
     geniusToken?: string;
     managers?: Snowflake[];
     grafanaLogging?: GrafanaLoggingSettingsObject;
@@ -50,6 +51,7 @@ export type FeaturesSettingsObject = {
 export type StayFeatureSettingsObject = {
     enabled?: boolean;
     whitelist?: boolean;
+    premium?: boolean;
 };
 
 export type SpotifyFeatureSettingsObject = {

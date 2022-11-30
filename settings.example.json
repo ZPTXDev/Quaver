@@ -11,6 +11,7 @@
     "defaultLocaleCode": "en",
     "disableAd": false,
     "supportServer": "https://discord.gg/",
+    "premiumURL": "https://example.com/premium",
     "managers": [
         "Paste your user ID here"
     ],
@@ -31,7 +32,8 @@
     "features": {
         "stay": {
             "enabled": true,
-            "whitelist": false
+            "whitelist": false,
+            "premium": false
         },
         "spotify": {
             "enabled": true,

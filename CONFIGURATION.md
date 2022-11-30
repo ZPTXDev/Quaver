@@ -14,6 +14,7 @@
     "defaultLocaleCode": "en",
     "disableAd": false,
     "supportServer": "https://discord.gg/",
+    "premiumURL": "https://example.com/premium",
     "managers": [
         "Paste your user ID here"
     ],
@@ -34,7 +35,8 @@
     "features": {
         "stay": {
             "enabled": true,
-            "whitelist": false
+            "whitelist": false,
+            "premium": false
         },
         "spotify": {
             "enabled": true,
@@ -75,6 +77,8 @@
 
 `supportServer` - The support server invite link. This is used in the `info` command (Support Server button) and some messages in the event of an error.
 
+`premiumURL` - The Get Premium URL. This is used in messages shown when a feature is premium-only.
+
 `managers` - The [user IDs](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-) that are given manager-level permissions on Quaver.
 
 `database.protocol` - The database protocol.
@@ -98,6 +102,8 @@
 `features.stay.enabled` - Whether or not the feature is enabled.
 
 `features.stay.whitelist` - Whether or not the feature requires guilds to be whitelisted. You will be able to whitelist guilds through the terminal.
+
+`features.stay.premium` - Whether or not to display the "requires premium" message when a guild is not whitelisted. Has no effect if `features.stay.whitelist` is `false` or `premiumURL` is unset.
 
 `features.spotify` - Spotify feature: Allows users to play songs from Spotify.
 

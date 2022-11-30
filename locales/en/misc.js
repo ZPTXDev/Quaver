@@ -15,5 +15,6 @@ export default {
 	ACTION_IRREVERSIBLE: 'This action is irreversible.',
 	CONFIRM: 'Confirm',
 	ADD: 'Add',
-	DASHBOARD: 'Dashboard'
+	DASHBOARD: 'Dashboard',
+	GET_PREMIUM: 'Get Premium'
 };

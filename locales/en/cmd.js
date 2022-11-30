@@ -7,7 +7,6 @@ export default {
 		RESPONSE: {
 			ENABLED: '24/7 **enabled**',
 			DISABLED: '24/7 **disabled**',
-			FEATURE_NOT_WHITELISTED: 'This server is not whitelisted to use 24/7.',
 			QUEUE_CHANNEL_MISSING: 'The queue channel is missing. Try using </bind:%1>.'
 		},
 		MISC: {

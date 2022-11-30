@@ -10,7 +10,13 @@ import type {
     ChatInputCommandInteraction,
     SlashCommandBooleanOption,
 } from 'discord.js';
-import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    EmbedBuilder,
+    SlashCommandBuilder,
+} from 'discord.js';
 
 export default {
     data: new SlashCommandBuilder()
@@ -56,10 +62,30 @@ export default {
                 'features.stay.whitelisted',
             ))
         ) {
-            await interaction.replyHandler.locale(
-                'CMD.247.RESPONSE.FEATURE_NOT_WHITELISTED',
-                { type: MessageOptionsBuilderType.Error },
-            );
+            settings.features.stay.premium && settings.premiumURL
+                ? await interaction.replyHandler.locale(
+                      'FEATURE.NO_PERMISSION.PREMIUM',
+                      {
+                          type: MessageOptionsBuilderType.Error,
+                          components: [
+                              new ActionRowBuilder<ButtonBuilder>().setComponents(
+                                  new ButtonBuilder()
+                                      .setLabel(
+                                          await getGuildLocaleString(
+                                              interaction.guildId,
+                                              'MISC.GET_PREMIUM',
+                                          ),
+                                      )
+                                      .setStyle(ButtonStyle.Link)
+                                      .setURL(settings.premiumURL),
+                              ),
+                          ],
+                      },
+                  )
+                : await interaction.replyHandler.locale(
+                      'FEATURE.NO_PERMISSION.DEFAULT',
+                      { type: MessageOptionsBuilderType.Error },
+                  );
             return;
         }
         const player = interaction.client.music.players.get(
