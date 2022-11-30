@@ -5,8 +5,7 @@ export default {
 		RESPONSE: {
 			ENABLED: 'Ang 24/7 ay **naka-enable**',
 			DISABLED: 'Ang 24/7 ay **naka-disable**',
-			FEATURE_NOT_WHITELISTED: 'Ang server na ito ay hindi naka-whitelist upang gumamit ng 24/7.',
-			QUEUE_CHANNEL_MISSING: 'Ang queue channel ay nawawala. Subukang gamitin ang `bind` na command.'
+			QUEUE_CHANNEL_MISSING: 'Ang queue channel ay nawawala. Subukang gamitin ang </bind:%1>.'
 		},
 		MISC: { NOTE: 'Gagamitin pa rin ni Quaver ang parehong mga voice at text channel kung nag-restart ito.' }
 	},
@@ -166,7 +165,7 @@ export default {
 	SEARCH: {
 		DESCRIPTION: 'Maghanap sa YouTube ng isang track.',
 		OPTION: { QUERY: 'YouTube na search query.' },
-		RESPONSE: { USE_PLAY_CMD: 'Subukang gamitin ang play command sa halip.' },
+		RESPONSE: { USE_PLAY_CMD: 'Subukang gamitin ang </play:%1> sa halip.' },
 		MISC: { PICK: 'Pumili ng (mga) track' }
 	},
 	SEEK: {

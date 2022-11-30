@@ -5,8 +5,7 @@ export default {
 		RESPONSE: {
 			ENABLED: 'Ang 24/7 ay **gi-enable**',
 			DISABLED: 'Ang 24/7 ay **gi-disable**',
-			FEATURE_NOT_WHITELISTED: 'Kini nga server wala gi-whitelist aron mogamit og 24/7.',
-			QUEUE_CHANNEL_MISSING: 'Ang queue channel kay nawala. Sulayi gamita ang `bind` nga command.'
+			QUEUE_CHANNEL_MISSING: 'Ang queue channel kay nawagtang. Sulayi og gamit ang </bind:%1>.'
 		},
 		MISC: { NOTE: 'Si Quaver mogamit sa parehas nga mga voice ug text channel kung kini magsugod pag-usab.' }
 	},
@@ -51,6 +50,7 @@ export default {
 		MISC: {
 			SOURCE_CODE: 'Source Code',
 			INVITE: 'I-imbitar',
+			SUPPORT_SERVER: 'Support Server',
 			SPONSOR_US: 'Sponsor Namo'
 		}
 	},
@@ -74,6 +74,12 @@ export default {
 		RESPONSE: {
 			NO_QUERY: 'Walay search query nga gipiho.',
 			NO_RESULTS: 'Walay mga resulta alang sa maong query nga nakit-an.'
+		},
+		MISC: {
+			ROMANIZE_FROM_KOREAN: 'I-romanize gikan sa Korean',
+			ROMANIZE_FROM_JAPANESE: 'I-romanize gikan sa Japanese',
+			ROMANIZE_FROM_CHINESE: 'I-romanize gikan sa Chinese',
+			JAPANESE_INACCURATE: 'Ang pag-romanize sa kanji kay mahimong moresulta sa gamay nga pagkasayup.'
 		}
 	},
 	MOVE: {
@@ -121,7 +127,8 @@ export default {
 				SPOTIFY: 'Walay nakit-an nga resulta sa imohang query sa Spotify.'
 			},
 			DISABLED: { SPOTIFY: 'Ang integration sa Spotify kay wala na-configure.' },
-			LOAD_FAILED: 'Napakyas sa pag-load sa track.'
+			LOAD_FAILED: 'Napakyas sa pag-load sa track.',
+			LIMIT_EXCEEDED: { SPOTIFY: 'Makapatugtog ra ka hangtod sa **500** ka nga mga track gikan sa Spotify sa matag higayon.' }
 		}
 	},
 	PLAYING: { DESCRIPTION: 'Ipakita unsay nagpatugtug karon.' },
@@ -140,7 +147,11 @@ export default {
 		DESCRIPTION: 'Pagtangtang og track gikan sa queue.',
 		OPTION: { POSITION: 'Ang posisyon sa track nga itangtang.' },
 		RESPONSE: {
-			SUCCESS: 'Gitangtang ang [**%1**](%2)',
+			SUCCESS: {
+				DEFAULT: 'Gitangtang ang [**%1**](%2)',
+				FORCED: 'Gitangtang ang [**%1**](%2) pinaagi og pugos',
+				MANAGER: 'Gitangtang ang [**%1**](%2) pinaagi sa manager bypass'
+			},
 			QUEUE_EMPTY: 'Walay mga track sa queue nga tangtangonon.'
 		}
 	},
@@ -154,7 +165,7 @@ export default {
 	SEARCH: {
 		DESCRIPTION: 'Mangita sa YouTube og usa ka track.',
 		OPTION: { QUERY: 'YouTube nga search query.' },
-		RESPONSE: { USE_PLAY_CMD: 'Suwayig gamit ang play command imbis ana.' },
+		RESPONSE: { USE_PLAY_CMD: 'Sulayi og gamit ang </play:%1> pangbaylo.' },
 		MISC: { PICK: 'Pili og (mga) track' }
 	},
 	SEEK: {
