@@ -15,5 +15,6 @@ export default {
 	ACTION_IRREVERSIBLE: 'Ang aksyon na ito ay hindi na mababawi.',
 	CONFIRM: 'Kumpirmahin',
 	ADD: 'Idagdag',
-	DASHBOARD: 'Dashboard'
+	DASHBOARD: 'Dashboard',
+	GET_PREMIUM: 'Kumuha ng Premium'
 };

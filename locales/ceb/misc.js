@@ -15,5 +15,6 @@ export default {
 	ACTION_IRREVERSIBLE: 'Kini nga aksyon kay dili na mabalik.',
 	CONFIRM: 'Kumpirma',
 	ADD: 'Idugang',
-	DASHBOARD: 'Dashboard'
+	DASHBOARD: 'Dashboard',
+	GET_PREMIUM: 'Pagkuha og Premium'
 };
