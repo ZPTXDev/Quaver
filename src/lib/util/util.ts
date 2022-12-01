@@ -586,6 +586,50 @@ export async function buildSettingsPage(
             actionRow.addComponents(
                 new RoleSelectMenuBuilder().setCustomId('dj').setMinValues(0),
             );
+            break;
+        }
+        case 'autolyrics': {
+            current = await data.guild.get<Snowflake>(
+                interaction.guildId,
+                'settings.autolyrics',
+            );
+            actionRow.addComponents(
+                new ButtonBuilder()
+                    .setCustomId('autolyrics:enabled')
+                    .setLabel(
+                        getLocaleString(
+                            guildLocaleCode,
+                            'CMD.SETTINGS.MISC.AUTOLYRICS.OPTIONS.ENABLED',
+                        ),
+                    )
+                    .setStyle(
+                        current ? ButtonStyle.Success : ButtonStyle.Secondary,
+                    )
+                    .setDisabled(!!current),
+                new ButtonBuilder()
+                    .setCustomId('autolyrics:disabled')
+                    .setLabel(
+                        getLocaleString(
+                            guildLocaleCode,
+                            'CMD.SETTINGS.MISC.AUTOLYRICS.OPTIONS.DISABLED',
+                        ),
+                    )
+                    .setStyle(
+                        !current ? ButtonStyle.Success : ButtonStyle.Secondary,
+                    )
+                    .setDisabled(!current),
+            );
+            current = `\`${
+                current
+                    ? getLocaleString(
+                          guildLocaleCode,
+                          'CMD.SETTINGS.MISC.AUTOLYRICS.OPTIONS.ENABLED',
+                      )
+                    : getLocaleString(
+                          guildLocaleCode,
+                          'CMD.SETTINGS.MISC.AUTOLYRICS.OPTIONS.DISABLED',
+                      )
+            }\``;
         }
     }
     return { current, embeds, actionRow };

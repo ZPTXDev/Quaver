@@ -1,6 +1,5 @@
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import { Check } from '#src/lib/util/constants.js';
 import { getGuildLocaleString } from '#src/lib/util/util.js';
 import { LyricsFinder } from '@jeve/lyrics-finder';
 import { pinyin as romanizeFromChinese, PINYIN_STYLE } from '@napi-rs/pinyin';
@@ -13,7 +12,7 @@ import { toRomaji as romanizeFromJapanese } from 'wanakana';
 
 export default {
     name: 'lyrics',
-    checks: [Check.InteractionStarter],
+    checks: [],
     async execute(
         interaction: QuaverInteraction<ButtonInteraction>,
     ): Promise<void> {

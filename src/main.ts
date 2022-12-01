@@ -91,7 +91,7 @@ rl.on('line', async (input): Promise<void> => {
                         console.log('The 24/7 whitelist is not enabled.');
                         break;
                     }
-                    const whitelisted = !(await data.guild.get(
+                    const whitelisted = !(await data.guild.get<boolean>(
                         guildId,
                         'features.stay.whitelisted',
                     ));
@@ -107,8 +107,31 @@ rl.on('line', async (input): Promise<void> => {
                     );
                     break;
                 }
+                case 'autolyrics': {
+                    if (!settings.features.autolyrics.whitelist) {
+                        console.log(
+                            'The Auto Lyrics whitelist is not enabled.',
+                        );
+                        break;
+                    }
+                    const whitelisted = !(await data.guild.get<boolean>(
+                        guildId,
+                        'features.autolyrics.whitelisted',
+                    ));
+                    await data.guild.set(
+                        guildId,
+                        'features.autolyrics.whitelisted',
+                        whitelisted,
+                    );
+                    console.log(
+                        `${whitelisted ? 'Added' : 'Removed'} ${
+                            guild.name
+                        } to the Auto Lyrics whitelist.`,
+                    );
+                    break;
+                }
                 default:
-                    console.log('Available features: stay');
+                    console.log('Available features: stay, autolyrics');
             }
             break;
         }

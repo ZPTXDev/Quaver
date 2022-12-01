@@ -33,6 +33,11 @@
         }
     },
     "features": {
+        "autolyrics": {
+            "enabled": true,
+            "whitelist": false,
+            "premium": false
+        },
         "stay": {
             "enabled": true,
             "whitelist": false,
@@ -75,9 +80,9 @@
 `disableAd` - Whether to disable the ad in the `info` command (Sponsor Us button).
 > **Note:** Please do not disable the ad unless you really need to. Sponsors help keep the development of ZPTXDev projects going. Consider sponsoring us if you need to disable the ad!
 
-`supportServer` - The support server invite link. This is used in the `info` command (Support Server button) and some messages in the event of an error.
+`supportServer` - **6.6.0+** The support server invite link. This is used in the `info` command (Support Server button) and some messages in the event of an error.
 
-`premiumURL` - The Get Premium URL. This is used in messages shown when a feature is premium-only.
+`premiumURL` - **6.7.0+** The Get Premium URL. This is used in messages shown when a feature is premium-only.
 
 `managers` - The [user IDs](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-) that are given manager-level permissions on Quaver.
 
@@ -97,13 +102,21 @@
 
 `lavalink.reconnect.tries` - The number of times to attempt to reconnect to Lavalink.
 
+`features.autolyrics` - **6.7.0+** Auto Lyrics feature: Allows users to toggle Quaver automatically sending lyrics for the current song.
+
+`features.autolyrics.enabled` - **6.7.0+** Whether or not the feature is enabled.
+
+`features.autolyrics.whitelist` - **6.7.0+** Whether or not the feature requires guilds to be whitelisted. You will be able to whitelist guilds through the terminal.
+
+`features.autolyrics.premium` - **6.7.0+** Whether or not to display the "requires premium" message when a guild is not whitelisted. Has no effect if `features.autolyrics.whitelist` is `false` or `premiumURL` is unset.
+
 `features.stay` - 24/7 feature: Allows users to make Quaver stay in their voice channel regardless of activity.
 
 `features.stay.enabled` - Whether or not the feature is enabled.
 
 `features.stay.whitelist` - Whether or not the feature requires guilds to be whitelisted. You will be able to whitelist guilds through the terminal.
 
-`features.stay.premium` - Whether or not to display the "requires premium" message when a guild is not whitelisted. Has no effect if `features.stay.whitelist` is `false` or `premiumURL` is unset.
+`features.stay.premium` - **6.7.0+** Whether or not to display the "requires premium" message when a guild is not whitelisted. Has no effect if `features.stay.whitelist` is `false` or `premiumURL` is unset.
 
 `features.spotify` - Spotify feature: Allows users to play songs from Spotify.
 
@@ -125,10 +138,10 @@
 
 `features.web.https` - HTTPS configuration.
 
-`features.web.https.enabled` - Whether or not HTTPS is enabled.
+`features.web.https.enabled` - **6.0.0+** Whether or not HTTPS is enabled.
 
-`features.web.https.key` - The path to the HTTPS key file. This is relative to the root folder.
+`features.web.https.key` - **6.0.0+** The path to the HTTPS key file. This is relative to the root folder.
 
-`features.web.https.cert` - The path to the HTTPS certificate file. This is relative to the root folder.
+`features.web.https.cert` - **6.0.0+** The path to the HTTPS certificate file. This is relative to the root folder.
 
-`features.web.dashboardURL` - The URL to the dashboard. If provided, this will be included at the bottom of the Now Playing message as a button.
+`features.web.dashboardURL` - **6.4.0+** The URL to the dashboard. If provided, this will be included at the bottom of the Now Playing message as a button.

@@ -242,7 +242,15 @@ export default {
 			},
 			DJ: {
 				NAME: 'DJ Role',
-				DESCRIPTION: 'The role that allows bypassing requester checks.'
+				DESCRIPTION: 'A role allowing requester check bypass.'
+			},
+			AUTOLYRICS: {
+				NAME: 'Auto Lyrics',
+				DESCRIPTION: 'Automatically send lyrics for every track.',
+				OPTIONS: {
+					ENABLED: 'Enabled',
+					DISABLED: 'Disabled'
+				}
 			}
 		}
 	},

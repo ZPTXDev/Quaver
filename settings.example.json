@@ -30,6 +30,11 @@
         }
     },
     "features": {
+        "autolyrics": {
+            "enabled": true,
+            "whitelist": false,
+            "premium": false
+        },
         "stay": {
             "enabled": true,
             "whitelist": false,
