@@ -86,47 +86,35 @@ rl.on('line', async (input): Promise<void> => {
                 break;
             }
             switch (feature) {
-                case 'stay': {
-                    if (!settings.features.stay.whitelist) {
-                        console.log('The 24/7 whitelist is not enabled.');
-                        break;
-                    }
-                    const whitelisted = !(await data.guild.get<boolean>(
-                        guildId,
-                        'features.stay.whitelisted',
-                    ));
-                    await data.guild.set(
-                        guildId,
-                        'features.stay.whitelisted',
-                        whitelisted,
-                    );
-                    console.log(
-                        `${whitelisted ? 'Added' : 'Removed'} ${
-                            guild.name
-                        } to the 24/7 whitelist.`,
-                    );
-                    break;
-                }
+                case 'stay':
                 case 'autolyrics': {
-                    if (!settings.features.autolyrics.whitelist) {
+                    let featureName = '';
+                    switch (feature) {
+                        case 'stay':
+                            featureName = '24/7';
+                            break;
+                        case 'autolyrics':
+                            featureName = 'Auto Lyrics';
+                    }
+                    if (!settings.features[feature].whitelist) {
                         console.log(
-                            'The Auto Lyrics whitelist is not enabled.',
+                            `The ${featureName} whitelist is not enabled.`,
                         );
                         break;
                     }
                     const whitelisted = !(await data.guild.get<boolean>(
                         guildId,
-                        'features.autolyrics.whitelisted',
+                        `features.${feature}.whitelisted`,
                     ));
                     await data.guild.set(
                         guildId,
-                        'features.autolyrics.whitelisted',
+                        `features.${feature}.whitelisted`,
                         whitelisted,
                     );
                     console.log(
-                        `${whitelisted ? 'Added' : 'Removed'} ${
-                            guild.name
-                        } to the Auto Lyrics whitelist.`,
+                        `${whitelisted ? 'Added' : 'Removed'} ${guild.name} ${
+                            whitelisted ? 'to' : 'from'
+                        } the ${featureName} whitelist.`,
                     );
                     break;
                 }
