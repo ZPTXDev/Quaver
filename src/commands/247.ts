@@ -55,38 +55,41 @@ export default {
             });
             return;
         }
-        if (
-            settings.features.stay.whitelist &&
-            !(await data.guild.get(
+        if (settings.features.stay.whitelist) {
+            const whitelisted = await data.guild.get<number>(
                 interaction.guildId,
                 'features.stay.whitelisted',
-            ))
-        ) {
-            settings.features.stay.premium && settings.premiumURL
-                ? await interaction.replyHandler.locale(
-                      'FEATURE.NO_PERMISSION.PREMIUM',
-                      {
-                          type: MessageOptionsBuilderType.Error,
-                          components: [
-                              new ActionRowBuilder<ButtonBuilder>().setComponents(
-                                  new ButtonBuilder()
-                                      .setLabel(
-                                          await getGuildLocaleString(
-                                              interaction.guildId,
-                                              'MISC.GET_PREMIUM',
-                                          ),
-                                      )
-                                      .setStyle(ButtonStyle.Link)
-                                      .setURL(settings.premiumURL),
-                              ),
-                          ],
-                      },
-                  )
-                : await interaction.replyHandler.locale(
-                      'FEATURE.NO_PERMISSION.DEFAULT',
-                      { type: MessageOptionsBuilderType.Error },
-                  );
-            return;
+            );
+            if (
+                !whitelisted ||
+                (whitelisted !== -1 && Date.now() > whitelisted)
+            ) {
+                settings.features.stay.premium && settings.premiumURL
+                    ? await interaction.replyHandler.locale(
+                          'FEATURE.NO_PERMISSION.PREMIUM',
+                          {
+                              type: MessageOptionsBuilderType.Error,
+                              components: [
+                                  new ActionRowBuilder<ButtonBuilder>().setComponents(
+                                      new ButtonBuilder()
+                                          .setLabel(
+                                              await getGuildLocaleString(
+                                                  interaction.guildId,
+                                                  'MISC.GET_PREMIUM',
+                                              ),
+                                          )
+                                          .setStyle(ButtonStyle.Link)
+                                          .setURL(settings.premiumURL),
+                                  ),
+                              ],
+                          },
+                      )
+                    : await interaction.replyHandler.locale(
+                          'FEATURE.NO_PERMISSION.DEFAULT',
+                          { type: MessageOptionsBuilderType.Error },
+                      );
+                return;
+            }
         }
         const player = interaction.client.music.players.get(
             interaction.guildId,

@@ -1,3 +1,5 @@
+import { settings } from './settings.js';
+
 export enum Check {
     /**
      * Only allowed in guild
@@ -25,4 +27,10 @@ export enum Language {
     en = 'English',
     fil = 'Filipino',
 }
-export const settingsOptions = ['language', 'format', 'dj', 'autolyrics'];
+export const settingsOptions = [
+    ...(settings.premiumURL ? ['premium'] : []),
+    'language',
+    'format',
+    'dj',
+    'autolyrics',
+];

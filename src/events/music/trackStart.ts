@@ -177,15 +177,6 @@ export default {
               );
         if (settings.features.autolyrics.enabled) {
             if (
-                settings.features.autolyrics.whitelist &&
-                !(await data.guild.get<boolean>(
-                    queue.player.guildId,
-                    'features.autolyrics.whitelisted',
-                ))
-            ) {
-                return;
-            }
-            if (
                 !(await data.guild.get<boolean>(
                     queue.player.guildId,
                     'settings.autolyrics',

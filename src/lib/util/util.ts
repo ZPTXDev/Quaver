@@ -115,6 +115,36 @@ export function msToTimeString(msObject: TimeObject, simple?: boolean): string {
 }
 
 /**
+ * Parses a human-readable time string into milliseconds.
+ * @param timeString - The time string to parse.
+ * @returns The parsed milliseconds.
+ */
+export function parseTimeString(timeString: string): number {
+    const timeRegex = /(\d+)([smhd])/g;
+    const timeMatches = timeString.matchAll(timeRegex);
+    let time = 0;
+    for (const match of timeMatches) {
+        const amount = parseInt(match[1]);
+        const unit = match[2];
+        switch (unit) {
+            case 's':
+                time += amount * 1000;
+                break;
+            case 'm':
+                time += amount * 1000 * 60;
+                break;
+            case 'h':
+                time += amount * 1000 * 60 * 60;
+                break;
+            case 'd':
+                time += amount * 1000 * 60 * 60 * 24;
+                break;
+        }
+    }
+    return time;
+}
+
+/**
  * Returns a number rounded to the number of decimal places provided.
  * Reference: https://stackoverflow.com/a/15762794
  * @param n - The number to round.
@@ -421,6 +451,77 @@ export async function buildSettingsPage(
         embeds: EmbedBuilder[] = [];
     const actionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
     switch (option) {
+        case 'premium': {
+            current = '';
+            actionRow.addComponents(
+                new ButtonBuilder()
+                    .setLabel(
+                        await getGuildLocaleString(
+                            interaction.guildId,
+                            'MISC.GET_PREMIUM',
+                        ),
+                    )
+                    .setStyle(ButtonStyle.Link)
+                    .setURL(settings.premiumURL),
+            );
+            const whitelisted = {
+                stay: await data.guild.get<number>(
+                    interaction.guildId,
+                    'features.stay.whitelisted',
+                ),
+                autolyrics: await data.guild.get<number>(
+                    interaction.guildId,
+                    'features.autolyrics.whitelisted',
+                ),
+            };
+            const features = Object.keys(whitelisted)
+                .filter(
+                    (key: 'stay' | 'autolyrics'): boolean =>
+                        settings.features[key].enabled &&
+                        settings.features[key].whitelist &&
+                        settings.features[key].premium,
+                )
+                .map(
+                    (key: 'stay' | 'autolyrics'): string =>
+                        `**${getLocaleString(
+                            guildLocaleCode,
+                            `CMD.SETTINGS.MISC.PREMIUM.FEATURES.${key.toUpperCase()}`,
+                        )}** ─ ${
+                            !whitelisted[key]
+                                ? getLocaleString(
+                                      guildLocaleCode,
+                                      'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.LOCKED.DEFAULT',
+                                  )
+                                : whitelisted[key] !== -1 &&
+                                  Date.now() > whitelisted[key]
+                                ? getLocaleString(
+                                      guildLocaleCode,
+                                      'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.LOCKED.EXPIRED',
+                                      Math.floor(
+                                          whitelisted[key] / 1000,
+                                      ).toString(),
+                                  )
+                                : whitelisted[key] === -1
+                                ? getLocaleString(
+                                      guildLocaleCode,
+                                      'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.UNLOCKED.PERMANENT',
+                                  )
+                                : getLocaleString(
+                                      guildLocaleCode,
+                                      'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.UNLOCKED.TEMPORARY',
+                                      Math.floor(
+                                          whitelisted[key] / 1000,
+                                      ).toString(),
+                                  )
+                        }`,
+                );
+            embeds = [
+                new EmbedBuilder()
+                    .setDescription(features.join('\n'))
+                    .setColor(settings.colors.neutral),
+            ];
+            break;
+        }
         case 'language':
             current = `\`${
                 Language[guildLocaleCode] ?? 'Unknown'

@@ -224,6 +224,24 @@ export default {
 			HEADER: 'Settings for **%1**'
 		},
 		MISC: {
+			PREMIUM: {
+				NAME: 'Premium',
+				DESCRIPTION: 'Premium features for this server.',
+				FEATURES: {
+					STAY: '24/7 Mode',
+					AUTOLYRICS: 'Auto Lyrics'
+				},
+				DISPLAY: {
+					UNLOCKED: {
+						PERMANENT: 'Available **forever**',
+						TEMPORARY: 'Available until **<t:%1:f>**'
+					},
+					LOCKED: {
+						DEFAULT: 'Requires Premium',
+						EXPIRED: 'Expired at **<t:%1:f>**'
+					}
+				}
+			},
 			LANGUAGE: {
 				NAME: 'Language',
 				DESCRIPTION: 'The language to use for this server.'

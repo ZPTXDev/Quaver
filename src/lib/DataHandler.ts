@@ -39,7 +39,7 @@ export default class DataHandler {
     async set(
         key: string,
         item: string,
-        value: string | boolean,
+        value: string | number | boolean,
     ): Promise<true> {
         let data: DatabaseObject = await this.cache.get(key);
         if (!data) data = {};

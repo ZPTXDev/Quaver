@@ -18,6 +18,7 @@ import {
     getGuildLocaleString,
     msToTime,
     msToTimeString,
+    parseTimeString,
 } from '#src/lib/util/util.js';
 import '@lavaclient/queue/register';
 import { load } from '@lavaclient/spotify';
@@ -76,8 +77,10 @@ rl.on('line', async (input): Promise<void> => {
         case 'whitelist': {
             const guildId = input.split(' ')[1];
             const feature = input.split(' ')[2];
+            const duration = input.split(' ')[3];
+            let durationMs = -1;
             if (!guildId || !feature) {
-                console.log('Usage: whitelist <guildId> <feature>');
+                console.log('Usage: whitelist <guildId> <feature> [duration]');
                 break;
             }
             const guild = await bot.guilds.fetch(guildId);
@@ -103,19 +106,38 @@ rl.on('line', async (input): Promise<void> => {
                 console.log(`The ${featureName} whitelist is not enabled.`);
                 break;
             }
-            const whitelisted = !(await data.guild.get<boolean>(
+            if (duration) {
+                if (!parseTimeString(duration)) {
+                    console.log('Duration example: 5d1h, 1h30m, 10s');
+                    break;
+                }
+                durationMs = parseTimeString(duration);
+            }
+            const whitelisted = !!(await data.guild.get<number>(
                 guildId,
                 `features.${feature}.whitelisted`,
             ));
+            if (whitelisted && !duration) {
+                await data.guild.unset(
+                    guildId,
+                    `features.${feature}.whitelisted`,
+                );
+                console.log(
+                    `Removed ${guild.name} from the ${featureName} whitelist.`,
+                );
+                break;
+            }
             await data.guild.set(
                 guildId,
                 `features.${feature}.whitelisted`,
-                whitelisted,
+                durationMs === -1 ? durationMs : Date.now() + durationMs,
             );
             console.log(
-                `${whitelisted ? 'Added' : 'Removed'} ${guild.name} ${
-                    whitelisted ? 'to' : 'from'
-                } the ${featureName} whitelist.`,
+                `Added ${guild.name} to the ${featureName} whitelist ${
+                    durationMs === -1
+                        ? 'permanently'
+                        : `for ${msToTimeString(msToTime(durationMs))}`
+                }.`,
             );
             break;
         }
