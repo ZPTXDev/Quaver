@@ -42,6 +42,9 @@ export default {
                         applicationCommands.cache.find(
                             (command): boolean => command.name === 'search',
                         )?.id ?? '1',
+                        applicationCommands.cache.find(
+                            (command): boolean => command.name === 'settings',
+                        )?.id ?? '1',
                     ),
                 ),
             );

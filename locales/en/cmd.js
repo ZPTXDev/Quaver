@@ -53,7 +53,7 @@ export default {
 		DESCRIPTION: 'Show information about Quaver.',
 		RESPONSE: {
 			SUCCESS: 'Open-source music bot for small communities.\nRunning version `%1`.',
-			MENTION: 'Hi! Quaver uses [Slash Commands](https://support.discord.com/hc/en-us/articles/1500000368501-Slash-Commands-FAQ).\nFor more information about Quaver, try </info:%1>. To play a track, try </play:%2> or </search:%3>.'
+			MENTION: 'Hi! Quaver uses [Slash Commands](https://support.discord.com/hc/en-us/articles/1500000368501-Slash-Commands-FAQ).\nFor more information about Quaver, use </info:%1>.\nTo play a track, try </play:%2> or </search:%3>.\nTo configure Quaver, use </settings:%4>.'
 		},
 		MISC: {
 			SOURCE_CODE: 'Source Code',
