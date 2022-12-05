@@ -38,7 +38,7 @@
     "@types/wanakana": "^4.0.3",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.1",
-    "eslint": "^8.28.0",
+    "eslint": "^8.29.0",
     "rimraf": "^3.0.2",
     "tsc-alias": "^1.8.1",
     "tsconfig-paths": "^4.1.1",
