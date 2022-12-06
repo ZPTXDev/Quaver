@@ -16,5 +16,6 @@ export default {
 	CONFIRM: 'Kumpirma',
 	ADD: 'Idugang',
 	DASHBOARD: 'Dashboard',
-	GET_PREMIUM: 'Pagkuha og Premium'
+	GET_PREMIUM: 'Pagkuha og Premium',
+	NONE: 'None'
 };
