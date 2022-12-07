@@ -1,3 +1,4 @@
+import { PlayerResponse } from '#src/lib/PlayerHandler.js';
 import { ForceType } from '#src/lib/ReplyHandler.js';
 import type {
     QuaverInteraction,
@@ -26,14 +27,27 @@ export default {
         ) as QuaverPlayer;
         clearTimeout(confirmationTimeout[interaction.message.id]);
         delete confirmationTimeout[interaction.message.id];
-        await player.handler.disconnect();
-        await interaction.replyHandler.locale(
-            'CMD.DISCONNECT.RESPONSE.SUCCESS',
-            {
-                type: MessageOptionsBuilderType.Success,
-                components: [],
-                force: ForceType.Update,
-            },
-        );
+        const response = await player.handler.disconnect();
+        switch (response) {
+            case PlayerResponse.FeatureConflict:
+                await interaction.replyHandler.locale(
+                    'CMD.DISCONNECT.RESPONSE.FEATURE_247_ENABLED',
+                    {
+                        type: MessageOptionsBuilderType.Error,
+                        components: [],
+                        force: ForceType.Update,
+                    },
+                );
+                return;
+            case PlayerResponse.Success:
+                await interaction.replyHandler.locale(
+                    'CMD.DISCONNECT.RESPONSE.SUCCESS',
+                    {
+                        type: MessageOptionsBuilderType.Success,
+                        components: [],
+                        force: ForceType.Update,
+                    },
+                );
+        }
     },
 };

@@ -58,7 +58,8 @@ export default {
                     'MUSIC.SESSION_ENDED.FORCED.DISCONNECTED',
                     { type: MessageOptionsBuilderType.Warning },
                 );
-                return player.handler.disconnect(oldState.channelId);
+                await player.handler.disconnect(oldState.channelId);
+                return;
             }
             /** Checks for when Quaver joins or moves */
             if (settings.features.web.enabled) {
@@ -91,7 +92,8 @@ export default {
                         'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC',
                         { type: MessageOptionsBuilderType.Error },
                     );
-                    return player.handler.disconnect();
+                    await player.handler.disconnect();
+                    return;
                 }
                 if (
                     (await data.guild.get(
@@ -134,7 +136,8 @@ export default {
                         'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC',
                         { type: MessageOptionsBuilderType.Error },
                     );
-                    return player.handler.disconnect();
+                    await player.handler.disconnect();
+                    return;
                 }
                 if (!permissions.has(PermissionsBitField.StageModerator)) {
                     if (
@@ -153,7 +156,8 @@ export default {
                         'MUSIC.SESSION_ENDED.FORCED.STAGE_NOT_MODERATOR',
                         { type: MessageOptionsBuilderType.Warning },
                     );
-                    return player.handler.disconnect();
+                    await player.handler.disconnect();
+                    return;
                 }
                 await newState.setSuppressed(false);
                 if (!newState.channel.stageInstance) {
@@ -231,7 +235,8 @@ export default {
                         'MUSIC.DISCONNECT.ALONE.DISCONNECTED.MOVED',
                         { type: MessageOptionsBuilderType.Warning },
                     );
-                    return player.handler.disconnect();
+                    await player.handler.disconnect();
+                    return;
                 }
                 // Ensure that Quaver does not set pauseTimeout if timeout already exists
                 // Ensure that Quaver does not set a new pauseTimeout if pauseTimeout already exists
@@ -382,7 +387,8 @@ export default {
                 'MUSIC.DISCONNECT.ALONE.DISCONNECTED.DEFAULT',
                 { type: MessageOptionsBuilderType.Warning },
             );
-            return player.handler.disconnect();
+            await player.handler.disconnect();
+            return;
         }
         // Ensure that Quaver does not set pauseTimeout if timeout already exists
         // Ensure that Quaver does not set pauseTimeout after a stage ends

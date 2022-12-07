@@ -1,3 +1,4 @@
+import { PlayerResponse } from '#src/lib/PlayerHandler.js';
 import type {
     QuaverInteraction,
     QuaverPlayer,
@@ -48,22 +49,28 @@ export default {
     async execute(
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
-        const { io } = await import('#src/main.js');
-        if (!settings.features.stay.enabled) {
-            await interaction.replyHandler.locale('FEATURE.DISABLED.DEFAULT', {
-                type: MessageOptionsBuilderType.Error,
-            });
-            return;
-        }
-        if (settings.features.stay.whitelist) {
-            const whitelisted = await data.guild.get<number>(
-                interaction.guildId,
-                'features.stay.whitelisted',
-            );
-            if (
-                !whitelisted ||
-                (whitelisted !== -1 && Date.now() > whitelisted)
-            ) {
+        const enabled = interaction.options.getBoolean('enabled');
+        const player = interaction.client.music.players.get(
+            interaction.guildId,
+        ) as QuaverPlayer;
+        const response = await player.handler.stay(
+            enabled !== null
+                ? enabled
+                : !(await data.guild.get(
+                      interaction.guildId,
+                      'settings.stay.enabled',
+                  )),
+        );
+        switch (response) {
+            case PlayerResponse.FeatureDisabled:
+                await interaction.replyHandler.locale(
+                    'FEATURE.DISABLED.DEFAULT',
+                    {
+                        type: MessageOptionsBuilderType.Error,
+                    },
+                );
+                return;
+            case PlayerResponse.FeatureNotWhitelisted:
                 settings.features.stay.premium && settings.premiumURL
                     ? await interaction.replyHandler.locale(
                           'FEATURE.NO_PERMISSION.PREMIUM',
@@ -89,86 +96,48 @@ export default {
                           { type: MessageOptionsBuilderType.Error },
                       );
                 return;
-            }
-        }
-        const player = interaction.client.music.players.get(
-            interaction.guildId,
-        ) as QuaverPlayer;
-        if (!player?.queue?.channel?.id) {
-            const applicationCommands =
-                interaction.client.application?.commands;
-            if (applicationCommands.cache.size === 0) {
-                await applicationCommands.fetch();
-            }
-            await interaction.replyHandler.locale(
-                'CMD.247.RESPONSE.QUEUE_CHANNEL_MISSING',
-                {
-                    type: MessageOptionsBuilderType.Error,
-                    vars: [
-                        applicationCommands.cache.find(
-                            (command): boolean => command.name === 'bind',
-                        )?.id ?? '1',
-                    ],
-                },
-            );
-            return;
-        }
-        const enabled = interaction.options.getBoolean('enabled');
-        const always =
-            enabled !== null
-                ? enabled
-                : !(await data.guild.get(
-                      interaction.guildId,
-                      'settings.stay.enabled',
-                  ));
-        await data.guild.set(
-            interaction.guildId,
-            'settings.stay.enabled',
-            always,
-        );
-        if (always) {
-            await data.guild.set(
-                interaction.guildId,
-                'settings.stay.channel',
-                player.channelId,
-            );
-            await data.guild.set(
-                interaction.guildId,
-                'settings.stay.text',
-                player.queue.channel.id,
-            );
-        }
-        if (player.timeout) {
-            clearTimeout(player.timeout);
-            delete player.timeout;
-            if (settings.features.web.enabled) {
-                io.to(`guild:${player.guildId}`).emit(
-                    'timeoutUpdate',
-                    !!player.timeout,
+            case PlayerResponse.QueueChannelMissing: {
+                const applicationCommands =
+                    interaction.client.application?.commands;
+                if (applicationCommands.cache.size === 0) {
+                    await applicationCommands.fetch();
+                }
+                await interaction.replyHandler.locale(
+                    'CMD.247.RESPONSE.QUEUE_CHANNEL_MISSING',
+                    {
+                        type: MessageOptionsBuilderType.Error,
+                        vars: [
+                            applicationCommands.cache.find(
+                                (command): boolean => command.name === 'bind',
+                            )?.id ?? '1',
+                        ],
+                    },
                 );
+                return;
             }
+            case PlayerResponse.Success:
+                // pause timeout is theoretically impossible because the user would need to be in the same vc as Quaver
+                // and pause timeout is only set when everyone leaves
+                await interaction.replyHandler.reply(
+                    new EmbedBuilder()
+                        .setDescription(
+                            await getGuildLocaleString(
+                                interaction.guildId,
+                                enabled
+                                    ? 'CMD.247.RESPONSE.ENABLED'
+                                    : 'CMD.247.RESPONSE.DISABLED',
+                            ),
+                        )
+                        .setFooter({
+                            text: enabled
+                                ? await getGuildLocaleString(
+                                      interaction.guildId,
+                                      'CMD.247.MISC.NOTE',
+                                  )
+                                : null,
+                        }),
+                );
+                if (!enabled && !player.playing) player.queue.emit('finish');
         }
-        // pause timeout is theoretically impossible because the user would need to be in the same vc as Quaver
-        // and pause timeout is only set when everyone leaves
-        await interaction.replyHandler.reply(
-            new EmbedBuilder()
-                .setDescription(
-                    await getGuildLocaleString(
-                        interaction.guildId,
-                        always
-                            ? 'CMD.247.RESPONSE.ENABLED'
-                            : 'CMD.247.RESPONSE.DISABLED',
-                    ),
-                )
-                .setFooter({
-                    text: always
-                        ? await getGuildLocaleString(
-                              interaction.guildId,
-                              'CMD.247.MISC.NOTE',
-                          )
-                        : null,
-                }),
-        );
-        if (!always && !player.playing) player.queue.emit('finish');
     },
 };

@@ -268,7 +268,8 @@ export default {
                               { vars: [interaction.user.id] },
                           );
                 }
-                return player.handler.disconnect();
+                await player.handler.disconnect();
+                return;
             }
         }
         const firstPosition = insert ? 1 : player.queue.tracks.length + 1;

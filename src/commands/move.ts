@@ -1,9 +1,12 @@
-import type { QuaverInteraction } from '#src/lib/util/common.d.js';
+import { PlayerResponse } from '#src/lib/PlayerHandler.js';
+import type {
+    QuaverInteraction,
+    QuaverPlayer,
+} from '#src/lib/util/common.d.js';
 import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getLocaleString } from '#src/lib/util/util.js';
-import type { Song } from '@lavaclient/queue';
 import type {
     ChatInputCommandInteraction,
     SlashCommandIntegerOption,
@@ -56,63 +59,46 @@ export default {
     async execute(
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
-        const { bot, io } = await import('#src/main.js');
         const player = interaction.client.music.players.get(
             interaction.guildId,
-        );
+        ) as QuaverPlayer;
         const oldPosition = interaction.options.getInteger('old_position');
         const newPosition = interaction.options.getInteger('new_position');
-        if (player.queue.tracks.length <= 1) {
-            await interaction.replyHandler.locale(
-                'CMD.MOVE.RESPONSE.QUEUE_INSUFFICIENT_TRACKS',
-                { type: MessageOptionsBuilderType.Error },
-            );
-            return;
-        }
-        if (
-            oldPosition > player.queue.tracks.length ||
-            newPosition > player.queue.tracks.length
-        ) {
-            await interaction.replyHandler.locale(
-                'CMD.MOVE.RESPONSE.OUT_OF_RANGE',
-                { type: MessageOptionsBuilderType.Error },
-            );
-            return;
-        }
-        if (oldPosition === newPosition) {
-            await interaction.replyHandler.locale(
-                'CMD.MOVE.RESPONSE.MOVING_IN_PLACE',
-                { type: MessageOptionsBuilderType.Error },
-            );
-            return;
-        }
-        player.queue.tracks.splice(
-            newPosition - 1,
-            0,
-            player.queue.tracks.splice(oldPosition - 1, 1)[0],
-        );
-        const track = player.queue.tracks[newPosition - 1];
-        if (settings.features.web.enabled) {
-            io.to(`guild:${interaction.guildId}`).emit(
-                'queueUpdate',
-                player.queue.tracks.map(
-                    (
-                        t: Song & { requesterTag: string },
-                    ): Song & { requesterTag: string } => {
-                        t.requesterTag = bot.users.cache.get(t.requester)?.tag;
-                        return t;
+        const response = await player.handler.move(oldPosition, newPosition);
+        switch (response) {
+            case PlayerResponse.QueueInsufficientTracks:
+                await interaction.replyHandler.locale(
+                    'CMD.MOVE.RESPONSE.QUEUE_INSUFFICIENT_TRACKS',
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
+            case PlayerResponse.InputOutOfRange:
+                await interaction.replyHandler.locale(
+                    'CMD.MOVE.RESPONSE.OUT_OF_RANGE',
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
+            case PlayerResponse.InputInvalid:
+                await interaction.replyHandler.locale(
+                    'CMD.MOVE.RESPONSE.MOVING_IN_PLACE',
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
+            case PlayerResponse.Success: {
+                const track = player.queue.tracks[newPosition - 1];
+                await interaction.replyHandler.locale(
+                    'CMD.MOVE.RESPONSE.SUCCESS',
+                    {
+                        vars: [
+                            escapeMarkdown(track.title),
+                            track.uri,
+                            oldPosition.toString(),
+                            newPosition.toString(),
+                        ],
+                        type: MessageOptionsBuilderType.Success,
                     },
-                ),
-            );
+                );
+            }
         }
-        await interaction.replyHandler.locale('CMD.MOVE.RESPONSE.SUCCESS', {
-            vars: [
-                escapeMarkdown(track.title),
-                track.uri,
-                oldPosition.toString(),
-                newPosition.toString(),
-            ],
-            type: MessageOptionsBuilderType.Success,
-        });
     },
 };

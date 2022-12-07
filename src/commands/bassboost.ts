@@ -1,3 +1,4 @@
+import { PlayerResponse } from '#src/lib/PlayerHandler.js';
 import type {
     QuaverInteraction,
     QuaverPlayer,
@@ -44,31 +45,14 @@ export default {
     async execute(
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
-        const { io } = await import('#src/main.js');
+        const enabled = interaction.options.getBoolean('enabled');
         const player = interaction.client.music.players.get(
             interaction.guildId,
         ) as QuaverPlayer;
-        const enabled = interaction.options.getBoolean('enabled');
-        const boost = enabled !== null ? enabled : !player.bassboost;
-        let eqValues: number[] = new Array(15).fill(0);
-        if (boost) {
-            eqValues = [
-                0.2,
-                0.15,
-                0.1,
-                0.05,
-                0.0,
-                ...new Array(10).fill(-0.05),
-            ];
-        }
-        await player.setEqualizer(...eqValues);
-        player.bassboost = boost;
-        if (settings.features.web.enabled) {
-            io.to(`guild:${interaction.guildId}`).emit('filterUpdate', {
-                bassboost: player.bassboost,
-                nightcore: player.nightcore,
-            });
-        }
+        const response = await player.handler.bassboost(
+            enabled !== null ? enabled : !player.bassboost,
+        );
+        if (response !== PlayerResponse.Success) return;
         await interaction.replyHandler.reply(
             new EmbedBuilder()
                 .setDescription(

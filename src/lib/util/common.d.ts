@@ -28,6 +28,8 @@ export type SearchStateRecord = {
     selected: Snowflake[];
 };
 
+export type WhitelistedFeatures = 'stay' | 'autolyrics';
+
 export type SettingsPageOptions =
     | 'premium'
     | 'language'

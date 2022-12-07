@@ -1,20 +1,22 @@
-import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
+import { PlayerResponse } from '#src/lib/PlayerHandler.js';
+import type {
+    QuaverInteraction,
+    QuaverPlayer,
+} from '#src/lib/util/common.d.js';
+import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
-import { getLocaleString } from '#src/lib/util/util.js';
-import type { Song } from '@lavaclient/queue';
+import {
+    getLocaleString,
+    getRequesterStatus,
+    RequesterStatus,
+} from '#src/lib/util/util.js';
 import type {
     ChatInputCommandInteraction,
     GuildMember,
     SlashCommandIntegerOption,
-    Snowflake,
 } from 'discord.js';
-import {
-    escapeMarkdown,
-    PermissionsBitField,
-    SlashCommandBuilder,
-} from 'discord.js';
+import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
 
 export default {
     data: new SlashCommandBuilder()
@@ -52,72 +54,47 @@ export default {
     async execute(
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
-        const { bot, io } = await import('#src/main.js');
+        const position = interaction.options.getInteger('position');
         const player = interaction.client.music.players.get(
             interaction.guildId,
+        ) as QuaverPlayer;
+        const track = player.queue.tracks[position - 1];
+        const requesterStatus = await getRequesterStatus(
+            track,
+            interaction.member as GuildMember,
+            player.queue.channel,
         );
-        const position = interaction.options.getInteger('position');
-        if (player.queue.tracks.length === 0) {
-            await interaction.replyHandler.locale(
-                'CMD.REMOVE.RESPONSE.QUEUE_EMPTY',
-                { type: MessageOptionsBuilderType.Error },
-            );
-            return;
-        }
-        if (position > player.queue.tracks.length) {
-            await interaction.replyHandler.locale('CHECK.INVALID_INDEX', {
-                type: MessageOptionsBuilderType.Error,
-            });
-            return;
-        }
-        const djRole = await data.guild.get<Snowflake>(
-            interaction.guild.id,
-            'settings.dj',
-        );
-        const dj =
-            djRole &&
-            (interaction.member as GuildMember).roles.cache.has(djRole);
-        const guildManager =
-            interaction.channel
-                .permissionsFor(interaction.member as GuildMember)
-                .missing(PermissionsBitField.Flags.ManageGuild).length === 0;
-        const botManager = settings.managers.includes(interaction.user.id);
-        if (
-            player.queue.tracks[position - 1].requester !==
-                interaction.user.id &&
-            !dj &&
-            !guildManager &&
-            !botManager
-        ) {
+        if (requesterStatus === RequesterStatus.NotRequester) {
             await interaction.replyHandler.locale('CHECK.NOT_REQUESTER', {
                 type: MessageOptionsBuilderType.Error,
             });
             return;
         }
-        const track = player.queue.remove(position - 1);
-        if (settings.features.web.enabled) {
-            io.to(`guild:${interaction.guildId}`).emit(
-                'queueUpdate',
-                player.queue.tracks.map(
-                    (
-                        t: Song & { requesterTag: string },
-                    ): Song & { requesterTag: string } => {
-                        t.requesterTag = bot.users.cache.get(t.requester)?.tag;
-                        return t;
+        const response = await player.handler.remove(position);
+        switch (response) {
+            case PlayerResponse.QueueInsufficientTracks:
+                await interaction.replyHandler.locale(
+                    'CMD.REMOVE.RESPONSE.QUEUE_EMPTY',
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
+            case PlayerResponse.InputOutOfRange:
+                await interaction.replyHandler.locale('CHECK.INVALID_INDEX', {
+                    type: MessageOptionsBuilderType.Error,
+                });
+                return;
+            default:
+                await interaction.replyHandler.locale(
+                    requesterStatus === RequesterStatus.Requester
+                        ? 'CMD.REMOVE.RESPONSE.SUCCESS.DEFAULT'
+                        : requesterStatus === RequesterStatus.ManagerBypass
+                        ? 'CMD.REMOVE.RESPONSE.SUCCESS.MANAGER'
+                        : 'CMD.REMOVE.RESPONSE.SUCCESS.FORCED',
+                    {
+                        vars: [escapeMarkdown(track.title), track.uri],
+                        type: MessageOptionsBuilderType.Success,
                     },
-                ),
-            );
+                );
         }
-        await interaction.replyHandler.locale(
-            track.requester === interaction.user.id
-                ? 'CMD.REMOVE.RESPONSE.SUCCESS.DEFAULT'
-                : dj || guildManager
-                ? 'CMD.REMOVE.RESPONSE.SUCCESS.FORCED'
-                : 'CMD.REMOVE.RESPONSE.SUCCESS.MANAGER',
-            {
-                vars: [escapeMarkdown(track.title), track.uri],
-                type: MessageOptionsBuilderType.Success,
-            },
-        );
     },
 };

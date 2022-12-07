@@ -1,5 +1,9 @@
+import { PlayerResponse } from '#src/lib/PlayerHandler.js';
 import { ForceType } from '#src/lib/ReplyHandler.js';
-import type { QuaverInteraction } from '#src/lib/util/common.d.js';
+import type {
+    QuaverInteraction,
+    QuaverPlayer,
+} from '#src/lib/util/common.d.js';
 import {
     confirmationTimeout,
     MessageOptionsBuilderType,
@@ -22,28 +26,37 @@ export default {
         const { io } = await import('#src/main.js');
         const player = interaction.client.music.players.get(
             interaction.guildId,
-        );
+        ) as QuaverPlayer;
         clearTimeout(confirmationTimeout[interaction.message.id]);
         delete confirmationTimeout[interaction.message.id];
-        if (player.queue.tracks.length === 0) {
-            await interaction.replyHandler.locale(
-                'CMD.CLEAR.RESPONSE.QUEUE_EMPTY',
-                {
-                    type: MessageOptionsBuilderType.Error,
-                    components: [],
-                    force: ForceType.Update,
-                },
-            );
-            return;
+        const response = await player.handler.clear();
+        switch (response) {
+            case PlayerResponse.QueueInsufficientTracks:
+                await interaction.replyHandler.locale(
+                    'CMD.CLEAR.RESPONSE.QUEUE_EMPTY',
+                    {
+                        type: MessageOptionsBuilderType.Error,
+                        components: [],
+                        force: ForceType.Update,
+                    },
+                );
+                return;
+            case PlayerResponse.Success:
+                player.queue.clear();
+                if (settings.features.web.enabled) {
+                    io.to(`guild:${interaction.guildId}`).emit(
+                        'queueUpdate',
+                        [],
+                    );
+                }
+                await interaction.replyHandler.locale(
+                    'CMD.CLEAR.RESPONSE.SUCCESS',
+                    {
+                        type: MessageOptionsBuilderType.Success,
+                        components: [],
+                        force: ForceType.Update,
+                    },
+                );
         }
-        player.queue.clear();
-        if (settings.features.web.enabled) {
-            io.to(`guild:${interaction.guildId}`).emit('queueUpdate', []);
-        }
-        await interaction.replyHandler.locale('CMD.CLEAR.RESPONSE.SUCCESS', {
-            type: MessageOptionsBuilderType.Success,
-            components: [],
-            force: ForceType.Update,
-        });
     },
 };

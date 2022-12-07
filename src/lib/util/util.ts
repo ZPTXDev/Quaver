@@ -1,9 +1,12 @@
 import type {
     MessageOptionsBuilderInputs,
     MessageOptionsBuilderOptions,
+    QuaverChannels,
     QuaverClient,
+    QuaverSong,
     SettingsPage,
     SettingsPageOptions,
+    WhitelistedFeatures,
 } from '#src/lib/util/common.d.js';
 import {
     data,
@@ -31,6 +34,7 @@ import {
     EmbedBuilder,
     escapeMarkdown,
     GuildMember,
+    PermissionsBitField,
     RoleSelectMenuBuilder,
     StringSelectMenuBuilder,
 } from 'discord.js';
@@ -315,6 +319,99 @@ export function checkLocaleCompletion(
     return { completion: 100, missing: [] };
 }
 
+export enum WhitelistStatus {
+    /**
+     * The guild is not whitelisted
+     */
+    NotWhitelisted,
+    /**
+     * The whitelist has expired
+     */
+    Expired,
+    /**
+     * The whitelist is temporary
+     */
+    Temporary,
+    /**
+     * The whitelist is permanent
+     */
+    Permanent,
+}
+
+/**
+ * Checks if a guild is whitelisted for a feature.
+ * @param guildId - The guild ID.
+ * @param feature - The feature to check.
+ * @returns Whether the guild is whitelisted.
+ */
+export async function getGuildFeatureWhitelisted(
+    guildId: Snowflake,
+    feature: WhitelistedFeatures,
+): Promise<WhitelistStatus> {
+    const whitelisted = await data.guild.get<number>(
+        guildId,
+        `features.${feature}.whitelisted`,
+    );
+    if (!whitelisted) return WhitelistStatus.NotWhitelisted;
+    if (whitelisted !== -1 && Date.now() > whitelisted) {
+        return WhitelistStatus.Expired;
+    }
+    if (whitelisted === -1) return WhitelistStatus.Permanent;
+    return WhitelistStatus.Temporary;
+}
+
+export enum RequesterStatus {
+    /**
+     * The user is not the requester
+     */
+    NotRequester,
+    /**
+     * The user is not the requester, but has a role that can bypass typical requester checks
+     */
+    RoleBypass,
+    /**
+     * The user is not the requester, but has a permission (Manage Server) that can bypass typical requester checks
+     */
+    PermissionBypass,
+    /**
+     * The user is not the requester, but is a manager defined in settings.json
+     */
+    ManagerBypass,
+    /**
+     * The user is the requester
+     */
+    Requester,
+}
+
+/**
+ * Returns the requester status of a user for a track.
+ * @param track - The track to check against.
+ * @param member - The member to check permissions for.
+ * @param channel - The channel to check against.
+ * @returns Whether the member is the requester of the track.
+ */
+export async function getRequesterStatus(
+    track: QuaverSong,
+    member: GuildMember,
+    channel: QuaverChannels,
+): Promise<RequesterStatus> {
+    if (track.requester === member.id) return RequesterStatus.Requester;
+    const djRole = await data.guild.get<Snowflake>(
+        member.guild.id,
+        'settings.dj',
+    );
+    const dj = djRole && member.roles.cache.has(djRole);
+    if (dj) return RequesterStatus.RoleBypass;
+    const guildManager =
+        channel
+            .permissionsFor(member)
+            .missing(PermissionsBitField.Flags.ManageGuild).length === 0;
+    if (guildManager) return RequesterStatus.PermissionBypass;
+    const botManager = settings.managers.includes(member.id);
+    if (botManager) return RequesterStatus.ManagerBypass;
+    return RequesterStatus.NotRequester;
+}
+
 /**
  * Returns an absolute file URL, readable by the ESM loader.
  * @param baseURL - The base URL of the module.
@@ -476,13 +573,13 @@ export async function buildSettingsPage(
             };
             const features = Object.keys(whitelisted)
                 .filter(
-                    (key: 'stay' | 'autolyrics'): boolean =>
+                    (key: WhitelistedFeatures): boolean =>
                         settings.features[key].enabled &&
                         settings.features[key].whitelist &&
                         settings.features[key].premium,
                 )
                 .map(
-                    (key: 'stay' | 'autolyrics'): string =>
+                    (key: WhitelistedFeatures): string =>
                         `**${getLocaleString(
                             guildLocaleCode,
                             `CMD.SETTINGS.MISC.PREMIUM.FEATURES.${key.toUpperCase()}`,

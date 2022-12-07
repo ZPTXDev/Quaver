@@ -1,7 +1,8 @@
+import { PlayerResponse } from '#src/lib/PlayerHandler.js';
 import { ForceType } from '#src/lib/ReplyHandler.js';
 import type { QuaverPlayer } from '#src/lib/util/common.d.js';
-import type { Song } from '@lavaclient/queue';
-import type { APIGuild, APIUser, Snowflake } from 'discord.js';
+import { getRequesterStatus, RequesterStatus } from '#src/lib/util/util.js';
+import type { APIGuild, APIUser, GuildMember, Snowflake } from 'discord.js';
 import type { Socket } from 'socket.io';
 
 export default {
@@ -15,7 +16,7 @@ export default {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         item: { type: UpdateItemType; value?: any },
     ): Promise<void> {
-        const { bot, io } = await import('#src/main.js');
+        const { bot } = await import('#src/main.js');
         if (!socket.guilds) return callback({ status: 'error-auth' });
         if (!socket.guilds.find((guild): boolean => guild.id === guildId)) {
             return callback({ status: 'error-auth' });
@@ -29,32 +30,49 @@ export default {
         }
         switch (item.type) {
             case UpdateItemType.Loop: {
-                const player = bot.music.players.get(guildId);
+                const player = bot.music.players.get(guildId) as QuaverPlayer;
                 if (!player) return callback({ status: 'error-generic' });
-                player.queue.setLoop(item.value);
-                io.to(`guild:${guildId}`).emit('loopUpdate', item.value);
+                const response = await player.handler.loop(item.value);
+                if (response !== PlayerResponse.Success) {
+                    return callback({ status: 'error-generic' });
+                }
                 break;
             }
             case UpdateItemType.Volume: {
-                const player = bot.music.players.get(guildId);
+                const player = bot.music.players.get(guildId) as QuaverPlayer;
                 if (!player) return callback({ status: 'error-generic' });
-                player.setVolume(item.value);
-                io.to(`guild:${guildId}`).emit('volumeUpdate', item.value);
+                const response = await player.handler.volume(item.value);
+                if (response !== PlayerResponse.Success) {
+                    return callback({ status: 'error-generic' });
+                }
                 break;
             }
             case UpdateItemType.Paused: {
-                const player = bot.music.players.get(guildId);
+                const player = bot.music.players.get(guildId) as QuaverPlayer;
                 if (!player) return callback({ status: 'error-generic' });
-                player.pause(item.value);
-                io.to(`guild:${guildId}`).emit('pauseUpdate', item.value);
+                const response = item.value
+                    ? await player.handler.pause()
+                    : await player.handler.resume();
+                if (response !== PlayerResponse.Success) {
+                    return callback({ status: 'error-generic' });
+                }
                 break;
             }
             case UpdateItemType.Skip: {
                 const player = bot.music.players.get(guildId) as QuaverPlayer;
                 if (!player) return callback({ status: 'error-generic' });
-                if (player.queue.current.requester === socket.user.id) {
-                    await player.queue.skip();
-                    await player.queue.start();
+                const requesterStatus = await getRequesterStatus(
+                    player.queue.current,
+                    bot.guilds.cache
+                        .get(guildId)
+                        .members.cache.get(socket.user.id) as GuildMember,
+                    player.queue.channel,
+                );
+                if (requesterStatus !== RequesterStatus.NotRequester) {
+                    const response = await player.handler.skip();
+                    if (response !== PlayerResponse.Success) {
+                        return callback({ status: 'error-generic' });
+                    }
                     break;
                 }
                 const skip = player.skip ?? {
@@ -72,8 +90,10 @@ export default {
                 }
                 skip.users.push(socket.user.id);
                 if (skip.users.length >= skip.required) {
-                    await player.queue.skip();
-                    await player.queue.start();
+                    const response = await player.handler.skip();
+                    if (response !== PlayerResponse.Success) {
+                        return callback({ status: 'error-generic' });
+                    }
                     break;
                 }
                 player.skip = skip;
@@ -82,97 +102,56 @@ export default {
             case UpdateItemType.Bassboost: {
                 const player = bot.music.players.get(guildId) as QuaverPlayer;
                 if (!player) return callback({ status: 'error-generic' });
-                let eqValues: number[] = Array(15).fill(0);
-                if (item.value) {
-                    eqValues = [
-                        0.2,
-                        0.15,
-                        0.1,
-                        0.05,
-                        0.0,
-                        ...new Array(10).fill(-0.05),
-                    ];
+                const response = await player.handler.bassboost(item.value);
+                if (response !== PlayerResponse.Success) {
+                    return callback({ status: 'error-generic' });
                 }
-                // i don't get it, if this breaks something we know where to look
-                await player.setEqualizer(...eqValues);
-                player.bassboost = item.value;
-                io.to(`guild:${guildId}`).emit('filterUpdate', {
-                    bassboost: player.bassboost,
-                    nightcore: player.nightcore,
-                });
                 break;
             }
             case UpdateItemType.Nightcore: {
                 const player = bot.music.players.get(guildId) as QuaverPlayer;
                 if (!player) return callback({ status: 'error-generic' });
-                player.filters.timescale = item.value
-                    ? { speed: 1.125, pitch: 1.125, rate: 1 }
-                    : undefined;
-                await player.setFilters();
-                player.nightcore = item.value;
-                io.to(`guild:${guildId}`).emit('filterUpdate', {
-                    bassboost: player.bassboost,
-                    nightcore: player.nightcore,
-                });
+                const response = await player.handler.nightcore(item.value);
+                if (response !== PlayerResponse.Success) {
+                    return callback({ status: 'error-generic' });
+                }
                 break;
             }
             case UpdateItemType.Seek: {
-                const player = bot.music.players.get(guildId);
+                const player = bot.music.players.get(guildId) as QuaverPlayer;
                 if (!player) return callback({ status: 'error-generic' });
-                if (player.queue.current.requester !== socket.user.id) {
+                const requesterStatus = await getRequesterStatus(
+                    player.queue.current,
+                    bot.guilds.cache
+                        .get(guildId)
+                        .members.cache.get(socket.user.id) as GuildMember,
+                    player.queue.channel,
+                );
+                if (requesterStatus === RequesterStatus.NotRequester) {
                     return callback({ status: 'error-auth' });
                 }
-                await player.seek(item.value);
+                const response = await player.handler.seek(item.value);
+                if (response !== PlayerResponse.Success) {
+                    return callback({ status: 'error-generic' });
+                }
                 break;
             }
             case UpdateItemType.Remove: {
-                const player = bot.music.players.get(guildId);
+                const player = bot.music.players.get(guildId) as QuaverPlayer;
                 if (!player) return callback({ status: 'error-generic' });
-                player.queue.remove(item.value);
-                io.to(`guild:${guildId}`).emit(
-                    'queueUpdate',
-                    player.queue.tracks.map(
-                        (
-                            t: Song & { requesterTag: string },
-                        ): Song & { requesterTag: string } => {
-                            t.requesterTag = bot.users.cache.get(
-                                t.requester,
-                            )?.tag;
-                            return t;
-                        },
-                    ),
-                );
+                const response = await player.handler.remove(item.value + 1);
+                if (response !== PlayerResponse.Success) {
+                    return callback({ status: 'error-generic' });
+                }
                 break;
             }
             case UpdateItemType.Shuffle: {
-                const player = bot.music.players.get(guildId);
+                const player = bot.music.players.get(guildId) as QuaverPlayer;
                 if (!player) return callback({ status: 'error-generic' });
-                let currentIndex = player.queue.tracks.length,
-                    randomIndex;
-                while (currentIndex !== 0) {
-                    randomIndex = Math.floor(Math.random() * currentIndex);
-                    currentIndex--;
-                    [
-                        player.queue.tracks[currentIndex],
-                        player.queue.tracks[randomIndex],
-                    ] = [
-                        player.queue.tracks[randomIndex],
-                        player.queue.tracks[currentIndex],
-                    ];
+                const response = await player.handler.shuffle();
+                if (response !== PlayerResponse.Success) {
+                    return callback({ status: 'error-generic' });
                 }
-                io.to(`guild:${player.guildId}`).emit(
-                    'queueUpdate',
-                    player.queue.tracks.map(
-                        (
-                            t: Song & { requesterTag: string },
-                        ): Song & { requesterTag: string } => {
-                            t.requesterTag = bot.users.cache.get(
-                                t.requester,
-                            )?.tag;
-                            return t;
-                        },
-                    ),
-                );
                 break;
             }
         }

@@ -24,7 +24,7 @@ export default {
                     false,
                 );
             }
-            return player.handler.disconnect();
+            await player.handler.disconnect();
         }
     },
 };

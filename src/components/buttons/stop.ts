@@ -1,3 +1,4 @@
+import { PlayerResponse } from '#src/lib/PlayerHandler.js';
 import { ForceType } from '#src/lib/ReplyHandler.js';
 import type {
     QuaverInteraction,
@@ -8,7 +9,6 @@ import {
     MessageOptionsBuilderType,
 } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
-import { settings } from '#src/lib/util/settings.js';
 import type { ButtonInteraction } from 'discord.js';
 
 export default {
@@ -22,33 +22,32 @@ export default {
     async execute(
         interaction: QuaverInteraction<ButtonInteraction>,
     ): Promise<void> {
-        const { io } = await import('#src/main.js');
         const player = interaction.client.music.players.get(
             interaction.guildId,
         ) as QuaverPlayer;
         clearTimeout(confirmationTimeout[interaction.message.id]);
         delete confirmationTimeout[interaction.message.id];
-        if (!player.queue.current || (!player.playing && !player.paused)) {
-            await interaction.replyHandler.locale(
-                'MUSIC.PLAYER.PLAYING.NOTHING',
-                {
-                    type: MessageOptionsBuilderType.Error,
-                    components: [],
-                    force: ForceType.Update,
-                },
-            );
-            return;
+        const response = await player.handler.stop();
+        switch (response) {
+            case PlayerResponse.PlayerIdle:
+                await interaction.replyHandler.locale(
+                    'MUSIC.PLAYER.PLAYING.NOTHING',
+                    {
+                        type: MessageOptionsBuilderType.Error,
+                        components: [],
+                        force: ForceType.Update,
+                    },
+                );
+                return;
+            case PlayerResponse.Success:
+                await interaction.replyHandler.locale(
+                    'CMD.STOP.RESPONSE.SUCCESS',
+                    {
+                        type: MessageOptionsBuilderType.Success,
+                        components: [],
+                        force: ForceType.Update,
+                    },
+                );
         }
-        player.queue.clear();
-        await player.queue.skip();
-        await player.queue.start();
-        if (settings.features.web.enabled) {
-            io.to(`guild:${interaction.guildId}`).emit('queueUpdate', []);
-        }
-        await interaction.replyHandler.locale('CMD.STOP.RESPONSE.SUCCESS', {
-            type: MessageOptionsBuilderType.Success,
-            components: [],
-            force: ForceType.Update,
-        });
     },
 };

@@ -1,4 +1,8 @@
-import type { QuaverInteraction } from '#src/lib/util/common.d.js';
+import { PlayerResponse } from '#src/lib/PlayerHandler.js';
+import type {
+    QuaverInteraction,
+    QuaverPlayer,
+} from '#src/lib/util/common.d.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
@@ -63,10 +67,9 @@ export default {
     async execute(
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
-        const { io } = await import('#src/main.js');
         const player = interaction.client.music.players.get(
             interaction.guildId,
-        );
+        ) as QuaverPlayer;
         const type = interaction.options.getString('type');
         let loop, typeLocale;
         switch (type) {
@@ -93,10 +96,8 @@ export default {
                 break;
         }
         typeLocale = typeLocale.toLowerCase();
-        player.queue.setLoop(loop);
-        if (settings.features.web.enabled) {
-            io.to(`guild:${interaction.guildId}`).emit('loopUpdate', loop);
-        }
+        const response = await player.handler.loop(loop);
+        if (response !== PlayerResponse.Success) return;
         await interaction.replyHandler.locale('CMD.LOOP.RESPONSE.SUCCESS', {
             vars: [typeLocale],
         });

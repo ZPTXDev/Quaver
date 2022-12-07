@@ -94,7 +94,7 @@ export default {
                 'MUSIC.DISCONNECT.ALONE.DISCONNECTED.DEFAULT',
                 { type: MessageOptionsBuilderType.Warning },
             );
-            return queue.player.handler.disconnect();
+            await queue.player.handler.disconnect();
         }
     },
 };

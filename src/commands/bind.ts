@@ -1,3 +1,4 @@
+import { PlayerResponse } from '#src/lib/PlayerHandler.js';
 import type {
     QuaverChannels,
     QuaverInteraction,
@@ -11,11 +12,7 @@ import type {
     ChatInputCommandInteraction,
     SlashCommandChannelOption,
 } from 'discord.js';
-import {
-    ChannelType,
-    PermissionsBitField,
-    SlashCommandBuilder,
-} from 'discord.js';
+import { ChannelType, SlashCommandBuilder } from 'discord.js';
 
 export default {
     data: new SlashCommandBuilder()
@@ -53,47 +50,50 @@ export default {
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
         const { io } = await import('#src/main.js');
-        const player = interaction.client.music.players.get(
-            interaction.guildId,
-        ) as QuaverPlayer;
         const channel = interaction.options.getChannel(
             'new_channel',
         ) as QuaverChannels;
-        if (
-            !channel
-                .permissionsFor(interaction.client.user.id)
-                .has(
-                    new PermissionsBitField([
-                        PermissionsBitField.Flags.ViewChannel,
-                        PermissionsBitField.Flags.SendMessages,
-                    ]),
-                )
-        ) {
-            await interaction.replyHandler.locale(
-                'CMD.BIND.RESPONSE.PERMISSIONS_INSUFFICIENT',
-                { vars: [channel.id], type: MessageOptionsBuilderType.Error },
-            );
-            return;
+        const player = interaction.client.music.players.get(
+            interaction.guildId,
+        ) as QuaverPlayer;
+        const response = await player.handler.bind(channel);
+        switch (response) {
+            case PlayerResponse.InsufficientPermissions:
+                await interaction.replyHandler.locale(
+                    'CMD.BIND.RESPONSE.PERMISSIONS_INSUFFICIENT',
+                    {
+                        vars: [channel.id],
+                        type: MessageOptionsBuilderType.Error,
+                    },
+                );
+                return;
+            case PlayerResponse.Success:
+                player.queue.channel = channel;
+                if (settings.features.web.enabled) {
+                    io.to(`guild:${interaction.guildId}`).emit(
+                        'textChannelUpdate',
+                        channel.name,
+                    );
+                }
+                if (
+                    await data.guild.get(
+                        interaction.guildId,
+                        'settings.stay.enabled',
+                    )
+                ) {
+                    await data.guild.set(
+                        interaction.guildId,
+                        'settings.stay.text',
+                        channel.id,
+                    );
+                }
+                await interaction.replyHandler.locale(
+                    'CMD.BIND.RESPONSE.SUCCESS',
+                    {
+                        vars: [channel.id],
+                        type: MessageOptionsBuilderType.Success,
+                    },
+                );
         }
-        player.queue.channel = channel;
-        if (settings.features.web.enabled) {
-            io.to(`guild:${interaction.guildId}`).emit(
-                'textChannelUpdate',
-                channel.name,
-            );
-        }
-        if (
-            await data.guild.get(interaction.guildId, 'settings.stay.enabled')
-        ) {
-            await data.guild.set(
-                interaction.guildId,
-                'settings.stay.text',
-                channel.id,
-            );
-        }
-        await interaction.replyHandler.locale('CMD.BIND.RESPONSE.SUCCESS', {
-            vars: [channel.id],
-            type: MessageOptionsBuilderType.Success,
-        });
     },
 };

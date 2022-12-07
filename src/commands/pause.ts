@@ -1,4 +1,8 @@
-import type { QuaverInteraction } from '#src/lib/util/common.d.js';
+import { PlayerResponse } from '#src/lib/PlayerHandler.js';
+import type {
+    QuaverInteraction,
+    QuaverPlayer,
+} from '#src/lib/util/common.d.js';
 import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
@@ -28,26 +32,22 @@ export default {
     async execute(
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
-        const { io } = await import('#src/main.js');
         const player = interaction.client.music.players.get(
             interaction.guildId,
-        );
-        if (player.paused) {
-            await interaction.replyHandler.locale(
-                'CMD.PAUSE.RESPONSE.STATE_UNCHANGED',
-                { type: MessageOptionsBuilderType.Error },
-            );
-            return;
+        ) as QuaverPlayer;
+        const response = await player.handler.pause();
+        switch (response) {
+            case PlayerResponse.PlayerStateUnchanged:
+                await interaction.replyHandler.locale(
+                    'CMD.PAUSE.RESPONSE.STATE_UNCHANGED',
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
+            case PlayerResponse.Success:
+                await interaction.replyHandler.locale(
+                    'CMD.PAUSE.RESPONSE.SUCCESS',
+                    { type: MessageOptionsBuilderType.Success },
+                );
         }
-        await player.pause();
-        if (settings.features.web.enabled) {
-            io.to(`guild:${interaction.guildId}`).emit(
-                'pauseUpdate',
-                player.paused,
-            );
-        }
-        await interaction.replyHandler.locale('CMD.PAUSE.RESPONSE.SUCCESS', {
-            type: MessageOptionsBuilderType.Success,
-        });
     },
 };

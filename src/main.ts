@@ -5,7 +5,11 @@ import type {
     ModalSubmit,
     SelectMenu,
 } from '#src/events/interactionCreate.d.js';
-import type { QuaverClient, QuaverPlayer } from '#src/lib/util/common.d.js';
+import type {
+    QuaverClient,
+    QuaverPlayer,
+    WhitelistedFeatures,
+} from '#src/lib/util/common.d.js';
 import {
     data,
     logger,
@@ -100,9 +104,7 @@ rl.on('line', async (input): Promise<void> => {
                 case 'autolyrics':
                     featureName = 'Auto Lyrics';
             }
-            if (
-                !settings.features[feature as 'stay' | 'autolyrics'].whitelist
-            ) {
+            if (!settings.features[feature as WhitelistedFeatures].whitelist) {
                 console.log(`The ${featureName} whitelist is not enabled.`);
                 break;
             }

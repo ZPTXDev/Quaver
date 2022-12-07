@@ -1,4 +1,8 @@
-import type { QuaverInteraction } from '#src/lib/util/common.d.js';
+import { PlayerResponse } from '#src/lib/PlayerHandler.js';
+import type {
+    QuaverInteraction,
+    QuaverPlayer,
+} from '#src/lib/util/common.d.js';
 import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
@@ -45,10 +49,9 @@ export default {
     async execute(
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
-        const { io } = await import('#src/main.js');
         const player = interaction.client.music.players.get(
             interaction.guildId,
-        );
+        ) as QuaverPlayer;
         const volume = interaction.options.getInteger('new_volume');
         if (volume > 200 && !settings.managers.includes(interaction.user.id)) {
             await interaction.replyHandler.locale(
@@ -57,10 +60,8 @@ export default {
             );
             return;
         }
-        await player.setVolume(volume);
-        if (settings.features.web.enabled) {
-            io.to(`guild:${interaction.guildId}`).emit('volumeUpdate', volume);
-        }
+        const response = await player.handler.volume(volume);
+        if (response !== PlayerResponse.Success) return;
         await interaction.replyHandler.reply(
             new EmbedBuilder()
                 .setDescription(

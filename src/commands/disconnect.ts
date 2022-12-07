@@ -1,10 +1,10 @@
+import { PlayerResponse } from '#src/lib/PlayerHandler.js';
 import type {
     QuaverInteraction,
     QuaverPlayer,
 } from '#src/lib/util/common.d.js';
 import {
     confirmationTimeout,
-    data,
     logger,
     MessageOptionsBuilderType,
 } from '#src/lib/util/common.js';
@@ -47,25 +47,25 @@ export default {
     async execute(
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
-        if (
-            await data.guild.get(interaction.guildId, 'settings.stay.enabled')
-        ) {
-            await interaction.replyHandler.locale(
-                'CMD.DISCONNECT.RESPONSE.FEATURE_247_ENABLED',
-                { type: MessageOptionsBuilderType.Error },
-            );
-            return;
-        }
         const player = interaction.client.music.players.get(
             interaction.guildId,
         ) as QuaverPlayer;
         if (player.queue.tracks.length === 0) {
-            await player.handler.disconnect();
-            await interaction.replyHandler.locale(
-                'CMD.DISCONNECT.RESPONSE.SUCCESS',
-                { type: MessageOptionsBuilderType.Success },
-            );
-            return;
+            const response = await player.handler.disconnect();
+            switch (response) {
+                case PlayerResponse.FeatureConflict:
+                    await interaction.replyHandler.locale(
+                        'CMD.DISCONNECT.RESPONSE.FEATURE_247_ENABLED',
+                        { type: MessageOptionsBuilderType.Error },
+                    );
+                    return;
+                case PlayerResponse.Success:
+                    await interaction.replyHandler.locale(
+                        'CMD.DISCONNECT.RESPONSE.SUCCESS',
+                        { type: MessageOptionsBuilderType.Success },
+                    );
+                    return;
+            }
         }
         const msg = await interaction.replyHandler.reply(
             new EmbedBuilder()

@@ -173,7 +173,8 @@ export default {
                                   },
                               );
                     }
-                    return player.handler.disconnect();
+                    await player.handler.disconnect();
+                    return;
                 }
             }
             const firstPosition = player.queue.tracks.length + 1;
