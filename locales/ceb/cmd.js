@@ -190,6 +190,24 @@ export default {
 		DESCRIPTION: 'Usba ang mga setting ni Quaver sa dinhi nga server.',
 		RESPONSE: { HEADER: 'Mga setting sa **%1**' },
 		MISC: {
+			PREMIUM: {
+				NAME: 'Premium',
+				DESCRIPTION: 'Premium nga mga feature alang niini nga server.',
+				FEATURES: {
+					STAY: '24/7 Mode',
+					AUTOLYRICS: 'Auto Lyrics'
+				},
+				DISPLAY: {
+					UNLOCKED: {
+						PERMANENT: 'Anaa **hangtod sa kahangturan**',
+						TEMPORARY: 'Anaa hangtod sa **<t:%1:f>**'
+					},
+					LOCKED: {
+						DEFAULT: 'Nagkinahanglan og Premium',
+						EXPIRED: 'Na-expire sa **<t:%1:f>**'
+					}
+				}
+			},
 			LANGUAGE: {
 				NAME: 'Lengguwahe',
 				DESCRIPTION: 'Ang lengguwahe nga gamiton alang niini nga server.'
@@ -204,6 +222,18 @@ export default {
 				OPTIONS: {
 					SIMPLE: 'Simple',
 					DETAILED: 'Detalyado'
+				}
+			},
+			DJ: {
+				NAME: 'DJ Role',
+				DESCRIPTION: 'Usa ka role nga nagtugot og requester check bypass.'
+			},
+			AUTOLYRICS: {
+				NAME: 'Auto Lyrics',
+				DESCRIPTION: 'Awtomatikong ipadala ang lyrics alang sa matag track.',
+				OPTIONS: {
+					ENABLED: 'Gi-enable',
+					DISABLED: 'Gi-disable'
 				}
 			}
 		}
