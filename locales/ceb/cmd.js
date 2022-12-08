@@ -45,7 +45,7 @@ export default {
 		DESCRIPTION: 'Ipakita ang impormasyon bahin ni Quaver.',
 		RESPONSE: {
 			SUCCESS: 'Open-source nga music bot para sa ginagmay na mga komunidad.\nNagdagan sa bersyong `%1`.',
-			MENTION: 'Hi! Si Quaver kay nigamit og [Mga slash command](https://support.discord.com/hc/en-us/articles/1500000368501-Slash-Commands-FAQ).\nAlang sa dugang impormasyon bahin ni Quaver, sulayi ang </info:%1>. Aron makapatugtog og track, sulayi ang </play:%2> o </search:%3>.'
+			MENTION: 'Hi! Si Quaver kay nigamit og [Mga slash command](https://support.discord.com/hc/en-us/articles/1500000368501-Slash-Commands-FAQ).\nPara sa dugang nga impormasyon bahin ni Quaver, gamita ang </info:%1>.\nAron makapatugtog og track, sulayi ang </play:%2> o </search:%3>.\nAron ma-configure si Quaver, gamita ang </settings:%4>.'
 		},
 		MISC: {
 			SOURCE_CODE: 'Source Code',

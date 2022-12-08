@@ -45,7 +45,7 @@ export default {
 		DESCRIPTION: 'Magpakita ng impormasyon tungkol kay Quaver.',
 		RESPONSE: {
 			SUCCESS: 'Open-source na music bot para sa maliliit na mga komunidad.\nTumatakbo sa bersyong `%1`.',
-			MENTION: 'Hi! Gumagamit si Quaver ng [Mga slash command](https://support.discord.com/hc/en-us/articles/1500000368501-Slash-Commands-FAQ).\nPara sa higit pang impormasyon tungkol kay Quaver, subukan ang </info:%1>. Upang mag-play ng track, subukan ang </play:%2> o </search:%3>.'
+			MENTION: 'Hi! Gumagamit si Quaver ng [Mga slash command](https://support.discord.com/hc/en-us/articles/1500000368501-Slash-Commands-FAQ).\nPara sa karagdagang impormasyon tungkol kay Quaver, gamitin ang </info:%1>.\nUpang mag-play ng track, subukan ang </play:%2> o </search:%3>.\nUpang i-configure si Quaver, gamitin ang </settings:%4>.'
 		},
 		MISC: {
 			SOURCE_CODE: 'Source Code',
@@ -190,6 +190,24 @@ export default {
 		DESCRIPTION: 'Baguhin ang mga setting ni Quaver sa server na ito.',
 		RESPONSE: { HEADER: 'Mga setting sa **%1**' },
 		MISC: {
+			PREMIUM: {
+				NAME: 'Premium',
+				DESCRIPTION: 'Mga premium na feature para sa server na ito.',
+				FEATURES: {
+					STAY: '24/7 Mode',
+					AUTOLYRICS: 'Auto Lyrics'
+				},
+				DISPLAY: {
+					UNLOCKED: {
+						PERMANENT: 'Available **magpakailanman**',
+						TEMPORARY: 'Available hanggang **<t:%1:f>**'
+					},
+					LOCKED: {
+						DEFAULT: 'Nangangailangan ng Premium',
+						EXPIRED: 'Nag-expire noong **<t:%1:f>**'
+					}
+				}
+			},
 			LANGUAGE: {
 				NAME: 'Wika',
 				DESCRIPTION: 'Ang wikang gagamitin sa server na ito.'
@@ -204,6 +222,18 @@ export default {
 				OPTIONS: {
 					SIMPLE: 'Simple',
 					DETAILED: 'Detalyado'
+				}
+			},
+			DJ: {
+				NAME: 'DJ Role',
+				DESCRIPTION: 'Isang role nagbibigay-daan sa requester check bypass.'
+			},
+			AUTOLYRICS: {
+				NAME: 'Auto Lyrics',
+				DESCRIPTION: 'Awtomatikong magpadala ng lyrics para sa bawat track.',
+				OPTIONS: {
+					ENABLED: 'Naka-enable',
+					DISABLED: 'Naka-disable'
 				}
 			}
 		}
