@@ -28,14 +28,15 @@ export type SearchStateRecord = {
     selected: Snowflake[];
 };
 
-export type WhitelistedFeatures = 'stay' | 'autolyrics';
+export type WhitelistedFeatures = 'stay' | 'autolyrics' | 'smartqueue';
 
 export type SettingsPageOptions =
     | 'premium'
     | 'language'
     | 'format'
     | 'dj'
-    | 'autolyrics';
+    | 'autolyrics'
+    | 'smartqueue';
 
 export type SettingsPage = {
     current: string;

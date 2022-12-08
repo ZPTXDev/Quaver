@@ -92,8 +92,8 @@ rl.on('line', async (input): Promise<void> => {
                 console.log('Guild not found.');
                 break;
             }
-            if (!['stay', 'autolyrics'].includes(feature)) {
-                console.log('Available features: stay, autolyrics');
+            if (!['stay', 'autolyrics', 'smartqueue'].includes(feature)) {
+                console.log('Available features: stay, autolyrics, smartqueue');
                 break;
             }
             let featureName = '';
@@ -103,6 +103,9 @@ rl.on('line', async (input): Promise<void> => {
                     break;
                 case 'autolyrics':
                     featureName = 'Auto Lyrics';
+                    break;
+                case 'smartqueue':
+                    featureName = 'Smart Queue';
             }
             if (!settings.features[feature as WhitelistedFeatures].whitelist) {
                 console.log(`The ${featureName} whitelist is not enabled.`);

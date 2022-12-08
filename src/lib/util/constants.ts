@@ -33,4 +33,5 @@ export const settingsOptions = [
     'format',
     'dj',
     'autolyrics',
+    'smartqueue',
 ];

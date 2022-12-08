@@ -229,7 +229,8 @@ export default {
 				DESCRIPTION: 'Premium features for this server.',
 				FEATURES: {
 					STAY: '24/7 Mode',
-					AUTOLYRICS: 'Auto Lyrics'
+					AUTOLYRICS: 'Auto Lyrics',
+					SMARTQUEUE: 'Smart Queue'
 				},
 				DISPLAY: {
 					UNLOCKED: {
@@ -264,11 +265,11 @@ export default {
 			},
 			AUTOLYRICS: {
 				NAME: 'Auto Lyrics',
-				DESCRIPTION: 'Automatically send lyrics for every track.',
-				OPTIONS: {
-					ENABLED: 'Enabled',
-					DISABLED: 'Disabled'
-				}
+				DESCRIPTION: 'Automatically send lyrics for every track.'
+			},
+			SMARTQUEUE: {
+				NAME: 'Smart Queue',
+				DESCRIPTION: 'Sorts the queue to alternate between requesters.'
 			}
 		}
 	},

@@ -17,5 +17,9 @@ export default {
 	ADD: 'Add',
 	DASHBOARD: 'Dashboard',
 	GET_PREMIUM: 'Get Premium',
-	NONE: 'None'
+	NONE: 'None',
+	ENABLED: 'Enabled',
+	DISABLED: 'Disabled',
+	ENABLE: 'Enable',
+	DISABLE: 'Disable'
 };

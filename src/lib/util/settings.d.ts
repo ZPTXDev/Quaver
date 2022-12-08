@@ -45,6 +45,7 @@ export type LavalinkReconnectSettingsObject = {
 export type FeaturesSettingsObject = {
     autolyrics?: AutoLyricsFeatureSettingsObject;
     stay?: StayFeatureSettingsObject;
+    smartqueue?: SmartQueueFeatureSettingsObject;
     spotify?: SpotifyFeatureSettingsObject;
     web?: WebFeatureSettingsObject;
 };
@@ -56,6 +57,12 @@ export type AutoLyricsFeatureSettingsObject = {
 };
 
 export type StayFeatureSettingsObject = {
+    enabled?: boolean;
+    whitelist?: boolean;
+    premium?: boolean;
+};
+
+export type SmartQueueFeatureSettingsObject = {
     enabled?: boolean;
     whitelist?: boolean;
     premium?: boolean;

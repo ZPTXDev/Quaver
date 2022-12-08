@@ -5,7 +5,7 @@ import type {
     QuaverPlayer,
     QuaverSong,
 } from '#src/lib/util/common.d.js';
-import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
+import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
@@ -279,6 +279,10 @@ export default {
             next: insert,
         });
         const started = player.playing || player.paused;
+        const smartQueue = await data.guild.get<boolean>(
+            interaction.guildId,
+            'settings.smartqueue',
+        );
         await interaction.replyHandler.reply(
             new EmbedBuilder()
                 .setDescription(
@@ -289,20 +293,22 @@ export default {
                     ),
                 )
                 .setFooter({
-                    text: started
-                        ? `${await getGuildLocaleString(
-                              interaction.guildId,
-                              'MISC.POSITION',
-                          )}: ${firstPosition}${
-                              endPosition !== firstPosition
-                                  ? ` - ${endPosition}`
-                                  : ''
-                          }`
-                        : null,
+                    text:
+                        started && !smartQueue
+                            ? `${await getGuildLocaleString(
+                                  interaction.guildId,
+                                  'MISC.POSITION',
+                              )}: ${firstPosition}${
+                                  endPosition !== firstPosition
+                                      ? ` - ${endPosition}`
+                                      : ''
+                              }`
+                            : null,
                 }),
             { type: MessageOptionsBuilderType.Success, ephemeral: true },
         );
         if (!started) await player.queue.start();
+        if (smartQueue) await player.handler.sort();
         if (settings.features.web.enabled) {
             io.to(`guild:${interaction.guildId}`).emit(
                 'queueUpdate',

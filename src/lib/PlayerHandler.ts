@@ -15,6 +15,7 @@ import {
     buildMessageOptions,
     getGuildFeatureWhitelisted,
     getGuildLocaleString,
+    sortQueue,
     WhitelistStatus,
 } from '#src/lib/util/util.js';
 import type { LoopType, Song } from '@lavaclient/queue';
@@ -386,6 +387,14 @@ export default class PlayerHandler {
                 ),
             );
         }
+        if (
+            await data.guild.get<boolean>(
+                this.player.guildId,
+                'settings.smartqueue',
+            )
+        ) {
+            await this.sort();
+        }
         return PlayerResponse.Success;
     }
 
@@ -458,6 +467,14 @@ export default class PlayerHandler {
                 ),
             );
         }
+        if (
+            await data.guild.get<boolean>(
+                this.player.guildId,
+                'settings.smartqueue',
+            )
+        ) {
+            await this.sort();
+        }
         return PlayerResponse.Success;
     }
 
@@ -527,6 +544,39 @@ export default class PlayerHandler {
                 this.player.queue.tracks[currentIndex],
             ];
         }
+        if (settings.features.web.enabled) {
+            io.to(`guild:${this.player.guildId}`).emit(
+                'queueUpdate',
+                this.player.queue.tracks.map(
+                    (
+                        t: Song & { requesterTag: string },
+                    ): Song & { requesterTag: string } => {
+                        t.requesterTag = this.client.users.cache.get(
+                            t.requester,
+                        )?.tag;
+                        return t;
+                    },
+                ),
+            );
+        }
+        if (
+            await data.guild.get<boolean>(
+                this.player.guildId,
+                'settings.smartqueue',
+            )
+        ) {
+            await this.sort();
+        }
+        return PlayerResponse.Success;
+    }
+
+    /**
+     * Sort the queue. (Smart Queue)
+     * @returns Whether or not the queue was sorted.
+     */
+    async sort(): Promise<PlayerResponse> {
+        const { io } = await import('#src/main.js');
+        this.player.queue.tracks = sortQueue(this.player.queue.tracks);
         if (settings.features.web.enabled) {
             io.to(`guild:${this.player.guildId}`).emit(
                 'queueUpdate',

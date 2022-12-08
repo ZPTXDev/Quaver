@@ -6,6 +6,7 @@ import type {
     QuaverPlayer,
 } from '#src/lib/util/common.d.js';
 import {
+    data,
     logger,
     MessageOptionsBuilderType,
     searchState,
@@ -183,6 +184,10 @@ export default {
                 requester: interaction.user.id,
             });
             const started = player.playing || player.paused;
+            const smartQueue = await data.guild.get<boolean>(
+                interaction.guildId,
+                'settings.smartqueue',
+            );
             await interaction.replyHandler.reply(
                 new EmbedBuilder()
                     .setDescription(
@@ -193,20 +198,22 @@ export default {
                         ),
                     )
                     .setFooter({
-                        text: started
-                            ? `${await getGuildLocaleString(
-                                  interaction.guildId,
-                                  'MISC.POSITION',
-                              )}: ${firstPosition}${
-                                  endPosition !== firstPosition
-                                      ? ` - ${endPosition}`
-                                      : ''
-                              }`
-                            : null,
+                        text:
+                            started && !smartQueue
+                                ? `${await getGuildLocaleString(
+                                      interaction.guildId,
+                                      'MISC.POSITION',
+                                  )}: ${firstPosition}${
+                                      endPosition !== firstPosition
+                                          ? ` - ${endPosition}`
+                                          : ''
+                                  }`
+                                : null,
                     }),
                 { type: MessageOptionsBuilderType.Success, components: [] },
             );
             if (!started) await player.queue.start();
+            if (smartQueue) await player.handler.sort();
             if (settings.features.web.enabled) {
                 io.to(`guild:${interaction.guildId}`).emit(
                     'queueUpdate',

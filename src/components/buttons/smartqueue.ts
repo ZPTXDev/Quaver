@@ -29,7 +29,7 @@ import {
 } from 'discord.js';
 
 export default {
-    name: 'autolyrics',
+    name: 'smartqueue',
     checks: [Check.InteractionStarter],
     async execute(
         interaction: QuaverInteraction<ButtonInteraction>,
@@ -71,23 +71,23 @@ export default {
         );
         const option = interaction.customId.split(':')[1] === 'enable';
         if (option) {
-            if (!settings.features.autolyrics.enabled) {
+            if (!settings.features.smartqueue.enabled) {
                 await interaction.replyHandler.locale(
                     'FEATURE.DISABLED.DEFAULT',
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             }
-            if (settings.features.autolyrics.whitelist) {
+            if (settings.features.smartqueue.whitelist) {
                 const whitelisted = await data.guild.get<number>(
                     interaction.guildId,
-                    'features.autolyrics.whitelisted',
+                    'features.smartqueue.whitelisted',
                 );
                 if (
                     !whitelisted ||
                     (whitelisted !== -1 && Date.now() > whitelisted)
                 ) {
-                    settings.features.autolyrics.premium && settings.premiumURL
+                    settings.features.smartqueue.premium && settings.premiumURL
                         ? await interaction.replyHandler.locale(
                               'FEATURE.NO_PERMISSION.PREMIUM',
                               {
@@ -117,7 +117,7 @@ export default {
         }
         await data.guild.set(
             interaction.guildId,
-            'settings.autolyrics',
+            'settings.smartqueue',
             option,
         );
         const guildLocaleCode =
@@ -128,7 +128,7 @@ export default {
         const { current, embeds, actionRow } = await buildSettingsPage(
             interaction,
             guildLocaleCode,
-            'autolyrics',
+            'smartqueue',
         );
         const description = `${getLocaleString(
             guildLocaleCode,
@@ -136,10 +136,10 @@ export default {
             interaction.guild.name,
         )}\n\n**${getLocaleString(
             guildLocaleCode,
-            'CMD.SETTINGS.MISC.AUTOLYRICS.NAME',
+            'CMD.SETTINGS.MISC.SMARTQUEUE.NAME',
         )}** ─ ${getLocaleString(
             guildLocaleCode,
-            'CMD.SETTINGS.MISC.AUTOLYRICS.DESCRIPTION',
+            'CMD.SETTINGS.MISC.SMARTQUEUE.DESCRIPTION',
         )}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: ${current}`;
         await interaction.replyHandler.reply([description, ...embeds], {
             components: [

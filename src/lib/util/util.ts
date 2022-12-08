@@ -495,6 +495,44 @@ export function getFailedChecks(
 }
 
 /**
+ * Returns a sorted queue to ensure all requesters have a fair chance of playing their track.
+ * @param queue - The queue to sort.
+ * @returns The sorted queue.
+ */
+export function sortQueue(queue: QuaverSong[]): QuaverSong[] {
+    if (queue.length === 0) return [];
+    const sorted = [];
+    const copy = [...queue];
+    while (copy.length > 0) {
+        // sorted is empty, so we start it off
+        if (sorted.length === 0) {
+            sorted.push(copy.shift());
+            continue;
+        }
+        if (
+            // the last requester is the same as the next requester
+            sorted[sorted.length - 1].requester === copy[0].requester &&
+            // and there is more than 1 requester in the queue
+            new Set(copy.map((song): Snowflake => song.requester)).size >= 2
+        ) {
+            // deal with the next requester later, move them to the next position behind another requester
+            copy.splice(
+                copy.findIndex(
+                    (element: QuaverSong): boolean =>
+                        element.requester !== copy[0].requester,
+                ),
+                0,
+                copy.shift(),
+            );
+            continue;
+        }
+        // the last requester is not the same as the next requester, or there is only 1 requester in the queue
+        sorted.push(copy.shift());
+    }
+    return sorted;
+}
+
+/**
  * Returns a MessageCreateOptions object.
  * @param inputData - The data to be used. Can be a string, EmbedBuilder, or an array of either.
  * @param options - Extra data, such as type, components, or files.
@@ -569,6 +607,10 @@ export async function buildSettingsPage(
                 autolyrics: await data.guild.get<number>(
                     interaction.guildId,
                     'features.autolyrics.whitelisted',
+                ),
+                smartqueue: await data.guild.get<number>(
+                    interaction.guildId,
+                    'features.smartqueue.whitelisted',
                 ),
             };
             const features = Object.keys(whitelisted)
@@ -787,46 +829,58 @@ export async function buildSettingsPage(
             break;
         }
         case 'autolyrics': {
-            current = await data.guild.get<Snowflake>(
+            const enabled = await data.guild.get<boolean>(
                 interaction.guildId,
                 'settings.autolyrics',
             );
             actionRow.addComponents(
                 new ButtonBuilder()
-                    .setCustomId('autolyrics:enabled')
-                    .setLabel(
-                        getLocaleString(
-                            guildLocaleCode,
-                            'CMD.SETTINGS.MISC.AUTOLYRICS.OPTIONS.ENABLED',
-                        ),
-                    )
+                    .setCustomId('autolyrics:enable')
+                    .setLabel(getLocaleString(guildLocaleCode, 'MISC.ENABLE'))
                     .setStyle(
-                        current ? ButtonStyle.Success : ButtonStyle.Secondary,
+                        enabled ? ButtonStyle.Success : ButtonStyle.Secondary,
                     )
-                    .setDisabled(!!current),
+                    .setDisabled(!!enabled),
                 new ButtonBuilder()
-                    .setCustomId('autolyrics:disabled')
-                    .setLabel(
-                        getLocaleString(
-                            guildLocaleCode,
-                            'CMD.SETTINGS.MISC.AUTOLYRICS.OPTIONS.DISABLED',
-                        ),
-                    )
+                    .setCustomId('autolyrics:disable')
+                    .setLabel(getLocaleString(guildLocaleCode, 'MISC.DISABLE'))
                     .setStyle(
-                        !current ? ButtonStyle.Success : ButtonStyle.Secondary,
+                        !enabled ? ButtonStyle.Success : ButtonStyle.Secondary,
                     )
-                    .setDisabled(!current),
+                    .setDisabled(!enabled),
             );
             current = `\`${
-                current
-                    ? getLocaleString(
-                          guildLocaleCode,
-                          'CMD.SETTINGS.MISC.AUTOLYRICS.OPTIONS.ENABLED',
-                      )
-                    : getLocaleString(
-                          guildLocaleCode,
-                          'CMD.SETTINGS.MISC.AUTOLYRICS.OPTIONS.DISABLED',
-                      )
+                enabled
+                    ? getLocaleString(guildLocaleCode, 'MISC.ENABLED')
+                    : getLocaleString(guildLocaleCode, 'MISC.DISABLED')
+            }\``;
+            break;
+        }
+        case 'smartqueue': {
+            const enabled = await data.guild.get<boolean>(
+                interaction.guildId,
+                'settings.smartqueue',
+            );
+            actionRow.addComponents(
+                new ButtonBuilder()
+                    .setCustomId('smartqueue:enable')
+                    .setLabel(getLocaleString(guildLocaleCode, 'MISC.ENABLE'))
+                    .setStyle(
+                        enabled ? ButtonStyle.Success : ButtonStyle.Secondary,
+                    )
+                    .setDisabled(!!enabled),
+                new ButtonBuilder()
+                    .setCustomId('smartqueue:disable')
+                    .setLabel(getLocaleString(guildLocaleCode, 'MISC.DISABLE'))
+                    .setStyle(
+                        !enabled ? ButtonStyle.Success : ButtonStyle.Secondary,
+                    )
+                    .setDisabled(!enabled),
+            );
+            current = `\`${
+                enabled
+                    ? getLocaleString(guildLocaleCode, 'MISC.ENABLED')
+                    : getLocaleString(guildLocaleCode, 'MISC.DISABLED')
             }\``;
         }
     }

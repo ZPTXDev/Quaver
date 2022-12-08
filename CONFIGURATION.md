@@ -43,6 +43,11 @@
             "whitelist": false,
             "premium": false
         },
+        "smartqueue": {
+            "enabled": true,
+            "whitelist": false,
+            "premium": false
+        },
         "spotify": {
             "enabled": true,
             "client_id": "Paste Spotify Client ID here",
@@ -117,6 +122,14 @@
 `features.stay.whitelist` - Whether or not the feature requires guilds to be whitelisted. You will be able to whitelist guilds through the terminal.
 
 `features.stay.premium` - **6.7.0+** Whether or not to display the "requires premium" message when a guild is not whitelisted. Has no effect if `features.stay.whitelist` is `false` or `premiumURL` is unset.
+
+`features.smartqueue` - **6.8.0+** Smart Queue feature: Allows users to toggle fair queue sorting, alternating between songs from multiple requesters.
+
+`features.smartqueue.enabled` - **6.8.0+** Whether or not the feature is enabled.
+
+`features.smartqueue.whitelist` - **6.8.0+** Whether or not the feature requires guilds to be whitelisted. You will be able to whitelist guilds through the terminal.
+
+`features.smartqueue.premium` - **6.8.0+** Whether or not to display the "requires premium" message when a guild is not whitelisted. Has no effect if `features.smartqueue.whitelist` is `false` or `premiumURL` is unset.
 
 `features.spotify` - Spotify feature: Allows users to play songs from Spotify.
 
