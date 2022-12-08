@@ -17,5 +17,9 @@ export default {
 	ADD: 'Idugang',
 	DASHBOARD: 'Dashboard',
 	GET_PREMIUM: 'Pagkuha og Premium',
-	NONE: 'None'
+	NONE: 'None',
+	ENABLED: 'Gi-enable',
+	DISABLED: 'Gi-disable',
+	ENABLE: 'Gi-enable',
+	DISABLE: 'Gi-disable'
 };

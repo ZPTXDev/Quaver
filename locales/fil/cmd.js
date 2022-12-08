@@ -195,7 +195,8 @@ export default {
 				DESCRIPTION: 'Mga premium na feature para sa server na ito.',
 				FEATURES: {
 					STAY: '24/7 Mode',
-					AUTOLYRICS: 'Auto Lyrics'
+					AUTOLYRICS: 'Auto Lyrics',
+					SMARTQUEUE: 'Smart Queue'
 				},
 				DISPLAY: {
 					UNLOCKED: {
@@ -230,11 +231,11 @@ export default {
 			},
 			AUTOLYRICS: {
 				NAME: 'Auto Lyrics',
-				DESCRIPTION: 'Awtomatikong magpadala ng lyrics para sa bawat track.',
-				OPTIONS: {
-					ENABLED: 'Naka-enable',
-					DISABLED: 'Naka-disable'
-				}
+				DESCRIPTION: 'Awtomatikong magpadala ng lyrics para sa bawat track.'
+			},
+			SMARTQUEUE: {
+				NAME: 'Smart Queue',
+				DESCRIPTION: 'Pinag-uuri-uriin ang queue upang magkahalili sa pagitan ng mga requester.'
 			}
 		}
 	},
