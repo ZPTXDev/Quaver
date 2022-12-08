@@ -16,5 +16,10 @@ export default {
 	CONFIRM: 'Kumpirmahin',
 	ADD: 'Idagdag',
 	DASHBOARD: 'Dashboard',
-	GET_PREMIUM: 'Kumuha ng Premium'
+	GET_PREMIUM: 'Kumuha ng Premium',
+	NONE: 'None',
+	ENABLED: 'Naka-enable',
+	DISABLED: 'Naka-disable',
+	ENABLE: 'Naka-enable',
+	DISABLE: 'Naka-disable'
 };
