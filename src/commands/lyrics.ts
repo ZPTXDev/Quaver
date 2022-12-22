@@ -99,7 +99,7 @@ export default {
         lyrics.split('\n\n').reduce((previous, chunk, index, array): string => {
             if (giveUp) return;
             if (chunk.length > 1024) giveUp = true;
-            if (previous.length + chunk.length > 1024) {
+            if (previous.length + chunk.length + '\n\n'.length > 1024) {
                 lyricsFields.push({
                     name: lyricsFields.length === 0 ? query : '​',
                     value: previous,
@@ -120,7 +120,7 @@ export default {
             lyrics
                 .split('\n')
                 .reduce((previous, line, index, array): string => {
-                    if (previous.length + line.length > 1024) {
+                    if (previous.length + line.length + '\n'.length > 1024) {
                         lyricsFields.push({
                             name: lyricsFields.length === 0 ? query : '​',
                             value: previous,
