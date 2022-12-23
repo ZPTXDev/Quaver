@@ -1,4 +1,4 @@
-# Quaver
+# Quaver [![CodeFactor](https://www.codefactor.io/repository/github/zptxdev/quaver/badge/next)](https://www.codefactor.io/repository/github/zptxdev/quaver/overview/next)
 Quaver is a simple-to-use music bot with features such as bass boost, nightcore, seek, search, and more.
 
 # Using Quaver
