@@ -496,6 +496,40 @@ export function getFailedChecks(
 }
 
 /**
+ * Returns the Enable and Disable button components used in settings.
+ * @param customId - The custom ID of the button.
+ * @param enabled - Whether the setting is enabled.
+ * @param guildLocaleCode - The guild's locale code.
+ */
+export function getButtonToggleComponents(
+    customId: string,
+    enabled: boolean,
+    guildLocaleCode: keyof typeof Language,
+): ButtonBuilder[] {
+    return ['enable', 'disable'].map(
+        (state): ButtonBuilder =>
+            new ButtonBuilder()
+                .setCustomId(`${customId}:${state}`)
+                .setLabel(
+                    getLocaleString(
+                        guildLocaleCode,
+                        `MISC.${state.toUpperCase()}`,
+                    ),
+                )
+                .setStyle(
+                    state === 'enable'
+                        ? enabled
+                            ? ButtonStyle.Success
+                            : ButtonStyle.Secondary
+                        : !enabled
+                        ? ButtonStyle.Success
+                        : ButtonStyle.Secondary,
+                )
+                .setDisabled(state === 'enable' ? enabled : !enabled),
+    );
+}
+
+/**
  * Returns a sorted queue to ensure all requesters have a fair chance of playing their track.
  * @param queue - The queue to sort.
  * @returns The sorted queue.
@@ -907,20 +941,11 @@ export async function buildSettingsPage(
                 'settings.autolyrics',
             );
             actionRow.addComponents(
-                new ButtonBuilder()
-                    .setCustomId('autolyrics:enable')
-                    .setLabel(getLocaleString(guildLocaleCode, 'MISC.ENABLE'))
-                    .setStyle(
-                        enabled ? ButtonStyle.Success : ButtonStyle.Secondary,
-                    )
-                    .setDisabled(!!enabled),
-                new ButtonBuilder()
-                    .setCustomId('autolyrics:disable')
-                    .setLabel(getLocaleString(guildLocaleCode, 'MISC.DISABLE'))
-                    .setStyle(
-                        !enabled ? ButtonStyle.Success : ButtonStyle.Secondary,
-                    )
-                    .setDisabled(!enabled),
+                ...getButtonToggleComponents(
+                    'autolyrics',
+                    !!enabled,
+                    guildLocaleCode,
+                ),
             );
             current = `\`${
                 enabled
@@ -935,20 +960,11 @@ export async function buildSettingsPage(
                 'settings.smartqueue',
             );
             actionRow.addComponents(
-                new ButtonBuilder()
-                    .setCustomId('smartqueue:enable')
-                    .setLabel(getLocaleString(guildLocaleCode, 'MISC.ENABLE'))
-                    .setStyle(
-                        enabled ? ButtonStyle.Success : ButtonStyle.Secondary,
-                    )
-                    .setDisabled(!!enabled),
-                new ButtonBuilder()
-                    .setCustomId('smartqueue:disable')
-                    .setLabel(getLocaleString(guildLocaleCode, 'MISC.DISABLE'))
-                    .setStyle(
-                        !enabled ? ButtonStyle.Success : ButtonStyle.Secondary,
-                    )
-                    .setDisabled(!enabled),
+                ...getButtonToggleComponents(
+                    'smartqueue',
+                    !!enabled,
+                    guildLocaleCode,
+                ),
             );
             current = `\`${
                 enabled
