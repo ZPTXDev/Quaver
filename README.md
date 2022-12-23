@@ -1,5 +1,21 @@
-# Quaver [![CodeFactor](https://www.codefactor.io/repository/github/zptxdev/quaver/badge/next)](https://www.codefactor.io/repository/github/zptxdev/quaver/overview/next)
-Quaver is a simple-to-use music bot with features such as bass boost, nightcore, seek, search, and more.
+<h1 align="center" style="border-bottom: none;">Quaver</h1>
+<h3 align="center">Simple-to-use music bot with features such as bass boost, nightcore, seek, search, and more.</h3>
+<p align="center">
+    <a href="#">
+        <img alt="GitHub package.json version (branch)" src="https://img.shields.io/github/package-json/v/zptxdev/quaver/master?color=2a005b&label=stable&style=flat-square">
+    </a>
+    <a href="#">
+        <img alt="GitHub package.json version (branch)" src="https://img.shields.io/github/package-json/v/zptxdev/quaver/next?color=46041f&label=next&style=flat-square">
+    </a>
+</p>
+<p align="center">
+    <a href="https://www.codefactor.io/repository/github/zptxdev/quaver/overview/next">
+        <img alt="CodeFactor Grade" src="https://img.shields.io/codefactor/grade/github/zptxdev/quaver/next?style=flat-square">
+    </a>
+    <a href="https://discord.gg/NXcFmBE">
+        <img alt="Discord" src="https://img.shields.io/discord/334654301651730432?label=chat%20with%20us&style=flat-square">
+    </a>
+</p>
 
 # Using Quaver
 Quaver utilizes slash commands, buttons, and menus. After deploying the commands, type `/` into your chat to list Quaver's commands.
