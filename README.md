@@ -12,7 +12,7 @@
     <a href="https://www.codefactor.io/repository/github/zptxdev/quaver/overview/next">
         <img alt="CodeFactor Grade" src="https://img.shields.io/codefactor/grade/github/zptxdev/quaver/next?style=flat-square">
     </a>
-    <a href="https://discord.gg/NXcFmBE">
+    <a href="https://go.zptx.dev/discord">
         <img alt="Discord" src="https://img.shields.io/discord/334654301651730432?label=chat%20with%20us&style=flat-square">
     </a>
 </p>
