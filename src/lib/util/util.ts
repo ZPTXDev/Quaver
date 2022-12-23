@@ -16,6 +16,7 @@ import {
 import { Check, Language } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import type {
+    APIEmbedField,
     APISelectMenuOption,
     ButtonInteraction,
     Interaction,
@@ -530,6 +531,78 @@ export function sortQueue(queue: QuaverSong[]): QuaverSong[] {
         sorted.push(copy.shift());
     }
     return sorted;
+}
+
+/**
+ * Generates an array of APIEmbedField from the lyrics.
+ * @param query - The query to be used.
+ * @param lyrics - The lyrics to be used.
+ * @returns An array of APIEmbedField.
+ */
+export function generateEmbedFieldsFromLyrics(
+    query: string,
+    lyrics: string,
+): APIEmbedField[] {
+    let lyricsFields: APIEmbedField[] = [];
+    // try method 1
+    let giveUp = false;
+    if (lyrics.split('\n\n').length === 1) giveUp = true;
+    lyrics.split('\n\n').reduce((previous, chunk, index, array): string => {
+        if (giveUp) return;
+        if (chunk.length > 1024) giveUp = true;
+        if (previous.length + chunk.length + '\n\n'.length > 1024) {
+            lyricsFields.push({
+                name: lyricsFields.length === 0 ? query : '​',
+                value: previous,
+            });
+            return chunk;
+        }
+        if (index === array.length - 1) {
+            lyricsFields.push({
+                name: lyricsFields.length === 0 ? query : '​',
+                value: previous + '\n\n' + chunk,
+            });
+        }
+        return previous + '\n\n' + chunk;
+    });
+    if (giveUp) {
+        lyricsFields = [];
+        // try method 2
+        lyrics.split('\n').reduce((previous, line, index, array): string => {
+            if (previous.length + line.length + '\n'.length > 1024) {
+                lyricsFields.push({
+                    name: lyricsFields.length === 0 ? query : '​',
+                    value: previous,
+                });
+                return line;
+            }
+            if (index === array.length - 1) {
+                lyricsFields.push({
+                    name: lyricsFields.length === 0 ? query : '​',
+                    value: previous + '\n' + line,
+                });
+            }
+            return previous + '\n' + line;
+        }, '');
+    }
+    if (
+        lyricsFields.reduce(
+            (previous, current): number => previous + current.value.length,
+            0,
+        ) > 6000
+    ) {
+        let exceedIndex = -1;
+        lyricsFields.reduce((previous, current, index): number => {
+            if (exceedIndex !== -1) return;
+            if (previous + current.value.length > 6000) {
+                exceedIndex = index;
+            }
+            return previous + current.value.length;
+        }, 0);
+        lyricsFields = lyricsFields.slice(0, exceedIndex);
+        lyricsFields.push({ name: '​', value: '`...`' });
+    }
+    return lyricsFields;
 }
 
 /**
