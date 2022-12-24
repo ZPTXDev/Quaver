@@ -6,8 +6,8 @@ body:
   attributes:
     label: Describe the bug
     description: What isn't working as intended, and what does it affect?
-    validations:
-      required: true
+  validations:
+    required: true
 - type: dropdown
   attributes:
     label: Severity
@@ -17,8 +17,8 @@ body:
       - High
       - Medium
       - Low
-    validations:
-      required: true
+  validations:
+    required: true
 - type: checkboxes
   attributes:
     label: Affected branches
@@ -31,27 +31,27 @@ body:
     label: Quaver version
     description: The version of Quaver you were using when experiencing this issue.
     placeholder: 6.8.0
-    validations:
-      required: true
+  validations:
+    required: true
 - type: textarea
     attributes:
       label: Steps to reproduce
       description: Steps to reproduce the behavior.
       placeholder: click on a button, enter a value, etc. and see error
-      validations:
-        required: true
+    validations:
+      required: true
 - type: textarea
     attributes:
       label: Expected behavior
       description: What is expected to happen?
-      validations:
-        required: true
+    validations:
+      required: true
 - type: textarea
     attributes:
       label: Actual behavior
       description: What actually happens? Attach or add errors or screenshots here as well.
-      validations:
-        required: true
+    validations:
+      required: true
 - type: textarea
   attributes:
     label: Relevant log output

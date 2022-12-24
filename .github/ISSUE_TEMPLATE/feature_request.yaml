@@ -6,8 +6,8 @@ body:
   attributes:
     label: Describe the feature
     description: What feature are you proposing?
-    validations:
-      required: true
+  validations:
+    required: true
 - type: dropdown
   attributes:
     label: Priority
@@ -16,14 +16,14 @@ body:
       - High
       - Medium
       - Low
-    validations:
-      required: true
+  validations:
+    required: true
 - type: textarea
   attributes:
     label: List the benefits of adding such a feature
     description: What will you gain from this feature?
-    validations:
-      required: true
+  validations:
+    required: true
 - type: textarea
   attributes:
     label: Is this feature request related to a problem?
