@@ -1,5 +1,5 @@
 name: Bug report
-about: Something not working as intended, or affecting normal functionality.
+description: Something not working as intended, or affecting normal functionality.
 labels: [ 'type:bug' ]
 body:
 - type: textarea
@@ -30,7 +30,7 @@ body:
   attributes:
     label: Quaver version
     description: The version of Quaver you were using when experiencing this issue.
-    placeholder: 6.8.0
+    placeholder: '6.8.0'
   validations:
     required: true
 - type: textarea

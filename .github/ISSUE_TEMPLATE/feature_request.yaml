@@ -1,5 +1,5 @@
 name: Feature request
-about: Proposal for a new feature or improvement.
+description: Proposal for a new feature or improvement.
 labels: [ 'type:enhancement' ]
 body:
 - type: textarea
