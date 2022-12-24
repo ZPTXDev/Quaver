@@ -69,3 +69,4 @@ jobs:
       - uses: creyD/prettier_action@v4.2
         with:
           commit_message: 'refactor: prettify'
+          prettier_options: --write **/*.ts
