@@ -1,12 +1,8 @@
 <h1 align="center" style="border-bottom: none;">Quaver</h1>
 <h3 align="center">Simple-to-use music bot with features such as bass boost, nightcore, seek, search, and more.</h3>
 <p align="center">
-    <a href="#">
-        <img alt="GitHub package.json version (branch)" src="https://img.shields.io/github/package-json/v/zptxdev/quaver/master?color=2a005b&label=stable&style=flat-square">
-    </a>
-    <a href="#">
-        <img alt="GitHub package.json version (branch)" src="https://img.shields.io/github/package-json/v/zptxdev/quaver/next?color=46041f&label=next&style=flat-square">
-    </a>
+    <img alt="GitHub package.json version (branch)" src="https://img.shields.io/github/package-json/v/zptxdev/quaver/master?color=2a005b&label=stable&style=flat-square">
+    <img alt="GitHub package.json version (branch)" src="https://img.shields.io/github/package-json/v/zptxdev/quaver/next?color=46041f&label=next&style=flat-square">
 </p>
 <p align="center">
     <a href="https://www.codefactor.io/repository/github/zptxdev/quaver/overview/next">
