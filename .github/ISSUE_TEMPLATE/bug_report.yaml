@@ -35,23 +35,23 @@ body:
       required: true
 - type: textarea
     attributes:
-    label: Steps to reproduce
-    description: Steps to reproduce the behavior.
-    placeholder: click on a button, enter a value, etc. and see error
-    validations:
-      required: true
+      label: Steps to reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: click on a button, enter a value, etc. and see error
+      validations:
+        required: true
 - type: textarea
     attributes:
-    label: Expected behavior
-    description: What is expected to happen?
-    validations:
-      required: true
+      label: Expected behavior
+      description: What is expected to happen?
+      validations:
+        required: true
 - type: textarea
     attributes:
-    label: Actual behavior
-    description: What actually happens? Attach or add errors or screenshots here as well.
-    validations:
-      required: true
+      label: Actual behavior
+      description: What actually happens? Attach or add errors or screenshots here as well.
+      validations:
+        required: true
 - type: textarea
   attributes:
     label: Relevant log output
