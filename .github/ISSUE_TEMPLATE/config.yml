@@ -1,1 +1,6 @@
 blank_issues_enabled: false
+contact_links:
+  - name: Question
+    url: https://go.zptx.dev/discord
+    about:
+      For any questions about setting up Quaver, how something works, etc.
