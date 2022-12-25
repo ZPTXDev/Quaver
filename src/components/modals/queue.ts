@@ -1,13 +1,9 @@
 import { ForceType } from '#src/lib/ReplyHandler.js';
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import {
-    getGuildLocaleString,
-    msToTime,
-    msToTimeString,
-    paginate,
-} from '#src/lib/util/util.js';
+import { getGuildLocaleString } from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/queue';
+import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
 import type {
     MessageActionRowComponentBuilder,
     ModalSubmitInteraction,

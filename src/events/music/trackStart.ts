@@ -5,10 +5,9 @@ import {
     generateEmbedFieldsFromLyrics,
     getGuildLocaleString,
     getLocaleString,
-    msToTime,
-    msToTimeString,
 } from '#src/lib/util/util.js';
 import { LyricsFinder } from '@jeve/lyrics-finder';
+import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import {
     ActionRowBuilder,
     ButtonBuilder,

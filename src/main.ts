@@ -20,12 +20,10 @@ import { settings } from '#src/lib/util/settings.js';
 import {
     getAbsoluteFileURL,
     getGuildLocaleString,
-    msToTime,
-    msToTimeString,
-    parseTimeString,
 } from '#src/lib/util/util.js';
 import '@lavaclient/queue/register';
 import { load } from '@lavaclient/spotify';
+import { msToTime, msToTimeString, parseTimeString } from '@zptxdev/zptx-lib';
 import {
     AttachmentBuilder,
     Client,

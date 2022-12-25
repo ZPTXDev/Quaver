@@ -12,7 +12,7 @@
     "@lavaclient/queue": "^2.1.1",
     "@lavaclient/spotify": "^3.1.0",
     "@napi-rs/pinyin": "^1.7.1",
-    "@types/express": "^4.17.15",
+    "@zptxdev/zptx-lib": "^1.0.7",
     "crypto-js": "^4.1.1",
     "discord-api-types": "^0.37.24",
     "discord.js": "^14.7.1",
@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",
+    "@types/express": "^4.17.15",
     "@types/lodash-es": "^4.17.6",
     "@types/node": "^18.11.17",
     "@types/wanakana": "^4.0.3",

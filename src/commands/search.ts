@@ -10,10 +10,8 @@ import {
     buildMessageOptions,
     getGuildLocaleString,
     getLocaleString,
-    msToTime,
-    msToTimeString,
-    paginate,
 } from '#src/lib/util/util.js';
+import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
 import type {
     ChatInputCommandInteraction,
     SelectMenuComponentOptionData,

@@ -9,10 +9,9 @@ import { settings } from '#src/lib/util/settings.js';
 import {
     getLocaleString,
     getRequesterStatus,
-    msToTime,
-    msToTimeString,
     RequesterStatus,
 } from '#src/lib/util/util.js';
+import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import type {
     ChatInputCommandInteraction,
     GuildMember,

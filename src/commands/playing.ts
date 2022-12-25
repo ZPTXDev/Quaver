@@ -5,14 +5,9 @@ import type {
 import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
-import {
-    getBar,
-    getGuildLocaleString,
-    getLocaleString,
-    msToTime,
-    msToTimeString,
-} from '#src/lib/util/util.js';
+import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import { LoopType } from '@lavaclient/queue';
+import { getBar, msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import type { ChatInputCommandInteraction } from 'discord.js';
 import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
 

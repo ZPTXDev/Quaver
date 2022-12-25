@@ -19,8 +19,8 @@ import {
     checkLocaleCompletion,
     getGuildLocaleString,
     getLocaleString,
-    roundTo,
 } from '#src/lib/util/util.js';
+import { roundTo } from '@zptxdev/zptx-lib';
 import type {
     MessageActionRowComponentBuilder,
     SelectMenuComponentOptionData,

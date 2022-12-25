@@ -1,5 +1,5 @@
 import { settings } from '#src/lib/util/settings.js';
-import { getJSONResponse } from '#src/lib/util/util.js';
+import { getJSONResponse } from '@zptxdev/zptx-lib';
 import CryptoJS from 'crypto-js';
 import type { Socket } from 'socket.io';
 import { request } from 'undici';

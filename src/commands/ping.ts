@@ -1,11 +1,7 @@
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { settings } from '#src/lib/util/settings.js';
-import {
-    getGuildLocaleString,
-    getLocaleString,
-    msToTime,
-    msToTimeString,
-} from '#src/lib/util/util.js';
+import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
+import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import type { ChatInputCommandInteraction } from 'discord.js';
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 

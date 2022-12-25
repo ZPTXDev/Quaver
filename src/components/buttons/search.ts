@@ -17,10 +17,9 @@ import {
     buildMessageOptions,
     getFailedChecks,
     getGuildLocaleString,
-    msToTime,
-    msToTimeString,
 } from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/queue';
+import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import type {
     APISelectMenuOption,
     ButtonComponent,
