@@ -13,10 +13,10 @@ body:
     label: Severity
     description: The severity of the issue.
     options:
-      - Critical
-      - High
-      - Medium
       - Low
+      - Medium
+      - High
+      - Critical
   validations:
     required: true
 - type: checkboxes

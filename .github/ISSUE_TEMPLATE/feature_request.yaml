@@ -13,9 +13,9 @@ body:
     label: Priority
     description: The priority you value this feature request at.
     options:
-      - High
-      - Medium
       - Low
+      - Medium
+      - High
   validations:
     required: true
 - type: textarea
