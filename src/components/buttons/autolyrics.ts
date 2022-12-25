@@ -81,7 +81,7 @@ export default {
                 return;
             }
             const whitelisted = await getGuildFeatureWhitelisted(
-                this.player.guildId,
+                interaction.guildId,
                 'autolyrics',
             );
             if (
