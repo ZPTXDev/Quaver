@@ -45,7 +45,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '16.9.1'
+          node-version: 16
       - run: yarn install
       - uses: reviewdog/action-eslint@v1
         with:
@@ -57,6 +57,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: cp settings.example.json settings.json
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: npm i genversion && genversion --es6 --semi src/lib/util/version.ts
       - uses: EPMatt/reviewdog-action-tsc@v1.4.0
         with:
           reporter: github-check
