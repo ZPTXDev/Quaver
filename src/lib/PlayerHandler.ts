@@ -576,6 +576,21 @@ export default class PlayerHandler {
      */
     async sort(): Promise<PlayerResponse> {
         const { io } = await import('#src/main.js');
+        if (!settings.features.smartqueue.enabled) {
+            return PlayerResponse.FeatureDisabled;
+        }
+        if (settings.features.smartqueue.whitelist) {
+            const whitelisted = await getGuildFeatureWhitelisted(
+                this.player.guildId,
+                'smartqueue',
+            );
+            if (
+                whitelisted === WhitelistStatus.NotWhitelisted ||
+                whitelisted === WhitelistStatus.Expired
+            ) {
+                return PlayerResponse.FeatureNotWhitelisted;
+            }
+        }
         this.player.queue.tracks = sortQueue(this.player.queue.tracks);
         if (settings.features.web.enabled) {
             io.to(`guild:${this.player.guildId}`).emit(

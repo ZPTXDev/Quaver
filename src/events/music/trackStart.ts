@@ -3,8 +3,10 @@ import { data, logger } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
     generateEmbedFieldsFromLyrics,
+    getGuildFeatureWhitelisted,
     getGuildLocaleString,
     getLocaleString,
+    WhitelistStatus,
 } from '#src/lib/util/util.js';
 import { LyricsFinder } from '@jeve/lyrics-finder';
 import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
@@ -180,6 +182,16 @@ export default {
                     queue.player.guildId,
                     'settings.autolyrics',
                 ))
+            ) {
+                return;
+            }
+            const whitelisted = await getGuildFeatureWhitelisted(
+                queue.player.guildId,
+                'autolyrics',
+            );
+            if (
+                whitelisted === WhitelistStatus.NotWhitelisted ||
+                whitelisted === WhitelistStatus.Expired
             ) {
                 return;
             }
