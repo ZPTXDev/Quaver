@@ -155,7 +155,7 @@ export enum WhitelistStatus {
 }
 
 /**
- * Checks if a guild is whitelisted for a feature.
+ * Checks if a guild is whitelisted for a feature. Returns Permanent status if the feature does not have whitelist enabled.
  * @param guildId - The guild ID.
  * @param feature - The feature to check.
  * @returns Whether the guild is whitelisted.
@@ -164,6 +164,7 @@ export async function getGuildFeatureWhitelisted(
     guildId: Snowflake,
     feature: WhitelistedFeatures,
 ): Promise<WhitelistStatus> {
+    if (!settings.features[feature].whitelist) return WhitelistStatus.Permanent;
     const whitelisted = await data.guild.get<number>(
         guildId,
         `features.${feature}.whitelisted`,
