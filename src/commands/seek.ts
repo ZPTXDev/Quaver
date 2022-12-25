@@ -7,6 +7,7 @@ import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
+    getGuildLocaleString,
     getLocaleString,
     getRequesterStatus,
     RequesterStatus,
@@ -107,9 +108,21 @@ export default {
             return;
         }
         const duration = msToTime(player.queue.current.length);
-        const durationString = msToTimeString(duration, true);
+        let durationString = msToTimeString(duration, true);
+        if (durationString === 'MORE_THAN_A_DAY') {
+            durationString = await getGuildLocaleString(
+                interaction.guildId,
+                'MISC.MORE_THAN_A_DAY',
+            );
+        }
         const target = msToTime(position);
-        const targetString = msToTimeString(target, true);
+        let targetString = msToTimeString(target, true);
+        if (targetString === 'MORE_THAN_A_DAY') {
+            targetString = await getGuildLocaleString(
+                interaction.guildId,
+                'MISC.MORE_THAN_A_DAY',
+            );
+        }
         const response = await player.handler.seek(position);
         switch (response) {
             case PlayerResponse.PlayerIdle:

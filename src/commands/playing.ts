@@ -51,9 +51,21 @@ export default {
         if (isNaN(elapsed['s']) || elapsed['s'] < 0) {
             elapsed = { d: 0, h: 0, m: 0, s: 0 };
         }
-        const elapsedString = msToTimeString(elapsed, true);
+        let elapsedString = msToTimeString(elapsed, true);
+        if (elapsedString === 'MORE_THAN_A_DAY') {
+            elapsedString = await getGuildLocaleString(
+                interaction.guildId,
+                'MISC.MORE_THAN_A_DAY',
+            );
+        }
         const duration = msToTime(player.queue.current.length);
-        const durationString = msToTimeString(duration, true);
+        let durationString = msToTimeString(duration, true);
+        if (durationString === 'MORE_THAN_A_DAY') {
+            durationString = await getGuildLocaleString(
+                interaction.guildId,
+                'MISC.MORE_THAN_A_DAY',
+            );
+        }
         if (player.queue.current.isStream) {
             await interaction.replyHandler.reply(
                 `**[${escapeMarkdown(player.queue.current.title)}](${

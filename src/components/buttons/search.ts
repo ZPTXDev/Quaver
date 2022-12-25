@@ -17,6 +17,7 @@ import {
     buildMessageOptions,
     getFailedChecks,
     getGuildLocaleString,
+    getLocaleString,
 } from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/queue';
 import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
@@ -276,14 +277,25 @@ export default {
             embeds: EmbedBuilder[];
             components: ActionRowBuilder<MessageActionRowComponentBuilder>[];
         } = { embeds: [], components: [] };
+        const guildLocaleCode =
+            (await data.guild.get<string>(
+                interaction.guildId,
+                'settings.locale',
+            )) ?? settings.defaultLocaleCode;
         updated.embeds[0] = EmbedBuilder.from(original.embeds[0])
             .setDescription(
                 pages[page - 1]
                     .map((track: { info: Song }, index: number): string => {
                         const duration = msToTime(track.info.length);
-                        const durationString = track.info.isStream
+                        let durationString = track.info.isStream
                             ? '∞'
                             : msToTimeString(duration, true);
+                        if (durationString === 'MORE_THAN_A_DAY') {
+                            durationString = getLocaleString(
+                                guildLocaleCode,
+                                'MISC.MORE_THAN_A_DAY',
+                            );
+                        }
                         return `\`${(firstIndex + index)
                             .toString()
                             .padStart(

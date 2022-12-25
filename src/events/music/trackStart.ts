@@ -46,9 +46,15 @@ export default {
             }
         }
         const duration = msToTime(track.length);
-        const durationString = track.isStream
+        let durationString = track.isStream
             ? '∞'
             : msToTimeString(duration, true);
+        if (durationString === 'MORE_THAN_A_DAY') {
+            durationString = await getGuildLocaleString(
+                queue.player.guildId,
+                'MISC.MORE_THAN_A_DAY',
+            );
+        }
         if (settings.features.web.enabled) {
             io.to(`guild:${queue.player.guildId}`).emit(
                 'queueUpdate',

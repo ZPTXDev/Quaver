@@ -12,7 +12,7 @@
     "@lavaclient/queue": "^2.1.1",
     "@lavaclient/spotify": "^3.1.0",
     "@napi-rs/pinyin": "^1.7.1",
-    "@zptxdev/zptx-lib": "^1.0.7",
+    "@zptxdev/zptx-lib": "^1.0.8",
     "crypto-js": "^4.1.1",
     "discord-api-types": "^0.37.24",
     "discord.js": "^14.7.1",

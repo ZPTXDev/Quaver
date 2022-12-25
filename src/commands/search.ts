@@ -1,5 +1,6 @@
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import {
+    data,
     logger,
     MessageOptionsBuilderType,
     searchState,
@@ -103,15 +104,26 @@ export default {
             return;
         }
         const pages = paginate(tracks, 10);
+        const guildLocaleCode =
+            (await data.guild.get<string>(
+                interaction.guildId,
+                'settings.locale',
+            )) ?? settings.defaultLocaleCode;
         const msg = await interaction.replyHandler.reply(
             new EmbedBuilder()
                 .setDescription(
                     pages[0]
                         .map((track, index): string => {
                             const duration = msToTime(track.info.length);
-                            const durationString = track.info.isStream
+                            let durationString = track.info.isStream
                                 ? '∞'
                                 : msToTimeString(duration, true);
+                            if (durationString === 'MORE_THAN_A_DAY') {
+                                durationString = getLocaleString(
+                                    guildLocaleCode,
+                                    'MISC.MORE_THAN_A_DAY',
+                                );
+                            }
                             return `\`${(index + 1)
                                 .toString()
                                 .padStart(
