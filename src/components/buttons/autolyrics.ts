@@ -12,8 +12,10 @@ import { settings } from '#src/lib/util/settings.js';
 import {
     buildMessageOptions,
     buildSettingsPage,
+    getGuildFeatureWhitelisted,
     getGuildLocaleString,
     getLocaleString,
+    WhitelistStatus,
 } from '#src/lib/util/util.js';
 import type {
     ButtonInteraction,
@@ -78,41 +80,39 @@ export default {
                 );
                 return;
             }
-            if (settings.features.autolyrics.whitelist) {
-                const whitelisted = await data.guild.get<number>(
-                    interaction.guildId,
-                    'features.autolyrics.whitelisted',
-                );
-                if (
-                    !whitelisted ||
-                    (whitelisted !== -1 && Date.now() > whitelisted)
-                ) {
-                    settings.features.autolyrics.premium && settings.premiumURL
-                        ? await interaction.replyHandler.locale(
-                              'FEATURE.NO_PERMISSION.PREMIUM',
-                              {
-                                  type: MessageOptionsBuilderType.Error,
-                                  components: [
-                                      new ActionRowBuilder<ButtonBuilder>().setComponents(
-                                          new ButtonBuilder()
-                                              .setLabel(
-                                                  await getGuildLocaleString(
-                                                      interaction.guildId,
-                                                      'MISC.GET_PREMIUM',
-                                                  ),
-                                              )
-                                              .setStyle(ButtonStyle.Link)
-                                              .setURL(settings.premiumURL),
-                                      ),
-                                  ],
-                              },
-                          )
-                        : await interaction.replyHandler.locale(
-                              'FEATURE.NO_PERMISSION.DEFAULT',
-                              { type: MessageOptionsBuilderType.Error },
-                          );
-                    return;
-                }
+            const whitelisted = await getGuildFeatureWhitelisted(
+                this.player.guildId,
+                'autolyrics',
+            );
+            if (
+                whitelisted === WhitelistStatus.NotWhitelisted ||
+                whitelisted === WhitelistStatus.Expired
+            ) {
+                settings.features.autolyrics.premium && settings.premiumURL
+                    ? await interaction.replyHandler.locale(
+                          'FEATURE.NO_PERMISSION.PREMIUM',
+                          {
+                              type: MessageOptionsBuilderType.Error,
+                              components: [
+                                  new ActionRowBuilder<ButtonBuilder>().setComponents(
+                                      new ButtonBuilder()
+                                          .setLabel(
+                                              await getGuildLocaleString(
+                                                  interaction.guildId,
+                                                  'MISC.GET_PREMIUM',
+                                              ),
+                                          )
+                                          .setStyle(ButtonStyle.Link)
+                                          .setURL(settings.premiumURL),
+                                  ),
+                              ],
+                          },
+                      )
+                    : await interaction.replyHandler.locale(
+                          'FEATURE.NO_PERMISSION.DEFAULT',
+                          { type: MessageOptionsBuilderType.Error },
+                      );
+                return;
             }
         }
         await data.guild.set(
