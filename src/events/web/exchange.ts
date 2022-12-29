@@ -36,6 +36,12 @@ export default {
             const oauthData = (await getJSONResponse(
                 tokenResponseData.body,
             )) as OAuth2Data;
+            if (oauthData.error) {
+                return callback({
+                    status: 'error-auth',
+                    error: oauthData.error,
+                });
+            }
             const encryptedToken = CryptoJS.AES.encrypt(
                 `${oauthData.token_type} ${oauthData.access_token}`,
                 settings.features.web.encryptionKey,
