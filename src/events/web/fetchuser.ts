@@ -17,10 +17,15 @@ export default {
         token?: string,
     ): Promise<void> {
         if (!token) return;
-        const decryptedToken = CryptoJS.AES.decrypt(
-            token,
-            settings.features.web.encryptionKey,
-        ).toString(CryptoJS.enc.Utf8);
+        let decryptedToken;
+        try {
+            decryptedToken = CryptoJS.AES.decrypt(
+                token,
+                settings.features.web.encryptionKey,
+            ).toString(CryptoJS.enc.Utf8);
+        } catch (error) {
+            return callback({ status: 'error-generic' });
+        }
         const user = await request('https://discord.com/api/users/@me', {
             headers: {
                 Authorization: decryptedToken,
