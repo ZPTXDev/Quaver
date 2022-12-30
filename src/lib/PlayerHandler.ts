@@ -484,7 +484,7 @@ export default class PlayerHandler {
      */
     async resume(): Promise<PlayerResponse> {
         const { io } = await import('#src/main.js');
-        if (this.player.paused) {
+        if (!this.player.paused) {
             return PlayerResponse.PlayerStateUnchanged;
         }
         await this.player.resume();
