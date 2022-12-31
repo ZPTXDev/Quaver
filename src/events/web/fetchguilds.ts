@@ -1,5 +1,12 @@
-import type { JSONResponse } from '#src/lib/util/common.d.js';
+import type {
+    JSONResponse,
+    WhitelistedFeatures,
+} from '#src/lib/util/common.d.js';
 import { settings } from '#src/lib/util/settings.js';
+import {
+    getGuildFeatureWhitelisted,
+    WhitelistStatus,
+} from '#src/lib/util/util.js';
 import { version } from '#src/lib/util/version.js';
 import { getJSONResponse } from '@zptxdev/zptx-lib';
 import CryptoJS from 'crypto-js';
@@ -17,6 +24,13 @@ export default {
         token?: string,
     ): Promise<void> {
         const { bot } = await import('#src/main.js');
+        if (socket.guilds) {
+            return callback({
+                status: 'success',
+                guilds: socket.guilds,
+                version,
+            });
+        }
         if (!token) return;
         const decryptedToken = CryptoJS.AES.decrypt(
             token,

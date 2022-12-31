@@ -16,6 +16,9 @@ export default {
         callback: (cb: Record<string, any>) => void,
         token?: string,
     ): Promise<void> {
+        if (socket.user) {
+            return callback({ status: 'success', user: socket.user, version });
+        }
         if (!token) return;
         let decryptedToken;
         try {
