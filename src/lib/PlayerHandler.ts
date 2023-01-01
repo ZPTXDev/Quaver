@@ -288,7 +288,9 @@ export default class PlayerHandler {
         const voiceChannel = this.client.guilds.cache
             .get(this.player.guildId)
             ?.channels.cache.get(channelId ?? this.player.channelId);
-        if (voiceChannel?.type !== ChannelType.GuildStageVoice) return;
+        if (voiceChannel?.type !== ChannelType.GuildStageVoice) {
+            return PlayerResponse.Success;
+        }
         const permissions = this.client.guilds.cache
             .get(this.player.guildId)
             ?.channels.cache.get(channelId ?? this.player.channelId)
