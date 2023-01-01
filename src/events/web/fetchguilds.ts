@@ -27,7 +27,21 @@ export default {
         if (socket.guilds) {
             return callback({
                 status: 'success',
-                guilds: socket.guilds,
+                guilds: socket.guilds.map((guild): WebGuild => {
+                    guild.botInGuild = !!bot.guilds.cache.get(guild.id);
+                    const player =
+                        guild.botInGuild && bot.music.players.get(guild.id);
+                    guild.idle =
+                        guild.botInGuild && player
+                            ? !player.queue.current ||
+                              (!player.playing && !player.paused)
+                            : true;
+                    guild.track =
+                        guild.botInGuild && !guild.idle
+                            ? player.queue.current.title
+                            : '';
+                    return guild;
+                }),
                 version,
             });
         }
