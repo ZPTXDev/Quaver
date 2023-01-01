@@ -36,6 +36,7 @@ export default {
     async execute(
         interaction: QuaverInteraction<ButtonInteraction>,
     ): Promise<void> {
+        const { io } = await import('#src/main.js');
         if (!confirmationTimeout[interaction.message.id]) {
             await interaction.replyHandler.locale(
                 'DISCORD.INTERACTION.EXPIRED',
@@ -120,6 +121,14 @@ export default {
             'settings.autolyrics',
             option,
         );
+        if (settings.features.web.enabled) {
+            io.to(`guild:${interaction.guildId}`).emit(
+                'autoLyricsFeatureUpdate',
+                {
+                    enabled: option,
+                },
+            );
+        }
         const guildLocaleCode =
             (await data.guild.get<keyof typeof Language>(
                 interaction.guildId,

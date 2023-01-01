@@ -180,6 +180,11 @@ export default class PlayerHandler {
                 );
             }
         }
+        if (settings.features.web.enabled) {
+            io.to(`guild:${this.player.guildId}`).emit('stayFeatureUpdate', {
+                enabled,
+            });
+        }
         return PlayerResponse.Success;
     }
 
@@ -382,7 +387,7 @@ export default class PlayerHandler {
                     const user = this.client.users.cache.get(t.requester);
                     t.requesterTag = user?.tag;
                     t.requesterAvatar = user?.avatar;
-                        return t;
+                    return t;
                 }),
             );
         }
@@ -458,7 +463,7 @@ export default class PlayerHandler {
                     const user = this.client.users.cache.get(t.requester);
                     t.requesterTag = user?.tag;
                     t.requesterAvatar = user?.avatar;
-                        return t;
+                    return t;
                 }),
             );
         }
@@ -546,7 +551,7 @@ export default class PlayerHandler {
                     const user = this.client.users.cache.get(t.requester);
                     t.requesterTag = user?.tag;
                     t.requesterAvatar = user?.avatar;
-                        return t;
+                    return t;
                 }),
             );
         }
@@ -590,7 +595,7 @@ export default class PlayerHandler {
                     const user = this.client.users.cache.get(t.requester);
                     t.requesterTag = user?.tag;
                     t.requesterAvatar = user?.avatar;
-                        return t;
+                    return t;
                 }),
             );
         }
