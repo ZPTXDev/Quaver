@@ -6,6 +6,7 @@ import CryptoJS from 'crypto-js';
 import type { APIUser } from 'discord.js';
 import type { Socket } from 'socket.io';
 import { request } from 'undici';
+import type { WebUser } from './fetchuser.d.js';
 
 export default {
     name: 'fetchuser',
@@ -38,6 +39,8 @@ export default {
             user.body,
         )) as JSONResponse<APIUser>;
         if (response.message) return callback({ status: 'error-auth' });
+        const webUser = response as WebUser;
+        webUser.manager = settings.managers.includes(response.id);
         socket.user = response;
         return callback({ status: 'success', user: response, version });
     },
