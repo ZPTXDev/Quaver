@@ -11,8 +11,7 @@ export default {
         guildId: Snowflake,
     ): Promise<void> {
         const { bot } = await import('#src/main.js');
-        if (!socket.guilds) return callback({ status: 'error-auth' });
-        if (!socket.guilds.find((guild): boolean => guild.id === guildId)) {
+        if (!socket.guilds?.find((guild): boolean => guild.id === guildId)) {
             return callback({ status: 'error-auth' });
         }
         if (!bot.guilds.cache.get(guildId)) {
