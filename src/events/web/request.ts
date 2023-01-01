@@ -1,4 +1,14 @@
-import type { QuaverPlayer, QuaverSong } from '#src/lib/util/common.d.js';
+import type {
+    QuaverPlayer,
+    QuaverSong,
+    WhitelistedFeatures,
+} from '#src/lib/util/common.d.js';
+import { data } from '#src/lib/util/common.js';
+import { settings } from '#src/lib/util/settings.js';
+import {
+    getGuildFeatureWhitelisted,
+    WhitelistStatus,
+} from '#src/lib/util/util.js';
 import { version } from '#src/lib/util/version.js';
 import type { APIGuild, Snowflake } from 'discord.js';
 import type { Socket } from 'socket.io';
@@ -11,7 +21,7 @@ export default {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         callback: (cb: Record<string, any>) => void,
         guildId: Snowflake,
-        item: 'player',
+        item: 'player' | 'settings',
     ): Promise<void> {
         const { bot } = await import('#src/main.js');
         if (!socket.guilds) return callback({ status: 'error-auth' });
@@ -73,6 +83,40 @@ export default {
                       }
                     : null;
                 break;
+            }
+            case 'settings': {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                response = {} as any;
+                for (const feature of [
+                    'stay',
+                    'autolyrics',
+                    'smartqueue',
+                ].filter(
+                    (feat: WhitelistedFeatures): boolean =>
+                        settings.features[feat].enabled,
+                )) {
+                    response[feature] = {
+                        enabled: !!(await data.guild.get<boolean>(
+                            guildId,
+                            `settings.${feature}${
+                                feature === 'stay' ? '.enabled' : ''
+                            }`,
+                        )),
+                        whitelisted: false,
+                    };
+                    const whitelisted = await getGuildFeatureWhitelisted(
+                        guildId,
+                        feature as WhitelistedFeatures,
+                    );
+                    if (
+                        ![
+                            WhitelistStatus.NotWhitelisted,
+                            WhitelistStatus.Expired,
+                        ].includes(whitelisted)
+                    ) {
+                        response[feature].whitelisted = true;
+                    }
+                }
             }
         }
         return callback({ status: 'success', response, version });

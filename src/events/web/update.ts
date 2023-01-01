@@ -1,12 +1,18 @@
 import { PlayerResponse } from '#src/lib/PlayerHandler.js';
-import { ForceType } from '#src/lib/ReplyHandler.js';
 import type { QuaverPlayer } from '#src/lib/util/common.d.js';
-import { getRequesterStatus, RequesterStatus } from '#src/lib/util/util.js';
+import { data } from '#src/lib/util/common.js';
+import { settings } from '#src/lib/util/settings.js';
+import {
+    getGuildFeatureWhitelisted,
+    getRequesterStatus,
+    RequesterStatus,
+    WhitelistStatus,
+} from '#src/lib/util/util.js';
 import type { APIGuild, APIUser, GuildMember, Snowflake } from 'discord.js';
 import type { Socket } from 'socket.io';
 
 export default {
-    name: ForceType.Update,
+    name: 'update',
     once: false,
     async execute(
         socket: Socket & { guilds: APIGuild[]; user: APIUser },
@@ -16,15 +22,20 @@ export default {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         item: { type: UpdateItemType; value?: any },
     ): Promise<void> {
-        const { bot } = await import('#src/main.js');
+        const { bot, io } = await import('#src/main.js');
         if (!socket.guilds) return callback({ status: 'error-auth' });
         if (!socket.guilds.find((guild): boolean => guild.id === guildId)) {
             return callback({ status: 'error-auth' });
         }
         if (
+            ![
+                UpdateItemType.StayFeature,
+                UpdateItemType.AutoLyricsFeature,
+                UpdateItemType.SmartQueueFeature,
+            ].includes(item.type) &&
             bot.guilds.cache.get(guildId)?.members.cache.get(socket.user.id)
                 ?.voice.channelId !==
-            bot.guilds.cache.get(guildId).members.me.voice.channelId
+                bot.guilds.cache.get(guildId).members.me.voice.channelId
         ) {
             return callback({ status: 'error-generic' });
         }
@@ -154,6 +165,71 @@ export default {
                 }
                 break;
             }
+            case UpdateItemType.StayFeature: {
+                const player = bot.music.players.get(guildId) as QuaverPlayer;
+                if (!player) return callback({ status: 'error-generic' });
+                const response = await player.handler.stay(item.value);
+                if (response !== PlayerResponse.Success) {
+                    return callback({ status: 'error-generic' });
+                }
+                break;
+            }
+            case UpdateItemType.AutoLyricsFeature: {
+                if (item.value) {
+                    if (!settings.features.autolyrics.enabled) {
+                        return callback({ status: 'error-generic' });
+                    }
+                    const whitelisted = await getGuildFeatureWhitelisted(
+                        guildId,
+                        'autolyrics',
+                    );
+                    if (
+                        whitelisted === WhitelistStatus.NotWhitelisted ||
+                        whitelisted === WhitelistStatus.Expired
+                    ) {
+                        return callback({ status: 'error-generic' });
+                    }
+                }
+                await data.guild.set(
+                    guildId,
+                    'settings.autolyrics',
+                    item.value,
+                );
+                if (settings.features.web.enabled) {
+                    io.to(`guild:${guildId}`).emit('autoLyricsFeatureUpdate', {
+                        enabled: item.value,
+                    });
+                }
+                break;
+            }
+            case UpdateItemType.SmartQueueFeature: {
+                if (item.value) {
+                    if (!settings.features.smartqueue.enabled) {
+                        return callback({ status: 'error-generic' });
+                    }
+                    const whitelisted = await getGuildFeatureWhitelisted(
+                        guildId,
+                        'smartqueue',
+                    );
+                    if (
+                        whitelisted === WhitelistStatus.NotWhitelisted ||
+                        whitelisted === WhitelistStatus.Expired
+                    ) {
+                        return callback({ status: 'error-generic' });
+                    }
+                }
+                await data.guild.set(
+                    guildId,
+                    'settings.smartqueue',
+                    item.value,
+                );
+                if (settings.features.web.enabled) {
+                    io.to(`guild:${guildId}`).emit('smartQueueFeatureUpdate', {
+                        enabled: item.value,
+                    });
+                }
+                break;
+            }
         }
         return callback({ status: 'success' });
     },
@@ -169,4 +245,7 @@ export enum UpdateItemType {
     Seek = 'seek',
     Remove = 'remove',
     Shuffle = 'shuffle',
+    StayFeature = 'stayFeature',
+    AutoLyricsFeature = 'autoLyricsFeature',
+    SmartQueueFeature = 'smartQueueFeature',
 }
