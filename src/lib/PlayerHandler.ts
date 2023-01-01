@@ -4,6 +4,7 @@ import type {
     QuaverChannels,
     QuaverClient,
     QuaverPlayer,
+    QuaverSong,
 } from '#src/lib/util/common.d.js';
 import {
     data,
@@ -18,7 +19,7 @@ import {
     sortQueue,
     WhitelistStatus,
 } from '#src/lib/util/util.js';
-import type { LoopType, Song } from '@lavaclient/queue';
+import type { LoopType } from '@lavaclient/queue';
 import type { Message, Snowflake } from 'discord.js';
 import { ChannelType, PermissionsBitField } from 'discord.js';
 
