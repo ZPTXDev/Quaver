@@ -70,6 +70,7 @@ export type QuaverClient = Client<boolean> & {
 
 export type QuaverSong = Song & {
     requesterTag?: string;
+    requesterAvatar?: string;
 };
 
 export type QuaverPlayer = Player<Node> & {

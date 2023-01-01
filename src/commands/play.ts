@@ -313,9 +313,9 @@ export default {
             io.to(`guild:${interaction.guildId}`).emit(
                 'queueUpdate',
                 player.queue.tracks.map((track: QuaverSong): QuaverSong => {
-                    track.requesterTag = bot.users.cache.get(
-                        track.requester,
-                    )?.tag;
+                    const user = bot.users.cache.get(track.requester);
+                    track.requesterTag = user?.tag;
+                    track.requesterAvatar = user?.avatar;
                     return track;
                 }),
             );

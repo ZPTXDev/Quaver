@@ -59,7 +59,9 @@ export default {
             io.to(`guild:${queue.player.guildId}`).emit(
                 'queueUpdate',
                 queue.tracks.map((t: QuaverSong): QuaverSong => {
-                    t.requesterTag = bot.users.cache.get(t.requester)?.tag;
+                    const user = bot.users.cache.get(t.requester);
+                    t.requesterTag = user?.tag;
+                    t.requesterAvatar = user?.avatar;
                     return t;
                 }),
             );

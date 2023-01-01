@@ -4,6 +4,7 @@ import type {
     QuaverChannels,
     QuaverInteraction,
     QuaverPlayer,
+    QuaverSong,
 } from '#src/lib/util/common.d.js';
 import {
     data,
@@ -217,16 +218,12 @@ export default {
             if (settings.features.web.enabled) {
                 io.to(`guild:${interaction.guildId}`).emit(
                     'queueUpdate',
-                    player.queue.tracks.map(
-                        (
-                            track: Song & { requesterTag: string },
-                        ): Song & { requesterTag: string } => {
-                            track.requesterTag = bot.users.cache.get(
-                                track.requester,
-                            )?.tag;
-                            return track;
-                        },
-                    ),
+                    player.queue.tracks.map((track: QuaverSong): QuaverSong => {
+                        const user = bot.users.cache.get(track.requester);
+                        track.requesterTag = user?.tag;
+                        track.requesterAvatar = user?.avatar;
+                        return track;
+                    }),
                 );
             }
             delete searchState[interaction.message.id];

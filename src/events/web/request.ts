@@ -26,17 +26,21 @@ export default {
             case 'player': {
                 const player = bot.music.players.get(guildId) as QuaverPlayer;
                 if (player?.queue.current) {
-                    player.queue.current.requesterTag = bot.users.cache.get(
+                    const user = bot.users.cache.get(
                         player.queue.current.requester,
-                    )?.tag;
+                    );
+                    player.queue.current.requesterTag = user?.tag;
+                    player.queue.current.requesterAvatar = user?.avatar;
                 }
                 response = player
                     ? {
                           queue: player.queue.tracks.map(
                               (track: QuaverSong): QuaverSong => {
-                                  track.requesterTag = bot.users.cache.get(
+                                  const user = bot.users.cache.get(
                                       track.requester,
-                                  )?.tag;
+                                  );
+                                  track.requesterTag = user?.tag;
+                                  track.requesterAvatar = user?.avatar;
                                   return track;
                               },
                           ),
