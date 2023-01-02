@@ -33,7 +33,7 @@ export default {
                         ),
                     )
                     .setMinValue(0)
-                    .setMaxValue(1000)
+                    .setMaxValue(200)
                     .setRequired(true),
         ),
     checks: [
@@ -53,7 +53,7 @@ export default {
             interaction.guildId,
         ) as QuaverPlayer;
         const volume = interaction.options.getInteger('new_volume');
-        if (volume > 200 && !settings.managers.includes(interaction.user.id)) {
+        if (volume > 200) {
             await interaction.replyHandler.locale(
                 'CMD.VOLUME.RESPONSE.OUT_OF_RANGE',
                 { type: MessageOptionsBuilderType.Error },
