@@ -5,7 +5,7 @@ export default {
     name: 'join',
     once: false,
     async execute(
-        socket: Socket & { guilds: APIGuild[] },
+        socket: Socket & { focused: Snowflake; guilds: APIGuild[] },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         callback: (cb: Record<string, any>) => void,
         guildId: Snowflake,
@@ -17,6 +17,8 @@ export default {
         if (!bot.guilds.cache.get(guildId)) {
             return callback({ status: 'error-generic' });
         }
+        if (socket.focused) socket.leave(`guild:${socket.focused}`);
+        socket.focused = guildId;
         socket.join(`guild:${guildId}`);
         return callback({ status: 'success' });
     },
