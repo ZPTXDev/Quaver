@@ -646,6 +646,9 @@ export default class PlayerHandler {
      */
     async volume(volume: number): Promise<PlayerResponse> {
         const { io } = await import('#src/main.js');
+        if (volume < 0 || volume > 200) {
+            return PlayerResponse.InputOutOfRange;
+        }
         await this.player.setVolume(volume);
         if (settings.features.web.enabled) {
             io.to(`guild:${this.player.guildId}`).emit('volumeUpdate', volume);
