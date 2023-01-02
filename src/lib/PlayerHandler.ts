@@ -169,14 +169,43 @@ export default class PlayerHandler {
                 'settings.stay.text',
                 this.player.queue.channel.id,
             );
-        }
-        if (this.player.timeout) {
-            clearTimeout(this.player.timeout);
-            delete this.player.timeout;
+            if (this.player.timeout) {
+                clearTimeout(this.player.timeout);
+                delete this.player.timeout;
+                if (settings.features.web.enabled) {
+                    io.to(`guild:${this.player.guildId}`).emit(
+                        'timeoutUpdate',
+                        !!this.player.timeout,
+                    );
+                }
+            }
+        } else if (
+            !this.player.queue.current ||
+            (!this.player.playing && !this.player.paused)
+        ) {
+            if (this.player.timeout) clearTimeout(this.player.timeout);
+            this.player.timeout = setTimeout(
+                (p): void => {
+                    logger.info({
+                        message: `[G ${p.guildId}] Disconnecting (inactivity)`,
+                        label: 'Quaver',
+                    });
+                    p.handler.locale(
+                        'MUSIC.DISCONNECT.INACTIVITY.DISCONNECTED',
+                        {
+                            type: MessageOptionsBuilderType.Warning,
+                        },
+                    );
+                    p.handler.disconnect();
+                },
+                30 * 60 * 1000,
+                this.player,
+            );
+            this.player.timeoutEnd = Date.now() + 30 * 60 * 1000;
             if (settings.features.web.enabled) {
                 io.to(`guild:${this.player.guildId}`).emit(
                     'timeoutUpdate',
-                    !!this.player.timeout,
+                    this.player.timeoutEnd,
                 );
             }
         }
