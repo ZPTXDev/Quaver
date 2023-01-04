@@ -9,6 +9,7 @@ import {
     WhitelistStatus,
 } from '#src/lib/util/util.js';
 import type { APIGuild, APIUser, GuildMember, Snowflake } from 'discord.js';
+import { PermissionsBitField } from 'discord.js';
 import type { Socket } from 'socket.io';
 
 export default {
@@ -175,6 +176,9 @@ export default {
                 break;
             }
             case UpdateItemType.AutoLyricsFeature: {
+                if (bot.guilds.cache.get(guildId).members.cache.get(socket.user.id).permissions.missing(PermissionsBitField.Flags.ManageGuild)) {
+                    return callback({ status: 'error-auth' });
+                }
                 if (item.value) {
                     if (!settings.features.autolyrics.enabled) {
                         return callback({ status: 'error-generic' });
@@ -203,6 +207,9 @@ export default {
                 break;
             }
             case UpdateItemType.SmartQueueFeature: {
+                if (bot.guilds.cache.get(guildId).members.cache.get(socket.user.id).permissions.missing(PermissionsBitField.Flags.ManageGuild)) {
+                    return callback({ status: 'error-auth' });
+                }
                 if (item.value) {
                     if (!settings.features.smartqueue.enabled) {
                         return callback({ status: 'error-generic' });
