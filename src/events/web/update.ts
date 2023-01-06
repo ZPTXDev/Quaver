@@ -176,7 +176,14 @@ export default {
                 break;
             }
             case UpdateItemType.AutoLyricsFeature: {
-                if (bot.guilds.cache.get(guildId).members.cache.get(socket.user.id).permissions.missing(PermissionsBitField.Flags.ManageGuild)) {
+                if (
+                    bot.guilds.cache
+                        .get(guildId)
+                        ?.members.cache.get(socket.user.id)
+                        ?.permissions.missing(
+                            PermissionsBitField.Flags.ManageGuild,
+                        )
+                ) {
                     return callback({ status: 'error-auth' });
                 }
                 if (item.value) {
@@ -207,7 +214,14 @@ export default {
                 break;
             }
             case UpdateItemType.SmartQueueFeature: {
-                if (bot.guilds.cache.get(guildId).members.cache.get(socket.user.id).permissions.missing(PermissionsBitField.Flags.ManageGuild)) {
+                if (
+                    bot.guilds.cache
+                        .get(guildId)
+                        ?.members.cache.get(socket.user.id)
+                        ?.permissions.missing(
+                            PermissionsBitField.Flags.ManageGuild,
+                        )
+                ) {
                     return callback({ status: 'error-auth' });
                 }
                 if (item.value) {
