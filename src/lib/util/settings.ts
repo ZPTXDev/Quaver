@@ -1,12 +1,6 @@
+import { getAbsoluteFileURL } from '@zptxdev/zptx-lib';
 import { existsSync, readFileSync } from 'fs';
-import { dirname, resolve } from 'path';
-import { fileURLToPath, pathToFileURL } from 'url';
 import type { SettingsObject } from './settings.d.js';
-
-function getAbsoluteFileURL(baseURL: string, path: string[]): URL {
-    const __dirname = dirname(fileURLToPath(baseURL));
-    return pathToFileURL(resolve(__dirname, ...path));
-}
 
 export let settings: SettingsObject = {};
 const path = getAbsoluteFileURL(import.meta.url, [

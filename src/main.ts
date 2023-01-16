@@ -17,13 +17,15 @@ import {
     setLocales,
 } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
-import {
-    getAbsoluteFileURL,
-    getGuildLocaleString,
-} from '#src/lib/util/util.js';
+import { getGuildLocaleString } from '#src/lib/util/util.js';
 import '@lavaclient/queue/register';
 import { load } from '@lavaclient/spotify';
-import { msToTime, msToTimeString, parseTimeString } from '@zptxdev/zptx-lib';
+import {
+    getAbsoluteFileURL,
+    msToTime,
+    msToTimeString,
+    parseTimeString,
+} from '@zptxdev/zptx-lib';
 import {
     AttachmentBuilder,
     Client,
