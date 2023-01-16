@@ -3,11 +3,11 @@
 // This means that it may take a little bit of time before your commands can be seen on all guilds.
 
 import { REST } from '@discordjs/rest';
+import { getAbsoluteFileURL } from '@zptxdev/zptx-lib';
 import { Routes } from 'discord-api-types/v10';
 import { Collection } from 'discord.js';
 import { readdirSync } from 'fs';
 import { setLocales } from '../dist/lib/util/common.js';
-import { getAbsoluteFileURL } from '../dist/lib/util/util.js';
 import settings from '../settings.json' assert { type: 'json' };
 
 const locales = new Collection();
