@@ -177,7 +177,7 @@ rl.on('line', async (input): Promise<void> => {
 rl.on('close', async (): Promise<void> => shuttingDown('SIGINT'));
 
 let app: Express, server;
-if (settings.features.web.enabled) {
+if (settings.features.web.enabled && settings.grafanaLogging) {
     app = express();
     app.get('/stats', async (req, res): Promise<void> => {
         const totalSessions = bot.music?.players?.size;
