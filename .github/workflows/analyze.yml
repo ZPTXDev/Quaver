@@ -70,6 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - run: npm i -g npm@8
       - uses: creyD/prettier_action@v4.2
         with:
           commit_message: 'refactor: prettify'
