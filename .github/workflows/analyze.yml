@@ -71,7 +71,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: npm i -g npm@8
-      - uses: creyD/prettier_action@v4.2
+      - uses: creyD/prettier_action@v4.3
         with:
           commit_message: 'refactor: prettify'
           prettier_options: --write **/*.ts
