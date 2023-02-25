@@ -4,7 +4,7 @@ import type { Snowflake } from 'discord.js';
 import { Collection } from 'discord.js';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
-import type { transport } from 'winston';
+import type { Logform, transport } from 'winston';
 import { createLogger, format, transports } from 'winston';
 import LokiTransport from 'winston-loki';
 import type { SearchStateRecord } from './common.d.js';
@@ -38,12 +38,7 @@ export const logger = createLogger({
     transports: [
         new transports.Console({
             format: format.combine(
-                // once again, i have stumbled across an unsolvable problem.
-                // TransformableInfo interface is not exported by winston,
-                // and i cannot find a way to somehow make it say that the
-                // arrow function returns a TransformableInfo object.
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                format((info): any => {
+                format((info): Logform.TransformableInfo => {
                     info.level = info.level.toUpperCase();
                     return info;
                 })(),
