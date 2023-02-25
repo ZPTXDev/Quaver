@@ -5,7 +5,7 @@ import { Collection } from 'discord.js';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import type { Logform, transport } from 'winston';
-import { createLogger, format, transports } from 'winston';
+import { addColors, createLogger, format, transports } from 'winston';
 import LokiTransport from 'winston-loki';
 import type { SearchStateRecord } from './common.d.js';
 
@@ -23,8 +23,19 @@ export const data = {
         namespace: 'guild',
     }),
 };
+addColors({
+    verbose: 'blackBG white bold',
+    info: 'greenBG white bold',
+    warn: 'yellowBG black bold',
+    error: 'redBG white bold',
+    verboseMsg: 'gray',
+    infoMsg: 'green',
+    warnMsg: 'yellow',
+    errorMsg: 'red',
+    meaningless: 'gray',
+});
 export const logger = createLogger({
-    level: 'info',
+    level: 'verbose',
     format: format.combine(
         format.errors({ stack: true }),
         format.timestamp(),
@@ -39,7 +50,17 @@ export const logger = createLogger({
         new transports.Console({
             format: format.combine(
                 format((info): Logform.TransformableInfo => {
-                    info.level = info.level.toUpperCase();
+                    const colorizer = format.colorize();
+                    info.timestamp = colorizer.colorize(
+                        'meaningless',
+                        info.timestamp,
+                    );
+                    info.label = colorizer.colorize('meaningless', info.label);
+                    info.message = colorizer.colorize(
+                        `${info.level}Msg`,
+                        info.message,
+                    );
+                    info.level = ` ${info.level.toUpperCase()} `;
                     return info;
                 })(),
                 format.errors({ stack: true }),
@@ -47,7 +68,7 @@ export const logger = createLogger({
                 format.colorize(),
                 format.printf(
                     (info): string =>
-                        `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`,
+                        `${info.timestamp} ${info.level} ${info.label} ${info.message}`,
                 ),
             ),
         }),
