@@ -24,11 +24,11 @@ export const data = {
     }),
 };
 addColors({
-    verbose: 'blackBG white bold',
+    verbose: 'blackBG dim bold',
     info: 'greenBG white bold',
     warn: 'yellowBG black bold',
     error: 'redBG white bold',
-    verboseMsg: 'gray',
+    verboseMsg: 'dim',
     infoMsg: 'green',
     warnMsg: 'yellow',
     errorMsg: 'red',
