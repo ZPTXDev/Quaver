@@ -77,12 +77,8 @@ export default {
         const updated: {
             components: ActionRowBuilder<MessageActionRowComponentBuilder>[];
         } = { components: [] };
-        updated.components[0] = ActionRowBuilder.from(
-            original.components[0],
-        ) as ActionRowBuilder<StringSelectMenuBuilder>;
-        updated.components[1] = ActionRowBuilder.from(
-            original.components[1],
-        ) as ActionRowBuilder<ButtonBuilder>;
+        updated.components[0] = ActionRowBuilder.from(original.components[0]);
+        updated.components[1] = ActionRowBuilder.from(original.components[1]);
         updated.components[0].components[0] = StringSelectMenuBuilder.from(
             original.components[0].components[0] as StringSelectMenuComponent,
         ).setOptions(

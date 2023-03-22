@@ -10,7 +10,9 @@ import {
 import type {
     AutocompleteInteraction,
     Interaction,
+    InteractionReplyOptions,
     InteractionResponse,
+    InteractionUpdateOptions,
     Message,
 } from 'discord.js';
 import { PermissionsBitField } from 'discord.js';
@@ -84,7 +86,7 @@ export default class ReplyHandler {
             type,
             components,
             files,
-        });
+        }) as InteractionReplyOptions;
         replyMsgOpts.fetchReply = fetchReply;
         if (
             force === ForceType.Reply ||
@@ -124,7 +126,9 @@ export default class ReplyHandler {
                 this.interaction.isFromMessage())
         ) {
             try {
-                return await this.interaction.update(replyMsgOpts);
+                return await this.interaction.update(
+                    replyMsgOpts as InteractionUpdateOptions,
+                );
             } catch (error) {
                 if (error instanceof Error) {
                     logger.error({

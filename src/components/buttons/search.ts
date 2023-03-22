@@ -312,14 +312,10 @@ export default {
                     pages.length.toString(),
                 ),
             });
-        updated.components[0] = <ActionRowBuilder<StringSelectMenuBuilder>>(
-            ActionRowBuilder.from(original.components[0])
-        );
-        updated.components[1] = <ActionRowBuilder<ButtonBuilder>>(
-            ActionRowBuilder.from(original.components[1])
-        );
+        updated.components[0] = ActionRowBuilder.from(original.components[0]);
+        updated.components[1] = ActionRowBuilder.from(original.components[1]);
         const selectComponent = StringSelectMenuBuilder.from(
-            <StringSelectMenuComponent>original.components[0].components[0],
+            original.components[0].components[0] as StringSelectMenuComponent,
         ).setOptions(
             pages[page - 1]
                 .map(

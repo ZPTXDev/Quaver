@@ -19,11 +19,10 @@ import { getAbsoluteFileURL } from '@zptxdev/zptx-lib';
 import type {
     APIEmbedField,
     APISelectMenuOption,
+    BaseMessageOptions,
     ButtonInteraction,
     Interaction,
-    InteractionReplyOptions,
     MessageActionRowComponentBuilder,
-    MessageCreateOptions,
     ModalSubmitInteraction,
     RoleSelectMenuInteraction,
     Snowflake,
@@ -447,7 +446,7 @@ export function buildMessageOptions(
         components = null,
         files = null,
     }: MessageOptionsBuilderOptions = {},
-): MessageCreateOptions & InteractionReplyOptions {
+): BaseMessageOptions {
     const messageData = Array.isArray(inputData) ? inputData : [inputData];
     const color: 'success' | 'neutral' | 'warning' | 'error' =
         MessageOptionsBuilderType[type].toLowerCase() as
@@ -464,7 +463,7 @@ export function buildMessageOptions(
         if (!msg.data.color) return msg.setColor(settings.colors[color]);
         return msg;
     });
-    const opts: MessageCreateOptions & InteractionReplyOptions = {
+    const opts: BaseMessageOptions = {
         embeds: embedData,
     };
     if (components !== null) opts.components = components;
