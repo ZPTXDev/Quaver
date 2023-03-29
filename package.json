@@ -38,7 +38,7 @@
     "@types/wanakana": "^4.0.3",
     "@typescript-eslint/eslint-plugin": "^5.57.0",
     "@typescript-eslint/parser": "^5.57.0",
-    "eslint": "^8.36.0",
+    "eslint": "^8.37.0",
     "prettier": "^2.8.7",
     "rimraf": "^4.4.1",
     "tsc-alias": "^1.8.4",
