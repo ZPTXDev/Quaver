@@ -37,7 +37,7 @@
     "@types/node": "^18.15.11",
     "@types/wanakana": "^4.0.3",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
-    "@typescript-eslint/parser": "^5.57.0",
+    "@typescript-eslint/parser": "^5.57.1",
     "eslint": "^8.37.0",
     "prettier": "^2.8.7",
     "rimraf": "^4.4.1",
