@@ -11,9 +11,9 @@ import type {
     WhitelistedFeatures,
 } from '#src/lib/util/common.d.js';
 import {
+    MessageOptionsBuilderType,
     data,
     logger,
-    MessageOptionsBuilderType,
     setLocales,
 } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
@@ -36,7 +36,7 @@ import {
 } from 'discord.js';
 import type { Express } from 'express';
 import express from 'express';
-import { readdirSync, readFileSync } from 'fs';
+import { readFileSync, readdirSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import * as http from 'http';
 import * as https from 'https';
@@ -177,39 +177,43 @@ rl.on('line', async (input): Promise<void> => {
 rl.on('close', async (): Promise<void> => shuttingDown('SIGINT'));
 
 let app: Express, server;
-if (settings.features.web.enabled && settings.grafanaLogging) {
+if (settings.features.web.enabled) {
     app = express();
-    app.get('/stats', async (req, res): Promise<void> => {
-        const totalSessions = bot.music?.players?.size;
-        const activeSessions = Array.from(bot.music?.players?.values()).filter(
-            (player: QuaverPlayer): boolean =>
-                !player.timeout && !player.pauseTimeout,
-        ).length;
-        const totalQueued = Array.from(bot.music?.players?.values()).reduce(
-            (total: number, player: QuaverPlayer): number =>
-                total + player.queue?.tracks.length,
-            0,
-        );
-        res.send({
-            sessions: {
-                total: totalSessions,
-                active: activeSessions,
-                idle: totalSessions - activeSessions,
-            },
-            tracks: {
-                totalQueued: totalQueued,
-            },
-            versions: {
-                node: process.version,
-                quaver: version,
-            },
-            cache: {
-                guilds: bot.guilds.cache.size,
-                users: bot.users.cache.size,
-            },
-            memory: process.memoryUsage(),
+    if (settings.grafanaLogging) {
+        app.get('/stats', async (req, res): Promise<void> => {
+            const totalSessions = bot.music?.players?.size;
+            const activeSessions = Array.from(
+                bot.music?.players?.values(),
+            ).filter(
+                (player: QuaverPlayer): boolean =>
+                    !player.timeout && !player.pauseTimeout,
+            ).length;
+            const totalQueued = Array.from(bot.music?.players?.values()).reduce(
+                (total: number, player: QuaverPlayer): number =>
+                    total + player.queue?.tracks.length,
+                0,
+            );
+            res.send({
+                sessions: {
+                    total: totalSessions,
+                    active: activeSessions,
+                    idle: totalSessions - activeSessions,
+                },
+                tracks: {
+                    totalQueued: totalQueued,
+                },
+                versions: {
+                    node: process.version,
+                    quaver: version,
+                },
+                cache: {
+                    guilds: bot.guilds.cache.size,
+                    users: bot.users.cache.size,
+                },
+                memory: process.memoryUsage(),
+            });
         });
-    });
+    }
     if (settings.features.web.https.enabled) {
         server = https.createServer(
             {
