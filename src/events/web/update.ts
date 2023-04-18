@@ -82,9 +82,9 @@ export default {
                 }
                 const requesterStatus = await getRequesterStatus(
                     player.queue.current,
-                    bot.guilds.cache
+                    (await bot.guilds.cache
                         .get(guildId)
-                        .members.cache.get(socket.user.id) as GuildMember,
+                        .members.fetch(socket.user.id)) as GuildMember,
                     player.queue.channel,
                 );
                 if (requesterStatus !== RequesterStatus.NotRequester) {
@@ -96,9 +96,11 @@ export default {
                 }
                 const skip = player.skip ?? {
                     required: Math.ceil(
-                        bot.guilds.cache
+                        (
+                            await bot.guilds.cache
                             .get(guildId)
-                            .members.me.voice.channel.members.filter(
+                                .members.fetchMe()
+                        ).voice.channel.members.filter(
                                 (m): boolean => !m.user.bot,
                             ).size / 2,
                     ),
@@ -141,9 +143,9 @@ export default {
                 }
                 const requesterStatus = await getRequesterStatus(
                     player.queue.current,
-                    bot.guilds.cache
+                    (await bot.guilds.cache
                         .get(guildId)
-                        .members.cache.get(socket.user.id) as GuildMember,
+                        .members.fetch(socket.user.id)) as GuildMember,
                     player.queue.channel,
                 );
                 if (requesterStatus === RequesterStatus.NotRequester) {
@@ -164,9 +166,9 @@ export default {
                 if (!track) return callback({ status: Response.GenericError });
                 const requesterStatus = await getRequesterStatus(
                     player.queue.tracks[item.value],
-                    bot.guilds.cache
+                    (await bot.guilds.cache
                         .get(guildId)
-                        .members.cache.get(socket.user.id) as GuildMember,
+                        .members.fetch(socket.user.id)) as GuildMember,
                     player.queue.channel,
                 );
                 if (requesterStatus === RequesterStatus.NotRequester) {
