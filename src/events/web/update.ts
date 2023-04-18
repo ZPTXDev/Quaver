@@ -160,6 +160,18 @@ export default {
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
+                const track = player.queue.tracks[item.value];
+                if (!track) return callback({ status: Response.GenericError });
+                const requesterStatus = await getRequesterStatus(
+                    player.queue.tracks[item.value],
+                    bot.guilds.cache
+                        .get(guildId)
+                        .members.cache.get(socket.user.id) as GuildMember,
+                    player.queue.channel,
+                );
+                if (requesterStatus === RequesterStatus.NotRequester) {
+                    return callback({ status: Response.AuthenticationError });
+                }
                 const response = await player.handler.remove(item.value + 1);
                 if (response !== PlayerResponse.Success) {
                     return callback({ status: Response.GenericError });
