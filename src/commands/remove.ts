@@ -59,11 +59,14 @@ export default {
             interaction.guildId,
         ) as QuaverPlayer;
         const track = player.queue.tracks[position - 1];
-        const requesterStatus = await getRequesterStatus(
+        // workaround: if track doesn't exist, temporarily mark it as "requested by user" and we'll let the switch case deal with it
+        const requesterStatus = track
+            ? await getRequesterStatus(
             track,
             interaction.member as GuildMember,
             player.queue.channel,
-        );
+              )
+            : RequesterStatus.Requester;
         if (requesterStatus === RequesterStatus.NotRequester) {
             await interaction.replyHandler.locale('CHECK.NOT_REQUESTER', {
                 type: MessageOptionsBuilderType.Error,
