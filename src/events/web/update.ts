@@ -5,10 +5,12 @@ import type {
     QuaverSong,
 } from '#src/lib/util/common.d.js';
 import { data } from '#src/lib/util/common.js';
+import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
     RequesterStatus,
     WhitelistStatus,
+    getFailedChecks,
     getGuildFeatureWhitelisted,
     getRequesterStatus,
 } from '#src/lib/util/util.js';
@@ -57,7 +59,12 @@ export default {
                 if (!(member instanceof GuildMember)) {
                     return callback({ status: Response.GenericError });
                 }
-                if (!member.voice.channelId) {
+                const failedChecks: Check[] = getFailedChecks(
+                    [Check.InVoice, Check.InSessionVoice],
+                    guildId,
+                    member,
+                );
+                if (failedChecks.length > 0) {
                     return callback({ status: Response.UserNotInChannelError });
                 }
                 if (member.voice.channel?.type !== ChannelType.GuildVoice) {
@@ -72,6 +79,7 @@ export default {
                     !permissions.has(
                         new PermissionsBitField([
                             PermissionsBitField.Flags.ViewChannel,
+                            PermissionsBitField.Flags.SendMessages,
                             PermissionsBitField.Flags.Connect,
                             PermissionsBitField.Flags.Speak,
                         ]),
