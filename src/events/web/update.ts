@@ -250,7 +250,7 @@ export default {
                             PermissionsBitField.Flags.ManageGuild,
                         )
                 ) {
-                    return callback({ status: 'error-auth' });
+                    return callback({ status: Response.AuthenticationError });
                 }
                 if (item.value === true) {
                     if (!settings.features.smartqueue.enabled) {
