@@ -201,12 +201,11 @@ export default {
             }
             case UpdateItemType.AutoLyricsFeature: {
                 if (
-                    bot.guilds.cache
+                    !(
+                        await bot.guilds.cache
                         .get(guildId)
-                        ?.members.cache.get(socket.user.id)
-                        ?.permissions.missing(
-                            PermissionsBitField.Flags.ManageGuild,
-                        )
+                            ?.members.fetch(socket.user.id)
+                    )?.permissions.has(PermissionsBitField.Flags.ManageGuild)
                 ) {
                     return callback({ status: Response.AuthenticationError });
                 }
@@ -243,12 +242,11 @@ export default {
             }
             case UpdateItemType.SmartQueueFeature: {
                 if (
-                    bot.guilds.cache
+                    !(
+                        await bot.guilds.cache
                         .get(guildId)
-                        ?.members.cache.get(socket.user.id)
-                        ?.permissions.missing(
-                            PermissionsBitField.Flags.ManageGuild,
-                        )
+                            ?.members.fetch(socket.user.id)
+                    )?.permissions.has(PermissionsBitField.Flags.ManageGuild)
                 ) {
                     return callback({ status: Response.AuthenticationError });
                 }
