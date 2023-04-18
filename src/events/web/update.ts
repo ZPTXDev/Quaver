@@ -41,6 +41,7 @@ export default {
                 UpdateItemType.StayFeature,
                 UpdateItemType.AutoLyricsFeature,
                 UpdateItemType.SmartQueueFeature,
+                UpdateItemType.Add,
             ].includes(item.type) &&
             (await bot.guilds.cache.get(guildId)?.members.fetch(socket.user.id))
                 ?.voice.channelId !==
