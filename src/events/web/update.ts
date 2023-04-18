@@ -210,7 +210,7 @@ export default {
                 ) {
                     return callback({ status: Response.AuthenticationError });
                 }
-                if (item.value) {
+                if (item.value === true) {
                     if (!settings.features.autolyrics.enabled) {
                         return callback({
                             status: Response.FeatureDisabledError,
@@ -252,7 +252,7 @@ export default {
                 ) {
                     return callback({ status: 'error-auth' });
                 }
-                if (item.value) {
+                if (item.value === true) {
                     if (!settings.features.smartqueue.enabled) {
                         return callback({
                             status: Response.FeatureDisabledError,
