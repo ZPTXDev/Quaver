@@ -65,9 +65,11 @@ export default {
     ): Promise<void> {
         const { bot, io } = await import('#src/main.js');
         if (
-            ![ChannelType.GuildText, ChannelType.GuildVoice].includes(
-                interaction.channel.type,
-            )
+            ![
+                ChannelType.GuildText,
+                ChannelType.GuildVoice,
+                ChannelType.GuildStageVoice,
+            ].includes(interaction.channel.type)
         ) {
             await interaction.replyHandler.locale(
                 'DISCORD.CHANNEL_UNSUPPORTED',

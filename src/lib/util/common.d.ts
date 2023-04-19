@@ -17,6 +17,7 @@ import type {
     EmbedBuilder,
     MessageActionRowComponentBuilder,
     Snowflake,
+    StageChannel,
     TextChannel,
     VoiceChannel,
 } from 'discord.js';
@@ -57,7 +58,7 @@ export type MessageOptionsBuilderOptions = {
 
 export type JSONResponse<T> = { message?: string } & T;
 
-export type QuaverChannels = TextChannel | VoiceChannel;
+export type QuaverChannels = TextChannel | VoiceChannel | StageChannel;
 
 export type QuaverClient = Client<boolean> & {
     music?: Node;

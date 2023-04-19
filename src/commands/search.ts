@@ -62,9 +62,11 @@ export default {
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
         if (
-            ![ChannelType.GuildText, ChannelType.GuildVoice].includes(
-                interaction.channel.type,
-            )
+            ![
+                ChannelType.GuildText,
+                ChannelType.GuildVoice,
+                ChannelType.GuildStageVoice,
+            ].includes(interaction.channel.type)
         ) {
             await interaction.replyHandler.locale(
                 'DISCORD.CHANNEL_UNSUPPORTED',
