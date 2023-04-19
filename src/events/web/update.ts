@@ -67,11 +67,6 @@ export default {
                 if (failedChecks.length > 0) {
                     return callback({ status: Response.UserNotInChannelError });
                 }
-                if (member.voice.channel?.type !== ChannelType.GuildVoice) {
-                    return callback({
-                        status: Response.ChannelUnsupportedError,
-                    });
-                }
                 const permissions = member.voice.channel?.permissionsFor(
                     bot.user.id,
                 );
@@ -83,7 +78,10 @@ export default {
                             PermissionsBitField.Flags.Connect,
                             PermissionsBitField.Flags.Speak,
                         ]),
-                    )
+                    ) ||
+                    (member.voice.channel.type ===
+                        ChannelType.GuildStageVoice &&
+                        !permissions.has(PermissionsBitField.StageModerator))
                 ) {
                     return callback({ status: Response.BotPermissionError });
                 }
@@ -493,7 +491,6 @@ enum Response {
     AuthenticationError = 'error-auth',
     GenericError = 'error-generic',
     ChannelMismatchError = 'error-channel-mismatch',
-    ChannelUnsupportedError = 'error-channel-unsupported',
     InactiveSessionError = 'error-inactive-session',
     FeatureDisabledError = 'error-feature-disabled',
     FeatureNotWhitelistedError = 'error-feature-not-whitelisted',
