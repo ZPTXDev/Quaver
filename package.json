@@ -39,7 +39,7 @@
     "@typescript-eslint/eslint-plugin": "^5.59.1",
     "@typescript-eslint/parser": "^5.59.1",
     "eslint": "^8.39.0",
-    "prettier": "^2.8.7",
+    "prettier": "^2.8.8",
     "rimraf": "^4.4.1",
     "tsc-alias": "^1.8.5",
     "tsconfig-paths": "^4.2.0",
