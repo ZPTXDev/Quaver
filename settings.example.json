@@ -8,6 +8,13 @@
         "warning": "Orange",
         "error": "DarkRed"
     },
+    "status": {
+        "presence": "online",
+        "activityType": "Listening",
+        "name": "music",
+        "url": "",
+        "showVersion": true
+    },
     "defaultLocaleCode": "en",
     "disableAd": false,
     "supportServer": "https://discord.gg/",

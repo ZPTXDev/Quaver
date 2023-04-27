@@ -11,6 +11,13 @@
         "warning": "Orange",
         "error": "DarkRed"
     },
+    "status": {
+        "presence": "online",
+        "activityType": "Listening",
+        "name": "music",
+        "url": "",
+        "showVersion": true
+    },
     "defaultLocaleCode": "en",
     "disableAd": false,
     "supportServer": "https://discord.gg/",
@@ -77,6 +84,11 @@
 | `applicationId` | Your application ID. Typically the same as your [bot's user ID](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-).<br />Alternatively, you can get it from the [Discord Developer Portal](https://discord.com/developers/applications). | ✅ |  |
 | `clientSecret` | Your client secret. You can get it from the [Discord Developer Portal](https://discord.com/developers/applications) under `OAuth2 > General`. | ✅ |  |
 | `colors` | The colors used for embeds. Valid values are available [here](https://discord.js.org/#/docs/discord.js/main/typedef/ColorResolvable). | ✅ |  |
+| `status.presence` | The presence. Valid values are `online`, `idle`, `dnd`, and `invisible`. | ✅ | `6.10.0` |
+| `status.activityType` | The activity type. Valid values are `Playing`, `Streaming`, `Listening`, `Watching`, and `Competing`. | ✅ | `6.10.0` |
+| `status.name` | The activity name. | ✅ | `6.10.0` |
+| `status.url` | The activity URL. Only used if `status.activityType` is `Streaming`. | ❌ | `6.10.0` |
+| `status.showVersion` | Whether to show the version in the status. | ❌ | `6.10.0` |
 | `defaultLocaleCode` | The default locale code. Valid values are available in the `locales` folder.<br />**Note:** This is used for all logs, slash command descriptions (at the time of deployment), and for all guilds without a language set in `/settings`. | ✅ |  |
 | `disableAd` | Whether to disable the ad in the `info` command (Sponsor Us button).<br />**Note:** Please do not disable the ad unless you really need to. Sponsors help keep the development of ZPTXDev projects going. Consider sponsoring us if you need to disable the ad! | ❌ |  |
 | `supportServer` | The support server invite link. This is used in the `info` command (Support Server button) and some messages in the event of an error. | ❌ | `6.6.0` |

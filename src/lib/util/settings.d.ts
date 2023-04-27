@@ -6,6 +6,7 @@ export type SettingsObject = {
     applicationId?: Snowflake;
     clientSecret?: string;
     colors?: ColorsSettingsObject;
+    status?: StatusSettingsObject;
     defaultLocaleCode?: string;
     developerMode?: boolean;
     disableAd?: boolean;
@@ -24,6 +25,14 @@ export type ColorsSettingsObject = {
     neutral?: ColorResolvable;
     warning?: ColorResolvable;
     error?: ColorResolvable;
+};
+
+export type StatusSettingsObject = {
+    presence?: string;
+    activityType?: string;
+    name?: string;
+    url?: string;
+    showVersion?: boolean;
 };
 
 export type DatabaseSettingsObject = {
