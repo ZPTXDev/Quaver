@@ -36,7 +36,7 @@
     "@types/lodash-es": "^4.17.7",
     "@types/node": "^18.16.2",
     "@types/wanakana": "^4.0.3",
-    "@typescript-eslint/eslint-plugin": "^5.59.1",
+    "@typescript-eslint/eslint-plugin": "^5.59.2",
     "@typescript-eslint/parser": "^5.59.1",
     "eslint": "^8.39.0",
     "prettier": "^2.8.8",
