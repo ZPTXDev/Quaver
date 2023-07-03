@@ -61,7 +61,7 @@ jobs:
         with:
           node-version: 18
       - run: npm i && npx genversion --es6 --semi src/lib/util/version.ts
-      - uses: EPMatt/reviewdog-action-tsc@v1.4.1
+      - uses: EPMatt/reviewdog-action-tsc@v1.5.0
         with:
           reporter: github-check
   prettier:
