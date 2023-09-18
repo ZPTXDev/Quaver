@@ -8,7 +8,7 @@
   "dependencies": {
     "@discordjs/rest": "^1.7.1",
     "@jeve/lyrics-finder": "^1.0.1",
-    "@keyv/sqlite": "^3.6.5",
+    "@keyv/sqlite": "^3.6.6",
     "@lavaclient/queue": "^2.1.1",
     "@lavaclient/spotify": "^3.1.0",
     "@napi-rs/pinyin": "^1.7.3",
