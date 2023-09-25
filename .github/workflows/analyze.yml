@@ -20,7 +20,7 @@ jobs:
       matrix:
         language: [ 'javascript' ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: github/codeql-action/init@v2
         with:
           languages: ${{ matrix.language }}
@@ -31,7 +31,7 @@ jobs:
     if: contains(fromJson('["push", "pull_request"]'), github.event_name)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: wagoid/commitlint-github-action@v5.4.3
@@ -42,7 +42,7 @@ jobs:
     if: contains(fromJson('["push", "pull_request"]'), github.event_name)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: 18
@@ -55,7 +55,7 @@ jobs:
     if: contains(fromJson('["push", "pull_request"]'), github.event_name)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: cp settings.example.json settings.json
       - uses: actions/setup-node@v3
         with:
@@ -69,7 +69,7 @@ jobs:
     if: contains(fromJson('["push", "pull_request"]'), github.event_name)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: creyD/prettier_action@v4.3
         with:
           commit_message: 'refactor: prettify'
