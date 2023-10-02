@@ -26,7 +26,7 @@
     "lodash-es": "^4.17.21",
     "patch-package": "^6.5.1",
     "socket.io": "^4.7.2",
-    "wanakana": "^5.1.0",
+    "wanakana": "^5.2.0",
     "winston": "^3.10.0",
     "winston-loki": "^6.0.7"
   },
