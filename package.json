@@ -28,7 +28,7 @@
     "socket.io": "^4.7.2",
     "wanakana": "^5.2.0",
     "winston": "^3.11.0",
-    "winston-loki": "^6.0.7"
+    "winston-loki": "^6.0.8"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.1.3",
