@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
       - run: yarn install
@@ -57,7 +57,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: cp settings.example.json settings.json
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
       - run: npm i && npx genversion --es6 --semi src/lib/util/version.ts
