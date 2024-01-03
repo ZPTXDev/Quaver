@@ -25,7 +25,7 @@
     "lavaclient": "^4.1.1",
     "lodash-es": "^4.17.21",
     "patch-package": "^6.5.1",
-    "socket.io": "^4.7.2",
+    "socket.io": "^4.7.3",
     "wanakana": "^5.3.1",
     "winston": "^3.11.0",
     "winston-loki": "^6.0.8"
