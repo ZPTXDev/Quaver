@@ -31,7 +31,7 @@
     "winston-loki": "^6.0.8"
   },
   "devDependencies": {
-    "@types/crypto-js": "^4.2.1",
+    "@types/crypto-js": "^4.2.2",
     "@types/express": "^4.17.21",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^18.16.3",
