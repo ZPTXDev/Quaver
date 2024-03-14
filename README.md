@@ -13,6 +13,11 @@
     </a>
 </p>
 
+# ⚠️ Quaver 7.0.0 Notice
+
+While the release is marked stable, a large part of the code remains untested. The main goal of the release is to provide a hotfix for the `LOAD_FAILED` errors.
+Spotify support is temporarily disabled due to internal changes and will be added back in a subsequent version.
+
 # 🎵 Public Instance
 
 Quaver is available for public use [here](https://go.zptx.dev/InviteQuaver), and its dashboard is available [here](https://quaver.zptx.dev). Keep in mind that this instance of Quaver will only run the latest stable version.
