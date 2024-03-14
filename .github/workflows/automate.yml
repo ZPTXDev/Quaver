@@ -35,7 +35,7 @@ jobs:
           token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
       - run: npm ci && npm run build
       - uses: cycjimmy/semantic-release-action@v3
         with:
