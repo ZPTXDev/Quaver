@@ -18,6 +18,7 @@ import {
 } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString } from '#src/lib/util/util.js';
+import { load as effectsLoad } from '@lavaclient/plugin-effects';
 import { load as queueLoad } from '@lavaclient/plugin-queue';
 import { load } from '@lavaclient/spotify';
 import {
@@ -49,6 +50,7 @@ import { inspect } from 'util';
 import { version } from './lib/util/version.js';
 import type { QuaverEvent, QuaverMusicEvent } from './main.d.js';
 
+effectsLoad();
 queueLoad();
 
 export const startup = { started: false };

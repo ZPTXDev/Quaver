@@ -49,7 +49,7 @@ const effects: Record<string, PlayerEffect> = {
                     band: 4,
                     gain: 0.0,
                 },
-                ...new Array(10).map(
+                ...Array.from({ length: 10 }).map(
                     (_, i): { band: number; gain: number } => ({
                         band: i + 5,
                         gain: -0.05,
