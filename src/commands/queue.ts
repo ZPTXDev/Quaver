@@ -3,6 +3,7 @@ import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
+import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
 import type { ChatInputCommandInteraction } from 'discord.js';
 import {
@@ -36,7 +37,7 @@ export default {
     async execute(
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
-        const player = interaction.client.music.players.get(
+        const player = await interaction.client.music.players.fetch(
             interaction.guildId,
         );
         if (player.queue.tracks.length === 0) {
@@ -56,9 +57,9 @@ export default {
             new EmbedBuilder()
                 .setDescription(
                     pages[0]
-                        .map((track, index): string => {
-                            const duration = msToTime(track.length);
-                            let durationString = track.isStream
+                        .map((track: Song, index): string => {
+                            const duration = msToTime(track.info.length);
+                            let durationString = track.info.isStream
                                 ? '∞'
                                 : msToTimeString(duration, true);
                             if (durationString === 'MORE_THAN_A_DAY') {
@@ -68,9 +69,9 @@ export default {
                                 );
                             }
                             return `\`${index + 1}.\` **[${escapeMarkdown(
-                                track.title,
-                            )}](${track.uri})** \`[${durationString}]\` <@${
-                                track.requester
+                                track.info.title,
+                            )}](${track.info.uri})** \`[${durationString}]\` <@${
+                                track.requesterId
                             }>`;
                         })
                         .join('\n'),

@@ -2,11 +2,11 @@ import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.d.js';
 import { data, logger } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
+    WhitelistStatus,
     generateEmbedFieldsFromLyrics,
     getGuildFeatureWhitelisted,
     getGuildLocaleString,
     getLocaleString,
-    WhitelistStatus,
 } from '#src/lib/util/util.js';
 import { LyricsFinder } from '@jeve/lyrics-finder';
 import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
@@ -25,12 +25,12 @@ export default {
         const { bot, io } = await import('#src/main.js');
         delete queue.player.skip;
         logger.info({
-            message: `[G ${queue.player.guildId}] Starting track`,
+            message: `[G ${queue.player.id}] Starting track`,
             label: 'Quaver',
         });
         await queue.player.pause(false);
         if (settings.features.web.enabled) {
-            io.to(`guild:${queue.player.guildId}`).emit(
+            io.to(`guild:${queue.player.id}`).emit(
                 'pauseUpdate',
                 queue.player.paused,
             );
@@ -39,27 +39,27 @@ export default {
             clearTimeout(queue.player.timeout);
             delete queue.player.timeout;
             if (settings.features.web.enabled) {
-                io.to(`guild:${queue.player.guildId}`).emit(
+                io.to(`guild:${queue.player.id}`).emit(
                     'timeoutUpdate',
                     !!queue.player.timeout,
                 );
             }
         }
-        const duration = msToTime(track.length);
-        let durationString = track.isStream
+        const duration = msToTime(track.info.length);
+        let durationString = track.info.isStream
             ? '∞'
             : msToTimeString(duration, true);
         if (durationString === 'MORE_THAN_A_DAY') {
             durationString = await getGuildLocaleString(
-                queue.player.guildId,
+                queue.player.id,
                 'MISC.MORE_THAN_A_DAY',
             );
         }
         if (settings.features.web.enabled) {
-            io.to(`guild:${queue.player.guildId}`).emit(
+            io.to(`guild:${queue.player.id}`).emit(
                 'queueUpdate',
                 queue.tracks.map((t: QuaverSong): QuaverSong => {
-                    const user = bot.users.cache.get(t.requester);
+                    const user = bot.users.cache.get(t.requesterId);
                     t.requesterTag = user?.tag;
                     t.requesterAvatar = user?.avatar;
                     return t;
@@ -68,24 +68,24 @@ export default {
         }
         const guildLocaleCode =
             (await data.guild.get<string>(
-                queue.player.guildId,
+                queue.player.id,
                 'settings.locale',
             )) ?? settings.defaultLocaleCode;
         const format =
-            (await data.guild.get(queue.player.guildId, 'settings.format')) ??
+            (await data.guild.get(queue.player.id, 'settings.format')) ??
             'simple';
         format === 'simple'
             ? await queue.player.handler.send(
                   `${getLocaleString(
                       guildLocaleCode,
                       'MUSIC.PLAYER.PLAYING.NOW.SIMPLE',
-                      escapeMarkdown(track.title),
-                      track.uri,
+                      escapeMarkdown(track.info.title),
+                      track.info.uri,
                       durationString,
                   )}\n${getLocaleString(
                       guildLocaleCode,
                       'MISC.ADDED_BY',
-                      track.requester,
+                      track.requesterId,
                   )}`,
                   {
                       components:
@@ -98,9 +98,7 @@ export default {
                                                 `${settings.features.web.dashboardURL.replace(
                                                     /\/+$/,
                                                     '',
-                                                )}/guild/${
-                                                    queue.player.guildId
-                                                }`,
+                                                )}/guild/${queue.player.id}`,
                                             )
                                             .setStyle(ButtonStyle.Link)
                                             .setLabel(
@@ -123,7 +121,7 @@ export default {
                           ),
                       )
                       .setDescription(
-                          `**[${escapeMarkdown(track.title)}](${track.uri})**`,
+                          `**[${escapeMarkdown(track.info.title)}](${track.info.uri})**`,
                       )
                       .addFields([
                           {
@@ -139,7 +137,7 @@ export default {
                                   guildLocaleCode,
                                   'MUSIC.PLAYER.PLAYING.NOW.DETAILED.UPLOADER',
                               ),
-                              value: track.author,
+                              value: track.info.author,
                               inline: true,
                           },
                           {
@@ -147,12 +145,12 @@ export default {
                                   guildLocaleCode,
                                   'MUSIC.PLAYER.PLAYING.NOW.DETAILED.ADDED_BY',
                               ),
-                              value: `<@${track.requester}>`,
+                              value: `<@${track.requesterId}>`,
                               inline: true,
                           },
                       ])
                       .setThumbnail(
-                          `https://i.ytimg.com/vi/${track.identifier}/hqdefault.jpg`,
+                          `https://i.ytimg.com/vi/${track.info.identifier}/hqdefault.jpg`,
                       )
                       .setFooter({
                           text: getLocaleString(
@@ -170,7 +168,7 @@ export default {
                                             `${settings.features.web.dashboardURL.replace(
                                                 /\/+$/,
                                                 '',
-                                            )}/guild/${queue.player.guildId}`,
+                                            )}/guild/${queue.player.id}`,
                                         )
                                         .setStyle(ButtonStyle.Link)
                                         .setLabel(
@@ -187,14 +185,14 @@ export default {
         if (settings.features.autolyrics.enabled) {
             if (
                 !(await data.guild.get<boolean>(
-                    queue.player.guildId,
+                    queue.player.id,
                     'settings.autolyrics',
                 ))
             ) {
                 return;
             }
             const whitelisted = await getGuildFeatureWhitelisted(
-                queue.player.guildId,
+                queue.player.id,
                 'autolyrics',
             );
             if (
@@ -205,7 +203,7 @@ export default {
             }
             let lyrics: string | Error;
             try {
-                lyrics = await LyricsFinder(track.title);
+                lyrics = await LyricsFinder(track.info.title);
             } catch (error) {
                 return;
             }
@@ -226,7 +224,7 @@ export default {
                 romanizeFrom = 'chinese';
             }
             const lyricsFields = generateEmbedFieldsFromLyrics(
-                track.title,
+                track.info.title,
                 lyrics,
             );
             if (lyricsFields.length === 0) return;
@@ -241,7 +239,7 @@ export default {
                                       .setStyle(ButtonStyle.Secondary)
                                       .setLabel(
                                           await getGuildLocaleString(
-                                              queue.player.guildId,
+                                              queue.player.id,
                                               `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}`,
                                           ),
                                       ),

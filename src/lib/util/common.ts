@@ -84,7 +84,7 @@ export const logger = createLogger({
                       json: true,
                       replaceTimestamp: true,
                       onConnectionError: (error): void => console.error(error),
-                  }) as transport,
+                  }) as unknown as transport,
               ]
             : []),
     ],

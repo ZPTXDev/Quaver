@@ -49,7 +49,9 @@ export default {
         let query = interaction.options.getString('query');
         if (!query) {
             const player = interaction.guildId
-                ? interaction.client.music.players.get(interaction.guildId)
+                ? await interaction.client.music.players.fetch(
+                      interaction.guildId,
+                  )
                 : null;
             if (
                 !interaction.guildId ||
@@ -62,7 +64,7 @@ export default {
                 );
                 return;
             }
-            query = player.queue.current.title;
+            query = player.queue.current.info.title;
         }
         await interaction.deferReply();
         let lyrics: string | Error;

@@ -3,7 +3,7 @@ import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
-import type { Song } from '@lavaclient/queue';
+import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
 import type {
     ButtonComponent,
@@ -25,7 +25,7 @@ export default {
     async execute(
         interaction: QuaverInteraction<ButtonInteraction>,
     ): Promise<void> {
-        const player = interaction.client.music.players.get(
+        const player = await interaction.client.music.players.fetch(
                 interaction.guildId,
             ),
             pages = player ? paginate(player.queue.tracks, 5) : [];
@@ -91,8 +91,8 @@ export default {
             .setDescription(
                 pages[page - 1]
                     .map((track: Song, index: number): string => {
-                        const duration = msToTime(track.length);
-                        let durationString = track.isStream
+                        const duration = msToTime(track.info.length);
+                        let durationString = track.info.isStream
                             ? '∞'
                             : msToTimeString(duration, true);
                         if (durationString === 'MORE_THAN_A_DAY') {
@@ -106,9 +106,9 @@ export default {
                             .padStart(
                                 largestIndexSize,
                                 ' ',
-                            )}.\` **[${escapeMarkdown(track.title)}](${
-                            track.uri
-                        })** \`[${durationString}]\` <@${track.requester}>`;
+                            )}.\` **[${escapeMarkdown(track.info.title)}](${
+                            track.info.uri
+                        })** \`[${durationString}]\` <@${track.requesterId}>`;
                     })
                     .join('\n'),
             )

@@ -1,10 +1,10 @@
 import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.d.js';
 import {
+    MessageOptionsBuilderType,
     data,
     logger,
-    MessageOptionsBuilderType,
 } from '#src/lib/util/common.js';
-import { LoopType } from '@lavaclient/queue';
+import { LoopType } from '@lavaclient/plugin-queue';
 import type { Collection, GuildMember, Snowflake } from 'discord.js';
 import { escapeMarkdown } from 'discord.js';
 
@@ -25,13 +25,17 @@ export default {
         delete queue.player.skip;
         if (reason === 'LOAD_FAILED') {
             logger.warn({
-                message: `[G ${queue.player.guildId}] Track skipped with reason: ${reason}`,
+                message: `[G ${queue.player.id}] Track skipped with reason: ${reason}`,
                 label: 'Quaver',
             });
             await queue.player.handler.locale(
                 'MUSIC.PLAYER.TRACK_SKIPPED_ERROR',
                 {
-                    vars: [escapeMarkdown(track.title), track.uri, reason],
+                    vars: [
+                        escapeMarkdown(track.info.title),
+                        track.info.uri,
+                        reason,
+                    ],
                     type: MessageOptionsBuilderType.Warning,
                 },
             );
@@ -49,7 +53,7 @@ export default {
         }
         switch (queue.loop.type) {
             case LoopType.Song:
-                if (track.length <= 15 * 1000) {
+                if (track.info.length <= 15 * 1000) {
                     queue.setLoop(LoopType.None);
                     await queue.player.handler.locale(
                         'MUSIC.PLAYER.LOOP_TRACK_DISABLED',
@@ -61,8 +65,8 @@ export default {
             case LoopType.Queue:
                 if (
                     queue.tracks.reduce(
-                        (a: number, b: QuaverSong): number => a + b.length,
-                        track.length,
+                        (a: number, b: QuaverSong): number => a + b.info.length,
+                        track.info.length,
                     ) <=
                     15 * 1000
                 ) {
@@ -74,20 +78,15 @@ export default {
         }
         if (queue.player.failed) delete queue.player.failed;
         const members = bot.guilds.cache
-            .get(queue.player.guildId)
-            .channels.cache.get(queue.player.channelId).members as Collection<
-            Snowflake,
-            GuildMember
-        >;
+            .get(queue.player.id)
+            .channels.cache.get(queue.player.voice.channelId)
+            .members as Collection<Snowflake, GuildMember>;
         if (
             members?.filter((m): boolean => !m.user.bot).size < 1 &&
-            !(await data.guild.get(
-                queue.player.guildId,
-                'settings.stay.enabled',
-            ))
+            !(await data.guild.get(queue.player.id, 'settings.stay.enabled'))
         ) {
             logger.info({
-                message: `[G ${queue.player.guildId}] Disconnecting (alone)`,
+                message: `[G ${queue.player.id}] Disconnecting (alone)`,
                 label: 'Quaver',
             });
             await queue.player.handler.locale(

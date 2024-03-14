@@ -11,7 +11,7 @@ import type {
     ChatInputCommandInteraction,
     SlashCommandIntegerOption,
 } from 'discord.js';
-import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
 
 export default {
     data: new SlashCommandBuilder()
@@ -59,9 +59,9 @@ export default {
     async execute(
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
-        const player = interaction.client.music.players.get(
+        const player = (await interaction.client.music.players.fetch(
             interaction.guildId,
-        ) as QuaverPlayer;
+        )) as QuaverPlayer;
         const oldPosition = interaction.options.getInteger('old_position');
         const newPosition = interaction.options.getInteger('new_position');
         const response = await player.handler.move(oldPosition, newPosition);
@@ -90,8 +90,8 @@ export default {
                     'CMD.MOVE.RESPONSE.SUCCESS',
                     {
                         vars: [
-                            escapeMarkdown(track.title),
-                            track.uri,
+                            escapeMarkdown(track.info.title),
+                            track.info.uri,
                             oldPosition.toString(),
                             newPosition.toString(),
                         ],

@@ -4,9 +4,9 @@ import type {
     QuaverPlayer,
 } from '#src/lib/util/common.d.js';
 import {
+    MessageOptionsBuilderType,
     confirmationTimeout,
     logger,
-    MessageOptionsBuilderType,
 } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
@@ -47,9 +47,9 @@ export default {
     async execute(
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
-        const player = interaction.client.music.players.get(
+        const player = (await interaction.client.music.players.fetch(
             interaction.guildId,
-        ) as QuaverPlayer;
+        )) as QuaverPlayer;
         if (player.queue.tracks.length === 0) {
             const response = await player.handler.disconnect();
             switch (response) {

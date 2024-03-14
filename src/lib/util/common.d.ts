@@ -7,7 +7,7 @@ import type {
 } from '#src/events/interactionCreate.d.js';
 import type PlayerHandler from '#src/lib/PlayerHandler.js';
 import type ReplyHandler from '#src/lib/ReplyHandler.js';
-import type { Queue, Song } from '@lavaclient/queue';
+import type { Queue, Song } from '@lavaclient/plugin-queue';
 import type {
     ActionRowBuilder,
     AttachmentBuilder,
@@ -24,7 +24,7 @@ import type {
 import type { Node, Player } from 'lavaclient';
 
 export type SearchStateRecord = {
-    pages: { info: Song }[][];
+    pages: Song[][];
     timeout: ReturnType<typeof setTimeout>;
     selected: Snowflake[];
 };

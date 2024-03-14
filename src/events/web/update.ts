@@ -14,8 +14,6 @@ import {
     getGuildFeatureWhitelisted,
     getRequesterStatus,
 } from '#src/lib/util/util.js';
-import type { Item } from '@lavaclient/spotify';
-import { SpotifyItemType } from '@lavaclient/spotify';
 import type { APIGuild, APIUser, Snowflake } from 'discord.js';
 import { ChannelType, GuildMember, PermissionsBitField } from 'discord.js';
 import type { Socket } from 'socket.io';
@@ -59,7 +57,7 @@ export default {
                 if (!(member instanceof GuildMember)) {
                     return callback({ status: Response.GenericError });
                 }
-                const failedChecks: Check[] = getFailedChecks(
+                const failedChecks: Check[] = await getFailedChecks(
                     [Check.InVoice, Check.InSessionVoice],
                     guildId,
                     member,
@@ -96,6 +94,8 @@ export default {
                 ) {
                     query = query.replace('embed/', '');
                     if (
+                        // eslint-disable-next-line no-constant-condition
+                        true ||
                         !settings.features.spotify.enabled ||
                         !settings.features.spotify.client_id ||
                         !settings.features.spotify.client_secret
@@ -104,71 +104,87 @@ export default {
                             status: Response.FeatureDisabledError,
                         });
                     }
-                    let spotifyItem: Item;
-                    try {
-                        spotifyItem = await bot.music.spotify.load(query);
-                    } catch (err) {
-                        return callback({ status: Response.NoResultsError });
-                    }
-                    switch (spotifyItem?.type) {
-                        case SpotifyItemType.Track: {
-                            const track =
-                                await spotifyItem.resolveYoutubeTrack();
-                            tracks = [track];
-                            break;
-                        }
-                        case SpotifyItemType.Album:
-                        case SpotifyItemType.Playlist:
-                        case SpotifyItemType.Artist:
-                            if (
-                                (spotifyItem.type === SpotifyItemType.Artist
-                                    ? spotifyItem.topTracks
-                                    : spotifyItem.tracks
-                                ).length > 500
-                            ) {
-                                return callback({
-                                    status: Response.SpotifyTooManyTracksError,
-                                });
-                            }
-                            tracks = await spotifyItem.resolveYoutubeTracks();
-                            break;
-                        default:
-                            return callback({
-                                status: Response.NoResultsError,
-                            });
-                    }
+                    // let spotifyItem: Item;
+                    // try {
+                    //     spotifyItem = await bot.music.spotify.load(query);
+                    // } catch (err) {
+                    //     return callback({ status: Response.NoResultsError });
+                    // }
+                    // switch (spotifyItem?.type) {
+                    //     case SpotifyItemType.Track: {
+                    //         const track =
+                    //             await spotifyItem.resolveYoutubeTrack();
+                    //         tracks = [
+                    //             { encoded: track.track, info: track.info },
+                    //         ];
+                    //         break;
+                    //     }
+                    //     case SpotifyItemType.Album:
+                    //     case SpotifyItemType.Playlist:
+                    //     case SpotifyItemType.Artist:
+                    //         if (
+                    //             (spotifyItem.type === SpotifyItemType.Artist
+                    //                 ? spotifyItem.topTracks
+                    //                 : spotifyItem.tracks
+                    //             ).length > 500
+                    //         ) {
+                    //             return callback({
+                    //                 status: Response.SpotifyTooManyTracksError,
+                    //             });
+                    //         }
+                    //         tracks = (
+                    //             await spotifyItem.resolveYoutubeTracks()
+                    //         ).map(
+                    //             (
+                    //                 track,
+                    //             ): { encoded: string; info: TrackInfo } => ({
+                    //                 encoded: track.track,
+                    //                 info: track.info,
+                    //             }),
+                    //         );
+                    //         break;
+                    //     default:
+                    //         return callback({
+                    //             status: Response.NoResultsError,
+                    //         });
+                    // }
                 } else {
-                    const results = await bot.music.rest.loadTracks(
+                    const result = await bot.music.api.loadTracks(
                         /^https?:\/\//.test(query)
                             ? query
                             : `ytsearch:${query}`,
                     );
-                    switch (results.loadType) {
-                        case 'PLAYLIST_LOADED':
-                            tracks = results.tracks;
+                    switch (result.loadType) {
+                        case 'playlist':
+                            tracks = [...result.data.tracks];
                             break;
-                        case 'TRACK_LOADED':
-                        case 'SEARCH_RESULT': {
-                            const [track] = results.tracks;
+                        case 'track':
+                        case 'search': {
+                            const track =
+                                result.loadType === 'search'
+                                    ? result.data[0]
+                                    : result.data;
                             tracks = [track];
                             break;
                         }
-                        case 'NO_MATCHES':
+                        case 'empty':
                             return callback({
                                 status: Response.NoResultsError,
                             });
-                        case 'LOAD_FAILED':
+                        case 'error':
                         default:
                             return callback({ status: Response.GenericError });
                     }
                 }
-                let player = bot.music.players.get(guildId) as QuaverPlayer;
-                if (!player?.connected) {
-                    player = bot.music.createPlayer(guildId) as QuaverPlayer;
+                let player = (await bot.music.players.fetch(
+                    guildId,
+                )) as QuaverPlayer;
+                if (!player?.voice.connected) {
+                    player = bot.music.players.create(guildId) as QuaverPlayer;
                     player.handler = new PlayerHandler(bot, player);
                     player.queue.channel = member.voice
                         .channel as QuaverChannels;
-                    await player.connect(member.voice.channelId, {
+                    await player.voice.connect(member.voice.channelId, {
                         deafened: true,
                     });
                     // Ensure that Quaver destroys the player if the user leaves the channel while Quaver is queuing tracks
@@ -202,7 +218,7 @@ export default {
                         player.queue.tracks.map(
                             (track: QuaverSong): QuaverSong => {
                                 const user = bot.users.cache.get(
-                                    track.requester,
+                                    track.requesterId,
                                 );
                                 track.requesterTag = user?.tag;
                                 track.requesterAvatar = user?.avatar;
@@ -214,7 +230,9 @@ export default {
                 break;
             }
             case UpdateItemType.Loop: {
-                const player = bot.music.players.get(guildId) as QuaverPlayer;
+                const player = (await bot.music.players.fetch(
+                    guildId,
+                )) as QuaverPlayer;
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
@@ -222,7 +240,9 @@ export default {
                 break;
             }
             case UpdateItemType.Volume: {
-                const player = bot.music.players.get(guildId) as QuaverPlayer;
+                const player = (await bot.music.players.fetch(
+                    guildId,
+                )) as QuaverPlayer;
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
@@ -233,7 +253,9 @@ export default {
                 break;
             }
             case UpdateItemType.Paused: {
-                const player = bot.music.players.get(guildId) as QuaverPlayer;
+                const player = (await bot.music.players.fetch(
+                    guildId,
+                )) as QuaverPlayer;
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
@@ -246,7 +268,9 @@ export default {
                 break;
             }
             case UpdateItemType.Skip: {
-                const player = bot.music.players.get(guildId) as QuaverPlayer;
+                const player = (await bot.music.players.fetch(
+                    guildId,
+                )) as QuaverPlayer;
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
@@ -291,7 +315,9 @@ export default {
                 break;
             }
             case UpdateItemType.Bassboost: {
-                const player = bot.music.players.get(guildId) as QuaverPlayer;
+                const player = (await bot.music.players.fetch(
+                    guildId,
+                )) as QuaverPlayer;
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
@@ -299,7 +325,9 @@ export default {
                 break;
             }
             case UpdateItemType.Nightcore: {
-                const player = bot.music.players.get(guildId) as QuaverPlayer;
+                const player = (await bot.music.players.fetch(
+                    guildId,
+                )) as QuaverPlayer;
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
@@ -307,7 +335,9 @@ export default {
                 break;
             }
             case UpdateItemType.Seek: {
-                const player = bot.music.players.get(guildId) as QuaverPlayer;
+                const player = (await bot.music.players.fetch(
+                    guildId,
+                )) as QuaverPlayer;
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
@@ -328,7 +358,9 @@ export default {
                 break;
             }
             case UpdateItemType.Remove: {
-                const player = bot.music.players.get(guildId) as QuaverPlayer;
+                const player = (await bot.music.players.fetch(
+                    guildId,
+                )) as QuaverPlayer;
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
@@ -351,7 +383,9 @@ export default {
                 break;
             }
             case UpdateItemType.Shuffle: {
-                const player = bot.music.players.get(guildId) as QuaverPlayer;
+                const player = (await bot.music.players.fetch(
+                    guildId,
+                )) as QuaverPlayer;
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
@@ -362,7 +396,9 @@ export default {
                 break;
             }
             case UpdateItemType.StayFeature: {
-                const player = bot.music.players.get(guildId) as QuaverPlayer;
+                const player = (await bot.music.players.fetch(
+                    guildId,
+                )) as QuaverPlayer;
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }

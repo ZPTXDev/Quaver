@@ -7,13 +7,13 @@ import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
+    RequesterStatus,
     getGuildLocaleString,
     getLocaleString,
     getRequesterStatus,
-    RequesterStatus,
 } from '#src/lib/util/util.js';
 import type { ChatInputCommandInteraction, GuildMember } from 'discord.js';
-import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
 
 export default {
     data: new SlashCommandBuilder()
@@ -34,9 +34,9 @@ export default {
     async execute(
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
-        const player = interaction.client.music.players.get(
+        const player = (await interaction.client.music.players.fetch(
             interaction.guildId,
-        ) as QuaverPlayer;
+        )) as QuaverPlayer;
         // this check already occurs in the PlayerHandler#skip() method, but we do it first as we need to check before running voteskip addition etc
         if (!player.queue.current || (!player.playing && !player.paused)) {
             await interaction.replyHandler.locale(
@@ -83,12 +83,12 @@ export default {
                             `${await getGuildLocaleString(
                                 interaction.guildId,
                                 'CMD.SKIP.RESPONSE.SUCCESS.VOTED',
-                                escapeMarkdown(track.title),
-                                track.uri,
+                                escapeMarkdown(track.info.title),
+                                track.info.uri,
                             )}\n${await getGuildLocaleString(
                                 interaction.guildId,
                                 'MISC.ADDED_BY',
-                                track.requester,
+                                track.requesterId,
                             )}`,
                         );
                 }
@@ -99,8 +99,8 @@ export default {
                 'CMD.SKIP.RESPONSE.VOTED.SUCCESS',
                 {
                     vars: [
-                        escapeMarkdown(track.title),
-                        track.uri,
+                        escapeMarkdown(track.info.title),
+                        track.info.uri,
                         skip.users.length.toString(),
                         skip.required.toString(),
                     ],
@@ -124,16 +124,16 @@ export default {
                         requesterStatus === RequesterStatus.Requester
                             ? 'CMD.SKIP.RESPONSE.SUCCESS.DEFAULT'
                             : requesterStatus === RequesterStatus.ManagerBypass
-                            ? 'CMD.SKIP.RESPONSE.SUCCESS.MANAGER'
-                            : 'CMD.SKIP.RESPONSE.SUCCESS.FORCED',
-                        escapeMarkdown(track.title),
-                        track.uri,
+                              ? 'CMD.SKIP.RESPONSE.SUCCESS.MANAGER'
+                              : 'CMD.SKIP.RESPONSE.SUCCESS.FORCED',
+                        escapeMarkdown(track.info.title),
+                        track.info.uri,
                     )}${
                         requesterStatus !== RequesterStatus.Requester
                             ? `\n${await getGuildLocaleString(
                                   interaction.guildId,
                                   'MISC.ADDED_BY',
-                                  track.requester,
+                                  track.requesterId,
                               )}`
                             : ''
                     }`,

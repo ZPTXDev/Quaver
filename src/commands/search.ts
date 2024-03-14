@@ -12,6 +12,7 @@ import {
     getGuildLocaleString,
     getLocaleString,
 } from '#src/lib/util/util.js';
+import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
 import type {
     ChatInputCommandInteraction,
@@ -82,10 +83,10 @@ export default {
         // commits
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let tracks: any[] = [];
-        const results = await interaction.client.music.rest.loadTracks(
+        const result = await interaction.client.music.api.loadTracks(
             `ytsearch:${query}`,
         );
-        if (results.loadType === 'SEARCH_RESULT') tracks = results.tracks;
+        if (result.loadType === 'search') tracks = [...result.data];
         if (tracks.length <= 1) {
             const applicationCommands =
                 interaction.client.application?.commands;
@@ -115,7 +116,7 @@ export default {
             new EmbedBuilder()
                 .setDescription(
                     pages[0]
-                        .map((track, index): string => {
+                        .map((track: Song, index): string => {
                             const duration = msToTime(track.info.length);
                             let durationString = track.info.isStream
                                 ? '∞'

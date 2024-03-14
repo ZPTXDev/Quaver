@@ -7,10 +7,10 @@ import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
+    RequesterStatus,
     getGuildLocaleString,
     getLocaleString,
     getRequesterStatus,
-    RequesterStatus,
 } from '#src/lib/util/util.js';
 import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import type {
@@ -78,9 +78,9 @@ export default {
     async execute(
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
-        const player = interaction.client.music.players.get(
+        const player = (await interaction.client.music.players.fetch(
             interaction.guildId,
-        ) as QuaverPlayer;
+        )) as QuaverPlayer;
         const hours = interaction.options.getInteger('hours') ?? 0,
             minutes = interaction.options.getInteger('minutes') ?? 0,
             seconds = interaction.options.getInteger('seconds') ?? 0;
@@ -107,7 +107,7 @@ export default {
             });
             return;
         }
-        const duration = msToTime(player.queue.current.length);
+        const duration = msToTime(player.queue.current.info.length);
         let durationString = msToTimeString(duration, true);
         if (durationString === 'MORE_THAN_A_DAY') {
             durationString = await getGuildLocaleString(
@@ -151,8 +151,8 @@ export default {
                     requesterStatus === RequesterStatus.Requester
                         ? 'CMD.SEEK.RESPONSE.SUCCESS.DEFAULT'
                         : requesterStatus === RequesterStatus.ManagerBypass
-                        ? 'CMD.SEEK.RESPONSE.SUCCESS.MANAGER'
-                        : 'CMD.SEEK.RESPONSE.SUCCESS.FORCED',
+                          ? 'CMD.SEEK.RESPONSE.SUCCESS.MANAGER'
+                          : 'CMD.SEEK.RESPONSE.SUCCESS.FORCED',
                     {
                         vars: [targetString, durationString],
                     },

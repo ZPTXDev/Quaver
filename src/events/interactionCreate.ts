@@ -38,11 +38,11 @@ async function handleFailedChecks(
             interaction.isChatInputCommand()
                 ? 'Command'
                 : interaction.isButton()
-                ? 'Button'
-                : interaction.isStringSelectMenu() ||
-                  interaction.isRoleSelectMenu()
-                ? 'Select menu'
-                : 'Modal'
+                  ? 'Button'
+                  : interaction.isStringSelectMenu() ||
+                      interaction.isRoleSelectMenu()
+                    ? 'Select menu'
+                    : 'Modal'
         } ${
             interaction.isChatInputCommand()
                 ? interaction.commandName
@@ -84,7 +84,7 @@ export default {
                 }`,
                 label: 'Quaver',
             });
-            const failedChecks = getFailedChecks(
+            const failedChecks = await getFailedChecks(
                 command.checks,
                 interaction.guildId,
                 interaction.member as GuildMember,
@@ -242,7 +242,7 @@ export default {
                 }`,
                 label: 'Quaver',
             });
-            const failedChecks = getFailedChecks(
+            const failedChecks = await getFailedChecks(
                 button.checks,
                 interaction.guildId,
                 interaction.member as GuildMember,
@@ -303,7 +303,7 @@ export default {
                 }`,
                 label: 'Quaver',
             });
-            const failedChecks = getFailedChecks(
+            const failedChecks = await getFailedChecks(
                 selectmenu.checks,
                 interaction.guildId,
                 interaction.member as GuildMember,
@@ -361,7 +361,7 @@ export default {
                 }`,
                 label: 'Quaver',
             });
-            const failedChecks = getFailedChecks(
+            const failedChecks = await getFailedChecks(
                 modal.checks,
                 interaction.guildId,
                 interaction.member as GuildMember,

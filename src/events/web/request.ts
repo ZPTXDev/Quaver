@@ -6,8 +6,8 @@ import type {
 import { data } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
-    getGuildFeatureWhitelisted,
     WhitelistStatus,
+    getGuildFeatureWhitelisted,
 } from '#src/lib/util/util.js';
 import { version } from '#src/lib/util/version.js';
 import type { APIGuild, Snowflake } from 'discord.js';
@@ -34,10 +34,12 @@ export default {
         let response;
         switch (item) {
             case 'player': {
-                const player = bot.music.players.get(guildId) as QuaverPlayer;
+                const player = (await bot.music.players.fetch(
+                    guildId,
+                )) as QuaverPlayer;
                 if (player?.queue.current) {
                     const user = bot.users.cache.get(
-                        player.queue.current.requester,
+                        player.queue.current.requesterId,
                     );
                     player.queue.current.requesterTag = user?.tag;
                     player.queue.current.requesterAvatar = user?.avatar;
@@ -47,7 +49,7 @@ export default {
                           queue: player.queue.tracks.map(
                               (track: QuaverSong): QuaverSong => {
                                   const user = bot.users.cache.get(
-                                      track.requester,
+                                      track.requesterId,
                                   );
                                   track.requesterTag = user?.tag;
                                   track.requesterAvatar = user?.avatar;
@@ -65,7 +67,7 @@ export default {
                               track: player.queue.current,
                               elapsed: player.position ?? 0,
                               duration: player.queue.current
-                                  ? player.queue.current.length
+                                  ? player.queue.current.info.length
                                   : 0,
                               skip: player.skip,
                               nothingPlaying:

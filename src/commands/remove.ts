@@ -55,9 +55,9 @@ export default {
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
         const position = interaction.options.getInteger('position');
-        const player = interaction.client.music.players.get(
+        const player = (await interaction.client.music.players.fetch(
             interaction.guildId,
-        ) as QuaverPlayer;
+        )) as QuaverPlayer;
         const track = player.queue.tracks[position - 1];
         // workaround: if track doesn't exist, temporarily mark it as "requested by user" and we'll let the switch case deal with it
         const requesterStatus = track
@@ -91,10 +91,13 @@ export default {
                     requesterStatus === RequesterStatus.Requester
                         ? 'CMD.REMOVE.RESPONSE.SUCCESS.DEFAULT'
                         : requesterStatus === RequesterStatus.ManagerBypass
-                        ? 'CMD.REMOVE.RESPONSE.SUCCESS.MANAGER'
-                        : 'CMD.REMOVE.RESPONSE.SUCCESS.FORCED',
+                          ? 'CMD.REMOVE.RESPONSE.SUCCESS.MANAGER'
+                          : 'CMD.REMOVE.RESPONSE.SUCCESS.FORCED',
                     {
-                        vars: [escapeMarkdown(track.title), track.uri],
+                        vars: [
+                            escapeMarkdown(track.info.title),
+                            track.info.uri,
+                        ],
                         type: MessageOptionsBuilderType.Success,
                     },
                 );

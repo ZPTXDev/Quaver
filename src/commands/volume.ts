@@ -49,9 +49,9 @@ export default {
     async execute(
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
-        const player = interaction.client.music.players.get(
+        const player = (await interaction.client.music.players.fetch(
             interaction.guildId,
-        ) as QuaverPlayer;
+        )) as QuaverPlayer;
         const volume = interaction.options.getInteger('new_volume');
         if (volume > 200) {
             await interaction.replyHandler.locale(

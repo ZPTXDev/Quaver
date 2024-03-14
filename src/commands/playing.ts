@@ -6,10 +6,10 @@ import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
-import { LoopType } from '@lavaclient/queue';
+import { LoopType } from '@lavaclient/plugin-queue';
 import { getBar, msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import type { ChatInputCommandInteraction } from 'discord.js';
-import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
 
 export default {
     data: new SlashCommandBuilder()
@@ -33,9 +33,9 @@ export default {
     async execute(
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
-        const player = interaction.client.music.players.get(
+        const player = (await interaction.client.music.players.fetch(
             interaction.guildId,
-        ) as QuaverPlayer;
+        )) as QuaverPlayer;
         // workaround: seems like current track doesn't get removed after the track, an issue with @lavaclient/queue
         if (!player.queue.current || (!player.playing && !player.paused)) {
             await interaction.replyHandler.locale(
@@ -45,7 +45,7 @@ export default {
             return;
         }
         const bar = getBar(
-            (player.position / player.queue.current.length) * 100,
+            (player.position / player.queue.current.info.length) * 100,
         );
         let elapsed = msToTime(player.position);
         if (isNaN(elapsed['s']) || elapsed['s'] < 0) {
@@ -58,7 +58,7 @@ export default {
                 'MISC.MORE_THAN_A_DAY',
             );
         }
-        const duration = msToTime(player.queue.current.length);
+        const duration = msToTime(player.queue.current.info.length);
         let durationString = msToTimeString(duration, true);
         if (durationString === 'MORE_THAN_A_DAY') {
             durationString = await getGuildLocaleString(
@@ -66,10 +66,10 @@ export default {
                 'MISC.MORE_THAN_A_DAY',
             );
         }
-        if (player.queue.current.isStream) {
+        if (player.queue.current.info.isStream) {
             await interaction.replyHandler.reply(
-                `**[${escapeMarkdown(player.queue.current.title)}](${
-                    player.queue.current.uri
+                `**[${escapeMarkdown(player.queue.current.info.title)}](${
+                    player.queue.current.info.uri
                 })**\n🔴 **${await getGuildLocaleString(
                     interaction.guildId,
                     'MISC.LIVE',
@@ -89,15 +89,15 @@ export default {
                 )}]\` | ${await getGuildLocaleString(
                     interaction.guildId,
                     'MISC.ADDED_BY',
-                    player.queue.current.requester,
+                    player.queue.current.requesterId,
                 )}`,
                 { ephemeral: true },
             );
             return;
         }
         await interaction.replyHandler.reply(
-            `**[${escapeMarkdown(player.queue.current.title)}](${
-                player.queue.current.uri
+            `**[${escapeMarkdown(player.queue.current.info.title)}](${
+                player.queue.current.info.uri
             })**\n${bar}${player.paused ? ' ⏸️' : ''}${
                 player.queue.loop.type !== LoopType.None
                     ? ` ${
@@ -111,7 +111,7 @@ export default {
             }\n\`[${elapsedString} / ${durationString}]\` | ${await getGuildLocaleString(
                 interaction.guildId,
                 'MISC.ADDED_BY',
-                player.queue.current.requester,
+                player.queue.current.requesterId,
             )}`,
             { ephemeral: true },
         );

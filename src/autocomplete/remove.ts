@@ -11,7 +11,7 @@ export default {
         interaction: QuaverInteraction<AutocompleteInteraction>,
     ): Promise<void> {
         const focused = interaction.options.getFocused();
-        const player = interaction.client.music.players.get(
+        const player = await interaction.client.music.players.fetch(
             interaction.guildId,
         );
         if (!player) return interaction.respond([]);
@@ -25,10 +25,10 @@ export default {
                         title: string;
                         requester: Snowflake;
                     } => ({
-                        name: `${index + 1}. ${track.title}`,
+                        name: `${index + 1}. ${track.info.title}`,
                         value: index + 1,
-                        title: track.title,
-                        requester: track.requester,
+                        title: track.info.title,
+                        requester: track.requesterId,
                     }),
                 )
                 .filter(

@@ -18,7 +18,7 @@ import {
 } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString } from '#src/lib/util/util.js';
-import '@lavaclient/queue/register';
+import { load as queueLoad } from '@lavaclient/plugin-queue';
 import { load } from '@lavaclient/spotify';
 import {
     getAbsoluteFileURL,
@@ -40,7 +40,7 @@ import { readFileSync, readdirSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import * as http from 'http';
 import * as https from 'https';
-import type { NodeEvents } from 'lavaclient';
+import type { ClientEvents } from 'lavaclient';
 import { Node } from 'lavaclient';
 import { createInterface } from 'readline';
 import type { Socket } from 'socket.io';
@@ -48,6 +48,8 @@ import { Server } from 'socket.io';
 import { inspect } from 'util';
 import { version } from './lib/util/version.js';
 import type { QuaverEvent, QuaverMusicEvent } from './main.d.js';
+
+queueLoad();
 
 export const startup = { started: false };
 
@@ -67,7 +69,7 @@ rl.on('line', async (input): Promise<void> => {
             break;
         case 'sessions':
             console.log(
-                `There are currently ${bot.music.players.size} active session(s).`,
+                `There are currently ${bot.music.players.cache.size} active session(s).`,
             );
             break;
         case 'stats': {
@@ -181,14 +183,16 @@ if (settings.features.web.enabled) {
     app = express();
     if (settings.grafanaLogging) {
         app.get('/stats', async (req, res): Promise<void> => {
-            const totalSessions = bot.music?.players?.size;
+            const totalSessions = bot.music?.players?.cache.size;
             const activeSessions = Array.from(
-                bot.music?.players?.values(),
+                bot.music?.players?.cache.values(),
             ).filter(
                 (player: QuaverPlayer): boolean =>
                     !player.timeout && !player.pauseTimeout,
             ).length;
-            const totalQueued = Array.from(bot.music?.players?.values()).reduce(
+            const totalQueued = Array.from(
+                bot.music?.players?.cache.values(),
+            ).reduce(
                 (total: number, player: QuaverPlayer): number =>
                     total + player.queue?.tracks.length,
                 0,
@@ -309,26 +313,32 @@ export const bot: QuaverClient = new Client({
 bot.commands = new Collection();
 bot.autocomplete = new Collection();
 bot.music = new Node({
-    connection: {
+    info: {
         host: settings.lavalink.host,
         port: settings.lavalink.port,
-        password: settings.lavalink.password,
-        secure: !!settings.lavalink.secure,
-        reconnect: {
+        auth: settings.lavalink.password,
+        tls: !!settings.lavalink.secure,
+    },
+    ws: {
+        reconnecting: {
             delay: settings.lavalink.reconnect.delay ?? 3000,
             tries: settings.lavalink.reconnect.tries ?? 5,
         },
     },
-    sendGatewayPayload: (id, payload): void =>
-        bot.guilds.cache.get(id)?.shard?.send(payload),
+    discord: {
+        sendGatewayCommand: (id, payload): void =>
+            bot.guilds.cache.get(id)?.shard?.send(payload),
+    },
 });
 bot.ws.on(
     GatewayDispatchEvents.VoiceServerUpdate,
-    async (payload): Promise<void> => bot.music.handleVoiceUpdate(payload),
+    async (payload): Promise<boolean> =>
+        bot.music.players.handleVoiceUpdate(payload),
 );
 bot.ws.on(
     GatewayDispatchEvents.VoiceStateUpdate,
-    async (payload): Promise<void> => bot.music.handleVoiceUpdate(payload),
+    async (payload): Promise<boolean> =>
+        bot.music.players.handleVoiceUpdate(payload),
 );
 
 let inProgress = false;
@@ -350,37 +360,37 @@ export async function shuttingDown(
     try {
         if (startup.started) {
             const players = bot.music.players;
-            if (players.size < 1) return;
+            if (players.cache.size < 1) return;
             logger.info({
                 message: 'Disconnecting from all guilds...',
                 label: 'Quaver',
             });
-            for (const pair of players) {
+            for (const pair of players.cache) {
                 const player: QuaverPlayer = pair[1];
                 logger.info({
-                    message: `[G ${player.guildId}] Disconnecting (restarting)`,
+                    message: `[G ${player.id}] Disconnecting (restarting)`,
                     label: 'Quaver',
                 });
                 const fileBuffer = [];
                 if (player.queue.current && (player.playing || player.paused)) {
                     fileBuffer.push(
                         `${await getGuildLocaleString(
-                            player.guildId,
+                            player.id,
                             'MISC.CURRENT',
                         )}:`,
                     );
-                    fileBuffer.push(player.queue.current.uri);
+                    fileBuffer.push(player.queue.current.info.uri);
                 }
                 if (player.queue.tracks.length > 0) {
                     fileBuffer.push(
                         `${await getGuildLocaleString(
-                            player.guildId,
+                            player.id,
                             'MISC.QUEUE',
                         )}:`,
                     );
                     fileBuffer.push(
                         player.queue.tracks
-                            .map((track): string => track.uri)
+                            .map((track): string => track.info.uri)
                             .join('\n'),
                     );
                 }
@@ -389,7 +399,7 @@ export async function shuttingDown(
                     new EmbedBuilder()
                         .setDescription(
                             `${await getGuildLocaleString(
-                                player.guildId,
+                                player.id,
                                 [
                                     'exit',
                                     'SIGINT',
@@ -401,7 +411,7 @@ export async function shuttingDown(
                             )}${
                                 fileBuffer.length > 0
                                     ? `\n${await getGuildLocaleString(
-                                          player.guildId,
+                                          player.id,
                                           'MUSIC.PLAYER.RESTARTING.QUEUE_DATA_ATTACHED',
                                       )}`
                                     : ''
@@ -409,7 +419,7 @@ export async function shuttingDown(
                         )
                         .setFooter({
                             text: await getGuildLocaleString(
-                                player.guildId,
+                                player.id,
                                 'MUSIC.PLAYER.RESTARTING.APOLOGY',
                             ),
                         }),
@@ -585,14 +595,14 @@ for await (const file of musicEventFiles) {
     );
     if (event.default.once) {
         bot.music.once(
-            event.default.name as keyof NodeEvents,
+            event.default.name as keyof ClientEvents,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (...args: any[]): void | Promise<void> =>
                 event.default.execute(...args),
         );
     } else {
         bot.music.on(
-            event.default.name as keyof NodeEvents,
+            event.default.name as keyof ClientEvents,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (...args: any[]): void | Promise<void> =>
                 event.default.execute(...args),

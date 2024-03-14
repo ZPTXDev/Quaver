@@ -7,21 +7,68 @@ import type {
     QuaverSong,
 } from '#src/lib/util/common.d.js';
 import {
+    MessageOptionsBuilderType,
     data,
     logger,
-    MessageOptionsBuilderType,
 } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
+    WhitelistStatus,
     buildMessageOptions,
     getGuildFeatureWhitelisted,
     getGuildLocaleString,
     sortQueue,
-    WhitelistStatus,
 } from '#src/lib/util/util.js';
-import type { LoopType } from '@lavaclient/queue';
+import type { PlayerEffect } from '@lavaclient/plugin-effects';
+import type { LoopType } from '@lavaclient/plugin-queue';
 import type { Message, Snowflake } from 'discord.js';
 import { ChannelType, PermissionsBitField } from 'discord.js';
+
+const effects: Record<string, PlayerEffect> = {
+    bassboost: {
+        id: 'bassboost',
+        filters: {
+            equalizer: [
+                {
+                    band: 0,
+                    gain: 0.2,
+                },
+                {
+                    band: 1,
+                    gain: 0.15,
+                },
+                {
+                    band: 2,
+                    gain: 0.1,
+                },
+                {
+                    band: 3,
+                    gain: 0.05,
+                },
+                {
+                    band: 4,
+                    gain: 0.0,
+                },
+                ...new Array(10).map(
+                    (_, i): { band: number; gain: number } => ({
+                        band: i + 5,
+                        gain: -0.05,
+                    }),
+                ),
+            ],
+        },
+    },
+    nightcore: {
+        id: 'nightcore',
+        filters: {
+            timescale: {
+                speed: 1.125,
+                pitch: 1.125,
+                rate: 1,
+            },
+        },
+    },
+};
 
 export enum PlayerResponse {
     FeatureDisabled,
@@ -87,7 +134,7 @@ export default class PlayerHandler {
         }
         if (
             this.client.guilds.cache
-                .get(this.player.guildId)
+                .get(this.player.id)
                 .members.me.isCommunicationDisabled()
         ) {
             return undefined;
@@ -121,7 +168,7 @@ export default class PlayerHandler {
         }: MessageOptionsBuilderOptions & { vars?: string[] } = {},
     ): Promise<Message | undefined> {
         const guildLocaleString = await getGuildLocaleString(
-            this.player.guildId,
+            this.player.id,
             stringPath,
             ...vars,
         );
@@ -140,7 +187,7 @@ export default class PlayerHandler {
         }
         if (settings.features.stay.whitelist) {
             const whitelisted = await getGuildFeatureWhitelisted(
-                this.player.guildId,
+                this.player.id,
                 'stay',
             );
             if (
@@ -153,19 +200,15 @@ export default class PlayerHandler {
         if (!this.player?.queue?.channel?.id) {
             return PlayerResponse.QueueChannelMissing;
         }
-        await data.guild.set(
-            this.player.guildId,
-            'settings.stay.enabled',
-            enabled,
-        );
+        await data.guild.set(this.player.id, 'settings.stay.enabled', enabled);
         if (enabled) {
             await data.guild.set(
-                this.player.guildId,
+                this.player.id,
                 'settings.stay.channel',
-                this.player.channelId,
+                this.player.voice.channelId,
             );
             await data.guild.set(
-                this.player.guildId,
+                this.player.id,
                 'settings.stay.text',
                 this.player.queue.channel.id,
             );
@@ -173,7 +216,7 @@ export default class PlayerHandler {
                 clearTimeout(this.player.timeout);
                 delete this.player.timeout;
                 if (settings.features.web.enabled) {
-                    io.to(`guild:${this.player.guildId}`).emit(
+                    io.to(`guild:${this.player.id}`).emit(
                         'timeoutUpdate',
                         !!this.player.timeout,
                     );
@@ -187,7 +230,7 @@ export default class PlayerHandler {
             this.player.timeout = setTimeout(
                 (p): void => {
                     logger.info({
-                        message: `[G ${p.guildId}] Disconnecting (inactivity)`,
+                        message: `[G ${p.id}] Disconnecting (inactivity)`,
                         label: 'Quaver',
                     });
                     p.handler.locale(
@@ -203,14 +246,14 @@ export default class PlayerHandler {
             );
             this.player.timeoutEnd = Date.now() + 30 * 60 * 1000;
             if (settings.features.web.enabled) {
-                io.to(`guild:${this.player.guildId}`).emit(
+                io.to(`guild:${this.player.id}`).emit(
                     'timeoutUpdate',
                     this.player.timeoutEnd,
                 );
             }
         }
         if (settings.features.web.enabled) {
-            io.to(`guild:${this.player.guildId}`).emit('stayFeatureUpdate', {
+            io.to(`guild:${this.player.id}`).emit('stayFeatureUpdate', {
                 enabled,
             });
         }
@@ -224,21 +267,13 @@ export default class PlayerHandler {
      */
     async bassboost(enabled: boolean): Promise<PlayerResponse> {
         const { io } = await import('#src/main.js');
-        let eqValues: number[] = new Array(15).fill(0);
-        if (enabled) {
-            eqValues = [
-                0.2,
-                0.15,
-                0.1,
-                0.05,
-                0.0,
-                ...new Array(10).fill(-0.05),
-            ];
+        const response = await this.player.effects.toggle(effects.bassboost);
+        if (response !== enabled) {
+            await this.player.effects.toggle(effects.bassboost);
         }
-        await this.player.setEqualizer(...eqValues);
         this.player.bassboost = enabled;
         if (settings.features.web.enabled) {
-            io.to(`guild:${this.player.guildId}`).emit('filterUpdate', {
+            io.to(`guild:${this.player.id}`).emit('filterUpdate', {
                 bassboost: this.player.bassboost,
                 nightcore: this.player.nightcore,
             });
@@ -267,16 +302,14 @@ export default class PlayerHandler {
         }
         this.player.queue.channel = channel;
         if (settings.features.web.enabled) {
-            io.to(`guild:${this.player.guildId}`).emit(
+            io.to(`guild:${this.player.id}`).emit(
                 'textChannelUpdate',
                 channel.name,
             );
         }
-        if (
-            await data.guild.get(this.player.guildId, 'settings.stay.enabled')
-        ) {
+        if (await data.guild.get(this.player.id, 'settings.stay.enabled')) {
             await data.guild.set(
-                this.player.guildId,
+                this.player.id,
                 'settings.stay.text',
                 channel.id,
             );
@@ -295,7 +328,7 @@ export default class PlayerHandler {
         }
         this.player.queue.clear();
         if (settings.features.web.enabled) {
-            io.to(`guild:${this.player.guildId}`).emit('queueUpdate', []);
+            io.to(`guild:${this.player.id}`).emit('queueUpdate', []);
         }
         return PlayerResponse.Success;
     }
@@ -307,27 +340,25 @@ export default class PlayerHandler {
      */
     async disconnect(channelId?: Snowflake): Promise<PlayerResponse> {
         const { io } = await import('#src/main.js');
-        if (
-            await data.guild.get(this.player.guildId, 'settings.stay.enabled')
-        ) {
+        if (await data.guild.get(this.player.id, 'settings.stay.enabled')) {
             return PlayerResponse.FeatureConflict;
         }
         clearTimeout(this.player.timeout);
         clearTimeout(this.player.pauseTimeout);
-        this.player.disconnect();
-        await this.client.music.destroyPlayer(this.player.guildId);
+        this.player.voice.disconnect();
+        await this.client.music.players.destroy(this.player.id);
         if (settings.features.web.enabled) {
-            io.to(`guild:${this.player.guildId}`).emit('playerDisconnect');
+            io.to(`guild:${this.player.id}`).emit('playerDisconnect');
         }
         const voiceChannel = this.client.guilds.cache
-            .get(this.player.guildId)
-            ?.channels.cache.get(channelId ?? this.player.channelId);
+            .get(this.player.id)
+            ?.channels.cache.get(channelId ?? this.player.voice.channelId);
         if (voiceChannel?.type !== ChannelType.GuildStageVoice) {
             return PlayerResponse.Success;
         }
         const permissions = this.client.guilds.cache
-            .get(this.player.guildId)
-            ?.channels.cache.get(channelId ?? this.player.channelId)
+            .get(this.player.id)
+            ?.channels.cache.get(channelId ?? this.player.voice.channelId)
             .permissionsFor(this.client.user.id);
         if (
             !permissions?.has(
@@ -344,15 +375,12 @@ export default class PlayerHandler {
             return PlayerResponse.Success;
         }
         const me = await this.client.guilds.cache
-            .get(this.player.guildId)
+            .get(this.player.id)
             ?.members.fetchMe();
         if (me.isCommunicationDisabled()) return PlayerResponse.Success;
         if (
             voiceChannel.stageInstance?.topic !==
-            (await getGuildLocaleString(
-                this.player.guildId,
-                'MISC.STAGE_TOPIC',
-            ))
+            (await getGuildLocaleString(this.player.id, 'MISC.STAGE_TOPIC'))
         ) {
             return PlayerResponse.Success;
         }
@@ -378,7 +406,7 @@ export default class PlayerHandler {
         const { io } = await import('#src/main.js');
         this.player.queue.setLoop(type);
         if (settings.features.web.enabled) {
-            io.to(`guild:${this.player.guildId}`).emit('loopUpdate', type);
+            io.to(`guild:${this.player.id}`).emit('loopUpdate', type);
         }
         return PlayerResponse.Success;
     }
@@ -410,10 +438,10 @@ export default class PlayerHandler {
             this.player.queue.tracks.splice(oldPosition - 1, 1)[0],
         );
         if (settings.features.web.enabled) {
-            io.to(`guild:${this.player.guildId}`).emit(
+            io.to(`guild:${this.player.id}`).emit(
                 'queueUpdate',
                 this.player.queue.tracks.map((t: QuaverSong): QuaverSong => {
-                    const user = this.client.users.cache.get(t.requester);
+                    const user = this.client.users.cache.get(t.requesterId);
                     t.requesterTag = user?.tag;
                     t.requesterAvatar = user?.avatar;
                     return t;
@@ -421,10 +449,7 @@ export default class PlayerHandler {
             );
         }
         if (
-            await data.guild.get<boolean>(
-                this.player.guildId,
-                'settings.smartqueue',
-            )
+            await data.guild.get<boolean>(this.player.id, 'settings.smartqueue')
         ) {
             await this.sort();
         }
@@ -438,13 +463,13 @@ export default class PlayerHandler {
      */
     async nightcore(enabled: boolean): Promise<PlayerResponse> {
         const { io } = await import('#src/main.js');
-        this.player.filters.timescale = enabled
-            ? { speed: 1.125, pitch: 1.125, rate: 1 }
-            : undefined;
-        await this.player.setFilters();
+        const response = await this.player.effects.toggle(effects.nightcore);
+        if (response !== enabled) {
+            await this.player.effects.toggle(effects.nightcore);
+        }
         this.player.nightcore = enabled;
         if (settings.features.web.enabled) {
-            io.to(`guild:${this.player.guildId}`).emit('filterUpdate', {
+            io.to(`guild:${this.player.id}`).emit('filterUpdate', {
                 bassboost: this.player.bassboost,
                 nightcore: this.player.nightcore,
             });
@@ -463,7 +488,7 @@ export default class PlayerHandler {
         }
         await this.player.pause();
         if (settings.features.web.enabled) {
-            io.to(`guild:${this.player.guildId}`).emit(
+            io.to(`guild:${this.player.id}`).emit(
                 'pauseUpdate',
                 this.player.paused,
             );
@@ -486,10 +511,10 @@ export default class PlayerHandler {
         }
         this.player.queue.remove(position - 1);
         if (settings.features.web.enabled) {
-            io.to(`guild:${this.player.guildId}`).emit(
+            io.to(`guild:${this.player.id}`).emit(
                 'queueUpdate',
                 this.player.queue.tracks.map((t: QuaverSong): QuaverSong => {
-                    const user = this.client.users.cache.get(t.requester);
+                    const user = this.client.users.cache.get(t.requesterId);
                     t.requesterTag = user?.tag;
                     t.requesterAvatar = user?.avatar;
                     return t;
@@ -497,10 +522,7 @@ export default class PlayerHandler {
             );
         }
         if (
-            await data.guild.get<boolean>(
-                this.player.guildId,
-                'settings.smartqueue',
-            )
+            await data.guild.get<boolean>(this.player.id, 'settings.smartqueue')
         ) {
             await this.sort();
         }
@@ -521,7 +543,7 @@ export default class PlayerHandler {
             await this.player.queue.start();
         }
         if (settings.features.web.enabled) {
-            io.to(`guild:${this.player.guildId}`).emit(
+            io.to(`guild:${this.player.id}`).emit(
                 'pauseUpdate',
                 this.player.paused,
             );
@@ -541,10 +563,10 @@ export default class PlayerHandler {
         ) {
             return PlayerResponse.PlayerIdle;
         }
-        if (this.player.queue.current.isStream) {
+        if (this.player.queue.current.info.isStream) {
             return PlayerResponse.PlayerIsStream;
         }
-        if (position > this.player.queue.current.length) {
+        if (position > this.player.queue.current.info.length) {
             return PlayerResponse.InputOutOfRange;
         }
         await this.player.seek(position);
@@ -574,10 +596,10 @@ export default class PlayerHandler {
             ];
         }
         if (settings.features.web.enabled) {
-            io.to(`guild:${this.player.guildId}`).emit(
+            io.to(`guild:${this.player.id}`).emit(
                 'queueUpdate',
                 this.player.queue.tracks.map((t: QuaverSong): QuaverSong => {
-                    const user = this.client.users.cache.get(t.requester);
+                    const user = this.client.users.cache.get(t.requesterId);
                     t.requesterTag = user?.tag;
                     t.requesterAvatar = user?.avatar;
                     return t;
@@ -585,10 +607,7 @@ export default class PlayerHandler {
             );
         }
         if (
-            await data.guild.get<boolean>(
-                this.player.guildId,
-                'settings.smartqueue',
-            )
+            await data.guild.get<boolean>(this.player.id, 'settings.smartqueue')
         ) {
             await this.sort();
         }
@@ -606,7 +625,7 @@ export default class PlayerHandler {
         }
         if (settings.features.smartqueue.whitelist) {
             const whitelisted = await getGuildFeatureWhitelisted(
-                this.player.guildId,
+                this.player.id,
                 'smartqueue',
             );
             if (
@@ -618,10 +637,10 @@ export default class PlayerHandler {
         }
         this.player.queue.tracks = sortQueue(this.player.queue.tracks);
         if (settings.features.web.enabled) {
-            io.to(`guild:${this.player.guildId}`).emit(
+            io.to(`guild:${this.player.id}`).emit(
                 'queueUpdate',
                 this.player.queue.tracks.map((t: QuaverSong): QuaverSong => {
-                    const user = this.client.users.cache.get(t.requester);
+                    const user = this.client.users.cache.get(t.requesterId);
                     t.requesterTag = user?.tag;
                     t.requesterAvatar = user?.avatar;
                     return t;
@@ -663,7 +682,7 @@ export default class PlayerHandler {
         await this.player.queue.skip();
         await this.player.queue.start();
         if (settings.features.web.enabled) {
-            io.to(`guild:${this.player.guildId}`).emit('queueUpdate', []);
+            io.to(`guild:${this.player.id}`).emit('queueUpdate', []);
         }
         return PlayerResponse.Success;
     }
@@ -680,7 +699,7 @@ export default class PlayerHandler {
         }
         await this.player.setVolume(volume);
         if (settings.features.web.enabled) {
-            io.to(`guild:${this.player.guildId}`).emit('volumeUpdate', volume);
+            io.to(`guild:${this.player.id}`).emit('volumeUpdate', volume);
         }
         return PlayerResponse.Success;
     }

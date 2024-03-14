@@ -90,7 +90,7 @@ export default {
                 },
             ],
         });
-        client.music.connect(client.user.id);
+        client.music.connect({ userId: client.user.id });
         await client.application.commands.fetch();
     },
 };

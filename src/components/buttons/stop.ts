@@ -5,8 +5,8 @@ import type {
     QuaverPlayer,
 } from '#src/lib/util/common.d.js';
 import {
-    confirmationTimeout,
     MessageOptionsBuilderType,
+    confirmationTimeout,
 } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import type { ButtonInteraction } from 'discord.js';
@@ -22,9 +22,9 @@ export default {
     async execute(
         interaction: QuaverInteraction<ButtonInteraction>,
     ): Promise<void> {
-        const player = interaction.client.music.players.get(
+        const player = (await interaction.client.music.players.fetch(
             interaction.guildId,
-        ) as QuaverPlayer;
+        )) as QuaverPlayer;
         clearTimeout(confirmationTimeout[interaction.message.id]);
         delete confirmationTimeout[interaction.message.id];
         const response = await player.handler.stop();

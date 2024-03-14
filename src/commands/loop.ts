@@ -6,7 +6,7 @@ import type {
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
-import { LoopType } from '@lavaclient/queue';
+import { LoopType } from '@lavaclient/plugin-queue';
 import type {
     ChatInputCommandInteraction,
     SlashCommandStringOption,
@@ -67,9 +67,9 @@ export default {
     async execute(
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
-        const player = interaction.client.music.players.get(
+        const player = (await interaction.client.music.players.fetch(
             interaction.guildId,
-        ) as QuaverPlayer;
+        )) as QuaverPlayer;
         const type = interaction.options.getString('type');
         let loop, typeLocale;
         switch (type) {

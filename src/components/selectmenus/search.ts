@@ -6,7 +6,7 @@ import {
     buildMessageOptions,
     getGuildLocaleString,
 } from '#src/lib/util/util.js';
-import type { Song } from '@lavaclient/queue';
+import type { Song } from '@lavaclient/plugin-queue';
 import type {
     APISelectMenuOption,
     ButtonComponent,
@@ -109,11 +109,9 @@ export default {
                             ): SelectMenuComponentOptionData => {
                                 const refPg = pages.indexOf(
                                     pages.find(
-                                        (
-                                            pg: { info: Song }[],
-                                        ): { info: Song } =>
+                                        (pg): Song =>
                                             pg.find(
-                                                (t: { info: Song }): boolean =>
+                                                (t): boolean =>
                                                     t.info.identifier ===
                                                     identifier,
                                             ),
@@ -121,7 +119,7 @@ export default {
                                 );
                                 const firstIdx = 10 * refPg + 1;
                                 const refTrack = pages[refPg].find(
-                                    (t: { info: Song }): boolean =>
+                                    (t): boolean =>
                                         t.info.identifier === identifier,
                                 );
                                 let label = `${

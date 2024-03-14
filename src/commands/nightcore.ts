@@ -46,9 +46,9 @@ export default {
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
         const enabled = interaction.options.getBoolean('enabled');
-        const player = interaction.client.music.players.get(
+        const player = (await interaction.client.music.players.fetch(
             interaction.guildId,
-        ) as QuaverPlayer;
+        )) as QuaverPlayer;
         const response = await player.handler.nightcore(
             enabled !== null ? enabled : !player.nightcore,
         );

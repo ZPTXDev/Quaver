@@ -4,8 +4,8 @@ import type {
 } from '#src/lib/util/common.d.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
-    getGuildFeatureWhitelisted,
     WhitelistStatus,
+    getGuildFeatureWhitelisted,
 } from '#src/lib/util/util.js';
 import { version } from '#src/lib/util/version.js';
 import { getJSONResponse } from '@zptxdev/zptx-lib';
@@ -30,7 +30,8 @@ export default {
                 guilds: socket.guilds.map((guild): WebGuild => {
                     guild.botInGuild = !!bot.guilds.cache.get(guild.id);
                     const player =
-                        guild.botInGuild && bot.music.players.get(guild.id);
+                        guild.botInGuild &&
+                        bot.music.players.cache.get(guild.id);
                     guild.idle =
                         guild.botInGuild && player
                             ? !player.queue.current ||
@@ -38,7 +39,7 @@ export default {
                             : true;
                     guild.track =
                         guild.botInGuild && !guild.idle
-                            ? player.queue.current.title
+                            ? player.queue.current.info.title
                             : '';
                     return guild;
                 }),
@@ -64,7 +65,8 @@ export default {
         if (response.message) return callback({ status: 'error-auth' });
         const webGuilds = response.map((guild): WebGuild => {
             guild.botInGuild = !!bot.guilds.cache.get(guild.id);
-            const player = guild.botInGuild && bot.music.players.get(guild.id);
+            const player =
+                guild.botInGuild && bot.music.players.cache.get(guild.id);
             guild.idle =
                 guild.botInGuild && player
                     ? !player.queue.current ||
@@ -72,7 +74,7 @@ export default {
                     : true;
             guild.track =
                 guild.botInGuild && !guild.idle
-                    ? player.queue.current.title
+                    ? player.queue.current.info.title
                     : '';
             return guild;
         });

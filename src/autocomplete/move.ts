@@ -10,7 +10,7 @@ export default {
         interaction: QuaverInteraction<AutocompleteInteraction>,
     ): Promise<void> {
         const focused = interaction.options.getFocused();
-        const player = interaction.client.music.players.get(
+        const player = await interaction.client.music.players.fetch(
             interaction.guildId,
         );
         if (!player) return interaction.respond([]);
@@ -23,9 +23,9 @@ export default {
                     ): ApplicationCommandOptionChoiceData & {
                         title: string;
                     } => ({
-                        name: `${index + 1}. ${track.title}`,
+                        name: `${index + 1}. ${track.info.title}`,
                         value: index + 1,
-                        title: track.title,
+                        title: track.info.title,
                     }),
                 )
                 .filter((track): boolean =>

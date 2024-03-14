@@ -7,9 +7,9 @@ import type {
     QuaverSong,
 } from '#src/lib/util/common.d.js';
 import {
+    MessageOptionsBuilderType,
     data,
     logger,
-    MessageOptionsBuilderType,
     searchState,
 } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
@@ -20,7 +20,7 @@ import {
     getGuildLocaleString,
     getLocaleString,
 } from '#src/lib/util/util.js';
-import type { Song } from '@lavaclient/queue';
+import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import type {
     APISelectMenuOption,
@@ -35,9 +35,9 @@ import {
     ButtonBuilder,
     ChannelType,
     EmbedBuilder,
-    escapeMarkdown,
     PermissionsBitField,
     StringSelectMenuBuilder,
+    escapeMarkdown,
 } from 'discord.js';
 
 export default {
@@ -58,11 +58,11 @@ export default {
         if (target === 'add') {
             const { bot, io } = await import('#src/main.js');
             const tracks = state.selected;
-            let player = interaction.client.music.players.get(
+            let player = (await interaction.client.music.players.fetch(
                 interaction.guildId,
-            ) as QuaverPlayer;
+            )) as QuaverPlayer;
             const member = interaction.member as GuildMember;
-            const failedChecks: Check[] = getFailedChecks(
+            const failedChecks: Check[] = await getFailedChecks(
                 [Check.InVoice, Check.InSessionVoice],
                 interaction.guildId,
                 member,
@@ -117,11 +117,10 @@ export default {
             });
             const resolvedTracks = [];
             for (const track of tracks) {
-                const results = await interaction.client.music.rest.loadTracks(
-                    track,
-                );
-                if (results.loadType === 'TRACK_LOADED') {
-                    resolvedTracks.push(results.tracks[0]);
+                const result =
+                    await interaction.client.music.api.loadTracks(track);
+                if (result.loadType === 'track') {
+                    resolvedTracks.push(result.data);
                 }
             }
             let msg,
@@ -140,16 +139,16 @@ export default {
                         interaction.guildId,
                         'MISC.YOUR_SEARCH',
                     ),
-                    '',
+                    'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
                 ];
             }
-            if (!player?.connected) {
-                player = interaction.client.music.createPlayer(
+            if (!player?.voice.connected) {
+                player = interaction.client.music.players.create(
                     interaction.guildId,
                 ) as QuaverPlayer;
                 player.handler = new PlayerHandler(interaction.client, player);
                 player.queue.channel = interaction.channel as QuaverChannels;
-                await player.connect(member.voice.channelId, {
+                await player.voice.connect(member.voice.channelId, {
                     deafened: true,
                 });
                 // Ensure that Quaver destroys the player if the user leaves the channel while Quaver is queuing tracks
@@ -219,7 +218,7 @@ export default {
                 io.to(`guild:${interaction.guildId}`).emit(
                     'queueUpdate',
                     player.queue.tracks.map((track: QuaverSong): QuaverSong => {
-                        const user = bot.users.cache.get(track.requester);
+                        const user = bot.users.cache.get(track.requesterId);
                         track.requesterTag = user?.tag;
                         track.requesterAvatar = user?.avatar;
                         return track;
@@ -282,7 +281,7 @@ export default {
         updated.embeds[0] = EmbedBuilder.from(original.embeds[0])
             .setDescription(
                 pages[page - 1]
-                    .map((track: { info: Song }, index: number): string => {
+                    .map((track, index: number): string => {
                         const duration = msToTime(track.info.length);
                         let durationString = track.info.isStream
                             ? '∞'
@@ -318,36 +317,29 @@ export default {
             original.components[0].components[0] as StringSelectMenuComponent,
         ).setOptions(
             pages[page - 1]
-                .map(
-                    (
-                        track: { info: Song },
-                        index: number,
-                    ): APISelectMenuOption => {
-                        let label = `${firstIndex + index}. ${
-                            track.info.title
-                        }`;
-                        if (label.length >= 100) {
-                            label = `${label.substring(0, 97)}...`;
-                        }
-                        return {
-                            label: label,
-                            description: track.info.author,
-                            value: track.info.identifier,
-                            default: !!state.selected.find(
-                                (identifier: string): boolean =>
-                                    identifier === track.info.identifier,
-                            ),
-                        };
-                    },
-                )
+                .map((track, index: number): APISelectMenuOption => {
+                    let label = `${firstIndex + index}. ${track.info.title}`;
+                    if (label.length >= 100) {
+                        label = `${label.substring(0, 97)}...`;
+                    }
+                    return {
+                        label: label,
+                        description: track.info.author,
+                        value: track.info.identifier,
+                        default: !!state.selected.find(
+                            (identifier: string): boolean =>
+                                identifier === track.info.identifier,
+                        ),
+                    };
+                })
                 .concat(
                     state.selected
                         .map((identifier: string): APISelectMenuOption => {
                             const refPg = pages.indexOf(
                                 pages.find(
-                                    (pg: { info: Song }[]): { info: Song } =>
+                                    (pg): Song =>
                                         pg.find(
-                                            (t: { info: Song }): boolean =>
+                                            (t): boolean =>
                                                 t.info.identifier ===
                                                 identifier,
                                         ),
@@ -355,7 +347,7 @@ export default {
                             );
                             const firstIdx = 10 * refPg + 1;
                             const refTrack = pages[refPg].find(
-                                (t: { info: Song }): boolean =>
+                                (t): boolean =>
                                     t.info.identifier === identifier,
                             );
                             let label = `${
@@ -374,7 +366,7 @@ export default {
                         .filter(
                             (options): boolean =>
                                 !pages[page - 1].find(
-                                    (track: { info: Song }): boolean =>
+                                    (track): boolean =>
                                         track.info.identifier === options.value,
                                 ),
                         ),

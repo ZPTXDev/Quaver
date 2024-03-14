@@ -4,17 +4,18 @@
 		"rootDir": "./src",
 		"outDir": "./dist",
 		"target": "ES2022",
-		"module": "ES2022",
+		"module": "Node16",
 		"allowJs": true,
 		"alwaysStrict": true,
-		"noEmitOnError": true,
+		"noEmitOnError": false,
 		"noImplicitAny": true,
 		"moduleResolution": "Node16",
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"paths": {
 			"#src/*": ["src/*"]
-		}
+		},
+		"allowSyntheticDefaultImports": true
 	},
 	"include": ["src/**/*"]
 }

@@ -9,9 +9,9 @@ import type {
     WhitelistedFeatures,
 } from '#src/lib/util/common.d.js';
 import {
+    MessageOptionsBuilderType,
     data,
     locales,
-    MessageOptionsBuilderType,
 } from '#src/lib/util/common.js';
 import { Check, Language } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
@@ -33,11 +33,11 @@ import {
     ButtonBuilder,
     ButtonStyle,
     EmbedBuilder,
-    escapeMarkdown,
     GuildMember,
     PermissionsBitField,
     RoleSelectMenuBuilder,
     StringSelectMenuBuilder,
+    escapeMarkdown,
 } from 'discord.js';
 import { readdirSync } from 'fs';
 import { get } from 'lodash-es';
@@ -210,7 +210,7 @@ export async function getRequesterStatus(
     member: GuildMember,
     channel: QuaverChannels,
 ): Promise<RequesterStatus> {
-    if (track.requester === member.id) return RequesterStatus.Requester;
+    if (track.requesterId === member.id) return RequesterStatus.Requester;
     const djRole = await data.guild.get<Snowflake>(
         member.guild.id,
         'settings.dj',
@@ -235,7 +235,7 @@ export async function getRequesterStatus(
  * @param interaction - The interaction, only required if checking for InteractionStarter.
  * @returns All failed checks.
  */
-export function getFailedChecks(
+export async function getFailedChecks(
     checks: Check[],
     guildId: Snowflake,
     member: GuildMember & { client: QuaverClient },
@@ -244,7 +244,7 @@ export function getFailedChecks(
         | StringSelectMenuInteraction
         | RoleSelectMenuInteraction
         | ModalSubmitInteraction,
-): Check[] {
+): Promise<Check[]> {
     const failedChecks: Check[] = [];
     for (const check of checks ?? []) {
         switch (check) {
@@ -256,7 +256,7 @@ export function getFailedChecks(
                     failedChecks.push(check);
                     break;
                 }
-                const player = member.client.music.players.get(guildId);
+                const player = await member.client.music.players.fetch(guildId);
                 if (!player) failedChecks.push(check);
                 break;
             }
@@ -269,11 +269,11 @@ export function getFailedChecks(
                 }
                 break;
             case Check.InSessionVoice: {
-                const player = member.client.music.players.get(guildId);
+                const player = await member.client.music.players.fetch(guildId);
                 if (
                     player &&
                     member instanceof GuildMember &&
-                    member?.voice.channelId !== player.channelId
+                    member?.voice.channelId !== player.voice.channelId
                 ) {
                     failedChecks.push(check);
                 }
@@ -316,8 +316,8 @@ export function getButtonToggleComponents(
                             ? ButtonStyle.Success
                             : ButtonStyle.Secondary
                         : !enabled
-                        ? ButtonStyle.Success
-                        : ButtonStyle.Secondary,
+                          ? ButtonStyle.Success
+                          : ButtonStyle.Secondary,
                 )
                 .setDisabled(state === 'enable' ? enabled : !enabled),
     );
@@ -340,15 +340,15 @@ export function sortQueue(queue: QuaverSong[]): QuaverSong[] {
         }
         if (
             // the last requester is the same as the next requester
-            sorted[sorted.length - 1].requester === copy[0].requester &&
+            sorted[sorted.length - 1].requesterId === copy[0].requesterId &&
             // and there is more than 1 requester in the queue
-            new Set(copy.map((song): Snowflake => song.requester)).size >= 2
+            new Set(copy.map((song): Snowflake => song.requesterId)).size >= 2
         ) {
             // deal with the next requester later, move them to the next position behind another requester
             copy.splice(
                 copy.findIndex(
                     (element: QuaverSong): boolean =>
-                        element.requester !== copy[0].requester,
+                        element.requesterId !== copy[0].requesterId,
                 ),
                 0,
                 copy.shift(),
@@ -533,26 +533,26 @@ export async function buildSettingsPage(
                                       'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.LOCKED.DEFAULT',
                                   )
                                 : whitelisted[key] !== -1 &&
-                                  Date.now() > whitelisted[key]
-                                ? getLocaleString(
-                                      guildLocaleCode,
-                                      'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.LOCKED.EXPIRED',
-                                      Math.floor(
-                                          whitelisted[key] / 1000,
-                                      ).toString(),
-                                  )
-                                : whitelisted[key] === -1
-                                ? getLocaleString(
-                                      guildLocaleCode,
-                                      'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.UNLOCKED.PERMANENT',
-                                  )
-                                : getLocaleString(
-                                      guildLocaleCode,
-                                      'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.UNLOCKED.TEMPORARY',
-                                      Math.floor(
-                                          whitelisted[key] / 1000,
-                                      ).toString(),
-                                  )
+                                    Date.now() > whitelisted[key]
+                                  ? getLocaleString(
+                                        guildLocaleCode,
+                                        'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.LOCKED.EXPIRED',
+                                        Math.floor(
+                                            whitelisted[key] / 1000,
+                                        ).toString(),
+                                    )
+                                  : whitelisted[key] === -1
+                                    ? getLocaleString(
+                                          guildLocaleCode,
+                                          'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.UNLOCKED.PERMANENT',
+                                      )
+                                    : getLocaleString(
+                                          guildLocaleCode,
+                                          'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.UNLOCKED.TEMPORARY',
+                                          Math.floor(
+                                              whitelisted[key] / 1000,
+                                          ).toString(),
+                                      )
                         }`,
                 );
             embeds = [

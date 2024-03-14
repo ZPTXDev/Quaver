@@ -3,7 +3,7 @@ import type {
     QuaverInteraction,
     QuaverPlayer,
 } from '#src/lib/util/common.d.js';
-import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
+import { MessageOptionsBuilderType, data } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
@@ -50,9 +50,9 @@ export default {
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
         const enabled = interaction.options.getBoolean('enabled');
-        const player = interaction.client.music.players.get(
+        const player = (await interaction.client.music.players.fetch(
             interaction.guildId,
-        ) as QuaverPlayer;
+        )) as QuaverPlayer;
         const response = await player.handler.stay(
             enabled !== null
                 ? enabled

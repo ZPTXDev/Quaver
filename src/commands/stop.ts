@@ -40,7 +40,7 @@ export default {
     async execute(
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
-        const player = interaction.client.music.players.get(
+        const player = await interaction.client.music.players.fetch(
             interaction.guildId,
         );
         if (!player.queue.current || (!player.playing && !player.paused)) {

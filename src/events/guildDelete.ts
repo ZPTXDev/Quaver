@@ -10,19 +10,17 @@ export default {
             message: `[G ${guild.id}] Left guild ${guild.name}`,
             label: 'Discord',
         });
-        const player = guild.client.music.players.get(guild.id) as QuaverPlayer;
+        const player = (await guild.client.music.players.fetch(
+            guild.id,
+        )) as QuaverPlayer;
         if (player) {
             logger.info({
                 message: `[G ${guild.id}] Cleaning up (left guild)`,
                 label: 'Quaver',
             });
-            player.channelId = null;
-            if (await data.guild.get(player.guildId, 'settings.stay.enabled')) {
-                await data.guild.set(
-                    player.guildId,
-                    'settings.stay.enabled',
-                    false,
-                );
+            player.voice.channelId = null;
+            if (await data.guild.get(player.id, 'settings.stay.enabled')) {
+                await data.guild.set(player.id, 'settings.stay.enabled', false);
             }
             await player.handler.disconnect();
         }

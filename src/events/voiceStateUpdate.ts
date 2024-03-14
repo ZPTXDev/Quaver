@@ -1,8 +1,8 @@
 import type { QuaverClient, QuaverPlayer } from '#src/lib/util/common.d.js';
 import {
+    MessageOptionsBuilderType,
     data,
     logger,
-    MessageOptionsBuilderType,
 } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString } from '#src/lib/util/util.js';
@@ -21,7 +21,9 @@ export default {
         const { io } = await import('#src/main.js');
         const guild = oldState.guild;
         const client = oldState.client as QuaverClient;
-        const player = client.music.players.get(guild.id) as QuaverPlayer;
+        const player = (await client.music.players.fetch(
+            guild.id,
+        )) as QuaverPlayer;
         if (!player) return;
         // Quaver voiceStateUpdate
         if (oldState.member.user.id === oldState.client.user.id) {
@@ -38,18 +40,13 @@ export default {
             // Disconnected
             if (!newState.channelId) {
                 logger.info({
-                    message: `[G ${player.guildId}] Cleaning up (disconnected)`,
+                    message: `[G ${player.id}] Cleaning up (disconnected)`,
                     label: 'Quaver',
                 });
-                player.channelId = null;
-                if (
-                    await data.guild.get(
-                        player.guildId,
-                        'settings.stay.enabled',
-                    )
-                ) {
+                player.voice.channelId = null;
+                if (await data.guild.get(player.id, 'settings.stay.enabled')) {
                     await data.guild.set(
-                        player.guildId,
+                        player.id,
                         'settings.stay.enabled',
                         false,
                     );
@@ -63,11 +60,11 @@ export default {
             }
             /** Checks for when Quaver joins or moves */
             if (settings.features.web.enabled) {
-                io.to(`guild:${player.guildId}`).emit(
+                io.to(`guild:${player.id}`).emit(
                     'textChannelUpdate',
                     player.queue.channel.name,
                 );
-                io.to(`guild:${player.guildId}`).emit(
+                io.to(`guild:${player.id}`).emit(
                     'channelUpdate',
                     newState.channel?.name,
                 );
@@ -97,16 +94,16 @@ export default {
                 }
                 if (
                     (await data.guild.get(
-                        player.guildId,
+                        player.id,
                         'settings.stay.enabled',
                     )) &&
                     (await data.guild.get(
-                        player.guildId,
+                        player.id,
                         'settings.stay.channel',
                     )) !== newState.channelId
                 ) {
                     await data.guild.set(
-                        player.guildId,
+                        player.id,
                         'settings.stay.channel',
                         newState.channelId,
                     );
@@ -141,13 +138,10 @@ export default {
                 }
                 if (!permissions.has(PermissionsBitField.StageModerator)) {
                     if (
-                        await data.guild.get(
-                            player.guildId,
-                            'settings.stay.enabled',
-                        )
+                        await data.guild.get(player.id, 'settings.stay.enabled')
                     ) {
                         await data.guild.set(
-                            player.guildId,
+                            player.id,
                             'settings.stay.enabled',
                             false,
                         );
@@ -164,7 +158,7 @@ export default {
                     try {
                         await newState.channel.createStageInstance({
                             topic: await getGuildLocaleString(
-                                player.guildId,
+                                player.id,
                                 'MISC.STAGE_TOPIC',
                             ),
                             privacyLevel: StageInstancePrivacyLevel.GuildOnly,
@@ -180,16 +174,16 @@ export default {
                 }
                 if (
                     (await data.guild.get(
-                        player.guildId,
+                        player.id,
                         'settings.stay.enabled',
                     )) &&
                     (await data.guild.get(
-                        player.guildId,
+                        player.id,
                         'settings.stay.channel',
                     )) !== newState.channelId
                 ) {
                     await data.guild.set(
-                        player.guildId,
+                        player.id,
                         'settings.stay.channel',
                         newState.channelId,
                     );
@@ -199,15 +193,10 @@ export default {
             if (
                 newState.channel.members.filter((m): boolean => !m.user.bot)
                     .size < 1 &&
-                !(await data.guild.get(player.guildId, 'settings.stay.enabled'))
+                !(await data.guild.get(player.id, 'settings.stay.enabled'))
             ) {
                 // Avoid pauseTimeout if 24/7 is enabled
-                if (
-                    await data.guild.get(
-                        player.guildId,
-                        'settings.stay.enabled',
-                    )
-                ) {
+                if (await data.guild.get(player.id, 'settings.stay.enabled')) {
                     return;
                 }
                 // Nothing is playing so we'll leave
@@ -216,19 +205,16 @@ export default {
                     (!player.playing && !player.paused)
                 ) {
                     if (
-                        await data.guild.get(
-                            player.guildId,
-                            'settings.stay.enabled',
-                        )
+                        await data.guild.get(player.id, 'settings.stay.enabled')
                     ) {
                         await data.guild.set(
-                            player.guildId,
+                            player.id,
                             'settings.stay.enabled',
                             false,
                         );
                     }
                     logger.info({
-                        message: `[G ${player.guildId}] Disconnecting (alone)`,
+                        message: `[G ${player.id}] Disconnecting (alone)`,
                         label: 'Quaver',
                     });
                     await player.handler.locale(
@@ -244,13 +230,13 @@ export default {
                 // Quaver was playing something - set pauseTimeout
                 await player.pause();
                 if (settings.features.web.enabled) {
-                    io.to(`guild:${player.guildId}`).emit(
+                    io.to(`guild:${player.id}`).emit(
                         'pauseUpdate',
                         player.paused,
                     );
                 }
                 logger.info({
-                    message: `[G ${player.guildId}] Setting pause timeout`,
+                    message: `[G ${player.id}] Setting pause timeout`,
                     label: 'Quaver',
                 });
                 // Before setting a new pauseTimeout, clear the pauseTimeout first as a failsafe
@@ -258,7 +244,7 @@ export default {
                 player.pauseTimeout = setTimeout(
                     (p): void => {
                         logger.info({
-                            message: `[G ${p.guildId}] Disconnecting (inactivity)`,
+                            message: `[G ${p.id}] Disconnecting (inactivity)`,
                             label: 'Quaver',
                         });
                         p.handler.locale(
@@ -272,7 +258,7 @@ export default {
                 );
                 player.timeoutEnd = Date.now() + 5 * 60 * 1000;
                 if (settings.features.web.enabled) {
-                    io.to(`guild:${player.guildId}`).emit(
+                    io.to(`guild:${player.id}`).emit(
                         'pauseTimeoutUpdate',
                         player.timeoutEnd,
                     );
@@ -281,10 +267,10 @@ export default {
                     new EmbedBuilder()
                         .setDescription(
                             `${await getGuildLocaleString(
-                                player.guildId,
+                                player.id,
                                 'MUSIC.DISCONNECT.ALONE.WARNING',
                             )} ${await getGuildLocaleString(
-                                player.guildId,
+                                player.id,
                                 'MUSIC.DISCONNECT.INACTIVITY.WARNING',
                                 (
                                     Math.floor(Date.now() / 1000) +
@@ -294,7 +280,7 @@ export default {
                         )
                         .setFooter({
                             text: await getGuildLocaleString(
-                                player.guildId,
+                                player.id,
                                 'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME',
                             ),
                         }),
@@ -309,18 +295,18 @@ export default {
                 player.pauseTimeout
             ) {
                 logger.info({
-                    message: `[G ${player.guildId}] Resuming session`,
+                    message: `[G ${player.id}] Resuming session`,
                     label: 'Quaver',
                 });
                 await player.resume();
                 clearTimeout(player.pauseTimeout);
                 delete player.pauseTimeout;
                 if (settings.features.web.enabled) {
-                    io.to(`guild:${player.guildId}`).emit(
+                    io.to(`guild:${player.id}`).emit(
                         'pauseUpdate',
                         player.paused,
                     );
-                    io.to(`guild:${player.guildId}`).emit(
+                    io.to(`guild:${player.id}`).emit(
                         'pauseTimeoutUpdate',
                         !!player.pauseTimeout,
                     );
@@ -336,23 +322,23 @@ export default {
         // User voiceStateUpdate
         /** Checks for when a user joins or moves */
         // User joined or moved to Quaver's channel, and pauseTimeout is set
-        if (newState.channelId === player?.channelId && player?.pauseTimeout) {
+        if (
+            newState.channelId === player?.voice.channelId &&
+            player?.pauseTimeout
+        ) {
             logger.info({
-                message: `[G ${player.guildId}] Resuming session`,
+                message: `[G ${player.id}] Resuming session`,
                 label: 'Quaver',
             });
             await player.resume();
             if (settings.features.web.enabled) {
-                io.to(`guild:${player.guildId}`).emit(
-                    'pauseUpdate',
-                    player.paused,
-                );
+                io.to(`guild:${player.id}`).emit('pauseUpdate', player.paused);
             }
             if (player.pauseTimeout) {
                 clearTimeout(player.pauseTimeout);
                 delete player.pauseTimeout;
                 if (settings.features.web.enabled) {
-                    io.to(`guild:${player.guildId}`).emit(
+                    io.to(`guild:${player.id}`).emit(
                         'pauseTimeoutUpdate',
                         !!player.pauseTimeout,
                     );
@@ -364,7 +350,7 @@ export default {
             return;
         }
         // User not in Quaver's channel
-        if (oldState.channelId !== player?.channelId) return;
+        if (oldState.channelId !== player?.voice.channelId) return;
         // User didn't leave the channel, but their voice state changed
         if (newState.channelId === oldState.channelId) return;
         /** Checks for when a user leaves */
@@ -380,7 +366,7 @@ export default {
         // Nothing is playing so we'll leave
         if (!player.queue.current || (!player.playing && !player.paused)) {
             logger.info({
-                message: `[G ${player.guildId}] Disconnecting (alone)`,
+                message: `[G ${player.id}] Disconnecting (alone)`,
                 label: 'Quaver',
             });
             await player.handler.locale(
@@ -392,10 +378,10 @@ export default {
         }
         // Ensure that Quaver does not set pauseTimeout if timeout already exists
         // Ensure that Quaver does not set pauseTimeout after a stage ends
-        if (player.timeout || !player.channelId) return;
+        if (player.timeout || !player.voice.channelId) return;
         const voiceChannel = oldState.client.guilds.cache
-            .get(player.guildId)
-            .channels.cache.get(player.channelId);
+            .get(player.id)
+            .channels.cache.get(player.voice.channelId);
         if (
             voiceChannel.type === ChannelType.GuildStageVoice &&
             !voiceChannel.stageInstance
@@ -405,10 +391,10 @@ export default {
         // Quaver was playing something - set pauseTimeout
         await player.pause();
         if (settings.features.web.enabled) {
-            io.to(`guild:${player.guildId}`).emit('pauseUpdate', player.paused);
+            io.to(`guild:${player.id}`).emit('pauseUpdate', player.paused);
         }
         logger.info({
-            message: `[G ${player.guildId}] Setting pause timeout`,
+            message: `[G ${player.id}] Setting pause timeout`,
             label: 'Quaver',
         });
         // Before setting a new pauseTimeout, clear the pauseTimeout first as a failsafe
@@ -416,7 +402,7 @@ export default {
         player.pauseTimeout = setTimeout(
             (p): void => {
                 logger.info({
-                    message: `[G ${p.guildId}] Disconnecting (inactivity)`,
+                    message: `[G ${p.id}] Disconnecting (inactivity)`,
                     label: 'Quaver',
                 });
                 p.handler.locale('MUSIC.DISCONNECT.INACTIVITY.DISCONNECTED', {
@@ -429,7 +415,7 @@ export default {
         );
         player.timeoutEnd = Date.now() + 5 * 60 * 1000;
         if (settings.features.web.enabled) {
-            io.to(`guild:${player.guildId}`).emit(
+            io.to(`guild:${player.id}`).emit(
                 'pauseTimeoutUpdate',
                 player.timeoutEnd,
             );
@@ -438,17 +424,17 @@ export default {
             new EmbedBuilder()
                 .setDescription(
                     `${await getGuildLocaleString(
-                        player.guildId,
+                        player.id,
                         'MUSIC.DISCONNECT.ALONE.WARNING',
                     )} ${await getGuildLocaleString(
-                        player.guildId,
+                        player.id,
                         'MUSIC.DISCONNECT.INACTIVITY.WARNING',
                         (Math.floor(Date.now() / 1000) + 5 * 60).toString(),
                     )}`,
                 )
                 .setFooter({
                     text: await getGuildLocaleString(
-                        player.guildId,
+                        player.id,
                         'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME',
                     ),
                 }),
