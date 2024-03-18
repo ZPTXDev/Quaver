@@ -23,7 +23,7 @@
     "keyv": "^4.5.4",
     "kuroshiro": "1.2.0",
     "kuroshiro-analyzer-kuromoji": "^1.1.0",
-    "lavaclient": "^5.0.0-rc.2",
+    "lavaclient": "^5.0.0-rc.3",
     "lavalink-protocol": "^1.0.1",
     "lodash-es": "^4.17.21",
     "patch-package": "^8.0.0",
