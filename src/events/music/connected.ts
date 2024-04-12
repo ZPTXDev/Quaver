@@ -8,7 +8,7 @@ import { data, logger } from '#src/lib/util/common.js';
 import { get } from 'lodash-es';
 
 export default {
-    name: 'connect',
+    name: 'connected',
     once: false,
     async execute(): Promise<void> {
         const { bot } = await import('#src/main.js');
