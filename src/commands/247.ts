@@ -53,14 +53,17 @@ export default {
         const player = (await interaction.client.music.players.fetch(
             interaction.guildId,
         )) as QuaverPlayer;
-        const response = await player.handler.stay(
+        // if the user has provided a preference, its input boolean value is used as the guild's stay.enabled value
+        // if the user simply used the slash command without using the enabled option, toggling it in a sense,
+        // it defaults to opposite of the stay.enabled value stored from the the guild's data.
+        const isGuildStayEnabled =
             enabled !== null
                 ? enabled
                 : !(await data.guild.get(
                       interaction.guildId,
                       'settings.stay.enabled',
-                  )),
-        );
+                  ));
+        const response = await player.handler.stay(isGuildStayEnabled);
         switch (response) {
             case PlayerResponse.FeatureDisabled:
                 await interaction.replyHandler.locale(
@@ -123,13 +126,13 @@ export default {
                         .setDescription(
                             await getGuildLocaleString(
                                 interaction.guildId,
-                                enabled
+                                isGuildStayEnabled
                                     ? 'CMD.247.RESPONSE.ENABLED'
                                     : 'CMD.247.RESPONSE.DISABLED',
                             ),
                         )
                         .setFooter({
-                            text: enabled
+                            text: isGuildStayEnabled
                                 ? await getGuildLocaleString(
                                       interaction.guildId,
                                       'CMD.247.MISC.NOTE',
@@ -137,7 +140,9 @@ export default {
                                 : null,
                         }),
                 );
-                if (!enabled && !player.playing) player.queue.emit('finish');
+                if (!isGuildStayEnabled && !player.playing) {
+                    player.queue.emit('finish');
+                }
         }
     },
 };
