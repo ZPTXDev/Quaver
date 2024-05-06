@@ -16,7 +16,7 @@
     "@zptxdev/zptx-lib": "^1.1.0",
     "crypto-js": "^4.2.0",
     "discord-api-types": "^0.37.83",
-    "discord.js": "^14.14.1",
+    "discord.js": "^14.15.2",
     "express": "^4.19.2",
     "genversion": "^3.2.0",
     "hangul-romanization": "^1.0.1",
