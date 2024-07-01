@@ -55,11 +55,6 @@
             "whitelist": false,
             "premium": false
         },
-        "spotify": {
-            "enabled": true,
-            "client_id": "Paste Spotify Client ID here",
-            "client_secret": "Paste Spotify Client Secret here"
-        },
         "web": {
             "enabled": false,
             "port": 3000,
@@ -114,10 +109,6 @@
 | `features.smartqueue.enabled` | Whether or not the feature is enabled. | ✅ | `6.8.0` |
 | `features.smartqueue.whitelist` | Whether or not the feature requires guilds to be whitelisted. You will be able to whitelist guilds through the terminal. | ✅ (if feature is enabled)<br />❌ (if feature is disabled) | `6.8.0` |
 | `features.smartqueue.premium` | Whether or not to display the "requires premium" message when a guild is not whitelisted. Has no effect if `features.smartqueue.whitelist` is `false` or `premiumURL` is unset. | ✅ (if feature is enabled)<br />❌ (if feature is disabled) | `6.8.0` |
-| `features.spotify` | Spotify feature: Allows users to play songs from Spotify. | ✅ | |
-| `features.spotify.enabled` | Whether or not the feature is enabled. | ✅ | |
-| `features.spotify.client_id` | Your Spotify client ID. You can get it from the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/). | ✅ (if feature is enabled)<br />❌ (if feature is disabled) | |
-| `features.spotify.client_secret` | Your Spotify client secret. You can get it from the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/). | ✅ (if feature is enabled)<br />❌ (if feature is disabled) | |
 | `features.web` | Web feature: Allows Quaver to handle Socket.IO connections from Quaver-Web. | ✅ | |
 | `features.web.enabled` | Whether or not the feature is enabled. | ✅ | |
 | `features.web.port` | The port to listen on for Socket.IO connections. | ✅ (if feature is enabled)<br />❌ (if feature is disabled) | |
