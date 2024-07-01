@@ -229,7 +229,7 @@ export default {
                 json,
                 lyrics,
             );
-            if (lyricsFields.length === 0) return;
+            if (lyricsFields.length === 0 || !lyricsFields[0].value) return;
             await queue.player.handler.send(
                 new EmbedBuilder().setFields(lyricsFields),
                 {

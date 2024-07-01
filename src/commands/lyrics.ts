@@ -112,7 +112,7 @@ export default {
             romanizeFrom = 'chinese';
         }
         const lyricsFields = generateEmbedFieldsFromLyrics(json, lyrics);
-        if (lyricsFields.length === 0) {
+        if (lyricsFields.length === 0 || !lyricsFields[0].value) {
             await interaction.replyHandler.locale(
                 'CMD.LYRICS.RESPONSE.NO_RESULTS',
                 { type: MessageOptionsBuilderType.Error },
