@@ -80,7 +80,7 @@ export default {
             }
         } else {
             try {
-                const response = await interaction.client.music.rest.execute({ path: `/v4/lyrics?query=${query}&source=genius`, method: 'GET' });
+                const response = await interaction.client.music.rest.execute({ path: `/v4/lyrics/search?query=${query}&source=genius`, method: 'GET' });
                 json = await response.json();
                 lyrics = formatResponse(json);
             } catch (error) {
