@@ -84,7 +84,7 @@ export default {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let tracks: any[] = [];
         const result = await interaction.client.music.api.loadTracks(
-            `ytmsearch:${query}`,
+            `ytsearch:${query}`,
         );
         if (result.loadType === 'search') tracks = [...result.data];
         if (tracks.length <= 1) {
