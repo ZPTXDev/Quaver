@@ -75,6 +75,8 @@ Yes! As of **5.0.0**, Quaver has a web dashboard add-on available [here](https:/
 
 As of **7.0.0**, Spotify support is provided through Lavalink. Please use the [LavaSrc plugin](https://github.com/topi314/LavaSrc) with Lavalink to enable Spotify support.
 
+> **NOTE:** To enable support via Lavalink, version **7.0.2** or higher is required. Older versions may block Spotify queries locally.
+
 # 💬 Translating
 
 Take a look at our [Crowdin project](https://translate.zptx.dev).
