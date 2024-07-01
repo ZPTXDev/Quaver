@@ -12,7 +12,7 @@ patchedDependencies:
     hash: 4jdpxiik557o3e3mu5heiyclmm
     path: patches/kuroshiro-analyzer-kuromoji@1.1.0.patch
   kuroshiro@1.2.0:
-    hash: fgcexhy6ertj4je4ggnmzniibu
+    hash: 5v3grs5e55tzwvl3bt4vmmplli
     path: patches/kuroshiro@1.2.0.patch
   winston-loki@6.1.2:
     hash: y3pi3kbgzzxkckogphzdkinrlq
@@ -63,7 +63,7 @@ importers:
         version: 4.5.4
       kuroshiro:
         specifier: 1.2.0
-        version: 1.2.0(patch_hash=fgcexhy6ertj4je4ggnmzniibu)
+        version: 1.2.0(patch_hash=5v3grs5e55tzwvl3bt4vmmplli)
       kuroshiro-analyzer-kuromoji:
         specifier: ^1.1.0
         version: 1.1.0(patch_hash=4jdpxiik557o3e3mu5heiyclmm)
@@ -3300,7 +3300,7 @@ snapshots:
     dependencies:
       kuromoji: 0.1.2
 
-  kuroshiro@1.2.0(patch_hash=fgcexhy6ertj4je4ggnmzniibu):
+  kuroshiro@1.2.0(patch_hash=5v3grs5e55tzwvl3bt4vmmplli):
     dependencies:
       '@babel/runtime': 7.24.5
 

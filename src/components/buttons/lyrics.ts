@@ -13,7 +13,7 @@ import Kuroshiro from 'kuroshiro';
 import KuromojiAnalyzer from 'kuroshiro-analyzer-kuromoji';
 import { toRomaji as romanizeFromJapanese } from 'wanakana';
 
-const kuroshiro = new Kuroshiro();
+const kuroshiro = new Kuroshiro.default();
 await kuroshiro.init(new KuromojiAnalyzer());
 
 export default {

@@ -82,10 +82,10 @@
   },
   "pnpm": {
     "patchedDependencies": {
-      "kuroshiro@1.2.0": "patches/kuroshiro@1.2.0.patch",
       "@lavaclient/plugin-queue@0.0.1": "patches/@lavaclient__plugin-queue@0.0.1.patch",
       "winston-loki@6.1.2": "patches/winston-loki@6.1.2.patch",
-      "kuroshiro-analyzer-kuromoji@1.1.0": "patches/kuroshiro-analyzer-kuromoji@1.1.0.patch"
+      "kuroshiro-analyzer-kuromoji@1.1.0": "patches/kuroshiro-analyzer-kuromoji@1.1.0.patch",
+      "kuroshiro@1.2.0": "patches/kuroshiro@1.2.0.patch"
     }
   }
 }
