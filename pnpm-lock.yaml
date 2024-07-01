@@ -96,9 +96,6 @@ importers:
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
-      '@types/node':
-        specifier: ^20.14.9
-        version: 20.14.9
       '@typescript-eslint/eslint-plugin':
         specifier: ^7.14.1
         version: 7.14.1(@typescript-eslint/parser@7.14.1(eslint@8.57.0)(typescript@5.5.2))(eslint@8.57.0)(typescript@5.5.2)
