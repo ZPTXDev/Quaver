@@ -1,0 +1,29 @@
+name: Update next branch
+on:
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
+    branches: [master]
+
+permissions:
+  contents: write
+
+jobs:
+  update-next:
+    name: Sync next with master
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
+      - name: Merge changes from 'master' into 'next'
+        run: |
+          git checkout master
+          git fetch origin
+          git checkout next
+          git pull
+          git merge origin/master
+          git push origin next

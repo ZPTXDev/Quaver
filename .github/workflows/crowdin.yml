@@ -1,7 +1,7 @@
 name: Crowdin
 on:
   push:
-    branches: next
+    branches: [next]
   schedule:
     - cron: '0 0 * * *'
   workflow_dispatch:
@@ -12,10 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository_owner == 'ZPTXDev'
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
       with:
         token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
-    - uses: crowdin/github-action@v1.20.2
+    - name: Fetch Crowdin translations
+      uses: crowdin/github-action@v1.20.4
       with:
         download_translations: true
         skip_untranslated_files: true
