@@ -2,7 +2,7 @@ import type {
     MessageOptionsBuilderInputs,
     MessageOptionsBuilderOptions,
     QuaverChannels,
-    QuaverClient,
+    QuaverClient, QuaverPlayer,
     QuaverSong,
     SettingsPage,
     SettingsPageOptions,
@@ -41,7 +41,7 @@ import {
 } from 'discord.js';
 import { readdirSync } from 'fs';
 import { get } from 'lodash-es';
-import type { LocaleCompletionState } from './util.d.js';
+import type { LocaleCompletionState, LyricsResponse } from './util.d.js';
 
 /**
  * Returns the localized string.
@@ -362,13 +362,22 @@ export function sortQueue(queue: QuaverSong[]): QuaverSong[] {
 }
 
 /**
+ * Formats LyricResponse into a string.
+ * @param json - The LyricsResponse object.
+ * @param player - The QuaverPlayer object. (for marking position in lyrics)
+ */
+export function formatResponse(json: LyricsResponse, player?: QuaverPlayer): string | Error {
+    return json.type === 'text' ? json.text : json.type === 'timed' ? json.lines.map((line): string => player?.position >= line.range.start && player?.position < line.range.end ? `**__${line.line}__**` : line.line).join('\n') : new Error('No results');
+}
+
+/**
  * Generates an array of APIEmbedField from the lyrics.
- * @param query - The query to be used.
+ * @param json - The LyricsResponse object.
  * @param lyrics - The lyrics to be used.
  * @returns An array of APIEmbedField.
  */
 export function generateEmbedFieldsFromLyrics(
-    query: string,
+    json: LyricsResponse,
     lyrics: string,
 ): APIEmbedField[] {
     let lyricsFields: APIEmbedField[] = [];
@@ -380,14 +389,14 @@ export function generateEmbedFieldsFromLyrics(
         if (chunk.length > 1024) giveUp = true;
         if (previous.length + chunk.length + '\n\n'.length > 1024) {
             lyricsFields.push({
-                name: lyricsFields.length === 0 ? query : '​',
+                name: lyricsFields.length === 0 ? `${json.track.author} - ${json.track.title}` : '​',
                 value: previous,
             });
             return chunk;
         }
         if (index === array.length - 1) {
             lyricsFields.push({
-                name: lyricsFields.length === 0 ? query : '​',
+                name: lyricsFields.length === 0 ? `${json.track.author} - ${json.track.title}` : '​',
                 value: previous + '\n\n' + chunk,
             });
         }
@@ -399,14 +408,14 @@ export function generateEmbedFieldsFromLyrics(
         lyrics.split('\n').reduce((previous, line, index, array): string => {
             if (previous.length + line.length + '\n'.length > 1024) {
                 lyricsFields.push({
-                    name: lyricsFields.length === 0 ? query : '​',
+                    name: lyricsFields.length === 0 ? `${json.track.author} - ${json.track.title}` : '​',
                     value: previous,
                 });
                 return line;
             }
             if (index === array.length - 1) {
                 lyricsFields.push({
-                    name: lyricsFields.length === 0 ? query : '​',
+                    name: lyricsFields.length === 0 ? `${json.track.author} - ${json.track.title}` : '​',
                     value: previous + '\n' + line,
                 });
             }

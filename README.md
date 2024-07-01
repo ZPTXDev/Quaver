@@ -31,6 +31,7 @@ As Quaver is designed to be as user-friendly as possible, users should be able t
 - [Lavalink](https://github.com/lavalink-devs/Lavalink) v4 (or higher)
   - [youtube-source plugin](https://github.com/lavalink-devs/youtube-source#plugin) installed
   - [LavaSrc plugin](https://github.com/topi314/LavaSrc#lavalink-usage) installed
+  - [java-timed-lyrics plugin](https://github.com/DuncteBot/java-timed-lyrics#using-with-lavalink) installed
 > Please note the connection details of your Lavalink instance. You will need to specify them in `settings.json` later.
 - Bot token from [Discord](https://discord.com/developers/applications)
 

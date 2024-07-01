@@ -2,11 +2,11 @@ import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
+    formatResponse,
     generateEmbedFieldsFromLyrics,
     getGuildLocaleString,
     getLocaleString,
 } from '#src/lib/util/util.js';
-import { LyricsFinder } from '@jeve/lyrics-finder';
 import type {
     ChatInputCommandInteraction,
     SlashCommandStringOption,
@@ -46,13 +46,16 @@ export default {
     async execute(
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
-        let query = interaction.options.getString('query');
+        const query = interaction.options.getString('query');
+        let json;
+        let lyrics: string | Error;
+        await interaction.deferReply();
+        const player = interaction.guildId
+            ? await interaction.client.music.players.fetch(
+                interaction.guildId,
+            )
+            : null;
         if (!query) {
-            const player = interaction.guildId
-                ? await interaction.client.music.players.fetch(
-                      interaction.guildId,
-                  )
-                : null;
             if (
                 !interaction.guildId ||
                 !player?.queue.current ||
@@ -64,18 +67,29 @@ export default {
                 );
                 return;
             }
-            query = player.queue.current.info.title;
-        }
-        await interaction.deferReply();
-        let lyrics: string | Error;
-        try {
-            lyrics = await LyricsFinder(query);
-        } catch (error) {
-            await interaction.replyHandler.locale(
-                'CMD.LYRICS.RESPONSE.NO_RESULTS',
-                { type: MessageOptionsBuilderType.Error },
-            );
-            return;
+            try {
+                const response = await interaction.client.music.rest.execute({ path: `/v4/sessions/${player.api.session.id}/players/${interaction.guildId}/lyrics`, method: 'GET' });
+                json = await response.json();
+                lyrics = formatResponse(json, player);
+            } catch (error) {
+                await interaction.replyHandler.locale(
+                    'CMD.LYRICS.RESPONSE.NO_RESULTS',
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
+            }
+        } else {
+            try {
+                const response = await interaction.client.music.rest.execute({ path: `/v4/lyrics?query=${query}&source=genius`, method: 'GET' });
+                json = await response.json();
+                lyrics = formatResponse(json);
+            } catch (error) {
+                await interaction.replyHandler.locale(
+                    'CMD.LYRICS.RESPONSE.NO_RESULTS',
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
+            }
         }
         if (lyrics instanceof Error) {
             await interaction.replyHandler.locale(
@@ -97,7 +111,7 @@ export default {
         } else if (lyrics.match(/[\u4e00-\u9fff]/g)) {
             romanizeFrom = 'chinese';
         }
-        const lyricsFields = generateEmbedFieldsFromLyrics(query, lyrics);
+        const lyricsFields = generateEmbedFieldsFromLyrics(json, lyrics);
         if (lyricsFields.length === 0) {
             await interaction.replyHandler.locale(
                 'CMD.LYRICS.RESPONSE.NO_RESULTS',

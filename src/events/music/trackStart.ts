@@ -6,9 +6,8 @@ import {
     generateEmbedFieldsFromLyrics,
     getGuildFeatureWhitelisted,
     getGuildLocaleString,
-    getLocaleString,
+    getLocaleString, formatResponse,
 } from '#src/lib/util/util.js';
-import { LyricsFinder } from '@jeve/lyrics-finder';
 import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import {
     ActionRowBuilder,
@@ -201,9 +200,12 @@ export default {
             ) {
                 return;
             }
+            let json;
             let lyrics: string | Error;
             try {
-                lyrics = await LyricsFinder(track.info.title);
+                const response = await bot.music.rest.execute({ path: `/v4/sessions/${queue.player.api.session.id}/players/${queue.player.id}/lyrics`, method: 'GET' });
+                json = await response.json();
+                lyrics = formatResponse(json, queue.player);
             } catch (error) {
                 return;
             }
@@ -224,7 +226,7 @@ export default {
                 romanizeFrom = 'chinese';
             }
             const lyricsFields = generateEmbedFieldsFromLyrics(
-                track.info.title,
+                json,
                 lyrics,
             );
             if (lyricsFields.length === 0) return;
