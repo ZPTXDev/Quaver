@@ -24,7 +24,6 @@
     "lavaclient": "^5.0.0-rc.3",
     "lavalink-protocol": "^1.0.2",
     "lodash-es": "^4.17.21",
-    "patch-package": "^8.0.0",
     "socket.io": "^4.7.5",
     "undici": "^6.19.2",
     "wanakana": "^5.3.1",
@@ -46,7 +45,6 @@
   },
   "main": "dist/main.js",
   "scripts": {
-    "postinstall": "patch-package",
     "slash:deploy": "node scripts/deploy-commands.js",
     "slash:delete": "node scripts/delete-commands.js",
     "migrate": "node scripts/migrate.js",
@@ -81,5 +79,13 @@
       ],
       "@semantic-release/github"
     ]
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "kuroshiro@1.2.0": "patches/kuroshiro@1.2.0.patch",
+      "@lavaclient/plugin-queue@0.0.1": "patches/@lavaclient__plugin-queue@0.0.1.patch",
+      "winston-loki@6.1.2": "patches/winston-loki@6.1.2.patch",
+      "kuroshiro-analyzer-kuromoji@1.1.0": "patches/kuroshiro-analyzer-kuromoji@1.1.0.patch"
+    }
   }
 }

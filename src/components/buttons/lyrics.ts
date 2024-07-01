@@ -51,13 +51,6 @@ export default {
                 break;
             case 'japanese': {
                 lyrics = await kuroshiro.convert(lyrics);
-                if (lyrics instanceof Error) {
-                    await interaction.replyHandler.locale(
-                        'CMD.LYRICS.RESPONSE.NO_RESULTS',
-                        { type: MessageOptionsBuilderType.Error },
-                    );
-                    return;
-                }
                 lyrics = romanizeFromJapanese(lyrics);
                 break;
             }

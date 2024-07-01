@@ -1,7 +1,7 @@
-diff --git a/node_modules/@lavaclient/plugin-queue/dist/queue.js b/node_modules/@lavaclient/plugin-queue/dist/queue.js
-index bcc4149..9d22aa5 100644
---- a/node_modules/@lavaclient/plugin-queue/dist/queue.js
-+++ b/node_modules/@lavaclient/plugin-queue/dist/queue.js
+diff --git a/dist/queue.js b/dist/queue.js
+index bcc4149479070c3bf84339cd62c4bd5534524597..95ac9710ded8f8884770c660cba7fe289727b85e 100644
+--- a/dist/queue.js
++++ b/dist/queue.js
 @@ -41,14 +41,16 @@ class Queue extends tiny_typed_emitter_1.TypedEmitter {
                  switch (this.loop.type) {
                      case LoopType.Song:

@@ -1,0 +1,15 @@
+diff --git a/index.d.ts b/index.d.ts
+index c550beca39a90e4a1bc69b672298e066ba3a2b71..f794210d4af1a2a3fc04ff41f6c2b57a4d3b0322 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -10,6 +10,7 @@ declare interface LokiTransportOptions extends TransportStream.TransportStreamOp
+     json?: boolean;
+     batching?: boolean;
+     labels?: object;
++    format?: any;
+     clearOnError?: boolean,
+     replaceTimestamp?: boolean,
+     gracefulShutdown?: boolean,
+diff --git a/package-lock.json b/package-lock.json
+deleted file mode 100644
+index e08faec5f46b8d3802f1a8bf7191fe41d695e047..0000000000000000000000000000000000000000

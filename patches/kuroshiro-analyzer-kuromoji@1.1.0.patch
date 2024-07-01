@@ -1,0 +1,29 @@
+diff --git a/package.json b/package.json
+index ab332195292a41b79d47db64b2b81da09a677760..3ad4a790efec70cbd13237b6657e6c1ae1ee243c 100644
+--- a/package.json
++++ b/package.json
+@@ -74,5 +74,6 @@
+         },
+         "testRegex": "(/test/.*|(\\.|/)(test|spec))\\.jsx?$",
+         "testURL": "http://localhost"
+-    }
++    },
++    "types": "./src/index.d.ts"
+ }
+diff --git a/src/index.d.ts b/src/index.d.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..6f129c2667d12acf8dede2e321a4ffd65c897388
+--- /dev/null
++++ b/src/index.d.ts
+@@ -0,0 +1,11 @@
++// to avoid mistakenly treating d.ts as js by ESLint.
++/* eslint-disable */
++declare class KuromojiAnalyzer {
++    constructor(dictPath?: { dictPath: string });
++    init(): Promise<void>;
++    parse(str: string): Promise<any>;
++}
++
++declare module "kuroshiro-analyzer-kuromoji" {
++    export = KuromojiAnalyzer;
++}
