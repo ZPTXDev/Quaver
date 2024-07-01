@@ -55,7 +55,7 @@ queueLoad();
 
 export const startup = { started: false };
 
-// @ts-ignore
+// @ts-expect-error
 const rl = createInterface({ input: process.stdin, output: process.stdout });
 rl.on('line', async (input): Promise<void> => {
     const command = input.split(' ')[0].toLowerCase();
@@ -298,7 +298,7 @@ load({
     autoResolveYoutubeTracks: false,
 });
 
-// @ts-ignore
+// @ts-expect-error
 data.guild.instance.on('error', async (err: Error): Promise<void> => {
     logger.error({ message: 'Failed to connect to database.', label: 'Keyv' });
     await shuttingDown('keyv', err);
