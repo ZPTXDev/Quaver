@@ -87,7 +87,7 @@ export default {
                 if (me.isCommunicationDisabled()) {
                     return callback({ status: Response.BotTimedOutError });
                 }
-                let query = item.value;
+                const query = item.value;
                 let tracks = [];
                 const result = await bot.music.api.loadTracks(
                     /^((http|https|ftts):\/\/|.*:\S)/.test(query)

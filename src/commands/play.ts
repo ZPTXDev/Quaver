@@ -115,7 +115,7 @@ export default {
             return;
         }
         await interaction.deferReply();
-        let query = interaction.options.getString('query');
+        const query = interaction.options.getString('query');
         const insert = interaction.options.getBoolean('insert');
         let tracks: QuaverSong[] = [],
             msg = '',
