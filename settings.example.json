@@ -52,11 +52,6 @@
             "whitelist": false,
             "premium": false
         },
-        "spotify": {
-            "enabled": true,
-            "client_id": "Paste Spotify Client ID here",
-            "client_secret": "Paste Spotify Client Secret here"
-        },
         "web": {
             "enabled": false,
             "port": 3000,
