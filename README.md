@@ -13,11 +13,6 @@
     </a>
 </p>
 
-# ⚠️ Quaver 7.0.0 Notice
-
-While the release is marked stable, a large part of the code remains untested. The main goal of the release is to provide a hotfix for the `LOAD_FAILED` errors.
-Spotify support is temporarily disabled due to internal changes and will be added back in a subsequent version.
-
 # 🎵 Public Instance
 
 Quaver is available for public use [here](https://go.zptx.dev/InviteQuaver), and its dashboard is available [here](https://quaver.zptx.dev). Keep in mind that this instance of Quaver will only run the latest stable version.
@@ -32,8 +27,10 @@ As Quaver is designed to be as user-friendly as possible, users should be able t
 
 ## Prerequisites
 
-- Node.js v16.9.0 (or higher)
-- [Lavalink](https://github.com/freyacodes/Lavalink) (latest release is preferred)
+- Node.js v20 (or higher)
+- [Lavalink](https://github.com/lavalink-devs/Lavalink) v4 (or higher)
+  - [youtube-source plugin](https://github.com/lavalink-devs/youtube-source#plugin) installed
+  - [LavaSrc plugin](https://github.com/topi314/LavaSrc#lavalink-usage) installed
 > Please note the connection details of your Lavalink instance. You will need to specify them in `settings.json` later.
 - Bot token from [Discord](https://discord.com/developers/applications)
 
@@ -43,10 +40,10 @@ As Quaver is designed to be as user-friendly as possible, users should be able t
 2. Make a copy of `settings.example.json` and rename it to `settings.json`
 3. Edit the fields in `settings.json` as necessary
 > Refer to [CONFIGURATION.md](CONFIGURATION.md) for a detailed explanation on configuration.
-4. Run `npm ci` to install packages required to run Quaver
-5. Run `npm run build` to compile the source code
-6. Run `npm run slash-deploy` to deploy slash commands
-7. Run `npm start` to start Quaver
+4. Run `pnpm i` to install packages required to run Quaver
+5. Run `pnpm build` to compile the source code
+6. Run `pnpm run slash:deploy` to deploy slash commands
+7. Run `pnpm start` to start Quaver
 
 # ❔ FAQ
 
@@ -73,6 +70,10 @@ Due to Discord's limitations and the localizations we have, we don't currently u
 ## Can I control Quaver from some kind of website/dashboard?
 
 Yes! As of **5.0.0**, Quaver has a web dashboard add-on available [here](https://github.com/ZPTXDev/Quaver-Web). Please note that this is an optional addon and is not required to run Quaver normally.
+
+## What happened to Spotify support?
+
+As of **7.0.0**, Spotify support is provided through Lavalink. Please use the [LavaSrc plugin](https://github.com/topi314/LavaSrc) with Lavalink to enable Spotify support.
 
 # 💬 Translating
 
