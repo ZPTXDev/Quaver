@@ -140,17 +140,8 @@ export default {
 			INSERT: 'Whether or not to play the track next.'
 		},
 		RESPONSE: {
-			NO_RESULTS: {
-				DEFAULT: 'Found no results from your query.',
-				SPOTIFY: 'Found no results from your Spotify query.'
-			},
-			DISABLED: {
-				SPOTIFY: 'Spotify integration is not configured.'
-			},
-			LOAD_FAILED: 'Failed to load the track.',
-			LIMIT_EXCEEDED: {
-				SPOTIFY: 'You can only play up to **500** tracks from Spotify at a time.'
-			}
+			NO_RESULTS: 'Found no results from your query.',
+			LOAD_FAILED: 'Failed to load the track.'
 		}
 	},
 	PLAYING: {

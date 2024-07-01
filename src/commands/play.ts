@@ -120,131 +120,52 @@ export default {
         let tracks: QuaverSong[] = [],
             msg = '',
             extras = [];
-        if (
-            interaction.client.music.spotify.isSpotifyUrl(
-                query.replace('embed/', ''),
-            )
-        ) {
-            query = query.replace('embed/', '');
-            // TODO: Spotify support temporarily disabled
-            if (
-                // eslint-disable-next-line no-constant-condition
-                true ||
-                !settings.features.spotify.enabled ||
-                !settings.features.spotify.client_id ||
-                !settings.features.spotify.client_secret
-            ) {
+        const result = await interaction.client.music.api.loadTracks(
+            /^((http|https|ftts):\/\/|.*:\S)/.test(query) ? query : `ytmsearch:${query}`,
+        );
+        switch (result.loadType) {
+            case 'playlist':
+                tracks = [...result.data.tracks] as unknown as QuaverSong[];
+                msg = insert
+                    ? 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.INSERTED'
+                    : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
+                extras = [
+                    tracks.length.toString(),
+                    escapeMarkdown(result.data.info.name),
+                    query,
+                ];
+                break;
+            case 'track':
+            case 'search': {
+                const track =
+                    result.loadType === 'search'
+                        ? result.data[0]
+                        : result.data;
+                tracks = [track];
+                msg = insert
+                    ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.INSERTED'
+                    : 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
+                extras = [escapeMarkdown(track.info.title), track.info.uri];
+                break;
+            }
+            case 'empty':
                 await interaction.replyHandler.locale(
-                    'CMD.PLAY.RESPONSE.DISABLED.SPOTIFY',
+                    'CMD.PLAY.RESPONSE.NO_RESULTS',
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
-            }
-            // let item: Item;
-            // try {
-            //     item = await interaction.client.music.spotify.load(query);
-            // } catch (err) {
-            //     await interaction.replyHandler.locale(
-            //         'CMD.PLAY.RESPONSE.NO_RESULTS.SPOTIFY',
-            //         { type: MessageOptionsBuilderType.Error },
-            //     );
-            //     return;
-            // }
-            // switch (item?.type) {
-            //     case SpotifyItemType.Track: {
-            //         const track = await item.resolveYoutubeTrack();
-            //         tracks = [{ ...track.info, encoded: track.track }];
-            //         msg = insert
-            //             ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.INSERTED'
-            //             : 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
-            //         extras = [escapeMarkdown(item.name), query];
-            //         break;
-            //     }
-            //     case SpotifyItemType.Album:
-            //     case SpotifyItemType.Playlist:
-            //     case SpotifyItemType.Artist:
-            //         if (
-            //             (item.type === SpotifyItemType.Artist
-            //                 ? item.topTracks
-            //                 : item.tracks
-            //             ).length > 500
-            //         ) {
-            //             await interaction.replyHandler.locale(
-            //                 'CMD.PLAY.RESPONSE.LIMIT_EXCEEDED.SPOTIFY',
-            //                 { type: MessageOptionsBuilderType.Error },
-            //             );
-            //             return;
-            //         }
-            //         tracks = (await item.resolveYoutubeTracks()).map(
-            //             (track): QuaverSong => ({
-            //                 track: track.track,
-            //                 ...track.info,
-            //             }),
-            //         );
-            //         msg = insert
-            //             ? 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.INSERTED'
-            //             : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
-            //         extras = [
-            //             tracks.length.toString(),
-            //             escapeMarkdown(item.name),
-            //             query,
-            //         ];
-            //         break;
-            //     default:
-            //         await interaction.replyHandler.locale(
-            //             'CMD.PLAY.RESPONSE.NO_RESULTS.SPOTIFY',
-            //             { type: MessageOptionsBuilderType.Error },
-            //         );
-            //         return;
-            // }
-        } else {
-            const result = await interaction.client.music.api.loadTracks(
-                /^https?:\/\//.test(query) ? query : `ytsearch:${query}`,
-            );
-            switch (result.loadType) {
-                case 'playlist':
-                    tracks = [...result.data.tracks] as unknown as QuaverSong[];
-                    msg = insert
-                        ? 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.INSERTED'
-                        : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
-                    extras = [
-                        tracks.length.toString(),
-                        escapeMarkdown(result.data.info.name),
-                        query,
-                    ];
-                    break;
-                case 'track':
-                case 'search': {
-                    const track =
-                        result.loadType === 'search'
-                            ? result.data[0]
-                            : result.data;
-                    tracks = [track];
-                    msg = insert
-                        ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.INSERTED'
-                        : 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
-                    extras = [escapeMarkdown(track.info.title), track.info.uri];
-                    break;
-                }
-                case 'empty':
-                    await interaction.replyHandler.locale(
-                        'CMD.PLAY.RESPONSE.NO_RESULTS.DEFAULT',
-                        { type: MessageOptionsBuilderType.Error },
-                    );
-                    return;
-                case 'error':
-                    await interaction.replyHandler.locale(
-                        'CMD.PLAY.RESPONSE.LOAD_FAILED',
-                        { type: MessageOptionsBuilderType.Error },
-                    );
-                    return;
-                default:
-                    await interaction.replyHandler.locale(
-                        'DISCORD.GENERIC_ERROR',
-                        { type: MessageOptionsBuilderType.Error },
-                    );
-                    return;
-            }
+            case 'error':
+                await interaction.replyHandler.locale(
+                    'CMD.PLAY.RESPONSE.LOAD_FAILED',
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
+            default:
+                await interaction.replyHandler.locale(
+                    'DISCORD.GENERIC_ERROR',
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
         }
         let player = (await interaction.client.music.players.fetch(
             interaction.guildId,

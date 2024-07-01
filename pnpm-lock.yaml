@@ -23,9 +23,6 @@ importers:
       '@lavaclient/plugin-queue':
         specifier: ^0.0.1
         version: 0.0.1(lavaclient@5.0.0-rc.3(effect@2.0.0-next.56)(fast-check@3.18.0))(lavalink-protocol@1.0.2(effect@2.0.0-next.56)(fast-check@3.18.0))
-      '@lavaclient/spotify':
-        specifier: ^3.1.0
-        version: 3.1.0
       '@napi-rs/pinyin':
         specifier: ^1.7.5
         version: 1.7.5
@@ -229,10 +226,6 @@ packages:
     peerDependencies:
       lavaclient: rc
       lavalink-protocol: 1.0.1
-
-  '@lavaclient/spotify@3.1.0':
-    resolution: {integrity: sha512-B9AwZVyxScjJnJWJa4zMylF2i2/UOvDKL7lHWMxcezBMvOqjM+rZMr4ZTJj179qdpOaQ7zc8mBfRYSXGWJIWmA==}
-    engines: {node: '>=16'}
 
   '@napi-rs/pinyin-android-arm-eabi@1.7.5':
     resolution: {integrity: sha512-dnurqJdedbU8D1Ngudf10nXvc4BbVSe4ki9U2LUZoGMDGa069t4c87BHRXvcy2By3YpOozORv9/QTMxAQFVOLg==}
@@ -2269,10 +2262,6 @@ snapshots:
       lavaclient: 5.0.0-rc.3(effect@2.0.0-next.56)(fast-check@3.18.0)
       lavalink-protocol: 1.0.2(effect@2.0.0-next.56)(fast-check@3.18.0)
       tiny-typed-emitter: 2.1.0
-      tslib: 2.6.2
-
-  '@lavaclient/spotify@3.1.0':
-    dependencies:
       tslib: 2.6.2
 
   '@napi-rs/pinyin-android-arm-eabi@1.7.5':

@@ -89,92 +89,31 @@ export default {
                 }
                 let query = item.value;
                 let tracks = [];
-                if (
-                    bot.music.spotify.isSpotifyUrl(query.replace('embed/', ''))
-                ) {
-                    query = query.replace('embed/', '');
-                    if (
-                        // eslint-disable-next-line no-constant-condition
-                        true ||
-                        !settings.features.spotify.enabled ||
-                        !settings.features.spotify.client_id ||
-                        !settings.features.spotify.client_secret
-                    ) {
+                const result = await bot.music.api.loadTracks(
+                    /^((http|https|ftts):\/\/|.*:\S)/.test(query)
+                        ? query
+                        : `ytmsearch:${query}`,
+                );
+                switch (result.loadType) {
+                    case 'playlist':
+                        tracks = [...result.data.tracks];
+                        break;
+                    case 'track':
+                    case 'search': {
+                        const track =
+                            result.loadType === 'search'
+                                ? result.data[0]
+                                : result.data;
+                        tracks = [track];
+                        break;
+                    }
+                    case 'empty':
                         return callback({
-                            status: Response.FeatureDisabledError,
+                            status: Response.NoResultsError,
                         });
-                    }
-                    // let spotifyItem: Item;
-                    // try {
-                    //     spotifyItem = await bot.music.spotify.load(query);
-                    // } catch (err) {
-                    //     return callback({ status: Response.NoResultsError });
-                    // }
-                    // switch (spotifyItem?.type) {
-                    //     case SpotifyItemType.Track: {
-                    //         const track =
-                    //             await spotifyItem.resolveYoutubeTrack();
-                    //         tracks = [
-                    //             { encoded: track.track, info: track.info },
-                    //         ];
-                    //         break;
-                    //     }
-                    //     case SpotifyItemType.Album:
-                    //     case SpotifyItemType.Playlist:
-                    //     case SpotifyItemType.Artist:
-                    //         if (
-                    //             (spotifyItem.type === SpotifyItemType.Artist
-                    //                 ? spotifyItem.topTracks
-                    //                 : spotifyItem.tracks
-                    //             ).length > 500
-                    //         ) {
-                    //             return callback({
-                    //                 status: Response.SpotifyTooManyTracksError,
-                    //             });
-                    //         }
-                    //         tracks = (
-                    //             await spotifyItem.resolveYoutubeTracks()
-                    //         ).map(
-                    //             (
-                    //                 track,
-                    //             ): { encoded: string; info: TrackInfo } => ({
-                    //                 encoded: track.track,
-                    //                 info: track.info,
-                    //             }),
-                    //         );
-                    //         break;
-                    //     default:
-                    //         return callback({
-                    //             status: Response.NoResultsError,
-                    //         });
-                    // }
-                } else {
-                    const result = await bot.music.api.loadTracks(
-                        /^https?:\/\//.test(query)
-                            ? query
-                            : `ytsearch:${query}`,
-                    );
-                    switch (result.loadType) {
-                        case 'playlist':
-                            tracks = [...result.data.tracks];
-                            break;
-                        case 'track':
-                        case 'search': {
-                            const track =
-                                result.loadType === 'search'
-                                    ? result.data[0]
-                                    : result.data;
-                            tracks = [track];
-                            break;
-                        }
-                        case 'empty':
-                            return callback({
-                                status: Response.NoResultsError,
-                            });
-                        case 'error':
-                        default:
-                            return callback({ status: Response.GenericError });
-                    }
+                    case 'error':
+                    default:
+                        return callback({ status: Response.GenericError });
                 }
                 let player = (await bot.music.players.fetch(
                     guildId,
@@ -533,6 +472,5 @@ enum Response {
     BotPermissionError = 'error-bot-permission',
     BotTimedOutError = 'error-bot-timed-out',
     NoResultsError = 'error-no-results',
-    SpotifyTooManyTracksError = 'error-spotify-too-many-tracks',
     UserNotInChannelError = 'error-user-not-in-channel',
 }

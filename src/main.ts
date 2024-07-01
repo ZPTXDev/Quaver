@@ -20,7 +20,6 @@ import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString } from '#src/lib/util/util.js';
 import { load as effectsLoad } from '@lavaclient/plugin-effects';
 import { load as queueLoad } from '@lavaclient/plugin-queue';
-import { load } from '@lavaclient/spotify';
 import {
     getAbsoluteFileURL,
     msToTime,
@@ -289,14 +288,6 @@ if (io) {
         }
     });
 }
-
-load({
-    client: {
-        id: settings.features.spotify.client_id,
-        secret: settings.features.spotify.client_secret,
-    },
-    autoResolveYoutubeTracks: false,
-});
 
 // @ts-expect-error some weird stuff is goin on
 data.guild.instance.on('error', async (err: Error): Promise<void> => {

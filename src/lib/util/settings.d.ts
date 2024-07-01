@@ -55,7 +55,6 @@ export type FeaturesSettingsObject = {
     autolyrics?: AutoLyricsFeatureSettingsObject;
     stay?: StayFeatureSettingsObject;
     smartqueue?: SmartQueueFeatureSettingsObject;
-    spotify?: SpotifyFeatureSettingsObject;
     web?: WebFeatureSettingsObject;
 };
 
@@ -75,12 +74,6 @@ export type SmartQueueFeatureSettingsObject = {
     enabled?: boolean;
     whitelist?: boolean;
     premium?: boolean;
-};
-
-export type SpotifyFeatureSettingsObject = {
-    enabled?: boolean;
-    client_id?: string;
-    client_secret?: string;
 };
 
 export type WebFeatureSettingsObject = {

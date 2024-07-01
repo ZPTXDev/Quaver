@@ -11,7 +11,6 @@
     "@keyv/sqlite": "^3.6.7",
     "@lavaclient/plugin-effects": "^1.0.0-rc.2",
     "@lavaclient/plugin-queue": "^0.0.1",
-    "@lavaclient/spotify": "^3.1.0",
     "@napi-rs/pinyin": "^1.7.5",
     "@zptxdev/zptx-lib": "^1.1.0",
     "crypto-js": "^4.2.0",
