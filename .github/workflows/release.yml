@@ -1,0 +1,41 @@
+name: Release
+on:
+  push:
+    branches: [master, next]
+
+jobs:
+  semantic-release:
+    name: Bump version and release
+    if: github.repository_owner == 'ZPTXDev'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build
+        run: pnpm build
+      - name: Release
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          branches: |
+            [
+              'master',
+              { name: 'next', prerelease: true }
+            ]
+          extra_plugins: |
+            @semantic-release/git
+            https://github.com/ZPTXDev/semantic-release-github-milestones#master
+        env:
+          GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}

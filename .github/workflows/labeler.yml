@@ -1,4 +1,4 @@
-name: "Labeler"
+name: Labeler
 on:
   issues:
     types: [opened, edited]
@@ -11,7 +11,8 @@ jobs:
     if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
-      - uses: ZPTXDev/issue-labeler@master
+      - name: Assign Labels
+        uses: ZPTXDev/issue-labeler@master
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           configuration-path: .github/labeler.yml

@@ -1,4 +1,4 @@
-name: "Auto Merge"
+name: Auto-merge
 on:
   pull_request_target:
     types:
@@ -17,10 +17,11 @@ on:
 
 jobs:
   auto-merge:
-    name: Auto Merge
+    name: Auto-merge
     runs-on: ubuntu-latest
     steps:
-      - uses: reitermarkus/automerge@v2
+      - name: Enable auto-merge if PR is ready
+        uses: reitermarkus/automerge@v2
         with:
           token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
           merge-method: squash

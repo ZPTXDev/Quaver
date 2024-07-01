@@ -1,12 +1,12 @@
 {
   "name": "quaver",
-  "version": "7.0.1",
+  "version": "7.0.2-next.1",
   "type": "module",
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
-    "@discordjs/rest": "^2.2.0",
+    "@discordjs/rest": "^2.3.0",
     "@jeve/lyrics-finder": "^1.0.1",
     "@keyv/sqlite": "^3.6.7",
     "@lavaclient/plugin-effects": "^1.0.0-rc.2",
@@ -15,8 +15,8 @@
     "@napi-rs/pinyin": "^1.7.5",
     "@zptxdev/zptx-lib": "^1.1.0",
     "crypto-js": "^4.2.0",
-    "discord-api-types": "^0.37.79",
-    "discord.js": "^14.14.1",
+    "discord-api-types": "^0.37.91",
+    "discord.js": "^14.15.3",
     "express": "^4.19.2",
     "genversion": "^3.2.0",
     "hangul-romanization": "^1.0.1",
@@ -24,36 +24,35 @@
     "kuroshiro": "1.2.0",
     "kuroshiro-analyzer-kuromoji": "^1.1.0",
     "lavaclient": "^5.0.0-rc.3",
-    "lavalink-protocol": "^1.0.1",
+    "lavalink-protocol": "^1.0.2",
     "lodash-es": "^4.17.21",
     "patch-package": "^8.0.0",
     "socket.io": "^4.7.5",
+    "undici": "^6.19.2",
     "wanakana": "^5.3.1",
     "winston": "^3.13.0",
-    "winston-loki": "^6.1.0"
+    "winston-loki": "^6.1.2"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.2",
     "@types/express": "^4.17.21",
     "@types/lodash-es": "^4.17.12",
-    "@types/node": "^20.12.7",
-    "@typescript-eslint/eslint-plugin": "^7.6.0",
-    "@typescript-eslint/parser": "^7.6.0",
+    "@typescript-eslint/eslint-plugin": "^7.14.1",
+    "@typescript-eslint/parser": "^7.14.1",
     "eslint": "^8.57.0",
-    "prettier": "^3.2.5",
-    "rimraf": "^5.0.5",
-    "tsc-alias": "^1.8.8",
+    "prettier": "^3.3.2",
+    "rimraf": "^5.0.7",
+    "tsc-alias": "^1.8.10",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.2"
   },
   "main": "dist/main.js",
   "scripts": {
     "postinstall": "patch-package",
-    "slash-deploy": "node scripts/deploy-commands.js",
-    "slash-delete": "node scripts/delete-commands.js",
+    "slash:deploy": "node scripts/deploy-commands.js",
+    "slash:delete": "node scripts/delete-commands.js",
     "migrate": "node scripts/migrate.js",
     "build": "rimraf dist/ && genversion --es6 --semi src/lib/util/version.ts && tsc && tsc-alias",
-    "build-start": "npm run build && npm start",
     "start": "node .",
     "dev": "node --enable-source-maps .",
     "lint": "eslint . --ext .ts"
