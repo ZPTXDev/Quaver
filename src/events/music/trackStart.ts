@@ -229,9 +229,15 @@ export default {
                 json,
                 lyrics,
             );
-            if (lyricsFields.length === 0 || !lyricsFields[0].value) return;
+            if (lyricsFields.length === 0) return;
+            let embed;
+            try {
+                embed = new EmbedBuilder().setFields(lyricsFields);
+            } catch (error) {
+                return;
+            }
             await queue.player.handler.send(
-                new EmbedBuilder().setFields(lyricsFields),
+                embed,
                 {
                     components: romanizeFrom
                         ? [

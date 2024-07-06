@@ -65,23 +65,31 @@ export default {
                     .join('\n');
         }
         const lyricsFields = generateEmbedFieldsFromLyrics(json, lyrics);
-        if (lyricsFields.length === 0 || !lyricsFields[0].value) {
+        if (lyricsFields.length === 0) {
             await interaction.replyHandler.locale(
                 'CMD.LYRICS.RESPONSE.NO_RESULTS',
                 { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
-        await interaction.replyHandler.reply(
-            new EmbedBuilder().setFields(lyricsFields).setFooter({
+        let embed;
+        try {
+            embed = new EmbedBuilder().setFields(lyricsFields).setFooter({
                 text:
                     romanizeFrom === 'japanese'
                         ? await getGuildLocaleString(
-                              interaction.guildId,
-                              'CMD.LYRICS.MISC.JAPANESE_INACCURATE',
-                          )
+                            interaction.guildId,
+                            'CMD.LYRICS.MISC.JAPANESE_INACCURATE',
+                        )
                         : null,
-            }),
-        );
+            });
+        } catch (error) {
+            await interaction.replyHandler.locale(
+                'CMD.LYRICS.RESPONSE.NO_RESULTS',
+                { type: MessageOptionsBuilderType.Error },
+            );
+            return;
+        }
+        await interaction.replyHandler.reply(embed);
     },
 };

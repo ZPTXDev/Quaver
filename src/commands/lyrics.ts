@@ -112,7 +112,17 @@ export default {
             romanizeFrom = 'chinese';
         }
         const lyricsFields = generateEmbedFieldsFromLyrics(json, lyrics);
-        if (lyricsFields.length === 0 || !lyricsFields[0].value) {
+        if (lyricsFields.length === 0) {
+            await interaction.replyHandler.locale(
+                'CMD.LYRICS.RESPONSE.NO_RESULTS',
+                { type: MessageOptionsBuilderType.Error },
+            );
+            return;
+        }
+        let embed;
+        try {
+            embed = new EmbedBuilder().setFields(lyricsFields);
+        } catch (error) {
             await interaction.replyHandler.locale(
                 'CMD.LYRICS.RESPONSE.NO_RESULTS',
                 { type: MessageOptionsBuilderType.Error },
@@ -120,7 +130,7 @@ export default {
             return;
         }
         await interaction.replyHandler.reply(
-            new EmbedBuilder().setFields(lyricsFields),
+            embed,
             {
                 components: romanizeFrom
                     ? [
