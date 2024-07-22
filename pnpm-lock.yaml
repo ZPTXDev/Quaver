@@ -80,8 +80,8 @@ importers:
         specifier: ^4.7.5
         version: 4.7.5
       undici:
-        specifier: ^6.19.2
-        version: 6.19.2
+        specifier: ^6.19.4
+        version: 6.19.4
       wanakana:
         specifier: ^5.3.1
         version: 5.3.1
@@ -1928,8 +1928,8 @@ packages:
     resolution: {integrity: sha512-Q2rtqmZWrbP8nePMq7mOJIN98M0fYvSgV89vwl/BQRT4mDOeY2GXZngfGpcBBhtky3woM7G24wZV3Q304Bv6cw==}
     engines: {node: '>=18.0'}
 
-  undici@6.19.2:
-    resolution: {integrity: sha512-JfjKqIauur3Q6biAtHJ564e3bWa8VvT+7cSiOJHFbX4Erv6CLGDpg8z+Fmg/1OI/47RA+GI2QZaF48SSaLvyBA==}
+  undici@6.19.4:
+    resolution: {integrity: sha512-i3uaEUwNdkRq2qtTRRJb13moW5HWqviu7Vl7oYRYz++uPtGHJj+x7TGjcEuwS5Mt2P4nA0U9dhIX3DdB6JGY0g==}
     engines: {node: '>=18.17'}
 
   unique-filename@1.1.1:
@@ -4018,7 +4018,7 @@ snapshots:
 
   undici@6.13.0: {}
 
-  undici@6.19.2: {}
+  undici@6.19.4: {}
 
   unique-filename@1.1.1:
     dependencies:
