@@ -13,7 +13,7 @@
     "@napi-rs/pinyin": "^1.7.5",
     "@zptxdev/zptx-lib": "^1.1.0",
     "crypto-js": "^4.2.0",
-    "discord-api-types": "^0.37.94",
+    "discord-api-types": "^0.37.95",
     "discord.js": "^14.15.3",
     "express": "^4.19.2",
     "genversion": "^3.2.0",
