@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@discordjs/rest": "^2.3.0",
-    "@keyv/sqlite": "^3.6.7",
+    "@keyv/sqlite": "^4.0.0",
     "@lavaclient/plugin-effects": "^1.0.0-rc.2",
     "@lavaclient/plugin-queue": "^0.0.1",
     "@napi-rs/pinyin": "^1.7.5",
