@@ -26,8 +26,8 @@ importers:
         specifier: ^2.4.0
         version: 2.4.0
       '@keyv/sqlite':
-        specifier: ^3.6.7
-        version: 3.6.7
+        specifier: ^4.0.1
+        version: 4.0.1
       '@lavaclient/plugin-effects':
         specifier: ^1.0.0-rc.2
         version: 1.0.0-rc.2(lavaclient@5.0.0-rc.3(effect@2.0.0-next.56)(fast-check@3.18.0))(lavalink-protocol@1.0.2(effect@2.0.0-next.56)(fast-check@3.18.0))
@@ -214,9 +214,9 @@ packages:
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
     engines: {node: '>=12'}
 
-  '@keyv/sqlite@3.6.7':
-    resolution: {integrity: sha512-r9MrIApqa5i1tJPijsxbXLplm0y+E2GTuCHw0N1oSz/0a16txUdzRmOGX0ggLVbz2MDlDojYRG7GCdq5y0xQBQ==}
-    engines: {node: '>= 14'}
+  '@keyv/sqlite@4.0.1':
+    resolution: {integrity: sha512-Ngs9jhElXN7efS9WvvCC/p6rXMbihna8eNLVBc421Zf+VcFd+pR4DOcS6yA9V22EKtAy4DEj7LtvEEIm0bb80A==}
+    engines: {node: '>= 18'}
 
   '@lavaclient/plugin-effects@1.0.0-rc.2':
     resolution: {integrity: sha512-S8c14HZknGsk1f691RMhRHJR2OWdZFwyKoRViarLtDJAZAYVGg2s8lBBT7mmuGsYHOB7v2PK3wwuvET6aHdwZg==}
@@ -2152,7 +2152,7 @@ snapshots:
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
 
-  '@keyv/sqlite@3.6.7':
+  '@keyv/sqlite@4.0.1':
     dependencies:
       sqlite3: 5.1.7
     transitivePeerDependencies:
