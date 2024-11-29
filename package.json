@@ -25,7 +25,7 @@
     "lavalink-protocol": "^1.0.2",
     "lodash-es": "^4.17.21",
     "socket.io": "^4.8.1",
-    "undici": "^6.21.0",
+    "undici": "^7.0.0",
     "wanakana": "^5.3.1",
     "winston": "^3.17.0",
     "winston-loki": "^6.1.2"
