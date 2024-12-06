@@ -15,7 +15,7 @@
     "crypto-js": "^4.2.0",
     "discord-api-types": "^0.37.110",
     "discord.js": "^14.16.3",
-    "express": "^4.21.1",
+    "express": "^4.21.2",
     "genversion": "^3.2.0",
     "hangul-romanization": "^1.0.1",
     "keyv": "^4.5.4",
