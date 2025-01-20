@@ -18,7 +18,7 @@
     "express": "^4.21.2",
     "genversion": "^3.2.0",
     "hangul-romanization": "^1.0.1",
-    "keyv": "^4.5.4",
+    "keyv": "^5.2.3",
     "kuroshiro": "1.2.0",
     "kuroshiro-analyzer-kuromoji": "^1.1.0",
     "lavaclient": "^5.0.0-rc.3",
