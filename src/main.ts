@@ -339,6 +339,7 @@ const requiredPlugins = [
 ];
 export const info = await bot.music.api.info();
 if (
+    info.plugins.length === 0 ||
     !info.plugins
         .map((plugin): string => plugin.name)
         .every((plugin): boolean => requiredPlugins.includes(plugin))
