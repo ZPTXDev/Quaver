@@ -28,8 +28,8 @@ export default {
                         'CMD.PING.RESPONSE.SUCCESS',
                         interaction.guild
                             ? interaction.guild.shard.ping === -1
-                                ? ` ${interaction.guild.shard.ping}ms`
-                                : ' 👀⌛'
+                                ? ' 👀⌛'
+                                : ` ${interaction.guild.shard.ping}ms`
                             : '',
                     ),
                 )
