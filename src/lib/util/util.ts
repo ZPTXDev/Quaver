@@ -805,7 +805,7 @@ export async function buildSettingsPage(
 }
 
 /**
- * Returns an array of query overrides.
+ * Updates the query overrides based on the source managers.
  * @param sourceManagers - The source managers to use.
  */
 export function updateQueryOverrides(sourceManagers: readonly string[]): void {
