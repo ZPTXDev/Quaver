@@ -17,8 +17,7 @@ import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
 import type {
     ChatInputCommandInteraction,
     SelectMenuComponentOptionData,
-    SlashCommandStringOption,
-} from 'discord.js';
+    SlashCommandStringOption } from 'discord.js';
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -26,7 +25,7 @@ import {
     ChannelType,
     EmbedBuilder,
     escapeMarkdown,
-    Message,
+    InteractionCallbackResponse,
     SlashCommandBuilder,
     StringSelectMenuBuilder,
 } from 'discord.js';
@@ -112,7 +111,7 @@ export default {
                 interaction.guildId,
                 'settings.locale',
             )) ?? settings.defaultLocaleCode;
-        const msg = await interaction.replyHandler.reply(
+        const response = await interaction.replyHandler.reply(
             new EmbedBuilder()
                 .setDescription(
                     pages[0]
@@ -218,7 +217,8 @@ export default {
                 withResponse: true,
             },
         );
-        if (!(msg instanceof Message)) return;
+        if (!(response instanceof InteractionCallbackResponse)) return;
+        const msg = response.resource.message;
         searchState[msg.id] = {
             pages: pages,
             timeout: setTimeout(

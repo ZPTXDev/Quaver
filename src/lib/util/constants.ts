@@ -30,12 +30,19 @@ export enum Language {
 }
 
 export const settingsOptions = [
-    ...(settings.premiumURL ? ['premium'] : []),
+    ...(settings.premiumURL &&
+    ['autolyrics', 'stay', 'smartqueue'].some((feature: string): boolean => {
+        const f =
+            settings.features[feature as 'autolyrics' | 'stay' | 'smartqueue'];
+        return f.enabled && f.whitelist && f.premium;
+    })
+        ? ['premium']
+        : []),
     'language',
     'format',
     'dj',
-    'autolyrics',
-    'smartqueue',
+    ...(settings.features.autolyrics.enabled ? ['autolyrics'] : []),
+    ...(settings.features.smartqueue.enabled ? ['smartqueue'] : []),
 ];
 export const queryOverrides = [
     'https://',

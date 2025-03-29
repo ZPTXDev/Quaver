@@ -17,7 +17,7 @@ import {
     ButtonBuilder,
     ButtonStyle,
     EmbedBuilder,
-    Message,
+    InteractionCallbackResponse,
     SlashCommandBuilder,
 } from 'discord.js';
 
@@ -50,7 +50,7 @@ export default {
             );
             return;
         }
-        const msg = await interaction.replyHandler.reply(
+        const response = await interaction.replyHandler.reply(
             new EmbedBuilder()
                 .setDescription(
                     await getGuildLocaleString(
@@ -91,7 +91,8 @@ export default {
                 withResponse: true,
             },
         );
-        if (!(msg instanceof Message)) return;
+        if (!(response instanceof InteractionCallbackResponse)) return;
+        const msg = response.resource.message;
         confirmationTimeout[msg.id] = setTimeout(
             async (message): Promise<void> => {
                 try {

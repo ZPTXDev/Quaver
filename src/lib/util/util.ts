@@ -2,17 +2,14 @@ import type {
     MessageOptionsBuilderInputs,
     MessageOptionsBuilderOptions,
     QuaverChannels,
-    QuaverClient, QuaverPlayer,
+    QuaverClient,
+    QuaverPlayer,
     QuaverSong,
     SettingsPage,
     SettingsPageOptions,
     WhitelistedFeatures,
 } from '#src/lib/util/common.d.js';
-import {
-    MessageOptionsBuilderType,
-    data,
-    locales,
-} from '#src/lib/util/common.js';
+import { data, locales, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check, Language } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getAbsoluteFileURL } from '@zptxdev/zptx-lib';
@@ -33,11 +30,11 @@ import {
     ButtonBuilder,
     ButtonStyle,
     EmbedBuilder,
+    escapeMarkdown,
     GuildMember,
     PermissionsBitField,
     RoleSelectMenuBuilder,
     StringSelectMenuBuilder,
-    escapeMarkdown,
 } from 'discord.js';
 import { readdirSync } from 'fs';
 import { get } from 'lodash-es';
@@ -104,6 +101,7 @@ export function checkLocaleCompletion(
     let foreignStringCount = 0;
     let englishStringCount = 0;
     const missingStrings: string[] = [];
+
     function iterateObject(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         obj: Record<string, any>,
@@ -120,6 +118,7 @@ export function checkLocaleCompletion(
             }
         });
     }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     iterateObject(englishStrings as Record<string, any>);
     foreignStringCount = englishStringCount - missingStrings.length;
@@ -366,8 +365,22 @@ export function sortQueue(queue: QuaverSong[]): QuaverSong[] {
  * @param json - The LyricsResponse object.
  * @param player - The QuaverPlayer object. (for marking position in lyrics)
  */
-export function formatResponse(json: LyricsResponse, player?: QuaverPlayer): string | Error {
-    return json.type === 'text' ? json.text : json.type === 'timed' ? json.lines.map((line): string => player?.position >= line.range.start && player?.position < line.range.end ? `**__${line.line}__**` : line.line).join('\n') : new Error('No results');
+export function formatResponse(
+    json: LyricsResponse,
+    player?: QuaverPlayer,
+): string | Error {
+    return json.type === 'text'
+        ? json.text
+        : json.type === 'timed'
+          ? json.lines
+                .map((line): string =>
+                    player?.position >= line.range.start &&
+                    player?.position < line.range.end
+                        ? `**__${line.line}__**`
+                        : line.line,
+                )
+                .join('\n')
+          : new Error('No results');
 }
 
 /**
@@ -389,14 +402,20 @@ export function generateEmbedFieldsFromLyrics(
         if (chunk.length > 1024) giveUp = true;
         if (previous.length + chunk.length + '\n\n'.length > 1024) {
             lyricsFields.push({
-                name: lyricsFields.length === 0 ? `${json.track.author} - ${json.track.title}` : '​',
+                name:
+                    lyricsFields.length === 0
+                        ? `${json.track.author} - ${json.track.title}`
+                        : '​',
                 value: previous,
             });
             return chunk;
         }
         if (index === array.length - 1) {
             lyricsFields.push({
-                name: lyricsFields.length === 0 ? `${json.track.author} - ${json.track.title}` : '​',
+                name:
+                    lyricsFields.length === 0
+                        ? `${json.track.author} - ${json.track.title}`
+                        : '​',
                 value: previous + '\n\n' + chunk,
             });
         }
@@ -408,14 +427,20 @@ export function generateEmbedFieldsFromLyrics(
         lyrics.split('\n').reduce((previous, line, index, array): string => {
             if (previous.length + line.length + '\n'.length > 1024) {
                 lyricsFields.push({
-                    name: lyricsFields.length === 0 ? `${json.track.author} - ${json.track.title}` : '​',
+                    name:
+                        lyricsFields.length === 0
+                            ? `${json.track.author} - ${json.track.title}`
+                            : '​',
                     value: previous,
                 });
                 return line;
             }
             if (index === array.length - 1) {
                 lyricsFields.push({
-                    name: lyricsFields.length === 0 ? `${json.track.author} - ${json.track.title}` : '​',
+                    name:
+                        lyricsFields.length === 0
+                            ? `${json.track.author} - ${json.track.title}`
+                            : '​',
                     value: previous + '\n' + line,
                 });
             }

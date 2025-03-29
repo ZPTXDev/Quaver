@@ -20,7 +20,7 @@ import type {
 import {
     ActionRowBuilder,
     EmbedBuilder,
-    Message,
+    InteractionCallbackResponse,
     PermissionsBitField,
     SlashCommandBuilder,
     StringSelectMenuBuilder,
@@ -73,7 +73,7 @@ export default {
                   )}: ${current}`
                 : ''
         }`;
-        const msg = await interaction.replyHandler.reply(
+        const response = await interaction.replyHandler.reply(
             [description, ...embeds],
             {
                 components: [
@@ -102,7 +102,8 @@ export default {
                 withResponse: true,
             },
         );
-        if (!(msg instanceof Message)) return;
+        if (!(response instanceof InteractionCallbackResponse)) return;
+        const msg = response.resource.message;
         confirmationTimeout[msg.id] = setTimeout(
             async (message): Promise<void> => {
                 try {

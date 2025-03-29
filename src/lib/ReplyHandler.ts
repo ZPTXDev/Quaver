@@ -4,6 +4,7 @@ import { buildMessageOptions, getGuildLocaleString } from '#src/lib/util/util.js
 import type {
     AutocompleteInteraction,
     Interaction,
+    InteractionCallbackResponse,
     InteractionEditReplyOptions,
     InteractionReplyOptions,
     InteractionResponse,
@@ -54,7 +55,7 @@ export default class ReplyHandler {
             withResponse,
         }?: MessageOptionsBuilderOptions &
             AdditionalBuilderOptions & { withResponse: true },
-    ): Promise<Message>;
+    ): Promise<InteractionCallbackResponse>;
     async reply(
         inputData: MessageOptionsBuilderInputs,
         {
@@ -76,7 +77,9 @@ export default class ReplyHandler {
             force = null,
             withResponse = false,
         }: MessageOptionsBuilderOptions & AdditionalBuilderOptions = {},
-    ): Promise<InteractionResponse | Message | undefined> {
+    ): Promise<
+        InteractionResponse | InteractionCallbackResponse | Message | undefined
+    > {
         const replyMsgOpts = buildMessageOptions(inputData, {
             type,
             components,
