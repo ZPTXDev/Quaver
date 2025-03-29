@@ -99,7 +99,7 @@ export default {
                     ),
                     actionRow as ActionRowBuilder<MessageActionRowComponentBuilder>,
                 ],
-                fetchReply: true,
+                withResponse: true,
             },
         );
         if (!(msg instanceof Message)) return;

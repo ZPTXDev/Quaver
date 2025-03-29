@@ -11,9 +11,9 @@ import type {
     WhitelistedFeatures,
 } from '#src/lib/util/common.d.js';
 import {
-    MessageOptionsBuilderType,
     data,
     logger,
+    MessageOptionsBuilderType,
     setLocales,
 } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
@@ -36,7 +36,7 @@ import {
 } from 'discord.js';
 import type { Express } from 'express';
 import express from 'express';
-import { readFileSync, readdirSync } from 'fs';
+import { readdirSync, readFileSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import * as http from 'http';
 import * as https from 'https';
@@ -54,7 +54,6 @@ queueLoad();
 
 export const startup = { started: false };
 
-// @ts-expect-error unable to fix this, someone please help
 const rl = createInterface({ input: process.stdin, output: process.stdout });
 rl.on('line', async (input): Promise<void> => {
     const command = input.split(' ')[0].toLowerCase();
@@ -289,7 +288,6 @@ if (io) {
     });
 }
 
-// @ts-expect-error some weird stuff is goin on
 data.guild.instance.on('error', async (err: Error): Promise<void> => {
     logger.error({ message: 'Failed to connect to database.', label: 'Keyv' });
     await shuttingDown('keyv', err);
@@ -334,6 +332,7 @@ bot.ws.on(
 );
 
 let inProgress = false;
+
 /**
  * Shuts the bot down gracefully.
  * @param eventType - The event type triggering the shutdown. This determines if the shutdown was caused by a crash.

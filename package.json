@@ -25,6 +25,7 @@
     "lavalink-protocol": "^1.0.2",
     "lodash-es": "^4.17.21",
     "socket.io": "^4.8.1",
+    "sqlite3": "^5.1.7",
     "undici": "^6.21.0",
     "wanakana": "^5.3.1",
     "winston": "^3.17.0",
@@ -86,6 +87,7 @@
       "winston-loki@6.1.2": "patches/winston-loki@6.1.2.patch",
       "kuroshiro-analyzer-kuromoji@1.1.0": "patches/kuroshiro-analyzer-kuromoji@1.1.0.patch",
       "kuroshiro@1.2.0": "patches/kuroshiro@1.2.0.patch"
-    }
+    },
+    "neverBuiltDependencies": []
   }
 }

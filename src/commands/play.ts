@@ -5,8 +5,8 @@ import type {
     QuaverPlayer,
     QuaverSong,
 } from '#src/lib/util/common.d.js';
-import { MessageOptionsBuilderType, data } from '#src/lib/util/common.js';
-import { Check } from '#src/lib/util/constants.js';
+import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
+import { Check, queryOverrides } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import type {
@@ -17,10 +17,10 @@ import type {
 import {
     ChannelType,
     EmbedBuilder,
+    escapeMarkdown,
     GuildMember,
     PermissionsBitField,
     SlashCommandBuilder,
-    escapeMarkdown,
 } from 'discord.js';
 
 export default {
@@ -121,7 +121,9 @@ export default {
             msg = '',
             extras = [];
         const result = await interaction.client.music.api.loadTracks(
-            /^((http|https|ftts):\/\/|.*:\S)/.test(query) ? query : `ytmsearch:${query}`,
+            queryOverrides.some((q): boolean => query.startsWith(q))
+                ? query
+                : `ytmsearch:${query}`,
         );
         switch (result.loadType) {
             case 'playlist':
@@ -138,9 +140,7 @@ export default {
             case 'track':
             case 'search': {
                 const track =
-                    result.loadType === 'search'
-                        ? result.data[0]
-                        : result.data;
+                    result.loadType === 'search' ? result.data[0] : result.data;
                 tracks = [track];
                 msg = insert
                     ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.INSERTED'
@@ -161,10 +161,9 @@ export default {
                 );
                 return;
             default:
-                await interaction.replyHandler.locale(
-                    'DISCORD.GENERIC_ERROR',
-                    { type: MessageOptionsBuilderType.Error },
-                );
+                await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', {
+                    type: MessageOptionsBuilderType.Error,
+                });
                 return;
         }
         let player = (await interaction.client.music.players.fetch(

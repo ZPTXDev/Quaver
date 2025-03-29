@@ -4,9 +4,9 @@ import type {
     QuaverPlayer,
 } from '#src/lib/util/common.d.js';
 import {
-    MessageOptionsBuilderType,
     confirmationTimeout,
     logger,
+    MessageOptionsBuilderType,
 } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
@@ -105,7 +105,7 @@ export default {
                             ),
                     ),
                 ],
-                fetchReply: true,
+                withResponse: true,
             },
         );
         if (!(msg instanceof Message)) return;

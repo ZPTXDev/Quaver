@@ -215,7 +215,7 @@ export default {
                             ),
                     ),
                 ],
-                fetchReply: true,
+                withResponse: true,
             },
         );
         if (!(msg instanceof Message)) return;

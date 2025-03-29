@@ -5,14 +5,14 @@ import type {
     QuaverSong,
 } from '#src/lib/util/common.d.js';
 import { data } from '#src/lib/util/common.js';
-import { Check } from '#src/lib/util/constants.js';
+import { Check, queryOverrides } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
-    RequesterStatus,
-    WhitelistStatus,
     getFailedChecks,
     getGuildFeatureWhitelisted,
     getRequesterStatus,
+    RequesterStatus,
+    WhitelistStatus,
 } from '#src/lib/util/util.js';
 import type { APIGuild, APIUser, Snowflake } from 'discord.js';
 import { ChannelType, GuildMember, PermissionsBitField } from 'discord.js';
@@ -90,7 +90,7 @@ export default {
                 const query = item.value;
                 let tracks = [];
                 const result = await bot.music.api.loadTracks(
-                    /^((http|https|ftts):\/\/|.*:\S)/.test(query)
+                    queryOverrides.some((q): boolean => query.startsWith(q))
                         ? query
                         : `ytmsearch:${query}`,
                 );

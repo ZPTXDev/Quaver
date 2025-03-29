@@ -6,16 +6,16 @@ settings:
 
 patchedDependencies:
   '@lavaclient/plugin-queue@0.0.1':
-    hash: m7cuycvh45g2vyq75bliiteena
+    hash: 853755462e6ce1f95e2c10bc479e11f834c56b668164fa23fd837572c9b9d29d
     path: patches/@lavaclient__plugin-queue@0.0.1.patch
   kuroshiro-analyzer-kuromoji@1.1.0:
-    hash: 4jdpxiik557o3e3mu5heiyclmm
+    hash: 89c697d45dcc2780fcef9d3dd55f278b49d382d3fab8fa8c3e42f7e605501430
     path: patches/kuroshiro-analyzer-kuromoji@1.1.0.patch
   kuroshiro@1.2.0:
-    hash: 5v3grs5e55tzwvl3bt4vmmplli
+    hash: 09adb3f39c37f027f6c7c6edf040de5c25b618fbb3c2d105f9296b89e95720b1
     path: patches/kuroshiro@1.2.0.patch
   winston-loki@6.1.2:
-    hash: y3pi3kbgzzxkckogphzdkinrlq
+    hash: ade2bf8ec860901ededb3a544af5777f0c633c6d28e7e096e98f741b67f00ded
     path: patches/winston-loki@6.1.2.patch
 
 importers:
@@ -33,7 +33,7 @@ importers:
         version: 1.0.0-rc.2(lavaclient@5.0.0-rc.3(effect@2.0.0-next.56)(fast-check@3.18.0))(lavalink-protocol@1.0.2(effect@2.0.0-next.56)(fast-check@3.18.0))
       '@lavaclient/plugin-queue':
         specifier: ^0.0.1
-        version: 0.0.1(patch_hash=m7cuycvh45g2vyq75bliiteena)(lavaclient@5.0.0-rc.3(effect@2.0.0-next.56)(fast-check@3.18.0))(lavalink-protocol@1.0.2(effect@2.0.0-next.56)(fast-check@3.18.0))
+        version: 0.0.1(patch_hash=853755462e6ce1f95e2c10bc479e11f834c56b668164fa23fd837572c9b9d29d)(lavaclient@5.0.0-rc.3(effect@2.0.0-next.56)(fast-check@3.18.0))(lavalink-protocol@1.0.2(effect@2.0.0-next.56)(fast-check@3.18.0))
       '@napi-rs/pinyin':
         specifier: ^1.7.5
         version: 1.7.5
@@ -63,10 +63,10 @@ importers:
         version: 4.5.4
       kuroshiro:
         specifier: 1.2.0
-        version: 1.2.0(patch_hash=5v3grs5e55tzwvl3bt4vmmplli)
+        version: 1.2.0(patch_hash=09adb3f39c37f027f6c7c6edf040de5c25b618fbb3c2d105f9296b89e95720b1)
       kuroshiro-analyzer-kuromoji:
         specifier: ^1.1.0
-        version: 1.1.0(patch_hash=4jdpxiik557o3e3mu5heiyclmm)
+        version: 1.1.0(patch_hash=89c697d45dcc2780fcef9d3dd55f278b49d382d3fab8fa8c3e42f7e605501430)
       lavaclient:
         specifier: ^5.0.0-rc.3
         version: 5.0.0-rc.3(effect@2.0.0-next.56)(fast-check@3.18.0)
@@ -79,6 +79,9 @@ importers:
       socket.io:
         specifier: ^4.8.1
         version: 4.8.1
+      sqlite3:
+        specifier: ^5.1.7
+        version: 5.1.7
       undici:
         specifier: ^6.21.0
         version: 6.21.0
@@ -90,7 +93,7 @@ importers:
         version: 3.17.0
       winston-loki:
         specifier: ^6.1.2
-        version: 6.1.2(patch_hash=y3pi3kbgzzxkckogphzdkinrlq)
+        version: 6.1.2(patch_hash=ade2bf8ec860901ededb3a544af5777f0c633c6d28e7e096e98f741b67f00ded)
     devDependencies:
       '@types/crypto-js':
         specifier: ^4.2.2
@@ -2208,7 +2211,7 @@ snapshots:
       lavalink-protocol: 1.0.2(effect@2.0.0-next.56)(fast-check@3.18.0)
       tslib: 2.6.2
 
-  '@lavaclient/plugin-queue@0.0.1(patch_hash=m7cuycvh45g2vyq75bliiteena)(lavaclient@5.0.0-rc.3(effect@2.0.0-next.56)(fast-check@3.18.0))(lavalink-protocol@1.0.2(effect@2.0.0-next.56)(fast-check@3.18.0))':
+  '@lavaclient/plugin-queue@0.0.1(patch_hash=853755462e6ce1f95e2c10bc479e11f834c56b668164fa23fd837572c9b9d29d)(lavaclient@5.0.0-rc.3(effect@2.0.0-next.56)(fast-check@3.18.0))(lavalink-protocol@1.0.2(effect@2.0.0-next.56)(fast-check@3.18.0))':
     dependencies:
       lavaclient: 5.0.0-rc.3(effect@2.0.0-next.56)(fast-check@3.18.0)
       lavalink-protocol: 1.0.2(effect@2.0.0-next.56)(fast-check@3.18.0)
@@ -3353,11 +3356,11 @@ snapshots:
       doublearray: 0.0.2
       zlibjs: 0.3.1
 
-  kuroshiro-analyzer-kuromoji@1.1.0(patch_hash=4jdpxiik557o3e3mu5heiyclmm):
+  kuroshiro-analyzer-kuromoji@1.1.0(patch_hash=89c697d45dcc2780fcef9d3dd55f278b49d382d3fab8fa8c3e42f7e605501430):
     dependencies:
       kuromoji: 0.1.2
 
-  kuroshiro@1.2.0(patch_hash=5v3grs5e55tzwvl3bt4vmmplli):
+  kuroshiro@1.2.0(patch_hash=09adb3f39c37f027f6c7c6edf040de5c25b618fbb3c2d105f9296b89e95720b1):
     dependencies:
       '@babel/runtime': 7.24.5
 
@@ -4123,7 +4126,7 @@ snapshots:
       string-width: 4.2.3
     optional: true
 
-  winston-loki@6.1.2(patch_hash=y3pi3kbgzzxkckogphzdkinrlq):
+  winston-loki@6.1.2(patch_hash=ade2bf8ec860901ededb3a544af5777f0c633c6d28e7e096e98f741b67f00ded):
     dependencies:
       async-exit-hook: 2.0.1
       btoa: 1.2.1

@@ -22,11 +22,13 @@ export enum Check {
      */
     InteractionStarter = 'CHECK.INTERACTION_STARTER',
 }
+
 export enum Language {
     ceb = 'Cebuano',
     en = 'English',
     fil = 'Filipino',
 }
+
 export const settingsOptions = [
     ...(settings.premiumURL ? ['premium'] : []),
     'language',
@@ -34,4 +36,23 @@ export const settingsOptions = [
     'dj',
     'autolyrics',
     'smartqueue',
+];
+export const queryOverrides = [
+    'https://',
+    'http://',
+    'spsearch:',
+    'sprec:',
+    'amsearch:',
+    'dzsearch:',
+    'dzisrc:',
+    'dzrec:',
+    'ymsearch:',
+    'ymrec:',
+    'ftts://',
+    'vksearch:',
+    'vkrec:',
+    'tdsearch:',
+    'tdrec:',
+    'ytsearch:',
+    'ytmsearch:',
 ];

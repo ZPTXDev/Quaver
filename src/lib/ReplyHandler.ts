@@ -1,15 +1,10 @@
-import type {
-    MessageOptionsBuilderInputs,
-    MessageOptionsBuilderOptions,
-} from '#src/lib/util/common.d.js';
+import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions } from '#src/lib/util/common.d.js';
 import { logger, MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import {
-    buildMessageOptions,
-    getGuildLocaleString,
-} from '#src/lib/util/util.js';
+import { buildMessageOptions, getGuildLocaleString } from '#src/lib/util/util.js';
 import type {
     AutocompleteInteraction,
     Interaction,
+    InteractionEditReplyOptions,
     InteractionReplyOptions,
     InteractionResponse,
     InteractionUpdateOptions,
@@ -43,10 +38,10 @@ export default class ReplyHandler {
             components,
             files,
             ephemeral,
-            fetchReply,
             force,
+            withResponse,
         }?: MessageOptionsBuilderOptions &
-            AdditionalBuilderOptions & { fetchReply?: false },
+            AdditionalBuilderOptions & { withResponse?: false },
     ): Promise<InteractionResponse>;
     async reply(
         inputData: MessageOptionsBuilderInputs,
@@ -55,10 +50,10 @@ export default class ReplyHandler {
             components,
             files,
             ephemeral,
-            fetchReply,
             force,
+            withResponse,
         }?: MessageOptionsBuilderOptions &
-            AdditionalBuilderOptions & { fetchReply: true },
+            AdditionalBuilderOptions & { withResponse: true },
     ): Promise<Message>;
     async reply(
         inputData: MessageOptionsBuilderInputs,
@@ -67,8 +62,8 @@ export default class ReplyHandler {
             components,
             files,
             ephemeral,
-            fetchReply,
             force,
+            withResponse,
         }?: MessageOptionsBuilderOptions & AdditionalBuilderOptions,
     ): Promise<InteractionResponse>;
     async reply(
@@ -78,8 +73,8 @@ export default class ReplyHandler {
             components = null,
             files = null,
             ephemeral = false,
-            fetchReply = false,
             force = null,
+            withResponse = false,
         }: MessageOptionsBuilderOptions & AdditionalBuilderOptions = {},
     ): Promise<InteractionResponse | Message | undefined> {
         const replyMsgOpts = buildMessageOptions(inputData, {
@@ -87,7 +82,7 @@ export default class ReplyHandler {
             components,
             files,
         }) as InteractionReplyOptions;
-        replyMsgOpts.fetchReply = fetchReply;
+        replyMsgOpts.withResponse = withResponse;
         if (
             force === ForceType.Reply ||
             (!this.interaction.replied && !this.interaction.deferred && !force)
@@ -140,7 +135,9 @@ export default class ReplyHandler {
             }
         }
         try {
-            return await this.interaction.editReply(replyMsgOpts);
+            return await this.interaction.editReply(
+                replyMsgOpts as InteractionEditReplyOptions,
+            );
         } catch (error) {
             if (error instanceof Error) {
                 logger.error({
@@ -166,10 +163,13 @@ export default class ReplyHandler {
             components,
             files,
             ephemeral,
-            fetchReply,
             force,
+            withResponse,
         }?: MessageOptionsBuilderOptions &
-            AdditionalBuilderOptions & { vars?: string[]; fetchReply?: false },
+            AdditionalBuilderOptions & {
+                vars?: string[];
+                withResponse?: false;
+            },
     ): Promise<InteractionResponse>;
     async locale(
         stringPath: string,
@@ -179,10 +179,10 @@ export default class ReplyHandler {
             components,
             files,
             ephemeral,
-            fetchReply,
             force,
+            withResponse,
         }?: MessageOptionsBuilderOptions &
-            AdditionalBuilderOptions & { vars?: string[]; fetchReply: true },
+            AdditionalBuilderOptions & { vars?: string[]; withResponse: true },
     ): Promise<Message>;
     async locale(
         stringPath: string,
@@ -192,8 +192,8 @@ export default class ReplyHandler {
             components,
             files,
             ephemeral,
-            fetchReply,
             force,
+            withResponse,
         }?: MessageOptionsBuilderOptions &
             AdditionalBuilderOptions & { vars?: string[] },
     ): Promise<InteractionResponse>;
@@ -205,8 +205,8 @@ export default class ReplyHandler {
             components = null,
             files = null,
             ephemeral = false,
-            fetchReply = false,
             force = null,
+            withResponse = false,
         }: MessageOptionsBuilderOptions &
             AdditionalBuilderOptions & { vars?: string[] } = {},
     ): Promise<InteractionResponse | Message | undefined> {
@@ -220,8 +220,8 @@ export default class ReplyHandler {
             components,
             files,
             ephemeral,
-            fetchReply,
             force,
+            withResponse,
         });
     }
 }

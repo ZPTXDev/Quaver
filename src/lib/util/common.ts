@@ -53,12 +53,15 @@ export const logger = createLogger({
                     const colorizer = format.colorize();
                     info.timestamp = colorizer.colorize(
                         'meaningless',
-                        info.timestamp,
+                        info.timestamp as string,
                     );
-                    info.label = colorizer.colorize('meaningless', info.label);
+                    info.label = colorizer.colorize(
+                        'meaningless',
+                        info.label as string,
+                    );
                     info.message = colorizer.colorize(
                         `${info.level}Msg`,
-                        info.message,
+                        info.message as string,
                     );
                     info.level = ` ${info.level.toUpperCase()} `;
                     return info;
@@ -90,14 +93,17 @@ export const logger = createLogger({
     ],
 });
 export let locales = new Collection();
+
 export function setLocales(newLocales: Collection<string, unknown>): void {
     locales = newLocales;
 }
+
 export const confirmationTimeout: Record<
     Snowflake,
     ReturnType<typeof setTimeout>
 > = {};
 export const searchState: Record<Snowflake, SearchStateRecord> = {};
+
 export enum MessageOptionsBuilderType {
     Success,
     Neutral,
