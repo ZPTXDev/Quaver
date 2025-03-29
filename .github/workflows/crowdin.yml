@@ -1,7 +1,7 @@
 name: Crowdin
 on:
   push:
-    branches: [next]
+    branches: [ next ]
   schedule:
     - cron: '0 0 * * *'
   workflow_dispatch:
@@ -12,25 +12,25 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository_owner == 'ZPTXDev'
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
-    - name: Fetch Crowdin translations
-      uses: crowdin/github-action@v1.20.4
-      with:
-        download_translations: true
-        skip_untranslated_files: true
-        export_only_approved: true
-        commit_message: 'chore(locales): new Crowdin translations'
-        localization_branch_name: 'l10n_next'
-        crowdin_branch_name: 'next'
-        create_pull_request: true
-        pull_request_title: 'chore(locales): new Crowdin translations'
-        pull_request_labels: 'affects:locale, priority:p2, status:proposed, type:enhancement'
-        pull_request_base_branch_name: next
-        base_url: 'https://zapsquared.crowdin.com'
-      env:
-        GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
-        CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
-        CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
+      - name: Fetch Crowdin translations
+        uses: crowdin/github-action@v2.6.1
+        with:
+          download_translations: true
+          skip_untranslated_files: true
+          export_only_approved: true
+          commit_message: 'chore(locales): new Crowdin translations'
+          localization_branch_name: 'l10n_next'
+          crowdin_branch_name: 'next'
+          create_pull_request: true
+          pull_request_title: 'chore(locales): new Crowdin translations'
+          pull_request_labels: 'affects:locale, priority:p2, status:proposed, type:enhancement'
+          pull_request_base_branch_name: next
+          base_url: 'https://zapsquared.crowdin.com'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
+          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
