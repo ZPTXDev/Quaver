@@ -409,7 +409,7 @@ export async function shuttingDown(
                     );
                 }
                 await player.handler.disconnect();
-                const success = await player.handler.send(
+                await player.handler.send(
                     new EmbedBuilder()
                         .setDescription(
                             `${await getGuildLocaleString(
@@ -450,7 +450,6 @@ export async function shuttingDown(
                                 : [],
                     },
                 );
-                if (!success) continue;
             }
         }
     } catch (error) {
