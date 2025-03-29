@@ -6,13 +6,9 @@ import type {
     QuaverSong,
 } from '#src/lib/util/common.d.js';
 import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import { Check } from '#src/lib/util/constants.js';
+import { Check, queryOverrides } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
-import {
-    getGuildLocaleString,
-    getLocaleString,
-    getQueryOverrides,
-} from '#src/lib/util/util.js';
+import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import type {
     ChatInputCommandInteraction,
     SlashCommandBooleanOption,
@@ -125,7 +121,7 @@ export default {
             msg = '',
             extras = [];
         const result = await interaction.client.music.api.loadTracks(
-            getQueryOverrides().some((q): boolean => query.startsWith(q))
+            queryOverrides.some((q): boolean => query.startsWith(q))
                 ? query
                 : `ytmsearch:${query}`,
         );

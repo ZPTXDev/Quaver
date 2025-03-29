@@ -5,12 +5,11 @@ import type {
     QuaverSong,
 } from '#src/lib/util/common.d.js';
 import { data } from '#src/lib/util/common.js';
-import { Check } from '#src/lib/util/constants.js';
+import { Check, queryOverrides } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
     getFailedChecks,
     getGuildFeatureWhitelisted,
-    getQueryOverrides,
     getRequesterStatus,
     RequesterStatus,
     WhitelistStatus,
@@ -91,9 +90,7 @@ export default {
                 const query = item.value;
                 let tracks = [];
                 const result = await bot.music.api.loadTracks(
-                    getQueryOverrides().some((q): boolean =>
-                        query.startsWith(q),
-                    )
+                    queryOverrides.some((q): boolean => query.startsWith(q))
                         ? query
                         : `ytmsearch:${query}`,
                 );

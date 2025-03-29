@@ -17,7 +17,10 @@ import {
     setLocales,
 } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
-import { getGuildLocaleString } from '#src/lib/util/util.js';
+import {
+    getGuildLocaleString,
+    updateQueryOverrides,
+} from '#src/lib/util/util.js';
 import { load as effectsLoad } from '@lavaclient/plugin-effects';
 import { load as queueLoad } from '@lavaclient/plugin-queue';
 import {
@@ -349,6 +352,7 @@ if (
         label: 'Lavalink',
     });
 }
+updateQueryOverrides(info.sourceManagers);
 
 let inProgress = false;
 

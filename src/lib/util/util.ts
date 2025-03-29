@@ -10,7 +10,7 @@ import type {
     WhitelistedFeatures,
 } from '#src/lib/util/common.d.js';
 import { data, locales, MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import { Check, Language } from '#src/lib/util/constants.js';
+import { Check, Language, queryOverrides } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getAbsoluteFileURL } from '@zptxdev/zptx-lib';
 import type {
@@ -39,7 +39,6 @@ import {
 import { readdirSync } from 'fs';
 import { get } from 'lodash-es';
 import type { LocaleCompletionState, LyricsResponse } from './util.d.js';
-import { info } from '#src/main.js';
 
 /**
  * Returns the localized string.
@@ -807,33 +806,25 @@ export async function buildSettingsPage(
 
 /**
  * Returns an array of query overrides.
- * @returns An array of query overrides.
+ * @param sourceManagers - The source managers to use.
  */
-export function getQueryOverrides(): string[] {
-    return [
-        ...(info.sourceManagers.includes('http')
-            ? ['https://', 'http://']
-            : []),
-        ...(info.sourceManagers.includes('spotify')
-            ? ['spsearch:', 'sprec:']
-            : []),
-        ...(info.sourceManagers.includes('applemusic') ? ['applemusic:'] : []),
-        ...(info.sourceManagers.includes('deezer')
+export function updateQueryOverrides(sourceManagers: readonly string[]): void {
+    queryOverrides.push(
+        ...(sourceManagers.includes('http') ? ['https://', 'http://'] : []),
+        ...(sourceManagers.includes('spotify') ? ['spsearch:', 'sprec:'] : []),
+        ...(sourceManagers.includes('applemusic') ? ['amsearch:'] : []),
+        ...(sourceManagers.includes('deezer')
             ? ['dzsearch:', 'dzisrc:', 'dzrec:']
             : []),
-        ...(info.sourceManagers.includes('yandexmusic')
+        ...(sourceManagers.includes('yandexmusic')
             ? ['ymsearch:', 'ymrec:']
             : []),
-        ...(info.sourceManagers.includes('flowerytts') ? ['ftts://'] : []),
-        ...(info.sourceManagers.includes('vkmusic')
-            ? ['vksearch:', 'vkrec:']
-            : []),
-        ...(info.sourceManagers.includes('tidal')
-            ? ['tdsearch:', 'tdrec:']
-            : []),
-        ...(info.sourceManagers.includes('youtube')
+        ...(sourceManagers.includes('flowery-tts') ? ['ftts://'] : []),
+        ...(sourceManagers.includes('vkmusic') ? ['vksearch:', 'vkrec:'] : []),
+        ...(sourceManagers.includes('tidal') ? ['tdsearch:', 'tdrec:'] : []),
+        ...(sourceManagers.includes('youtube')
             ? ['ytsearch:', 'ytmsearch:']
             : []),
-        ...(info.sourceManagers.includes('soundcloud') ? ['scsearch:'] : []),
-    ];
+        ...(sourceManagers.includes('soundcloud') ? ['scsearch:'] : []),
+    );
 }

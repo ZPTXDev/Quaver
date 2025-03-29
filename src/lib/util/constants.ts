@@ -44,3 +44,4 @@ export const settingsOptions = [
     ...(settings.features.autolyrics.enabled ? ['autolyrics'] : []),
     ...(settings.features.smartqueue.enabled ? ['smartqueue'] : []),
 ];
+export const queryOverrides: string[] = [];
