@@ -39,6 +39,7 @@ import {
 import { readdirSync } from 'fs';
 import { get } from 'lodash-es';
 import type { LocaleCompletionState, LyricsResponse } from './util.d.js';
+import { info } from '#src/main.js';
 
 /**
  * Returns the localized string.
@@ -802,4 +803,37 @@ export async function buildSettingsPage(
         }
     }
     return { current, embeds, actionRow };
+}
+
+/**
+ * Returns an array of query overrides.
+ * @returns An array of query overrides.
+ */
+export function getQueryOverrides(): string[] {
+    return [
+        ...(info.sourceManagers.includes('http')
+            ? ['https://', 'http://']
+            : []),
+        ...(info.sourceManagers.includes('spotify')
+            ? ['spsearch:', 'sprec:']
+            : []),
+        ...(info.sourceManagers.includes('applemusic') ? ['applemusic:'] : []),
+        ...(info.sourceManagers.includes('deezer')
+            ? ['dzsearch:', 'dzisrc:', 'dzrec:']
+            : []),
+        ...(info.sourceManagers.includes('yandexmusic')
+            ? ['ymsearch:', 'ymrec:']
+            : []),
+        ...(info.sourceManagers.includes('flowerytts') ? ['ftts://'] : []),
+        ...(info.sourceManagers.includes('vkmusic')
+            ? ['vksearch:', 'vkrec:']
+            : []),
+        ...(info.sourceManagers.includes('tidal')
+            ? ['tdsearch:', 'tdrec:']
+            : []),
+        ...(info.sourceManagers.includes('youtube')
+            ? ['ytsearch:', 'ytmsearch:']
+            : []),
+        ...(info.sourceManagers.includes('soundcloud') ? ['scsearch:'] : []),
+    ];
 }

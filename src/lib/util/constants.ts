@@ -44,22 +44,3 @@ export const settingsOptions = [
     ...(settings.features.autolyrics.enabled ? ['autolyrics'] : []),
     ...(settings.features.smartqueue.enabled ? ['smartqueue'] : []),
 ];
-export const queryOverrides = [
-    'https://',
-    'http://',
-    'spsearch:',
-    'sprec:',
-    'amsearch:',
-    'dzsearch:',
-    'dzisrc:',
-    'dzrec:',
-    'ymsearch:',
-    'ymrec:',
-    'ftts://',
-    'vksearch:',
-    'vkrec:',
-    'tdsearch:',
-    'tdrec:',
-    'ytsearch:',
-    'ytmsearch:',
-];

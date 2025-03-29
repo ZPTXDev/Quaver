@@ -337,7 +337,7 @@ const requiredPlugins = [
     'youtube-plugin',
     'java-lyrics-plugin',
 ];
-const info = await bot.music.api.info();
+export const info = await bot.music.api.info();
 if (
     !info.plugins
         .map((plugin): string => plugin.name)
