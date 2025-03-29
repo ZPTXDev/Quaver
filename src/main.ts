@@ -331,6 +331,24 @@ bot.ws.on(
         bot.music.players.handleVoiceUpdate(payload),
 );
 
+const requiredPlugins = [
+    'lavasrc-plugin',
+    'lavalyrics-plugin',
+    'youtube-plugin',
+    'java-lyrics-plugin',
+];
+const info = await bot.music.api.info();
+if (
+    !info.plugins
+        .map((plugin): string => plugin.name)
+        .every((plugin): boolean => requiredPlugins.includes(plugin))
+) {
+    logger.warn({
+        message: 'Required plugins are not loaded. Some features may not work.',
+        label: 'Lavalink',
+    });
+}
+
 let inProgress = false;
 
 /**
