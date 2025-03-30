@@ -166,9 +166,12 @@ async function onChannelJoinOrMove(
     newState: VoiceState,
     isGuildStayEnabled: boolean | unknown,
     isOldQuaverStateUpdate: boolean,
-    isInGuildStayChannel: boolean,
 ): Promise<void> {
-    if (!isInGuildStayChannel) {
+    const guildStayChannelId = await guildDatabase.get(
+        player.id,
+        'settings.stay.channel',
+    );
+    if (isGuildStayEnabled && guildStayChannelId !== newState.channelId) {
         await guildDatabase.set(
             player.id,
             'settings.stay.channel',
@@ -290,12 +293,6 @@ export default {
                 PermissionsBitField.Flags.Speak,
             ]),
         );
-        const guildStayChannelId = await guildDatabase.get(
-            playerId,
-            'settings.stay.channel',
-        );
-        const isInGuildStayChannel =
-            isGuildStayEnabled && guildStayChannelId === newChannelId;
         if (
             isQuaverJoinOrMoveState &&
             newChannelType === ChannelType.GuildVoice
@@ -316,7 +313,6 @@ export default {
                 newState,
                 isGuildStayEnabled,
                 isOldQuaverStateUpdate,
-                isInGuildStayChannel,
             );
             return;
         }
@@ -380,7 +376,6 @@ export default {
                 newState,
                 isGuildStayEnabled,
                 isOldQuaverStateUpdate,
-                isInGuildStayChannel,
             );
             return;
         }
