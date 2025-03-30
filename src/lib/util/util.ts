@@ -762,7 +762,10 @@ export async function buildSettingsPage(
                 current = `<@&${current}>`;
             }
             actionRow.addComponents(
-                new RoleSelectMenuBuilder().setCustomId('dj').setMinValues(0),
+                new RoleSelectMenuBuilder()
+                    .setCustomId('dj')
+                    .setMinValues(0)
+                    .setDefaultRoles(current),
             );
             break;
         }
