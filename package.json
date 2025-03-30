@@ -84,10 +84,10 @@
   },
   "pnpm": {
     "patchedDependencies": {
-      "@lavaclient/plugin-queue@0.0.1": "E:\\ZPTX Dev\\Quaver\\patches\\@lavaclient__plugin-queue@0.0.1.patch",
-      "kuroshiro-analyzer-kuromoji@1.1.0": "E:\\ZPTX Dev\\Quaver\\patches\\kuroshiro-analyzer-kuromoji@1.1.0.patch",
-      "kuroshiro@1.2.0": "E:\\ZPTX Dev\\Quaver\\patches\\kuroshiro@1.2.0.patch",
-      "keyv@5.3.2": "E:\\ZPTX Dev\\Quaver\\patches\\keyv@5.3.2.patch",
+      "@lavaclient/plugin-queue@0.0.1": "patches/@lavaclient__plugin-queue@0.0.1.patch",
+      "kuroshiro-analyzer-kuromoji@1.1.0": "patches/kuroshiro-analyzer-kuromoji@1.1.0.patch",
+      "kuroshiro@1.2.0": "patches/kuroshiro@1.2.0.patch",
+      "keyv@5.3.2": "patches/keyv@5.3.2.patch",
       "winston-loki@6.1.3": "patches/winston-loki@6.1.3.patch"
     },
     "neverBuiltDependencies": []
