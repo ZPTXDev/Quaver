@@ -9,9 +9,11 @@ import type {
     InteractionReplyOptions,
     InteractionResponse,
     InteractionUpdateOptions,
-    Message,
+    Message } from 'discord.js';
+import {
+    MessageFlags,
+    PermissionsBitField,
 } from 'discord.js';
-import { PermissionsBitField } from 'discord.js';
 import type { AdditionalBuilderOptions } from './ReplyHandler.d.js';
 
 /** Class for handling replies to interactions. */
@@ -103,7 +105,7 @@ export default class ReplyHandler {
                             ]),
                         ))
             ) {
-                replyMsgOpts.ephemeral = true;
+                replyMsgOpts.flags = [MessageFlags.Ephemeral];
             }
             try {
                 return await this.interaction.reply(replyMsgOpts);
