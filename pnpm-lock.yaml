@@ -6,16 +6,19 @@ settings:
 
 patchedDependencies:
   '@lavaclient/plugin-queue@0.0.1':
-    hash: m7cuycvh45g2vyq75bliiteena
+    hash: 853755462e6ce1f95e2c10bc479e11f834c56b668164fa23fd837572c9b9d29d
     path: patches/@lavaclient__plugin-queue@0.0.1.patch
+  keyv@5.3.2:
+    hash: 1ee1139933a388c434f8a4bbf77cf475a2b034f5ef0c067221798899d0c9f0cc
+    path: patches/keyv@5.3.2.patch
   kuroshiro-analyzer-kuromoji@1.1.0:
-    hash: 4jdpxiik557o3e3mu5heiyclmm
+    hash: 89c697d45dcc2780fcef9d3dd55f278b49d382d3fab8fa8c3e42f7e605501430
     path: patches/kuroshiro-analyzer-kuromoji@1.1.0.patch
   kuroshiro@1.2.0:
-    hash: 5v3grs5e55tzwvl3bt4vmmplli
+    hash: 09adb3f39c37f027f6c7c6edf040de5c25b618fbb3c2d105f9296b89e95720b1
     path: patches/kuroshiro@1.2.0.patch
   winston-loki@6.1.2:
-    hash: y3pi3kbgzzxkckogphzdkinrlq
+    hash: ade2bf8ec860901ededb3a544af5777f0c633c6d28e7e096e98f741b67f00ded
     path: patches/winston-loki@6.1.2.patch
 
 importers:
@@ -26,14 +29,14 @@ importers:
         specifier: ^2.4.3
         version: 2.4.3
       '@keyv/sqlite':
-        specifier: ^3.6.7
-        version: 3.6.7
+        specifier: ^4.0.1
+        version: 4.0.1
       '@lavaclient/plugin-effects':
         specifier: ^1.0.0-rc.2
         version: 1.0.0-rc.2(lavaclient@5.0.0-rc.3(effect@2.0.0-next.56)(fast-check@3.18.0))(lavalink-protocol@1.0.2(effect@2.0.0-next.56)(fast-check@3.18.0))
       '@lavaclient/plugin-queue':
         specifier: ^0.0.1
-        version: 0.0.1(patch_hash=m7cuycvh45g2vyq75bliiteena)(lavaclient@5.0.0-rc.3(effect@2.0.0-next.56)(fast-check@3.18.0))(lavalink-protocol@1.0.2(effect@2.0.0-next.56)(fast-check@3.18.0))
+        version: 0.0.1(patch_hash=853755462e6ce1f95e2c10bc479e11f834c56b668164fa23fd837572c9b9d29d)(lavaclient@5.0.0-rc.3(effect@2.0.0-next.56)(fast-check@3.18.0))(lavalink-protocol@1.0.2(effect@2.0.0-next.56)(fast-check@3.18.0))
       '@napi-rs/pinyin':
         specifier: ^1.7.5
         version: 1.7.5
@@ -59,14 +62,14 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       keyv:
-        specifier: ^4.5.4
-        version: 4.5.4
+        specifier: ^5.3.2
+        version: 5.3.2(patch_hash=1ee1139933a388c434f8a4bbf77cf475a2b034f5ef0c067221798899d0c9f0cc)
       kuroshiro:
         specifier: 1.2.0
-        version: 1.2.0(patch_hash=5v3grs5e55tzwvl3bt4vmmplli)
+        version: 1.2.0(patch_hash=09adb3f39c37f027f6c7c6edf040de5c25b618fbb3c2d105f9296b89e95720b1)
       kuroshiro-analyzer-kuromoji:
         specifier: ^1.1.0
-        version: 1.1.0(patch_hash=4jdpxiik557o3e3mu5heiyclmm)
+        version: 1.1.0(patch_hash=89c697d45dcc2780fcef9d3dd55f278b49d382d3fab8fa8c3e42f7e605501430)
       lavaclient:
         specifier: ^5.0.0-rc.3
         version: 5.0.0-rc.3(effect@2.0.0-next.56)(fast-check@3.18.0)
@@ -93,7 +96,7 @@ importers:
         version: 3.17.0
       winston-loki:
         specifier: ^6.1.2
-        version: 6.1.2(patch_hash=y3pi3kbgzzxkckogphzdkinrlq)
+        version: 6.1.2(patch_hash=ade2bf8ec860901ededb3a544af5777f0c633c6d28e7e096e98f741b67f00ded)
     devDependencies:
       '@types/crypto-js':
         specifier: ^4.2.2
@@ -219,9 +222,12 @@ packages:
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
     engines: {node: '>=12'}
 
-  '@keyv/sqlite@3.6.7':
-    resolution: {integrity: sha512-r9MrIApqa5i1tJPijsxbXLplm0y+E2GTuCHw0N1oSz/0a16txUdzRmOGX0ggLVbz2MDlDojYRG7GCdq5y0xQBQ==}
-    engines: {node: '>= 14'}
+  '@keyv/serialize@1.0.3':
+    resolution: {integrity: sha512-qnEovoOp5Np2JDGonIDL6Ayihw0RhnRh6vxPuHo4RDn1UOzwEo4AeIfpL6UGIrsceWrCMiVPgwRjbHu4vYFc3g==}
+
+  '@keyv/sqlite@4.0.1':
+    resolution: {integrity: sha512-Ngs9jhElXN7efS9WvvCC/p6rXMbihna8eNLVBc421Zf+VcFd+pR4DOcS6yA9V22EKtAy4DEj7LtvEEIm0bb80A==}
+    engines: {node: '>= 18'}
 
   '@lavaclient/plugin-effects@1.0.0-rc.2':
     resolution: {integrity: sha512-S8c14HZknGsk1f691RMhRHJR2OWdZFwyKoRViarLtDJAZAYVGg2s8lBBT7mmuGsYHOB7v2PK3wwuvET6aHdwZg==}
@@ -719,6 +725,9 @@ packages:
 
   buffer@5.7.1:
     resolution: {integrity: sha512-EHcyIPBQ4BSGlvjB16k5KgAJ27CIsHY/2JBmCRReo48y9rQ3MaUzWX3KVlBa4U7MyX02HdVj0K7C3WaB3ju7FQ==}
+
+  buffer@6.0.3:
+    resolution: {integrity: sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==}
 
   bytes@3.1.2:
     resolution: {integrity: sha512-/Nf7TyzTx6S3yRJObOAV7956r8cr2+Oj8AC5dt8wSP3BQAoeX58NoHyCU8P8zGkNXStjTSi6fzO6F0pBdcYbEg==}
@@ -1310,6 +1319,9 @@ packages:
 
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
+
+  keyv@5.3.2:
+    resolution: {integrity: sha512-Lji2XRxqqa5Wg+CHLVfFKBImfJZ4pCSccu9eVWK6w4c2SDFLd8JAn1zqTuSFnsxb7ope6rMsnIHfp+eBbRBRZQ==}
 
   kuler@2.0.0:
     resolution: {integrity: sha512-Xq9nH7KlWZmXAtodXDDRE7vs6DU1gTU8zYDHDiWLSip45Egwq3plLHzPn27NgvzL2r1LMPC1vdqh98sQxtqj4A==}
@@ -2205,7 +2217,11 @@ snapshots:
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
 
-  '@keyv/sqlite@3.6.7':
+  '@keyv/serialize@1.0.3':
+    dependencies:
+      buffer: 6.0.3
+
+  '@keyv/sqlite@4.0.1':
     dependencies:
       sqlite3: 5.1.7
     transitivePeerDependencies:
@@ -2218,7 +2234,7 @@ snapshots:
       lavalink-protocol: 1.0.2(effect@2.0.0-next.56)(fast-check@3.18.0)
       tslib: 2.6.2
 
-  '@lavaclient/plugin-queue@0.0.1(patch_hash=m7cuycvh45g2vyq75bliiteena)(lavaclient@5.0.0-rc.3(effect@2.0.0-next.56)(fast-check@3.18.0))(lavalink-protocol@1.0.2(effect@2.0.0-next.56)(fast-check@3.18.0))':
+  '@lavaclient/plugin-queue@0.0.1(patch_hash=853755462e6ce1f95e2c10bc479e11f834c56b668164fa23fd837572c9b9d29d)(lavaclient@5.0.0-rc.3(effect@2.0.0-next.56)(fast-check@3.18.0))(lavalink-protocol@1.0.2(effect@2.0.0-next.56)(fast-check@3.18.0))':
     dependencies:
       lavaclient: 5.0.0-rc.3(effect@2.0.0-next.56)(fast-check@3.18.0)
       lavalink-protocol: 1.0.2(effect@2.0.0-next.56)(fast-check@3.18.0)
@@ -2671,6 +2687,11 @@ snapshots:
   btoa@1.2.1: {}
 
   buffer@5.7.1:
+    dependencies:
+      base64-js: 1.5.1
+      ieee754: 1.2.1
+
+  buffer@6.0.3:
     dependencies:
       base64-js: 1.5.1
       ieee754: 1.2.1
@@ -3357,6 +3378,10 @@ snapshots:
     dependencies:
       json-buffer: 3.0.1
 
+  keyv@5.3.2(patch_hash=1ee1139933a388c434f8a4bbf77cf475a2b034f5ef0c067221798899d0c9f0cc):
+    dependencies:
+      '@keyv/serialize': 1.0.3
+
   kuler@2.0.0: {}
 
   kuromoji@0.1.2:
@@ -3365,11 +3390,11 @@ snapshots:
       doublearray: 0.0.2
       zlibjs: 0.3.1
 
-  kuroshiro-analyzer-kuromoji@1.1.0(patch_hash=4jdpxiik557o3e3mu5heiyclmm):
+  kuroshiro-analyzer-kuromoji@1.1.0(patch_hash=89c697d45dcc2780fcef9d3dd55f278b49d382d3fab8fa8c3e42f7e605501430):
     dependencies:
       kuromoji: 0.1.2
 
-  kuroshiro@1.2.0(patch_hash=5v3grs5e55tzwvl3bt4vmmplli):
+  kuroshiro@1.2.0(patch_hash=09adb3f39c37f027f6c7c6edf040de5c25b618fbb3c2d105f9296b89e95720b1):
     dependencies:
       '@babel/runtime': 7.24.5
 
@@ -4142,7 +4167,7 @@ snapshots:
       string-width: 4.2.3
     optional: true
 
-  winston-loki@6.1.2(patch_hash=y3pi3kbgzzxkckogphzdkinrlq):
+  winston-loki@6.1.2(patch_hash=ade2bf8ec860901ededb3a544af5777f0c633c6d28e7e096e98f741b67f00ded):
     dependencies:
       async-exit-hook: 2.0.1
       btoa: 1.2.1

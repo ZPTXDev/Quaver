@@ -1,6 +1,7 @@
 import Keyv from 'keyv';
 import { get as _get, set as _set, unset as _unset } from 'lodash-es';
 import type { DatabaseObject } from './DataHandler.d.js';
+import KeyvSqlite from '@keyv/sqlite';
 
 /** Class for handling data through Keyv. */
 export default class DataHandler {
@@ -12,7 +13,9 @@ export default class DataHandler {
      */
     constructor(opts: { cache: string; namespace: string }) {
         this.cache = new Keyv({
-            uri: opts.cache,
+            store: new KeyvSqlite({
+                uri: opts.cache,
+            }),
             namespace: opts.namespace,
         });
     }
@@ -40,7 +43,7 @@ export default class DataHandler {
         key: string,
         item: string,
         value: string | number | boolean,
-    ): Promise<true> {
+    ): Promise<boolean> {
         let data: DatabaseObject = await this.cache.get(key);
         if (!data) data = {};
         return this.cache.set(key, _set(data, item, value));

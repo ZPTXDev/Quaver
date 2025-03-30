@@ -1,0 +1,13 @@
+diff --git a/dist/index.d.ts b/dist/index.d.ts
+index 3db6576393eabb2253949ec4b9ee6a89f10589f5..aa1e6073ae66ccff29e414a44d252b04196f3fe7 100644
+--- a/dist/index.d.ts
++++ b/dist/index.d.ts	
+@@ -124,7 +124,7 @@ type KeyvOptions = {
+ type KeyvOptions_ = Omit<KeyvOptions, 'store'> & {
+     store: KeyvStoreAdapter | Map<any, any> & KeyvStoreAdapter;
+ };
+-type IteratorFunction = (argument: any) => AsyncGenerator<any, void>;
++type IteratorFunction = () => AsyncGenerator<any, void>;
+ declare class Keyv<GenericValue = any> extends EventManager {
+     opts: KeyvOptions_;
+     iterator?: IteratorFunction;

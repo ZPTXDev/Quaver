@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@discordjs/rest": "^2.4.3",
-    "@keyv/sqlite": "^3.6.7",
+    "@keyv/sqlite": "^4.0.1",
     "@lavaclient/plugin-effects": "^1.0.0-rc.2",
     "@lavaclient/plugin-queue": "^0.0.1",
     "@napi-rs/pinyin": "^1.7.5",
@@ -18,7 +18,7 @@
     "express": "^4.21.2",
     "genversion": "^3.2.0",
     "hangul-romanization": "^1.0.1",
-    "keyv": "^4.5.4",
+    "keyv": "^5.3.2",
     "kuroshiro": "1.2.0",
     "kuroshiro-analyzer-kuromoji": "^1.1.0",
     "lavaclient": "^5.0.0-rc.3",
@@ -83,10 +83,11 @@
   },
   "pnpm": {
     "patchedDependencies": {
-      "@lavaclient/plugin-queue@0.0.1": "patches/@lavaclient__plugin-queue@0.0.1.patch",
-      "winston-loki@6.1.2": "patches/winston-loki@6.1.2.patch",
-      "kuroshiro-analyzer-kuromoji@1.1.0": "patches/kuroshiro-analyzer-kuromoji@1.1.0.patch",
-      "kuroshiro@1.2.0": "patches/kuroshiro@1.2.0.patch"
+      "@lavaclient/plugin-queue@0.0.1": "E:\\ZPTX Dev\\Quaver\\patches\\@lavaclient__plugin-queue@0.0.1.patch",
+      "winston-loki@6.1.2": "E:\\ZPTX Dev\\Quaver\\patches\\winston-loki@6.1.2.patch",
+      "kuroshiro-analyzer-kuromoji@1.1.0": "E:\\ZPTX Dev\\Quaver\\patches\\kuroshiro-analyzer-kuromoji@1.1.0.patch",
+      "kuroshiro@1.2.0": "E:\\ZPTX Dev\\Quaver\\patches\\kuroshiro@1.2.0.patch",
+      "keyv@5.3.2": "patches/keyv@5.3.2.patch"
     },
     "neverBuiltDependencies": []
   }
