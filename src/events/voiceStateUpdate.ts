@@ -363,7 +363,7 @@ export default {
                     }
                 }
             }
-            // To prevent a regression bug where in Quaver remains silent in Stage channels, unsuppress Quaver after stage instance creation
+            // To prevent a regression bug in which Quaver remains silent in stage channels, unsuppress Quaver after stage instance creation
             await newState.setSuppressed(false);
             await onChannelJoinOrMove(
                 io,
