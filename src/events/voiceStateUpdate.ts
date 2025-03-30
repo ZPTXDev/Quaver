@@ -234,16 +234,10 @@ export default {
             return;
         }
         const playerId = player.id;
-        const guildStayChannelId = await guildDatabase.get(
-            playerId,
-            'settings.stay.channel',
-        );
         const isGuildStayEnabled = await guildDatabase.get(
             playerId,
             'settings.stay.enabled',
         );
-        const isInGuildStayChannel =
-            isGuildStayEnabled && guildStayChannelId === newChannelId;
         const playerVoice = player.voice;
         const hasQuaverDisconnected = isOldQuaverStateUpdate && !newChannelId;
         // To ensure it does not persist in an inactive session, disable stay for this guild
@@ -293,6 +287,12 @@ export default {
                 PermissionsBitField.Flags.Speak,
             ]),
         );
+        const guildStayChannelId = await guildDatabase.get(
+            playerId,
+            'settings.stay.channel',
+        );
+        const isInGuildStayChannel =
+            isGuildStayEnabled && guildStayChannelId === newChannelId;
         if (
             isQuaverJoinOrMoveState &&
             newChannelType === ChannelType.GuildVoice
