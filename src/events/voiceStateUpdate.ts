@@ -153,7 +153,6 @@ export default {
                     await player.handler.disconnect();
                     return;
                 }
-                await newState.setSuppressed(false);
                 if (!newState.channel.stageInstance) {
                     try {
                         await newState.channel.createStageInstance({
@@ -172,6 +171,7 @@ export default {
                         }
                     }
                 }
+                await newState.setSuppressed(false);
                 if (
                     (await data.guild.get(
                         player.id,
