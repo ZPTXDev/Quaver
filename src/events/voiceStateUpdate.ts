@@ -109,6 +109,7 @@ async function resumeChannelSession(
     });
 }
 
+// isOldQuaverStateUpdate is the context whether the state update belongs to Quaver
 async function onChannelEmpty(
     io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>,
     player: QuaverPlayer,
@@ -119,7 +120,7 @@ async function onChannelEmpty(
     const playerId = player.id;
     const isPlayerIdle =
         !player.queue.current || (!player.playing && !player.paused);
-    // To ensure Quaver does not persist in an inactive session, disable stay for this guild
+    // To ensure Quaver does not persist in an inactive session, disable stay feature for this guild
     if (isOldQuaverStateUpdate && isPlayerIdle && isGuildStayEnabled) {
         await guildDatabase.set(playerId, 'settings.stay.enabled', false);
     }
@@ -183,7 +184,7 @@ async function onChannelJoinOrMove(
     if (hasNewChannelUsers && player.pauseTimeout) {
         await resumeChannelSession(io, player);
     }
-    // To prevent Quaver from handling a channel that still has users or the guild's stay feature is enabled, do not handle the non-empty channel
+    // To prevent Quaver from handling a channel that still has users or the guild's stay feature is enabled, do not handle the channel
     if (hasNewChannelUsers || isGuildStayEnabled) {
         return;
     }
@@ -204,7 +205,7 @@ export default {
         const oldClientUserId = oldClient.user.id;
         const oldUser = oldState.member.user;
         const isOldQuaverStateUpdate = oldUser.id === oldClientUserId;
-        // Since we don't handle state updates for another bot, no action needed
+        // Since we don't handle state updates for another bot, do not operate
         if (!isOldQuaverStateUpdate && oldUser.bot) {
             return;
         }
@@ -212,7 +213,7 @@ export default {
         const newChannelId = newState.channelId;
         const isSameChannel = oldChannelId === newChannelId;
         const isNewSuppress = newState.suppress;
-        // Since Quaver is expected to continue playback despite these state updates, no action needed
+        // Since Quaver is expected to continue playback despite these state updates, do not operate
         if (
             isOldQuaverStateUpdate &&
             isSameChannel &&
@@ -226,7 +227,7 @@ export default {
         const player = (await oldClient.music.players.fetch(
             oldGuildId,
         )) as QuaverPlayer;
-        // To prevent further operations on an uninitialized player session / player handler, no action needed
+        // To prevent further operations on an uninitialized player session / player handler, do not operate
         if (!player) {
             return;
         }
@@ -266,7 +267,7 @@ export default {
         const newChannel = newState.channel;
         // In this context, newState#channel can be null because of leave states, so optional chaining is necessary
         const newChannelType = newChannel?.type;
-        // To keep the dashboard updated with the latest session details, emit events for this guild
+        // To keep the dashboard updated with the latest session details, emit channel events for this guild
         if (isQuaverJoinOrMoveState && settings.features.web.enabled) {
             io.to(`guild:${playerId}`).emit(
                 'textChannelUpdate',
@@ -387,7 +388,7 @@ export default {
             !isOldQuaverStateUpdate &&
             !newChannelId &&
             oldChannelId === playerVoice.channelId;
-        // Since the last user left Quaver's channel and stay is disabled, handle the empty channel
+        // Since the last user left Quaver's channel and the guild's stay feature is disabled, handle the empty channel
         // In this context, oldState#channel is always defined for leave states, so optional chaining is unnecessary
         if (
             hasUserLeftQuaverChannel &&
