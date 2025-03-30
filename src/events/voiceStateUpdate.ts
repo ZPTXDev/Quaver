@@ -384,14 +384,12 @@ export default {
             await resumeChannelSession(io, player);
             return;
         }
-        const hasUserLeftQuaverChannel =
-            !isOldQuaverStateUpdate &&
-            !newChannelId &&
-            oldChannelId === playerVoice.channelId;
-        // Since the last user left Quaver's channel and the guild's stay feature is disabled, handle the empty channel
-        // In this context, oldState#channel is always defined for leave states, so optional chaining is unnecessary
+        const isUserLeaveOrMoveState =
+            !isOldQuaverStateUpdate && oldChannelId === playerVoice.channelId;
+        // Since the last user left or moved out from Quaver's channel and the guild's stay feature is disabled, handle the empty channel
+        // In this context, oldState#channel is always defined for leave/move states, so optional chaining is unnecessary
         if (
-            hasUserLeftQuaverChannel &&
+            isUserLeaveOrMoveState &&
             oldState.channel.members.filter(isUser).size < 1 &&
             !isGuildStayEnabled
         ) {
