@@ -27,8 +27,8 @@ async function pauseChannelSession(
     io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>,
     player: QuaverPlayer,
 ): Promise<void> {
-    const playerId = player.id;
     await player.pause();
+    const playerId = player.id;
     if (settings.features.web.enabled) {
         io.to(`guild:${playerId}`).emit('pauseUpdate', player.paused);
     }
