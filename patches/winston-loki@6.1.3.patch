@@ -1,7 +1,7 @@
 diff --git a/index.d.ts b/index.d.ts
 index c550beca39a90e4a1bc69b672298e066ba3a2b71..f794210d4af1a2a3fc04ff41f6c2b57a4d3b0322 100644
 --- a/index.d.ts
-+++ b/index.d.ts
++++ b/index.d.ts	
 @@ -10,6 +10,7 @@ declare interface LokiTransportOptions extends TransportStream.TransportStreamOp
      json?: boolean;
      batching?: boolean;
