@@ -1,42 +1,32 @@
 import { ForceType } from '#src/lib/ReplyHandler.js';
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import {
-    confirmationTimeout,
-    data,
-    logger,
-    MessageOptionsBuilderType,
-} from '#src/lib/util/common.js';
+import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
 import type { Language } from '#src/lib/util/constants.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
     buildMessageOptions,
     buildSettingsPage,
-    getGuildFeatureWhitelisted,
     getGuildLocaleString,
     getLocaleString,
-    WhitelistStatus,
 } from '#src/lib/util/util.js';
 import type {
-    ButtonInteraction,
     MessageActionRowComponentBuilder,
     StringSelectMenuComponent,
+    StringSelectMenuInteraction,
 } from 'discord.js';
 import {
     ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
     EmbedBuilder,
     StringSelectMenuBuilder,
 } from 'discord.js';
 
 export default {
-    name: 'smartqueue',
+    name: 'source',
     checks: [Check.InteractionStarter],
     async execute(
-        interaction: QuaverInteraction<ButtonInteraction>,
+        interaction: QuaverInteraction<StringSelectMenuInteraction>,
     ): Promise<void> {
-        const { io } = await import('#src/main.js');
         if (!confirmationTimeout[interaction.message.id]) {
             await interaction.replyHandler.locale(
                 'DISCORD.INTERACTION.EXPIRED',
@@ -72,68 +62,8 @@ export default {
             30 * 1000,
             interaction.message,
         );
-        const option = interaction.customId.split(':')[1] === 'enable';
-        if (option) {
-            if (!settings.features.smartqueue.enabled) {
-                await interaction.replyHandler.locale(
-                    'FEATURE.DISABLED.DEFAULT',
-                    { type: MessageOptionsBuilderType.Error },
-                );
-                return;
-            }
-            const whitelisted = await getGuildFeatureWhitelisted(
-                interaction.guildId,
-                'smartqueue',
-            );
-            if (
-                whitelisted === WhitelistStatus.NotWhitelisted ||
-                whitelisted === WhitelistStatus.Expired
-            ) {
-                if (
-                    settings.features.smartqueue.premium &&
-                    settings.premiumURL
-                ) {
-                    await interaction.replyHandler.locale(
-                        'FEATURE.NO_PERMISSION.PREMIUM',
-                        {
-                            type: MessageOptionsBuilderType.Error,
-                            components: [
-                                new ActionRowBuilder<ButtonBuilder>().setComponents(
-                                    new ButtonBuilder()
-                                        .setLabel(
-                                            await getGuildLocaleString(
-                                                interaction.guildId,
-                                                'MISC.GET_PREMIUM',
-                                            ),
-                                        )
-                                        .setStyle(ButtonStyle.Link)
-                                        .setURL(settings.premiumURL),
-                                ),
-                            ],
-                        },
-                    );
-                    return;
-                }
-                await interaction.replyHandler.locale(
-                    'FEATURE.NO_PERMISSION.DEFAULT',
-                    { type: MessageOptionsBuilderType.Error },
-                );
-                return;
-            }
-        }
-        await data.guild.set(
-            interaction.guildId,
-            'settings.smartqueue',
-            option,
-        );
-        if (settings.features.web.enabled) {
-            io.to(`guild:${interaction.guildId}`).emit(
-                'smartQueueFeatureUpdate',
-                {
-                    enabled: option,
-                },
-            );
-        }
+        const option = interaction.values[0];
+        await data.guild.set(interaction.guildId, 'settings.source', option);
         const guildLocaleCode =
             (await data.guild.get<keyof typeof Language>(
                 interaction.guildId,
@@ -142,7 +72,7 @@ export default {
         const { current, embeds, actionRow } = await buildSettingsPage(
             interaction,
             guildLocaleCode,
-            'smartqueue',
+            'source',
         );
         const description = `${getLocaleString(
             guildLocaleCode,
@@ -150,10 +80,10 @@ export default {
             interaction.guild.name,
         )}\n\n**${getLocaleString(
             guildLocaleCode,
-            'CMD.SETTINGS.MISC.SMARTQUEUE.NAME',
+            'CMD.SETTINGS.MISC.SOURCE.NAME',
         )}** ─ ${getLocaleString(
             guildLocaleCode,
-            'CMD.SETTINGS.MISC.SMARTQUEUE.DESCRIPTION',
+            'CMD.SETTINGS.MISC.SOURCE.DESCRIPTION',
         )}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: ${current}`;
         await interaction.replyHandler.reply([description, ...embeds], {
             components: [

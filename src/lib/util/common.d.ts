@@ -36,6 +36,7 @@ export type SettingsPageOptions =
     | 'language'
     | 'format'
     | 'dj'
+    | 'source'
     | 'autolyrics'
     | 'smartqueue';
 

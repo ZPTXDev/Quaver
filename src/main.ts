@@ -19,7 +19,9 @@ import {
 import { settings } from '#src/lib/util/settings.js';
 import {
     getGuildLocaleString,
+    updateAcceptableSources,
     updateQueryOverrides,
+    updateSourceManagers,
 } from '#src/lib/util/util.js';
 import { load as effectsLoad } from '@lavaclient/plugin-effects';
 import { load as queueLoad } from '@lavaclient/plugin-queue';
@@ -260,7 +262,6 @@ if (io) {
                     name: string;
                     once: boolean;
                     execute(
-                        // eslint-disable-next-line @typescript-eslint/no-shadow
                         socket: Socket,
                         callback: () => void,
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -353,6 +354,37 @@ if (
     });
 }
 updateQueryOverrides(info.sourceManagers);
+
+const acceptableSources = {
+    youtubemusic: 'ytmsearch:',
+    youtube: 'ytsearch:',
+    deezer: 'dzsearch:',
+    soundcloud: 'scsearch:',
+    yandexmusic: 'ymsearch:',
+    vkmusic: 'vksearch:',
+    tidal: 'tdsearch:',
+};
+if (
+    info.sourceManagers.length === 0 ||
+    !info.sourceManagers.some((source): boolean =>
+        Object.keys(acceptableSources).includes(source),
+    )
+) {
+    logger.warn({
+        message:
+            'No acceptable sources were found. It is HIGHLY unlikely that this instance will work as intended.',
+        label: 'Lavalink',
+    });
+}
+const sm = [...info.sourceManagers];
+if (info.sourceManagers.includes('youtube')) sm.push('youtubemusic');
+for (const source of Object.keys(acceptableSources)) {
+    if (sm.includes(source)) continue;
+    // @ts-expect-error - expected behaviour with check above
+    delete acceptableSources[source];
+}
+updateSourceManagers(info.sourceManagers);
+updateAcceptableSources(acceptableSources);
 
 let inProgress = false;
 

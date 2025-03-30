@@ -6,7 +6,11 @@ import type {
     QuaverSong,
 } from '#src/lib/util/common.d.js';
 import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import { Check, queryOverrides } from '#src/lib/util/constants.js';
+import {
+    acceptableSources,
+    Check,
+    queryOverrides,
+} from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import type {
@@ -120,10 +124,16 @@ export default {
         let tracks: QuaverSong[] = [],
             msg = '',
             extras = [];
+        const source =
+            (await data.guild.get<string>(
+                interaction.guildId,
+                'settings.source',
+            )) ?? Object.keys(acceptableSources)[0];
+        const preQuery = acceptableSources[source];
         const result = await interaction.client.music.api.loadTracks(
             queryOverrides.some((q): boolean => query.startsWith(q))
                 ? query
-                : `ytmsearch:${query}`,
+                : `${preQuery}${query}`,
         );
         switch (result.loadType) {
             case 'playlist':

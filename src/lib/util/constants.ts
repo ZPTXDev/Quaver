@@ -41,7 +41,11 @@ export const settingsOptions = [
     'language',
     'format',
     'dj',
+    'source',
     ...(settings.features.autolyrics.enabled ? ['autolyrics'] : []),
     ...(settings.features.smartqueue.enabled ? ['smartqueue'] : []),
 ];
+
 export const queryOverrides: string[] = [];
+export const sourceManagers: string[] = [];
+export const acceptableSources: Record<string, string> = {};
