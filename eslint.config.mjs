@@ -75,7 +75,6 @@ export default defineConfig([globalIgnores(['**/locales/', '**/dist/', '**/scrip
             maxBOF: 0,
         }],
 
-        'no-return-await': 'error',
         'no-shadow': 'off',
         'no-trailing-spaces': ['error'],
         'no-var': 'error',
