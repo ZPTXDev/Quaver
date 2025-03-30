@@ -381,7 +381,7 @@ export default {
             );
             return;
         }
-        // Since a user joined the channel while the session was paused, resume the session
+        // Since a user joined Quaver's channel while the session was paused, resume the session
         if (
             !isOldQuaverStateUpdate &&
             newChannelId === playerVoice.channelId &&
