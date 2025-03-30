@@ -208,6 +208,10 @@ export default {
                 NAME: 'Lengguwahe',
                 DESCRIPTION: 'Ang lengguwahe nga gamiton alang niini nga server.'
             },
+            NOTIFYIN247: {
+                NAME: 'Pahibalo samtang naka-24/7 mode',
+                DESCRIPTION: 'Kung ipadala o dili ang "Nagpatugtug karon" nga mga mensahe sa 24/7 mode.'
+            },
             FORMAT: {
                 NAME: 'Pormat',
                 DESCRIPTION: 'Ang "Nagpatugtug karon" nga pormat nga gamiton alang niini nga server.',
@@ -223,6 +227,19 @@ export default {
             DJ: {
                 NAME: 'DJ Role',
                 DESCRIPTION: 'Usa ka role nga nagtugot og requester check bypass.'
+            },
+            SOURCE: {
+                NAME: 'Tinubdan',
+                DESCRIPTION: 'Ang default nga tinubdan na gamiton. Makaapekto sa /play nga command.',
+                OPTIONS: {
+                    YOUTUBE: 'YouTube',
+                    YOUTUBEMUSIC: 'YouTube Music',
+                    DEEZER: 'Deezer',
+                    SOUNDCLOUD: 'SoundCloud',
+                    YANDEXMUSIC: 'Yandex Music',
+                    VKMUSIC: 'VK Music',
+                    TIDAL: 'Tidal'
+                }
             },
             AUTOLYRICS: {
                 NAME: 'Auto Lyrics',

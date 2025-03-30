@@ -208,6 +208,10 @@ export default {
                 NAME: 'Wika',
                 DESCRIPTION: 'Ang wikang gagamitin sa server na ito.'
             },
+            NOTIFYIN247: {
+                NAME: 'Magaabiso sa 24/7 mode',
+                DESCRIPTION: 'Kung magpapadala o hindi ng "Nagpe-play ngayon" na mga mensahe sa 24/7 mode.'
+            },
             FORMAT: {
                 NAME: 'Pormat',
                 DESCRIPTION: 'Ang pormat ng "Nagpe-play ngayon" na gagamitin para sa server na ito.',
@@ -223,6 +227,19 @@ export default {
             DJ: {
                 NAME: 'DJ Role',
                 DESCRIPTION: 'Isang role nagbibigay-daan sa requester check bypass.'
+            },
+            SOURCE: {
+                NAME: 'Pinagmulan',
+                DESCRIPTION: 'Ang default na source na gagamitin. Makaapekto sa /play na command.',
+                OPTIONS: {
+                    YOUTUBE: 'YouTube',
+                    YOUTUBEMUSIC: 'YouTube Music',
+                    DEEZER: 'Deezer',
+                    SOUNDCLOUD: 'SoundCloud',
+                    YANDEXMUSIC: 'Yandex Music',
+                    VKMUSIC: 'VK Music',
+                    TIDAL: 'Tidal'
+                }
             },
             AUTOLYRICS: {
                 NAME: 'Auto Lyrics',
