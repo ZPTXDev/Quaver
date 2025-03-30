@@ -26,6 +26,7 @@ import {
     EmbedBuilder,
     escapeMarkdown,
     InteractionCallbackResponse,
+    Message,
     SlashCommandBuilder,
     StringSelectMenuBuilder,
 } from 'discord.js';
@@ -217,8 +218,18 @@ export default {
                 withResponse: true,
             },
         );
-        if (!(response instanceof InteractionCallbackResponse)) return;
-        const msg = response.resource.message;
+        if (
+            !(
+                response instanceof InteractionCallbackResponse ||
+                response instanceof Message
+            )
+        ) {
+            return;
+        }
+        const msg =
+            response instanceof InteractionCallbackResponse
+                ? response.resource.message
+                : response;
         searchState[msg.id] = {
             pages: pages,
             timeout: setTimeout(

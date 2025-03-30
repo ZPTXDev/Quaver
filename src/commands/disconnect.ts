@@ -22,6 +22,7 @@ import {
     ButtonStyle,
     EmbedBuilder,
     InteractionCallbackResponse,
+    Message,
     SlashCommandBuilder,
 } from 'discord.js';
 
@@ -108,8 +109,16 @@ export default {
                 withResponse: true,
             },
         );
-        if (!(response instanceof InteractionCallbackResponse)) return;
-        const msg = response.resource.message;
+        if (
+            !(
+                response instanceof InteractionCallbackResponse ||
+                response instanceof Message
+            )
+        ) {return;}
+        const msg =
+            response instanceof InteractionCallbackResponse
+                ? response.resource.message
+                : response;
         confirmationTimeout[msg.id] = setTimeout(
             async (message): Promise<void> => {
                 try {

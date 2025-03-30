@@ -9,11 +9,9 @@ import type {
     InteractionReplyOptions,
     InteractionResponse,
     InteractionUpdateOptions,
-    Message } from 'discord.js';
-import {
-    MessageFlags,
-    PermissionsBitField,
+    Message,
 } from 'discord.js';
+import { MessageFlags, PermissionsBitField } from 'discord.js';
 import type { AdditionalBuilderOptions } from './ReplyHandler.d.js';
 
 /** Class for handling replies to interactions. */
@@ -57,7 +55,7 @@ export default class ReplyHandler {
             withResponse,
         }?: MessageOptionsBuilderOptions &
             AdditionalBuilderOptions & { withResponse: true },
-    ): Promise<InteractionCallbackResponse>;
+    ): Promise<InteractionCallbackResponse | Message>;
     async reply(
         inputData: MessageOptionsBuilderInputs,
         {
