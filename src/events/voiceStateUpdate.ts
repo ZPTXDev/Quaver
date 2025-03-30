@@ -142,7 +142,7 @@ async function onChannelEmpty(
     const playerVoice = player.voice;
     const playerVoiceChannelId = playerVoice.channelId;
     // To ensure that Quaver does not set pauseTimeout if timeout or pauseTimeout already exists, do not pause the session
-    // To ensure that Quaver does not set a pauseTimeout after a stage ends, do not pause the session
+    // To ensure that Quaver does not set pauseTimeout after a stage ends, do not pause the session
     if (player.timeout || player.pauseTimeout || !playerVoiceChannelId) {
         return;
     }
