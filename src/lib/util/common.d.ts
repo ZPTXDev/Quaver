@@ -34,6 +34,7 @@ export type WhitelistedFeatures = 'stay' | 'autolyrics' | 'smartqueue';
 export type SettingsPageOptions =
     | 'premium'
     | 'language'
+    | 'notifyin247'
     | 'format'
     | 'dj'
     | 'source'

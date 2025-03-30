@@ -238,6 +238,10 @@ export default {
                 NAME: 'Language',
                 DESCRIPTION: 'The language to use for this server.',
             },
+            NOTIFYIN247: {
+                NAME: 'Notify in 24/7 mode',
+                DESCRIPTION: 'Whether or not to send "Now Playing" messages in 24/7 mode.',
+            },
             FORMAT: {
                 NAME: 'Format',
                 DESCRIPTION: 'The "Now playing" format to use for this server.',

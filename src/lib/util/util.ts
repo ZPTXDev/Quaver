@@ -634,6 +634,26 @@ export async function buildSettingsPage(
                     ),
             );
             break;
+        case 'notifyin247': {
+            const enabled =
+                (await data.guild.get<boolean>(
+                    interaction.guildId,
+                    'settings.notifyin247',
+                )) ?? true;
+            actionRow.addComponents(
+                ...getButtonToggleComponents(
+                    'notifyin247',
+                    !!enabled,
+                    guildLocaleCode,
+                ),
+            );
+            current = `\`${
+                enabled
+                    ? getLocaleString(guildLocaleCode, 'MISC.ENABLED')
+                    : getLocaleString(guildLocaleCode, 'MISC.DISABLED')
+            }\``;
+            break;
+        }
         case 'format': {
             const exampleId = 'dQw4w9WgXcQ';
             current =
