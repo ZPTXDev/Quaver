@@ -10,7 +10,13 @@ import type {
     WhitelistedFeatures,
 } from '#src/lib/util/common.d.js';
 import { data, locales, MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import { Check, Language, queryOverrides } from '#src/lib/util/constants.js';
+import {
+    acceptableSources,
+    Check,
+    Language,
+    queryOverrides,
+    sourceManagers as extSourceManagers,
+} from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getAbsoluteFileURL } from '@zptxdev/zptx-lib';
 import type {
@@ -771,6 +777,32 @@ export async function buildSettingsPage(
             );
             break;
         }
+        case 'source': {
+            current =
+                (await data.guild.get<string>(
+                    interaction.guildId,
+                    'settings.source',
+                )) ?? Object.keys(acceptableSources)[0];
+            actionRow.addComponents(
+                new StringSelectMenuBuilder().setCustomId('source').addOptions(
+                    Object.keys(acceptableSources).map(
+                        (source: string): APISelectMenuOption => ({
+                            label: getLocaleString(
+                                guildLocaleCode,
+                                `CMD.SETTINGS.MISC.SOURCE.OPTIONS.${source.toUpperCase()}`,
+                            ),
+                            value: source,
+                            default: current === source,
+                        }),
+                    ),
+                ),
+            );
+            current = `\`${getLocaleString(
+                guildLocaleCode,
+                `CMD.SETTINGS.MISC.SOURCE.OPTIONS.${current.toUpperCase()}`,
+            )}\``;
+            break;
+        }
         case 'autolyrics': {
             const enabled = await data.guild.get<boolean>(
                 interaction.guildId,
@@ -835,4 +867,24 @@ export function updateQueryOverrides(sourceManagers: readonly string[]): void {
             : []),
         ...(sourceManagers.includes('soundcloud') ? ['scsearch:'] : []),
     );
+}
+
+/**
+ * Updates the source managers.
+ * @param sourceManagers - The source managers to use.
+ */
+export function updateSourceManagers(sourceManagers: readonly string[]): void {
+    extSourceManagers.push(...sourceManagers);
+}
+
+/**
+ * Updates the acceptable sources.
+ * @param sourceManagers - The source managers to use.
+ */
+export function updateAcceptableSources(
+    sourceManagers: Record<string, string>,
+): void {
+    for (const [key, value] of Object.entries(sourceManagers)) {
+        acceptableSources[key] = value;
+    }
 }
