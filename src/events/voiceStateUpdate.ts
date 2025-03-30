@@ -108,9 +108,9 @@ async function resumeChannelSession(
 async function onChannelEmpty(
     io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>,
     player: QuaverPlayer,
+    oldState: VoiceState,
     isOldQuaverStateUpdate: boolean,
     isGuildStayEnabled: boolean | unknown,
-    oldState: VoiceState,
 ): Promise<void> {
     const playerId = player.id;
     const isPlayerIdle =
@@ -188,9 +188,9 @@ async function onChannelJoinOrMove(
         await onChannelEmpty(
             io,
             player,
+            oldState,
             isOldQuaverStateUpdate,
             isGuildStayEnabled,
-            oldState,
         );
     }
 }
@@ -405,9 +405,9 @@ export default {
             await onChannelEmpty(
                 io,
                 player,
+                oldState,
                 isOldQuaverStateUpdate,
                 isGuildStayEnabled,
-                oldState,
             );
         }
     },
