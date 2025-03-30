@@ -179,26 +179,21 @@ async function onChannelJoinOrMove(
         );
     }
     // newState#channel is always defined for join/move states, so optional chaining is unnecessary
-    if (
-        newState.channel.members.filter(isUser).size > 0 &&
-        player.pauseTimeout
-    ) {
+    const hasNewChannelUsers = newState.channel.members.filter(isUser).size > 0;
+    if (hasNewChannelUsers && player.pauseTimeout) {
         await resumeChannelSession(io, player);
+    }
+    // To prevent Quaver from handling a channel that still has users or the guild's stay feature is enabled, do not handle the non-empty channel
+    if (hasNewChannelUsers || isGuildStayEnabled) {
         return;
     }
-    // oldState#channel can be null for join/move states, so optional chaining is necessary
-    if (
-        oldState.channel?.members.filter(isUser).size < 1 &&
-        !isGuildStayEnabled
-    ) {
-        await onChannelEmpty(
-            io,
-            player,
-            oldState,
-            isOldQuaverStateUpdate,
-            isGuildStayEnabled,
-        );
-    }
+    await onChannelEmpty(
+        io,
+        player,
+        oldState,
+        isOldQuaverStateUpdate,
+        isGuildStayEnabled,
+    );
 }
 
 export default {
