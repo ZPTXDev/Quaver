@@ -497,7 +497,7 @@ export async function shuttingDown(
                 }
             }
         }
-        bot.destroy();
+        await bot.destroy();
         process.exit();
     }
 }
@@ -627,7 +627,7 @@ if (settings.features.web.enabled) {
     setInterval((): boolean => bot.emit('timer'), 500);
 }
 
-bot.login(settings.token);
+await bot.login(settings.token);
 
 [
     'exit',
