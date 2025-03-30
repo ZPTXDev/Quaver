@@ -753,19 +753,21 @@ export async function buildSettingsPage(
                 interaction.guildId,
                 'settings.dj',
             );
+            let raw = undefined;
             if (!current) {
                 current = `\`${getLocaleString(
                     guildLocaleCode,
                     'MISC.NONE',
                 )}\``;
             } else {
+                raw = current;
                 current = `<@&${current}>`;
             }
             actionRow.addComponents(
                 new RoleSelectMenuBuilder()
                     .setCustomId('dj')
                     .setMinValues(0)
-                    .setDefaultRoles(current),
+                    .setDefaultRoles(raw ? [raw] : []),
             );
             break;
         }
