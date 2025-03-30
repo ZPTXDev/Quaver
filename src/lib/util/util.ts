@@ -279,7 +279,10 @@ export async function getFailedChecks(
                 break;
             }
             case Check.InteractionStarter: {
-                if (interaction.message.interaction.user.id !== member.id) {
+                if (
+                    interaction.message.interactionMetadata.user.id !==
+                    member.id
+                ) {
                     failedChecks.push(check);
                 }
             }

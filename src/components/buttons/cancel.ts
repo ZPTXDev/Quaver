@@ -15,7 +15,7 @@ export default {
         delete confirmationTimeout[interaction.message.id];
         delete searchState[interaction.message.id];
         await interaction.replyHandler.locale('DISCORD.INTERACTION.CANCELED', {
-            vars: [interaction.message.interaction.user.id],
+            vars: [interaction.message.interactionMetadata.user.id],
             components: [],
             force: ForceType.Update,
         });
