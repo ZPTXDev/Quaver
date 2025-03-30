@@ -6,7 +6,7 @@ import {
 } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString } from '#src/lib/util/util.js';
-import type { VoiceState } from 'discord.js';
+import type { GuildMember, VoiceState } from 'discord.js';
 import {
     ChannelType,
     EmbedBuilder,
@@ -18,6 +18,10 @@ import type { DefaultEventsMap, Server } from 'socket.io';
 const PAUSE_TIMEOUT_SECONDS = 5 * 60;
 
 const guildDatabase = data.guild;
+
+function isUser(member: GuildMember): boolean {
+    return !member.user.bot;
+}
 
 async function pauseChannelSession(
     io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>,
@@ -173,7 +177,7 @@ async function onChannelJoinOrMove(
     }
     // newState#channel is always defined for join/move states, so optional chaining is unnecessary
     if (
-        newState.channel.members.filter((m): boolean => !m.user.bot).size > 0 &&
+        newState.channel.members.filter(isUser).size > 0 &&
         player.pauseTimeout
     ) {
         await resumeChannelSession(io, player);
@@ -181,8 +185,7 @@ async function onChannelJoinOrMove(
     }
     // oldState#channel can be null for join/move states, so optional chaining is necessary
     if (
-        oldState.channel?.members.filter((m): boolean => !m.user.bot).size <
-            1 &&
+        oldState.channel?.members.filter(isUser).size < 1 &&
         !isGuildStayEnabled
     ) {
         await onChannelEmpty(
@@ -398,8 +401,7 @@ export default {
         // In this context, oldState#channel is always defined for leave states, so optional chaining is unnecessary
         if (
             hasUserLeftQuaverChannel &&
-            oldState.channel.members.filter((m): boolean => !m.user.bot).size <
-                1 &&
+            oldState.channel.members.filter(isUser).size < 1 &&
             !isGuildStayEnabled
         ) {
             await onChannelEmpty(
