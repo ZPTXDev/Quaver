@@ -331,14 +331,17 @@ export default {
                 await playerHandler.disconnect();
                 return;
             }
-            if (!channelPermissions.has(PermissionsBitField.StageModerator)) {
-                if (isGuildStayEnabled) {
-                    await guildDatabase.set(
-                        playerId,
-                        'settings.stay.enabled',
-                        false,
-                    );
-                }
+            const hasStageModerator = channelPermissions.has(
+                PermissionsBitField.StageModerator,
+            );
+            if (!hasStageModerator && isGuildStayEnabled) {
+                await guildDatabase.set(
+                    playerId,
+                    'settings.stay.enabled',
+                    false,
+                );
+            }
+            if (!hasStageModerator) {
                 await playerHandler.locale(
                     'MUSIC.SESSION_ENDED.FORCED.STAGE_NOT_MODERATOR',
                     { type: MessageOptionsBuilderType.Warning },
