@@ -6,6 +6,7 @@ export type SettingsObject = {
     applicationId?: Snowflake;
     clientSecret?: string;
     colors?: ColorsSettingsObject;
+    emojis?: EmojisSettingsObject;
     status?: StatusSettingsObject;
     defaultLocaleCode?: string;
     developerMode?: boolean;
@@ -25,6 +26,19 @@ export type ColorsSettingsObject = {
     neutral?: ColorResolvable;
     warning?: ColorResolvable;
     error?: ColorResolvable;
+};
+
+export type EmojisSettingsObject = {
+    youtube?: string;
+    deezer?: string;
+    spotify?: string;
+    soundcloud?: string;
+    applemusic?: string;
+    http?: string;
+    yandexmusic?: string;
+    'flowery-tts'?: string;
+    vkmusic?: string;
+    tidal?: string;
 };
 
 export type StatusSettingsObject = {

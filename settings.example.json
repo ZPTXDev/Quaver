@@ -1,70 +1,82 @@
 {
-    "token": "Paste token here",
-    "applicationId": "Paste application ID here",
-    "clientSecret": "Paste client secret here",
-    "colors": {
-        "success": "DarkGreen",
-        "neutral": "#f39bff",
-        "warning": "Orange",
-        "error": "DarkRed"
-    },
-    "status": {
-        "presence": "online",
-        "activityType": "Listening",
-        "name": "music",
-        "url": "",
-        "showVersion": true
-    },
-    "defaultLocaleCode": "en",
-    "disableAd": false,
-    "supportServer": "https://discord.gg/",
-    "premiumURL": "https://example.com/premium",
-    "managers": [
-        "Paste your user ID here"
-    ],
-    "database": {
-        "protocol": "sqlite",
-        "path": "../database.sqlite"
-    },
-    "lavalink": {
-        "host": "localhost",
-        "port": 12345,
-        "password": "youshallnotpass",
-        "secure": false,
-        "reconnect": {
-            "delay": 3000,
-            "tries": 5
-        }
-    },
-    "features": {
-        "autolyrics": {
-            "enabled": true,
-            "whitelist": false,
-            "premium": false
-        },
-        "stay": {
-            "enabled": true,
-            "whitelist": false,
-            "premium": false
-        },
-        "smartqueue": {
-            "enabled": true,
-            "whitelist": false,
-            "premium": false
-        },
-        "web": {
-            "enabled": false,
-            "port": 3000,
-            "allowedOrigins": [
-                "http://localhost"
-            ],
-            "encryptionKey": "Type an encryption key here",
-            "https": {
-                "enabled": false,
-                "key": "key.pem",
-                "cert": "cert.pem"
-            },
-            "dashboardURL": "http://example.com"
-        }
+  "token": "Paste token here",
+  "applicationId": "Paste application ID here",
+  "clientSecret": "Paste client secret here",
+  "colors": {
+    "success": "DarkGreen",
+    "neutral": "#f39bff",
+    "warning": "Orange",
+    "error": "DarkRed"
+  },
+  "emojis": {
+    "youtube": "",
+    "deezer": "",
+    "spotify": "",
+    "soundcloud": "",
+    "applemusic": "",
+    "http": "",
+    "yandexmusic": "",
+    "flowery-tts": "",
+    "vkmusic": "",
+    "tidal": ""
+  },
+  "status": {
+    "presence": "online",
+    "activityType": "Listening",
+    "name": "music",
+    "url": "",
+    "showVersion": true
+  },
+  "defaultLocaleCode": "en",
+  "disableAd": false,
+  "supportServer": "https://discord.gg/",
+  "premiumURL": "https://example.com/premium",
+  "managers": [
+    "Paste your user ID here"
+  ],
+  "database": {
+    "protocol": "sqlite",
+    "path": "../database.sqlite"
+  },
+  "lavalink": {
+    "host": "localhost",
+    "port": 12345,
+    "password": "youshallnotpass",
+    "secure": false,
+    "reconnect": {
+      "delay": 3000,
+      "tries": 5
     }
+  },
+  "features": {
+    "autolyrics": {
+      "enabled": true,
+      "whitelist": false,
+      "premium": false
+    },
+    "stay": {
+      "enabled": true,
+      "whitelist": false,
+      "premium": false
+    },
+    "smartqueue": {
+      "enabled": true,
+      "whitelist": false,
+      "premium": false
+    },
+    "web": {
+      "enabled": false,
+      "port": 3000,
+      "allowedOrigins": [
+        "http://localhost"
+      ],
+      "encryptionKey": "Type an encryption key here",
+      "https": {
+        "enabled": false,
+        "key": "key.pem",
+        "cert": "cert.pem"
+      },
+      "dashboardURL": "http://example.com"
+    }
+  }
 }
