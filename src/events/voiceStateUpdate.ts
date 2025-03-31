@@ -125,7 +125,9 @@ async function onChannelEmpty(
         await guildDatabase.set(playerId, 'settings.stay.enabled', false);
     }
     const playerHandler = player.handler;
-    if (isPlayerIdle) {
+    const playerVoice = player.voice;
+    const playerVoiceChannelId = playerVoice.channelId;
+    if (isPlayerIdle && playerVoiceChannelId) {
         logger.info({
             message: `[G ${playerId}] Disconnecting (alone)`,
             label: 'Quaver',
@@ -139,8 +141,6 @@ async function onChannelEmpty(
         await playerHandler.disconnect();
         return;
     }
-    const playerVoice = player.voice;
-    const playerVoiceChannelId = playerVoice.channelId;
     // To ensure that Quaver does not set pauseTimeout if timeout or pauseTimeout already exists, do not pause the session
     if (player.timeout || player.pauseTimeout || !playerVoiceChannelId) {
         return;
@@ -235,7 +235,7 @@ export default {
             await guildDatabase.set(playerId, 'settings.stay.enabled', false);
         }
         // To reset states, properly handle disconnection
-        if (hasQuaverDisconnected) {
+        if (hasQuaverDisconnected && !playerVoice.channelId) {
             logger.info({
                 message: `[G ${playerId}] Cleaning up (disconnected)`,
                 label: 'Quaver',
