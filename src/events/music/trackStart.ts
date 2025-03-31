@@ -84,12 +84,17 @@ export default {
             (await data.guild.get(queue.player.id, 'settings.format')) ??
             'simple';
         if (!notify) format = 'off';
+        const emoji =
+            settings.emojis[
+                track.info.sourceName as keyof typeof settings.emojis
+            ] ?? '';
         switch (format) {
             case 'simple':
                 await queue.player.handler.send(
                     `${getLocaleString(
                         guildLocaleCode,
                         'MUSIC.PLAYER.PLAYING.NOW.SIMPLE',
+                        emoji ? `${emoji} ` : '',
                         escapeMarkdown(track.info.title),
                         track.info.uri,
                         durationString,
@@ -134,7 +139,7 @@ export default {
                             ),
                         )
                         .setDescription(
-                            `**[${escapeMarkdown(track.info.title)}](${track.info.uri})**`,
+                            `${emoji ? `${emoji} ` : ''}**[${escapeMarkdown(track.info.title)}](${track.info.uri})**`,
                         )
                         .addFields([
                             {
