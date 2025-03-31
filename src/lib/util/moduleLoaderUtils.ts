@@ -343,7 +343,7 @@ export async function loadInteractionHandlerMaps(
  * @param {string | string[]} folderPaths - A single folder path or an array of folder paths to process.
  * The function iterates through each folder to locate JavaScript event handler modules.
  *
- * @param {EventEmitter} eventEmitterLikeInstance - An instance of an event emitter where event handlers will be registered.
+ * @param {EventEmitter} eventEmitterLikeInstance - An eventEmitter or instance with event emitter methods where event handlers will be registered.
  *
  * @param {LoadEventHandlerOptions} [options] - Optional configuration to control concurrency settings.
  * If not provided, default options are used.
