@@ -179,7 +179,7 @@ async function onChannelJoinOrMove(
             newState.channelId,
         );
     }
-    // newState#channel is always defined for join/move states, so optional chaining is unnecessary
+    // In this context newState#channel is always defined for join/move states, so optional chaining is unnecessary
     const hasNewChannelUsers = newState.channel.members.filter(isUser).size > 0;
     if (hasNewChannelUsers && player.pauseTimeout) {
         await resumeChannelSession(io, player);
@@ -242,7 +242,7 @@ export default {
         );
         const playerVoice = player.voice;
         const hasQuaverDisconnected = isOldQuaverStateUpdate && !newChannelId;
-        // To ensure it does not persist in an inactive session, disable stay for this guild
+        // To ensure Quaver does not persist in an inactive session, disable stay feature for this guild
         if (hasQuaverDisconnected && isGuildStayEnabled) {
             await guildDatabase.set(playerId, 'settings.stay.enabled', false);
         }
@@ -265,7 +265,7 @@ export default {
         // explicitly use booleans for Quaver's state update and newState#channelId
         const isQuaverJoinOrMoveState = isOldQuaverStateUpdate && newChannelId;
         const newChannel = newState.channel;
-        // In this context, newState#channel can be null because of leave states, so optional chaining is necessary
+        // In this context newState#channel can be null because of leave states, so optional chaining is necessary
         const newChannelType = newChannel?.type;
         // To keep the dashboard updated with the latest session details, emit channel events for this guild
         if (isQuaverJoinOrMoveState && settings.features.web.enabled) {
@@ -387,10 +387,9 @@ export default {
         const isUserLeaveOrMoveState =
             !isOldQuaverStateUpdate && oldChannelId === playerVoice.channelId;
         // Since the last user left or moved out from Quaver's channel and the guild's stay feature is disabled, handle the empty channel
-        // In this context, oldState#channel is always defined for leave/move states, so optional chaining is unnecessary
         if (
             isUserLeaveOrMoveState &&
-            oldState.channel.members.filter(isUser).size < 1 &&
+            oldState.channel?.members.filter(isUser).size < 1 &&
             !isGuildStayEnabled
         ) {
             await onChannelEmpty(
