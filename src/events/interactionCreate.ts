@@ -7,7 +7,6 @@ import type {
     ChatInputCommandInteraction,
     Collection,
     CommandInteraction,
-    GuildMember,
     Interaction,
 } from 'discord.js';
 import { PermissionsBitField } from 'discord.js';
@@ -36,7 +35,7 @@ async function checkCommandHandlerPermissions(
     const interactionChannel = interaction.channel;
     if (interaction.guildId) {
         failedPermissions.user = interactionChannel
-            .permissionsFor(interaction.member as GuildMember)
+            .permissionsFor(interaction.member)
             .missing(handlerUserPermissions);
         failedPermissions.bot = interactionChannel
             .permissionsFor(interaction.client.user.id)
@@ -164,7 +163,7 @@ async function onInteractionCreate(
         const failedChecks = await getFailedChecks(
             interactionHandler.checks,
             interaction.guildId,
-            interaction.member as GuildMember,
+            interaction.member,
             hasCommandName ? undefined : (interaction as never),
         );
         const failedChecksCount = failedChecks.length;
