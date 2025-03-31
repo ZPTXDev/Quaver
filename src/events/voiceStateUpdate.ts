@@ -216,6 +216,7 @@ export default {
                 hasEnforcedStateUpdates ||
                 hasVoluntaryStateUpdates);
         // Since Quaver is expected to continue playback despite its own state updates, do not operate
+        // Handles ignoring state updates from self-deafening or unsuppressing itself from starting tracks
         if (isOldQuaverStateUpdate && hasSameChannelStateUpdates) {
             return;
         }
