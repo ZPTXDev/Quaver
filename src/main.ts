@@ -561,11 +561,12 @@ for await (const folder of localeFolders) {
 setLocales(locales);
 
 const commandFiles = readdirSync(
-    getAbsoluteFileURL(import.meta.url, ['chatInputCommands']),
+    getAbsoluteFileURL(import.meta.url, ['commands', 'chatInputCommands']),
 ).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 for await (const file of commandFiles) {
     const command: { default: ChatInputCommand } = await import(
         getAbsoluteFileURL(import.meta.url, [
+            'commands',
             'chatInputCommands',
             file,
         ]).toString()
