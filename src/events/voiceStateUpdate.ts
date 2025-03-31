@@ -240,7 +240,6 @@ export default {
                 message: `[G ${playerId}] Cleaning up (disconnected)`,
                 label: 'Quaver',
             });
-            playerVoice.channelId = null;
             await playerHandler.locale(
                 'MUSIC.SESSION_ENDED.FORCED.DISCONNECTED',
                 { type: MessageOptionsBuilderType.Warning },
