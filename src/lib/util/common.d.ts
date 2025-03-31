@@ -64,11 +64,11 @@ export type QuaverChannels = TextChannel | VoiceChannel | StageChannel;
 
 export type QuaverClient = Client<boolean> & {
     music?: Node;
-    commands?: Collection<string, ChatInputCommand>;
+    chatInputCommands?: Collection<string, ChatInputCommand>;
     buttons?: Collection<string, Button>;
-    selectmenus?: Collection<string, SelectMenu>;
-    autocomplete?: Collection<string, Autocomplete>;
-    modals?: Collection<string, ModalSubmit>;
+    selectMenus?: Collection<string, SelectMenu>;
+    autocompletes?: Collection<string, Autocomplete>;
+    modalSubmits?: Collection<string, ModalSubmit>;
 };
 
 export type QuaverSong = Song & {

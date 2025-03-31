@@ -304,8 +304,8 @@ export const bot: QuaverClient = new Client({
         GatewayIntentBits.GuildMessages,
     ],
 });
-bot.commands = new Collection();
-bot.autocomplete = new Collection();
+bot.chatInputCommands = new Collection();
+bot.autocompletes = new Collection();
 bot.music = new Node({
     info: {
         host: settings.lavalink.host,
@@ -561,23 +561,26 @@ for await (const folder of localeFolders) {
 setLocales(locales);
 
 const commandFiles = readdirSync(
-    getAbsoluteFileURL(import.meta.url, ['commands']),
+    getAbsoluteFileURL(import.meta.url, ['chatInputCommands']),
 ).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 for await (const file of commandFiles) {
     const command: { default: ChatInputCommand } = await import(
-        getAbsoluteFileURL(import.meta.url, ['commands', file]).toString()
+        getAbsoluteFileURL(import.meta.url, [
+            'chatInputCommands',
+            file,
+        ]).toString()
     );
-    bot.commands.set(command.default.data.name, command.default);
+    bot.chatInputCommands.set(command.default.data.name, command.default);
 }
 
 const autocompleteFiles = readdirSync(
-    getAbsoluteFileURL(import.meta.url, ['autocomplete']),
+    getAbsoluteFileURL(import.meta.url, ['autocompletes']),
 ).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 for await (const file of autocompleteFiles) {
     const autocomplete: { default: Autocomplete } = await import(
-        getAbsoluteFileURL(import.meta.url, ['autocomplete', file]).toString()
+        getAbsoluteFileURL(import.meta.url, ['autocompletes', file]).toString()
     );
-    bot.autocomplete.set(autocomplete.default.name, autocomplete.default);
+    bot.autocompletes.set(autocomplete.default.name, autocomplete.default);
 }
 
 const componentsFolders = readdirSync(

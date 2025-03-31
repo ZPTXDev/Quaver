@@ -1,410 +1,352 @@
 import ReplyHandler from '#src/lib/ReplyHandler.js';
-import type { QuaverInteraction } from '#src/lib/util/common.d.js';
+import type { QuaverClient } from '#src/lib/util/common.d.js';
 import { logger, MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import type { Check } from '#src/lib/util/constants.js';
 import { getFailedChecks } from '#src/lib/util/util.js';
 import type {
-    ButtonInteraction,
+    AnySelectMenuInteraction,
     ChatInputCommandInteraction,
+    Collection,
+    CommandInteraction,
     GuildMember,
     Interaction,
-    ModalSubmitInteraction,
-    RoleSelectMenuInteraction,
-    StringSelectMenuInteraction,
 } from 'discord.js';
 import { PermissionsBitField } from 'discord.js';
-import type {
-    Autocomplete,
-    Button,
-    ChatInputCommand,
-    ModalSubmit,
-    SelectMenu,
-} from './interactionCreate.d.js';
+import type { ChatInputCommand } from './interactionCreate.d.js';
+import { isAsyncFunction } from 'node:util/types';
 
-async function handleFailedChecks(
-    failedChecks: Check[],
-    interaction: QuaverInteraction<
-        | ChatInputCommandInteraction
-        | ButtonInteraction
-        | StringSelectMenuInteraction
-        | RoleSelectMenuInteraction
-        | ModalSubmitInteraction
-    >,
+const INTERACTION_CUSTOM_ID_NAME = 0;
+const INTERACTION_CUSTOM_ID_SEPARATOR = ':';
+
+async function checkCommandHandlerPermissions(
+    interaction: Interaction<'cached'>,
+    mapKey: string,
+    replyHandler: ReplyHandler,
+    interactionHandler: ChatInputCommand,
+    commandId: string,
+    guildId: string | 'DirectMessage',
+    userId: string,
+): Promise<boolean | void> {
+    const handlerPermissions = interactionHandler.permissions;
+    const handlerUserPermissions = handlerPermissions.user;
+    const handlerBotPermissions = handlerPermissions.bot;
+    const failedPermissions: { user: string[]; bot: string[] } = {
+        user: new PermissionsBitField(handlerUserPermissions).toArray(),
+        bot: new PermissionsBitField(handlerBotPermissions).toArray(),
+    };
+    const interactionChannel = interaction.channel;
+    if (interaction.guildId) {
+        failedPermissions.user = interactionChannel
+            .permissionsFor(interaction.member as GuildMember)
+            .missing(handlerUserPermissions);
+        failedPermissions.bot = interactionChannel
+            .permissionsFor(interaction.client.user.id)
+            .missing([
+                PermissionsBitField.Flags.ViewChannel,
+                PermissionsBitField.Flags.SendMessages,
+                ...handlerBotPermissions,
+            ]);
+    }
+    const failedUserPermissions = failedPermissions.user;
+    const failedUserPermsCount = failedUserPermissions.length;
+    if (failedUserPermsCount > 0) {
+        logger.info({
+            message: `[G ${guildId} | U ${userId}] ${mapKey} ${
+                commandId
+            } failed ${failedUserPermsCount} user permission check(s)`,
+            label: 'Quaver',
+        });
+        await replyHandler.locale('DISCORD.INSUFFICIENT_PERMISSIONS.USER', {
+            vars: [
+                failedPermissions.user
+                    .map((perm): string => `\`${perm}\``)
+                    .join(' '),
+            ],
+            type: MessageOptionsBuilderType.Error,
+        });
+        return false;
+    }
+    const failedBotPermissions = failedPermissions.bot;
+    const failedBotPermsCount = failedBotPermissions.length;
+    if (failedBotPermsCount > 0) {
+        logger.info({
+            message: `[G ${guildId} | U ${userId}] ${mapKey} ${
+                commandId
+            } failed ${failedBotPermsCount} bot permission check(s)`,
+            label: 'Quaver',
+        });
+        if (
+            failedBotPermissions.includes('ViewChannel') ||
+            failedBotPermissions.includes('SendMessages')
+        ) {
+            await replyHandler.locale(
+                'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.VIEW',
+                {
+                    type: MessageOptionsBuilderType.Error,
+                },
+            );
+            return false;
+        }
+        await replyHandler.locale(
+            'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.DEFAULT',
+            {
+                vars: [
+                    failedBotPermissions
+                        .map((perm): string => `\`${perm}\``)
+                        .join(' '),
+                ],
+                type: MessageOptionsBuilderType.Error,
+            },
+        );
+        return false;
+    }
+    return true;
+}
+
+function getFormattedCommandOptions(
+    hasCommandName: boolean,
+    interaction: Interaction<'cached'>,
+): string {
+    const optionsData =
+        hasCommandName && (interaction as CommandInteraction).options.data;
+    return hasCommandName && optionsData.length > 0
+        ? ` ${optionsData
+              .map((option): string => `${option.name}:${option.value}`)
+              .join(' ')}`
+        : '';
+}
+
+async function onInteractionCreate(
+    interaction: Interaction<'cached'> & { replyHandler: ReplyHandler },
+    discordClient: QuaverClient,
+    mapKey: string,
+    hasCommandName: boolean,
+    isAutocomplete: boolean,
 ): Promise<void> {
+    const guildId = interaction.guild?.id ?? 'DirectMessage';
+    const userId = interaction.user.id;
+    const idType = hasCommandName ? 'commandName' : 'customId';
+    const id = hasCommandName
+        ? (interaction as ChatInputCommandInteraction).commandName
+        : (interaction as AnySelectMenuInteraction).customId.split(
+              INTERACTION_CUSTOM_ID_SEPARATOR,
+          )[INTERACTION_CUSTOM_ID_NAME];
+    const formattedCommandOptions = getFormattedCommandOptions(
+        hasCommandName,
+        interaction,
+    );
     logger.info({
-        message: `[${
-            interaction.guildId ? `G ${interaction.guildId} | ` : ''
-        }U ${interaction.user.id}] ${
-            interaction.isChatInputCommand()
-                ? 'Command'
-                : interaction.isButton()
-                  ? 'Button'
-                  : interaction.isStringSelectMenu() ||
-                      interaction.isRoleSelectMenu()
-                    ? 'Select menu'
-                    : 'Modal'
-        } ${
-            interaction.isChatInputCommand()
-                ? interaction.commandName
-                : interaction.customId
-        } failed ${failedChecks.length} check(s)`,
+        message: `[G ${guildId} | U ${userId}] Processing ${mapKey} ${idType}: ${id}${formattedCommandOptions}`,
         label: 'Quaver',
     });
-    await interaction.replyHandler.locale(failedChecks[0], {
-        type: MessageOptionsBuilderType.Error,
-    });
+    const handlerMap = discordClient[
+        mapKey as 'chatInputCommands'
+    ] as Collection<string, ChatInputCommand>;
+    if (!handlerMap) {
+        logger.warn({
+            message: `[G ${guildId} | U ${userId}] No handler map found for mapKey: ${mapKey}`,
+            label: 'Quaver',
+        });
+        return;
+    }
+    const interactionHandler = handlerMap.get(id);
+    if (!interactionHandler) {
+        logger.warn({
+            message: `[G ${guildId} | U ${userId}] No ${mapKey} map element found for ${idType}: ${id}`,
+            label: 'Quaver',
+        });
+        return;
+    }
+    const replyHandler = interaction.replyHandler;
+    if (!isAutocomplete) {
+        interaction.replyHandler = new ReplyHandler(
+            interaction as ChatInputCommandInteraction,
+        );
+        const failedChecks = await getFailedChecks(
+            interactionHandler.checks,
+            interaction.guildId,
+            interaction.member as GuildMember,
+            hasCommandName ? undefined : (interaction as never),
+        );
+        const failedChecksCount = failedChecks.length;
+        if (failedChecksCount > 0) {
+            logger.info({
+                message: `[G ${guildId} | U ${userId}] ${mapKey} ${id} failed ${failedChecksCount} check(s)`,
+                label: 'Quaver',
+            });
+            await replyHandler.locale(failedChecks[0], {
+                type: MessageOptionsBuilderType.Error,
+            });
+            return;
+        }
+    }
+    if (!isAutocomplete && hasCommandName) {
+        const hasRequiredPermissions = await checkCommandHandlerPermissions(
+            interaction,
+            mapKey,
+            replyHandler,
+            interactionHandler,
+            id,
+            guildId,
+            userId,
+        );
+        if (!hasRequiredPermissions) {
+            return;
+        }
+    }
+    try {
+        const executeMethod = interactionHandler.execute;
+        logger.info({
+            message: `[G ${guildId} | U ${userId}] Executing ${mapKey} ${idType}: ${id}${formattedCommandOptions}`,
+            label: 'Quaver',
+        });
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        isAsyncFunction(executeMethod)
+            ? await executeMethod(interaction as never)
+            : executeMethod(interaction as never);
+    } catch (error) {
+        if (!(error instanceof Error)) {
+            return;
+        }
+        logger.error({
+            message: `[G ${guildId} | U ${userId}] Encountered error with executing ${mapKey} ${idType}: ${id}`,
+            label: 'Quaver',
+        });
+        logger.error({
+            message: `${error.message}\n${error.stack}`,
+            label: 'Quaver',
+        });
+        if (isAutocomplete) {
+            return;
+        }
+        await replyHandler.locale('DISCORD.GENERIC_ERROR', {
+            type: MessageOptionsBuilderType.Error,
+        });
+    }
 }
 
 export default {
     name: 'interactionCreate',
     once: false,
-    async execute(interaction: QuaverInteraction<Interaction>): Promise<void> {
-        if (!interaction.isAutocomplete()) {
-            interaction.replyHandler = new ReplyHandler(interaction);
-        }
-        if (interaction.isChatInputCommand()) {
-            const command: ChatInputCommand = interaction.client.commands.get(
-                interaction.commandName,
+    async execute(
+        interaction: Interaction<'cached'> & { replyHandler: ReplyHandler },
+    ): Promise<void> {
+        const interactionHandlerMaps = interaction.client as QuaverClient;
+        const isAnySelectMenu = interaction.isAnySelectMenu();
+        const isAutocomplete = interaction.isAutocomplete();
+        const isCommand = interaction.isCommand();
+        const hasCommandName = isCommand || isAutocomplete;
+        if (isAnySelectMenu && interaction.isChannelSelectMenu()) {
+            await onInteractionCreate(
+                interaction,
+                interactionHandlerMaps,
+                'channelSelectMenus',
+                hasCommandName,
+                isAutocomplete,
             );
-            if (!command) return;
-            logger.info({
-                message: `[${
-                    interaction.guildId ? `G ${interaction.guildId} | ` : ''
-                }U ${interaction.user.id}] Processing command ${
-                    interaction.commandName
-                }${
-                    interaction.options.data.length > 0
-                        ? ` ${interaction.options.data
-                              .map(
-                                  (option): string =>
-                                      `${option.name}:${option.value}`,
-                              )
-                              .join(' ')}`
-                        : ''
-                }`,
-                label: 'Quaver',
-            });
-            const failedChecks = await getFailedChecks(
-                command.checks,
-                interaction.guildId,
-                interaction.member as GuildMember,
-            );
-            if (failedChecks.length > 0) {
-                return handleFailedChecks(failedChecks, interaction);
-            }
-            const failedPermissions: { user: string[]; bot: string[] } = {
-                user: [],
-                bot: [],
-            };
-            if (interaction.guildId) {
-                failedPermissions.user = interaction.channel
-                    .permissionsFor(interaction.member as GuildMember)
-                    .missing(command.permissions.user);
-                failedPermissions.bot = interaction.channel
-                    .permissionsFor(interaction.client.user.id)
-                    .missing([
-                        PermissionsBitField.Flags.ViewChannel,
-                        PermissionsBitField.Flags.SendMessages,
-                        ...command.permissions.bot,
-                    ]);
-            } else {
-                failedPermissions.user = new PermissionsBitField(
-                    command.permissions.user,
-                ).toArray();
-                failedPermissions.bot = new PermissionsBitField(
-                    command.permissions.bot,
-                ).toArray();
-            }
-            if (failedPermissions.user.length > 0) {
-                logger.info({
-                    message: `[${
-                        interaction.guildId ? `G ${interaction.guildId} | ` : ''
-                    }U ${interaction.user.id}] Command ${
-                        interaction.commandName
-                    } failed ${
-                        failedPermissions.user.length
-                    } user permission check(s)`,
-                    label: 'Quaver',
-                });
-                await interaction.replyHandler.locale(
-                    'DISCORD.INSUFFICIENT_PERMISSIONS.USER',
-                    {
-                        vars: [
-                            failedPermissions.user
-                                .map((perm): string => `\`${perm}\``)
-                                .join(' '),
-                        ],
-                        type: MessageOptionsBuilderType.Error,
-                    },
-                );
-                return;
-            }
-            if (failedPermissions.bot.length > 0) {
-                logger.info({
-                    message: `[${
-                        interaction.guildId ? `G ${interaction.guildId} | ` : ''
-                    }U ${interaction.user.id}] Command ${
-                        interaction.commandName
-                    } failed ${
-                        failedPermissions.bot.length
-                    } bot permission check(s)`,
-                    label: 'Quaver',
-                });
-                if (
-                    failedPermissions.bot.includes('ViewChannel') ||
-                    failedPermissions.bot.includes('SendMessages')
-                ) {
-                    await interaction.replyHandler.locale(
-                        'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.VIEW',
-                        { type: MessageOptionsBuilderType.Error },
-                    );
-                    return;
-                }
-                await interaction.replyHandler.locale(
-                    'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.DEFAULT',
-                    {
-                        vars: [
-                            failedPermissions.bot
-                                .map((perm): string => `\`${perm}\``)
-                                .join(' '),
-                        ],
-                        type: MessageOptionsBuilderType.Error,
-                    },
-                );
-                return;
-            }
-            try {
-                logger.info({
-                    message: `[${
-                        interaction.guildId ? `G ${interaction.guildId} | ` : ''
-                    }U ${interaction.user.id}] Executing command ${
-                        interaction.commandName
-                    }${
-                        interaction.options.data.length > 0
-                            ? ` ${interaction.options.data
-                                  .map(
-                                      (option): string =>
-                                          `${option.name}:${option.value}`,
-                                  )
-                                  .join(' ')}`
-                            : ''
-                    }`,
-                    label: 'Quaver',
-                });
-                return command.execute(interaction);
-            } catch (error) {
-                if (error instanceof Error) {
-                    logger.error({
-                        message: `[${
-                            interaction.guildId
-                                ? `G ${interaction.guildId} | `
-                                : ''
-                        }U ${
-                            interaction.user.id
-                        }] Encountered error with command ${
-                            interaction.commandName
-                        }`,
-                        label: 'Quaver',
-                    });
-                    logger.error({
-                        message: `${error.message}\n${error.stack}`,
-                        label: 'Quaver',
-                    });
-                    await interaction.replyHandler.locale(
-                        'DISCORD.GENERIC_ERROR',
-                        { type: MessageOptionsBuilderType.Error },
-                    );
-                }
-                return;
-            }
+            return;
         }
-        if (interaction.isAutocomplete()) {
-            const autocomplete = interaction.client.autocomplete.get(
-                interaction.commandName,
-            ) as Autocomplete;
-            if (!autocomplete) return;
-            try {
-                return autocomplete.execute(interaction);
-            } catch (error) {
-                return;
-            }
+        if (isAnySelectMenu && interaction.isMentionableSelectMenu()) {
+            await onInteractionCreate(
+                interaction,
+                interactionHandlerMaps,
+                'mentionableSelectMenus',
+                hasCommandName,
+                isAutocomplete,
+            );
+            return;
+        }
+        if (isAnySelectMenu && interaction.isRoleSelectMenu()) {
+            await onInteractionCreate(
+                interaction,
+                interactionHandlerMaps,
+                'roleSelectMenus',
+                hasCommandName,
+                isAutocomplete,
+            );
+            return;
+        }
+        if (isAnySelectMenu && interaction.isStringSelectMenu()) {
+            await onInteractionCreate(
+                interaction,
+                interactionHandlerMaps,
+                'stringSelectMenus',
+                hasCommandName,
+                isAutocomplete,
+            );
+            return;
+        }
+        if (isAnySelectMenu && interaction.isUserSelectMenu()) {
+            await onInteractionCreate(
+                interaction,
+                interactionHandlerMaps,
+                'userSelectMenus',
+                hasCommandName,
+                isAutocomplete,
+            );
+            return;
+        }
+        if (isAutocomplete) {
+            await onInteractionCreate(
+                interaction,
+                interactionHandlerMaps,
+                'autocompletes',
+                hasCommandName,
+                isAutocomplete,
+            );
+            return;
         }
         if (interaction.isButton()) {
-            const button = interaction.client.buttons.get(
-                interaction.customId.split(':')[0],
-            ) as Button;
-            if (!button) return;
-            logger.info({
-                message: `[${
-                    interaction.guildId ? `G ${interaction.guildId} | ` : ''
-                }U ${interaction.user.id}] Processing button ${
-                    interaction.customId
-                }`,
-                label: 'Quaver',
-            });
-            const failedChecks = await getFailedChecks(
-                button.checks,
-                interaction.guildId,
-                interaction.member as GuildMember,
+            await onInteractionCreate(
                 interaction,
+                interactionHandlerMaps,
+                'buttons',
+                hasCommandName,
+                isAutocomplete,
             );
-            if (failedChecks.length > 0) {
-                return handleFailedChecks(failedChecks, interaction);
-            }
-            try {
-                logger.info({
-                    message: `[${
-                        interaction.guildId ? `G ${interaction.guildId} | ` : ''
-                    }U ${interaction.user.id}] Executing button ${
-                        interaction.customId
-                    }`,
-                    label: 'Quaver',
-                });
-                return button.execute(interaction);
-            } catch (error) {
-                if (error instanceof Error) {
-                    logger.error({
-                        message: `[${
-                            interaction.guildId
-                                ? `G ${interaction.guildId} | `
-                                : ''
-                        }U ${
-                            interaction.user.id
-                        }] Encountered error with button ${
-                            interaction.customId
-                        }`,
-                        label: 'Quaver',
-                    });
-                    logger.error({
-                        message: `${error.message}\n${error.stack}`,
-                        label: 'Quaver',
-                    });
-                    await interaction.replyHandler.locale(
-                        'DISCORD.GENERIC_ERROR',
-                        { type: MessageOptionsBuilderType.Error },
-                    );
-                }
-                return;
-            }
+            return;
         }
-        if (
-            interaction.isStringSelectMenu() ||
-            interaction.isRoleSelectMenu()
-        ) {
-            const selectmenu = interaction.client.selectmenus.get(
-                interaction.customId.split(':')[0],
-            ) as SelectMenu;
-            if (!selectmenu) return;
-            logger.info({
-                message: `[${
-                    interaction.guildId ? `G ${interaction.guildId} | ` : ''
-                }U ${interaction.user.id}] Processing select menu ${
-                    interaction.customId
-                }`,
-                label: 'Quaver',
-            });
-            const failedChecks = await getFailedChecks(
-                selectmenu.checks,
-                interaction.guildId,
-                interaction.member as GuildMember,
+        if (isCommand && interaction.isChatInputCommand()) {
+            await onInteractionCreate(
                 interaction,
+                interactionHandlerMaps,
+                'chatInputCommands',
+                hasCommandName,
+                isAutocomplete,
             );
-            if (failedChecks.length > 0) {
-                return handleFailedChecks(failedChecks, interaction);
-            }
-            try {
-                logger.info({
-                    message: `[${
-                        interaction.guildId ? `G ${interaction.guildId} | ` : ''
-                    }U ${interaction.user.id}] Executing select menu ${
-                        interaction.customId
-                    }`,
-                    label: 'Quaver',
-                });
-                return selectmenu.execute(interaction);
-            } catch (error) {
-                if (error instanceof Error) {
-                    logger.error({
-                        message: `[${
-                            interaction.guildId
-                                ? `G ${interaction.guildId} | `
-                                : ''
-                        }U ${
-                            interaction.user.id
-                        }] Encountered error with select menu ${
-                            interaction.customId
-                        }`,
-                        label: 'Quaver',
-                    });
-                    logger.error({
-                        message: `${error.message}\n${error.stack}`,
-                        label: 'Quaver',
-                    });
-                    await interaction.replyHandler.locale(
-                        'DISCORD.GENERIC_ERROR',
-                        { type: MessageOptionsBuilderType.Error },
-                    );
-                }
-                return;
-            }
+            return;
+        }
+        const isContextMenuCommand =
+            isCommand && interaction.isContextMenuCommand();
+        if (isContextMenuCommand && interaction.isMessageContextMenuCommand()) {
+            await onInteractionCreate(
+                interaction,
+                interactionHandlerMaps,
+                'messageContextMenuCommands',
+                hasCommandName,
+                isAutocomplete,
+            );
+            return;
+        }
+        if (isContextMenuCommand && interaction.isUserContextMenuCommand()) {
+            await onInteractionCreate(
+                interaction,
+                interactionHandlerMaps,
+                'userContextMenuCommands',
+                hasCommandName,
+                isAutocomplete,
+            );
+            return;
         }
         if (interaction.isModalSubmit()) {
-            const modal = interaction.client.modals.get(
-                interaction.customId.split(':')[0],
-            ) as ModalSubmit;
-            if (!modal) return;
-            logger.info({
-                message: `[${
-                    interaction.guildId ? `G ${interaction.guildId} | ` : ''
-                }U ${interaction.user.id}] Processing modal ${
-                    interaction.customId
-                }`,
-                label: 'Quaver',
-            });
-            const failedChecks = await getFailedChecks(
-                modal.checks,
-                interaction.guildId,
-                interaction.member as GuildMember,
+            await onInteractionCreate(
                 interaction,
+                interactionHandlerMaps,
+                'modalSubmits',
+                hasCommandName,
+                isAutocomplete,
             );
-            if (failedChecks.length > 0) {
-                return handleFailedChecks(failedChecks, interaction);
-            }
-            try {
-                logger.info({
-                    message: `[${
-                        interaction.guildId ? `G ${interaction.guildId} | ` : ''
-                    }U ${interaction.user.id}] Executing modal ${
-                        interaction.customId
-                    }`,
-                    label: 'Quaver',
-                });
-                return modal.execute(interaction);
-            } catch (error) {
-                if (error instanceof Error) {
-                    logger.error({
-                        message: `[${
-                            interaction.guildId
-                                ? `G ${interaction.guildId} | `
-                                : ''
-                        }U ${
-                            interaction.user.id
-                        }] Encountered error with modal ${
-                            interaction.customId
-                        }`,
-                        label: 'Quaver',
-                    });
-                    logger.error({
-                        message: `${error.message}\n${error.stack}`,
-                        label: 'Quaver',
-                    });
-                    await interaction.replyHandler.locale(
-                        'DISCORD.GENERIC_ERROR',
-                        { type: MessageOptionsBuilderType.Error },
-                    );
-                }
-                return;
-            }
+            return;
         }
+        throw new Error('Encountered an unhandled interaction.');
     },
 };
