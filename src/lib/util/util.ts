@@ -691,7 +691,7 @@ export async function buildSettingsPage(
                     )
                     .setDisabled(current === 'detailed'),
             );
-            const emoji = settings.emojis.youtube ?? '';
+            const emoji = settings.emojis?.youtube ?? '';
             embeds =
                 current === 'simple'
                     ? [

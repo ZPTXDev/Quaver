@@ -85,7 +85,7 @@ export default {
             'simple';
         if (!notify) format = 'off';
         const emoji =
-            settings.emojis[
+            settings.emojis?.[
                 track.info.sourceName as keyof typeof settings.emojis
             ] ?? '';
         switch (format) {
