@@ -699,8 +699,7 @@ export async function buildSettingsPage(
                               .setDescription(
                                   `${getLocaleString(
                                       guildLocaleCode,
-                                      'MUSIC.PLAYER.PLAYING.NOW.SIMPLE',
-                                      emoji ? `${emoji} ` : '',
+                                      'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
                                       escapeMarkdown(
                                           getLocaleString(
                                               guildLocaleCode,
@@ -709,7 +708,7 @@ export async function buildSettingsPage(
                                       ),
                                       'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
                                       '4:20',
-                                  )}\n${getLocaleString(
+                                  )}\n${getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${getLocaleString(guildLocaleCode, 'MISC.SOURCES.YOUTUBE')}** ─ ${getLocaleString(
                                       guildLocaleCode,
                                       'MISC.ADDED_BY',
                                       interaction.user.id,
@@ -726,7 +725,7 @@ export async function buildSettingsPage(
                                   ),
                               )
                               .setDescription(
-                                  `${emoji ? `${emoji} ` : ''}**[${escapeMarkdown(
+                                  `**[${escapeMarkdown(
                                       getLocaleString(
                                           guildLocaleCode,
                                           'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.DETAILED',
@@ -748,6 +747,14 @@ export async function buildSettingsPage(
                                           'MUSIC.PLAYER.PLAYING.NOW.DETAILED.UPLOADER',
                                       ),
                                       value: 'Rick Astley',
+                                      inline: true,
+                                  },
+                                  {
+                                      name: getLocaleString(
+                                          guildLocaleCode,
+                                          'MUSIC.PLAYER.PLAYING.NOW.DETAILED.SOURCE',
+                                      ),
+                                      value: `${emoji ? `${emoji} ` : ''}${getLocaleString(guildLocaleCode, 'MISC.SOURCES.YOUTUBE')}`,
                                       inline: true,
                                   },
                                   {
@@ -811,7 +818,7 @@ export async function buildSettingsPage(
                         (source: string): APISelectMenuOption => ({
                             label: getLocaleString(
                                 guildLocaleCode,
-                                `CMD.SETTINGS.MISC.SOURCE.OPTIONS.${source.toUpperCase()}`,
+                                `MISC.SOURCES.${source.toUpperCase()}`,
                             ),
                             value: source,
                             default: current === source,
@@ -821,7 +828,7 @@ export async function buildSettingsPage(
             );
             current = `\`${getLocaleString(
                 guildLocaleCode,
-                `CMD.SETTINGS.MISC.SOURCE.OPTIONS.${current.toUpperCase()}`,
+                `MISC.SOURCES.${current.toUpperCase()}`,
             )}\``;
             break;
         }
