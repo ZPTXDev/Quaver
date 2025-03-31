@@ -285,7 +285,7 @@ export async function processFolderPaths(
  *
  * Execution flow:
  * 1. Merges user-provided options with defaults.
- * 2. Iterates through each folder and processes only importable JavaScript module files.
+ * 2. Iterates through each folder and processes only importable modules.
  * 3. Loads each module, extracts and looks for `data`, `command`, or `name` properties. (DEFAULT BEHAVIOR)
  * 4. Stores the extracted handler in the appropriate `handlerMaps` entry.
  * 5. Uses `processFileOverride` if provided; otherwise, the default processing function is used.
@@ -361,7 +361,7 @@ export async function loadInteractionHandlerMaps(
  *
  * Execution flow:
  * 1. Merges user-provided options with defaults.
- * 2. Iterates through each folder and processes only `.js` files.
+ * 2. Iterates through each folder and processes importable modules.
  * 3. Loads each module and extracts the `name`, `execute`, `isOnce`, and `isPrepend` properties. (DEFAULT BEHAVIOR)
  * 4. Registers the extracted event handlers to the event emitter using the appropriate method (`on`, `once`, etc.).
  * 5. Uses `processFileOverride` if provided; otherwise, the default processing function is used.
