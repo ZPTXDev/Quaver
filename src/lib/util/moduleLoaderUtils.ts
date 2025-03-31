@@ -16,7 +16,13 @@ const DEFAULT_MODULE_EXPORT_NAME = 'default';
 
 const ARRAY_FIRST_INDEX = 0;
 
-const IMPORTABLE_JAVASCRIPT_MODULE_FILE_EXTENSIONS = ['.js', '.mjs'];
+const IMPORTABLE_JAVASCRIPT_MODULE_FILE_EXTENSIONS = [
+    '.js',
+    '.ts',
+    '.mjs',
+    '.mts',
+    '.cts',
+];
 
 const DEFAULT_PROCESS_FOLDER_PATHS_OPTIONS = {
     isFileConcurrent: true,
