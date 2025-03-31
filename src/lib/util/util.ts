@@ -691,6 +691,7 @@ export async function buildSettingsPage(
                     )
                     .setDisabled(current === 'detailed'),
             );
+            const emoji = settings.emojis.youtube ?? '';
             embeds =
                 current === 'simple'
                     ? [
@@ -699,6 +700,7 @@ export async function buildSettingsPage(
                                   `${getLocaleString(
                                       guildLocaleCode,
                                       'MUSIC.PLAYER.PLAYING.NOW.SIMPLE',
+                                      emoji ? `${emoji} ` : '',
                                       escapeMarkdown(
                                           getLocaleString(
                                               guildLocaleCode,
@@ -724,7 +726,7 @@ export async function buildSettingsPage(
                                   ),
                               )
                               .setDescription(
-                                  `**[${escapeMarkdown(
+                                  `${emoji ? `${emoji} ` : ''}**[${escapeMarkdown(
                                       getLocaleString(
                                           guildLocaleCode,
                                           'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.DETAILED',
