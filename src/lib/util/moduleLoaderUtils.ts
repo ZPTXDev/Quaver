@@ -372,7 +372,12 @@ export async function loadEventHandlers(
         folderPath: string,
     ): Promise<void> {
         const fileName = file.name;
-        if (!file.isFile() || !fileName.endsWith('.js')) {
+        if (
+            !file.isFile() ||
+            !IMPORTABLE_JAVASCRIPT_MODULE_FILE_EXTENSIONS.some(
+                (fileExtension): boolean => fileName.endsWith(fileExtension),
+            )
+        ) {
             return;
         }
         const filePath = nodePath.join(folderPath, fileName);
