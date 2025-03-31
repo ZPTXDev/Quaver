@@ -41,6 +41,17 @@ const DEFAULT_LOAD_HANDLER_MAPS_OPTIONS = {
 };
 
 /**
+ * Ensures the given value is always returned as an array with the least validation.
+ *
+ * @template T - The type of the value.
+ * @param {T | T[]} value - The value to convert into an array if it's not already one.
+ * @returns {T[]} - The value wrapped in an array if it wasn't one already.
+ */
+function arrifyValue<T>(value: T | T[]): T[] {
+    return Array.isArray(value) ? value : [value];
+}
+
+/**
  * Dynamically imports a module from the given absolute file URL and retrieves a specified export.
  *
  * @param {string} fileUrlHref - The absolute file URL or file path of the module to import.
@@ -171,7 +182,7 @@ async function executeProcessFileCallback(
 /**
  * Processes files within the given folder paths by executing a callback function on each file.
  *
- * @param {string | string[]} folderPaths - A single folder path or an array of folder paths to process.
+ * @param {string | string[]} paths - A single folder path or an array of folder paths to process.
  * If an empty array is provided, the function returns immediately.
  *
  * @param {ProcessFileCallback} processFileCallback - A callback function that is invoked for each file found.
@@ -193,10 +204,11 @@ async function executeProcessFileCallback(
  * 4. Uses `Promise.all` when concurrency is enabled, otherwise processes sequentially.
  */
 export async function processFolderPaths(
-    folderPaths: string | string[],
+    paths: string | string[],
     processFileCallback: ProcessFileCallback,
     options?: ProcessFolderPathOptions,
 ): Promise<void> {
+    const folderPaths = arrifyValue(paths);
     const folderPathsCount = folderPaths.length;
     if (folderPathsCount === 0) {
         return;
@@ -253,8 +265,8 @@ export async function processFolderPaths(
         await processFolderPath(folderPath);
         return;
     }
+    // Created a gaurd clause because TypeScript couldn't infer that the paths get transformed to an array
     if (typeof folderPaths === 'string') {
-        await processFolderPath(folderPaths);
         return;
     }
     if (userOptions.isFolderConcurrent) {
