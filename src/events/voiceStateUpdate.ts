@@ -142,19 +142,7 @@ async function onChannelEmpty(
     const playerVoice = player.voice;
     const playerVoiceChannelId = playerVoice.channelId;
     // To ensure that Quaver does not set pauseTimeout if timeout or pauseTimeout already exists, do not pause the session
-    // To ensure that Quaver does not set pauseTimeout after a stage ends, do not pause the session
     if (player.timeout || player.pauseTimeout || !playerVoiceChannelId) {
-        return;
-    }
-    const voiceChannel = oldState.client.guilds.cache
-        .get(playerId)
-        .channels.cache.get(playerVoiceChannelId);
-    // From commit https://github.com/ZPTXDev/Quaver/commit/6f405c5dce1a94cf788000229070ae8a8eeef7cb
-    // This check will be removed once confirmed to be redundant
-    if (
-        voiceChannel.type === ChannelType.GuildStageVoice &&
-        !voiceChannel.stageInstance
-    ) {
         return;
     }
     await pauseChannelSession(io, player);
