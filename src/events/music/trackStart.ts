@@ -93,12 +93,11 @@ export default {
                 await queue.player.handler.send(
                     `${getLocaleString(
                         guildLocaleCode,
-                        'MUSIC.PLAYER.PLAYING.NOW.SIMPLE',
-                        emoji ? `${emoji} ` : '',
+                        'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
                         escapeMarkdown(track.info.title),
                         track.info.uri,
                         durationString,
-                    )}\n${getLocaleString(
+                    )}\n${getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${getLocaleString(guildLocaleCode, `MISC.SOURCES.${track.info.sourceName.toUpperCase()}`)}** ─ ${getLocaleString(
                         guildLocaleCode,
                         'MISC.ADDED_BY',
                         track.requesterId,
@@ -139,7 +138,7 @@ export default {
                             ),
                         )
                         .setDescription(
-                            `${emoji ? `${emoji} ` : ''}**[${escapeMarkdown(track.info.title)}](${track.info.uri})**`,
+                            `**[${escapeMarkdown(track.info.title)}](${track.info.uri})**`,
                         )
                         .addFields([
                             {
@@ -156,6 +155,17 @@ export default {
                                     'MUSIC.PLAYER.PLAYING.NOW.DETAILED.UPLOADER',
                                 ),
                                 value: track.info.author,
+                                inline: true,
+                            },
+                            {
+                                name: getLocaleString(
+                                    guildLocaleCode,
+                                    'MUSIC.PLAYER.PLAYING.NOW.DETAILED.SOURCE',
+                                ),
+                                value: `${emoji ? `${emoji} ` : ''}${getLocaleString(
+                                    guildLocaleCode,
+                                    `MISC.SOURCES.${track.info.sourceName.toUpperCase()}`,
+                                )}`,
                                 inline: true,
                             },
                             {

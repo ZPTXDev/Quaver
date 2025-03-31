@@ -261,15 +261,6 @@ export default {
             SOURCE: {
                 NAME: 'Source',
                 DESCRIPTION: 'The default source to use. Affects the /play command.',
-                OPTIONS: {
-                    YOUTUBE: 'YouTube',
-                    YOUTUBEMUSIC: 'YouTube Music',
-                    DEEZER: 'Deezer',
-                    SOUNDCLOUD: 'SoundCloud',
-                    YANDEXMUSIC: 'Yandex Music',
-                    VKMUSIC: 'VK Music',
-                    TIDAL: 'Tidal',
-                },
             },
             AUTOLYRICS: {
                 NAME: 'Auto Lyrics',

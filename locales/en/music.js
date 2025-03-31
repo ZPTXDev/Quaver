@@ -29,11 +29,15 @@ export default {
         PLAYING: {
             NOTHING: 'There is nothing playing right now.',
             NOW: {
-                SIMPLE: 'Now playing %1[**%2**](%3) `[%4]`',
+                SIMPLE: {
+                    TEXT: 'Now playing [**%1**](%2) `[%3]`',
+                    SOURCE: 'Source',
+                },
                 DETAILED: {
                     TITLE: 'Now playing',
                     DURATION: 'Duration',
                     UPLOADER: 'Uploader',
+                    SOURCE: 'Source',
                     ADDED_BY: 'Added by',
                     REMAINING: 'Remaining: %1',
                 },
