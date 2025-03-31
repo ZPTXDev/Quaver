@@ -201,14 +201,26 @@ export default {
         const newChannelId = newState.channelId;
         const isSameChannel = oldChannelId === newChannelId;
         const isNewSuppress = newState.suppress;
-        // Since Quaver is expected to continue playback despite these state updates, do not operate
-        if (
-            isOldQuaverStateUpdate &&
+        const hasEnforcedStateUpdates =
+            oldState.serverMute !== newState.serverMute ||
+            oldState.serverDeaf !== newState.serverDeaf;
+        const hasVoluntaryStateUpdates =
+            oldState.streaming !== newState.streaming ||
+            oldState.selfMute !== newState.selfMute ||
+            oldState.selfDeaf !== newState.selfDeaf ||
+            oldState.selfVideo !== newState.selfVideo;
+        // To prevent Quaver from remaining suppressed when suppression is attempted mid-track, exclude suppress state update check from enforced
+        const hasSameChannelStateUpdates =
             isSameChannel &&
             (oldState.suppress !== isNewSuppress ||
-                oldState.serverMute !== newState.serverMute ||
-                oldState.serverDeaf !== newState.serverDeaf)
-        ) {
+                hasEnforcedStateUpdates ||
+                hasVoluntaryStateUpdates);
+        // Since Quaver is expected to continue playback despite its own state updates, do not operate
+        if (isOldQuaverStateUpdate && hasSameChannelStateUpdates) {
+            return;
+        }
+        // To prevent Quaver from falling through statements doing nothing from a user's state updates, do not operate
+        if (!isOldQuaverStateUpdate && hasSameChannelStateUpdates) {
             return;
         }
         const oldGuildId = oldState.guild.id;
@@ -248,8 +260,7 @@ export default {
             return;
         }
         const { io } = await import('#src/main.js');
-        // To prevent Quaver from remaining suppressed when suppression is attempted mid-track,
-        // explicitly use booleans for Quaver's state update and newState#channelId
+        // To help Quaver remain unsuppressed in stage channels, explicitly use booleans for Quaver's state update and newState#channelId
         const isQuaverJoinOrMoveState = isOldQuaverStateUpdate && newChannelId;
         const newChannel = newState.channel;
         // In this context newState#channel can be null because of leave states, so optional chaining is necessary
@@ -351,6 +362,7 @@ export default {
                 }
             }
             // To prevent a regression bug in which Quaver remains silent in stage channels, unsuppress Quaver after stage instance creation
+            // Also handles unsuppressing Quaver mid-track as suppress state updates were intentionally written not to be ignored by Quaver
             await newState.setSuppressed(false);
             await onChannelJoinOrMove(
                 io,
