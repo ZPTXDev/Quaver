@@ -11,6 +11,7 @@ import type {
     InteractionHandlerMapKeys,
     InteractionHandlerMapsFlat,
     InteractionIdType,
+    FailedPermissions,
 } from './interactionCreate.d.js';
 
 const CHANNEL_SELECTMENUS_MAP_KEY = 'channelSelectMenus';
@@ -59,7 +60,7 @@ async function isCommandPermitted(
     const handlerPermissions = interactionHandler.permissions;
     const handlerUserPermissions = handlerPermissions.user;
     const handlerBotPermissions = handlerPermissions.bot;
-    const failedPermissions: { user: string[]; bot: string[] } = {
+    const failedPermissions: FailedPermissions = {
         user: new PermissionsBitField(handlerUserPermissions).toArray(),
         bot: new PermissionsBitField(handlerBotPermissions).toArray(),
     };

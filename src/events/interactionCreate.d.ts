@@ -30,6 +30,7 @@ import type {
     UserContextMenuCommandInteraction,
     MessageContextMenuCommandInteraction,
     PermissionsBitField,
+    PermissionsString,
 } from 'discord.js';
 import type { AllInteractions } from './interactionTypes.js';
 import type { Check } from './lib/util/constants.js';
@@ -270,8 +271,12 @@ export interface InteractionHandlerMapsFlat {
 
 export type CommandInteractionId = 'commandName';
 export type ComponentInteractionId = 'customId';
-
 export type InteractionIdType = CommandInteractionId | ComponentInteractionId;
+
+export interface FailedPermissions {
+    user: PermissionsString[];
+    bot: PermissionsString[];
+}
 
 /** Message commands is UNSUPPORTED */
 export type MessageCommandKeys = 'messageCommands';
