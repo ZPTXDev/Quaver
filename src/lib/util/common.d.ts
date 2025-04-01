@@ -1,10 +1,4 @@
-import type {
-    Autocomplete,
-    Button,
-    ChatInputCommand,
-    ModalSubmit,
-    SelectMenu,
-} from '#src/events/interactionCreate.d.js';
+import type { InteractionHandlerMapsFlat } from '#src/events/interactionCreate.d.js';
 import type PlayerHandler from '#src/lib/PlayerHandler.js';
 import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import type { Queue, Song } from '@lavaclient/plugin-queue';
@@ -13,7 +7,6 @@ import type {
     AttachmentBuilder,
     AutocompleteInteraction,
     Client,
-    Collection,
     EmbedBuilder,
     MessageActionRowComponentBuilder,
     Snowflake,
@@ -62,14 +55,8 @@ export type JSONResponse<T> = { message?: string } & T;
 
 export type QuaverChannels = TextChannel | VoiceChannel | StageChannel;
 
-export type QuaverClient = Client<boolean> & {
-    music?: Node;
-    chatInputCommands?: Collection<string, ChatInputCommand>;
-    buttons?: Collection<string, Button>;
-    selectMenus?: Collection<string, SelectMenu>;
-    autocompletes?: Collection<string, Autocomplete>;
-    modalSubmits?: Collection<string, ModalSubmit>;
-};
+export type QuaverClient = Client &
+    InteractionHandlerMapsFlat & { music?: Node };
 
 export type QuaverSong = Song & {
     requesterTag?: string;
@@ -100,10 +87,5 @@ export type QuaverPlayerSkipObject = {
 };
 
 export type QuaverInteraction<T> = T extends AutocompleteInteraction
-    ? AutocompleteInteraction & {
-          client: QuaverClient;
-      }
-    : T & {
-          client: QuaverClient;
-          replyHandler: ReplyHandler;
-      };
+    ? T & { client: QuaverClient }
+    : T & { client: QuaverClient; replyHandler: ReplyHandler };
