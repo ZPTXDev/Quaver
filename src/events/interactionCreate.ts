@@ -290,7 +290,7 @@ export default {
         interaction: QuaverInteraction<AllInteractions>,
     ): Promise<void> {
         // Since Quaver from the beginning stores interaction handler maps as properties within the DiscordClient, we'll use DiscordClient as the main storage of the interaction handler maps
-        // Alternatively, interactionHandler maps can be separated from the DiscordClient entirely if we want to but that would involve importing and exporting that to here
+        // Alternatively, interactionHandler maps can be separated from the DiscordClient entirely if we want to but that would involve exporting and importing that to here
         const interactionHandlerMaps = interaction.client;
         const isAnySelectMenu = interaction.isAnySelectMenu();
         const isAutocomplete = interaction.isAutocomplete();
