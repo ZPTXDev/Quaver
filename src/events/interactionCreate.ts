@@ -274,7 +274,7 @@ export default {
         const isCommand = interaction.isCommand();
         // To determine the appropriate key to use for the handler stored from the handler map, we diligently check the type of interaction and hard code a string
         // that reflects that interaction to be used as the key for that handler map
-        // With this, Quaver is basically ready to support every type of interaction that Discord.js provides without altering interactionCreate
+        // With this, Quaver is basically ready to support every type of interaction that Discord.js provides, lessening the need to mess with interactionCreate's listener
         if (isAnySelectMenu && interaction.isChannelSelectMenu()) {
             await onInteractionCreate(
                 interaction,
