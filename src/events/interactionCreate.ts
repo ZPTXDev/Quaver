@@ -274,7 +274,7 @@ async function onInteractionCreate(
             return;
         }
     }
-    // Because autocomplete is a form command that doesn't need permission checks, only do permission checks when neither a component nor an autocomplete
+    // Because autocomplete is a form of command that doesn't need permission checks, only do permission checks when neither a component nor an autocomplete
     if (
         !isAutocomplete &&
         hasCommandName &&
