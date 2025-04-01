@@ -90,21 +90,21 @@ function getFailedCommandPermissions(
  *
  * @param {QuaverInteraction<CommandInteractions>} interaction - The command interaction to check.
  * @param {CommandTypeHandler} interactionHandler - The handler containing permission requirements.
- * @param {string} mapKey - A key used to map commands for logging.
- * @param {string} id - The unique identifier of the command.
- * @param {string} idType - The type of identifer of the command.
  * @param {string | DirectMessage} guildId - The guild ID or 'DirectMessage' for DMs.
- * @param {string} userId - The user ID of the command executor.
+ * @param {string} userId - The user ID of the interaction executor for logging.
+ * @param {string} mapKey - The key's context for logging.
+ * @param {string} id - The unique identifier of the interaction for logging.
+ * @param {string} idType - The type of identifer of the interaction for logging.
  * @returns {Promise<boolean>} Resolves to `true` if the command is permitted to proceed, `false` if permissions fail.
  */
 async function isCommandPermitted(
     interaction: QuaverInteraction<CommandInteractions>,
     interactionHandler: CommandTypeHandler,
+    guildId: string | DirectMessage,
+    userId: string,
     mapKey: string,
     id: string,
     idType: string,
-    guildId: string | DirectMessage,
-    userId: string,
 ): Promise<boolean> {
     const replyHandler = interaction.replyHandler;
     const failedPermissions = getFailedCommandPermissions(
@@ -317,11 +317,11 @@ async function onInteractionCreate(
         !(await isCommandPermitted(
             interaction,
             interactionHandler as CommandTypeHandler,
+            guildId,
+            userId,
             mapKey,
             id,
             idType,
-            guildId,
-            userId,
         ))
     ) {
         return;
