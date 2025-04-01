@@ -37,16 +37,16 @@ const INTERACTION_DIRECT_MESSAGE = 'DirectMessage';
 /**
  * Handles a command interaction, extracts user and bot permissions from the interaction handler and checks for necessary permissions.
  *
- * @param {QuaverInteraction<CommandInteractions>} interaction - The command interaction to process.
+ * @param {QuaverInteraction<CommandInteractions>} interaction - The command interaction to check.
  * @param {CommandTypeHandler} interactionHandler - The handler containing permission requirements.
  * @param {string} mapKey - A key used to map commands for logging.
  * @param {string} id - The unique identifier of the command.
  * @param {string} idType - The type of identifer of the command.
  * @param {string | 'DirectMessage'} guildId - The guild ID or 'DirectMessage' for DMs.
  * @param {string} userId - The user ID of the command executor.
- * @returns {Promise<boolean>} Resolves to `true` if the command can proceed, `false` if permissions fail.
+ * @returns {Promise<boolean>} Resolves to `true` if the command is permitted to proceed, `false` if permissions fail.
  */
-async function onCommandTypeHandler(
+async function isCommandPermitted(
     interaction: QuaverInteraction<CommandInteractions>,
     interactionHandler: CommandTypeHandler,
     mapKey: string,
@@ -275,8 +275,10 @@ async function onInteractionCreate(
         }
     }
     // Because autocomplete is a form command that doesn't need permission checks, only do permission checks when neither a component nor an autocomplete
-    if (!isAutocomplete && hasCommandName) {
-        const hasCommandPassedPermissions = await onCommandTypeHandler(
+    if (
+        !isAutocomplete &&
+        hasCommandName &&
+        !(await isCommandPermitted(
             interaction,
             interactionHandler as CommandTypeHandler,
             mapKey,
@@ -284,10 +286,9 @@ async function onInteractionCreate(
             idType,
             guildId,
             userId,
-        );
-        if (!hasCommandPassedPermissions) {
-            return;
-        }
+        ))
+    ) {
+        return;
     }
     const executeMethod = interactionHandler.execute;
     if (!executeMethod || typeof executeMethod !== 'function') {
