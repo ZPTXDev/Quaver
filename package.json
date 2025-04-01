@@ -50,8 +50,10 @@
   },
   "main": "dist/main.js",
   "scripts": {
-    "slash:deploy": "node scripts/deploy-commands.js",
-    "slash:delete": "node scripts/delete-commands.js",
+    "slash:register:global": "node scripts/register-global-commands.js",
+    "slash:register:guild": "node scripts/register-guild-commands.js",
+    "slash:delete:global": "node scripts/delete-global-commands.js",
+    "slash:delete:guild": "node scripts/delete-guild-commands.js",
     "migrate": "node scripts/migrate.js",
     "build": "rimraf dist/ && genversion --es6 --semi src/lib/util/version.ts && tsc && tsc-alias",
     "start": "node .",
