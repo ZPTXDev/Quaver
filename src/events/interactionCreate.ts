@@ -289,7 +289,7 @@ export default {
     async execute(
         interaction: QuaverInteraction<AllInteractions>,
     ): Promise<void> {
-        // Since Quaver from the beginning stores interaction handler maps as properties within the DiscordClient, we'll use DiscordClient is the main storage of the interaction handler maps
+        // Since Quaver from the beginning stores interaction handler maps as properties within the DiscordClient, we'll use DiscordClient as the main storage of the interaction handler maps
         // Alternatively, interactionHandler maps can be separated from the DiscordClient entirely if we want to but that would involve importing and exporting that to here
         const interactionHandlerMaps = interaction.client;
         const isAnySelectMenu = interaction.isAnySelectMenu();
