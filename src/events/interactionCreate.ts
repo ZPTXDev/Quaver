@@ -130,12 +130,12 @@ function getFormattedCommandOptions(
         return EMPTY_STRING;
     }
     const optionsData = interaction.options.data;
-    if (optionsData.length > 0) {
-        return ` ${optionsData
-            .map((option): string => `${option.name}:${option.value}`)
-            .join(' ')}`;
+    if (optionsData.length < 1) {
+        return EMPTY_STRING;
     }
-    return EMPTY_STRING;
+    return ` ${optionsData
+        .map((option): string => `${option.name}: ${option.value}`)
+        .join(' ')}`;
 }
 
 function getInteractionIdType(hasCommandName: boolean): InteractionIdType {
