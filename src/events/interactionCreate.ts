@@ -10,6 +10,7 @@ import type {
     CommandTypeHandler,
     InteractionHandlerMapKeys,
     InteractionHandlerMapsFlat,
+    InteractionIdType,
 } from './interactionCreate.d.js';
 
 const INTERACTION_CUSTOM_ID_NAME = 0;
@@ -17,12 +18,6 @@ const INTERACTION_CUSTOM_ID_SEPARATOR = ':';
 
 const INTERACTION_COMMAND_ID_TYPE = 'commandName';
 const INTERACTION_COMPONENT_ID_TYPE = 'customId';
-
-type CommandInteractionId = 'commandName';
-type ComponentInteractionId = 'customId';
-
-type InteractionIdType = CommandInteractionId | ComponentInteractionId;
-
 const INTERACTION_DIRECT_MESSAGE = 'DirectMessage';
 
 async function onCommandTypeHandler(

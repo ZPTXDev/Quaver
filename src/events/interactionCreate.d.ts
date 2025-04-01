@@ -269,6 +269,11 @@ export interface InteractionHandlerMapsFlat {
     userSelectMenus?: UserSelectMenuHandlerMap;
 }
 
+export type CommandInteractionId = 'commandName';
+export type ComponentInteractionId = 'customId';
+
+export type InteractionIdType = CommandInteractionId | ComponentInteractionId;
+
 /** Message commands is UNSUPPORTED */
 export type MessageCommandKeys = 'messageCommands';
 export type MessageCommandHandlerMap = Collection<
