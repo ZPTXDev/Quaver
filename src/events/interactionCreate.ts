@@ -41,6 +41,7 @@ const INTERACTION_DIRECT_MESSAGE = 'DirectMessage';
  * @param {CommandTypeHandler} interactionHandler - The handler containing permission requirements.
  * @param {string} mapKey - A key used to map commands for logging.
  * @param {string} id - The unique identifier of the command.
+ * @param {string} idType - The type of identifer of the command.
  * @param {string | 'DirectMessage'} guildId - The guild ID or 'DirectMessage' for DMs.
  * @param {string} userId - The user ID of the command executor.
  * @returns {Promise<boolean>} Resolves to `true` if the command can proceed, `false` if permissions fail.
@@ -50,6 +51,7 @@ async function onCommandTypeHandler(
     interactionHandler: CommandTypeHandler,
     mapKey: string,
     id: string,
+    idType: string,
     guildId: string | 'DirectMessage',
     userId: string,
 ): Promise<boolean> {
@@ -78,7 +80,7 @@ async function onCommandTypeHandler(
     const failedUserPermsCount = failedUserPermissions.length;
     if (failedUserPermsCount > 0) {
         logger.info({
-            message: `[G ${guildId} | U ${userId}] ${mapKey} ${
+            message: `[G ${guildId} | U ${userId}] ${mapKey} ${idType}: ${
                 id
             } failed ${failedUserPermsCount} user permission check(s)`,
             label: 'Quaver',
@@ -97,7 +99,7 @@ async function onCommandTypeHandler(
     const failedBotPermsCount = failedBotPermissions.length;
     if (failedBotPermsCount > 0) {
         logger.info({
-            message: `[G ${guildId} | U ${userId}] ${mapKey} ${
+            message: `[G ${guildId} | U ${userId}] ${mapKey} ${idType}: ${
                 id
             } failed ${failedBotPermsCount} bot permission check(s)`,
             label: 'Quaver',
@@ -263,7 +265,7 @@ async function onInteractionCreate(
         const failedChecksCount = failedChecks.length;
         if (failedChecksCount > 0) {
             logger.info({
-                message: `[G ${guildId} | U ${userId}] ${mapKey} ${id} failed ${failedChecksCount} check(s)`,
+                message: `[G ${guildId} | U ${userId}] ${mapKey} ${idType}: ${id} failed ${failedChecksCount} check(s)`,
                 label: 'Quaver',
             });
             await replyHandler.locale(failedChecks[0], {
@@ -279,6 +281,7 @@ async function onInteractionCreate(
             interactionHandler as CommandTypeHandler,
             mapKey,
             id,
+            idType,
             guildId,
             userId,
         );
