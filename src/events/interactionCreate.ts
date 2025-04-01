@@ -214,8 +214,8 @@ function createReplyHandler(
  * Handles the interaction creation and executes the corresponding interaction handler.
  *
  * @param {QuaverInteraction<AllInteractions>} interaction - The interaction created by the user.
- * @param {InteractionHandlerMapsFlat} interactionHandlerMapsFlat - A map of all possible interaction handlers.
- * @param {InteractionHandlerMapKeys} mapKey - The key used to access the correct interaction handler map.
+ * @param {InteractionHandlerMapsFlat} interactionHandlerMapsFlat - An object that contains all possible maps of interaction handlers.
+ * @param {InteractionHandlerMapKeys} mapKey - The possible key used to access the correct interaction handler map.
  * @returns {Promise<void>} Resolves once the interaction handler is executed or an error is handled.
  */
 async function onInteractionCreate(
