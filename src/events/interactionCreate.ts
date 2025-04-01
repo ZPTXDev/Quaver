@@ -253,7 +253,7 @@ async function onInteractionCreate(
         return;
     }
     const replyHandler = createReplyHandler(interaction);
-    // Since we only do checks for Command and Component type interactions, do not do checks
+    // Since we only do checks for Command and Component type interactions, do not do checks for autocompletes
     if (!isAutocomplete && replyHandler) {
         const componentInteraction = hasCommandName ? undefined : interaction;
         const failedChecks = await getFailedChecks(
