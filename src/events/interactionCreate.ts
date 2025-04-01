@@ -41,7 +41,7 @@ async function onCommandTypeHandler(
     commandId: string,
     guildId: string | 'DirectMessage',
     userId: string,
-): Promise<boolean | void> {
+): Promise<boolean> {
     const replyHandler = interaction.replyHandler;
     const handlerPermissions = interactionHandler.permissions;
     const handlerUserPermissions = handlerPermissions.user;
@@ -160,6 +160,19 @@ function getInteractionId(
     ];
 }
 
+function createReplyHandler(
+    interaction: QuaverInteraction<AllInteractions>,
+): ReplyHandler | void {
+    // To make TypeScript happy without having to extend lots of types or overloads, do not provide boolean parameters in this function
+    // We do not reuse the booleans from the caller and instead invoke Discord.js' properly typed boolean methods to ensure that TypeScript excludes the correct types in this context
+    // To prevent ReplyHandler from handling autocomplete, do not instantiate ReplyHandler when it is an autocomplete
+    if (interaction.isAutocomplete()) {
+        return;
+    }
+    interaction.replyHandler = new ReplyHandler(interaction);
+    return interaction.replyHandler;
+}
+
 async function onInteractionCreate(
     interaction: QuaverInteraction<AllInteractions>,
     interactionHandlerMapsFlat: InteractionHandlerMapsFlat,
@@ -194,12 +207,9 @@ async function onInteractionCreate(
         });
         return;
     }
-    // To prevent ReplyHandler from handling autocomplete, do not instantiate ReplyHandler
-    const replyHandler = isAutocomplete
-        ? undefined
-        : new ReplyHandler(interaction);
+    const replyHandler = createReplyHandler(interaction);
     // Since we only do checks for Command and Component type interactions, do not do checks
-    if (!isAutocomplete) {
+    if (!isAutocomplete && replyHandler) {
         const componentInteraction = hasCommandName ? undefined : interaction;
         const failedChecks = await getFailedChecks(
             interactionHandler.checks,
@@ -220,7 +230,7 @@ async function onInteractionCreate(
         }
     }
     // Because autocomplete is a form command that doesn't need permission checks, only do permission checks when neither a component nor an autocomplete
-    if (hasCommandName && !isAutocomplete) {
+    if (!isAutocomplete && hasCommandName) {
         const hasCommandPassedPermissions = await onCommandTypeHandler(
             interaction,
             interactionHandler as CommandTypeHandler,
@@ -264,7 +274,7 @@ async function onInteractionCreate(
             label: 'Quaver',
         });
         // Since ReplyHandler is not available with autocomplete interaction, do not send the locale
-        if (isAutocomplete) {
+        if (isAutocomplete || !replyHandler) {
             return;
         }
         await replyHandler.locale('DISCORD.GENERIC_ERROR', {
