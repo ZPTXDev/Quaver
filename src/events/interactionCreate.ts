@@ -336,7 +336,6 @@ export default {
         // Alternatively, interactionHandler maps can be separated from the DiscordClient entirely if we want to but that would involve exporting and importing that to here
         const interactionHandlerMaps = interaction.client;
         const isAnySelectMenu = interaction.isAnySelectMenu();
-        const isAutocomplete = interaction.isAutocomplete();
         const isCommand = interaction.isCommand();
         // To determine the appropriate key to use for the handler stored from the handler map, we diligently check the type of interaction and hard code a string
         // that reflects that interaction to be used as the key for that handler map
@@ -381,7 +380,7 @@ export default {
             );
             return;
         }
-        if (isAutocomplete) {
+        if (interaction.isAutocomplete()) {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
