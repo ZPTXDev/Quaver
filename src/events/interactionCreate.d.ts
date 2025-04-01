@@ -255,7 +255,6 @@ export interface InteractionHandlerMapsNonFlat {
 }
 
 export interface InteractionHandlerMapsFlat {
-    // [key: string]: Collection<string, InteractionHandler>;
     autocompletes?: AutocompleteHandlerMap;
     buttons?: ButtonHandlerMap;
     channelSelectMenus?: ChannelSelectMenuHandlerMap;
