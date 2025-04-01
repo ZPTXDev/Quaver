@@ -63,8 +63,8 @@ async function isCommandPermitted(
         user: new PermissionsBitField(handlerUserPermissions).toArray(),
         bot: new PermissionsBitField(handlerBotPermissions).toArray(),
     };
-    const interactionChannel = interaction.channel;
     if (guildId !== INTERACTION_DIRECT_MESSAGE) {
+        const interactionChannel = interaction.channel;
         failedPermissions.user = interactionChannel
             .permissionsFor(interaction.member)
             .missing(handlerUserPermissions);
