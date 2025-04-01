@@ -14,13 +14,13 @@ async function deleteCommands(guildId) {
     try {
         const applicationGuildCommands = await rest.get(applicationGuildCommandsRoute);
         console.log(`[G ${guildId} | U ${clientId}] Concurrently deleting ${applicationGuildCommands.length} application guild commands...`);
-        await Promise.all(
+        const deletedCommands = await Promise.all(
             responseData.map(async function (command) {
                 console.log(`[G ${guildId} | U ${clientId}] Deleting command: ${command.id} (${command.name})`);
                 return await rest.delete(`${applicationGuildCommandsRoute}/${command.id}`);
             }),
         );
-        console.log(`[G ${guildId} | U ${clientId}] Successfully deleted ${applicationGuildCommands.length} application guild commands.`);
+        console.log(`[G ${guildId} | U ${clientId}] Successfully deleted ${deletedCommands.length} application guild commands.`);
     } catch (error) {
         console.error(`[G ${guildId} | U ${clientId}] Failed to delete application guild commands:\n${error.message}\n${error.stack}`);
     }
