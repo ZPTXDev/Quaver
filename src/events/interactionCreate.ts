@@ -57,7 +57,7 @@ const INTERACTION_DIRECT_MESSAGE = 'DirectMessage';
  * - `bot`: The permissions that the bot is missing in the current context.
  */
 function getFailedCommandPermissions(
-    guildId: string | null,
+    guildId: string | DirectMessage,
     interaction: QuaverInteraction<CommandInteractions>,
     interactionHandler: CommandTypeHandler,
 ): FailedCommandPermissions {
