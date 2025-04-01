@@ -275,6 +275,8 @@ export type InteractionIdType = CommandInteractionId | ComponentInteractionId;
 
 export type DirectMessage = 'DirectMessage';
 
+export type EmptyString = '';
+
 export interface FailedCommandPermissions {
     user: PermissionsString[];
     bot: PermissionsString[];

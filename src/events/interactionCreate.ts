@@ -13,6 +13,7 @@ import type {
     InteractionIdType,
     FailedCommandPermissions,
     DirectMessage,
+    EmptyString,
 } from './interactionCreate.d.js';
 
 const CHANNEL_SELECTMENUS_MAP_KEY = 'channelSelectMenus';
@@ -172,11 +173,11 @@ async function isCommandPermitted(
  * Formats the command options from an interaction into a string.
 
  * @param {QuaverInteraction<AllInteractions>} interaction - The interaction to extract options from.
- * @returns {string} A formatted string of command options, or an empty string if the interaction is not a command or has no options.
+ * @returns {string | EmptyString} A formatted string of command options, or an empty string if the interaction is not a command or has no options.
  */
 function getFormattedCommandOptions(
     interaction: QuaverInteraction<AllInteractions>,
-): string {
+): string | EmptyString {
     // To make TypeScript happy without having to extend lots of types or overloads, do not provide boolean parameters in this function
     // We do not reuse the booleans from the caller and instead invoke Discord.js' properly typed boolean methods to ensure that TypeScript excludes the correct types in this context
     const hasCommandName =
