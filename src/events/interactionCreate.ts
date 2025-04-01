@@ -1,30 +1,39 @@
+import { isAsyncFunction } from 'node:util/types';
 import ReplyHandler from '#src/lib/ReplyHandler.js';
-import type { QuaverClient } from '#src/lib/util/common.d.js';
+import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { logger, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { getFailedChecks } from '#src/lib/util/util.js';
-import type {
-    AnySelectMenuInteraction,
-    ChatInputCommandInteraction,
-    Collection,
-    CommandInteraction,
-    Interaction,
-} from 'discord.js';
 import { PermissionsBitField } from 'discord.js';
-import type { ChatInputCommand } from './interactionCreate.d.js';
-import { isAsyncFunction } from 'node:util/types';
+import type {
+    AllInteractions,
+    CommandInteractions,
+    CommandTypeHandler,
+    InteractionHandlerMapKeys,
+    InteractionHandlerMapsFlat,
+} from './interactionCreate.d.js';
 
 const INTERACTION_CUSTOM_ID_NAME = 0;
 const INTERACTION_CUSTOM_ID_SEPARATOR = ':';
 
-async function checkCommandHandlerPermissions(
-    interaction: Interaction<'cached'>,
+const INTERACTION_COMMAND_ID_TYPE = 'commandName';
+const INTERACTION_COMPONENT_ID_TYPE = 'customId';
+
+type CommandInteractionId = 'commandName';
+type ComponentInteractionId = 'customId';
+
+type InteractionIdType = CommandInteractionId | ComponentInteractionId;
+
+const INTERACTION_DIRECT_MESSAGE = 'DirectMessage';
+
+async function onCommandTypeHandler(
+    interaction: QuaverInteraction<CommandInteractions>,
+    interactionHandler: CommandTypeHandler,
     mapKey: string,
-    replyHandler: ReplyHandler,
-    interactionHandler: ChatInputCommand,
     commandId: string,
     guildId: string | 'DirectMessage',
     userId: string,
 ): Promise<boolean | void> {
+    const replyHandler = interaction.replyHandler;
     const handlerPermissions = interactionHandler.permissions;
     const handlerUserPermissions = handlerPermissions.user;
     const handlerBotPermissions = handlerPermissions.bot;
@@ -33,7 +42,7 @@ async function checkCommandHandlerPermissions(
         bot: new PermissionsBitField(handlerBotPermissions).toArray(),
     };
     const interactionChannel = interaction.channel;
-    if (interaction.guildId) {
+    if (guildId !== INTERACTION_DIRECT_MESSAGE) {
         failedPermissions.user = interactionChannel
             .permissionsFor(interaction.member)
             .missing(handlerUserPermissions);
@@ -102,44 +111,66 @@ async function checkCommandHandlerPermissions(
 }
 
 function getFormattedCommandOptions(
-    hasCommandName: boolean,
-    interaction: Interaction<'cached'>,
+    interaction: QuaverInteraction<AllInteractions>,
 ): string {
-    const optionsData =
-        hasCommandName && (interaction as CommandInteraction).options.data;
-    return hasCommandName && optionsData.length > 0
-        ? ` ${optionsData
-              .map((option): string => `${option.name}:${option.value}`)
-              .join(' ')}`
-        : '';
+    // To make TypeScript happy without having to extend lots of types or overloads, do not provide boolean parameters in this function
+    // We do not reuse the booleans from the caller and instead invoke Discord.js' properly typed boolean methods to ensure that TypeScript excludes the correct types in this context
+    const hasCommandName =
+        interaction.isCommand() || interaction.isAutocomplete();
+    const EMPTY_STRING = '';
+    if (!hasCommandName) {
+        return EMPTY_STRING;
+    }
+    const optionsData = interaction.options.data;
+    if (optionsData.length > 0) {
+        return ` ${optionsData
+            .map((option): string => `${option.name}:${option.value}`)
+            .join(' ')}`;
+    }
+    return EMPTY_STRING;
+}
+
+function getInteractionIdType(hasCommandName: boolean): InteractionIdType {
+    if (hasCommandName) {
+        return INTERACTION_COMMAND_ID_TYPE;
+    }
+    return INTERACTION_COMPONENT_ID_TYPE;
+}
+
+function getInteractionId(
+    interaction: QuaverInteraction<AllInteractions>,
+): string {
+    // To make TypeScript happy without having to extend lots of types or overloads, do not provide boolean parameters in this function
+    // We do not reuse the booleans from the caller and instead invoke Discord.js' properly typed boolean methods to ensure that TypeScript excludes the correct types in this context
+    const hasCommandName =
+        interaction.isCommand() || interaction.isAutocomplete();
+    if (hasCommandName) {
+        return interaction.commandName;
+    }
+    return interaction.customId.split(INTERACTION_CUSTOM_ID_SEPARATOR)[
+        INTERACTION_CUSTOM_ID_NAME
+    ];
 }
 
 async function onInteractionCreate(
-    interaction: Interaction<'cached'> & { replyHandler: ReplyHandler },
-    discordClient: QuaverClient,
-    mapKey: string,
-    hasCommandName: boolean,
-    isAutocomplete: boolean,
+    interaction: QuaverInteraction<AllInteractions>,
+    interactionHandlerMapsFlat: InteractionHandlerMapsFlat,
+    mapKey: InteractionHandlerMapKeys,
 ): Promise<void> {
+    // To make TypeScript happy without having to extend lots of types or overloads, do not provide boolean parameters in this function
+    // We do not reuse the booleans from the caller and instead invoke Discord.js' properly typed boolean methods to ensure that TypeScript excludes the correct types in this context
+    const isAutocomplete = interaction.isAutocomplete();
+    const hasCommandName = interaction.isCommand() || isAutocomplete;
     const guildId = interaction.guild?.id ?? 'DirectMessage';
     const userId = interaction.user.id;
-    const idType = hasCommandName ? 'commandName' : 'customId';
-    const id = hasCommandName
-        ? (interaction as ChatInputCommandInteraction).commandName
-        : (interaction as AnySelectMenuInteraction).customId.split(
-              INTERACTION_CUSTOM_ID_SEPARATOR,
-          )[INTERACTION_CUSTOM_ID_NAME];
-    const formattedCommandOptions = getFormattedCommandOptions(
-        hasCommandName,
-        interaction,
-    );
+    const idType = getInteractionIdType(hasCommandName);
+    const id = getInteractionId(interaction);
+    const formattedCommandOptions = getFormattedCommandOptions(interaction);
     logger.info({
         message: `[G ${guildId} | U ${userId}] Processing ${mapKey} ${idType}: ${id}${formattedCommandOptions}`,
         label: 'Quaver',
     });
-    const handlerMap = discordClient[
-        mapKey as 'chatInputCommands'
-    ] as Collection<string, ChatInputCommand>;
+    const handlerMap = interactionHandlerMapsFlat[mapKey];
     if (!handlerMap) {
         logger.warn({
             message: `[G ${guildId} | U ${userId}] No handler map found for mapKey: ${mapKey}`,
@@ -155,16 +186,18 @@ async function onInteractionCreate(
         });
         return;
     }
-    const replyHandler = interaction.replyHandler;
+    // To prevent ReplyHandler from handling autocomplete, do not instantiate ReplyHandler
+    const replyHandler = isAutocomplete
+        ? undefined
+        : new ReplyHandler(interaction);
+    // Since we only do checks for Command and Component type interactions, do not do checks
     if (!isAutocomplete) {
-        interaction.replyHandler = new ReplyHandler(
-            interaction as ChatInputCommandInteraction,
-        );
+        const componentInteraction = hasCommandName ? undefined : interaction;
         const failedChecks = await getFailedChecks(
             interactionHandler.checks,
             interaction.guildId,
             interaction.member,
-            hasCommandName ? undefined : (interaction as never),
+            componentInteraction,
         );
         const failedChecksCount = failedChecks.length;
         if (failedChecksCount > 0) {
@@ -178,30 +211,38 @@ async function onInteractionCreate(
             return;
         }
     }
-    if (!isAutocomplete && hasCommandName) {
-        const hasRequiredPermissions = await checkCommandHandlerPermissions(
+    // Because autocomplete is a form command that doesn't need permission checks, only do permission checks when neither a component nor an autocomplete
+    if (hasCommandName && !isAutocomplete) {
+        const hasCommandPassedPermissions = await onCommandTypeHandler(
             interaction,
+            interactionHandler as CommandTypeHandler,
             mapKey,
-            replyHandler,
-            interactionHandler,
             id,
             guildId,
             userId,
         );
-        if (!hasRequiredPermissions) {
+        if (!hasCommandPassedPermissions) {
             return;
         }
     }
+    const executeMethod = interactionHandler.execute;
+    if (!executeMethod || typeof executeMethod !== 'function') {
+        logger.warn({
+            message: `[G ${guildId} | U ${userId}] No ${mapKey} execute method found for ${idType}: ${id}`,
+            label: 'Quaver',
+        });
+        return;
+    }
     try {
-        const executeMethod = interactionHandler.execute;
         logger.info({
             message: `[G ${guildId} | U ${userId}] Executing ${mapKey} ${idType}: ${id}${formattedCommandOptions}`,
             label: 'Quaver',
         });
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-        isAsyncFunction(executeMethod)
-            ? await executeMethod(interaction as never)
-            : executeMethod(interaction as never);
+        if (isAsyncFunction(executeMethod)) {
+            await executeMethod(interaction as never);
+            return;
+        }
+        executeMethod(interaction as never);
     } catch (error) {
         if (!(error instanceof Error)) {
             return;
@@ -214,6 +255,7 @@ async function onInteractionCreate(
             message: `${error.message}\n${error.stack}`,
             label: 'Quaver',
         });
+        // Since ReplyHandler is not available with autocomplete interaction, do not send the locale
         if (isAutocomplete) {
             return;
         }
@@ -227,20 +269,22 @@ export default {
     name: 'interactionCreate',
     once: false,
     async execute(
-        interaction: Interaction<'cached'> & { replyHandler: ReplyHandler },
+        interaction: QuaverInteraction<AllInteractions>,
     ): Promise<void> {
-        const interactionHandlerMaps = interaction.client as QuaverClient;
+        // Since Quaver from the beginning stores interaction handler maps as properties within the DiscordClient, we'll use DiscordClient is the main storage of the interaction handler maps
+        // Alternatively, interactionHandler maps can be separated from the DiscordClient entirely if we want to but that would involve importing and exporting that to here
+        const interactionHandlerMaps = interaction.client;
         const isAnySelectMenu = interaction.isAnySelectMenu();
         const isAutocomplete = interaction.isAutocomplete();
         const isCommand = interaction.isCommand();
-        const hasCommandName = isCommand || isAutocomplete;
+        // To determine the appropriate key to use for the handler stored from the handler map, we diligently check the type of interaction and hard code a string
+        // that reflects that interaction to be used as the key for that handler map
+        // With this, Quaver is basically ready to support every type of interaction that Discord.js provides without altering interactionCreate
         if (isAnySelectMenu && interaction.isChannelSelectMenu()) {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
                 'channelSelectMenus',
-                hasCommandName,
-                isAutocomplete,
             );
             return;
         }
@@ -249,8 +293,6 @@ export default {
                 interaction,
                 interactionHandlerMaps,
                 'mentionableSelectMenus',
-                hasCommandName,
-                isAutocomplete,
             );
             return;
         }
@@ -259,8 +301,6 @@ export default {
                 interaction,
                 interactionHandlerMaps,
                 'roleSelectMenus',
-                hasCommandName,
-                isAutocomplete,
             );
             return;
         }
@@ -269,8 +309,6 @@ export default {
                 interaction,
                 interactionHandlerMaps,
                 'stringSelectMenus',
-                hasCommandName,
-                isAutocomplete,
             );
             return;
         }
@@ -279,8 +317,6 @@ export default {
                 interaction,
                 interactionHandlerMaps,
                 'userSelectMenus',
-                hasCommandName,
-                isAutocomplete,
             );
             return;
         }
@@ -289,8 +325,6 @@ export default {
                 interaction,
                 interactionHandlerMaps,
                 'autocompletes',
-                hasCommandName,
-                isAutocomplete,
             );
             return;
         }
@@ -299,8 +333,6 @@ export default {
                 interaction,
                 interactionHandlerMaps,
                 'buttons',
-                hasCommandName,
-                isAutocomplete,
             );
             return;
         }
@@ -309,8 +341,6 @@ export default {
                 interaction,
                 interactionHandlerMaps,
                 'chatInputCommands',
-                hasCommandName,
-                isAutocomplete,
             );
             return;
         }
@@ -321,8 +351,6 @@ export default {
                 interaction,
                 interactionHandlerMaps,
                 'messageContextMenuCommands',
-                hasCommandName,
-                isAutocomplete,
             );
             return;
         }
@@ -331,8 +359,6 @@ export default {
                 interaction,
                 interactionHandlerMaps,
                 'userContextMenuCommands',
-                hasCommandName,
-                isAutocomplete,
             );
             return;
         }
@@ -341,8 +367,6 @@ export default {
                 interaction,
                 interactionHandlerMaps,
                 'modalSubmits',
-                hasCommandName,
-                isAutocomplete,
             );
             return;
         }
