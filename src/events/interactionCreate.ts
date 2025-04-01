@@ -13,6 +13,20 @@ import type {
     InteractionIdType,
 } from './interactionCreate.d.js';
 
+const CHANNEL_SELECTMENUS_MAP_KEY = 'channelSelectMenus';
+const MENTIONABLE_SELECTMENUS_MAP_KEY = 'mentionableSelectMenus';
+const ROLE_SELECTMENUS_MAP_KEY = 'roleSelectMenus';
+const STRING_SELECTMENUS_MAP_KEY = 'stringSelectMenus';
+const USER_SELECTMENUS_MAP_KEY = 'userSelectMenus';
+const AUTOCOMPLETES_MAP_KEY = 'autocompletes';
+const BUTTONS_MAP_KEY = 'buttons';
+const CHATINPUT_COMMANDS_MAP_KEY = 'chatInputCommands';
+const MESSAGECONTEXTMENU_COMMANDS_MAP_KEY = 'messageContextMenuCommands';
+const USERCONTEXTMENU_COMMANDS_MAP_KEY = 'userContextMenuCommands';
+const MODALSUBMITS_MAP_KEY = 'modalSubmits';
+
+const EMPTY_STRING = '';
+
 const INTERACTION_CUSTOM_ID_NAME = 0;
 const INTERACTION_CUSTOM_ID_SEPARATOR = ':';
 
@@ -112,7 +126,6 @@ function getFormattedCommandOptions(
     // We do not reuse the booleans from the caller and instead invoke Discord.js' properly typed boolean methods to ensure that TypeScript excludes the correct types in this context
     const hasCommandName =
         interaction.isCommand() || interaction.isAutocomplete();
-    const EMPTY_STRING = '';
     if (!hasCommandName) {
         return EMPTY_STRING;
     }
@@ -279,7 +292,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                'channelSelectMenus',
+                CHANNEL_SELECTMENUS_MAP_KEY,
             );
             return;
         }
@@ -287,7 +300,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                'mentionableSelectMenus',
+                MENTIONABLE_SELECTMENUS_MAP_KEY,
             );
             return;
         }
@@ -295,7 +308,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                'roleSelectMenus',
+                ROLE_SELECTMENUS_MAP_KEY,
             );
             return;
         }
@@ -303,7 +316,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                'stringSelectMenus',
+                STRING_SELECTMENUS_MAP_KEY,
             );
             return;
         }
@@ -311,7 +324,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                'userSelectMenus',
+                USER_SELECTMENUS_MAP_KEY,
             );
             return;
         }
@@ -319,7 +332,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                'autocompletes',
+                AUTOCOMPLETES_MAP_KEY,
             );
             return;
         }
@@ -327,7 +340,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                'buttons',
+                BUTTONS_MAP_KEY,
             );
             return;
         }
@@ -335,7 +348,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                'chatInputCommands',
+                CHATINPUT_COMMANDS_MAP_KEY,
             );
             return;
         }
@@ -345,7 +358,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                'messageContextMenuCommands',
+                MESSAGECONTEXTMENU_COMMANDS_MAP_KEY,
             );
             return;
         }
@@ -353,7 +366,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                'userContextMenuCommands',
+                USERCONTEXTMENU_COMMANDS_MAP_KEY,
             );
             return;
         }
@@ -361,7 +374,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                'modalSubmits',
+                MODALSUBMITS_MAP_KEY,
             );
             return;
         }
