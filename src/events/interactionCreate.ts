@@ -210,7 +210,7 @@ function getInteractionIdType(hasCommandName: boolean): InteractionIdType {
  * Retrieves the interaction ID based on the interaction type.
  *
  * @param {QuaverInteraction<AllInteractions>} interaction - The interaction to extract the ID from.
- * @returns {string} The command name if the interaction is a command, otherwise the parsed custom ID which is the name of the customId.
+ * @returns {string} The command name if the interaction is a command, otherwise the parsed custom ID.
  */
 function getInteractionId(
     interaction: QuaverInteraction<AllInteractions>,
