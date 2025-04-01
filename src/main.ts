@@ -1,11 +1,4 @@
 import type {
-    Autocomplete,
-    Button,
-    ChatInputCommand,
-    ModalSubmit,
-    SelectMenu,
-} from '#src/events/interactionCreate.d.js';
-import type {
     QuaverClient,
     QuaverPlayer,
     WhitelistedFeatures,
@@ -53,6 +46,11 @@ import { Server } from 'socket.io';
 import { inspect } from 'util';
 import { version } from './lib/util/version.js';
 import type { QuaverEvent, QuaverMusicEvent } from './main.d.js';
+import type {
+    ChatInputCommandHandler,
+    AutocompleteHandler,
+    ComponentTypeHandler,
+} from './events/interactionCreate.d.js';
 
 effectsLoad();
 queueLoad();
@@ -304,8 +302,8 @@ export const bot: QuaverClient = new Client({
         GatewayIntentBits.GuildMessages,
     ],
 });
-bot.commands = new Collection();
-bot.autocomplete = new Collection();
+bot.chatInputCommands = new Collection();
+bot.autocompletes = new Collection();
 bot.music = new Node({
     info: {
         host: settings.lavalink.host,
@@ -561,23 +559,27 @@ for await (const folder of localeFolders) {
 setLocales(locales);
 
 const commandFiles = readdirSync(
-    getAbsoluteFileURL(import.meta.url, ['commands']),
+    getAbsoluteFileURL(import.meta.url, ['commands', 'chatInputCommands']),
 ).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 for await (const file of commandFiles) {
-    const command: { default: ChatInputCommand } = await import(
-        getAbsoluteFileURL(import.meta.url, ['commands', file]).toString()
+    const command: { default: ChatInputCommandHandler } = await import(
+        getAbsoluteFileURL(import.meta.url, [
+            'commands',
+            'chatInputCommands',
+            file,
+        ]).toString()
     );
-    bot.commands.set(command.default.data.name, command.default);
+    bot.chatInputCommands.set(command.default.data.name, command.default);
 }
 
 const autocompleteFiles = readdirSync(
-    getAbsoluteFileURL(import.meta.url, ['autocomplete']),
+    getAbsoluteFileURL(import.meta.url, ['autocompletes']),
 ).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
 for await (const file of autocompleteFiles) {
-    const autocomplete: { default: Autocomplete } = await import(
-        getAbsoluteFileURL(import.meta.url, ['autocomplete', file]).toString()
+    const autocomplete: { default: AutocompleteHandler } = await import(
+        getAbsoluteFileURL(import.meta.url, ['autocompletes', file]).toString()
     );
-    bot.autocomplete.set(autocomplete.default.name, autocomplete.default);
+    bot.autocompletes.set(autocomplete.default.name, autocomplete.default);
 }
 
 const componentsFolders = readdirSync(
@@ -588,14 +590,13 @@ for await (const folder of componentsFolders) {
         getAbsoluteFileURL(import.meta.url, ['components', folder]),
     ).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
     for await (const file of componentFiles) {
-        const component: { default: Button | SelectMenu | ModalSubmit } =
-            await import(
-                getAbsoluteFileURL(import.meta.url, [
-                    'components',
-                    folder,
-                    file,
-                ]).toString()
-            );
+        const component: { default: ComponentTypeHandler } = await import(
+            getAbsoluteFileURL(import.meta.url, [
+                'components',
+                folder,
+                file,
+            ]).toString()
+        );
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (!(bot as Record<string, any>)[folder]) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
