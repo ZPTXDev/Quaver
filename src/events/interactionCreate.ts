@@ -34,11 +34,22 @@ const INTERACTION_COMMAND_ID_TYPE = 'commandName';
 const INTERACTION_COMPONENT_ID_TYPE = 'customId';
 const INTERACTION_DIRECT_MESSAGE = 'DirectMessage';
 
+/**
+ * Handles a command interaction, extracts user and bot permissions from the interaction handler and checks for necessary permissions.
+ *
+ * @param {QuaverInteraction<CommandInteractions>} interaction - The command interaction to process.
+ * @param {CommandTypeHandler} interactionHandler - The handler containing permission requirements.
+ * @param {string} mapKey - A key used to map commands for logging.
+ * @param {string} id - The unique identifier of the command.
+ * @param {string | 'DirectMessage'} guildId - The guild ID or 'DirectMessage' for DMs.
+ * @param {string} userId - The user ID of the command executor.
+ * @returns {Promise<boolean>} Resolves to `true` if the command can proceed, `false` if permissions fail.
+ */
 async function onCommandTypeHandler(
     interaction: QuaverInteraction<CommandInteractions>,
     interactionHandler: CommandTypeHandler,
     mapKey: string,
-    commandId: string,
+    id: string,
     guildId: string | 'DirectMessage',
     userId: string,
 ): Promise<boolean> {
@@ -68,7 +79,7 @@ async function onCommandTypeHandler(
     if (failedUserPermsCount > 0) {
         logger.info({
             message: `[G ${guildId} | U ${userId}] ${mapKey} ${
-                commandId
+                id
             } failed ${failedUserPermsCount} user permission check(s)`,
             label: 'Quaver',
         });
@@ -87,7 +98,7 @@ async function onCommandTypeHandler(
     if (failedBotPermsCount > 0) {
         logger.info({
             message: `[G ${guildId} | U ${userId}] ${mapKey} ${
-                commandId
+                id
             } failed ${failedBotPermsCount} bot permission check(s)`,
             label: 'Quaver',
         });
@@ -119,6 +130,12 @@ async function onCommandTypeHandler(
     return true;
 }
 
+/**
+ * Formats the command options from an interaction into a string.
+
+ * @param {QuaverInteraction<AllInteractions>} interaction - The interaction to extract options from.
+ * @returns {string} A formatted string of command options, or an empty string if the interaction is not a command or has no options.
+ */
 function getFormattedCommandOptions(
     interaction: QuaverInteraction<AllInteractions>,
 ): string {
@@ -138,6 +155,12 @@ function getFormattedCommandOptions(
         .join(' ')}`;
 }
 
+/**
+ * Determines the interaction ID type based on whether it is a command.
+ *
+ * @param {boolean} hasCommandName - Indicates if the interaction has a command name.
+ * @returns {InteractionIdType} The corresponding interaction ID type.
+ */
 function getInteractionIdType(hasCommandName: boolean): InteractionIdType {
     if (hasCommandName) {
         return INTERACTION_COMMAND_ID_TYPE;
@@ -145,6 +168,12 @@ function getInteractionIdType(hasCommandName: boolean): InteractionIdType {
     return INTERACTION_COMPONENT_ID_TYPE;
 }
 
+/**
+ * Retrieves the interaction ID based on the interaction type.
+ *
+ * @param {QuaverInteraction<AllInteractions>} interaction - The interaction to extract the ID from.
+ * @returns {string} The command name if the interaction is a command, otherwise the parsed custom ID which is the name of the customId.
+ */
 function getInteractionId(
     interaction: QuaverInteraction<AllInteractions>,
 ): string {
@@ -160,6 +189,12 @@ function getInteractionId(
     ];
 }
 
+/**
+ * Creates and assigns a `ReplyHandler` for the given interaction and prevents `ReplyHandler` from being instantiated for autocomplete interactions.
+ *
+ * @param {QuaverInteraction<AllInteractions>} interaction - The interaction to attach a reply handler to.
+ * @returns {ReplyHandler | void} The created `ReplyHandler`, or `void` if the interaction is an autocomplete.
+ */
 function createReplyHandler(
     interaction: QuaverInteraction<AllInteractions>,
 ): ReplyHandler | void {
@@ -173,6 +208,14 @@ function createReplyHandler(
     return interaction.replyHandler;
 }
 
+/**
+ * Handles the interaction creation and executes the corresponding interaction handler.
+ *
+ * @param {QuaverInteraction<AllInteractions>} interaction - The interaction created by the user.
+ * @param {InteractionHandlerMapsFlat} interactionHandlerMapsFlat - A map of all possible interaction handlers.
+ * @param {InteractionHandlerMapKeys} mapKey - The key used to access the correct interaction handler map.
+ * @returns {Promise<void>} Resolves once the interaction handler is executed or an error is handled.
+ */
 async function onInteractionCreate(
     interaction: QuaverInteraction<AllInteractions>,
     interactionHandlerMapsFlat: InteractionHandlerMapsFlat,
