@@ -9,7 +9,11 @@ import type {
     SettingsPageOptions,
     WhitelistedFeatures,
 } from '#src/lib/util/common.d.js';
-import { data, locales, MessageOptionsBuilderType } from '#src/lib/util/common.js';
+import {
+    data,
+    locales,
+    MessageOptionsBuilderType,
+} from '#src/lib/util/common.js';
 import {
     acceptableSources,
     Check,
@@ -23,13 +27,9 @@ import type {
     APIEmbedField,
     APISelectMenuOption,
     BaseMessageOptions,
-    ButtonInteraction,
     Interaction,
     MessageActionRowComponentBuilder,
-    ModalSubmitInteraction,
-    RoleSelectMenuInteraction,
     Snowflake,
-    StringSelectMenuInteraction,
 } from 'discord.js';
 import {
     ActionRowBuilder,
@@ -45,6 +45,7 @@ import {
 import { readdirSync } from 'fs';
 import { get } from 'lodash-es';
 import type { LocaleCompletionState, LyricsResponse } from './util.d.js';
+import type { ComponentInteractions } from '#src/events/interactionCreate.d.js';
 
 /**
  * Returns the localized string.
@@ -244,11 +245,7 @@ export async function getFailedChecks(
     checks: Check[],
     guildId: Snowflake,
     member: GuildMember & { client: QuaverClient },
-    interaction?:
-        | ButtonInteraction
-        | StringSelectMenuInteraction
-        | RoleSelectMenuInteraction
-        | ModalSubmitInteraction,
+    interaction?: ComponentInteractions,
 ): Promise<Check[]> {
     const failedChecks: Check[] = [];
     for (const check of checks ?? []) {
