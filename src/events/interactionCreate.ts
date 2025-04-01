@@ -156,7 +156,7 @@ async function onInteractionCreate(
     // We do not reuse the booleans from the caller and instead invoke Discord.js' properly typed boolean methods to ensure that TypeScript excludes the correct types in this context
     const isAutocomplete = interaction.isAutocomplete();
     const hasCommandName = interaction.isCommand() || isAutocomplete;
-    const guildId = interaction.guild?.id ?? 'DirectMessage';
+    const guildId = interaction.guild?.id ?? INTERACTION_DIRECT_MESSAGE;
     const userId = interaction.user.id;
     const idType = getInteractionIdType(hasCommandName);
     const id = getInteractionId(interaction);
