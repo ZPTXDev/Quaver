@@ -11,7 +11,8 @@ import type {
     InteractionHandlerMapKeys,
     InteractionHandlerMapsFlat,
     InteractionIdType,
-    FailedPermissions,
+    FailedCommandPermissions,
+    DirectMessage,
 } from './interactionCreate.d.js';
 
 const CHANNEL_SELECTMENUS_MAP_KEY = 'channelSelectMenus';
@@ -36,6 +37,55 @@ const INTERACTION_COMPONENT_ID_TYPE = 'customId';
 const INTERACTION_DIRECT_MESSAGE = 'DirectMessage';
 
 /**
+ * Checks the required command permissions for the user and bot in a specific guild or direct message context
+ * and returns the permissions that are missing for each.
+ *
+ * This function calculates the missing permissions for the user and bot, either from the interaction
+ * channel in a guild or from a direct message context. If the interaction occurs in a guild, it checks
+ * the permissions for the user and bot within the specific channel and returns the missing permissions.
+ * In the case of a direct message, it simply returns the permissions that the handler expects the user
+ * and bot to have.
+ *
+ * @param {string | DirectMessage} guildId - The guild ID or 'DirectMessage' for DMs.
+ * @param {QuaverInteraction<CommandInteractions>} interaction - The interaction object, which contains
+ * the channel and member information required to check permissions.
+ * @param {CommandTypeHandler} interactionHandler - The handler that contains the permissions required
+ * for both the user and the bot.
+ *
+ * @returns {FailedCommandPermissions} An object containing two arrays:
+ * - `user`: The permissions that the user is missing in the current context.
+ * - `bot`: The permissions that the bot is missing in the current context.
+ */
+function getFailedCommandPermissions(
+    guildId: string | null,
+    interaction: QuaverInteraction<CommandInteractions>,
+    interactionHandler: CommandTypeHandler,
+): FailedCommandPermissions {
+    const handlerPermissions = interactionHandler.permissions;
+    const handlerUserPermissions = handlerPermissions.user;
+    const handlerBotPermissions = handlerPermissions.bot;
+    if (guildId !== INTERACTION_DIRECT_MESSAGE) {
+        const interactionChannel = interaction.channel;
+        return {
+            user: interactionChannel
+                .permissionsFor(interaction.member)
+                .missing(handlerUserPermissions),
+            bot: interactionChannel
+                .permissionsFor(interaction.client.user.id)
+                .missing([
+                    PermissionsBitField.Flags.ViewChannel,
+                    PermissionsBitField.Flags.SendMessages,
+                    ...handlerBotPermissions,
+                ]),
+        };
+    }
+    return {
+        user: new PermissionsBitField(handlerUserPermissions).toArray(),
+        bot: new PermissionsBitField(handlerBotPermissions).toArray(),
+    };
+}
+
+/**
  * Handles a command interaction, extracts user and bot permissions from the interaction handler and checks for necessary permissions.
  *
  * @param {QuaverInteraction<CommandInteractions>} interaction - The command interaction to check.
@@ -43,7 +93,7 @@ const INTERACTION_DIRECT_MESSAGE = 'DirectMessage';
  * @param {string} mapKey - A key used to map commands for logging.
  * @param {string} id - The unique identifier of the command.
  * @param {string} idType - The type of identifer of the command.
- * @param {string | 'DirectMessage'} guildId - The guild ID or 'DirectMessage' for DMs.
+ * @param {string | DirectMessage} guildId - The guild ID or 'DirectMessage' for DMs.
  * @param {string} userId - The user ID of the command executor.
  * @returns {Promise<boolean>} Resolves to `true` if the command is permitted to proceed, `false` if permissions fail.
  */
@@ -53,30 +103,15 @@ async function isCommandPermitted(
     mapKey: string,
     id: string,
     idType: string,
-    guildId: string | 'DirectMessage',
+    guildId: string | DirectMessage,
     userId: string,
 ): Promise<boolean> {
     const replyHandler = interaction.replyHandler;
-    const handlerPermissions = interactionHandler.permissions;
-    const handlerUserPermissions = handlerPermissions.user;
-    const handlerBotPermissions = handlerPermissions.bot;
-    const failedPermissions: FailedPermissions = {
-        user: new PermissionsBitField(handlerUserPermissions).toArray(),
-        bot: new PermissionsBitField(handlerBotPermissions).toArray(),
-    };
-    if (guildId !== INTERACTION_DIRECT_MESSAGE) {
-        const interactionChannel = interaction.channel;
-        failedPermissions.user = interactionChannel
-            .permissionsFor(interaction.member)
-            .missing(handlerUserPermissions);
-        failedPermissions.bot = interactionChannel
-            .permissionsFor(interaction.client.user.id)
-            .missing([
-                PermissionsBitField.Flags.ViewChannel,
-                PermissionsBitField.Flags.SendMessages,
-                ...handlerBotPermissions,
-            ]);
-    }
+    const failedPermissions = getFailedCommandPermissions(
+        guildId,
+        interaction,
+        interactionHandler,
+    );
     const failedUserPermissions = failedPermissions.user;
     const failedUserPermsCount = failedUserPermissions.length;
     if (failedUserPermsCount > 0) {

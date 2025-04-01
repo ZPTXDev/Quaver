@@ -273,7 +273,9 @@ export type CommandInteractionId = 'commandName';
 export type ComponentInteractionId = 'customId';
 export type InteractionIdType = CommandInteractionId | ComponentInteractionId;
 
-export interface FailedPermissions {
+export type DirectMessage = 'DirectMessage';
+
+export interface FailedCommandPermissions {
     user: PermissionsString[];
     bot: PermissionsString[];
 }
