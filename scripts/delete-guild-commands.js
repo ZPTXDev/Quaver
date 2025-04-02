@@ -2,9 +2,8 @@ import { Routes } from "discord.js";
 import { rest } from "./modules/restHandler.js";
 import { rootSettingsJson, scriptSettingsJson } from "./modules/configHandler.js"
 
-const guildIds = scriptSettingsJson.guildIds
-if (guildIds.length === 0 || guildIds[0] === "Paste your development servers' guild IDs here") {
-    console.error("Unable to delete application guild commands. No guildIds provided.")
+if (scriptSettingsJson.guildIds.length === 0) {
+    console.error("No guild ID(s) to process.")
     process.exit(1)
 }
 
