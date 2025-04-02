@@ -33,10 +33,10 @@ importers:
         version: 4.0.1
       '@lavaclient/plugin-effects':
         specifier: ^1.0.0-rc.2
-        version: 1.0.0-rc.2(lavaclient@5.0.0-rc.3(effect@2.4.19)(fast-check@3.23.2))(lavalink-protocol@1.1.1)
+        version: 1.0.0-rc.2(lavaclient@5.0.0-rc.3(effect@3.14.5)(fast-check@3.23.2))(lavalink-protocol@1.1.1)
       '@lavaclient/plugin-queue':
         specifier: ^0.0.1
-        version: 0.0.1(patch_hash=m7cuycvh45g2vyq75bliiteena)(lavaclient@5.0.0-rc.3(effect@2.4.19)(fast-check@3.23.2))(lavalink-protocol@1.1.1)
+        version: 0.0.1(patch_hash=m7cuycvh45g2vyq75bliiteena)(lavaclient@5.0.0-rc.3(effect@3.14.5)(fast-check@3.23.2))(lavalink-protocol@1.1.1)
       '@napi-rs/pinyin':
         specifier: ^1.7.5
         version: 1.7.5
@@ -53,8 +53,8 @@ importers:
         specifier: ^14.18.0
         version: 14.18.0
       effect:
-        specifier: '2'
-        version: 2.4.19
+        specifier: '3'
+        version: 3.14.5
       express:
         specifier: ^5.1.0
         version: 5.1.0
@@ -75,7 +75,7 @@ importers:
         version: 1.1.0(patch_hash=4jdpxiik557o3e3mu5heiyclmm)
       lavaclient:
         specifier: ^5.0.0-rc.3
-        version: 5.0.0-rc.3(effect@2.4.19)(fast-check@3.23.2)
+        version: 5.0.0-rc.3(effect@3.14.5)(fast-check@3.23.2)
       lavalink-protocol:
         specifier: ^1.1.1
         version: 1.1.1
@@ -950,11 +950,8 @@ packages:
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
 
-  effect@2.4.19:
-    resolution: {integrity: sha512-z/rn878Po3n522g/AYUDHD1SsZaZdvRxlTCLQ8xl8H6xA82nBwwooD1mdn/73Uywmp7d84oay3w3528r0Uyd0w==}
-
-  effect@3.14.2:
-    resolution: {integrity: sha512-AqLlvhkcWqSgfPnfGO/JdwvEqhtzFLb4qwe43YLwrvnN5ev2dqB4ve2Bv6oq64iplRMYO9lmYRibN0Ig6fK/nQ==}
+  effect@3.14.5:
+    resolution: {integrity: sha512-X3/365UyPLyXGgS+kcqh7OTDJJVmjC6n2dDPBSppjwOpS7PV5d/UdBStwvCfkuz7kFajwLkd5KFhjDUtTl5SRA==}
 
   ejs@3.1.10:
     resolution: {integrity: sha512-UeJmFfOrAQS8OJWPZ4qtgHyWExa088/MtK5UEyoJGFH67cDEXkZSviOiKRCZ4Xij0zxI3JECgYs3oKx+AizQBA==}
@@ -2224,14 +2221,14 @@ snapshots:
 
   '@effect/data@0.17.6': {}
 
-  '@effect/schema@0.49.4(effect@2.4.19)(fast-check@3.23.2)':
+  '@effect/schema@0.49.4(effect@3.14.5)(fast-check@3.23.2)':
     dependencies:
-      effect: 2.4.19
+      effect: 3.14.5
       fast-check: 3.23.2
 
-  '@effect/schema@0.67.24(effect@3.14.2)':
+  '@effect/schema@0.67.24(effect@3.14.5)':
     dependencies:
-      effect: 3.14.2
+      effect: 3.14.5
       fast-check: 3.23.2
 
   '@eslint-community/eslint-utils@4.4.0(eslint@9.23.0)':
@@ -2319,15 +2316,15 @@ snapshots:
       - bluebird
       - supports-color
 
-  '@lavaclient/plugin-effects@1.0.0-rc.2(lavaclient@5.0.0-rc.3(effect@2.4.19)(fast-check@3.23.2))(lavalink-protocol@1.1.1)':
+  '@lavaclient/plugin-effects@1.0.0-rc.2(lavaclient@5.0.0-rc.3(effect@3.14.5)(fast-check@3.23.2))(lavalink-protocol@1.1.1)':
     dependencies:
-      lavaclient: 5.0.0-rc.3(effect@2.4.19)(fast-check@3.23.2)
+      lavaclient: 5.0.0-rc.3(effect@3.14.5)(fast-check@3.23.2)
       lavalink-protocol: 1.1.1
       tslib: 2.6.2
 
-  '@lavaclient/plugin-queue@0.0.1(patch_hash=m7cuycvh45g2vyq75bliiteena)(lavaclient@5.0.0-rc.3(effect@2.4.19)(fast-check@3.23.2))(lavalink-protocol@1.1.1)':
+  '@lavaclient/plugin-queue@0.0.1(patch_hash=m7cuycvh45g2vyq75bliiteena)(lavaclient@5.0.0-rc.3(effect@3.14.5)(fast-check@3.23.2))(lavalink-protocol@1.1.1)':
     dependencies:
-      lavaclient: 5.0.0-rc.3(effect@2.4.19)(fast-check@3.23.2)
+      lavaclient: 5.0.0-rc.3(effect@3.14.5)(fast-check@3.23.2)
       lavalink-protocol: 1.1.1
       tiny-typed-emitter: 2.1.0
       tslib: 2.6.2
@@ -2971,9 +2968,7 @@ snapshots:
 
   ee-first@1.1.1: {}
 
-  effect@2.4.19: {}
-
-  effect@3.14.2:
+  effect@3.14.5:
     dependencies:
       '@standard-schema/spec': 1.0.0
       fast-check: 3.23.2
@@ -3474,12 +3469,12 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.24.5
 
-  lavaclient@5.0.0-rc.3(effect@2.4.19)(fast-check@3.23.2):
+  lavaclient@5.0.0-rc.3(effect@3.14.5)(fast-check@3.23.2):
     dependencies:
-      '@effect/schema': 0.49.4(effect@2.4.19)(fast-check@3.23.2)
-      lavalink-api-client: 1.0.1(lavalink-protocol@1.0.2(effect@2.4.19)(fast-check@3.23.2))
-      lavalink-protocol: 1.0.2(effect@2.4.19)(fast-check@3.23.2)
-      lavalink-ws-client: 1.0.1(lavalink-api-client@1.0.1(lavalink-protocol@1.1.1))(lavalink-protocol@1.0.2(effect@2.4.19)(fast-check@3.23.2))
+      '@effect/schema': 0.49.4(effect@3.14.5)(fast-check@3.23.2)
+      lavalink-api-client: 1.0.1(lavalink-protocol@1.0.2(effect@3.14.5)(fast-check@3.23.2))
+      lavalink-protocol: 1.0.2(effect@3.14.5)(fast-check@3.23.2)
+      lavalink-ws-client: 1.0.1(lavalink-api-client@1.0.1(lavalink-protocol@1.1.1))(lavalink-protocol@1.0.2(effect@3.14.5)(fast-check@3.23.2))
       tiny-typed-emitter: 2.1.0
       tslib: 2.6.2
     transitivePeerDependencies:
@@ -3488,15 +3483,15 @@ snapshots:
       - fast-check
       - utf-8-validate
 
-  lavalink-api-client@1.0.1(lavalink-protocol@1.0.2(effect@2.4.19)(fast-check@3.23.2)):
+  lavalink-api-client@1.0.1(lavalink-protocol@1.0.2(effect@3.14.5)(fast-check@3.23.2)):
     dependencies:
-      lavalink-protocol: 1.0.2(effect@2.4.19)(fast-check@3.23.2)
+      lavalink-protocol: 1.0.2(effect@3.14.5)(fast-check@3.23.2)
       tslib: 2.8.1
 
-  lavalink-protocol@1.0.2(effect@2.4.19)(fast-check@3.23.2):
+  lavalink-protocol@1.0.2(effect@3.14.5)(fast-check@3.23.2):
     dependencies:
       '@effect/data': 0.17.6
-      '@effect/schema': 0.49.4(effect@2.4.19)(fast-check@3.23.2)
+      '@effect/schema': 0.49.4(effect@3.14.5)(fast-check@3.23.2)
       tslib: 2.8.1
     transitivePeerDependencies:
       - effect
@@ -3504,14 +3499,14 @@ snapshots:
 
   lavalink-protocol@1.1.1:
     dependencies:
-      '@effect/schema': 0.67.24(effect@3.14.2)
-      effect: 3.14.2
+      '@effect/schema': 0.67.24(effect@3.14.5)
+      effect: 3.14.5
       tslib: 2.8.1
 
-  lavalink-ws-client@1.0.1(lavalink-api-client@1.0.1(lavalink-protocol@1.1.1))(lavalink-protocol@1.0.2(effect@2.4.19)(fast-check@3.23.2)):
+  lavalink-ws-client@1.0.1(lavalink-api-client@1.0.1(lavalink-protocol@1.1.1))(lavalink-protocol@1.0.2(effect@3.14.5)(fast-check@3.23.2)):
     dependencies:
-      lavalink-api-client: 1.0.1(lavalink-protocol@1.0.2(effect@2.4.19)(fast-check@3.23.2))
-      lavalink-protocol: 1.0.2(effect@2.4.19)(fast-check@3.23.2)
+      lavalink-api-client: 1.0.1(lavalink-protocol@1.0.2(effect@3.14.5)(fast-check@3.23.2))
+      lavalink-protocol: 1.0.2(effect@3.14.5)(fast-check@3.23.2)
       tslib: 2.8.1
       typed-emitter: 2.1.0
       ws: 8.17.0
