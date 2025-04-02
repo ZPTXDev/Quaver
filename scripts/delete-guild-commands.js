@@ -1,8 +1,10 @@
 import { Routes } from "discord.js";
 import { rest } from "./modules/restHandler.js";
-import { rootSettingsJson, scriptSettingsJson } from "./modules/configHandler.js"
+import { rootSettingsJson } from "./modules/configHandler.js"
+import scriptSettingsJson from "./settings.json" with { type: "json" }
 
-if (scriptSettingsJson.guildIds.length === 0) {
+const guildIds = scriptSettingsJson.guildIds
+if (guildIds.length === 0) {
     console.error("No guild ID(s) to process.")
     process.exit(1)
 }
