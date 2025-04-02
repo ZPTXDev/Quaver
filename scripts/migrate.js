@@ -3,9 +3,10 @@ import Keyv from 'keyv';
 import { set } from 'lodash-es';
 import { resolve } from 'path';
 import data from '../data.json';
-import { database } from '../settings.json' with { type: 'json' };
+import { rootSettingsJson } from './modules/configHandler.js'
 import { getDirname } from "./modules/fileUtils.js";
 
+const database = rootSettingsJson.database
 const dirname = getDirname(import.meta.url)
 const keyv = new Keyv(database ? `${database.protocol}://${resolve(dirname, '..', database.path)}` : `sqlite://${resolve(dirname, '..', 'database.sqlite')}`, { namespace: 'guild' });
 
