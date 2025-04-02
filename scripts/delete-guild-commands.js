@@ -15,9 +15,10 @@ async function deleteCommands(guildId) {
         const applicationGuildCommands = await rest.get(applicationGuildCommandsRoute);
         console.log(`[G ${guildId} | U ${clientId}] Concurrently deleting ${applicationGuildCommands.length} application guild commands...`);
         const deletedCommands = await Promise.all(
-            responseData.map(async function (command) {
-                console.log(`[G ${guildId} | U ${clientId}] Deleting command: ${command.id} (${command.name})`);
-                return await rest.delete(`${applicationGuildCommandsRoute}/${command.id}`);
+            applicationGuildCommands.map(async function (command) {
+                const commandId = command.id
+                console.log(`[G ${guildId} | U ${clientId}] Deleting command: ${commandId} (${command.name})`);
+                return await rest.delete(`${applicationGuildCommandsRoute}/${commandId}`);
             }),
         );
         console.log(`[G ${guildId} | U ${clientId}] Successfully deleted ${deletedCommands.length} application guild commands.`);
