@@ -1,17 +1,16 @@
-import { Routes } from "discord.js";
+import { applicationGlobalCommandsRoute } from "./modules/routes.js";
 import { rest } from "./modules/restHandler.js"
 import { getJsonCommands } from "./modules/jsonCommands.js";
-import { settingsJson } from "./modules/configHandler.js"
+import { rootSettingsJson } from "./modules/configHandler.js"
 import { getLocalesMap } from "./modules/localesMap.js";
 import { setLocales } from "../dist/lib/util/common.js";
 
-const clientId = settingsJson.applicationId
+const clientId = rootSettingsJson.applicationId
 
 const localesMap = await getLocalesMap();
 setLocales(localesMap)
 
 const commands = await getJsonCommands();
-const applicationGlobalCommandsRoute = Routes.applicationCommands(clientId);
 
 try {
     console.warn("Warning: Application global commands should only be registered once. The changes may take time to propagate across all guilds.");
