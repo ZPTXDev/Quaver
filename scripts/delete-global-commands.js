@@ -1,8 +1,8 @@
 import { Routes } from "discord.js";
 import { rest } from "./modules/restHandler.js";
-import { settingsJson } from "./modules/configHandler.js"
+import { rootSettingsJson } from "./modules/configHandler.js"
 
-const clientId = settingsJson.applicationId
+const clientId = rootSettingsJson.applicationId
 
 try {
     console.warn("Warning: Application global commands should only be deleted once. The changes may take time to propagate across all guilds.");

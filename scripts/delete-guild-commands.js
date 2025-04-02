@@ -1,13 +1,14 @@
 import { Routes } from "discord.js";
 import { rest } from "./modules/restHandler.js";
-import { settingsJson, guildIds } from "./modules/configHandler.js"
+import { rootSettingsJson, scriptSettingsJson } from "./modules/configHandler.js"
 
-if (guildIds.length === 0) {
+const guildIds = scriptSettingsJson.guildIds
+if (guildIds.length === 0 || guildIds[0] === "Paste your development servers' guild IDs here") {
     console.error("Unable to delete application guild commands. No guildIds provided.")
     process.exit(1)
 }
 
-const clientId = settingsJson.applicationId
+const clientId = rootSettingsJson.applicationId
 
 async function deleteCommands(guildId) {
     const applicationGuildCommandsRoute = Routes.applicationGuildCommands(clientId, guildId);

@@ -1,5 +1,4 @@
-import settingsJson from "../../settings.json" with { type: "json" }
+import rootSettingsJson from "../../settings.json" with { type: "json" }
+import scriptSettingsJson from "../settings.json" with { type: "json" }
 
-const guildIds = []
-
-export { settingsJson, guildIds }
+export { rootSettingsJson, scriptSettingsJson }

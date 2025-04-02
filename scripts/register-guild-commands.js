@@ -1,16 +1,17 @@
 import { Routes } from "discord.js";
 import { rest } from "./modules/restHandler.js"
 import { getJsonCommands } from "./modules/jsonCommands.js";
-import { settingsJson, guildIds } from "./modules/configHandler.js"
+import { rootSettingsJson, scriptSettingsJson } from "./modules/configHandler.js"
 import { getLocalesMap } from "./modules/localesMap.js";
 import { setLocales } from "../dist/lib/util/common.js";
 
-if (guildIds.length === 0) {
+const guildIds = scriptSettingsJson.guildIds
+if (guildIds.length === 0 || guildIds[0] === "Paste your development servers' guild IDs here") {
     console.error("Unable to register application guild commands. No guildIds provided.")
     process.exit(1)
 }
 
-const clientId = settingsJson.applicationId
+const clientId = rootSettingsJson.applicationId
 
 const localesMap = await getLocalesMap();
 setLocales(localesMap)
