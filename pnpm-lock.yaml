@@ -29,8 +29,8 @@ importers:
         specifier: ^2.4.3
         version: 2.4.3
       '@keyv/sqlite':
-        specifier: ^4.0.1
-        version: 4.0.1
+        specifier: ^4.0.2
+        version: 4.0.2
       '@lavaclient/plugin-effects':
         specifier: ^1.0.0-rc.2
         version: 1.0.0-rc.2(lavaclient@5.0.0-rc.3(effect@2.4.19)(fast-check@3.23.2))(lavalink-protocol@1.1.1)
@@ -274,8 +274,8 @@ packages:
   '@keyv/serialize@1.0.3':
     resolution: {integrity: sha512-qnEovoOp5Np2JDGonIDL6Ayihw0RhnRh6vxPuHo4RDn1UOzwEo4AeIfpL6UGIrsceWrCMiVPgwRjbHu4vYFc3g==}
 
-  '@keyv/sqlite@4.0.1':
-    resolution: {integrity: sha512-Ngs9jhElXN7efS9WvvCC/p6rXMbihna8eNLVBc421Zf+VcFd+pR4DOcS6yA9V22EKtAy4DEj7LtvEEIm0bb80A==}
+  '@keyv/sqlite@4.0.2':
+    resolution: {integrity: sha512-0tMWhvoe5gSkMYxnpkbnV6/f8ZAle1prm9drCyhKPQb3Pconk3zx+/3TX7adf6uY6ZF6xrGQE3o3ENcv/9QLUw==}
     engines: {node: '>= 18'}
 
   '@lavaclient/plugin-effects@1.0.0-rc.2':
@@ -2309,8 +2309,9 @@ snapshots:
     dependencies:
       buffer: 6.0.3
 
-  '@keyv/sqlite@4.0.1':
+  '@keyv/sqlite@4.0.2':
     dependencies:
+      keyv: 5.3.2(patch_hash=tg3f223bx2dgo6xy4spszqtwma)
       sqlite3: 5.1.7
     transitivePeerDependencies:
       - bluebird
