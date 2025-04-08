@@ -13,9 +13,7 @@
     "@napi-rs/pinyin": "^1.7.5",
     "@zptxdev/zptx-lib": "^1.1.0",
     "crypto-js": "^4.2.0",
-    "discord-api-types": "^0.37.119",
     "discord.js": "^14.18.0",
-    "effect": "2",
     "express": "^5.1.0",
     "genversion": "^3.2.0",
     "hangul-romanization": "^1.0.1",
@@ -96,5 +94,6 @@
       "winston-loki@6.1.3": "patches/winston-loki@6.1.3.patch"
     },
     "neverBuiltDependencies": []
-  }
+  },
+  "packageManager": "pnpm@8.15.1+sha1.8adba2d20330c02d3856e18c4eb3819d1d3ca6aa"
 }
