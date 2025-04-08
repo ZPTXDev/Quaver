@@ -1,11 +1,13 @@
 import { Routes } from "discord.js";
 import { rest } from "./modules/restHandler.js"
 import { getJsonCommands } from "./modules/jsonCommands.js";
-import { rootSettingsJson, scriptSettingsJson } from "./modules/configHandler.js"
+import { rootSettingsJson } from "./modules/configHandler.js"
+import scriptSettingsJson from "./settings.json" with { type: "json" }
 import { getLocalesMap } from "./modules/localesMap.js";
 import { setLocales } from "../dist/lib/util/common.js";
 
-if (scriptSettingsJson.guildIds.length === 0) {
+const guildIds = scriptSettingsJson.guildIds
+if (guildIds.length === 0) {
     console.error("No guild ID(s) to process.")
     process.exit(1)
 }
