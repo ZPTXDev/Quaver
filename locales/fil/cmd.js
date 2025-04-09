@@ -230,16 +230,7 @@ export default {
             },
             SOURCE: {
                 NAME: 'Pinagmulan',
-                DESCRIPTION: 'Ang default na source na gagamitin. Makaapekto sa /play na command.',
-                OPTIONS: {
-                    YOUTUBE: 'YouTube',
-                    YOUTUBEMUSIC: 'YouTube Music',
-                    DEEZER: 'Deezer',
-                    SOUNDCLOUD: 'SoundCloud',
-                    YANDEXMUSIC: 'Yandex Music',
-                    VKMUSIC: 'VK Music',
-                    TIDAL: 'Tidal'
-                }
+                DESCRIPTION: 'Ang default na source na gagamitin. Makaapekto sa /play na command.'
             },
             AUTOLYRICS: {
                 NAME: 'Auto Lyrics',
