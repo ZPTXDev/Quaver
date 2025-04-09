@@ -6,6 +6,10 @@ on:
     - cron: '0 0 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   crowdin:
     name: Sync translations
@@ -28,7 +32,7 @@ jobs:
           create_pull_request: true
           pull_request_title: 'chore(locales): new Crowdin translations'
           pull_request_labels: 'affects:locale, priority:p2, status:proposed, type:enhancement'
-          pull_request_base_branch_name: next
+          pull_request_base_branch_name: 'next'
           base_url: 'https://zapsquared.crowdin.com'
         env:
           GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
