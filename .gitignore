@@ -108,6 +108,7 @@ dist
 .vscode
 
 # Settings and Data
+/scripts/settings.json
 /settings.json
 /database.sqlite
 
