@@ -67,8 +67,16 @@ export function getLocaleString(
     }
     if (!localeString) return stringPath;
     const safeVars = vars.map((v): string => encodeURI(escapeMarkdown(v)));
+    const varMap: Record<string, string> = {};
     safeVars.forEach((v, i): void => {
-        localeString = localeString.replace(`%${i + 1}`, v);
+        varMap[`%${i + 1}`] = v;
+    });
+    localeString = localeString.replace(/%\d+/g, (match): string => {
+        const index = parseInt(match.slice(1), 10);
+        if (isNaN(index) || index < 1 || index > safeVars.length) {
+            return match;
+        }
+        return varMap[match];
     });
     return decodeURI(localeString);
 }
