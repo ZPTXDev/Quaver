@@ -102,7 +102,6 @@ export function checkLocaleCompletion(
     if (!locales.get(localeCode)) return 'LOCALE_MISSING';
     const englishStrings = locales.get('en');
     const foreignStrings = locales.get(localeCode);
-    let foreignStringCount = 0;
     let englishStringCount = 0;
     const missingStrings: string[] = [];
 
@@ -125,7 +124,7 @@ export function checkLocaleCompletion(
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     iterateObject(englishStrings as Record<string, any>);
-    foreignStringCount = englishStringCount - missingStrings.length;
+    const foreignStringCount = englishStringCount - missingStrings.length;
     // missing strings
     if (englishStringCount > foreignStringCount) {
         return {
@@ -268,7 +267,8 @@ export async function getFailedChecks(
                 }
                 break;
             case Check.InSessionVoice: {
-                const player = await member.client.music.players.fetch(guildId);
+                const player =
+                    await member?.client.music.players.fetch(guildId);
                 if (
                     player &&
                     member instanceof GuildMember &&

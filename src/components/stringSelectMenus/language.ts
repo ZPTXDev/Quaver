@@ -155,11 +155,13 @@ export default {
                 ],
             },
         ];
-        localeCompletion.completion !== 100
-            ? await interaction.message.edit(buildMessageOptions(...args))
-            : await interaction.replyHandler.reply(args[0], {
-                  ...args[1],
-                  force: ForceType.Update,
-              });
+        if (localeCompletion.completion !== 100) {
+            await interaction.message.edit(buildMessageOptions(...args));
+            return;
+        }
+        await interaction.replyHandler.reply(args[0], {
+            ...args[1],
+            force: ForceType.Update,
+        });
     },
 };

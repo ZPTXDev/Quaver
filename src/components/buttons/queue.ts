@@ -121,16 +121,16 @@ export default {
                 ),
             });
         updated.components[0] = ActionRowBuilder.from(original.components[0]);
-        (updated.components[0].components[0] = ButtonBuilder.from(
+        updated.components[0].components[0] = ButtonBuilder.from(
             original.components[0].components[0] as ButtonComponent,
         )
             .setCustomId(`queue:${page - 1}`)
-            .setDisabled(page - 1 < 1)),
-            (updated.components[0].components[2] = ButtonBuilder.from(
-                original.components[0].components[2] as ButtonComponent,
-            )
-                .setCustomId(`queue:${page + 1}`)
-                .setDisabled(page + 1 > pages.length));
+            .setDisabled(page - 1 < 1);
+        updated.components[0].components[2] = ButtonBuilder.from(
+            original.components[0].components[2] as ButtonComponent,
+        )
+            .setCustomId(`queue:${page + 1}`)
+            .setDisabled(page + 1 > pages.length);
         await interaction.replyHandler.reply(updated.embeds, {
             components: updated.components,
             force: ForceType.Update,

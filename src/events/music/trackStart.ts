@@ -239,7 +239,7 @@ export default {
                 });
                 json = await response.json();
                 lyrics = formatResponse(json, queue.player);
-            } catch (error) {
+            } catch {
                 return;
             }
             if (lyrics instanceof Error) {
@@ -263,7 +263,7 @@ export default {
             let embed;
             try {
                 embed = new EmbedBuilder().setFields(lyricsFields);
-            } catch (error) {
+            } catch {
                 return;
             }
             await queue.player.handler.send(embed, {

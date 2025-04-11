@@ -26,6 +26,7 @@ import {
     PermissionsBitField,
     SlashCommandBuilder,
 } from 'discord.js';
+import { LavalinkWSClientState } from 'lavalink-ws-client';
 
 export default {
     data: new SlashCommandBuilder()
@@ -118,6 +119,12 @@ export default {
             );
             return;
         }
+        if (interaction.client.music.ws.state !== LavalinkWSClientState.Ready) {
+            await interaction.replyHandler.locale('MUSIC.NOT_READY', {
+                type: MessageOptionsBuilderType.Error,
+            });
+            return;
+        }
         await interaction.deferReply();
         const query = interaction.options.getString('query');
         const insert = interaction.options.getBoolean('insert');
@@ -199,15 +206,17 @@ export default {
                 !interaction.guild
             ) {
                 if (interaction.guild) {
-                    timedOut
-                        ? await interaction.replyHandler.locale(
-                              'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
-                              { type: MessageOptionsBuilderType.Error },
-                          )
-                        : await interaction.replyHandler.locale(
-                              'DISCORD.INTERACTION.CANCELED',
-                              { vars: [interaction.user.id] },
-                          );
+                    if (timedOut) {
+                        await interaction.replyHandler.locale(
+                            'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
+                            { type: MessageOptionsBuilderType.Error },
+                        );
+                    } else {
+                        await interaction.replyHandler.locale(
+                            'DISCORD.INTERACTION.CANCELED',
+                            { vars: [interaction.user.id] },
+                        );
+                    }
                 }
                 await player.handler.disconnect();
                 return;

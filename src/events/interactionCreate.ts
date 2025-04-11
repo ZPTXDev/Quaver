@@ -8,12 +8,12 @@ import type {
     AllInteractions,
     CommandInteractions,
     CommandTypeHandler,
+    DirectMessage,
+    EmptyString,
+    FailedCommandPermissions,
     InteractionHandlerMapKeys,
     InteractionHandlerMapsFlat,
     InteractionIdType,
-    FailedCommandPermissions,
-    DirectMessage,
-    EmptyString,
 } from './interactionCreate.d.js';
 
 const CHANNEL_SELECTMENUS_MAP_KEY = 'channelSelectMenus';
@@ -350,7 +350,7 @@ async function onInteractionCreate(
             return;
         }
         logger.error({
-            message: `[G ${guildId} | U ${userId}] Encountered error with executing ${mapKey} ${idType}: ${id}`,
+            message: `[G ${guildId} | U ${userId}] Encountered error while executing ${mapKey} ${idType}: ${id}`,
             label: 'Quaver',
         });
         logger.error({

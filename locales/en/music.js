@@ -63,4 +63,5 @@ export default {
             },
         },
     },
+    NOT_READY: 'One moment please! I\'m still getting things ready.',
 };
