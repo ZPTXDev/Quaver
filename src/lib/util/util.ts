@@ -9,11 +9,7 @@ import type {
     SettingsPageOptions,
     WhitelistedFeatures,
 } from '#src/lib/util/common.d.js';
-import {
-    data,
-    locales,
-    MessageOptionsBuilderType,
-} from '#src/lib/util/common.js';
+import { data, locales, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import {
     acceptableSources,
     Check,
@@ -55,7 +51,7 @@ import type { ComponentInteractions } from '#src/events/interactionCreate.d.js';
  * @param vars - The extra variables required in some localized strings.
  * @returns The localized string, or LOCALE_MISSING if the locale is missing, or stringPath if the string is missing.
  */
-export function getLocaleString(
+function getLocaleString(
     localeCode: string,
     stringPath: string,
     ...vars: string[]
@@ -70,10 +66,11 @@ export function getLocaleString(
         localeString = get(strings, stringPath);
     }
     if (!localeString) return stringPath;
-    vars.forEach(
-        (v, i): string => (localeString = localeString.replace(`%${i + 1}`, v)),
-    );
-    return localeString;
+    const safeVars = vars.map((v): string => encodeURI(escapeMarkdown(v)));
+    safeVars.forEach((v, i): void => {
+        localeString = localeString.replace(`%${i + 1}`, v);
+    });
+    return decodeURI(localeString);
 }
 
 /**
