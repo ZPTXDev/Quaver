@@ -9,11 +9,7 @@ import type {
     SettingsPageOptions,
     WhitelistedFeatures,
 } from '#src/lib/util/common.d.js';
-import {
-    data,
-    locales,
-    MessageOptionsBuilderType,
-} from '#src/lib/util/common.js';
+import { data, locales, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import {
     acceptableSources,
     Check,
@@ -105,7 +101,6 @@ export function checkLocaleCompletion(
     if (!locales.get(localeCode)) return 'LOCALE_MISSING';
     const englishStrings = locales.get('en');
     const foreignStrings = locales.get(localeCode);
-    let foreignStringCount = 0;
     let englishStringCount = 0;
     const missingStrings: string[] = [];
 
@@ -128,7 +123,7 @@ export function checkLocaleCompletion(
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     iterateObject(englishStrings as Record<string, any>);
-    foreignStringCount = englishStringCount - missingStrings.length;
+    const foreignStringCount = englishStringCount - missingStrings.length;
     // missing strings
     if (englishStringCount > foreignStringCount) {
         return {
