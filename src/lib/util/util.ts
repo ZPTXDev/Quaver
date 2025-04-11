@@ -266,7 +266,8 @@ export async function getFailedChecks(
                 }
                 break;
             case Check.InSessionVoice: {
-                const player = await member.client.music.players.fetch(guildId);
+                const player =
+                    await member?.client.music.players.fetch(guildId);
                 if (
                     player &&
                     member instanceof GuildMember &&
