@@ -1,6 +1,5 @@
 name: Bug report
 description: Something not working as intended, or affecting normal functionality.
-labels: [ 'type:bug' ]
 type: Bug
 body:
   - type: textarea
