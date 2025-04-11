@@ -1,30 +1,31 @@
 name: Feature request
 description: Proposal for a new feature or improvement.
 labels: [ 'type:enhancement' ]
+type: Feature
 body:
-- type: textarea
-  attributes:
-    label: Describe the feature
-    description: What feature are you proposing?
-  validations:
-    required: true
-- type: dropdown
-  attributes:
-    label: Priority
-    description: The priority you value this feature request at.
-    options:
-      - Low
-      - Medium
-      - High
-  validations:
-    required: true
-- type: textarea
-  attributes:
-    label: List the benefits of adding such a feature
-    description: What will you gain from this feature?
-  validations:
-    required: true
-- type: textarea
-  attributes:
-    label: Is this feature request related to a problem?
-    description: Is there a problem with the current implementation (if any), or is there an issue that would be resolved with this feature?
+  - type: textarea
+    attributes:
+      label: Describe the feature
+      description: What feature are you proposing?
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Priority
+      description: The priority you value this feature request at.
+      options:
+        - Low
+        - Medium
+        - High
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: List the benefits of adding such a feature
+      description: What will you gain from this feature?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Is this feature request related to a problem?
+      description: Is there a problem with the current implementation (if any), or is there an issue that would be resolved with this feature?
