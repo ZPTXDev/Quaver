@@ -39,6 +39,7 @@ import {
     PermissionsBitField,
     StringSelectMenuBuilder,
 } from 'discord.js';
+import { LavalinkWSClientState } from 'lavalink-ws-client';
 
 export default {
     name: 'search',
@@ -108,6 +109,15 @@ export default {
                     'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
                     { type: MessageOptionsBuilderType.Error },
                 );
+                return;
+            }
+            if (
+                interaction.client.music.ws.state !==
+                LavalinkWSClientState.Ready
+            ) {
+                await interaction.replyHandler.locale('MUSIC.NOT_READY', {
+                    type: MessageOptionsBuilderType.Error,
+                });
                 return;
             }
             clearTimeout(state.timeout);

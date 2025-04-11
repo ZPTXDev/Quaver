@@ -21,6 +21,7 @@ import {
 import type { APIGuild, APIUser, Snowflake } from 'discord.js';
 import { ChannelType, GuildMember, PermissionsBitField } from 'discord.js';
 import type { Socket } from 'socket.io';
+import { LavalinkWSClientState } from 'lavalink-ws-client';
 
 export default {
     name: 'update',
@@ -90,6 +91,9 @@ export default {
                 let me = await bot.guilds.cache.get(guildId).members.fetchMe();
                 if (me.isCommunicationDisabled()) {
                     return callback({ status: Response.BotTimedOutError });
+                }
+                if (bot.music.ws.state !== LavalinkWSClientState.Ready) {
+                    return callback({ status: Response.NotReadyError });
                 }
                 const query = item.value;
                 let tracks = [];
@@ -483,4 +487,5 @@ enum Response {
     BotTimedOutError = 'error-bot-timed-out',
     NoResultsError = 'error-no-results',
     UserNotInChannelError = 'error-user-not-in-channel',
+    NotReadyError = 'error-not-ready',
 }

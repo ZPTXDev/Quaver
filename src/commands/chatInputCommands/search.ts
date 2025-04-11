@@ -17,7 +17,8 @@ import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
 import type {
     ChatInputCommandInteraction,
     SelectMenuComponentOptionData,
-    SlashCommandStringOption } from 'discord.js';
+    SlashCommandStringOption,
+} from 'discord.js';
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -30,6 +31,7 @@ import {
     SlashCommandBuilder,
     StringSelectMenuBuilder,
 } from 'discord.js';
+import { LavalinkWSClientState } from 'lavalink-ws-client';
 
 // credit: https://github.com/lavaclient/djs-v13-example/blob/main/src/commands/Play.ts
 export default {
@@ -73,6 +75,12 @@ export default {
                 'DISCORD.CHANNEL_UNSUPPORTED',
                 { type: MessageOptionsBuilderType.Error },
             );
+            return;
+        }
+        if (interaction.client.music.ws.state !== LavalinkWSClientState.Ready) {
+            await interaction.replyHandler.locale('MUSIC.NOT_READY', {
+                type: MessageOptionsBuilderType.Error,
+            });
             return;
         }
         await interaction.deferReply();
