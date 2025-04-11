@@ -89,30 +89,35 @@ export default {
                 whitelisted === WhitelistStatus.NotWhitelisted ||
                 whitelisted === WhitelistStatus.Expired
             ) {
-                settings.features.autolyrics.premium && settings.premiumURL
-                    ? await interaction.replyHandler.locale(
-                          'FEATURE.NO_PERMISSION.PREMIUM',
-                          {
-                              type: MessageOptionsBuilderType.Error,
-                              components: [
-                                  new ActionRowBuilder<ButtonBuilder>().setComponents(
-                                      new ButtonBuilder()
-                                          .setLabel(
-                                              await getGuildLocaleString(
-                                                  interaction.guildId,
-                                                  'MISC.GET_PREMIUM',
-                                              ),
-                                          )
-                                          .setStyle(ButtonStyle.Link)
-                                          .setURL(settings.premiumURL),
-                                  ),
-                              ],
-                          },
-                      )
-                    : await interaction.replyHandler.locale(
-                          'FEATURE.NO_PERMISSION.DEFAULT',
-                          { type: MessageOptionsBuilderType.Error },
-                      );
+                if (
+                    settings.features.autolyrics.premium &&
+                    settings.premiumURL
+                ) {
+                    await interaction.replyHandler.locale(
+                        'FEATURE.NO_PERMISSION.PREMIUM',
+                        {
+                            type: MessageOptionsBuilderType.Error,
+                            components: [
+                                new ActionRowBuilder<ButtonBuilder>().setComponents(
+                                    new ButtonBuilder()
+                                        .setLabel(
+                                            await getGuildLocaleString(
+                                                interaction.guildId,
+                                                'MISC.GET_PREMIUM',
+                                            ),
+                                        )
+                                        .setStyle(ButtonStyle.Link)
+                                        .setURL(settings.premiumURL),
+                                ),
+                            ],
+                        },
+                    );
+                    return;
+                }
+                await interaction.replyHandler.locale(
+                    'FEATURE.NO_PERMISSION.DEFAULT',
+                    { type: MessageOptionsBuilderType.Error },
+                );
                 return;
             }
         }

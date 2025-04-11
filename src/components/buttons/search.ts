@@ -7,9 +7,9 @@ import type {
     QuaverSong,
 } from '#src/lib/util/common.d.js';
 import {
-    MessageOptionsBuilderType,
     data,
     logger,
+    MessageOptionsBuilderType,
     searchState,
 } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
@@ -35,9 +35,9 @@ import {
     ButtonBuilder,
     ChannelType,
     EmbedBuilder,
+    escapeMarkdown,
     PermissionsBitField,
     StringSelectMenuBuilder,
-    escapeMarkdown,
 } from 'discord.js';
 
 export default {
@@ -158,21 +158,23 @@ export default {
                 const timedOut = me.isCommunicationDisabled();
                 if (!member.voice.channelId || timedOut || !interaction.guild) {
                     if (interaction.guild) {
-                        timedOut
-                            ? await interaction.replyHandler.locale(
-                                  'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
-                                  {
-                                      type: MessageOptionsBuilderType.Error,
-                                      components: [],
-                                  },
-                              )
-                            : await interaction.replyHandler.locale(
-                                  'DISCORD.INTERACTION.CANCELED',
-                                  {
-                                      vars: [interaction.user.id],
-                                      components: [],
-                                  },
-                              );
+                        if (timedOut) {
+                            await interaction.replyHandler.locale(
+                                'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
+                                {
+                                    type: MessageOptionsBuilderType.Error,
+                                    components: [],
+                                },
+                            );
+                        } else {
+                            await interaction.replyHandler.locale(
+                                'DISCORD.INTERACTION.CANCELED',
+                                {
+                                    vars: [interaction.user.id],
+                                    components: [],
+                                },
+                            );
+                        }
                     }
                     await player.handler.disconnect();
                     return;

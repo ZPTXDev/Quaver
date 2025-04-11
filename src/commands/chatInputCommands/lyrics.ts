@@ -51,9 +51,7 @@ export default {
         let lyrics: string | Error;
         await interaction.deferReply();
         const player = interaction.guildId
-            ? await interaction.client.music.players.fetch(
-                interaction.guildId,
-            )
+            ? await interaction.client.music.players.fetch(interaction.guildId)
             : null;
         if (!query) {
             if (
@@ -68,10 +66,13 @@ export default {
                 return;
             }
             try {
-                const response = await interaction.client.music.rest.execute({ path: `/v4/sessions/${player.api.session.id}/players/${interaction.guildId}/lyrics`, method: 'GET' });
+                const response = await interaction.client.music.rest.execute({
+                    path: `/v4/sessions/${player.api.session.id}/players/${interaction.guildId}/lyrics`,
+                    method: 'GET',
+                });
                 json = await response.json();
                 lyrics = formatResponse(json, player);
-            } catch (error) {
+            } catch {
                 await interaction.replyHandler.locale(
                     'CMD.LYRICS.RESPONSE.NO_RESULTS',
                     { type: MessageOptionsBuilderType.Error },
@@ -80,10 +81,13 @@ export default {
             }
         } else {
             try {
-                const response = await interaction.client.music.rest.execute({ path: `/v4/lyrics/search?query=${query}&source=genius`, method: 'GET' });
+                const response = await interaction.client.music.rest.execute({
+                    path: `/v4/lyrics/search?query=${query}&source=genius`,
+                    method: 'GET',
+                });
                 json = await response.json();
                 lyrics = formatResponse(json);
-            } catch (error) {
+            } catch {
                 await interaction.replyHandler.locale(
                     'CMD.LYRICS.RESPONSE.NO_RESULTS',
                     { type: MessageOptionsBuilderType.Error },
@@ -122,32 +126,29 @@ export default {
         let embed;
         try {
             embed = new EmbedBuilder().setFields(lyricsFields);
-        } catch (error) {
+        } catch {
             await interaction.replyHandler.locale(
                 'CMD.LYRICS.RESPONSE.NO_RESULTS',
                 { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
-        await interaction.replyHandler.reply(
-            embed,
-            {
-                components: romanizeFrom
-                    ? [
-                          new ActionRowBuilder<ButtonBuilder>().addComponents(
-                              new ButtonBuilder()
-                                  .setCustomId(`lyrics:${romanizeFrom}`)
-                                  .setStyle(ButtonStyle.Secondary)
-                                  .setLabel(
-                                      await getGuildLocaleString(
-                                          interaction.guildId,
-                                          `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}`,
-                                      ),
+        await interaction.replyHandler.reply(embed, {
+            components: romanizeFrom
+                ? [
+                      new ActionRowBuilder<ButtonBuilder>().addComponents(
+                          new ButtonBuilder()
+                              .setCustomId(`lyrics:${romanizeFrom}`)
+                              .setStyle(ButtonStyle.Secondary)
+                              .setLabel(
+                                  await getGuildLocaleString(
+                                      interaction.guildId,
+                                      `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}`,
                                   ),
-                          ),
-                      ]
-                    : [],
-            },
-        );
+                              ),
+                      ),
+                  ]
+                : [],
+        });
     },
 };
