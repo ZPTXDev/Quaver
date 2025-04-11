@@ -3,7 +3,7 @@ import type {
     QuaverInteraction,
     QuaverPlayer,
 } from '#src/lib/util/common.d.js';
-import { MessageOptionsBuilderType, data } from '#src/lib/util/common.js';
+import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
@@ -74,30 +74,32 @@ export default {
                 );
                 return;
             case PlayerResponse.FeatureNotWhitelisted:
-                settings.features.stay.premium && settings.premiumURL
-                    ? await interaction.replyHandler.locale(
-                          'FEATURE.NO_PERMISSION.PREMIUM',
-                          {
-                              type: MessageOptionsBuilderType.Error,
-                              components: [
-                                  new ActionRowBuilder<ButtonBuilder>().setComponents(
-                                      new ButtonBuilder()
-                                          .setLabel(
-                                              await getGuildLocaleString(
-                                                  interaction.guildId,
-                                                  'MISC.GET_PREMIUM',
-                                              ),
-                                          )
-                                          .setStyle(ButtonStyle.Link)
-                                          .setURL(settings.premiumURL),
-                                  ),
-                              ],
-                          },
-                      )
-                    : await interaction.replyHandler.locale(
-                          'FEATURE.NO_PERMISSION.DEFAULT',
-                          { type: MessageOptionsBuilderType.Error },
-                      );
+                if (settings.features.stay.premium && settings.premiumURL) {
+                    await interaction.replyHandler.locale(
+                        'FEATURE.NO_PERMISSION.PREMIUM',
+                        {
+                            type: MessageOptionsBuilderType.Error,
+                            components: [
+                                new ActionRowBuilder<ButtonBuilder>().setComponents(
+                                    new ButtonBuilder()
+                                        .setLabel(
+                                            await getGuildLocaleString(
+                                                interaction.guildId,
+                                                'MISC.GET_PREMIUM',
+                                            ),
+                                        )
+                                        .setStyle(ButtonStyle.Link)
+                                        .setURL(settings.premiumURL),
+                                ),
+                            ],
+                        },
+                    );
+                    return;
+                }
+                await interaction.replyHandler.locale(
+                    'FEATURE.NO_PERMISSION.DEFAULT',
+                    { type: MessageOptionsBuilderType.Error },
+                );
                 return;
             case PlayerResponse.QueueChannelMissing: {
                 const applicationCommands =

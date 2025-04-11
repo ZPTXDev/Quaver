@@ -23,13 +23,9 @@ import type {
     APIEmbedField,
     APISelectMenuOption,
     BaseMessageOptions,
-    ButtonInteraction,
     Interaction,
     MessageActionRowComponentBuilder,
-    ModalSubmitInteraction,
-    RoleSelectMenuInteraction,
     Snowflake,
-    StringSelectMenuInteraction,
 } from 'discord.js';
 import {
     ActionRowBuilder,
@@ -45,6 +41,7 @@ import {
 import { readdirSync } from 'fs';
 import { get } from 'lodash-es';
 import type { LocaleCompletionState, LyricsResponse } from './util.d.js';
+import type { ComponentInteractions } from '#src/events/interactionCreate.d.js';
 
 /**
  * Returns the localized string.
@@ -104,7 +101,6 @@ export function checkLocaleCompletion(
     if (!locales.get(localeCode)) return 'LOCALE_MISSING';
     const englishStrings = locales.get('en');
     const foreignStrings = locales.get(localeCode);
-    let foreignStringCount = 0;
     let englishStringCount = 0;
     const missingStrings: string[] = [];
 
@@ -127,7 +123,7 @@ export function checkLocaleCompletion(
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     iterateObject(englishStrings as Record<string, any>);
-    foreignStringCount = englishStringCount - missingStrings.length;
+    const foreignStringCount = englishStringCount - missingStrings.length;
     // missing strings
     if (englishStringCount > foreignStringCount) {
         return {
@@ -244,11 +240,7 @@ export async function getFailedChecks(
     checks: Check[],
     guildId: Snowflake,
     member: GuildMember & { client: QuaverClient },
-    interaction?:
-        | ButtonInteraction
-        | StringSelectMenuInteraction
-        | RoleSelectMenuInteraction
-        | ModalSubmitInteraction,
+    interaction?: ComponentInteractions,
 ): Promise<Check[]> {
     const failedChecks: Check[] = [];
     for (const check of checks ?? []) {

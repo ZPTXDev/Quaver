@@ -136,7 +136,7 @@ export default {
     PLAY: {
         DESCRIPTION: 'Add a track to the queue.',
         OPTION: {
-            QUERY: 'YouTube search query or a link from Spotify or YouTube.',
+            QUERY: 'Your search query or a link.',
             INSERT: 'Whether or not to play the track next.',
         },
         RESPONSE: {
@@ -180,9 +180,9 @@ export default {
         },
     },
     SEARCH: {
-        DESCRIPTION: 'Search YouTube for a track.',
+        DESCRIPTION: 'Search for a track.',
         OPTION: {
-            QUERY: 'YouTube search query.',
+            QUERY: 'Your search query.',
         },
         RESPONSE: {
             USE_PLAY_CMD: 'Try using </play:%1> instead.',
@@ -240,7 +240,7 @@ export default {
             },
             NOTIFYIN247: {
                 NAME: 'Notify in 24/7 mode',
-                DESCRIPTION: 'Whether or not to send "Now Playing" messages in 24/7 mode.',
+                DESCRIPTION: 'Whether or not to send "Now playing" messages in 24/7 mode.',
             },
             FORMAT: {
                 NAME: 'Format',

@@ -28,10 +28,13 @@ export default {
         let lyrics: string | Error;
         await interaction.deferReply();
         try {
-            const response = await interaction.client.music.rest.execute({ path: `/v4/lyrics/search?query=${query}&source=genius`, method: 'GET' });
+            const response = await interaction.client.music.rest.execute({
+                path: `/v4/lyrics/search?query=${query}&source=genius`,
+                method: 'GET',
+            });
             json = await response.json();
             lyrics = formatResponse(json);
-        } catch (error) {
+        } catch {
             await interaction.replyHandler.locale(
                 'CMD.LYRICS.RESPONSE.NO_RESULTS',
                 { type: MessageOptionsBuilderType.Error },
@@ -78,12 +81,12 @@ export default {
                 text:
                     romanizeFrom === 'japanese'
                         ? await getGuildLocaleString(
-                            interaction.guildId,
-                            'CMD.LYRICS.MISC.JAPANESE_INACCURATE',
-                        )
+                              interaction.guildId,
+                              'CMD.LYRICS.MISC.JAPANESE_INACCURATE',
+                          )
                         : null,
             });
-        } catch (error) {
+        } catch {
             await interaction.replyHandler.locale(
                 'CMD.LYRICS.RESPONSE.NO_RESULTS',
                 { type: MessageOptionsBuilderType.Error },

@@ -1,9 +1,13 @@
-import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions } from '#src/lib/util/common.d.js';
-import { logger, MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import { buildMessageOptions, getGuildLocaleString } from '#src/lib/util/util.js';
 import type {
-    AutocompleteInteraction,
-    Interaction,
+    MessageOptionsBuilderInputs,
+    MessageOptionsBuilderOptions,
+} from '#src/lib/util/common.d.js';
+import { logger, MessageOptionsBuilderType } from '#src/lib/util/common.js';
+import {
+    buildMessageOptions,
+    getGuildLocaleString,
+} from '#src/lib/util/util.js';
+import type {
     InteractionCallbackResponse,
     InteractionEditReplyOptions,
     InteractionReplyOptions,
@@ -13,16 +17,17 @@ import type {
 } from 'discord.js';
 import { MessageFlags, PermissionsBitField } from 'discord.js';
 import type { AdditionalBuilderOptions } from './ReplyHandler.d.js';
+import type { NonSpecialInteractions } from '#src/events/interactionCreate.d.js';
 
 /** Class for handling replies to interactions. */
 export default class ReplyHandler {
-    interaction: Exclude<Interaction, AutocompleteInteraction>;
+    interaction: NonSpecialInteractions;
 
     /**
      * Create an instance of ReplyHandler.
      * @param interaction - The discord.js ChatInputCommandInteraction object.
      */
-    constructor(interaction: Exclude<Interaction, AutocompleteInteraction>) {
+    constructor(interaction: NonSpecialInteractions) {
         this.interaction = interaction;
     }
 
