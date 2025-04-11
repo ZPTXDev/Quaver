@@ -27,7 +27,7 @@ export default {
                 token,
                 settings.features.web.encryptionKey,
             ).toString(CryptoJS.enc.Utf8);
-        } catch (error) {
+        } catch {
             return callback({ status: 'error-generic' });
         }
         const user = await request('https://discord.com/api/users/@me', {
