@@ -51,7 +51,7 @@ import type { ComponentInteractions } from '#src/events/interactionCreate.d.js';
  * @param vars - The extra variables required in some localized strings.
  * @returns The localized string, or LOCALE_MISSING if the locale is missing, or stringPath if the string is missing.
  */
-function getLocaleString(
+export function getLocaleString(
     localeCode: string,
     stringPath: string,
     ...vars: string[]
