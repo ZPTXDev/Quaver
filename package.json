@@ -94,5 +94,6 @@
       "winston-loki@6.1.3": "patches/winston-loki@6.1.3.patch"
     },
     "neverBuiltDependencies": []
-  }
+  },
+  "packageManager": "pnpm@8.15.9"
 }
