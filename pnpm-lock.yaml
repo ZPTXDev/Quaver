@@ -70,6 +70,9 @@ dependencies:
   lavalink-protocol:
     specifier: ^1.1.1
     version: 1.1.1
+  lavalink-ws-client:
+    specifier: ^1.0.2
+    version: 1.0.2(lavalink-api-client@1.0.2)(lavalink-protocol@1.1.1)
   lodash-es:
     specifier: ^4.17.21
     version: 4.17.21
@@ -2418,7 +2421,7 @@ packages:
     engines: {node: '>=20'}
     dependencies:
       '@effect/schema': 0.49.4(effect@2.0.0-next.56)(fast-check@3.23.2)
-      lavalink-api-client: 1.0.1(lavalink-protocol@1.1.1)
+      lavalink-api-client: 1.0.1(lavalink-protocol@1.0.2)
       lavalink-protocol: 1.0.2(effect@2.0.0-next.56)(fast-check@3.23.2)
       lavalink-ws-client: 1.0.1(lavalink-api-client@1.0.1)(lavalink-protocol@1.0.2)
       tiny-typed-emitter: 2.1.0
@@ -2430,11 +2433,21 @@ packages:
       - utf-8-validate
     dev: false
 
-  /lavalink-api-client@1.0.1(lavalink-protocol@1.1.1):
+  /lavalink-api-client@1.0.1(lavalink-protocol@1.0.2):
     resolution: {integrity: sha512-ur4rrOf68mEKQQ6SwDdzG/8W+ew6zpguLPxny14DjEGxDz/mXvDtILovXpFRR5S4d8Ko9xZygIJ9YqEQfgKC/w==}
     engines: {node: '>=20'}
     peerDependencies:
       lavalink-protocol: 1.0.2
+    dependencies:
+      lavalink-protocol: 1.0.2(effect@2.0.0-next.56)(fast-check@3.23.2)
+      tslib: 2.8.1
+    dev: false
+
+  /lavalink-api-client@1.0.2(lavalink-protocol@1.1.1):
+    resolution: {integrity: sha512-lYljdof2OqW+NbI1yeu+XdAMpjfkEhVCZkmQBIV/6nMAQZakqFwKUvRFYPxx1XsbjOkGSlkfBYy1Bq8p0v8R7w==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      lavalink-protocol: 1.1.1
     dependencies:
       lavalink-protocol: 1.1.1
       tslib: 2.8.1
@@ -2468,8 +2481,25 @@ packages:
       lavalink-api-client: 1.0.1
       lavalink-protocol: 1.0.2
     dependencies:
-      lavalink-api-client: 1.0.1(lavalink-protocol@1.1.1)
+      lavalink-api-client: 1.0.1(lavalink-protocol@1.0.2)
       lavalink-protocol: 1.0.2(effect@2.0.0-next.56)(fast-check@3.23.2)
+      tslib: 2.8.1
+      typed-emitter: 2.1.0
+      ws: 8.18.1
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+    dev: false
+
+  /lavalink-ws-client@1.0.2(lavalink-api-client@1.0.2)(lavalink-protocol@1.1.1):
+    resolution: {integrity: sha512-D6GDxASMlz6lEEARbXP6Kg5DfIV4apTSAfX7OBkkKw66qD+hoV2wmqDMQY+XKgaTv+igYKyL17snsDKg9ZVb+Q==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      lavalink-api-client: 1.0.2
+      lavalink-protocol: 1.1.1
+    dependencies:
+      lavalink-api-client: 1.0.2(lavalink-protocol@1.1.1)
+      lavalink-protocol: 1.1.1
       tslib: 2.8.1
       typed-emitter: 2.1.0
       ws: 8.18.1
