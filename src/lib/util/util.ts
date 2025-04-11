@@ -66,10 +66,19 @@ export function getLocaleString(
         localeString = get(strings, stringPath);
     }
     if (!localeString) return stringPath;
-    vars.forEach(
-        (v, i): string => (localeString = localeString.replace(`%${i + 1}`, v)),
-    );
-    return localeString;
+    const safeVars = vars.map((v): string => encodeURI(escapeMarkdown(v)));
+    const varMap: Record<string, string> = {};
+    safeVars.forEach((v, i): void => {
+        varMap[`%${i + 1}`] = v;
+    });
+    localeString = localeString.replace(/%\d+/g, (match): string => {
+        const index = parseInt(match.slice(1), 10);
+        if (isNaN(index) || index < 1 || index > safeVars.length) {
+            return match;
+        }
+        return varMap[match];
+    });
+    return decodeURI(localeString);
 }
 
 /**
