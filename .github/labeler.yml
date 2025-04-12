@@ -1,30 +1,39 @@
-'priority:p0':
-  - '(### Severity\n\nCritical)|(- \[x] Critical)'
-'priority:p1':
-  - '(### (Priority|Severity)\n\nHigh)|(- \[x] High)'
-'priority:p2':
-  - '(### (Priority|Severity)\n\nMedium)|(- \[x] Medium)'
-'priority:p3':
-  - '(### (Priority|Severity)\n\nLow)|(- \[x] Low)'
-'pr:type:feat':
-  - '(feat:|- \[x] Feature)'
-'pr:type:fix':
-  - '(fix:|- \[x] Bug fix)'
-'type:bug':
-  - '- \[x] Bug fix'
-'type:enhancement':
-  - '(- \[x] Feature|- \[x] Other)'
-'affects:documentation':
-  - '(- \[x] Documentation only|\bdoc[s]\b|\bdocumentation[s]\b)'
-'affects:functionality':
-  - '\bfunctionalit(?:y|ies)\b'
-'affects:locale':
-  - '(\blocale[s]?\b|\blocali(?:s|z)(?:e[d]?|ation)\b)'
-'affects:permissions':
-  - '\bpermission[s]?\b'
-'status:proposed':
-  - '.*'
-'branch:stable':
-  - '(\* \[x]  Stable)|(- \[x] Stable)'
-'branch:next':
-  - '(\* \[x]  Next)|(- \[x] Next)'
+version: 1
+labels:
+  - label: "priority:p0"
+    body: "(### Severity\n\nCritical)|(- \[x] Critical)"
+  - label: "priority:p1"
+    body: "(### (Priority|Severity)\n\nHigh)|(- \[x] High)"
+  - label: "priority:p2"
+    body: "(### (Priority|Severity)\n\nMedium)|(- \[x] Medium)"
+  - label: "priority:p3"
+    body: "(### (Priority|Severity)\n\nLow)|(- \[x] Low)"
+  - label: "pr:type:feat"
+    type: "pull_request"
+    body: "- \[x] Feature"
+  - label: "pr:type:feat"
+    type: "pull_request"
+    title: "^feat:.*"
+  - label: "pr:type:fix"
+    type: "pull_request"
+    body: "- \[x] Bug fix"
+  - label: "pr:type:fix"
+    type: "pull_request"
+    title: "^fix:.*"
+  - label: "affects:documentation"
+    body: "(- \[x] Documentation only|\bdoc[s]\b|\bdocumentation[s]\b)"
+  - label: "affects:functionality"
+    body: "\bfunctionalit(?:y|ies)\b"
+  - label: "affects:locale"
+    body: "(\blocale[s]?\b|\blocali(?:s|z)(?:e[d]?|ation)\b)"
+  - label: "affects:locale"
+    files:
+      - "\\/locales\\/.*"
+  - label: "affects:permissions"
+    body: "\bpermission[s]?\b"
+  - label: "branch:stable"
+    type: "issue"
+    body: "- \[x] Stable"
+  - label: "branch:next"
+    type: "issue"
+    body: "- \[x] Next"

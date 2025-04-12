@@ -31,7 +31,7 @@ jobs:
           crowdin_branch_name: 'next'
           create_pull_request: true
           pull_request_title: 'chore(locales): new Crowdin translations'
-          pull_request_labels: 'affects:locale, priority:p2, status:proposed, type:enhancement'
+          pull_request_labels: 'affects:locale, priority:p2'
           pull_request_base_branch_name: 'next'
           base_url: 'https://zapsquared.crowdin.com'
         env:
