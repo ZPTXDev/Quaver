@@ -22,7 +22,7 @@ export default {
     },
     PLAYER: {
         FILTER_NOTE: 'This may take a few seconds to apply',
-        TRACK_SKIPPED_ERROR: 'Skipped [**%1**](%2) as an error occurred: `%3`',
+        TRACK_SKIPPED_ERROR: 'Skipped [**%1**](%2) as an error occurred while loading the track.',
         QUEUE_CLEARED_ERROR: 'Cleared queue as an error occurred multiple times consecutively.',
         LOOP_TRACK_DISABLED: 'Disabled looping as the track is less than 15 seconds long.',
         LOOP_QUEUE_DISABLED: 'Disabled looping as the queue is less than 15 seconds long.',
