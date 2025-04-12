@@ -1,8 +1,8 @@
 import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.d.js';
 import {
-    MessageOptionsBuilderType,
     data,
     logger,
+    MessageOptionsBuilderType,
 } from '#src/lib/util/common.js';
 import { LoopType } from '@lavaclient/plugin-queue';
 import type { Collection, GuildMember, Snowflake } from 'discord.js';
@@ -14,28 +14,19 @@ export default {
     async execute(
         queue: QuaverQueue,
         track: QuaverSong,
-        reason:
-            | 'PLAYLIST_LOADED'
-            | 'TRACK_LOADED'
-            | 'SEARCH_RESULT'
-            | 'NO_MATCHES'
-            | 'LOAD_FAILED',
+        reason: 'cleanup' | 'finished' | 'loadFailed' | 'replaced' | 'stopped',
     ): Promise<void> {
         const { bot } = await import('#src/main.js');
         delete queue.player.skip;
-        if (reason === 'LOAD_FAILED') {
+        if (reason === 'loadFailed') {
             logger.warn({
-                message: `[G ${queue.player.id}] Track skipped with reason: ${reason}`,
+                message: `[G ${queue.player.id}] Track skipped as it failed to load`,
                 label: 'Quaver',
             });
             await queue.player.handler.locale(
                 'MUSIC.PLAYER.TRACK_SKIPPED_ERROR',
                 {
-                    vars: [
-                        escapeMarkdown(track.info.title),
-                        track.info.uri,
-                        reason,
-                    ],
+                    vars: [escapeMarkdown(track.info.title), track.info.uri],
                     type: MessageOptionsBuilderType.Warning,
                 },
             );
