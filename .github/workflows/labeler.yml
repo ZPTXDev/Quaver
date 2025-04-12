@@ -1,9 +1,9 @@
 name: Labeler
 on:
   issues:
-    types: [opened, edited]
+    types: [ opened, edited ]
   pull_request_target:
-    types: [opened, edited]
+    types: [ opened, edited ]
 
 jobs:
   labeler:
@@ -12,9 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Assign Labels
-        uses: ZPTXDev/issue-labeler@master
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          configuration-path: .github/labeler.yml
-          enable-versioned-regex: 0
-          include-title: 1
+        uses: srvaroa/labeler@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
