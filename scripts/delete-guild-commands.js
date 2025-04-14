@@ -1,15 +1,15 @@
-import { Routes } from "discord.js";
-import { rest } from "./modules/restHandler.js";
-import { rootSettingsJson } from "./modules/configHandler.js"
-import scriptSettingsJson from "./settings.json" with { type: "json" }
+import { Routes } from 'discord.js';
+import { rest } from './modules/restHandler.js';
+import { rootSettingsJson } from './modules/configHandler.js';
+import scriptSettingsJson from './settings.json' with { type: 'json' };
 
-const guildIds = scriptSettingsJson.guildIds
+const guildIds = scriptSettingsJson.guildIds;
 if (guildIds.length === 0) {
-    console.error("No guild ID(s) to process.")
-    process.exit(1)
+    console.error('No guild ID(s) to process.');
+    process.exit(1);
 }
 
-const clientId = rootSettingsJson.applicationId
+const clientId = rootSettingsJson.applicationId;
 
 async function deleteCommands(guildId) {
     const applicationGuildCommandsRoute = Routes.applicationGuildCommands(clientId, guildId);
@@ -17,8 +17,8 @@ async function deleteCommands(guildId) {
         const applicationGuildCommands = await rest.get(applicationGuildCommandsRoute);
         console.log(`[G ${guildId} | U ${clientId}] Concurrently deleting ${applicationGuildCommands.length} application guild commands...`);
         const deletedCommands = await Promise.all(
-            applicationGuildCommands.map(async function (command) {
-                const commandId = command.id
+            applicationGuildCommands.map(async function(command) {
+                const commandId = command.id;
                 console.log(`[G ${guildId} | U ${clientId}] Deleting command: ${commandId} (${command.name})`);
                 return await rest.delete(`${applicationGuildCommandsRoute}/${commandId}`);
             }),
