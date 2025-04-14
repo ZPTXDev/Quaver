@@ -2,7 +2,7 @@
 import Keyv from 'keyv';
 import { set } from 'lodash-es';
 import { resolve } from 'path';
-import data from '../data.json';
+import data from '../data.json' with { type: 'json' };
 import { rootSettingsJson } from './modules/configHandler.js';
 import { getDirname } from './modules/fileUtils.js';
 
