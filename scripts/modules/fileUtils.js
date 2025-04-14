@@ -1,5 +1,5 @@
-import * as nodeUrl from "node:url";
-import * as nodePath from "node:path";
+import * as nodeUrl from 'node:url';
+import * as nodePath from 'node:path';
 
 function getDirname(moduleAbsoluteFileUrl) {
     const fileName = nodeUrl.fileURLToPath(moduleAbsoluteFileUrl);

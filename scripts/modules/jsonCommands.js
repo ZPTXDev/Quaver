@@ -17,7 +17,7 @@ async function loadCommandsFromPath(directoryPath) {
     await Promise.all(
         commandFileNames.map(async (fileName) => {
             if (!fileName.endsWith('.js')) {
-                return
+                return;
             }
             const filePath = nodePath.join(directoryPath, fileName);
             const fileUrlHref = nodeUrl.pathToFileURL(filePath).href;
@@ -31,7 +31,7 @@ async function loadCommandsFromPath(directoryPath) {
             }
         }),
     );
-    console.log("LOAD DONE: jsonCommands")
+    console.log('LOAD DONE: jsonCommands');
     return jsonCommands;
 }
 

@@ -31,7 +31,7 @@ export async function getLocalesMap() {
                 }
             }),
         );
-        console.log(`LOAD DONE: localesProps: ${folderName}`)
+        console.log(`LOAD DONE: localesProps: ${folderName}`);
         localesMap.set(folderName, localeProps);
     }
     return localesMap;
