@@ -35,13 +35,11 @@ async function loadCommandsFromPath(directoryPath) {
     return jsonCommands;
 }
 
-const promises = [
-    loadCommandsFromPath(
-        chatInputCommandsPath,
-    ),
-];
-
 export async function getJsonCommands() {
-    const jsonCommands = await Promise.all(promises);
+    const jsonCommands = await Promise.all([
+        loadCommandsFromPath(
+            chatInputCommandsPath,
+        ),
+    ]);
     return jsonCommands.flat();
 }
