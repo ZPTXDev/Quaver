@@ -94,7 +94,7 @@ export default {
             uri = `[**${track.info.title.replace(/^https?:\/\//, '').replace(/\/$/, '')}**](${track.info.uri})`;
         }
         switch (format) {
-            case 'simple': {
+            case 'simple':
                 await queue.player.handler.send(
                     `${getLocaleString(
                         guildLocaleCode,
@@ -132,7 +132,6 @@ export default {
                     },
                 );
                 break;
-            }
             case 'detailed':
                 await queue.player.handler.send(
                     new EmbedBuilder()
