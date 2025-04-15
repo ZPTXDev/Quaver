@@ -30,13 +30,14 @@ export default {
                 searchSuggestions
                     .filter((element): boolean => element !== '')
                     .map((suggestion): string =>
-                        suggestion.replace(
-                            /\\u([0-9a-fA-F]{4})/g,
-                            (_whole, grp): string =>
-                                String.fromCharCode(parseInt(grp, 16)),
-                        ),
+                        suggestion
+                            .replace(
+                                /\\u([0-9a-fA-F]{4})/g,
+                                (_whole, grp): string =>
+                                    String.fromCharCode(parseInt(grp, 16)),
+                            )
+                            .slice(0, 100),
                     )
-                    .filter((suggestion): boolean => suggestion.length <= 100)
                     .map(
                         (suggestion): ApplicationCommandOptionChoiceData => ({
                             name: suggestion,
