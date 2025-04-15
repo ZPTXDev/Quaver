@@ -40,6 +40,12 @@ dependencies:
   '@zptxdev/zptx-lib':
     specifier: ^1.1.0
     version: 1.1.0
+  cache-manager:
+    specifier: ^6.4.2
+    version: 6.4.2
+  cacheable:
+    specifier: ^1.8.10
+    version: 1.8.10
   crypto-js:
     specifier: ^4.2.0
     version: 4.2.0
@@ -1308,6 +1314,19 @@ packages:
     dev: false
     optional: true
 
+  /cache-manager@6.4.2:
+    resolution: {integrity: sha512-oT0d1cGWZAlqEGDPjOfhmldTS767jT6kBT3KIdn7MX5OevlRVYqJT+LxRv5WY4xW9heJtYxeRRXaoKlEW+Biew==}
+    dependencies:
+      keyv: 5.3.2(patch_hash=tg3f223bx2dgo6xy4spszqtwma)
+    dev: false
+
+  /cacheable@1.8.10:
+    resolution: {integrity: sha512-0ZnbicB/N2R6uziva8l6O6BieBklArWyiGx4GkwAhLKhSHyQtRfM9T1nx7HHuHDKkYB/efJQhz3QJ6x/YqoZzA==}
+    dependencies:
+      hookified: 1.8.2
+      keyv: 5.3.2(patch_hash=tg3f223bx2dgo6xy4spszqtwma)
+    dev: false
+
   /call-bind-apply-helpers@1.0.2:
     resolution: {integrity: sha512-Sp1ablJ0ivDkSzjcaJdxEunN5/XvksFJ2sMBFfq6x0ryhQV/2b/KwFe21cMpmHtPOSij8K99/wSfoEuTObmuMQ==}
     engines: {node: '>= 0.4'}
@@ -2159,6 +2178,10 @@ packages:
     engines: {node: '>= 0.4'}
     dependencies:
       function-bind: 1.1.2
+    dev: false
+
+  /hookified@1.8.2:
+    resolution: {integrity: sha512-5nZbBNP44sFCDjSoB//0N7m508APCgbQ4mGGo1KJGBYyCKNHfry1Pvd0JVHZIxjdnqn8nFRBAN/eFB6Rk/4w5w==}
     dev: false
 
   /http-cache-semantics@4.1.1:
