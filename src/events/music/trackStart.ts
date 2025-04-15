@@ -15,7 +15,6 @@ import {
     ButtonBuilder,
     ButtonStyle,
     EmbedBuilder,
-    escapeMarkdown,
 } from 'discord.js';
 
 export default {
@@ -88,14 +87,19 @@ export default {
             settings.emojis?.[
                 track.info.sourceName as keyof typeof settings.emojis
             ] ?? '';
+        let uri = `[**${track.info.title}**](${track.info.uri})`;
+        if (track.info.uri === track.info.title) {
+            uri = `**${track.info.uri}**`;
+        } else if (track.info.title.match(/^(https?:\/\/.*?)(\/)?$/)) {
+            uri = `[**${track.info.title.replace(/^https?:\/\//, '').replace(/\/$/, '')}**](${track.info.uri})`;
+        }
         switch (format) {
-            case 'simple':
+            case 'simple': {
                 await queue.player.handler.send(
                     `${getLocaleString(
                         guildLocaleCode,
                         'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
-                        escapeMarkdown(track.info.title),
-                        track.info.uri,
+                        uri,
                         durationString,
                     )}\n${getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${getLocaleString(guildLocaleCode, `MISC.SOURCES.${track.info.sourceName.toUpperCase()}`)}** ─ ${getLocaleString(
                         guildLocaleCode,
@@ -128,6 +132,7 @@ export default {
                     },
                 );
                 break;
+            }
             case 'detailed':
                 await queue.player.handler.send(
                     new EmbedBuilder()
@@ -137,9 +142,7 @@ export default {
                                 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE',
                             ),
                         )
-                        .setDescription(
-                            `**[${escapeMarkdown(track.info.title)}](${track.info.uri})**`,
-                        )
+                        .setDescription(uri)
                         .addFields([
                             {
                                 name: getLocaleString(

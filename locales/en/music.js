@@ -30,7 +30,7 @@ export default {
             NOTHING: 'There is nothing playing right now.',
             NOW: {
                 SIMPLE: {
-                    TEXT: 'Now playing [**%1**](%2) `[%3]`',
+                    TEXT: 'Now playing %1 `[%2]`',
                     SOURCE: 'Source',
                 },
                 DETAILED: {

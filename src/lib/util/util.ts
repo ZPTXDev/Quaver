@@ -702,13 +702,10 @@ export async function buildSettingsPage(
                                   `${getLocaleString(
                                       guildLocaleCode,
                                       'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
-                                      escapeMarkdown(
-                                          getLocaleString(
-                                              guildLocaleCode,
-                                              'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.SIMPLE',
-                                          ),
-                                      ),
-                                      'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                                      `[**${getLocaleString(
+                                          guildLocaleCode,
+                                          'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.SIMPLE',
+                                      )}**](https://www.youtube.com/watch?v=dQw4w9WgXcQ)`,
                                       '4:20',
                                   )}\n${getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${getLocaleString(guildLocaleCode, 'MISC.SOURCES.YOUTUBE')}** ─ ${getLocaleString(
                                       guildLocaleCode,
