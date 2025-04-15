@@ -65,14 +65,18 @@ export default {
                 .filter(
                     (element): boolean => element !== focused && element !== '',
                 )
-                .map((suggestion): string =>
-                    suggestion
-                        .replace(
-                            /\\u([0-9a-fA-F]{4})/g,
-                            (_whole, grp): string =>
-                                String.fromCharCode(parseInt(grp, 16)),
-                        )
-                        .slice(0, 100),
+                .map(
+                    (suggestion): string =>
+                        `${suggestion
+                            .replace(
+                                /\\u([0-9a-fA-F]{4})/g,
+                                (_whole, grp): string =>
+                                    String.fromCharCode(parseInt(grp, 16)),
+                            )
+                            .slice(
+                                0,
+                                suggestion.length > 100 ? 97 : 100,
+                            )}${suggestion.length > 100 ? '...' : ''}`,
                 )
                 .slice(0, 24)
                 .map(
