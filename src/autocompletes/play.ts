@@ -4,6 +4,7 @@ import type {
     AutocompleteInteraction,
 } from 'discord.js';
 import { request } from 'undici';
+import { YOUTUBE_AUTOCOMPLETE_URL } from '#src/lib/util/constants.js';
 
 export default {
     name: 'play',
@@ -11,9 +12,7 @@ export default {
         interaction: QuaverInteraction<AutocompleteInteraction>,
     ): Promise<void> {
         const focused = interaction.options.getFocused();
-        const { body } = await request(
-            `https://clients1.google.com/complete/search?client=youtube&gs_ri=youtube&ds=yt&q=${focused}`,
-        );
+        const { body } = await request(`${YOUTUBE_AUTOCOMPLETE_URL}${focused}`);
         let data;
         try {
             data = await body.text();

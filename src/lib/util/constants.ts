@@ -50,3 +50,6 @@ export const settingsOptions = [
 export const queryOverrides: string[] = [];
 export const sourceManagers: string[] = [];
 export const acceptableSources: Record<string, string> = {};
+
+export const YOUTUBE_AUTOCOMPLETE_URL =
+    'https://clients1.google.com/complete/search?client=youtube&gs_ri=youtube&ds=yt&q=';
