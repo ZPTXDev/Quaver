@@ -6,7 +6,7 @@ import type {
 import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
-import { getLocaleString } from '#src/lib/util/util.js';
+import { cleanURIForMarkdown, getLocaleString } from '#src/lib/util/util.js';
 import type {
     ChatInputCommandInteraction,
     SlashCommandIntegerOption,
@@ -87,10 +87,14 @@ export default {
             case PlayerResponse.Success: {
                 const track = player.queue.tracks[newPosition - 1];
                 await interaction.replyHandler.locale(
-                    'CMD.MOVE.RESPONSE.SUCCESS',
+                    track.info.title === track.info.uri
+                        ? 'CMD.MOVE.RESPONSE.SUCCESS_DIRECT_LINK'
+                        : 'CMD.MOVE.RESPONSE.SUCCESS',
                     {
                         vars: [
-                            track.info.title,
+                            ...(track.info.title !== track.info.uri
+                                ? [cleanURIForMarkdown(track.info.title)]
+                                : []),
                             track.info.uri,
                             oldPosition.toString(),
                             newPosition.toString(),

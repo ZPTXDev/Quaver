@@ -5,11 +5,15 @@ import type {
 import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
-import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
+import {
+    cleanURIForMarkdown,
+    getGuildLocaleString,
+    getLocaleString,
+} from '#src/lib/util/util.js';
 import { LoopType } from '@lavaclient/plugin-queue';
 import { getBar, msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import type { ChatInputCommandInteraction } from 'discord.js';
-import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
+import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
 
 export default {
     data: new SlashCommandBuilder()
@@ -68,9 +72,12 @@ export default {
         }
         if (player.queue.current.info.isStream) {
             await interaction.replyHandler.reply(
-                `**[${escapeMarkdown(player.queue.current.info.title)}](${
+                `${
+                    player.queue.current.info.title ===
                     player.queue.current.info.uri
-                })**\n🔴 **${await getGuildLocaleString(
+                        ? `**${player.queue.current.info.uri}**`
+                        : `[**${escapeMarkdown(cleanURIForMarkdown(player.queue.current.info.title))}**](${player.queue.current.info.uri})`
+                }\n🔴 **${await getGuildLocaleString(
                     interaction.guildId,
                     'MISC.LIVE',
                 )}** ${'▬'.repeat(10)}${player.paused ? ' ⏸️' : ''}${

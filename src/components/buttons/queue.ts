@@ -2,7 +2,11 @@ import { ForceType } from '#src/lib/ReplyHandler.js';
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
-import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
+import {
+    cleanURIForMarkdown,
+    getGuildLocaleString,
+    getLocaleString,
+} from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
 import type {
@@ -101,14 +105,16 @@ export default {
                                 'MISC.MORE_THAN_A_DAY',
                             );
                         }
+                        const uri =
+                            track.info.title === track.info.uri
+                                ? `**${track.info.uri}**`
+                                : `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`;
                         return `\`${(firstIndex + index)
                             .toString()
                             .padStart(
                                 largestIndexSize,
                                 ' ',
-                            )}.\` **[${escapeMarkdown(track.info.title)}](${
-                            track.info.uri
-                        })** \`[${durationString}]\` <@${track.requesterId}>`;
+                            )}.\` ${uri} \`[${durationString}]\` <@${track.requesterId}>`;
                     })
                     .join('\n'),
             )

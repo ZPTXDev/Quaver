@@ -23,6 +23,7 @@ export default {
     PLAYER: {
         FILTER_NOTE: 'This may take a few seconds to apply',
         TRACK_SKIPPED_ERROR: 'Skipped [**%1**](%2) as an error occurred while loading the track.',
+        TRACK_SKIPPED_ERROR_DIRECT_LINK: 'Skipped **%1** as an error occurred while loading the track.',
         QUEUE_CLEARED_ERROR: 'Cleared queue as an error occurred multiple times consecutively.',
         LOOP_TRACK_DISABLED: 'Disabled looping as the track is less than 15 seconds long.',
         LOOP_QUEUE_DISABLED: 'Disabled looping as the queue is less than 15 seconds long.',
@@ -31,6 +32,7 @@ export default {
             NOW: {
                 SIMPLE: {
                     TEXT: 'Now playing [**%1**](%2) `[%3]`',
+                    TEXT_DIRECT_LINK: 'Now playing **%1** [%2]',
                     SOURCE: 'Source',
                 },
                 DETAILED: {
@@ -55,11 +57,15 @@ export default {
         TRACK_ADDED: {
             SINGLE: {
                 DEFAULT: 'Added [**%1**](%2) to queue',
+                DEFAULT_DIRECT_LINK: 'Added **%1** to queue',
                 INSERTED: 'Added [**%1**](%2) to start of queue',
+                INSERTED_DIRECT_LINK: 'Added **%1** to start of queue',
             },
             MULTIPLE: {
                 DEFAULT: 'Added **%1** tracks from [**%2**](%3) to queue',
+                DEFAULT_DIRECT_LINK: 'Added **%1** tracks from **%2** to queue',
                 INSERTED: 'Added **%1** tracks from [**%2**](%3) to start of queue',
+                INSERTED_DIRECT_LINK: 'Added **%1** tracks from **%2** to start of queue',
             },
         },
     },

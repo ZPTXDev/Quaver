@@ -2,6 +2,7 @@ import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.d.js';
 import { data, logger } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
+    cleanURIForMarkdown,
     formatResponse,
     generateEmbedFieldsFromLyrics,
     getGuildFeatureWhitelisted,
@@ -15,7 +16,6 @@ import {
     ButtonBuilder,
     ButtonStyle,
     EmbedBuilder,
-    escapeMarkdown,
 } from 'discord.js';
 
 export default {
@@ -88,16 +88,21 @@ export default {
             settings.emojis?.[
                 track.info.sourceName as keyof typeof settings.emojis
             ] ?? '';
+        const uri = getLocaleString(
+            guildLocaleCode,
+            track.info.title === track.info.uri
+                ? 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT_DIRECT_LINK'
+                : 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
+            ...(track.info.title !== track.info.uri
+                ? [cleanURIForMarkdown(track.info.title)]
+                : []),
+            track.info.uri,
+            durationString,
+        );
         switch (format) {
             case 'simple':
                 await queue.player.handler.send(
-                    `${getLocaleString(
-                        guildLocaleCode,
-                        'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
-                        track.info.title,
-                        track.info.uri,
-                        durationString,
-                    )}\n${getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${getLocaleString(guildLocaleCode, `MISC.SOURCES.${track.info.sourceName.toUpperCase()}`)}** ─ ${getLocaleString(
+                    `${uri}\n${getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${getLocaleString(guildLocaleCode, `MISC.SOURCES.${track.info.sourceName.toUpperCase()}`)}** ─ ${getLocaleString(
                         guildLocaleCode,
                         'MISC.ADDED_BY',
                         track.requesterId,
@@ -137,9 +142,7 @@ export default {
                                 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE',
                             ),
                         )
-                        .setDescription(
-                            `**[${escapeMarkdown(track.info.title)}](${track.info.uri})**`,
-                        )
+                        .setDescription(uri)
                         .addFields([
                             {
                                 name: getLocaleString(

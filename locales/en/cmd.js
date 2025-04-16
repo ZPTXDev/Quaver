@@ -102,6 +102,7 @@ export default {
         },
         RESPONSE: {
             SUCCESS: 'Moved [**%1**](%2) `%3 -> %4`',
+            SUCCESS_DIRECT_LINK: 'Moved **%1** `%2 -> %3`',
             QUEUE_INSUFFICIENT_TRACKS: 'There aren\'t enough tracks in the queue to perform a move.',
             OUT_OF_RANGE: 'Your input was invalid.',
             MOVING_IN_PLACE: 'You can\'t move a track to the same position it is already in.',
@@ -166,8 +167,11 @@ export default {
         RESPONSE: {
             SUCCESS: {
                 DEFAULT: 'Removed [**%1**](%2)',
+                DEFAULT_DIRECT_LINK: 'Removed **%1**',
                 FORCED: 'Removed [**%1**](%2) by force',
+                FORCED_DIRECT_LINK: 'Removed **%1** by force',
                 MANAGER: 'Removed [**%1**](%2) by manager bypass',
+                MANAGER_DIRECT_LINK: 'Removed **%1** by manager bypass',
             },
             QUEUE_EMPTY: 'There are no tracks in the queue to remove.',
         },
@@ -284,12 +288,17 @@ export default {
         RESPONSE: {
             SUCCESS: {
                 DEFAULT: 'Skipped [**%1**](%2)',
+                DEFAULT_DIRECT_LINK: 'Skipped **%1**',
                 VOTED: 'Skipped [**%1**](%2) by voting',
+                VOTED_DIRECT_LINK: 'Skipped **%1** by voting',
                 FORCED: 'Skipped [**%1**](%2) by force',
+                FORCED_DIRECT_LINK: 'Skipped **%1** by force',
                 MANAGER: 'Skipped [**%1**](%2) by manager bypass',
+                MANAGER_DIRECT_LINK: 'Skipped **%1** by manager bypass',
             },
             VOTED: {
                 SUCCESS: 'Voted to skip [**%1**](%2) `[%3 / %4]`',
+                SUCCESS_DIRECT_LINK: 'Voted to skip **%1** `[%2 / %3]`',
                 STATE_UNCHANGED: 'You have already voted to skip this track.',
             },
         },

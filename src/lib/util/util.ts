@@ -934,3 +934,14 @@ export function updateAcceptableSources(
         acceptableSources[key] = value;
     }
 }
+
+/**
+ * Cleans a URI for use in markdown.
+ * @param uri - The URI to clean.
+ * @returns The cleaned URI. If not a valid URI, returns the input.
+ */
+export function cleanURIForMarkdown(uri: string): string {
+    return uri.match(/^(https?:\/\/.*?)(\/)?$/)
+        ? uri.replace(/^https?:\/\//, '').replace(/\/$/, '')
+        : uri;
+}

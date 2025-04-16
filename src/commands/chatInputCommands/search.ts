@@ -9,6 +9,7 @@ import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
     buildMessageOptions,
+    cleanURIForMarkdown,
     getGuildLocaleString,
     getLocaleString,
 } from '#src/lib/util/util.js';
@@ -140,9 +141,11 @@ export default {
                                 .padStart(
                                     tracks.length.toString().length,
                                     ' ',
-                                )}.\` **[${escapeMarkdown(track.info.title)}](${
-                                track.info.uri
-                            })** \`[${durationString}]\``;
+                                )}.\` ${
+                                track.info.title === track.info.uri
+                                    ? `**${track.info.uri}**`
+                                    : `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`
+                            } \`[${durationString}]\``;
                         })
                         .join('\n'),
                 )

@@ -2,7 +2,11 @@ import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
-import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
+import {
+    cleanURIForMarkdown,
+    getGuildLocaleString,
+    getLocaleString,
+} from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
 import type { ChatInputCommandInteraction } from 'discord.js';
@@ -68,11 +72,11 @@ export default {
                                     'MISC.MORE_THAN_A_DAY',
                                 );
                             }
-                            return `\`${index + 1}.\` **[${escapeMarkdown(
-                                track.info.title,
-                            )}](${track.info.uri})** \`[${durationString}]\` <@${
-                                track.requesterId
-                            }>`;
+                            return `\`${index + 1}.\` ${
+                                track.info.title === track.info.uri
+                                    ? `**${track.info.uri}**`
+                                    : `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`
+                            } \`[${durationString}]\` <@${track.requesterId}>`;
                         })
                         .join('\n'),
                 )
