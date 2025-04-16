@@ -702,11 +702,9 @@ export async function buildSettingsPage(
                                   `${getLocaleString(
                                       guildLocaleCode,
                                       'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
-                                      escapeMarkdown(
-                                          getLocaleString(
-                                              guildLocaleCode,
-                                              'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.SIMPLE',
-                                          ),
+                                      getLocaleString(
+                                          guildLocaleCode,
+                                          'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.SIMPLE',
                                       ),
                                       'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
                                       '4:20',

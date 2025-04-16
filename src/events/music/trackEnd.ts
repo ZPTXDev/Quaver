@@ -6,7 +6,6 @@ import {
 } from '#src/lib/util/common.js';
 import { LoopType } from '@lavaclient/plugin-queue';
 import type { Collection, GuildMember, Snowflake } from 'discord.js';
-import { escapeMarkdown } from 'discord.js';
 
 export default {
     name: 'trackEnd',
@@ -26,7 +25,7 @@ export default {
             await queue.player.handler.locale(
                 'MUSIC.PLAYER.TRACK_SKIPPED_ERROR',
                 {
-                    vars: [escapeMarkdown(track.info.title), track.info.uri],
+                    vars: [track.info.title, track.info.uri],
                     type: MessageOptionsBuilderType.Warning,
                 },
             );
