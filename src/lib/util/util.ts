@@ -76,9 +76,9 @@ export function getLocaleString(
         if (isNaN(index) || index < 1 || index > safeVars.length) {
             return match;
         }
-        return varMap[match];
+        return decodeURI(varMap[match]);
     });
-    return decodeURI(localeString);
+    return localeString;
 }
 
 /**
