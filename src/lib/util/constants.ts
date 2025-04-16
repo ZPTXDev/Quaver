@@ -50,3 +50,26 @@ export const settingsOptions = [
 export const queryOverrides: string[] = [];
 export const sourceManagers: string[] = [];
 export const acceptableSources: Record<string, string> = {};
+export const sourceList: Record<string, string> = {
+    'https://': 'http',
+    'http://': 'http',
+    'spsearch:': 'spotify',
+    'sprec:': 'spotify',
+    'amsearch:': 'applemusic',
+    'dzsearch:': 'deezer',
+    'dzisrc:': 'deezer',
+    'dzrec:': 'deezer',
+    'ymsearch:': 'yandexmusic',
+    'ymrec:': 'yandexmusic',
+    'ftts://': 'flowery-tts',
+    'vksearch:': 'vkmusic',
+    'vkrec:': 'vkmusic',
+    'tdsearch:': 'tidal',
+    'tdrec:': 'tidal',
+    'ytsearch:': 'youtube',
+    'ytmsearch:': 'youtubemusic',
+    'scsearch:': 'soundcloud',
+};
+
+export const YOUTUBE_AUTOCOMPLETE_URL =
+    'https://clients1.google.com/complete/search?client=youtube&gs_ri=youtube&ds=yt&q=';
