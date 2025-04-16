@@ -139,7 +139,7 @@ export default {
             if (resolvedTracks.length === 1) {
                 msg = 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
                 extras = [
-                    escapeMarkdown(resolvedTracks[0].info.title),
+                    resolvedTracks[0].info.title,
                     resolvedTracks[0].info.uri,
                 ];
             } else {
