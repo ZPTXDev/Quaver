@@ -8,21 +8,25 @@ import type { Logform, transport } from 'winston';
 import { addColors, createLogger, format, transports } from 'winston';
 import LokiTransport from 'winston-loki';
 import type { SearchStateRecord } from './common.d.js';
+import { KeyvCacheableMemory } from 'cacheable';
+import Keyv from 'keyv';
+import { createCache } from 'cache-manager';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 export const data = {
     guild: new DataHandler({
         cache: settings.database
             ? `${settings.database.protocol}://${resolve(
-                  __dirname,
-                  '..',
-                  '..',
-                  settings.database.path,
-              )}`
+                __dirname,
+                '..',
+                '..',
+                settings.database.path,
+            )}`
             : `sqlite://${resolve(__dirname, '..', '..', 'database.sqlite')}`,
         namespace: 'guild',
     }),
 };
+export const cache = createCache({ stores: [new Keyv({ store: new KeyvCacheableMemory({ ttl: '10m' }) })] });
 addColors({
     verbose: 'blackBG dim bold',
     info: 'greenBG white bold',
@@ -79,16 +83,16 @@ export const logger = createLogger({
         new transports.File({ filename: 'logs/log.log' }),
         ...(settings.grafanaLogging
             ? [
-                  new LokiTransport({
-                      host: settings.grafanaLogging.host,
-                      labels: { app: settings.grafanaLogging.appName },
-                      basicAuth: settings.grafanaLogging.basicAuth,
-                      format: format.json(),
-                      json: true,
-                      replaceTimestamp: true,
-                      onConnectionError: (error): void => console.error(error),
-                  }) as unknown as transport,
-              ]
+                new LokiTransport({
+                    host: settings.grafanaLogging.host,
+                    labels: { app: settings.grafanaLogging.appName },
+                    basicAuth: settings.grafanaLogging.basicAuth,
+                    format: format.json(),
+                    json: true,
+                    replaceTimestamp: true,
+                    onConnectionError: (error): void => console.error(error),
+                }) as unknown as transport,
+            ]
             : []),
     ],
 });

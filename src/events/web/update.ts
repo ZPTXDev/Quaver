@@ -97,17 +97,18 @@ export default {
                 }
                 const query = item.value;
                 let tracks = [];
-                const source =
-                    (await data.guild.get<string>(
-                        guildId,
-                        'settings.source',
-                    )) ?? Object.keys(acceptableSources)[0];
-                const preQuery = acceptableSources[source];
-                const result = await bot.music.api.loadTracks(
-                    queryOverrides.some((q): boolean => query.startsWith(q))
-                        ? query
-                        : `${preQuery}${query}`,
-                );
+                let searchQuery;
+                if (queryOverrides.some((q): boolean => query.startsWith(q))) {
+                    searchQuery = query;
+                } else {
+                    const source =
+                        (await data.guild.get<string>(
+                            guildId,
+                            'settings.source',
+                        )) ?? Object.keys(acceptableSources)[0];
+                    searchQuery = `${acceptableSources[source]}${query}`;
+                }
+                const result = await bot.music.api.loadTracks(searchQuery);
                 switch (result.loadType) {
                     case 'playlist':
                         tracks = [...result.data.tracks];

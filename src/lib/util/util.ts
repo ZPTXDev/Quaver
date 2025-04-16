@@ -76,9 +76,9 @@ export function getLocaleString(
         if (isNaN(index) || index < 1 || index > safeVars.length) {
             return match;
         }
-        return varMap[match];
+        return decodeURI(varMap[match]);
     });
-    return decodeURI(localeString);
+    return localeString;
 }
 
 /**
@@ -415,7 +415,8 @@ export function generateEmbedFieldsFromLyrics(
             lyricsFields.push({
                 name:
                     lyricsFields.length === 0
-                        ? `${json.track.author} - ${json.track.title}`
+                        ? (json.track.override ??
+                          `${json.track.author} - ${json.track.title}`)
                         : '​',
                 value: previous,
             });
@@ -425,7 +426,8 @@ export function generateEmbedFieldsFromLyrics(
             lyricsFields.push({
                 name:
                     lyricsFields.length === 0
-                        ? `${json.track.author} - ${json.track.title}`
+                        ? (json.track.override ??
+                          `${json.track.author} - ${json.track.title}`)
                         : '​',
                 value: previous + '\n\n' + chunk,
             });
@@ -440,7 +442,8 @@ export function generateEmbedFieldsFromLyrics(
                 lyricsFields.push({
                     name:
                         lyricsFields.length === 0
-                            ? `${json.track.author} - ${json.track.title}`
+                            ? (json.track.override ??
+                              `${json.track.author} - ${json.track.title}`)
                             : '​',
                     value: previous,
                 });
@@ -450,7 +453,8 @@ export function generateEmbedFieldsFromLyrics(
                 lyricsFields.push({
                     name:
                         lyricsFields.length === 0
-                            ? `${json.track.author} - ${json.track.title}`
+                            ? (json.track.override ??
+                              `${json.track.author} - ${json.track.title}`)
                             : '​',
                     value: previous + '\n' + line,
                 });
@@ -476,6 +480,19 @@ export function generateEmbedFieldsFromLyrics(
         lyricsFields.push({ name: '​', value: '`...`' });
     }
     return lyricsFields;
+}
+
+/**
+ * Retrieve lyrics from embed fields.
+ * @param fields - The embed fields to check.
+ * @returns The lyrics,
+ */
+export function getLyricsFromEmbedFields(fields: APIEmbedField[]): string {
+    return fields.reduce(
+        (previous, current): string =>
+            previous + (current.value ?? '').replace(/`/g, ''),
+        '',
+    );
 }
 
 /**

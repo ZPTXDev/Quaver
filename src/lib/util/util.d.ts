@@ -17,10 +17,11 @@ export type LyricsResponse = {
     text?: string;
     lines?: { line: string; range: { start: number; end: number } }[];
     track: {
-        title: string;
-        author: string;
-        album: string;
-        albumArt: { url: string; height: number; width: number }[];
+        title?: string;
+        author?: string;
+        album?: string;
+        albumArt?: { url: string; height: number; width: number }[];
+        override?: string;
     };
-    source: string;
-}
+    source?: string;
+};
