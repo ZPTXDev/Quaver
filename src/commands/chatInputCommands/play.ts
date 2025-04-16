@@ -21,7 +21,6 @@ import type {
 import {
     ChannelType,
     EmbedBuilder,
-    escapeMarkdown,
     GuildMember,
     PermissionsBitField,
     SlashCommandBuilder,
@@ -150,7 +149,7 @@ export default {
                     : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
                 extras = [
                     tracks.length.toString(),
-                    escapeMarkdown(result.data.info.name),
+                    result.data.info.name,
                     query,
                 ];
                 break;
@@ -162,7 +161,7 @@ export default {
                 msg = insert
                     ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.INSERTED'
                     : 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
-                extras = [escapeMarkdown(track.info.title), track.info.uri];
+                extras = [track.info.title, track.info.uri];
                 break;
             }
             case 'empty':

@@ -94,7 +94,7 @@ export default {
                     `${getLocaleString(
                         guildLocaleCode,
                         'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
-                        escapeMarkdown(track.info.title),
+                        track.info.title,
                         track.info.uri,
                         durationString,
                     )}\n${getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${getLocaleString(guildLocaleCode, `MISC.SOURCES.${track.info.sourceName.toUpperCase()}`)}** ─ ${getLocaleString(

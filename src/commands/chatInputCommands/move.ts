@@ -11,7 +11,7 @@ import type {
     ChatInputCommandInteraction,
     SlashCommandIntegerOption,
 } from 'discord.js';
-import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 
 export default {
     data: new SlashCommandBuilder()
@@ -90,7 +90,7 @@ export default {
                     'CMD.MOVE.RESPONSE.SUCCESS',
                     {
                         vars: [
-                            escapeMarkdown(track.info.title),
+                            track.info.title,
                             track.info.uri,
                             oldPosition.toString(),
                             newPosition.toString(),

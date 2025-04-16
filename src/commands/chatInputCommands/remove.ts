@@ -7,16 +7,16 @@ import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
-    RequesterStatus,
     getLocaleString,
     getRequesterStatus,
+    RequesterStatus,
 } from '#src/lib/util/util.js';
 import type {
     ChatInputCommandInteraction,
     GuildMember,
     SlashCommandIntegerOption,
 } from 'discord.js';
-import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 
 export default {
     data: new SlashCommandBuilder()
@@ -94,10 +94,7 @@ export default {
                           ? 'CMD.REMOVE.RESPONSE.SUCCESS.MANAGER'
                           : 'CMD.REMOVE.RESPONSE.SUCCESS.FORCED',
                     {
-                        vars: [
-                            escapeMarkdown(track.info.title),
-                            track.info.uri,
-                        ],
+                        vars: [track.info.title, track.info.uri],
                         type: MessageOptionsBuilderType.Success,
                     },
                 );
