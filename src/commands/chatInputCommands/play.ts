@@ -12,7 +12,11 @@ import {
     queryOverrides,
 } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
-import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
+import {
+    cleanURIForMarkdown,
+    getGuildLocaleString,
+    getLocaleString,
+} from '#src/lib/util/util.js';
 import type {
     ChatInputCommandInteraction,
     SlashCommandBooleanOption,
@@ -162,7 +166,13 @@ export default {
                 msg = insert
                     ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.INSERTED'
                     : 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
-                extras = [escapeMarkdown(track.info.title), track.info.uri];
+                if (track.info.title === track.info.uri) msg += '_DIRECT_LINK';
+                extras = [
+                    ...(track.info.title !== track.info.uri
+                        ? [cleanURIForMarkdown(track.info.title)]
+                        : []),
+                    track.info.uri,
+                ];
                 break;
             }
             case 'empty':

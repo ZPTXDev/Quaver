@@ -16,6 +16,7 @@ import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
     buildMessageOptions,
+    cleanURIForMarkdown,
     getFailedChecks,
     getGuildLocaleString,
     getLocaleString,
@@ -304,14 +305,16 @@ export default {
                                 'MISC.MORE_THAN_A_DAY',
                             );
                         }
+                        const uri =
+                            track.info.title === track.info.uri
+                                ? `**${track.info.uri}**`
+                                : `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`;
                         return `\`${(firstIndex + index)
                             .toString()
                             .padStart(
                                 largestIndexSize,
                                 ' ',
-                            )}.\` **[${escapeMarkdown(track.info.title)}](${
-                            track.info.uri
-                        })** \`[${durationString}]\``;
+                            )}.\` ${uri} \`[${durationString}]\``;
                     })
                     .join('\n'),
             )

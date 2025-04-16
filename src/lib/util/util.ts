@@ -702,10 +702,11 @@ export async function buildSettingsPage(
                                   `${getLocaleString(
                                       guildLocaleCode,
                                       'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
-                                      `[**${getLocaleString(
+                                      getLocaleString(
                                           guildLocaleCode,
                                           'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.SIMPLE',
-                                      )}**](https://www.youtube.com/watch?v=dQw4w9WgXcQ)`,
+                                      ),
+                                      'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
                                       '4:20',
                                   )}\n${getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${getLocaleString(guildLocaleCode, 'MISC.SOURCES.YOUTUBE')}** ─ ${getLocaleString(
                                       guildLocaleCode,
@@ -915,4 +916,15 @@ export function updateAcceptableSources(
     for (const [key, value] of Object.entries(sourceManagers)) {
         acceptableSources[key] = value;
     }
+}
+
+/**
+ * Cleans a URI for use in markdown.
+ * @param uri - The URI to clean.
+ * @returns The cleaned URI. If not a valid URI, returns the input.
+ */
+export function cleanURIForMarkdown(uri: string): string {
+    return uri.match(/^(https?:\/\/.*?)(\/)?$/)
+        ? uri.replace(/^https?:\/\//, '').replace(/\/$/, '')
+        : uri;
 }

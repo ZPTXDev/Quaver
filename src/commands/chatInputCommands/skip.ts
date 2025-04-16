@@ -7,13 +7,14 @@ import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
-    RequesterStatus,
+    cleanURIForMarkdown,
     getGuildLocaleString,
     getLocaleString,
     getRequesterStatus,
+    RequesterStatus,
 } from '#src/lib/util/util.js';
 import type { ChatInputCommandInteraction, GuildMember } from 'discord.js';
-import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 
 export default {
     data: new SlashCommandBuilder()
@@ -82,8 +83,12 @@ export default {
                         await interaction.replyHandler.reply(
                             `${await getGuildLocaleString(
                                 interaction.guildId,
-                                'CMD.SKIP.RESPONSE.SUCCESS.VOTED',
-                                escapeMarkdown(track.info.title),
+                                track.info.title === track.info.uri
+                                    ? 'CMD.SKIP.RESPONSE.SUCCESS.VOTED_DIRECT_LINK'
+                                    : 'CMD.SKIP.RESPONSE.SUCCESS.VOTED',
+                                ...(track.info.title !== track.info.uri
+                                    ? [cleanURIForMarkdown(track.info.title)]
+                                    : []),
                                 track.info.uri,
                             )}\n${await getGuildLocaleString(
                                 interaction.guildId,
@@ -96,10 +101,14 @@ export default {
             }
             player.skip = skip;
             await interaction.replyHandler.locale(
-                'CMD.SKIP.RESPONSE.VOTED.SUCCESS',
+                track.info.title === track.info.uri
+                    ? 'CMD.SKIP.RESPONSE.VOTED.SUCCESS_DIRECT_LINK'
+                    : 'CMD.SKIP.RESPONSE.VOTED.SUCCESS',
                 {
                     vars: [
-                        escapeMarkdown(track.info.title),
+                        ...(track.info.title !== track.info.uri
+                            ? [cleanURIForMarkdown(track.info.title)]
+                            : []),
                         track.info.uri,
                         skip.users.length.toString(),
                         skip.required.toString(),
@@ -117,16 +126,23 @@ export default {
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
-            case PlayerResponse.Success:
+            case PlayerResponse.Success: {
+                let locale =
+                    requesterStatus === RequesterStatus.Requester
+                        ? 'CMD.SKIP.RESPONSE.SUCCESS.DEFAULT'
+                        : requesterStatus === RequesterStatus.ManagerBypass
+                          ? 'CMD.SKIP.RESPONSE.SUCCESS.MANAGER'
+                          : 'CMD.SKIP.RESPONSE.SUCCESS.FORCED';
+                if (track.info.title === track.info.uri) {
+                    locale += '_DIRECT_LINK';
+                }
                 await interaction.replyHandler.reply(
                     `${await getGuildLocaleString(
                         interaction.guildId,
-                        requesterStatus === RequesterStatus.Requester
-                            ? 'CMD.SKIP.RESPONSE.SUCCESS.DEFAULT'
-                            : requesterStatus === RequesterStatus.ManagerBypass
-                              ? 'CMD.SKIP.RESPONSE.SUCCESS.MANAGER'
-                              : 'CMD.SKIP.RESPONSE.SUCCESS.FORCED',
-                        escapeMarkdown(track.info.title),
+                        locale,
+                        ...(track.info.title !== track.info.uri
+                            ? [cleanURIForMarkdown(track.info.title)]
+                            : []),
                         track.info.uri,
                     )}${
                         requesterStatus !== RequesterStatus.Requester
@@ -138,6 +154,7 @@ export default {
                             : ''
                     }`,
                 );
+            }
         }
     },
 };
