@@ -10,12 +10,14 @@ import type { Song } from '@lavaclient/plugin-queue';
 import type {
     APISelectMenuOption,
     ButtonComponent,
+    MessageActionRowComponent,
     MessageActionRowComponentBuilder,
     SelectMenuComponentOptionData,
     StringSelectMenuComponent,
     StringSelectMenuInteraction,
 } from 'discord.js';
 import {
+    ActionRow,
     ActionRowBuilder,
     ButtonBuilder,
     EmbedBuilder,
@@ -77,6 +79,8 @@ export default {
         const updated: {
             components: ActionRowBuilder<MessageActionRowComponentBuilder>[];
         } = { components: [] };
+        if (!(original.components[0] instanceof ActionRow)) return;
+        if (!(original.components[1] instanceof ActionRow)) return;
         updated.components[0] = ActionRowBuilder.from(original.components[0]);
         updated.components[1] = ActionRowBuilder.from(original.components[1]);
         updated.components[0].components[0] = StringSelectMenuBuilder.from(
@@ -139,8 +143,10 @@ export default {
                         .filter(
                             (options): boolean =>
                                 !(
-                                    original.components[0]
-                                        .components[0] as StringSelectMenuComponent
+                                    (
+                                        original
+                                            .components[0] as ActionRow<MessageActionRowComponent>
+                                    ).components[0] as StringSelectMenuComponent
                                 ).options.find(
                                     (opt): boolean =>
                                         opt.value === options.value,

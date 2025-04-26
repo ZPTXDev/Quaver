@@ -18,9 +18,9 @@ import type {
     MessageActionRowComponentBuilder,
     RoleSelectMenuInteraction,
     SelectMenuComponentOptionData,
-    StringSelectMenuComponent,
-} from 'discord.js';
+    StringSelectMenuComponent } from 'discord.js';
 import {
+    ActionRow,
     ActionRowBuilder,
     EmbedBuilder,
     StringSelectMenuBuilder,
@@ -94,6 +94,7 @@ export default {
             guildLocaleCode,
             'CMD.SETTINGS.MISC.DJ.DESCRIPTION',
         )}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: ${current}`;
+        if (!(interaction.message.components[0] instanceof ActionRow)) return;
         const args: [
             MessageOptionsBuilderInputs,
             MessageOptionsBuilderOptions,

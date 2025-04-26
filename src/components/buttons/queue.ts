@@ -12,9 +12,9 @@ import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
 import type {
     ButtonComponent,
     ButtonInteraction,
-    MessageActionRowComponentBuilder,
-} from 'discord.js';
+    MessageActionRowComponentBuilder } from 'discord.js';
 import {
+    ActionRow,
     ActionRowBuilder,
     ButtonBuilder,
     EmbedBuilder,
@@ -126,6 +126,7 @@ export default {
                     pages.length.toString(),
                 ),
             });
+        if (!(original.components[0] instanceof ActionRow)) return;
         updated.components[0] = ActionRowBuilder.from(original.components[0]);
         updated.components[0].components[0] = ButtonBuilder.from(
             original.components[0].components[0] as ButtonComponent,

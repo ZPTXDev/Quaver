@@ -16,6 +16,7 @@ import type {
     StringSelectMenuInteraction,
 } from 'discord.js';
 import {
+    ActionRow,
     ActionRowBuilder,
     EmbedBuilder,
     StringSelectMenuBuilder,
@@ -85,6 +86,7 @@ export default {
             guildLocaleCode,
             'CMD.SETTINGS.MISC.SOURCE.DESCRIPTION',
         )}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: ${current}`;
+        if (!(interaction.message.components[0] instanceof ActionRow)) return;
         await interaction.replyHandler.reply([description, ...embeds], {
             components: [
                 new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(

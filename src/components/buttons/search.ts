@@ -29,9 +29,9 @@ import type {
     ButtonInteraction,
     GuildMember,
     MessageActionRowComponentBuilder,
-    StringSelectMenuComponent,
-} from 'discord.js';
+    StringSelectMenuComponent } from 'discord.js';
 import {
+    ActionRow,
     ActionRowBuilder,
     ButtonBuilder,
     ChannelType,
@@ -326,6 +326,8 @@ export default {
                     pages.length.toString(),
                 ),
             });
+        if (!(original.components[0] instanceof ActionRow)) return;
+        if (!(original.components[1] instanceof ActionRow)) return;
         updated.components[0] = ActionRowBuilder.from(original.components[0]);
         updated.components[1] = ActionRowBuilder.from(original.components[1]);
         const selectComponent = StringSelectMenuBuilder.from(

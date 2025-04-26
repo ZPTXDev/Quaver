@@ -23,6 +23,7 @@ import type {
     StringSelectMenuComponent,
 } from 'discord.js';
 import {
+    ActionRow,
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
@@ -155,6 +156,7 @@ export default {
             guildLocaleCode,
             'CMD.SETTINGS.MISC.AUTOLYRICS.DESCRIPTION',
         )}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: ${current}`;
+        if (!(interaction.message.components[0] instanceof ActionRow)) return;
         await interaction.replyHandler.reply([description, ...embeds], {
             components: [
                 new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
