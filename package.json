@@ -36,7 +36,7 @@
   "devDependencies": {
     "@discordjs/builders": "<=1.10.1",
     "@eslint/eslintrc": "^3.3.1",
-    "@eslint/js": "^9.25.1",
+    "@eslint/js": "^9.26.0",
     "@types/crypto-js": "^4.2.2",
     "@types/express": "^5.0.1",
     "@types/lodash-es": "^4.17.12",
