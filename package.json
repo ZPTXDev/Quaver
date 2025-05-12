@@ -28,7 +28,7 @@
     "lodash-es": "^4.17.21",
     "socket.io": "^4.8.1",
     "sqlite3": "^5.1.7",
-    "undici": "^7.8.0",
+    "undici": "^7.9.0",
     "wanakana": "^5.3.1",
     "winston": "^3.17.0",
     "winston-loki": "^6.1.3"
