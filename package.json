@@ -38,7 +38,7 @@
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.27.0",
     "@types/crypto-js": "^4.2.2",
-    "@types/express": "^5.0.1",
+    "@types/express": "^5.0.2",
     "@types/lodash-es": "^4.17.12",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
