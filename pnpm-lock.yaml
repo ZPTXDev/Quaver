@@ -44,8 +44,8 @@ dependencies:
     specifier: ^6.4.3
     version: 6.4.3
   cacheable:
-    specifier: ^1.9.0
-    version: 1.9.0
+    specifier: ^1.10.0
+    version: 1.10.0
   crypto-js:
     specifier: ^4.2.0
     version: 4.2.0
@@ -1394,10 +1394,10 @@ packages:
       keyv: 5.3.3(patch_hash=tg3f223bx2dgo6xy4spszqtwma)
     dev: false
 
-  /cacheable@1.9.0:
-    resolution: {integrity: sha512-8D5htMCxPDUULux9gFzv30f04Xo3wCnik0oOxKoRTPIBoqA7HtOcJ87uBhQTs3jCfZZTrUBGsYIZOgE0ZRgMAg==}
+  /cacheable@1.10.0:
+    resolution: {integrity: sha512-SSgQTAnhd7WlJXnGlIi4jJJOiHzgnM5wRMEPaXAU4kECTAMpBoYKoZ9i5zHmclIEZbxcu3j7yY/CF8DTmwIsHg==}
     dependencies:
-      hookified: 1.9.0
+      hookified: 1.9.1
       keyv: 5.3.3(patch_hash=tg3f223bx2dgo6xy4spszqtwma)
     dev: false
 
@@ -2274,8 +2274,8 @@ packages:
       function-bind: 1.1.2
     dev: false
 
-  /hookified@1.9.0:
-    resolution: {integrity: sha512-2yEEGqphImtKIe1NXWEhu6yD3hlFR4Mxk4Mtp3XEyScpSt4pQ4ymmXA1zzxZpj99QkFK+nN0nzjeb2+RUi/6CQ==}
+  /hookified@1.9.1:
+    resolution: {integrity: sha512-u3pxtGhKjcSXnGm1CX6aXS9xew535j3lkOCegbA6jdyh0BaAjTbXI4aslKstCr6zUNtoCxFGFKwjbSHdGrMB8g==}
     dev: false
 
   /http-cache-semantics@4.1.1:
