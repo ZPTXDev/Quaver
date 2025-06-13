@@ -41,8 +41,8 @@ dependencies:
     specifier: ^1.1.0
     version: 1.1.0
   cache-manager:
-    specifier: ^6.4.3
-    version: 6.4.3
+    specifier: ^7.0.0
+    version: 7.0.0
   cacheable:
     specifier: ^1.10.0
     version: 1.10.0
@@ -1328,8 +1328,8 @@ packages:
     dev: false
     optional: true
 
-  /cache-manager@6.4.3:
-    resolution: {integrity: sha512-VV5eq/QQ5rIVix7/aICO4JyvSeEv9eIQuKL5iFwgM2BrcYoE0A/D1mNsAHJAsB0WEbNdBlKkn6Tjz6fKzh/cKQ==}
+  /cache-manager@7.0.0:
+    resolution: {integrity: sha512-5HLGorfU4g2GyLTXd+bbq8RhZPwLRlVm7hfS1EssJx4Ujq1FjyQAjHND93sI6ByQTlUlCQ0jrHZqLI0qtBFyHA==}
     dependencies:
       keyv: 5.3.3(patch_hash=tg3f223bx2dgo6xy4spszqtwma)
     dev: false
