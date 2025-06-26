@@ -9,8 +9,7 @@ import {
 } from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
-import type {
-    ModalSubmitInteraction } from 'discord.js';
+import type { ModalSubmitInteraction } from 'discord.js';
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -62,14 +61,6 @@ export default {
         const firstIndex = 5 * (page - 1) + 1;
         const pageSize = pages[page - 1].length;
         const largestIndexSize = (firstIndex + pageSize - 1).toString().length;
-        const original = {
-            embeds: interaction.message.embeds,
-            components: interaction.message.components,
-        };
-        if (original.embeds.length === 0) {
-            await interaction.message.delete();
-            return;
-        }
         const guildLocaleCode =
             (await data.guild.get<string>(
                 interaction.guildId,
