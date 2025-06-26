@@ -7,6 +7,7 @@ import type {
     QuaverSong,
     SettingsPage,
     SettingsPageOptions,
+    TopLevelComponentBuilders,
     WhitelistedFeatures,
 } from '#src/lib/util/common.d.js';
 import { data, locales, MessageOptionsBuilderType } from '#src/lib/util/common.js';
@@ -15,12 +16,12 @@ import {
     Check,
     Language,
     queryOverrides,
+    settingsOptions,
     sourceManagers as extSourceManagers,
 } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getAbsoluteFileURL } from '@zptxdev/zptx-lib';
 import type {
-    APIEmbedField,
     APISelectMenuOption,
     BaseMessageOptions,
     Interaction,
@@ -31,17 +32,24 @@ import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    EmbedBuilder,
+    ContainerBuilder,
     escapeMarkdown,
     GuildMember,
     PermissionsBitField,
+    resolveColor,
     RoleSelectMenuBuilder,
+    SectionBuilder,
+    type SelectMenuComponentOptionData,
+    SeparatorBuilder,
     StringSelectMenuBuilder,
+    TextDisplayBuilder,
+    ThumbnailBuilder,
 } from 'discord.js';
 import { readdirSync } from 'fs';
 import { get } from 'lodash-es';
-import type { LocaleCompletionState, LyricsResponse } from './util.d.js';
+import type { ColorTypes, LocaleCompletionState, LyricsResponse } from './util.d.js';
 import type { ComponentInteractions } from '#src/events/interactionCreate.d.js';
+import type { Song } from '@lavaclient/plugin-queue';
 
 /**
  * Returns the localized string.
@@ -395,109 +403,8 @@ export function formatResponse(
 }
 
 /**
- * Generates an array of APIEmbedField from the lyrics.
- * @param json - The LyricsResponse object.
- * @param lyrics - The lyrics to be used.
- * @returns An array of APIEmbedField.
- */
-export function generateEmbedFieldsFromLyrics(
-    json: LyricsResponse,
-    lyrics: string,
-): APIEmbedField[] {
-    let lyricsFields: APIEmbedField[] = [];
-    // try method 1
-    let giveUp = false;
-    if (lyrics.split('\n\n').length === 1) giveUp = true;
-    lyrics.split('\n\n').reduce((previous, chunk, index, array): string => {
-        if (giveUp) return;
-        if (chunk.length > 1024) giveUp = true;
-        if (previous.length + chunk.length + '\n\n'.length > 1024) {
-            lyricsFields.push({
-                name:
-                    lyricsFields.length === 0
-                        ? (json.track.override ??
-                          `${json.track.author} - ${json.track.title}`)
-                        : '​',
-                value: previous,
-            });
-            return chunk;
-        }
-        if (index === array.length - 1) {
-            lyricsFields.push({
-                name:
-                    lyricsFields.length === 0
-                        ? (json.track.override ??
-                          `${json.track.author} - ${json.track.title}`)
-                        : '​',
-                value: previous + '\n\n' + chunk,
-            });
-        }
-        return previous + '\n\n' + chunk;
-    });
-    if (giveUp) {
-        lyricsFields = [];
-        // try method 2
-        lyrics.split('\n').reduce((previous, line, index, array): string => {
-            if (previous.length + line.length + '\n'.length > 1024) {
-                lyricsFields.push({
-                    name:
-                        lyricsFields.length === 0
-                            ? (json.track.override ??
-                              `${json.track.author} - ${json.track.title}`)
-                            : '​',
-                    value: previous,
-                });
-                return line;
-            }
-            if (index === array.length - 1) {
-                lyricsFields.push({
-                    name:
-                        lyricsFields.length === 0
-                            ? (json.track.override ??
-                              `${json.track.author} - ${json.track.title}`)
-                            : '​',
-                    value: previous + '\n' + line,
-                });
-            }
-            return previous + '\n' + line;
-        }, '');
-    }
-    if (
-        lyricsFields.reduce(
-            (previous, current): number => previous + current.value.length,
-            0,
-        ) > 6000
-    ) {
-        let exceedIndex = -1;
-        lyricsFields.reduce((previous, current, index): number => {
-            if (exceedIndex !== -1) return;
-            if (previous + current.value.length > 6000) {
-                exceedIndex = index;
-            }
-            return previous + current.value.length;
-        }, 0);
-        lyricsFields = lyricsFields.slice(0, exceedIndex);
-        lyricsFields.push({ name: '​', value: '`...`' });
-    }
-    return lyricsFields;
-}
-
-/**
- * Retrieve lyrics from embed fields.
- * @param fields - The embed fields to check.
- * @returns The lyrics,
- */
-export function getLyricsFromEmbedFields(fields: APIEmbedField[]): string {
-    return fields.reduce(
-        (previous, current): string =>
-            previous + (current.value ?? '').replace(/`/g, ''),
-        '',
-    );
-}
-
-/**
  * Returns a MessageCreateOptions object.
- * @param inputData - The data to be used. Can be a string, EmbedBuilder, or an array of either.
+ * @param inputData - The data to be used. Can be a string, ContainerBuilder, or an array of either.
  * @param options - Extra data, such as type, components, or files.
  * @returns The MessageCreateOptions object.
  */
@@ -510,27 +417,26 @@ export function buildMessageOptions(
     }: MessageOptionsBuilderOptions = {},
 ): BaseMessageOptions {
     const messageData = Array.isArray(inputData) ? inputData : [inputData];
-    const color: 'success' | 'neutral' | 'warning' | 'error' =
-        MessageOptionsBuilderType[type].toLowerCase() as
-            | 'success'
-            | 'neutral'
-            | 'warning'
-            | 'error';
-    const embedData = messageData.map((msg): EmbedBuilder => {
+    const color: ColorTypes = MessageOptionsBuilderType[
+        type
+    ].toLowerCase() as ColorTypes;
+    const containerData = messageData.map((msg): TopLevelComponentBuilders => {
         if (typeof msg === 'string') {
-            return new EmbedBuilder()
-                .setDescription(msg)
-                .setColor(settings.colors[color]);
+            return new ContainerBuilder()
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(msg),
+                )
+                .setAccentColor(resolveColor(settings.colors[color]));
         }
-        if (!msg.data.color) return msg.setColor(settings.colors[color]);
+        if (msg instanceof ContainerBuilder && !msg.data.accent_color) {
+            return msg.setAccentColor(resolveColor(settings.colors[color]));
+        }
         return msg;
     });
-    const opts: BaseMessageOptions = {
-        embeds: embedData,
-    };
-    if (components !== null) opts.components = components;
-    if (files !== null) opts.files = files;
-    return opts;
+    if (!components) components = [];
+    components.unshift(...containerData);
+    if (!files) files = [];
+    return { components, files };
 }
 
 /**
@@ -545,8 +451,9 @@ export async function buildSettingsPage(
     guildLocaleCode: keyof typeof Language,
     option: SettingsPageOptions,
 ): Promise<SettingsPage> {
-    let current: string,
-        embeds: EmbedBuilder[] = [];
+    let current: string;
+    const containers: ContainerBuilder[] = [];
+    const baseContainer = new ContainerBuilder();
     const actionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
     switch (option) {
         case 'premium': {
@@ -617,11 +524,9 @@ export async function buildSettingsPage(
                                       )
                         }`,
                 );
-            embeds = [
-                new EmbedBuilder()
-                    .setDescription(features.join('\n'))
-                    .setColor(settings.colors.neutral),
-            ];
+            baseContainer.addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(features.join('\n')),
+            );
             break;
         }
         case 'language':
@@ -711,89 +616,97 @@ export async function buildSettingsPage(
                     .setDisabled(current === 'detailed'),
             );
             const emoji = settings.emojis?.youtube ?? '';
-            embeds =
+            containers.push(
                 current === 'simple'
-                    ? [
-                          new EmbedBuilder()
-                              .setDescription(
-                                  `${getLocaleString(
-                                      guildLocaleCode,
-                                      'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
-                                      getLocaleString(
+                    ? new ContainerBuilder({
+                          components: [
+                              new TextDisplayBuilder()
+                                  .setContent(
+                                      `${getLocaleString(
                                           guildLocaleCode,
-                                          'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.SIMPLE',
-                                      ),
-                                      'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-                                      '4:20',
-                                  )}\n${getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${getLocaleString(guildLocaleCode, 'MISC.SOURCES.YOUTUBE')}** ─ ${getLocaleString(
-                                      guildLocaleCode,
-                                      'MISC.ADDED_BY',
-                                      interaction.user.id,
-                                  )}`,
-                              )
-                              .setColor(settings.colors.neutral),
-                      ]
-                    : [
-                          new EmbedBuilder()
-                              .setTitle(
-                                  getLocaleString(
-                                      guildLocaleCode,
-                                      'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE',
-                                  ),
-                              )
-                              .setDescription(
-                                  `**[${escapeMarkdown(
-                                      getLocaleString(
+                                          'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
+                                          `[${getLocaleString(
+                                              guildLocaleCode,
+                                              'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.SIMPLE',
+                                          )}](https://www.youtube.com/watch?v=${exampleId})`,
+                                          '4:20',
+                                      )}\n${getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${getLocaleString(guildLocaleCode, 'MISC.SOURCES.YOUTUBE')}** ─ ${getLocaleString(
                                           guildLocaleCode,
-                                          'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.DETAILED',
-                                      ),
-                                  )}](https://www.youtube.com/watch?v=${exampleId})**`,
-                              )
-                              .addFields([
-                                  {
-                                      name: getLocaleString(
-                                          guildLocaleCode,
-                                          'MUSIC.PLAYER.PLAYING.NOW.DETAILED.DURATION',
-                                      ),
-                                      value: '`4:20`',
-                                      inline: true,
-                                  },
-                                  {
-                                      name: getLocaleString(
-                                          guildLocaleCode,
-                                          'MUSIC.PLAYER.PLAYING.NOW.DETAILED.UPLOADER',
-                                      ),
-                                      value: 'Rick Astley',
-                                      inline: true,
-                                  },
-                                  {
-                                      name: getLocaleString(
-                                          guildLocaleCode,
-                                          'MUSIC.PLAYER.PLAYING.NOW.DETAILED.SOURCE',
-                                      ),
-                                      value: `${emoji ? `${emoji} ` : ''}${getLocaleString(guildLocaleCode, 'MISC.SOURCES.YOUTUBE')}`,
-                                      inline: true,
-                                  },
-                                  {
-                                      name: getLocaleString(
-                                          guildLocaleCode,
-                                          'MUSIC.PLAYER.PLAYING.NOW.DETAILED.ADDED_BY',
-                                      ),
-                                      value: `<@${interaction.user.id}>`,
-                                      inline: true,
-                                  },
-                              ])
-                              .setThumbnail(
-                                  `https://i.ytimg.com/vi/${exampleId}/hqdefault.jpg`,
-                              )
-                              .setFooter({
-                                  text: getLocaleString(
-                                      guildLocaleCode,
-                                      'MUSIC.PLAYER.PLAYING.NOW.DETAILED.REMAINING',
-                                      '1',
-                                  ),
-                              }),
-                      ];
+                                          'MISC.ADDED_BY',
+                                          interaction.user.id,
+                                      )}`,
+                                  )
+                                  .toJSON(),
+                          ],
+                      }).setAccentColor(resolveColor(settings.colors.neutral))
+                    : new ContainerBuilder({
+                          components: [
+                              new SectionBuilder({
+                                  components: [
+                                      new TextDisplayBuilder()
+                                          .setContent(
+                                              getLocaleString(
+                                                  guildLocaleCode,
+                                                  'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE',
+                                              ),
+                                          )
+                                          .toJSON(),
+                                      new TextDisplayBuilder()
+                                          .setContent(
+                                              `${getLocaleString(
+                                                  guildLocaleCode,
+                                                  'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TEXT',
+                                                  `[Rick Astley - ${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.DETAILED')}](https://www.youtube.com/watch?v=${exampleId})`,
+                                                  '4:20',
+                                              )}\n${getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${getLocaleString(guildLocaleCode, 'MISC.SOURCES.YOUTUBE')}** ─ ${getLocaleString(
+                                                  guildLocaleCode,
+                                                  'MISC.ADDED_BY',
+                                                  interaction.user.id,
+                                              )}`,
+                                          )
+                                          .toJSON(),
+                                      new TextDisplayBuilder()
+                                          .setContent(
+                                              getLocaleString(
+                                                  guildLocaleCode,
+                                                  'MUSIC.PLAYER.PLAYING.NOW.DETAILED.REMAINING',
+                                                  '1',
+                                              ),
+                                          )
+                                          .toJSON(),
+                                  ],
+                                  accessory: new ThumbnailBuilder()
+                                      .setURL(
+                                          `https://i.ytimg.com/vi/${exampleId}/hqdefault.jpg`,
+                                      )
+                                      .toJSON(),
+                              }).toJSON(),
+                              ...(settings.features.web.dashboardURL
+                                  ? [
+                                        new SeparatorBuilder().toJSON(),
+                                        new ActionRowBuilder<ButtonBuilder>()
+                                            .addComponents(
+                                                new ButtonBuilder()
+                                                    .setURL(
+                                                        `${settings.features.web.dashboardURL.replace(
+                                                            /\/+$/,
+                                                            '',
+                                                        )}/guild/${interaction.guildId}`,
+                                                    )
+                                                    .setStyle(ButtonStyle.Link)
+                                                    .setLabel(
+                                                        getLocaleString(
+                                                            guildLocaleCode,
+                                                            'MISC.DASHBOARD',
+                                                        ),
+                                                    ),
+                                            )
+                                            .toJSON(),
+                                    ]
+                                  : []),
+                          ],
+                      }),
+            );
             current = `\`${getLocaleString(
                 guildLocaleCode,
                 `CMD.SETTINGS.MISC.FORMAT.OPTIONS.${current.toUpperCase()}`,
@@ -887,7 +800,57 @@ export async function buildSettingsPage(
             }\``;
         }
     }
-    return { current, embeds, actionRow };
+    baseContainer
+        .spliceComponents(
+            0,
+            0,
+            new TextDisplayBuilder().setContent(
+                `${getLocaleString(
+                    guildLocaleCode,
+                    'CMD.SETTINGS.RESPONSE.HEADER',
+                    interaction.guild.name,
+                )}\n\n**${getLocaleString(
+                    guildLocaleCode,
+                    `CMD.SETTINGS.MISC.${option.toUpperCase()}.NAME`,
+                )}** ─ ${getLocaleString(
+                    guildLocaleCode,
+                    `CMD.SETTINGS.MISC.${option.toUpperCase()}.DESCRIPTION`,
+                )}${
+                    current
+                        ? `\n> ${getLocaleString(
+                              guildLocaleCode,
+                              'MISC.CURRENT',
+                          )}: ${current}`
+                        : ''
+                }`,
+            ),
+        )
+        .addActionRowComponents(actionRow)
+        .addSeparatorComponents(new SeparatorBuilder())
+        .addActionRowComponents(
+            new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+                new StringSelectMenuBuilder()
+                    .setCustomId('settings')
+                    .addOptions(
+                        settingsOptions.map(
+                            (opt): SelectMenuComponentOptionData => ({
+                                label: getLocaleString(
+                                    guildLocaleCode,
+                                    `CMD.SETTINGS.MISC.${opt.toUpperCase()}.NAME`,
+                                ),
+                                description: getLocaleString(
+                                    guildLocaleCode,
+                                    `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION`,
+                                ),
+                                value: opt,
+                                default: opt === option,
+                            }),
+                        ),
+                    ),
+            ),
+        );
+    containers.unshift(baseContainer);
+    return { current, containers, actionRow };
 }
 
 /**
@@ -944,4 +907,15 @@ export function cleanURIForMarkdown(uri: string): string {
     return uri.match(/^(https?:\/\/.*?)(\/)?$/)
         ? uri.replace(/^https?:\/\//, '').replace(/\/$/, '')
         : uri;
+}
+
+/**
+ * Returns the markdown-formatted locale string for a track.
+ * @param track - The track to format.
+ * @returns The markdown-formatted string.
+ */
+export function getTrackMarkdownLocaleString(track: Song): string {
+    return track.info.title === track.info.uri
+        ? track.info.uri
+        : `[${track.info.title}](${track.info.uri})`;
 }

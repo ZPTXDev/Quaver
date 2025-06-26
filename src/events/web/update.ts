@@ -138,7 +138,7 @@ export default {
                     player.handler = new PlayerHandler(bot, player);
                     player.queue.channel = member.voice
                         .channel as QuaverChannels;
-                    await player.voice.connect(member.voice.channelId, {
+                    player.voice.connect(member.voice.channelId, {
                         deafened: true,
                     });
                     // Ensure that Quaver destroys the player if the user leaves the channel while Quaver is queuing tracks

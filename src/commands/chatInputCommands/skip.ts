@@ -3,14 +3,13 @@ import type {
     QuaverInteraction,
     QuaverPlayer,
 } from '#src/lib/util/common.d.js';
-import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
+import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
-    cleanURIForMarkdown,
-    getGuildLocaleString,
     getLocaleString,
     getRequesterStatus,
+    getTrackMarkdownLocaleString,
     RequesterStatus,
 } from '#src/lib/util/util.js';
 import type { ChatInputCommandInteraction, GuildMember } from 'discord.js';
@@ -79,42 +78,42 @@ export default {
                             { type: MessageOptionsBuilderType.Error },
                         );
                         return;
-                    case PlayerResponse.Success:
+                    case PlayerResponse.Success: {
+                        const guildLocaleCode =
+                            (await data.guild.get<string>(
+                                interaction.guildId,
+                                'settings.locale',
+                            )) ?? settings.defaultLocaleCode;
                         await interaction.replyHandler.reply(
-                            `${await getGuildLocaleString(
-                                interaction.guildId,
-                                track.info.title === track.info.uri
-                                    ? 'CMD.SKIP.RESPONSE.SUCCESS.VOTED_DIRECT_LINK'
-                                    : 'CMD.SKIP.RESPONSE.SUCCESS.VOTED',
-                                ...(track.info.title !== track.info.uri
-                                    ? [cleanURIForMarkdown(track.info.title)]
-                                    : []),
-                                track.info.uri,
-                            )}\n${await getGuildLocaleString(
-                                interaction.guildId,
+                            `${getLocaleString(
+                                guildLocaleCode,
+                                'CMD.SKIP.RESPONSE.SUCCESS.VOTED',
+                                getTrackMarkdownLocaleString(track),
+                            )}\n${getLocaleString(
+                                guildLocaleCode,
                                 'MISC.ADDED_BY',
                                 track.requesterId,
                             )}`,
                         );
+                    }
                 }
                 return;
             }
             player.skip = skip;
-            await interaction.replyHandler.locale(
-                track.info.title === track.info.uri
-                    ? 'CMD.SKIP.RESPONSE.VOTED.SUCCESS_DIRECT_LINK'
-                    : 'CMD.SKIP.RESPONSE.VOTED.SUCCESS',
-                {
-                    vars: [
-                        ...(track.info.title !== track.info.uri
-                            ? [cleanURIForMarkdown(track.info.title)]
-                            : []),
-                        track.info.uri,
-                        skip.users.length.toString(),
-                        skip.required.toString(),
-                    ],
-                    type: MessageOptionsBuilderType.Success,
-                },
+            const guildLocaleCode =
+                (await data.guild.get<string>(
+                    interaction.guildId,
+                    'settings.locale',
+                )) ?? settings.defaultLocaleCode;
+            await interaction.replyHandler.reply(
+                getLocaleString(
+                    guildLocaleCode,
+                    'CMD.SKIP.RESPONSE.VOTED.SUCCESS',
+                    getTrackMarkdownLocaleString(track),
+                    skip.users.length.toString(),
+                    skip.required.toString(),
+                ),
+                { type: MessageOptionsBuilderType.Success },
             );
             return;
         }
@@ -127,27 +126,24 @@ export default {
                 );
                 return;
             case PlayerResponse.Success: {
-                let locale =
-                    requesterStatus === RequesterStatus.Requester
-                        ? 'CMD.SKIP.RESPONSE.SUCCESS.DEFAULT'
-                        : requesterStatus === RequesterStatus.ManagerBypass
-                          ? 'CMD.SKIP.RESPONSE.SUCCESS.MANAGER'
-                          : 'CMD.SKIP.RESPONSE.SUCCESS.FORCED';
-                if (track.info.title === track.info.uri) {
-                    locale += '_DIRECT_LINK';
-                }
-                await interaction.replyHandler.reply(
-                    `${await getGuildLocaleString(
+                const guildLocaleCode =
+                    (await data.guild.get<string>(
                         interaction.guildId,
-                        locale,
-                        ...(track.info.title !== track.info.uri
-                            ? [cleanURIForMarkdown(track.info.title)]
-                            : []),
-                        track.info.uri,
+                        'settings.locale',
+                    )) ?? settings.defaultLocaleCode;
+                await interaction.replyHandler.reply(
+                    `${getLocaleString(
+                        guildLocaleCode,
+                        requesterStatus === RequesterStatus.Requester
+                            ? 'CMD.SKIP.RESPONSE.SUCCESS.DEFAULT'
+                            : requesterStatus === RequesterStatus.ManagerBypass
+                              ? 'CMD.SKIP.RESPONSE.SUCCESS.MANAGER'
+                              : 'CMD.SKIP.RESPONSE.SUCCESS.FORCED',
+                        getTrackMarkdownLocaleString(track),
                     )}${
                         requesterStatus !== RequesterStatus.Requester
-                            ? `\n${await getGuildLocaleString(
-                                  interaction.guildId,
+                            ? `\n${getLocaleString(
+                                  guildLocaleCode,
                                   'MISC.ADDED_BY',
                                   track.requesterId,
                               )}`

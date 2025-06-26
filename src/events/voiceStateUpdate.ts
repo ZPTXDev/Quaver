@@ -1,17 +1,18 @@
 import type { QuaverClient, QuaverPlayer } from '#src/lib/util/common.d.js';
 import {
-    MessageOptionsBuilderType,
     data,
     logger,
+    MessageOptionsBuilderType,
 } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import { getGuildLocaleString } from '#src/lib/util/util.js';
 import type { GuildMember, VoiceState } from 'discord.js';
 import {
     ChannelType,
-    EmbedBuilder,
+    ContainerBuilder,
     PermissionsBitField,
     StageInstancePrivacyLevel,
+    TextDisplayBuilder,
 } from 'discord.js';
 import type { DefaultEventsMap, Server } from 'socket.io';
 
@@ -62,25 +63,33 @@ async function pauseChannelSession(
         );
     }
     await player.handler.send(
-        new EmbedBuilder()
-            .setDescription(
-                `${await getGuildLocaleString(
-                    playerId,
-                    'MUSIC.DISCONNECT.ALONE.WARNING',
-                )} ${await getGuildLocaleString(
-                    playerId,
-                    'MUSIC.DISCONNECT.INACTIVITY.WARNING',
-                    (
-                        Math.floor(Date.now() / 1000) + PAUSE_TIMEOUT_SECONDS
-                    ).toString(),
-                )}`,
-            )
-            .setFooter({
-                text: await getGuildLocaleString(
-                    playerId,
-                    'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME',
-                ),
-            }),
+        new ContainerBuilder({
+            components: [
+                new TextDisplayBuilder()
+                    .setContent(
+                        `${await getGuildLocaleString(
+                            playerId,
+                            'MUSIC.DISCONNECT.ALONE.WARNING',
+                        )} ${await getGuildLocaleString(
+                            playerId,
+                            'MUSIC.DISCONNECT.INACTIVITY.WARNING',
+                            (
+                                Math.floor(Date.now() / 1000) +
+                                PAUSE_TIMEOUT_SECONDS
+                            ).toString(),
+                        )}`,
+                    )
+                    .toJSON(),
+                new TextDisplayBuilder()
+                    .setContent(
+                        await getGuildLocaleString(
+                            playerId,
+                            'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME',
+                        ),
+                    )
+                    .toJSON(),
+            ],
+        }),
         { type: MessageOptionsBuilderType.Warning },
     );
 }

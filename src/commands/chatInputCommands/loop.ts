@@ -5,13 +5,14 @@ import type {
 } from '#src/lib/util/common.d.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
-import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
+import { getLocaleString } from '#src/lib/util/util.js';
 import { LoopType } from '@lavaclient/plugin-queue';
 import type {
     ChatInputCommandInteraction,
     SlashCommandStringOption,
 } from 'discord.js';
 import { SlashCommandBuilder } from 'discord.js';
+import { data } from '#src/lib/util/common.js';
 
 export default {
     data: new SlashCommandBuilder()
@@ -72,25 +73,30 @@ export default {
         )) as QuaverPlayer;
         const type = interaction.options.getString('type');
         let loop, typeLocale;
+        const guildLocaleCode =
+            (await data.guild.get<string>(
+                interaction.guildId,
+                'settings.locale',
+            )) ?? settings.defaultLocaleCode;
         switch (type) {
             case 'disabled':
                 loop = LoopType.None;
-                typeLocale = await getGuildLocaleString(
-                    interaction.guildId,
+                typeLocale = getLocaleString(
+                    guildLocaleCode,
                     'CMD.LOOP.OPTION.TYPE.OPTION.DISABLED',
                 );
                 break;
             case 'track':
                 loop = LoopType.Song;
-                typeLocale = await getGuildLocaleString(
-                    interaction.guildId,
+                typeLocale = getLocaleString(
+                    guildLocaleCode,
                     'CMD.LOOP.OPTION.TYPE.OPTION.TRACK',
                 );
                 break;
             case 'queue':
                 loop = LoopType.Queue;
-                typeLocale = await getGuildLocaleString(
-                    interaction.guildId,
+                typeLocale = getLocaleString(
+                    guildLocaleCode,
                     'CMD.LOOP.OPTION.TYPE.OPTION.QUEUE',
                 );
                 break;
@@ -98,8 +104,8 @@ export default {
         typeLocale = typeLocale.toLowerCase();
         const response = await player.handler.loop(loop);
         if (response !== PlayerResponse.Success) return;
-        await interaction.replyHandler.locale('CMD.LOOP.RESPONSE.SUCCESS', {
-            vars: [typeLocale],
-        });
+        await interaction.replyHandler.reply(
+            getLocaleString('CMD.LOOP.RESPONSE.SUCCESS', typeLocale),
+        );
     },
 };

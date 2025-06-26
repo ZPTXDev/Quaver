@@ -3,10 +3,13 @@ import type {
     QuaverInteraction,
     QuaverPlayer,
 } from '#src/lib/util/common.d.js';
-import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
+import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
-import { cleanURIForMarkdown, getLocaleString } from '#src/lib/util/util.js';
+import {
+    getLocaleString,
+    getTrackMarkdownLocaleString,
+} from '#src/lib/util/util.js';
 import type {
     ChatInputCommandInteraction,
     SlashCommandIntegerOption,
@@ -86,21 +89,20 @@ export default {
                 return;
             case PlayerResponse.Success: {
                 const track = player.queue.tracks[newPosition - 1];
-                await interaction.replyHandler.locale(
-                    track.info.title === track.info.uri
-                        ? 'CMD.MOVE.RESPONSE.SUCCESS_DIRECT_LINK'
-                        : 'CMD.MOVE.RESPONSE.SUCCESS',
-                    {
-                        vars: [
-                            ...(track.info.title !== track.info.uri
-                                ? [cleanURIForMarkdown(track.info.title)]
-                                : []),
-                            track.info.uri,
-                            oldPosition.toString(),
-                            newPosition.toString(),
-                        ],
-                        type: MessageOptionsBuilderType.Success,
-                    },
+                const guildLocaleCode =
+                    (await data.guild.get<string>(
+                        interaction.guildId,
+                        'settings.locale',
+                    )) ?? settings.defaultLocaleCode;
+                await interaction.replyHandler.reply(
+                    getLocaleString(
+                        guildLocaleCode,
+                        'CMD.MOVE.RESPONSE.SUCCESS',
+                        getTrackMarkdownLocaleString(track),
+                        oldPosition.toString(),
+                        newPosition.toString(),
+                    ),
+                    { type: MessageOptionsBuilderType.Success },
                 );
             }
         }

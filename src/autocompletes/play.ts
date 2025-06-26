@@ -75,8 +75,8 @@ export default {
                             )
                             .slice(
                                 0,
-                                suggestion.length > 100 ? 97 : 100,
-                            )}${suggestion.length > 100 ? '...' : ''}`,
+                                suggestion.length > 100 ? 99 : 100,
+                            )}${suggestion.length > 100 ? '…' : ''}`,
                 )
                 .slice(0, 24)
                 .map(

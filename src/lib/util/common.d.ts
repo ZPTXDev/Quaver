@@ -7,11 +7,16 @@ import type {
     AttachmentBuilder,
     AutocompleteInteraction,
     Client,
-    EmbedBuilder,
+    ContainerBuilder,
+    FileBuilder,
+    MediaGalleryBuilder,
     MessageActionRowComponentBuilder,
+    SectionBuilder,
+    SeparatorBuilder,
     Snowflake,
     StageChannel,
     TextChannel,
+    TextDisplayBuilder,
     VoiceChannel,
 } from 'discord.js';
 import type { Node, Player } from 'lavaclient';
@@ -36,18 +41,27 @@ export type SettingsPageOptions =
 
 export type SettingsPage = {
     current: string;
-    embeds: EmbedBuilder[];
+    containers: ContainerBuilder[];
     actionRow: ActionRowBuilder;
 };
 
+type TopLevelComponentBuilders =
+    | ActionRowBuilder<MessageActionRowComponentBuilder>
+    | SectionBuilder
+    | TextDisplayBuilder
+    | MediaGalleryBuilder
+    | FileBuilder
+    | SeparatorBuilder
+    | ContainerBuilder;
+
 export type MessageOptionsBuilderInputs =
     | string
-    | EmbedBuilder
-    | (string | EmbedBuilder)[];
+    | TopLevelComponentBuilders
+    | Array<string | TopLevelComponentBuilders>;
 
 export type MessageOptionsBuilderOptions = {
     type?: MessageOptionsBuilderType;
-    components?: ActionRowBuilder<MessageActionRowComponentBuilder>[];
+    components?: Array<TopLevelComponentBuilders>;
     files?: AttachmentBuilder[];
 };
 

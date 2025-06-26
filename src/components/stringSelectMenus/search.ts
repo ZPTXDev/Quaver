@@ -1,28 +1,28 @@
 import { ForceType } from '#src/lib/ReplyHandler.js';
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import { logger, searchState } from '#src/lib/util/common.js';
+import { data, logger, searchState } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
-import {
-    buildMessageOptions,
-    getGuildLocaleString,
-} from '#src/lib/util/util.js';
+import { buildMessageOptions, getLocaleString } from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/plugin-queue';
 import type {
+    APIActionRowComponent,
+    APIButtonComponent,
+    APIContainerComponent,
     APISelectMenuOption,
-    ButtonComponent,
-    MessageActionRowComponent,
-    MessageActionRowComponentBuilder,
+    APIStringSelectComponent,
     SelectMenuComponentOptionData,
-    StringSelectMenuComponent,
     StringSelectMenuInteraction,
+    StringSelectMenuOptionBuilder,
 } from 'discord.js';
 import {
-    ActionRow,
     ActionRowBuilder,
     ButtonBuilder,
-    EmbedBuilder,
+    ButtonStyle,
+    ContainerBuilder,
+    ContainerComponent,
     StringSelectMenuBuilder,
 } from 'discord.js';
+import { settings } from '#src/lib/util/settings.js';
 
 export default {
     name: 'search',
@@ -31,9 +31,14 @@ export default {
         interaction: QuaverInteraction<StringSelectMenuInteraction>,
     ): Promise<void> {
         const state = searchState[interaction.message.id];
+        const guildLocaleCode =
+            (await data.guild.get<string>(
+                interaction.guildId,
+                'settings.locale',
+            )) ?? settings.defaultLocaleCode;
         if (!state) {
-            await interaction.replyHandler.locale(
-                'DISCORD.INTERACTION.EXPIRED',
+            await interaction.replyHandler.reply(
+                getLocaleString(guildLocaleCode, 'DISCORD.INTERACTION.EXPIRED'),
                 { components: [], force: ForceType.Update },
             );
             return;
@@ -44,11 +49,9 @@ export default {
                 try {
                     await message.edit(
                         buildMessageOptions(
-                            new EmbedBuilder().setDescription(
-                                await getGuildLocaleString(
-                                    message.guildId,
-                                    'DISCORD.INTERACTION.EXPIRED',
-                                ),
+                            getLocaleString(
+                                guildLocaleCode,
+                                'DISCORD.INTERACTION.EXPIRED',
                             ),
                             { components: [] },
                         ),
@@ -63,44 +66,38 @@ export default {
                 }
                 delete searchState[message.id];
             },
-            30 * 1000,
+            30_000,
             interaction.message,
         );
         state.selected = interaction.values;
         const pages = state.pages;
-        const original = {
-            embeds: interaction.message.embeds,
-            components: interaction.message.components,
-        };
-        if (original.embeds.length === 0) {
-            await interaction.message.delete();
+        if (
+            !(interaction.message.components[0] instanceof ContainerComponent)
+        ) {
             return;
         }
-        const updated: {
-            components: ActionRowBuilder<MessageActionRowComponentBuilder>[];
-        } = { components: [] };
-        if (!(original.components[0] instanceof ActionRow)) return;
-        if (!(original.components[1] instanceof ActionRow)) return;
-        updated.components[0] = ActionRowBuilder.from(original.components[0]);
-        updated.components[1] = ActionRowBuilder.from(original.components[1]);
-        updated.components[0].components[0] = StringSelectMenuBuilder.from(
-            original.components[0].components[0] as StringSelectMenuComponent,
+        const container = new ContainerBuilder(
+            interaction.message.components[0].toJSON(),
+        );
+        const selectMenuActionRow =
+            ActionRowBuilder.from<StringSelectMenuBuilder>(
+                container.components[3].toJSON() as APIActionRowComponent<APIStringSelectComponent>,
+            );
+        selectMenuActionRow.components[0] = StringSelectMenuBuilder.from(
+            selectMenuActionRow.components[0].toJSON(),
         ).setOptions(
-            (
-                original.components[0]
-                    .components[0] as StringSelectMenuComponent
-            ).options
+            selectMenuActionRow.components[0].options
                 .map(
                     (
-                        data: APISelectMenuOption,
+                        value: StringSelectMenuOptionBuilder,
                     ): SelectMenuComponentOptionData => {
                         return {
-                            label: data.label,
-                            description: data.description,
-                            value: data.value,
+                            label: value.data.label,
+                            description: value.data.description,
+                            value: value.data.value,
                             default: !!state.selected.find(
                                 (identifier: string): boolean =>
-                                    identifier === data.value,
+                                    identifier === value.data.value,
                             ),
                         };
                     },
@@ -130,7 +127,7 @@ export default {
                                     firstIdx + pages[refPg].indexOf(refTrack)
                                 }. ${refTrack.info.title}`;
                                 if (label.length >= 100) {
-                                    label = `${label.substring(0, 97)}...`;
+                                    label = `${label.substring(0, 99)}…`;
                                 }
                                 return {
                                     label: label,
@@ -142,14 +139,9 @@ export default {
                         )
                         .filter(
                             (options): boolean =>
-                                !(
-                                    (
-                                        original
-                                            .components[0] as ActionRow<MessageActionRowComponent>
-                                    ).components[0] as StringSelectMenuComponent
-                                ).options.find(
+                                !selectMenuActionRow.components[0].options.find(
                                     (opt): boolean =>
-                                        opt.value === options.value,
+                                        opt.data.value === options.value,
                                 ),
                         ),
                 )
@@ -159,14 +151,16 @@ export default {
                         parseInt(b.label.split('.')[0]),
                 ),
         );
-        updated.components[1].components[2] = ButtonBuilder.from(
-            original.components[1].components[2] as ButtonComponent,
-        ).setDisabled(state.selected.length === 0);
-        await interaction.replyHandler.reply(
-            original.embeds.map(
-                (embed): EmbedBuilder => EmbedBuilder.from(embed),
-            ),
-            { components: updated.components, force: ForceType.Update },
+        container.components[3] = selectMenuActionRow;
+        const buttonActionRow = ActionRowBuilder.from<ButtonBuilder>(
+            container.components[4].toJSON() as APIActionRowComponent<APIButtonComponent>,
         );
+        buttonActionRow.components[2] = ButtonBuilder.from(
+            buttonActionRow.components[2].toJSON(),
+        ).setDisabled(state.selected.length === 0);
+        container.components[4] = buttonActionRow;
+        await interaction.replyHandler.reply(container, {
+            force: ForceType.Update,
+        });
     },
 };

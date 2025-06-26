@@ -10,7 +10,6 @@ import { settings } from '#src/lib/util/settings.js';
 import {
     buildMessageOptions,
     cleanURIForMarkdown,
-    getGuildLocaleString,
     getLocaleString,
 } from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/plugin-queue';
@@ -25,12 +24,14 @@ import {
     ButtonBuilder,
     ButtonStyle,
     ChannelType,
-    EmbedBuilder,
+    ContainerBuilder,
     escapeMarkdown,
     InteractionCallbackResponse,
     Message,
+    SeparatorBuilder,
     SlashCommandBuilder,
     StringSelectMenuBuilder,
+    TextDisplayBuilder,
 } from 'discord.js';
 import { LavalinkWSClientState } from 'lavalink-ws-client';
 
@@ -122,112 +123,122 @@ export default {
                 'settings.locale',
             )) ?? settings.defaultLocaleCode;
         const response = await interaction.replyHandler.reply(
-            new EmbedBuilder()
-                .setDescription(
-                    pages[0]
-                        .map((track: Song, index): string => {
-                            const duration = msToTime(track.info.length);
-                            let durationString = track.info.isStream
-                                ? '∞'
-                                : msToTimeString(duration, true);
-                            if (durationString === 'MORE_THAN_A_DAY') {
-                                durationString = getLocaleString(
-                                    guildLocaleCode,
-                                    'MISC.MORE_THAN_A_DAY',
-                                );
-                            }
-                            return `\`${(index + 1)
-                                .toString()
-                                .padStart(
-                                    tracks.length.toString().length,
-                                    ' ',
-                                )}.\` ${
-                                track.info.title === track.info.uri
-                                    ? `**${track.info.uri}**`
-                                    : `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`
-                            } \`[${durationString}]\``;
-                        })
-                        .join('\n'),
-                )
-                .setFooter({
-                    text: await getGuildLocaleString(
-                        interaction.guildId,
-                        'MISC.PAGE',
-                        '1',
-                        pages.length.toString(),
-                    ),
-                }),
-            {
+            new ContainerBuilder({
                 components: [
-                    new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-                        new StringSelectMenuBuilder()
-                            .setCustomId('search')
-                            .setPlaceholder(
-                                await getGuildLocaleString(
-                                    interaction.guildId,
-                                    'CMD.SEARCH.MISC.PICK',
-                                ),
-                            )
-                            .addOptions(
-                                pages[0].map(
-                                    (
-                                        track,
-                                        index,
-                                    ): SelectMenuComponentOptionData => {
-                                        let label = `${index + 1}. ${
-                                            track.info.title
-                                        }`;
-                                        if (label.length >= 100) {
-                                            label = `${label.substring(
-                                                0,
-                                                97,
-                                            )}...`;
-                                        }
-                                        return {
-                                            label: label,
-                                            description: track.info.author,
-                                            value: track.info.identifier,
-                                        };
-                                    },
-                                ),
-                            )
-                            .setMinValues(0)
-                            .setMaxValues(pages[0].length),
-                    ),
-                    new ActionRowBuilder<ButtonBuilder>().addComponents(
-                        new ButtonBuilder()
-                            .setCustomId('search:0')
-                            .setEmoji('⬅️')
-                            .setDisabled(true)
-                            .setStyle(ButtonStyle.Primary),
-                        new ButtonBuilder()
-                            .setCustomId('search:2')
-                            .setEmoji('➡️')
-                            .setDisabled(pages.length === 1)
-                            .setStyle(ButtonStyle.Primary),
-                        new ButtonBuilder()
-                            .setCustomId('search:add')
-                            .setStyle(ButtonStyle.Success)
-                            .setDisabled(true)
-                            .setLabel(
-                                await getGuildLocaleString(
-                                    interaction.guildId,
-                                    'MISC.ADD',
-                                ),
+                    new TextDisplayBuilder()
+                        .setContent(
+                            pages[0]
+                                .map((track: Song, index): string => {
+                                    const duration = msToTime(
+                                        track.info.length,
+                                    );
+                                    let durationString = track.info.isStream
+                                        ? '∞'
+                                        : msToTimeString(duration, true);
+                                    if (durationString === 'MORE_THAN_A_DAY') {
+                                        durationString = getLocaleString(
+                                            guildLocaleCode,
+                                            'MISC.MORE_THAN_A_DAY',
+                                        );
+                                    }
+                                    return `\`${(index + 1)
+                                        .toString()
+                                        .padStart(
+                                            tracks.length.toString().length,
+                                            ' ',
+                                        )}.\` ${
+                                        track.info.title === track.info.uri
+                                            ? `**${track.info.uri}**`
+                                            : `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`
+                                    } \`[${durationString}]\``;
+                                })
+                                .join('\n'),
+                        )
+                        .toJSON(),
+                    new TextDisplayBuilder()
+                        .setContent(
+                            getLocaleString(
+                                guildLocaleCode,
+                                'MISC.PAGE',
+                                '1',
+                                pages.length.toString(),
                             ),
-                        new ButtonBuilder()
-                            .setCustomId('cancel')
-                            .setStyle(ButtonStyle.Secondary)
-                            .setLabel(
-                                await getGuildLocaleString(
-                                    interaction.guildId,
-                                    'MISC.CANCEL',
+                        )
+                        .toJSON(),
+                    new SeparatorBuilder().toJSON(),
+                    new ActionRowBuilder<StringSelectMenuBuilder>()
+                        .addComponents(
+                            new StringSelectMenuBuilder()
+                                .setCustomId('search')
+                                .setPlaceholder(
+                                    getLocaleString(
+                                        guildLocaleCode,
+                                        'CMD.SEARCH.MISC.PICK',
+                                    ),
+                                )
+                                .addOptions(
+                                    pages[0].map(
+                                        (
+                                            track,
+                                            index,
+                                        ): SelectMenuComponentOptionData => {
+                                            let label = `${index + 1}. ${
+                                                track.info.title
+                                            }`;
+                                            if (label.length >= 100) {
+                                                label = `${label.substring(
+                                                    0,
+                                                    99,
+                                                )}…`;
+                                            }
+                                            return {
+                                                label: label,
+                                                description: track.info.author,
+                                                value: track.info.identifier,
+                                            };
+                                        },
+                                    ),
+                                )
+                                .setMinValues(0)
+                                .setMaxValues(pages[0].length),
+                        )
+                        .toJSON(),
+                    new ActionRowBuilder<ButtonBuilder>()
+                        .addComponents(
+                            new ButtonBuilder()
+                                .setCustomId('search:0')
+                                .setEmoji('⬅️')
+                                .setDisabled(true)
+                                .setStyle(ButtonStyle.Primary),
+                            new ButtonBuilder()
+                                .setCustomId('search:2')
+                                .setEmoji('➡️')
+                                .setDisabled(pages.length === 1)
+                                .setStyle(ButtonStyle.Primary),
+                            new ButtonBuilder()
+                                .setCustomId('search:add')
+                                .setStyle(ButtonStyle.Success)
+                                .setDisabled(true)
+                                .setLabel(
+                                    getLocaleString(
+                                        guildLocaleCode,
+                                        'MISC.ADD',
+                                    ),
                                 ),
-                            ),
-                    ),
+                            new ButtonBuilder()
+                                .setCustomId('cancel')
+                                .setStyle(ButtonStyle.Secondary)
+                                .setLabel(
+                                    getLocaleString(
+                                        guildLocaleCode,
+                                        'MISC.CANCEL',
+                                    ),
+                                ),
+                        )
+                        .toJSON(),
                 ],
-                withResponse: true,
-            },
+            }),
+            { withResponse: true },
         );
         if (
             !(
@@ -244,15 +255,13 @@ export default {
         searchState[msg.id] = {
             pages: pages,
             timeout: setTimeout(
-                async (message): Promise<void> => {
+                async (glc, message): Promise<void> => {
                     try {
                         await message.edit(
                             buildMessageOptions(
-                                new EmbedBuilder().setDescription(
-                                    await getGuildLocaleString(
-                                        message.guildId,
-                                        'DISCORD.INTERACTION.EXPIRED',
-                                    ),
+                                getLocaleString(
+                                    glc,
+                                    'DISCORD.INTERACTION.EXPIRED',
                                 ),
                                 { components: [] },
                             ),
@@ -268,6 +277,7 @@ export default {
                     delete searchState[message.id];
                 },
                 30 * 1000,
+                guildLocaleCode,
                 msg,
             ),
             selected: [],

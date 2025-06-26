@@ -6,7 +6,11 @@ import {
 } from '#src/lib/util/common.js';
 import { LoopType } from '@lavaclient/plugin-queue';
 import type { Collection, GuildMember, Snowflake } from 'discord.js';
-import { cleanURIForMarkdown } from '#src/lib/util/util.js';
+import {
+    getLocaleString,
+    getTrackMarkdownLocaleString,
+} from '#src/lib/util/util.js';
+import { settings } from '#src/lib/util/settings.js';
 
 export default {
     name: 'trackEnd',
@@ -23,19 +27,18 @@ export default {
                 message: `[G ${queue.player.id}] Track skipped as it failed to load`,
                 label: 'Quaver',
             });
-            await queue.player.handler.locale(
-                track.info.title === track.info.uri
-                    ? 'MUSIC.PLAYER.TRACK_SKIPPED_ERROR_DIRECT_LINK'
-                    : 'MUSIC.PLAYER.TRACK_SKIPPED_ERROR',
-                {
-                    vars: [
-                        ...(track.info.title !== track.info.uri
-                            ? [cleanURIForMarkdown(track.info.title)]
-                            : []),
-                        track.info.uri,
-                    ],
-                    type: MessageOptionsBuilderType.Warning,
-                },
+            const guildLocaleCode =
+                (await data.guild.get<string>(
+                    queue.player.id,
+                    'settings.locale',
+                )) ?? settings.defaultLocaleCode;
+            await queue.player.handler.send(
+                getLocaleString(
+                    guildLocaleCode,
+                    'MUSIC.PLAYER.TRACK_SKIPPED_ERROR',
+                    getTrackMarkdownLocaleString(track),
+                ),
+                { type: MessageOptionsBuilderType.Warning },
             );
             if (!queue.player.failed) queue.player.failed = 0;
             queue.player.failed++;
@@ -43,8 +46,12 @@ export default {
                 queue.clear();
                 await queue.skip();
                 await queue.start();
-                await queue.player.handler.locale(
-                    'MUSIC.PLAYER.QUEUE_CLEARED_ERROR',
+                await queue.player.handler.send(
+                    getLocaleString(
+                        guildLocaleCode,
+                        'MUSIC.PLAYER.QUEUE_CLEARED_ERROR',
+                    ),
+                    { type: MessageOptionsBuilderType.Warning },
                 );
             }
             return;
@@ -55,6 +62,7 @@ export default {
                     queue.setLoop(LoopType.None);
                     await queue.player.handler.locale(
                         'MUSIC.PLAYER.LOOP_TRACK_DISABLED',
+                        { type: MessageOptionsBuilderType.Warning },
                     );
                     await queue.skip();
                     await queue.start();
@@ -71,6 +79,7 @@ export default {
                     queue.setLoop(LoopType.None);
                     await queue.player.handler.locale(
                         'MUSIC.PLAYER.LOOP_QUEUE_DISABLED',
+                        { type: MessageOptionsBuilderType.Warning },
                     );
                 }
         }

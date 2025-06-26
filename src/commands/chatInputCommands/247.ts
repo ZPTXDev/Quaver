@@ -15,8 +15,9 @@ import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    EmbedBuilder,
+    ContainerBuilder,
     SlashCommandBuilder,
+    TextDisplayBuilder,
 } from 'discord.js';
 
 export default {
@@ -64,40 +65,58 @@ export default {
                       'settings.stay.enabled',
                   ));
         const response = await player.handler.stay(isGuildStayEnabled);
+        const guildLocaleCode =
+            (await data.guild.get<string>(
+                interaction.guildId,
+                'settings.locale',
+            )) ?? settings.defaultLocaleCode;
         switch (response) {
             case PlayerResponse.FeatureDisabled:
-                await interaction.replyHandler.locale(
-                    'FEATURE.DISABLED.DEFAULT',
-                    {
-                        type: MessageOptionsBuilderType.Error,
-                    },
+                await interaction.replyHandler.reply(
+                    getLocaleString(
+                        guildLocaleCode,
+                        'FEATURE.DISABLED.DEFAULT',
+                    ),
+                    { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             case PlayerResponse.FeatureNotWhitelisted:
                 if (settings.features.stay.premium && settings.premiumURL) {
-                    await interaction.replyHandler.locale(
-                        'FEATURE.NO_PERMISSION.PREMIUM',
-                        {
-                            type: MessageOptionsBuilderType.Error,
+                    await interaction.replyHandler.reply(
+                        new ContainerBuilder({
                             components: [
-                                new ActionRowBuilder<ButtonBuilder>().setComponents(
-                                    new ButtonBuilder()
-                                        .setLabel(
-                                            await getGuildLocaleString(
-                                                interaction.guildId,
-                                                'MISC.GET_PREMIUM',
-                                            ),
-                                        )
-                                        .setStyle(ButtonStyle.Link)
-                                        .setURL(settings.premiumURL),
-                                ),
+                                new TextDisplayBuilder()
+                                    .setContent(
+                                        getLocaleString(
+                                            guildLocaleCode,
+                                            'FEATURE.NO_PERMISSION.PREMIUM',
+                                        ),
+                                    )
+                                    .toJSON(),
+                                new ActionRowBuilder<ButtonBuilder>()
+                                    .setComponents(
+                                        new ButtonBuilder()
+                                            .setLabel(
+                                                await getGuildLocaleString(
+                                                    interaction.guildId,
+                                                    'MISC.GET_PREMIUM',
+                                                ),
+                                            )
+                                            .setStyle(ButtonStyle.Link)
+                                            .setURL(settings.premiumURL),
+                                    )
+                                    .toJSON(),
                             ],
-                        },
+                        }),
+                        { type: MessageOptionsBuilderType.Error },
                     );
                     return;
                 }
-                await interaction.replyHandler.locale(
-                    'FEATURE.NO_PERMISSION.DEFAULT',
+                await interaction.replyHandler.reply(
+                    getLocaleString(
+                        guildLocaleCode,
+                        'FEATURE.NO_PERMISSION.DEFAULT',
+                    ),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
@@ -107,44 +126,53 @@ export default {
                 if (applicationCommands.cache.size === 0) {
                     await applicationCommands.fetch();
                 }
-                await interaction.replyHandler.locale(
-                    'CMD.247.RESPONSE.QUEUE_CHANNEL_MISSING',
-                    {
-                        type: MessageOptionsBuilderType.Error,
-                        vars: [
-                            applicationCommands.cache.find(
-                                (command): boolean => command.name === 'bind',
-                            )?.id ?? '1',
-                        ],
-                    },
+                await interaction.replyHandler.reply(
+                    getLocaleString(
+                        guildLocaleCode,
+                        'CMD.247.RESPONSE.QUEUE_CHANNEL_MISSING',
+                        applicationCommands.cache.find(
+                            (command): boolean => command.name === 'bind',
+                        )?.id ?? '1',
+                    ),
+                    { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             }
-            case PlayerResponse.Success:
+            case PlayerResponse.Success: {
                 // pause timeout is theoretically impossible because the user would need to be in the same vc as Quaver
                 // and pause timeout is only set when everyone leaves
                 await interaction.replyHandler.reply(
-                    new EmbedBuilder()
-                        .setDescription(
-                            await getGuildLocaleString(
-                                interaction.guildId,
-                                isGuildStayEnabled
-                                    ? 'CMD.247.RESPONSE.ENABLED'
-                                    : 'CMD.247.RESPONSE.DISABLED',
-                            ),
-                        )
-                        .setFooter({
-                            text: isGuildStayEnabled
-                                ? await getGuildLocaleString(
-                                      interaction.guildId,
-                                      'CMD.247.MISC.NOTE',
-                                  )
-                                : null,
-                        }),
+                    new ContainerBuilder({
+                        components: [
+                            new TextDisplayBuilder()
+                                .setContent(
+                                    getLocaleString(
+                                        guildLocaleCode,
+                                        isGuildStayEnabled
+                                            ? 'CMD.247.RESPONSE.ENABLED'
+                                            : 'CMD.247.RESPONSE.DISABLED',
+                                    ),
+                                )
+                                .toJSON(),
+                            ...(isGuildStayEnabled
+                                ? [
+                                      new TextDisplayBuilder()
+                                          .setContent(
+                                              getLocaleString(
+                                                  guildLocaleCode,
+                                                  'CMD.247.MISC.NOTE',
+                                              ),
+                                          )
+                                          .toJSON(),
+                                  ]
+                                : []),
+                        ],
+                    }),
                 );
                 if (!isGuildStayEnabled && !player.playing) {
                     player.queue.emit('finish');
                 }
+            }
         }
     },
 };

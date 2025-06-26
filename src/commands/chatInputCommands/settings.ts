@@ -9,21 +9,14 @@ import { settings } from '#src/lib/util/settings.js';
 import {
     buildMessageOptions,
     buildSettingsPage,
-    getGuildLocaleString,
     getLocaleString,
 } from '#src/lib/util/util.js';
-import type {
-    ChatInputCommandInteraction,
-    MessageActionRowComponentBuilder,
-    SelectMenuComponentOptionData } from 'discord.js';
+import type { ChatInputCommandInteraction } from 'discord.js';
 import {
-    ActionRowBuilder,
-    EmbedBuilder,
     InteractionCallbackResponse,
     Message,
     PermissionsBitField,
     SlashCommandBuilder,
-    StringSelectMenuBuilder,
 } from 'discord.js';
 
 export default {
@@ -50,58 +43,14 @@ export default {
                 interaction.guild.id,
                 'settings.locale',
             )) ?? (settings.defaultLocaleCode as keyof typeof Language);
-        const { current, embeds, actionRow } = await buildSettingsPage(
+        const { containers } = await buildSettingsPage(
             interaction,
             guildLocaleCode,
             option,
         );
-        const description = `${getLocaleString(
-            guildLocaleCode,
-            'CMD.SETTINGS.RESPONSE.HEADER',
-            interaction.guild.name,
-        )}\n\n**${getLocaleString(
-            guildLocaleCode,
-            `CMD.SETTINGS.MISC.${option.toUpperCase()}.NAME`,
-        )}** ─ ${getLocaleString(
-            guildLocaleCode,
-            `CMD.SETTINGS.MISC.${option.toUpperCase()}.DESCRIPTION`,
-        )}${
-            current
-                ? `\n> ${getLocaleString(
-                      guildLocaleCode,
-                      'MISC.CURRENT',
-                  )}: ${current}`
-                : ''
-        }`;
-        const response = await interaction.replyHandler.reply(
-            [description, ...embeds],
-            {
-                components: [
-                    new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-                        new StringSelectMenuBuilder()
-                            .setCustomId('settings')
-                            .addOptions(
-                                settingsOptions.map(
-                                    (opt): SelectMenuComponentOptionData => ({
-                                        label: getLocaleString(
-                                            guildLocaleCode,
-                                            `CMD.SETTINGS.MISC.${opt.toUpperCase()}.NAME`,
-                                        ),
-                                        description: getLocaleString(
-                                            guildLocaleCode,
-                                            `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION`,
-                                        ),
-                                        value: opt,
-                                        default: opt === option,
-                                    }),
-                                ),
-                            ),
-                    ),
-                    actionRow as ActionRowBuilder<MessageActionRowComponentBuilder>,
-                ],
-                withResponse: true,
-            },
-        );
+        const response = await interaction.replyHandler.reply(containers, {
+            withResponse: true,
+        });
         if (
             !(
                 response instanceof InteractionCallbackResponse ||
@@ -115,16 +64,11 @@ export default {
                 ? response.resource.message
                 : response;
         confirmationTimeout[msg.id] = setTimeout(
-            async (message): Promise<void> => {
+            async (glc, message): Promise<void> => {
                 try {
                     await message.edit(
                         buildMessageOptions(
-                            new EmbedBuilder().setDescription(
-                                await getGuildLocaleString(
-                                    message.guildId,
-                                    'DISCORD.INTERACTION.EXPIRED',
-                                ),
-                            ),
+                            getLocaleString(glc, 'DISCORD.INTERACTION.EXPIRED'),
                             { components: [] },
                         ),
                     );
@@ -138,7 +82,8 @@ export default {
                 }
                 delete confirmationTimeout[message.id];
             },
-            30 * 1000,
+            30_000,
+            guildLocaleCode,
             msg,
         );
     },

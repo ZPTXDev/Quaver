@@ -1,9 +1,5 @@
 import { ForceType } from '#src/lib/ReplyHandler.js';
-import type {
-    MessageOptionsBuilderInputs,
-    MessageOptionsBuilderOptions,
-    QuaverInteraction,
-} from '#src/lib/util/common.d.js';
+import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import {
     confirmationTimeout,
     data,
@@ -11,27 +7,17 @@ import {
     MessageOptionsBuilderType,
 } from '#src/lib/util/common.js';
 import type { Language } from '#src/lib/util/constants.js';
-import { Check, settingsOptions } from '#src/lib/util/constants.js';
+import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
     buildMessageOptions,
     buildSettingsPage,
     checkLocaleCompletion,
     getGuildLocaleString,
-    getLocaleString,
 } from '#src/lib/util/util.js';
 import { roundTo } from '@zptxdev/zptx-lib';
-import type {
-    MessageActionRowComponentBuilder,
-    SelectMenuComponentOptionData,
-    StringSelectMenuComponent,
-    StringSelectMenuInteraction } from 'discord.js';
-import {
-    ActionRow,
-    ActionRowBuilder,
-    EmbedBuilder,
-    StringSelectMenuBuilder,
-} from 'discord.js';
+import type { StringSelectMenuInteraction } from 'discord.js';
+import { ContainerComponent } from 'discord.js';
 
 export default {
     name: 'language',
@@ -52,11 +38,9 @@ export default {
                 try {
                     await message.edit(
                         buildMessageOptions(
-                            new EmbedBuilder().setDescription(
-                                await getGuildLocaleString(
-                                    message.guildId,
-                                    'DISCORD.INTERACTION.EXPIRED',
-                                ),
+                            await getGuildLocaleString(
+                                message.guildId,
+                                'DISCORD.INTERACTION.EXPIRED',
                             ),
                             { components: [] },
                         ),
@@ -86,18 +70,16 @@ export default {
         await data.guild.set(interaction.guildId, 'settings.locale', option);
         if (localeCompletion.completion !== 100) {
             await interaction.replyHandler.reply(
-                new EmbedBuilder().setDescription(
-                    `This language is incomplete. Completion: \`${roundTo(
-                        localeCompletion.completion,
-                        2,
-                    )}%\`${
-                        settings.managers.includes(interaction.user.id)
-                            ? `\nMissing strings:\n\`\`\`\n${localeCompletion.missing.join(
-                                  '\n',
-                              )}\`\`\``
-                            : ''
-                    }`,
-                ),
+                `This language is incomplete. Completion: \`${roundTo(
+                    localeCompletion.completion,
+                    2,
+                )}%\`${
+                    settings.managers.includes(interaction.user.id)
+                        ? `\nMissing strings:\n\`\`\`\n${localeCompletion.missing.join(
+                              '\n',
+                          )}\`\`\``
+                        : ''
+                }`,
                 { type: MessageOptionsBuilderType.Warning, ephemeral: true },
             );
         }
@@ -106,62 +88,21 @@ export default {
                 interaction.guildId,
                 'settings.locale',
             )) ?? (settings.defaultLocaleCode as keyof typeof Language);
-        const { current, embeds, actionRow } = await buildSettingsPage(
+        const { containers } = await buildSettingsPage(
             interaction,
             guildLocaleCode,
             'language',
         );
-        const description = `${getLocaleString(
-            guildLocaleCode,
-            'CMD.SETTINGS.RESPONSE.HEADER',
-            interaction.guild.name,
-        )}\n\n**${getLocaleString(
-            guildLocaleCode,
-            'CMD.SETTINGS.MISC.LANGUAGE.NAME',
-        )}** ─ ${getLocaleString(
-            guildLocaleCode,
-            'CMD.SETTINGS.MISC.LANGUAGE.DESCRIPTION',
-        )}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: ${current}`;
-        if (!(interaction.message.components[0] instanceof ActionRow)) return;
-        const args: [
-            MessageOptionsBuilderInputs,
-            MessageOptionsBuilderOptions,
-        ] = [
-            [description, ...embeds],
-            {
-                components: [
-                    new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-                        StringSelectMenuBuilder.from(
-                            <StringSelectMenuComponent>(
-                                interaction.message.components[0].components[0]
-                            ),
-                        ).setOptions(
-                            settingsOptions.map(
-                                (opt): SelectMenuComponentOptionData => ({
-                                    label: getLocaleString(
-                                        guildLocaleCode,
-                                        `CMD.SETTINGS.MISC.${opt.toUpperCase()}.NAME`,
-                                    ),
-                                    description: getLocaleString(
-                                        guildLocaleCode,
-                                        `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION`,
-                                    ),
-                                    value: opt,
-                                    default: opt === 'language',
-                                }),
-                            ),
-                        ),
-                    ),
-                    actionRow as ActionRowBuilder<MessageActionRowComponentBuilder>,
-                ],
-            },
-        ];
-        if (localeCompletion.completion !== 100) {
-            await interaction.message.edit(buildMessageOptions(...args));
+        if (
+            !(interaction.message.components[0] instanceof ContainerComponent)
+        ) {
             return;
         }
-        await interaction.replyHandler.reply(args[0], {
-            ...args[1],
+        if (localeCompletion.completion !== 100) {
+            await interaction.message.edit(buildMessageOptions(containers));
+            return;
+        }
+        await interaction.replyHandler.reply(containers, {
             force: ForceType.Update,
         });
     },

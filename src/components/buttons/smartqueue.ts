@@ -17,17 +17,14 @@ import {
     getLocaleString,
     WhitelistStatus,
 } from '#src/lib/util/util.js';
-import type {
-    ButtonInteraction,
-    MessageActionRowComponentBuilder,
-    StringSelectMenuComponent } from 'discord.js';
+import type { ButtonInteraction } from 'discord.js';
 import {
-    ActionRow,
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    EmbedBuilder,
-    StringSelectMenuBuilder,
+    ContainerBuilder,
+    ContainerComponent,
+    TextDisplayBuilder,
 } from 'discord.js';
 
 export default {
@@ -50,11 +47,9 @@ export default {
                 try {
                     await message.edit(
                         buildMessageOptions(
-                            new EmbedBuilder().setDescription(
-                                await getGuildLocaleString(
-                                    message.guildId,
-                                    'DISCORD.INTERACTION.EXPIRED',
-                                ),
+                            await getGuildLocaleString(
+                                message.guildId,
+                                'DISCORD.INTERACTION.EXPIRED',
                             ),
                             { components: [] },
                         ),
@@ -69,14 +64,22 @@ export default {
                 }
                 delete confirmationTimeout[message.id];
             },
-            30 * 1000,
+            30_000,
             interaction.message,
         );
         const option = interaction.customId.split(':')[1] === 'enable';
+        const guildLocaleCode =
+            (await data.guild.get<keyof typeof Language>(
+                interaction.guildId,
+                'settings.locale',
+            )) ?? (settings.defaultLocaleCode as keyof typeof Language);
         if (option) {
             if (!settings.features.smartqueue.enabled) {
-                await interaction.replyHandler.locale(
-                    'FEATURE.DISABLED.DEFAULT',
+                await interaction.replyHandler.reply(
+                    getLocaleString(
+                        guildLocaleCode,
+                        'FEATURE.DISABLED.DEFAULT',
+                    ),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
@@ -93,29 +96,41 @@ export default {
                     settings.features.smartqueue.premium &&
                     settings.premiumURL
                 ) {
-                    await interaction.replyHandler.locale(
-                        'FEATURE.NO_PERMISSION.PREMIUM',
-                        {
-                            type: MessageOptionsBuilderType.Error,
+                    await interaction.replyHandler.reply(
+                        new ContainerBuilder({
                             components: [
-                                new ActionRowBuilder<ButtonBuilder>().setComponents(
-                                    new ButtonBuilder()
-                                        .setLabel(
-                                            await getGuildLocaleString(
-                                                interaction.guildId,
-                                                'MISC.GET_PREMIUM',
-                                            ),
-                                        )
-                                        .setStyle(ButtonStyle.Link)
-                                        .setURL(settings.premiumURL),
-                                ),
+                                new TextDisplayBuilder()
+                                    .setContent(
+                                        getLocaleString(
+                                            guildLocaleCode,
+                                            'FEATURE.NO_PERMISSION.PREMIUM',
+                                        ),
+                                    )
+                                    .toJSON(),
+                                new ActionRowBuilder<ButtonBuilder>()
+                                    .setComponents(
+                                        new ButtonBuilder()
+                                            .setLabel(
+                                                await getGuildLocaleString(
+                                                    interaction.guildId,
+                                                    'MISC.GET_PREMIUM',
+                                                ),
+                                            )
+                                            .setStyle(ButtonStyle.Link)
+                                            .setURL(settings.premiumURL),
+                                    )
+                                    .toJSON(),
                             ],
-                        },
+                        }),
+                        { type: MessageOptionsBuilderType.Error },
                     );
                     return;
                 }
-                await interaction.replyHandler.locale(
-                    'FEATURE.NO_PERMISSION.DEFAULT',
+                await interaction.replyHandler.reply(
+                    getLocaleString(
+                        guildLocaleCode,
+                        'FEATURE.NO_PERMISSION.DEFAULT',
+                    ),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
@@ -134,38 +149,17 @@ export default {
                 },
             );
         }
-        const guildLocaleCode =
-            (await data.guild.get<keyof typeof Language>(
-                interaction.guildId,
-                'settings.locale',
-            )) ?? (settings.defaultLocaleCode as keyof typeof Language);
-        const { current, embeds, actionRow } = await buildSettingsPage(
+        const { containers } = await buildSettingsPage(
             interaction,
             guildLocaleCode,
             'smartqueue',
         );
-        const description = `${getLocaleString(
-            guildLocaleCode,
-            'CMD.SETTINGS.RESPONSE.HEADER',
-            interaction.guild.name,
-        )}\n\n**${getLocaleString(
-            guildLocaleCode,
-            'CMD.SETTINGS.MISC.SMARTQUEUE.NAME',
-        )}** ─ ${getLocaleString(
-            guildLocaleCode,
-            'CMD.SETTINGS.MISC.SMARTQUEUE.DESCRIPTION',
-        )}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: ${current}`;
-        if (!(interaction.message.components[0] instanceof ActionRow)) return;
-        await interaction.replyHandler.reply([description, ...embeds], {
-            components: [
-                new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-                    StringSelectMenuBuilder.from(
-                        interaction.message.components[0]
-                            .components[0] as StringSelectMenuComponent,
-                    ),
-                ),
-                actionRow as ActionRowBuilder<MessageActionRowComponentBuilder>,
-            ],
+        if (
+            !(interaction.message.components[0] instanceof ContainerComponent)
+        ) {
+            return;
+        }
+        await interaction.replyHandler.reply(containers, {
             force: ForceType.Update,
         });
     },

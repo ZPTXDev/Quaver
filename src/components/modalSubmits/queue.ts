@@ -10,15 +10,15 @@ import {
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
 import type {
-    MessageActionRowComponentBuilder,
-    ModalSubmitInteraction,
-} from 'discord.js';
+    ModalSubmitInteraction } from 'discord.js';
 import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    EmbedBuilder,
+    ContainerBuilder,
     escapeMarkdown,
+    SeparatorBuilder,
+    TextDisplayBuilder,
 } from 'discord.js';
 
 export default {
@@ -70,73 +70,79 @@ export default {
             await interaction.message.delete();
             return;
         }
-        const updated: {
-            embeds: EmbedBuilder[];
-            components: ActionRowBuilder<MessageActionRowComponentBuilder>[];
-        } = { embeds: [], components: [] };
         const guildLocaleCode =
             (await data.guild.get<string>(
                 interaction.guildId,
                 'settings.locale',
             )) ?? settings.defaultLocaleCode;
-        updated.embeds[0] = EmbedBuilder.from(original.embeds[0])
-            .setDescription(
-                pages[page - 1]
-                    .map((track: Song, index: number): string => {
-                        const duration = msToTime(track.info.length);
-                        let durationString = track.info.isStream
-                            ? '∞'
-                            : msToTimeString(duration, true);
-                        if (durationString === 'MORE_THAN_A_DAY') {
-                            durationString = getLocaleString(
-                                guildLocaleCode,
-                                'MISC.MORE_THAN_A_DAY',
-                            );
-                        }
-                        return `\`${(firstIndex + index)
-                            .toString()
-                            .padStart(largestIndexSize, ' ')}.\` ${
-                            track.info.title === track.info.uri
-                                ? `**${track.info.uri}**`
-                                : `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`
-                        } \`[${durationString}]\` <@${track.requesterId}>`;
-                    })
-                    .join('\n'),
-            )
-            .setFooter({
-                text: await getGuildLocaleString(
-                    interaction.guildId,
-                    'MISC.PAGE',
-                    page.toString(),
-                    pages.length.toString(),
-                ),
-            });
-        updated.components[0] =
-            new ActionRowBuilder<ButtonBuilder>().addComponents(
-                new ButtonBuilder()
-                    .setCustomId(`queue:${page - 1}`)
-                    .setEmoji('⬅️')
-                    .setDisabled(page - 1 < 1)
-                    .setStyle(ButtonStyle.Primary),
-                new ButtonBuilder()
-                    .setCustomId('queue:goto')
-                    .setStyle(ButtonStyle.Secondary)
-                    .setLabel(
-                        await getGuildLocaleString(
-                            interaction.guildId,
-                            'MISC.GO_TO',
-                        ),
-                    ),
-                new ButtonBuilder()
-                    .setCustomId(`queue:${page + 1}`)
-                    .setEmoji('➡️')
-                    .setDisabled(page + 1 > pages.length)
-                    .setStyle(ButtonStyle.Primary),
-            );
-        await interaction.replyHandler.reply(updated.embeds, {
-            components: updated.components,
-            force: ForceType.Update,
-        });
+        await interaction.replyHandler.reply(
+            new ContainerBuilder({
+                components: [
+                    new TextDisplayBuilder()
+                        .setContent(
+                            pages[page - 1]
+                                .map((track: Song, index): string => {
+                                    const duration = msToTime(
+                                        track.info.length,
+                                    );
+                                    let durationString = track.info.isStream
+                                        ? '∞'
+                                        : msToTimeString(duration, true);
+                                    if (durationString === 'MORE_THAN_A_DAY') {
+                                        durationString = getLocaleString(
+                                            guildLocaleCode,
+                                            'MISC.MORE_THAN_A_DAY',
+                                        );
+                                    }
+                                    return `\`${(firstIndex + index)
+                                        .toString()
+                                        .padStart(largestIndexSize, ' ')}.\` ${
+                                        track.info.title === track.info.uri
+                                            ? `**${track.info.uri}**`
+                                            : `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`
+                                    } \`[${durationString}]\` <@${track.requesterId}>`;
+                                })
+                                .join('\n'),
+                        )
+                        .toJSON(),
+                    new TextDisplayBuilder()
+                        .setContent(
+                            await getGuildLocaleString(
+                                interaction.guildId,
+                                'MISC.PAGE',
+                                page.toString(),
+                                pages.length.toString(),
+                            ),
+                        )
+                        .toJSON(),
+                    new SeparatorBuilder().toJSON(),
+                    new ActionRowBuilder<ButtonBuilder>()
+                        .addComponents(
+                            new ButtonBuilder()
+                                .setCustomId(`queue:${page - 1}`)
+                                .setEmoji('⬅️')
+                                .setDisabled(page - 1 < 1)
+                                .setStyle(ButtonStyle.Primary),
+                            new ButtonBuilder()
+                                .setCustomId('queue:goto')
+                                .setStyle(ButtonStyle.Secondary)
+                                .setLabel(
+                                    await getGuildLocaleString(
+                                        interaction.guildId,
+                                        'MISC.GO_TO',
+                                    ),
+                                ),
+                            new ButtonBuilder()
+                                .setCustomId(`queue:${page + 1}`)
+                                .setEmoji('➡️')
+                                .setDisabled(page + 1 > pages.length)
+                                .setStyle(ButtonStyle.Primary),
+                        )
+                        .toJSON(),
+                ],
+            }),
+            { force: ForceType.Update },
+        );
         return;
     },
 };
