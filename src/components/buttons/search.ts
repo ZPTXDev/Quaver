@@ -343,70 +343,69 @@ export default {
             ActionRowBuilder.from<StringSelectMenuBuilder>(
                 container.components[3].toJSON() as APIActionRowComponent<APIStringSelectComponent>,
             );
+        const options = pages[page - 1]
+            .map((track, index: number): APISelectMenuOption => {
+                let label = `${firstIndex + index}. ${track.info.title}`;
+                if (label.length >= 100) {
+                    label = `${label.substring(0, 97)}...`;
+                }
+                return {
+                    label: label,
+                    description: track.info.author,
+                    value: track.info.identifier,
+                    default: !!state.selected.find(
+                        (identifier: string): boolean =>
+                            identifier === track.info.identifier,
+                    ),
+                };
+            })
+            .concat(
+                state.selected
+                    .map((identifier: string): APISelectMenuOption => {
+                        const refPg = pages.indexOf(
+                            pages.find(
+                                (pg): Song =>
+                                    pg.find(
+                                        (t): boolean =>
+                                            t.info.identifier === identifier,
+                                    ),
+                            ),
+                        );
+                        const firstIdx = 10 * refPg + 1;
+                        const refTrack = pages[refPg].find(
+                            (t): boolean => t.info.identifier === identifier,
+                        );
+                        let label = `${
+                            firstIdx + pages[refPg].indexOf(refTrack)
+                        }. ${refTrack.info.title}`;
+                        if (label.length >= 100) {
+                            label = `${label.substring(0, 97)}...`;
+                        }
+                        return {
+                            label: label,
+                            description: refTrack.info.author,
+                            value: identifier,
+                            default: true,
+                        };
+                    })
+                    .filter(
+                        (options): boolean =>
+                            !pages[page - 1].find(
+                                (track): boolean =>
+                                    track.info.identifier === options.value,
+                            ),
+                    ),
+            )
+            .sort(
+                (a, b): number =>
+                    parseInt(a.label.split('.')[0]) -
+                    parseInt(b.label.split('.')[0]),
+            );
         selectMenuActionRow.components[0] = StringSelectMenuBuilder.from(
             selectMenuActionRow.components[0].toJSON(),
-        ).setOptions(
-            pages[page - 1]
-                .map((track, index: number): APISelectMenuOption => {
-                    let label = `${firstIndex + index}. ${track.info.title}`;
-                    if (label.length >= 100) {
-                        label = `${label.substring(0, 97)}...`;
-                    }
-                    return {
-                        label: label,
-                        description: track.info.author,
-                        value: track.info.identifier,
-                        default: !!state.selected.find(
-                            (identifier: string): boolean =>
-                                identifier === track.info.identifier,
-                        ),
-                    };
-                })
-                .concat(
-                    state.selected
-                        .map((identifier: string): APISelectMenuOption => {
-                            const refPg = pages.indexOf(
-                                pages.find(
-                                    (pg): Song =>
-                                        pg.find(
-                                            (t): boolean =>
-                                                t.info.identifier ===
-                                                identifier,
-                                        ),
-                                ),
-                            );
-                            const firstIdx = 10 * refPg + 1;
-                            const refTrack = pages[refPg].find(
-                                (t): boolean =>
-                                    t.info.identifier === identifier,
-                            );
-                            let label = `${
-                                firstIdx + pages[refPg].indexOf(refTrack)
-                            }. ${refTrack.info.title}`;
-                            if (label.length >= 100) {
-                                label = `${label.substring(0, 97)}...`;
-                            }
-                            return {
-                                label: label,
-                                description: refTrack.info.author,
-                                value: identifier,
-                                default: true,
-                            };
-                        })
-                        .filter(
-                            (options): boolean =>
-                                !pages[page - 1].find(
-                                    (track): boolean =>
-                                        track.info.identifier === options.value,
-                                ),
-                        ),
-                )
-                .sort(
-                    (a, b): number =>
-                        parseInt(a.label.split('.')[0]) -
-                        parseInt(b.label.split('.')[0]),
-                ),
-        );
+        )
+            .setOptions(options)
+            .setMaxValues(options.length);
         container.components[3] = selectMenuActionRow;
         const buttonActionRow = ActionRowBuilder.from<ButtonBuilder>(
             container.components[4].toJSON() as APIActionRowComponent<APIButtonComponent>,
