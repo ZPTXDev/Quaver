@@ -121,7 +121,7 @@ devDependencies:
     specifier: ^8.34.1
     version: 8.35.0(@typescript-eslint/parser@8.35.0)(eslint@9.29.0)(typescript@5.8.3)
   '@typescript-eslint/parser':
-    specifier: ^8.34.1
+    specifier: ^8.35.0
     version: 8.35.0(eslint@9.29.0)(typescript@5.8.3)
   eslint:
     specifier: ^9.29.0
@@ -130,7 +130,7 @@ devDependencies:
     specifier: ^16.2.0
     version: 16.2.0
   prettier:
-    specifier: ^3.6.0
+    specifier: ^3.6.1
     version: 3.6.1
   rimraf:
     specifier: ^6.0.1
@@ -147,9 +147,11 @@ devDependencies:
 
 packages:
 
-  /@babel/runtime@7.27.6:
-    resolution: {integrity: sha512-vbavdySgbTTrmFE+EsiqUTzlOr5bzlnJtUv9PynGCAKvfQqjIXbvFdumPM/GxMDfyuGMJaJAU6TO4zc1Jf1i8Q==}
+  /@babel/runtime@7.27.0:
+    resolution: {integrity: sha512-VtPOkrdPHZsKc/clNqyi9WUA8TINkZ4cGk63UUE3u4pmB2k+ZMQRDuIOagv8UVd6j7k0T3+RRIb7beKTebNbcw==}
     engines: {node: '>=6.9.0'}
+    dependencies:
+      regenerator-runtime: 0.14.1
     dev: false
 
   /@colors/colors@1.6.0:
