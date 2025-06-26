@@ -7,8 +7,6 @@ import type { Song } from '@lavaclient/plugin-queue';
 import type {
     APIActionRowComponent,
     APIButtonComponent,
-    APIContainerComponent,
-    APISelectMenuOption,
     APIStringSelectComponent,
     SelectMenuComponentOptionData,
     StringSelectMenuInteraction,
@@ -17,7 +15,6 @@ import type {
 import {
     ActionRowBuilder,
     ButtonBuilder,
-    ButtonStyle,
     ContainerBuilder,
     ContainerComponent,
     StringSelectMenuBuilder,
