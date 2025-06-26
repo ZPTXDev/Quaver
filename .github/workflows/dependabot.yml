@@ -1,7 +1,7 @@
 name: Approve PR (dependabot)
 on:
   pull_request_target:
-    branches: [next]
+    branches: [ next ]
 
 permissions:
   pull-requests: write
@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Fetch metadata
         id: metadata
-        uses: dependabot/fetch-metadata@v2.3.0
+        uses: dependabot/fetch-metadata@v2.4.0
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
       - name: Approve PR if non-major update
