@@ -637,6 +637,29 @@ export async function buildSettingsPage(
                                       )}`,
                                   )
                                   .toJSON(),
+                              ...(settings.features.web.dashboardURL
+                                  ? [
+                                        new SeparatorBuilder().toJSON(),
+                                        new ActionRowBuilder<ButtonBuilder>()
+                                            .addComponents(
+                                                new ButtonBuilder()
+                                                    .setURL(
+                                                        `${settings.features.web.dashboardURL.replace(
+                                                            /\/+$/,
+                                                            '',
+                                                        )}/guild/${interaction.guildId}`,
+                                                    )
+                                                    .setStyle(ButtonStyle.Link)
+                                                    .setLabel(
+                                                        getLocaleString(
+                                                            guildLocaleCode,
+                                                            'MISC.DASHBOARD',
+                                                        ),
+                                                    ),
+                                            )
+                                            .toJSON(),
+                                    ]
+                                  : []),
                           ],
                       }).setAccentColor(resolveColor(settings.colors.neutral))
                     : new ContainerBuilder({
