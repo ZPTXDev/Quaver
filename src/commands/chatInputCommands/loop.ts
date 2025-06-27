@@ -105,7 +105,11 @@ export default {
         const response = await player.handler.loop(loop);
         if (response !== PlayerResponse.Success) return;
         await interaction.replyHandler.reply(
-            getLocaleString('CMD.LOOP.RESPONSE.SUCCESS', typeLocale),
+            getLocaleString(
+                guildLocaleCode,
+                'CMD.LOOP.RESPONSE.SUCCESS',
+                typeLocale,
+            ),
         );
     },
 };
