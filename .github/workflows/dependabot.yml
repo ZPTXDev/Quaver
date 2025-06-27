@@ -1,7 +1,7 @@
 name: Approve PR (dependabot)
 on:
   pull_request_target:
-    branches: [next]
+    branches: [ next ]
 
 permissions:
   pull-requests: write

@@ -1,16 +1,16 @@
-name: Update next branch
+name: Update staging branch
 on:
   workflow_run:
     workflows: [ Release ]
     types: [ completed ]
-    branches: [ staging ]
+    branches: [ master ]
 
 permissions:
   contents: write
 
 jobs:
-  update-next:
-    name: Sync next with staging
+  update-staging:
+    name: Sync staging with master
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
@@ -19,11 +19,11 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
-      - name: Merge changes from 'staging' into 'next'
+      - name: Merge changes from 'master' into 'staging'
         run: |
-          git checkout staging
+          git checkout master
           git fetch origin
-          git checkout next
+          git checkout staging
           git pull
-          git merge origin/staging
-          git push origin next
+          git merge origin/master
+          git push origin staging
