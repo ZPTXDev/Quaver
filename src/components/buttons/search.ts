@@ -16,7 +16,6 @@ import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
     buildMessageOptions,
-    cleanURIForMarkdown,
     getFailedChecks,
     getGuildLocaleString,
     getLocaleString,
@@ -38,7 +37,6 @@ import {
     ChannelType,
     ContainerBuilder,
     ContainerComponent,
-    escapeMarkdown,
     PermissionsBitField,
     SeparatorBuilder,
     StringSelectMenuBuilder,
@@ -322,11 +320,12 @@ export default {
                     }
                     return `\`${(firstIndex + index)
                         .toString()
-                        .padStart(largestIndexSize, ' ')}.\` ${
-                        track.info.title === track.info.uri
-                            ? `**${track.info.uri}**`
-                            : `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`
-                    } \`[${durationString}]\``;
+                        .padStart(
+                            largestIndexSize,
+                            ' ',
+                        )}.\` ${getTrackMarkdownLocaleString(
+                        track,
+                    )} \`[${durationString}]\``;
                 })
                 .join('\n'),
         );
