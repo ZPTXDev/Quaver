@@ -25,6 +25,7 @@ body:
       description: Does the issue affect the stable version, development version, or both?
       options:
         - label: Stable
+        - label: Staging
         - label: Next
   - type: input
     attributes:

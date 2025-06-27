@@ -1,7 +1,7 @@
 name: Release
 on:
   push:
-    branches: [ master, next ]
+    branches: [ master, staging, next ]
 
 jobs:
   semantic-release:
@@ -32,10 +32,10 @@ jobs:
           branches: |
             [
               'master',
+              { name: 'staging', prerelease: true },
               { name: 'next', prerelease: true }
             ]
           extra_plugins: |
             @semantic-release/git
-            https://github.com/ZPTXDev/semantic-release-github-milestones#master
         env:
           GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
