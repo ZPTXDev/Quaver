@@ -343,7 +343,7 @@ export default {
             ActionRowBuilder.from<StringSelectMenuBuilder>(
                 container.components[3].toJSON() as APIActionRowComponent<APIStringSelectComponent>,
             );
-        const options = pages[page - 1]
+        const selectMenuOptions = pages[page - 1]
             .map((track, index: number): APISelectMenuOption => {
                 let label = `${firstIndex + index}. ${track.info.title}`;
                 if (label.length >= 100) {
@@ -404,8 +404,8 @@ export default {
         selectMenuActionRow.components[0] = StringSelectMenuBuilder.from(
             selectMenuActionRow.components[0].toJSON(),
         )
-            .setOptions(options)
-            .setMaxValues(options.length);
+            .setOptions(selectMenuOptions)
+            .setMaxValues(selectMenuOptions.length);
         container.components[3] = selectMenuActionRow;
         const buttonActionRow = ActionRowBuilder.from<ButtonBuilder>(
             container.components[4].toJSON() as APIActionRowComponent<APIButtonComponent>,
