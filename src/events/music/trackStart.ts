@@ -278,8 +278,8 @@ export default {
                                               )
                                               .setStyle(ButtonStyle.Secondary)
                                               .setLabel(
-                                                  await getGuildLocaleString(
-                                                      queue.player.id,
+                                                  getLocaleString(
+                                                      guildLocaleCode,
                                                       `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}`,
                                                   ),
                                               ),

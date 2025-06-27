@@ -2,11 +2,7 @@ import { ForceType } from '#src/lib/ReplyHandler.js';
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
-import {
-    cleanURIForMarkdown,
-    getGuildLocaleString,
-    getLocaleString,
-} from '#src/lib/util/util.js';
+import { cleanURIForMarkdown, getLocaleString } from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
 import type { ModalSubmitInteraction } from 'discord.js';
@@ -98,8 +94,8 @@ export default {
                         .toJSON(),
                     new TextDisplayBuilder()
                         .setContent(
-                            await getGuildLocaleString(
-                                interaction.guildId,
+                            getLocaleString(
+                                guildLocaleCode,
                                 'MISC.PAGE',
                                 page.toString(),
                                 pages.length.toString(),
@@ -118,8 +114,8 @@ export default {
                                 .setCustomId('queue:goto')
                                 .setStyle(ButtonStyle.Secondary)
                                 .setLabel(
-                                    await getGuildLocaleString(
-                                        interaction.guildId,
+                                    getLocaleString(
+                                        guildLocaleCode,
                                         'MISC.GO_TO',
                                     ),
                                 ),

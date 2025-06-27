@@ -14,6 +14,7 @@ import {
     buildSettingsPage,
     checkLocaleCompletion,
     getGuildLocaleString,
+    getLocaleString,
 } from '#src/lib/util/util.js';
 import { roundTo } from '@zptxdev/zptx-lib';
 import type { StringSelectMenuInteraction } from 'discord.js';
@@ -96,6 +97,10 @@ export default {
         if (
             !(interaction.message.components[0] instanceof ContainerComponent)
         ) {
+            await interaction.replyHandler.reply(
+                getLocaleString(guildLocaleCode, 'DISCORD.INTERACTION.EXPIRED'),
+                { components: [], force: ForceType.Update },
+            );
             return;
         }
         if (localeCompletion.completion !== 100) {

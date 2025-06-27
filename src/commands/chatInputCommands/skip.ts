@@ -34,13 +34,21 @@ export default {
     async execute(
         interaction: QuaverInteraction<ChatInputCommandInteraction>,
     ): Promise<void> {
+        const guildLocaleCode =
+            (await data.guild.get<string>(
+                interaction.guildId,
+                'settings.locale',
+            )) ?? settings.defaultLocaleCode;
         const player = (await interaction.client.music.players.fetch(
             interaction.guildId,
         )) as QuaverPlayer;
         // this check already occurs in the PlayerHandler#skip() method, but we do it first as we need to check before running voteskip addition etc
         if (!player.queue.current || (!player.playing && !player.paused)) {
-            await interaction.replyHandler.locale(
-                'MUSIC.PLAYER.PLAYING.NOTHING',
+            await interaction.replyHandler.reply(
+                getLocaleString(
+                    guildLocaleCode,
+                    'MUSIC.PLAYER.PLAYING.NOTHING',
+                ),
                 { type: MessageOptionsBuilderType.Error },
             );
             return;
@@ -62,8 +70,11 @@ export default {
                 users: [],
             };
             if (skip.users.includes(interaction.user.id)) {
-                await interaction.replyHandler.locale(
-                    'CMD.SKIP.RESPONSE.VOTED.STATE_UNCHANGED',
+                await interaction.replyHandler.reply(
+                    getLocaleString(
+                        guildLocaleCode,
+                        'CMD.SKIP.RESPONSE.VOTED.STATE_UNCHANGED',
+                    ),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
@@ -73,17 +84,15 @@ export default {
                 const response = await player.handler.skip();
                 switch (response) {
                     case PlayerResponse.PlayerIdle:
-                        await interaction.replyHandler.locale(
-                            'MUSIC.PLAYER.PLAYING.NOTHING',
+                        await interaction.replyHandler.reply(
+                            getLocaleString(
+                                guildLocaleCode,
+                                'MUSIC.PLAYER.PLAYING.NOTHING',
+                            ),
                             { type: MessageOptionsBuilderType.Error },
                         );
                         return;
                     case PlayerResponse.Success: {
-                        const guildLocaleCode =
-                            (await data.guild.get<string>(
-                                interaction.guildId,
-                                'settings.locale',
-                            )) ?? settings.defaultLocaleCode;
                         await interaction.replyHandler.reply(
                             `${getLocaleString(
                                 guildLocaleCode,
@@ -100,11 +109,6 @@ export default {
                 return;
             }
             player.skip = skip;
-            const guildLocaleCode =
-                (await data.guild.get<string>(
-                    interaction.guildId,
-                    'settings.locale',
-                )) ?? settings.defaultLocaleCode;
             await interaction.replyHandler.reply(
                 getLocaleString(
                     guildLocaleCode,
@@ -120,17 +124,15 @@ export default {
         const response = await player.handler.skip();
         switch (response) {
             case PlayerResponse.PlayerIdle:
-                await interaction.replyHandler.locale(
-                    'MUSIC.PLAYER.PLAYING.NOTHING',
+                await interaction.replyHandler.reply(
+                    getLocaleString(
+                        guildLocaleCode,
+                        'MUSIC.PLAYER.PLAYING.NOTHING',
+                    ),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             case PlayerResponse.Success: {
-                const guildLocaleCode =
-                    (await data.guild.get<string>(
-                        interaction.guildId,
-                        'settings.locale',
-                    )) ?? settings.defaultLocaleCode;
                 await interaction.replyHandler.reply(
                     `${getLocaleString(
                         guildLocaleCode,

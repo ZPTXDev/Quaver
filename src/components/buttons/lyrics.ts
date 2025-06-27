@@ -72,13 +72,13 @@ export default {
             guildLocaleCode,
             'CMD.LYRICS.MISC.JAPANESE_INACCURATE',
         );
-        lyrics =
-            lyrics.length >
+        const maxLength =
             4000 -
-                title.length -
-                (romanizeFrom === 'japanese' ? japaneseInaccurate.length : 0)
-                ? `${lyrics.slice(0, 3999 - title.length - (romanizeFrom === 'japanese' ? japaneseInaccurate.length : 0))}…`
-                : lyrics;
+            title.length -
+            (romanizeFrom === 'japanese' ? japaneseInaccurate.length : 0);
+        if (lyrics.length > maxLength) {
+            lyrics = `${lyrics.slice(0, maxLength - 1)}…`;
+        }
         if (lyrics.length === 0) {
             await interaction.replyHandler.reply(
                 getLocaleString(

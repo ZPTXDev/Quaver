@@ -5,7 +5,7 @@ import {
     MessageOptionsBuilderType,
 } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
-import { getGuildLocaleString } from '#src/lib/util/util.js';
+import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
 import type { GuildMember, VoiceState } from 'discord.js';
 import {
     ChannelType,
@@ -62,16 +62,19 @@ async function pauseChannelSession(
             player.timeoutEnd,
         );
     }
+    const guildLocaleCode =
+        (await data.guild.get<string>(playerId, 'settings.locale')) ??
+        settings.defaultLocaleCode;
     await player.handler.send(
         new ContainerBuilder({
             components: [
                 new TextDisplayBuilder()
                     .setContent(
-                        `${await getGuildLocaleString(
-                            playerId,
+                        `${getLocaleString(
+                            guildLocaleCode,
                             'MUSIC.DISCONNECT.ALONE.WARNING',
-                        )} ${await getGuildLocaleString(
-                            playerId,
+                        )} ${getLocaleString(
+                            guildLocaleCode,
                             'MUSIC.DISCONNECT.INACTIVITY.WARNING',
                             (
                                 Math.floor(Date.now() / 1000) +
@@ -82,8 +85,8 @@ async function pauseChannelSession(
                     .toJSON(),
                 new TextDisplayBuilder()
                     .setContent(
-                        await getGuildLocaleString(
-                            playerId,
+                        getLocaleString(
+                            guildLocaleCode,
                             'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME',
                         ),
                     )
