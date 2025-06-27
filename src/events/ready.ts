@@ -22,7 +22,7 @@ export default {
         if (version.includes('-')) {
             logger.warn({
                 message:
-                    'You are running an unstable version of Quaver. Please report bugs using the link above, and note that features may change or be removed entirely prior to release.',
+                    'You are running an experimental version of Quaver. Please report bugs using the link above, and note that features may change or be removed entirely prior to release.',
                 label: 'Quaver',
             });
         }
