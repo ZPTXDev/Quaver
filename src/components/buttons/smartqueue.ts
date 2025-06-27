@@ -111,8 +111,8 @@ export default {
                                     .setComponents(
                                         new ButtonBuilder()
                                             .setLabel(
-                                                await getGuildLocaleString(
-                                                    interaction.guildId,
+                                                getLocaleString(
+                                                    guildLocaleCode,
                                                     'MISC.GET_PREMIUM',
                                                 ),
                                             )

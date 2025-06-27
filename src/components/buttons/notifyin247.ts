@@ -7,7 +7,7 @@ import { settings } from '#src/lib/util/settings.js';
 import {
     buildMessageOptions,
     buildSettingsPage,
-    getGuildLocaleString,
+    getLocaleString,
 } from '#src/lib/util/util.js';
 import type { ButtonInteraction } from 'discord.js';
 import { ContainerComponent } from 'discord.js';
@@ -26,15 +26,17 @@ export default {
             return;
         }
         clearTimeout(confirmationTimeout[interaction.message.id]);
+        const guildLocaleCode =
+            (await data.guild.get<string>(
+                interaction.guildId,
+                'settings.locale',
+            )) ?? settings.defaultLocaleCode;
         confirmationTimeout[interaction.message.id] = setTimeout(
-            async (message): Promise<void> => {
+            async (glc, message): Promise<void> => {
                 try {
                     await message.edit(
                         buildMessageOptions(
-                            await getGuildLocaleString(
-                                message.guildId,
-                                'DISCORD.INTERACTION.EXPIRED',
-                            ),
+                            getLocaleString(glc, 'DISCORD.INTERACTION.EXPIRED'),
                             { components: [] },
                         ),
                     );
@@ -49,6 +51,7 @@ export default {
                 delete confirmationTimeout[message.id];
             },
             30 * 1000,
+            guildLocaleCode,
             interaction.message,
         );
         const option = interaction.customId.split(':')[1] === 'enable';
@@ -57,19 +60,18 @@ export default {
             'settings.notifyin247',
             option,
         );
-        const guildLocaleCode =
-            (await data.guild.get<keyof typeof Language>(
-                interaction.guildId,
-                'settings.locale',
-            )) ?? (settings.defaultLocaleCode as keyof typeof Language);
         const { containers } = await buildSettingsPage(
             interaction,
-            guildLocaleCode,
+            guildLocaleCode as keyof typeof Language,
             'notifyin247',
         );
         if (
             !(interaction.message.components[0] instanceof ContainerComponent)
         ) {
+            await interaction.replyHandler.reply(
+                getLocaleString(guildLocaleCode, 'DISCORD.INTERACTION.EXPIRED'),
+                { components: [], force: ForceType.Update },
+            );
             return;
         }
         await interaction.replyHandler.reply(containers, {

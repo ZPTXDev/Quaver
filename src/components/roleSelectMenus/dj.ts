@@ -7,7 +7,7 @@ import { settings } from '#src/lib/util/settings.js';
 import {
     buildMessageOptions,
     buildSettingsPage,
-    getGuildLocaleString,
+    getLocaleString,
 } from '#src/lib/util/util.js';
 import type { RoleSelectMenuInteraction } from 'discord.js';
 import { ContainerComponent } from 'discord.js';
@@ -26,15 +26,17 @@ export default {
             return;
         }
         clearTimeout(confirmationTimeout[interaction.message.id]);
+        const guildLocaleCode =
+            (await data.guild.get<keyof typeof Language>(
+                interaction.guildId,
+                'settings.locale',
+            )) ?? (settings.defaultLocaleCode as keyof typeof Language);
         confirmationTimeout[interaction.message.id] = setTimeout(
-            async (message): Promise<void> => {
+            async (glc, message): Promise<void> => {
                 try {
                     await message.edit(
                         buildMessageOptions(
-                            await getGuildLocaleString(
-                                message.guildId,
-                                'DISCORD.INTERACTION.EXPIRED',
-                            ),
+                            getLocaleString(glc, 'DISCORD.INTERACTION.EXPIRED'),
                             { components: [] },
                         ),
                     );
@@ -49,6 +51,7 @@ export default {
                 delete confirmationTimeout[message.id];
             },
             30 * 1000,
+            guildLocaleCode,
             interaction.message,
         );
         if (interaction.values.length > 0) {
@@ -57,11 +60,6 @@ export default {
         } else {
             await data.guild.unset(interaction.guildId, 'settings.dj');
         }
-        const guildLocaleCode =
-            (await data.guild.get<keyof typeof Language>(
-                interaction.guildId,
-                'settings.locale',
-            )) ?? (settings.defaultLocaleCode as keyof typeof Language);
         const { containers } = await buildSettingsPage(
             interaction,
             guildLocaleCode,
@@ -70,6 +68,10 @@ export default {
         if (
             !(interaction.message.components[0] instanceof ContainerComponent)
         ) {
+            await interaction.replyHandler.reply(
+                getLocaleString(guildLocaleCode, 'DISCORD.INTERACTION.EXPIRED'),
+                { components: [], force: ForceType.Update },
+            );
             return;
         }
         await interaction.replyHandler.reply(containers, {

@@ -9,8 +9,7 @@ import {
 } from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
-import type {
-    ButtonInteraction } from 'discord.js';
+import type { ButtonInteraction } from 'discord.js';
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -75,16 +74,20 @@ export default {
         const firstIndex = 5 * (page - 1) + 1;
         const pageSize = pages[page - 1].length;
         const largestIndexSize = (firstIndex + pageSize - 1).toString().length;
-        if (
-            !(interaction.message.components[0] instanceof ContainerComponent)
-        ) {
-            return;
-        }
         const guildLocaleCode =
             (await data.guild.get<string>(
                 interaction.guildId,
                 'settings.locale',
             )) ?? settings.defaultLocaleCode;
+        if (
+            !(interaction.message.components[0] instanceof ContainerComponent)
+        ) {
+            await interaction.replyHandler.reply(
+                getLocaleString(guildLocaleCode, 'DISCORD.INTERACTION.EXPIRED'),
+                { components: [], force: ForceType.Update },
+            );
+            return;
+        }
         await interaction.replyHandler.reply(
             new ContainerBuilder({
                 components: [
