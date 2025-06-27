@@ -50,7 +50,7 @@ dependencies:
     specifier: ^4.2.0
     version: 4.2.0
   discord.js:
-    specifier: ^14.21.0
+    specifier: ^14.22.0
     version: 14.21.0
   express:
     specifier: ^5.1.0
@@ -89,8 +89,8 @@ dependencies:
     specifier: ^5.1.7
     version: 5.1.7
   undici:
-    specifier: ^7.10.0
-    version: 7.10.0
+    specifier: ^7.11.0
+    version: 7.11.0
   wanakana:
     specifier: ^5.3.1
     version: 5.3.1
@@ -118,7 +118,7 @@ devDependencies:
     specifier: ^4.17.12
     version: 4.17.12
   '@typescript-eslint/eslint-plugin':
-    specifier: ^8.34.1
+    specifier: ^8.35.0
     version: 8.35.0(@typescript-eslint/parser@8.35.0)(eslint@9.29.0)(typescript@5.8.3)
   '@typescript-eslint/parser':
     specifier: ^8.35.0
@@ -3759,8 +3759,8 @@ packages:
     engines: {node: '>=18.17'}
     dev: false
 
-  /undici@7.10.0:
-    resolution: {integrity: sha512-u5otvFBOBZvmdjWLVW+5DAc9Nkq8f24g0O9oY7qw2JVIF1VocIFoyz9JFkuVOS2j41AufeO0xnlweJ2RLT8nGw==}
+  /undici@7.11.0:
+    resolution: {integrity: sha512-heTSIac3iLhsmZhUCjyS3JQEkZELateufzZuBaVM5RHXdSBMb1LPMQf5x+FH7qjsZYDP0ttAc3nnVpUB+wYbOg==}
     engines: {node: '>=20.18.1'}
     dev: false
 
