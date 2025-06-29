@@ -145,7 +145,7 @@ export default {
                     const { body } = await request(`https://api.deezer.com/track/${track.info.identifier}`);
                     let dzTrackInfo;
                     try {
-                        dzTrackInfo = await body.json() as any;
+                        dzTrackInfo = await body.json() as { id?: number; album?: { cover_big?: string } };
                         if (dzTrackInfo?.id?.toString() === track.info.identifier) {
                             thumbnailURL = dzTrackInfo?.album?.cover_big || thumbnailURL;
                         } else {
@@ -154,7 +154,7 @@ export default {
                                 label: 'Quaver',
                             });
                         }
-                    } catch (e) {
+                    } catch {
                         logger.warn({
                             message: `[G ${queue.player.id}] Failed to parse Deezer track info`,
                             label: 'Quaver',
