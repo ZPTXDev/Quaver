@@ -1,17 +1,7 @@
 import PlayerHandler from '#src/lib/PlayerHandler.js';
 import { ForceType } from '#src/lib/ReplyHandler.js';
-import type {
-    QuaverChannels,
-    QuaverInteraction,
-    QuaverPlayer,
-    QuaverSong,
-} from '#src/lib/util/common.d.js';
-import {
-    data,
-    logger,
-    MessageOptionsBuilderType,
-    searchState,
-} from '#src/lib/util/common.js';
+import type { QuaverChannels, QuaverInteraction, QuaverPlayer, QuaverSong } from '#src/lib/util/common.d.js';
+import { data, logger, MessageOptionsBuilderType, searchState } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
@@ -38,7 +28,6 @@ import {
     ContainerBuilder,
     ContainerComponent,
     PermissionsBitField,
-    SeparatorBuilder,
     StringSelectMenuBuilder,
     TextDisplayBuilder,
 } from 'discord.js';
@@ -223,20 +212,19 @@ export default {
                             .toJSON(),
                         ...(started && !smartQueue
                             ? [
-                                  new SeparatorBuilder().toJSON(),
-                                  new TextDisplayBuilder()
-                                      .setContent(
-                                          `${await getGuildLocaleString(
-                                              interaction.guildId,
-                                              'MISC.POSITION',
-                                          )}: ${firstPosition}${
-                                              endPosition !== firstPosition
-                                                  ? ` - ${endPosition}`
-                                                  : ''
-                                          }`,
-                                      )
-                                      .toJSON(),
-                              ]
+                                new TextDisplayBuilder()
+                                    .setContent(
+                                        `${await getGuildLocaleString(
+                                            interaction.guildId,
+                                            'MISC.POSITION',
+                                        )}: ${firstPosition}${
+                                            endPosition !== firstPosition
+                                                ? ` - ${endPosition}`
+                                                : ''
+                                        }`,
+                                    )
+                                    .toJSON(),
+                            ]
                             : []),
                     ],
                 }),

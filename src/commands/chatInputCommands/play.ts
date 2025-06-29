@@ -1,32 +1,15 @@
 import PlayerHandler from '#src/lib/PlayerHandler.js';
-import type {
-    QuaverChannels,
-    QuaverInteraction,
-    QuaverPlayer,
-    QuaverSong,
-} from '#src/lib/util/common.d.js';
+import type { QuaverChannels, QuaverInteraction, QuaverPlayer, QuaverSong } from '#src/lib/util/common.d.js';
 import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import {
-    acceptableSources,
-    Check,
-    queryOverrides,
-} from '#src/lib/util/constants.js';
+import { acceptableSources, Check, queryOverrides } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
-import {
-    getLocaleString,
-    getTrackMarkdownLocaleString,
-} from '#src/lib/util/util.js';
-import type {
-    ChatInputCommandInteraction,
-    SlashCommandBooleanOption,
-    SlashCommandStringOption,
-} from 'discord.js';
+import { getLocaleString, getTrackMarkdownLocaleString } from '#src/lib/util/util.js';
+import type { ChatInputCommandInteraction, SlashCommandBooleanOption, SlashCommandStringOption } from 'discord.js';
 import {
     ChannelType,
     ContainerBuilder,
     GuildMember,
     PermissionsBitField,
-    SeparatorBuilder,
     SlashCommandBuilder,
     TextDisplayBuilder,
 } from 'discord.js';
@@ -106,7 +89,7 @@ export default {
         }
         if (
             interaction.member.voice.channel.type ===
-                ChannelType.GuildStageVoice &&
+            ChannelType.GuildStageVoice &&
             !permissions.has(PermissionsBitField.StageModerator)
         ) {
             await interaction.replyHandler.locale(
@@ -272,20 +255,19 @@ export default {
                         .toJSON(),
                     ...(started && !smartQueue
                         ? [
-                              new SeparatorBuilder().toJSON(),
-                              new TextDisplayBuilder()
-                                  .setContent(
-                                      `-# ${getLocaleString(
-                                          guildLocaleCode,
-                                          'MISC.POSITION',
-                                      )}: ${firstPosition}${
-                                          endPosition !== firstPosition
-                                              ? ` - ${endPosition}`
-                                              : ''
-                                      }`,
-                                  )
-                                  .toJSON(),
-                          ]
+                            new TextDisplayBuilder()
+                                .setContent(
+                                    `-# ${getLocaleString(
+                                        guildLocaleCode,
+                                        'MISC.POSITION',
+                                    )}: ${firstPosition}${
+                                        endPosition !== firstPosition
+                                            ? ` - ${endPosition}`
+                                            : ''
+                                    }`,
+                                )
+                                .toJSON(),
+                        ]
                         : []),
                 ],
             }),
