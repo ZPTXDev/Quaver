@@ -2,7 +2,7 @@
 <h3 align="center">Simple-to-use music bot with features such as bass boost, nightcore, seek, search, and more.</h3>
 <p align="center">
     <img alt="GitHub package.json version (branch)" src="https://img.shields.io/github/package-json/v/zptxdev/quaver/master?color=2a005b&label=stable&style=flat-square">
-    <img alt="GitHub package.json version (branch)" src="https://img.shields.io/github/package-json/v/zptxdev/quaver/staging?color=46041f&label=staging&style=flat-square">
+    <img alt="GitHub package.json version (branch)" src="https://img.shields.io/github/package-json/v/zptxdev/quaver/staging?color=356051&label=staging&style=flat-square">
     <img alt="GitHub package.json version (branch)" src="https://img.shields.io/github/package-json/v/zptxdev/quaver/next?color=46041f&label=next&style=flat-square">
 </p>
 <p align="center">
