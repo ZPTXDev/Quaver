@@ -1,30 +1,16 @@
 import { ForceType } from '#src/lib/ReplyHandler.js';
-import type {
-    MessageOptionsBuilderInputs,
-    MessageOptionsBuilderOptions,
-    QuaverInteraction,
-} from '#src/lib/util/common.d.js';
+import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
 import type { Language } from '#src/lib/util/constants.js';
-import { Check, settingsOptions } from '#src/lib/util/constants.js';
+import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
     buildMessageOptions,
     buildSettingsPage,
-    getGuildLocaleString,
     getLocaleString,
 } from '#src/lib/util/util.js';
-import type {
-    MessageActionRowComponentBuilder,
-    RoleSelectMenuInteraction,
-    SelectMenuComponentOptionData,
-    StringSelectMenuComponent,
-} from 'discord.js';
-import {
-    ActionRowBuilder,
-    EmbedBuilder,
-    StringSelectMenuBuilder,
-} from 'discord.js';
+import type { RoleSelectMenuInteraction } from 'discord.js';
+import { ContainerComponent } from 'discord.js';
 
 export default {
     name: 'dj',
@@ -40,17 +26,17 @@ export default {
             return;
         }
         clearTimeout(confirmationTimeout[interaction.message.id]);
+        const guildLocaleCode =
+            (await data.guild.get<keyof typeof Language>(
+                interaction.guildId,
+                'settings.locale',
+            )) ?? (settings.defaultLocaleCode as keyof typeof Language);
         confirmationTimeout[interaction.message.id] = setTimeout(
-            async (message): Promise<void> => {
+            async (glc, message): Promise<void> => {
                 try {
                     await message.edit(
                         buildMessageOptions(
-                            new EmbedBuilder().setDescription(
-                                await getGuildLocaleString(
-                                    message.guildId,
-                                    'DISCORD.INTERACTION.EXPIRED',
-                                ),
-                            ),
+                            getLocaleString(glc, 'DISCORD.INTERACTION.EXPIRED'),
                             { components: [] },
                         ),
                     );
@@ -65,6 +51,7 @@ export default {
                 delete confirmationTimeout[message.id];
             },
             30 * 1000,
+            guildLocaleCode,
             interaction.message,
         );
         if (interaction.values.length > 0) {
@@ -73,62 +60,21 @@ export default {
         } else {
             await data.guild.unset(interaction.guildId, 'settings.dj');
         }
-        const guildLocaleCode =
-            (await data.guild.get<keyof typeof Language>(
-                interaction.guildId,
-                'settings.locale',
-            )) ?? (settings.defaultLocaleCode as keyof typeof Language);
-        const { current, embeds, actionRow } = await buildSettingsPage(
+        const { containers } = await buildSettingsPage(
             interaction,
             guildLocaleCode,
             'dj',
         );
-        const description = `${getLocaleString(
-            guildLocaleCode,
-            'CMD.SETTINGS.RESPONSE.HEADER',
-            interaction.guild.name,
-        )}\n\n**${getLocaleString(
-            guildLocaleCode,
-            'CMD.SETTINGS.MISC.DJ.NAME',
-        )}** ─ ${getLocaleString(
-            guildLocaleCode,
-            'CMD.SETTINGS.MISC.DJ.DESCRIPTION',
-        )}\n> ${getLocaleString(guildLocaleCode, 'MISC.CURRENT')}: ${current}`;
-        const args: [
-            MessageOptionsBuilderInputs,
-            MessageOptionsBuilderOptions,
-        ] = [
-            [description, ...embeds],
-            {
-                components: [
-                    new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-                        StringSelectMenuBuilder.from(
-                            <StringSelectMenuComponent>(
-                                interaction.message.components[0].components[0]
-                            ),
-                        ).setOptions(
-                            settingsOptions.map(
-                                (opt): SelectMenuComponentOptionData => ({
-                                    label: getLocaleString(
-                                        guildLocaleCode,
-                                        `CMD.SETTINGS.MISC.${opt.toUpperCase()}.NAME`,
-                                    ),
-                                    description: getLocaleString(
-                                        guildLocaleCode,
-                                        `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION`,
-                                    ),
-                                    value: opt,
-                                    default: opt === 'dj',
-                                }),
-                            ),
-                        ),
-                    ),
-                    actionRow as ActionRowBuilder<MessageActionRowComponentBuilder>,
-                ],
-            },
-        ];
-        await interaction.replyHandler.reply(args[0], {
-            ...args[1],
+        if (
+            !(interaction.message.components[0] instanceof ContainerComponent)
+        ) {
+            await interaction.replyHandler.reply(
+                getLocaleString(guildLocaleCode, 'DISCORD.INTERACTION.EXPIRED'),
+                { components: [], force: ForceType.Update },
+            );
+            return;
+        }
+        await interaction.replyHandler.reply(containers, {
             force: ForceType.Update,
         });
     },

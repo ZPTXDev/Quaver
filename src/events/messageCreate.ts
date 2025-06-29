@@ -2,8 +2,13 @@ import {
     buildMessageOptions,
     getGuildLocaleString,
 } from '#src/lib/util/util.js';
-import type { Message } from 'discord.js';
-import { PermissionsBitField } from 'discord.js';
+import type {
+    Message,
+    MessageCreateOptions } from 'discord.js';
+import {
+    MessageFlags,
+    PermissionsBitField,
+} from 'discord.js';
 
 export default {
     name: 'messageCreate',
@@ -28,26 +33,26 @@ export default {
             if (applicationCommands.cache.size === 0) {
                 await applicationCommands.fetch();
             }
-            await message.reply(
-                buildMessageOptions(
-                    await getGuildLocaleString(
-                        message.guildId,
-                        'CMD.INFO.RESPONSE.MENTION',
-                        applicationCommands.cache.find(
-                            (command): boolean => command.name === 'info',
-                        )?.id ?? '1',
-                        applicationCommands.cache.find(
-                            (command): boolean => command.name === 'play',
-                        )?.id ?? '1',
-                        applicationCommands.cache.find(
-                            (command): boolean => command.name === 'search',
-                        )?.id ?? '1',
-                        applicationCommands.cache.find(
-                            (command): boolean => command.name === 'settings',
-                        )?.id ?? '1',
-                    ),
+            const opts: MessageCreateOptions = buildMessageOptions(
+                await getGuildLocaleString(
+                    message.guildId,
+                    'CMD.INFO.RESPONSE.MENTION',
+                    applicationCommands.cache.find(
+                        (command): boolean => command.name === 'info',
+                    )?.id ?? '1',
+                    applicationCommands.cache.find(
+                        (command): boolean => command.name === 'play',
+                    )?.id ?? '1',
+                    applicationCommands.cache.find(
+                        (command): boolean => command.name === 'search',
+                    )?.id ?? '1',
+                    applicationCommands.cache.find(
+                        (command): boolean => command.name === 'settings',
+                    )?.id ?? '1',
                 ),
             );
+            opts.flags = [MessageFlags.IsComponentsV2];
+            await message.reply(opts);
         }
     },
 };

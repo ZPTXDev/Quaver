@@ -1,3 +1,5 @@
+type ColorTypes = 'success' | 'neutral' | 'warning' | 'error';
+
 export type TimeFormats = 's' | 'm' | 'h' | 'd';
 
 export type TimeObject = {

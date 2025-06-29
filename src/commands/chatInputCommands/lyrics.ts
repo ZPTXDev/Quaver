@@ -3,7 +3,6 @@ import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
     formatResponse,
-    generateEmbedFieldsFromLyrics,
     getGuildLocaleString,
     getLocaleString,
 } from '#src/lib/util/util.js';
@@ -15,8 +14,10 @@ import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    EmbedBuilder,
+    ContainerBuilder,
+    SeparatorBuilder,
     SlashCommandBuilder,
+    TextDisplayBuilder,
 } from 'discord.js';
 
 export default {
@@ -115,40 +116,43 @@ export default {
         } else if (lyrics.match(/[\u4e00-\u9fff]/g)) {
             romanizeFrom = 'chinese';
         }
-        const lyricsFields = generateEmbedFieldsFromLyrics(json, lyrics);
-        if (lyricsFields.length === 0) {
+        const title = `**${json.track.override ?? `${json.track.author} - ${json.track.title}`}**`;
+        lyrics =
+            lyrics.length > 4000 - title.length
+                ? `${lyrics.slice(0, 3999 - title.length)}…`
+                : lyrics;
+        if (lyrics.length === 0) {
             await interaction.replyHandler.locale(
                 'CMD.LYRICS.RESPONSE.NO_RESULTS',
                 { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
-        let embed;
-        try {
-            embed = new EmbedBuilder().setFields(lyricsFields);
-        } catch {
-            await interaction.replyHandler.locale(
-                'CMD.LYRICS.RESPONSE.NO_RESULTS',
-                { type: MessageOptionsBuilderType.Error },
-            );
-            return;
-        }
-        await interaction.replyHandler.reply(embed, {
-            components: romanizeFrom
-                ? [
-                      new ActionRowBuilder<ButtonBuilder>().addComponents(
-                          new ButtonBuilder()
-                              .setCustomId(`lyrics:${romanizeFrom}`)
-                              .setStyle(ButtonStyle.Secondary)
-                              .setLabel(
-                                  await getGuildLocaleString(
-                                      interaction.guildId,
-                                      `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}`,
-                                  ),
-                              ),
-                      ),
-                  ]
-                : [],
-        });
+        await interaction.replyHandler.reply(
+            new ContainerBuilder({
+                components: [
+                    new TextDisplayBuilder().setContent(title).toJSON(),
+                    new TextDisplayBuilder().setContent(lyrics).toJSON(),
+                    ...(romanizeFrom
+                        ? [
+                              new SeparatorBuilder().toJSON(),
+                              new ActionRowBuilder<ButtonBuilder>()
+                                  .addComponents(
+                                      new ButtonBuilder()
+                                          .setCustomId(`lyrics:${romanizeFrom}`)
+                                          .setStyle(ButtonStyle.Secondary)
+                                          .setLabel(
+                                              await getGuildLocaleString(
+                                                  interaction.guildId,
+                                                  `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}`,
+                                              ),
+                                          ),
+                                  )
+                                  .toJSON(),
+                          ]
+                        : []),
+                ],
+            }),
+        );
     },
 };

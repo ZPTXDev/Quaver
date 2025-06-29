@@ -1,12 +1,6 @@
-import type {
-    MessageOptionsBuilderInputs,
-    MessageOptionsBuilderOptions,
-} from '#src/lib/util/common.d.js';
+import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions } from '#src/lib/util/common.d.js';
 import { logger, MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import {
-    buildMessageOptions,
-    getGuildLocaleString,
-} from '#src/lib/util/util.js';
+import { buildMessageOptions, getGuildLocaleString } from '#src/lib/util/util.js';
 import type {
     InteractionCallbackResponse,
     InteractionEditReplyOptions,
@@ -33,7 +27,7 @@ export default class ReplyHandler {
 
     /**
      * Replies with a message.
-     * @param inputData - The data to be used. Can be a string, EmbedBuilder, or an array of either.
+     * @param inputData - The data to be used. Can be a string, ContainerBuilder, or an array of either.
      * @param options - Extra data, such as type or components.
      * @returns The message that was sent.
      */
@@ -91,6 +85,8 @@ export default class ReplyHandler {
             files,
         }) as InteractionReplyOptions;
         replyMsgOpts.withResponse = withResponse;
+        replyMsgOpts.flags = [MessageFlags.IsComponentsV2];
+        replyMsgOpts.allowedMentions = { parse: [] };
         if (
             force === ForceType.Reply ||
             (!this.interaction.replied && !this.interaction.deferred && !force)
@@ -108,7 +104,10 @@ export default class ReplyHandler {
                             ]),
                         ))
             ) {
-                replyMsgOpts.flags = [MessageFlags.Ephemeral];
+                replyMsgOpts.flags = [
+                    MessageFlags.IsComponentsV2,
+                    MessageFlags.Ephemeral,
+                ];
             }
             try {
                 return await this.interaction.reply(replyMsgOpts);

@@ -2,7 +2,7 @@ import type {
     QuaverInteraction,
     QuaverPlayer,
 } from '#src/lib/util/common.d.js';
-import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
+import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
@@ -71,14 +71,19 @@ export default {
             );
         }
         if (player.queue.current.info.isStream) {
+            const guildLocaleCode =
+                (await data.guild.get<string>(
+                    interaction.guildId,
+                    'settings.locale',
+                )) ?? settings.defaultLocaleCode;
             await interaction.replyHandler.reply(
                 `${
                     player.queue.current.info.title ===
                     player.queue.current.info.uri
                         ? `**${player.queue.current.info.uri}**`
                         : `[**${escapeMarkdown(cleanURIForMarkdown(player.queue.current.info.title))}**](${player.queue.current.info.uri})`
-                }\n🔴 **${await getGuildLocaleString(
-                    interaction.guildId,
+                }\n🔴 **${getLocaleString(
+                    guildLocaleCode,
                     'MISC.LIVE',
                 )}** ${'▬'.repeat(10)}${player.paused ? ' ⏸️' : ''}${
                     player.queue.loop.type !== LoopType.None
@@ -88,13 +93,11 @@ export default {
                                   : '🔂'
                           }`
                         : ''
-                }${
-                    player.bassboost ? ' 🅱️' : ''
-                }\n\`[${await getGuildLocaleString(
-                    interaction.guildId,
+                }${player.bassboost ? ' 🅱️' : ''}\n\`[${getLocaleString(
+                    guildLocaleCode,
                     'MISC.STREAMING',
-                )}]\` | ${await getGuildLocaleString(
-                    interaction.guildId,
+                )}]\` | ${getLocaleString(
+                    guildLocaleCode,
                     'MISC.ADDED_BY',
                     player.queue.current.requesterId,
                 )}`,
