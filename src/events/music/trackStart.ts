@@ -20,6 +20,7 @@ import {
     TextDisplayBuilder,
     ThumbnailBuilder,
 } from 'discord.js';
+import { request } from 'undici';
 
 export default {
     name: 'trackStart',
@@ -90,7 +91,7 @@ export default {
         const emoji =
             settings.emojis?.[
                 track.info.sourceName as keyof typeof settings.emojis
-            ] ?? '';
+                ] ?? '';
         switch (format) {
             case 'simple':
                 await queue.player.handler.send(
@@ -113,32 +114,53 @@ export default {
                             ...(settings.features.web.enabled &&
                             settings.features.web.dashboardURL
                                 ? [
-                                      new SeparatorBuilder().toJSON(),
-                                      new ActionRowBuilder<ButtonBuilder>()
-                                          .addComponents(
-                                              new ButtonBuilder()
-                                                  .setURL(
-                                                      `${settings.features.web.dashboardURL.replace(
-                                                          /\/+$/,
-                                                          '',
-                                                      )}/guild/${queue.player.id}`,
-                                                  )
-                                                  .setStyle(ButtonStyle.Link)
-                                                  .setLabel(
-                                                      getLocaleString(
-                                                          guildLocaleCode,
-                                                          'MISC.DASHBOARD',
-                                                      ),
-                                                  ),
-                                          )
-                                          .toJSON(),
-                                  ]
+                                    new SeparatorBuilder().toJSON(),
+                                    new ActionRowBuilder<ButtonBuilder>()
+                                        .addComponents(
+                                            new ButtonBuilder()
+                                                .setURL(
+                                                    `${settings.features.web.dashboardURL.replace(
+                                                        /\/+$/,
+                                                        '',
+                                                    )}/guild/${queue.player.id}`,
+                                                )
+                                                .setStyle(ButtonStyle.Link)
+                                                .setLabel(
+                                                    getLocaleString(
+                                                        guildLocaleCode,
+                                                        'MISC.DASHBOARD',
+                                                    ),
+                                                ),
+                                        )
+                                        .toJSON(),
+                                ]
                                 : []),
                         ],
                     }),
                 );
                 break;
-            case 'detailed':
+            case 'detailed': {
+                let thumbnailURL = `https://i.ytimg.com/vi/${track.info.identifier}/hqdefault.jpg`;
+                if (track.info.sourceName === 'deezer') {
+                    const { body } = await request(`https://api.deezer.com/track/${track.info.identifier}`);
+                    let dzTrackInfo;
+                    try {
+                        dzTrackInfo = await body.json() as any;
+                        if (dzTrackInfo?.id?.toString() === track.info.identifier) {
+                            thumbnailURL = dzTrackInfo?.album?.cover_big || thumbnailURL;
+                        } else {
+                            logger.warn({
+                                message: `[G ${queue.player.id}] Mismatched Deezer track ID: expected ${track.info.identifier}, got ${dzTrackInfo?.id}`,
+                                label: 'Quaver',
+                            });
+                        }
+                    } catch (e) {
+                        logger.warn({
+                            message: `[G ${queue.player.id}] Failed to parse Deezer track info`,
+                            label: 'Quaver',
+                        });
+                    }
+                }
                 await queue.player.handler.send(
                     new ContainerBuilder({
                         components: [
@@ -177,37 +199,36 @@ export default {
                                         .toJSON(),
                                 ],
                                 accessory: new ThumbnailBuilder()
-                                    .setURL(
-                                        `https://i.ytimg.com/vi/${track.info.identifier}/hqdefault.jpg`,
-                                    )
+                                    .setURL(thumbnailURL)
                                     .toJSON(),
                             }).toJSON(),
                             ...(settings.features.web.dashboardURL
                                 ? [
-                                      new SeparatorBuilder().toJSON(),
-                                      new ActionRowBuilder<ButtonBuilder>()
-                                          .addComponents(
-                                              new ButtonBuilder()
-                                                  .setURL(
-                                                      `${settings.features.web.dashboardURL.replace(
-                                                          /\/+$/,
-                                                          '',
-                                                      )}/guild/${queue.player.id}`,
-                                                  )
-                                                  .setStyle(ButtonStyle.Link)
-                                                  .setLabel(
-                                                      getLocaleString(
-                                                          guildLocaleCode,
-                                                          'MISC.DASHBOARD',
-                                                      ),
-                                                  ),
-                                          )
-                                          .toJSON(),
-                                  ]
+                                    new SeparatorBuilder().toJSON(),
+                                    new ActionRowBuilder<ButtonBuilder>()
+                                        .addComponents(
+                                            new ButtonBuilder()
+                                                .setURL(
+                                                    `${settings.features.web.dashboardURL.replace(
+                                                        /\/+$/,
+                                                        '',
+                                                    )}/guild/${queue.player.id}`,
+                                                )
+                                                .setStyle(ButtonStyle.Link)
+                                                .setLabel(
+                                                    getLocaleString(
+                                                        guildLocaleCode,
+                                                        'MISC.DASHBOARD',
+                                                    ),
+                                                ),
+                                        )
+                                        .toJSON(),
+                                ]
                                 : []),
                         ],
                     }),
                 );
+            }
         }
         if (settings.features.autolyrics.enabled) {
             if (
@@ -269,23 +290,23 @@ export default {
                         new TextDisplayBuilder().setContent(lyrics).toJSON(),
                         ...(romanizeFrom
                             ? [
-                                  new SeparatorBuilder().toJSON(),
-                                  new ActionRowBuilder<ButtonBuilder>()
-                                      .addComponents(
-                                          new ButtonBuilder()
-                                              .setCustomId(
-                                                  `lyrics:${romanizeFrom}`,
-                                              )
-                                              .setStyle(ButtonStyle.Secondary)
-                                              .setLabel(
-                                                  getLocaleString(
-                                                      guildLocaleCode,
-                                                      `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}`,
-                                                  ),
-                                              ),
-                                      )
-                                      .toJSON(),
-                              ]
+                                new SeparatorBuilder().toJSON(),
+                                new ActionRowBuilder<ButtonBuilder>()
+                                    .addComponents(
+                                        new ButtonBuilder()
+                                            .setCustomId(
+                                                `lyrics:${romanizeFrom}`,
+                                            )
+                                            .setStyle(ButtonStyle.Secondary)
+                                            .setLabel(
+                                                getLocaleString(
+                                                    guildLocaleCode,
+                                                    `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}`,
+                                                ),
+                                            ),
+                                    )
+                                    .toJSON(),
+                            ]
                             : []),
                     ],
                 }),
