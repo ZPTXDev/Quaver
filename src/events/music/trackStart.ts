@@ -20,7 +20,6 @@ import {
     TextDisplayBuilder,
     ThumbnailBuilder,
 } from 'discord.js';
-import { request } from 'undici';
 
 export default {
     name: 'trackStart',
@@ -140,27 +139,6 @@ export default {
                 );
                 break;
             case 'detailed': {
-                let thumbnailURL = `https://i.ytimg.com/vi/${track.info.identifier}/hqdefault.jpg`;
-                if (track.info.sourceName === 'deezer') {
-                    const { body } = await request(`https://api.deezer.com/track/${track.info.identifier}`);
-                    let dzTrackInfo;
-                    try {
-                        dzTrackInfo = await body.json() as { id?: number; album?: { cover_big?: string } };
-                        if (dzTrackInfo?.id?.toString() === track.info.identifier) {
-                            thumbnailURL = dzTrackInfo?.album?.cover_big || thumbnailURL;
-                        } else {
-                            logger.warn({
-                                message: `[G ${queue.player.id}] Mismatched Deezer track ID: expected ${track.info.identifier}, got ${dzTrackInfo?.id}`,
-                                label: 'Quaver',
-                            });
-                        }
-                    } catch {
-                        logger.warn({
-                            message: `[G ${queue.player.id}] Failed to parse Deezer track info`,
-                            label: 'Quaver',
-                        });
-                    }
-                }
                 await queue.player.handler.send(
                     new ContainerBuilder({
                         components: [
@@ -199,7 +177,7 @@ export default {
                                         .toJSON(),
                                 ],
                                 accessory: new ThumbnailBuilder()
-                                    .setURL(thumbnailURL)
+                                    .setURL(track.info.artworkUrl ?? `https://i.ytimg.com/vi/${track.info.identifier}/hqdefault.jpg`)
                                     .toJSON(),
                             }).toJSON(),
                             ...(settings.features.web.dashboardURL
