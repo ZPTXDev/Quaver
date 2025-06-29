@@ -12,7 +12,7 @@
     "@lavaclient/plugin-queue": "^0.0.1",
     "@napi-rs/pinyin": "^1.7.5",
     "@zptxdev/zptx-lib": "^1.1.0",
-    "cache-manager": "^6.4.3",
+    "cache-manager": "^7.0.1",
     "cacheable": "^1.10.0",
     "crypto-js": "^4.2.0",
     "discord.js": "<=14.18.0",
