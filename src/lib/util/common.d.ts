@@ -29,6 +29,18 @@ export type SearchStateRecord = {
 
 export type WhitelistedFeatures = 'stay' | 'autolyrics' | 'smartqueue';
 
+export type SettingsPageGenericOptions = {
+    components: Array<MessageActionRowComponentBuilder>;
+}
+
+export type SettingsPagePremiumOptions = SettingsPageGenericOptions & {
+    features: string[];
+}
+
+export type SettingsPageFormatOptions = SettingsPageGenericOptions & {
+    containers: ContainerBuilder[];
+}
+
 export type SettingsPageOptions =
     | 'premium'
     | 'language'
