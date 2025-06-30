@@ -1,4 +1,4 @@
-import {
+import type {
     MessageOptionsBuilderInputs,
     MessageOptionsBuilderOptions,
     QuaverChannels,
@@ -772,13 +772,14 @@ export async function buildSettingsPage(
             );
             break;
         }
-        case 'language':
+        case 'language': {
             current = `\`${
                 Language[guildLocaleCode] ?? 'Unknown'
             } (${guildLocaleCode})\``;
             const { components } = buildSettingsPageLanguageOptions(guildLocaleCode);
             actionRow.addComponents(...components);
             break;
+        }
         case 'notifyin247': {
             const enabled =
                 (await data.guild.get<boolean>(
