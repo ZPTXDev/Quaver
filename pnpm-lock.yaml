@@ -44,8 +44,8 @@ dependencies:
     specifier: ^6.4.3
     version: 6.4.3
   cacheable:
-    specifier: ^1.10.0
-    version: 1.10.0
+    specifier: ^1.10.1
+    version: 1.10.1
   crypto-js:
     specifier: ^4.2.0
     version: 4.2.0
@@ -1362,11 +1362,11 @@ packages:
       keyv: 5.3.3(patch_hash=tg3f223bx2dgo6xy4spszqtwma)
     dev: false
 
-  /cacheable@1.10.0:
-    resolution: {integrity: sha512-SSgQTAnhd7WlJXnGlIi4jJJOiHzgnM5wRMEPaXAU4kECTAMpBoYKoZ9i5zHmclIEZbxcu3j7yY/CF8DTmwIsHg==}
+  /cacheable@1.10.1:
+    resolution: {integrity: sha512-Fa2BZY0CS9F0PFc/6aVA6tgpOdw+hmv9dkZOlHXII5v5Hw+meJBIWDcPrG9q/dXxGcNbym5t77fzmawrBQfTmQ==}
     dependencies:
-      hookified: 1.9.1
-      keyv: 5.3.3(patch_hash=tg3f223bx2dgo6xy4spszqtwma)
+      hookified: 1.10.0
+      keyv: 5.3.4
     dev: false
 
   /call-bind-apply-helpers@1.0.2:
@@ -2254,8 +2254,8 @@ packages:
       function-bind: 1.1.2
     dev: false
 
-  /hookified@1.9.1:
-    resolution: {integrity: sha512-u3pxtGhKjcSXnGm1CX6aXS9xew535j3lkOCegbA6jdyh0BaAjTbXI4aslKstCr6zUNtoCxFGFKwjbSHdGrMB8g==}
+  /hookified@1.10.0:
+    resolution: {integrity: sha512-dJw0492Iddsj56U1JsSTm9E/0B/29a1AuoSLRAte8vQg/kaTGF3IgjEWT8c8yG4cC10+HisE1x5QAwR0Xwc+DA==}
     dev: false
 
   /http-cache-semantics@4.1.1:
@@ -2500,6 +2500,12 @@ packages:
       '@keyv/serialize': 1.0.3
     dev: false
     patched: true
+
+  /keyv@5.3.4:
+    resolution: {integrity: sha512-ypEvQvInNpUe+u+w8BIcPkQvEqXquyyibWE/1NB5T2BTzIpS5cGEV1LZskDzPSTvNAaT4+5FutvzlvnkxOSKlw==}
+    dependencies:
+      '@keyv/serialize': 1.0.3
+    dev: false
 
   /kuler@2.0.0:
     resolution: {integrity: sha512-Xq9nH7KlWZmXAtodXDDRE7vs6DU1gTU8zYDHDiWLSip45Egwq3plLHzPn27NgvzL2r1LMPC1vdqh98sQxtqj4A==}
