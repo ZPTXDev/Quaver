@@ -7,22 +7,22 @@ import type {
     QuaverSong,
 } from '#src/lib/util/common.d.js';
 import {
-    MessageOptionsBuilderType,
     data,
     logger,
+    MessageOptionsBuilderType,
 } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
-    WhitelistStatus,
     buildMessageOptions,
     getGuildFeatureWhitelisted,
     getGuildLocaleString,
     sortQueue,
+    WhitelistStatus,
 } from '#src/lib/util/util.js';
 import type { PlayerEffect } from '@lavaclient/plugin-effects';
 import type { LoopType } from '@lavaclient/plugin-queue';
-import type { Message, Snowflake } from 'discord.js';
-import { ChannelType, PermissionsBitField } from 'discord.js';
+import type { Message, MessageCreateOptions, Snowflake } from 'discord.js';
+import { ChannelType, MessageFlags, PermissionsBitField } from 'discord.js';
 
 const effects: Record<string, PlayerEffect> = {
     bassboost: {
@@ -102,7 +102,7 @@ export default class PlayerHandler {
 
     /**
      * Sends a message to the bound text channel.
-     * @param inputData - The data to be used. Can be a string, EmbedBuilder, or an array of either.
+     * @param inputData - The data to be used. Can be a string, ContainerBuilder, or an array of either.
      * @param options - Extra data, such as type or components, or files.
      * @returns The message that was sent.
      */
@@ -118,7 +118,9 @@ export default class PlayerHandler {
             type,
             components,
             files,
-        });
+        }) as MessageCreateOptions;
+        sendMsgOpts.flags = [MessageFlags.IsComponentsV2];
+        sendMsgOpts.allowedMentions = { parse: [] };
         const channel = this.player.queue.channel;
         if (
             !channel

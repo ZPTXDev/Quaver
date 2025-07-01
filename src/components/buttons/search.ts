@@ -1,44 +1,35 @@
 import PlayerHandler from '#src/lib/PlayerHandler.js';
 import { ForceType } from '#src/lib/ReplyHandler.js';
-import type {
-    QuaverChannels,
-    QuaverInteraction,
-    QuaverPlayer,
-    QuaverSong,
-} from '#src/lib/util/common.d.js';
-import {
-    data,
-    logger,
-    MessageOptionsBuilderType,
-    searchState,
-} from '#src/lib/util/common.js';
+import type { QuaverChannels, QuaverInteraction, QuaverPlayer, QuaverSong } from '#src/lib/util/common.d.js';
+import { data, logger, MessageOptionsBuilderType, searchState } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
     buildMessageOptions,
-    cleanURIForMarkdown,
     getFailedChecks,
     getGuildLocaleString,
     getLocaleString,
+    getTrackMarkdownLocaleString,
 } from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import type {
+    APIActionRowComponent,
+    APIButtonComponent,
     APISelectMenuOption,
-    ButtonComponent,
+    APIStringSelectComponent,
     ButtonInteraction,
     GuildMember,
-    MessageActionRowComponentBuilder,
-    StringSelectMenuComponent,
 } from 'discord.js';
 import {
     ActionRowBuilder,
     ButtonBuilder,
     ChannelType,
-    EmbedBuilder,
-    escapeMarkdown,
+    ContainerBuilder,
+    ContainerComponent,
     PermissionsBitField,
     StringSelectMenuBuilder,
+    TextDisplayBuilder,
 } from 'discord.js';
 import { LavalinkWSClientState } from 'lavalink-ws-client';
 
@@ -134,14 +125,21 @@ export default {
                     resolvedTracks.push(result.data);
                 }
             }
+            if (resolvedTracks.length === 0) {
+                await interaction.replyHandler.locale(
+                    'CMD.SEARCH.RESPONSE.LOAD_FAILED',
+                    {
+                        type: MessageOptionsBuilderType.Error,
+                        components: [],
+                    },
+                );
+                return;
+            }
             let msg,
                 extras = [];
             if (resolvedTracks.length === 1) {
                 msg = 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
-                extras = [
-                    resolvedTracks[0].info.title,
-                    resolvedTracks[0].info.uri,
-                ];
+                extras = [getTrackMarkdownLocaleString(resolvedTracks[0])];
             } else {
                 msg = 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
                 extras = [
@@ -150,7 +148,6 @@ export default {
                         interaction.guildId,
                         'MISC.YOUR_SEARCH',
                     ),
-                    'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
                 ];
             }
             if (!player?.voice.connected) {
@@ -159,7 +156,7 @@ export default {
                 ) as QuaverPlayer;
                 player.handler = new PlayerHandler(interaction.client, player);
                 player.queue.channel = interaction.channel as QuaverChannels;
-                await player.voice.connect(member.voice.channelId, {
+                player.voice.connect(member.voice.channelId, {
                     deafened: true,
                 });
                 // Ensure that Quaver destroys the player if the user leaves the channel while Quaver is queuing tracks
@@ -202,27 +199,35 @@ export default {
                 'settings.smartqueue',
             );
             await interaction.replyHandler.reply(
-                new EmbedBuilder()
-                    .setDescription(
-                        await getGuildLocaleString(
-                            interaction.guildId,
-                            msg,
-                            ...extras,
-                        ),
-                    )
-                    .setFooter({
-                        text:
-                            started && !smartQueue
-                                ? `${await getGuildLocaleString(
-                                      interaction.guildId,
-                                      'MISC.POSITION',
-                                  )}: ${firstPosition}${
-                                      endPosition !== firstPosition
-                                          ? ` - ${endPosition}`
-                                          : ''
-                                  }`
-                                : null,
-                    }),
+                new ContainerBuilder({
+                    components: [
+                        new TextDisplayBuilder()
+                            .setContent(
+                                await getGuildLocaleString(
+                                    interaction.guildId,
+                                    msg,
+                                    ...extras,
+                                ),
+                            )
+                            .toJSON(),
+                        ...(started && !smartQueue
+                            ? [
+                                new TextDisplayBuilder()
+                                    .setContent(
+                                        `${await getGuildLocaleString(
+                                            interaction.guildId,
+                                            'MISC.POSITION',
+                                        )}: ${firstPosition}${
+                                            endPosition !== firstPosition
+                                                ? ` - ${endPosition}`
+                                                : ''
+                                        }`,
+                                    )
+                                    .toJSON(),
+                            ]
+                            : []),
+                    ],
+                }),
                 { type: MessageOptionsBuilderType.Success, components: [] },
             );
             if (!started) await player.queue.start();
@@ -248,11 +253,9 @@ export default {
                 try {
                     await message.edit(
                         buildMessageOptions(
-                            new EmbedBuilder().setDescription(
-                                await getGuildLocaleString(
-                                    message.guildId,
-                                    'DISCORD.INTERACTION.EXPIRED',
-                                ),
+                            await getGuildLocaleString(
+                                message.guildId,
+                                'DISCORD.INTERACTION.EXPIRED',
                             ),
                             { components: [] },
                         ),
@@ -274,139 +277,138 @@ export default {
         const firstIndex = 10 * (page - 1) + 1;
         const pageSize = pages[page - 1].length;
         const largestIndexSize = (firstIndex + pageSize - 1).toString().length;
-        const original = {
-            embeds: interaction.message.embeds,
-            components: interaction.message.components,
-        };
-        if (original.embeds.length === 0) {
-            await interaction.message.delete();
-            return;
-        }
-        const updated: {
-            embeds: EmbedBuilder[];
-            components: ActionRowBuilder<MessageActionRowComponentBuilder>[];
-        } = { embeds: [], components: [] };
         const guildLocaleCode =
             (await data.guild.get<string>(
                 interaction.guildId,
                 'settings.locale',
             )) ?? settings.defaultLocaleCode;
-        updated.embeds[0] = EmbedBuilder.from(original.embeds[0])
-            .setDescription(
-                pages[page - 1]
-                    .map((track, index: number): string => {
-                        const duration = msToTime(track.info.length);
-                        let durationString = track.info.isStream
-                            ? '∞'
-                            : msToTimeString(duration, true);
-                        if (durationString === 'MORE_THAN_A_DAY') {
-                            durationString = getLocaleString(
-                                guildLocaleCode,
-                                'MISC.MORE_THAN_A_DAY',
-                            );
-                        }
-                        const uri =
-                            track.info.title === track.info.uri
-                                ? `**${track.info.uri}**`
-                                : `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`;
-                        return `\`${(firstIndex + index)
-                            .toString()
-                            .padStart(
-                                largestIndexSize,
-                                ' ',
-                            )}.\` ${uri} \`[${durationString}]\``;
-                    })
-                    .join('\n'),
-            )
-            .setFooter({
-                text: await getGuildLocaleString(
-                    interaction.guildId,
-                    'MISC.PAGE',
-                    page.toString(),
-                    pages.length.toString(),
-                ),
-            });
-        updated.components[0] = ActionRowBuilder.from(original.components[0]);
-        updated.components[1] = ActionRowBuilder.from(original.components[1]);
-        const selectComponent = StringSelectMenuBuilder.from(
-            original.components[0].components[0] as StringSelectMenuComponent,
-        ).setOptions(
-            pages[page - 1]
-                .map((track, index: number): APISelectMenuOption => {
-                    let label = `${firstIndex + index}. ${track.info.title}`;
-                    if (label.length >= 100) {
-                        label = `${label.substring(0, 97)}...`;
-                    }
-                    return {
-                        label: label,
-                        description: track.info.author,
-                        value: track.info.identifier,
-                        default: !!state.selected.find(
-                            (identifier: string): boolean =>
-                                identifier === track.info.identifier,
-                        ),
-                    };
-                })
-                .concat(
-                    state.selected
-                        .map((identifier: string): APISelectMenuOption => {
-                            const refPg = pages.indexOf(
-                                pages.find(
-                                    (pg): Song =>
-                                        pg.find(
-                                            (t): boolean =>
-                                                t.info.identifier ===
-                                                identifier,
-                                        ),
-                                ),
-                            );
-                            const firstIdx = 10 * refPg + 1;
-                            const refTrack = pages[refPg].find(
-                                (t): boolean =>
-                                    t.info.identifier === identifier,
-                            );
-                            let label = `${
-                                firstIdx + pages[refPg].indexOf(refTrack)
-                            }. ${refTrack.info.title}`;
-                            if (label.length >= 100) {
-                                label = `${label.substring(0, 97)}...`;
-                            }
-                            return {
-                                label: label,
-                                description: refTrack.info.author,
-                                value: identifier,
-                                default: true,
-                            };
-                        })
-                        .filter(
-                            (options): boolean =>
-                                !pages[page - 1].find(
-                                    (track): boolean =>
-                                        track.info.identifier === options.value,
-                                ),
-                        ),
-                )
-                .sort(
-                    (a, b): number =>
-                        parseInt(a.label.split('.')[0]) -
-                        parseInt(b.label.split('.')[0]),
-                ),
+        if (
+            !(interaction.message.components[0] instanceof ContainerComponent)
+        ) {
+            return;
+        }
+        const container = new ContainerBuilder(
+            interaction.message.components[0].toJSON(),
         );
-        // this code probably doesn't even do anything?
-        selectComponent.setMaxValues(selectComponent.options.length);
-        updated.components[0].components[0] = selectComponent;
-        updated.components[1].components[0] = ButtonBuilder.from(
-            original.components[1].components[0] as ButtonComponent,
+        if (!(container.components[0] instanceof TextDisplayBuilder)) {
+            return;
+        }
+        container.components[0] = new TextDisplayBuilder().setContent(
+            pages[page - 1]
+                .map((track: Song, index): string => {
+                    const duration = msToTime(track.info.length);
+                    let durationString = track.info.isStream
+                        ? '∞'
+                        : msToTimeString(duration, true);
+                    if (durationString === 'MORE_THAN_A_DAY') {
+                        durationString = getLocaleString(
+                            guildLocaleCode,
+                            'MISC.MORE_THAN_A_DAY',
+                        );
+                    }
+                    return `\`${(firstIndex + index)
+                        .toString()
+                        .padStart(
+                            largestIndexSize,
+                            ' ',
+                        )}.\` ${getTrackMarkdownLocaleString(
+                        track,
+                    )} \`[${durationString}]\``;
+                })
+                .join('\n'),
+        );
+        if (!(container.components[1] instanceof TextDisplayBuilder)) return;
+        container.components[1] = new TextDisplayBuilder().setContent(
+            getLocaleString(
+                guildLocaleCode,
+                'MISC.PAGE',
+                page.toString(),
+                pages.length.toString(),
+            ),
+        );
+        const selectMenuActionRow =
+            ActionRowBuilder.from<StringSelectMenuBuilder>(
+                container.components[3].toJSON() as APIActionRowComponent<APIStringSelectComponent>,
+            );
+        const selectMenuOptions = pages[page - 1]
+            .map((track, index: number): APISelectMenuOption => {
+                let label = `${firstIndex + index}. ${track.info.title}`;
+                if (label.length >= 100) {
+                    label = `${label.substring(0, 97)}...`;
+                }
+                return {
+                    label: label,
+                    description: track.info.author,
+                    value: track.info.identifier,
+                    default: !!state.selected.find(
+                        (identifier: string): boolean =>
+                            identifier === track.info.identifier,
+                    ),
+                };
+            })
+            .concat(
+                state.selected
+                    .map((identifier: string): APISelectMenuOption => {
+                        const refPg = pages.indexOf(
+                            pages.find(
+                                (pg): Song =>
+                                    pg.find(
+                                        (t): boolean =>
+                                            t.info.identifier === identifier,
+                                    ),
+                            ),
+                        );
+                        const firstIdx = 10 * refPg + 1;
+                        const refTrack = pages[refPg].find(
+                            (t): boolean => t.info.identifier === identifier,
+                        );
+                        let label = `${
+                            firstIdx + pages[refPg].indexOf(refTrack)
+                        }. ${refTrack.info.title}`;
+                        if (label.length >= 100) {
+                            label = `${label.substring(0, 97)}...`;
+                        }
+                        return {
+                            label: label,
+                            description: refTrack.info.author,
+                            value: identifier,
+                            default: true,
+                        };
+                    })
+                    .filter(
+                        (options): boolean =>
+                            !pages[page - 1].find(
+                                (track): boolean =>
+                                    track.info.identifier === options.value,
+                            ),
+                    ),
+            )
+            .sort(
+                (a, b): number =>
+                    parseInt(a.label.split('.')[0]) -
+                    parseInt(b.label.split('.')[0]),
+            );
+        selectMenuActionRow.components[0] = StringSelectMenuBuilder.from(
+            selectMenuActionRow.components[0].toJSON(),
+        )
+            .setOptions(selectMenuOptions)
+            .setMaxValues(selectMenuOptions.length);
+        container.components[3] = selectMenuActionRow;
+        const buttonActionRow = ActionRowBuilder.from<ButtonBuilder>(
+            container.components[4].toJSON() as APIActionRowComponent<APIButtonComponent>,
+        );
+        buttonActionRow.components[0] = ButtonBuilder.from(
+            buttonActionRow.components[0].toJSON(),
         )
             .setCustomId(`search:${page - 1}`)
             .setDisabled(page - 1 < 1);
-        updated.components[1].components[1] = ButtonBuilder.from(
-            original.components[1].components[1] as ButtonComponent,
+        buttonActionRow.components[1] = ButtonBuilder.from(
+            buttonActionRow.components[1].toJSON(),
         )
             .setCustomId(`search:${page + 1}`)
             .setDisabled(page + 1 > pages.length);
-        await interaction.replyHandler.reply(updated.embeds, {
-            components: updated.components,
+        container.components[4] = buttonActionRow;
+        await interaction.replyHandler.reply(container, {
             force: ForceType.Update,
         });
     },

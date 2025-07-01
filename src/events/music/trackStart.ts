@@ -2,12 +2,11 @@ import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.d.js';
 import { data, logger } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
-    cleanURIForMarkdown,
     formatResponse,
-    generateEmbedFieldsFromLyrics,
     getGuildFeatureWhitelisted,
     getGuildLocaleString,
     getLocaleString,
+    getTrackMarkdownLocaleString,
     WhitelistStatus,
 } from '#src/lib/util/util.js';
 import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
@@ -15,7 +14,11 @@ import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    EmbedBuilder,
+    ContainerBuilder,
+    SectionBuilder,
+    SeparatorBuilder,
+    TextDisplayBuilder,
+    ThumbnailBuilder,
 } from 'discord.js';
 
 export default {
@@ -87,132 +90,123 @@ export default {
         const emoji =
             settings.emojis?.[
                 track.info.sourceName as keyof typeof settings.emojis
-            ] ?? '';
-        const uri = getLocaleString(
-            guildLocaleCode,
-            track.info.title === track.info.uri
-                ? 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT_DIRECT_LINK'
-                : 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
-            ...(track.info.title !== track.info.uri
-                ? [cleanURIForMarkdown(track.info.title)]
-                : []),
-            track.info.uri,
-            durationString,
-        );
+                ] ?? '';
         switch (format) {
             case 'simple':
                 await queue.player.handler.send(
-                    `${uri}\n${getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${getLocaleString(guildLocaleCode, `MISC.SOURCES.${track.info.sourceName.toUpperCase()}`)}** ─ ${getLocaleString(
-                        guildLocaleCode,
-                        'MISC.ADDED_BY',
-                        track.requesterId,
-                    )}`,
-                    {
-                        components:
-                            settings.features.web.enabled &&
+                    new ContainerBuilder({
+                        components: [
+                            new TextDisplayBuilder()
+                                .setContent(
+                                    `${getLocaleString(
+                                        guildLocaleCode,
+                                        'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
+                                        getTrackMarkdownLocaleString(track),
+                                        durationString,
+                                    )}\n${getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${getLocaleString(guildLocaleCode, `MISC.SOURCES.${track.info.sourceName.toUpperCase()}`)}** ─ ${getLocaleString(
+                                        guildLocaleCode,
+                                        'MISC.ADDED_BY',
+                                        track.requesterId,
+                                    )}`,
+                                )
+                                .toJSON(),
+                            ...(settings.features.web.enabled &&
                             settings.features.web.dashboardURL
                                 ? [
-                                      new ActionRowBuilder<ButtonBuilder>().addComponents(
-                                          new ButtonBuilder()
-                                              .setURL(
-                                                  `${settings.features.web.dashboardURL.replace(
-                                                      /\/+$/,
-                                                      '',
-                                                  )}/guild/${queue.player.id}`,
-                                              )
-                                              .setStyle(ButtonStyle.Link)
-                                              .setLabel(
-                                                  getLocaleString(
-                                                      guildLocaleCode,
-                                                      'MISC.DASHBOARD',
-                                                  ),
-                                              ),
-                                      ),
-                                  ]
-                                : [],
-                    },
+                                    new SeparatorBuilder().toJSON(),
+                                    new ActionRowBuilder<ButtonBuilder>()
+                                        .addComponents(
+                                            new ButtonBuilder()
+                                                .setURL(
+                                                    `${settings.features.web.dashboardURL.replace(
+                                                        /\/+$/,
+                                                        '',
+                                                    )}/guild/${queue.player.id}`,
+                                                )
+                                                .setStyle(ButtonStyle.Link)
+                                                .setLabel(
+                                                    getLocaleString(
+                                                        guildLocaleCode,
+                                                        'MISC.DASHBOARD',
+                                                    ),
+                                                ),
+                                        )
+                                        .toJSON(),
+                                ]
+                                : []),
+                        ],
+                    }),
                 );
                 break;
-            case 'detailed':
+            case 'detailed': {
                 await queue.player.handler.send(
-                    new EmbedBuilder()
-                        .setTitle(
-                            getLocaleString(
-                                guildLocaleCode,
-                                'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE',
-                            ),
-                        )
-                        .setDescription(uri)
-                        .addFields([
-                            {
-                                name: getLocaleString(
-                                    guildLocaleCode,
-                                    'MUSIC.PLAYER.PLAYING.NOW.DETAILED.DURATION',
-                                ),
-                                value: `\`${durationString}\``,
-                                inline: true,
-                            },
-                            {
-                                name: getLocaleString(
-                                    guildLocaleCode,
-                                    'MUSIC.PLAYER.PLAYING.NOW.DETAILED.UPLOADER',
-                                ),
-                                value: track.info.author,
-                                inline: true,
-                            },
-                            {
-                                name: getLocaleString(
-                                    guildLocaleCode,
-                                    'MUSIC.PLAYER.PLAYING.NOW.DETAILED.SOURCE',
-                                ),
-                                value: `${emoji ? `${emoji} ` : ''}${getLocaleString(
-                                    guildLocaleCode,
-                                    `MISC.SOURCES.${track.info.sourceName.toUpperCase()}`,
-                                )}`,
-                                inline: true,
-                            },
-                            {
-                                name: getLocaleString(
-                                    guildLocaleCode,
-                                    'MUSIC.PLAYER.PLAYING.NOW.DETAILED.ADDED_BY',
-                                ),
-                                value: `<@${track.requesterId}>`,
-                                inline: true,
-                            },
-                        ])
-                        .setThumbnail(
-                            `https://i.ytimg.com/vi/${track.info.identifier}/hqdefault.jpg`,
-                        )
-                        .setFooter({
-                            text: getLocaleString(
-                                guildLocaleCode,
-                                'MUSIC.PLAYER.PLAYING.NOW.DETAILED.REMAINING',
-                                queue.tracks.length.toString(),
-                            ),
-                        }),
-                    {
-                        components: settings.features.web.dashboardURL
-                            ? [
-                                  new ActionRowBuilder<ButtonBuilder>().addComponents(
-                                      new ButtonBuilder()
-                                          .setURL(
-                                              `${settings.features.web.dashboardURL.replace(
-                                                  /\/+$/,
-                                                  '',
-                                              )}/guild/${queue.player.id}`,
-                                          )
-                                          .setStyle(ButtonStyle.Link)
-                                          .setLabel(
-                                              getLocaleString(
-                                                  guildLocaleCode,
-                                                  'MISC.DASHBOARD',
-                                              ),
-                                          ),
-                                  ),
-                              ]
-                            : [],
-                    },
+                    new ContainerBuilder({
+                        components: [
+                            new SectionBuilder({
+                                components: [
+                                    new TextDisplayBuilder()
+                                        .setContent(
+                                            getLocaleString(
+                                                guildLocaleCode,
+                                                'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE',
+                                            ),
+                                        )
+                                        .toJSON(),
+                                    new TextDisplayBuilder()
+                                        .setContent(
+                                            `${getLocaleString(
+                                                guildLocaleCode,
+                                                'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TEXT',
+                                                `[${track.info.author} - ${track.info.title}](${track.info.uri})`,
+                                                durationString,
+                                            )}\n${getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${getLocaleString(guildLocaleCode, `MISC.SOURCES.${track.info.sourceName.toUpperCase()}`)}** ─ ${getLocaleString(
+                                                guildLocaleCode,
+                                                'MISC.ADDED_BY',
+                                                track.requesterId,
+                                            )}`,
+                                        )
+                                        .toJSON(),
+                                    new TextDisplayBuilder()
+                                        .setContent(
+                                            getLocaleString(
+                                                guildLocaleCode,
+                                                'MUSIC.PLAYER.PLAYING.NOW.DETAILED.REMAINING',
+                                                queue.tracks.length.toString(),
+                                            ),
+                                        )
+                                        .toJSON(),
+                                ],
+                                accessory: new ThumbnailBuilder()
+                                    .setURL(track.info.artworkUrl ?? `https://i.ytimg.com/vi/${track.info.identifier}/hqdefault.jpg`)
+                                    .toJSON(),
+                            }).toJSON(),
+                            ...(settings.features.web.dashboardURL
+                                ? [
+                                    new SeparatorBuilder().toJSON(),
+                                    new ActionRowBuilder<ButtonBuilder>()
+                                        .addComponents(
+                                            new ButtonBuilder()
+                                                .setURL(
+                                                    `${settings.features.web.dashboardURL.replace(
+                                                        /\/+$/,
+                                                        '',
+                                                    )}/guild/${queue.player.id}`,
+                                                )
+                                                .setStyle(ButtonStyle.Link)
+                                                .setLabel(
+                                                    getLocaleString(
+                                                        guildLocaleCode,
+                                                        'MISC.DASHBOARD',
+                                                    ),
+                                                ),
+                                        )
+                                        .toJSON(),
+                                ]
+                                : []),
+                        ],
+                    }),
                 );
+            }
         }
         if (settings.features.autolyrics.enabled) {
             if (
@@ -261,31 +255,40 @@ export default {
             } else if (lyrics.match(/[\u4e00-\u9fff]/g)) {
                 romanizeFrom = 'chinese';
             }
-            const lyricsFields = generateEmbedFieldsFromLyrics(json, lyrics);
-            if (lyricsFields.length === 0) return;
-            let embed;
-            try {
-                embed = new EmbedBuilder().setFields(lyricsFields);
-            } catch {
-                return;
-            }
-            await queue.player.handler.send(embed, {
-                components: romanizeFrom
-                    ? [
-                          new ActionRowBuilder<ButtonBuilder>().addComponents(
-                              new ButtonBuilder()
-                                  .setCustomId(`lyrics:${romanizeFrom}`)
-                                  .setStyle(ButtonStyle.Secondary)
-                                  .setLabel(
-                                      await getGuildLocaleString(
-                                          queue.player.id,
-                                          `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}`,
-                                      ),
-                                  ),
-                          ),
-                      ]
-                    : [],
-            });
+            const title = `**${json.track.override ?? `${json.track.author} - ${json.track.title}`}**`;
+            lyrics =
+                lyrics.length > 4000 - title.length
+                    ? `${lyrics.slice(0, 3999 - title.length)}…`
+                    : lyrics;
+            if (lyrics.length === 0) return;
+            await queue.player.handler.send(
+                new ContainerBuilder({
+                    components: [
+                        new TextDisplayBuilder().setContent(title).toJSON(),
+                        new TextDisplayBuilder().setContent(lyrics).toJSON(),
+                        ...(romanizeFrom
+                            ? [
+                                new SeparatorBuilder().toJSON(),
+                                new ActionRowBuilder<ButtonBuilder>()
+                                    .addComponents(
+                                        new ButtonBuilder()
+                                            .setCustomId(
+                                                `lyrics:${romanizeFrom}`,
+                                            )
+                                            .setStyle(ButtonStyle.Secondary)
+                                            .setLabel(
+                                                getLocaleString(
+                                                    guildLocaleCode,
+                                                    `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}`,
+                                                ),
+                                            ),
+                                    )
+                                    .toJSON(),
+                            ]
+                            : []),
+                    ],
+                }),
+            );
         }
     },
 };

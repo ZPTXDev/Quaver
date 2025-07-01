@@ -2,23 +2,18 @@ import { ForceType } from '#src/lib/ReplyHandler.js';
 import type { QuaverInteraction } from '#src/lib/util/common.d.js';
 import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { settings } from '#src/lib/util/settings.js';
-import {
-    cleanURIForMarkdown,
-    getGuildLocaleString,
-    getLocaleString,
-} from '#src/lib/util/util.js';
+import { cleanURIForMarkdown, getLocaleString } from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
-import type {
-    MessageActionRowComponentBuilder,
-    ModalSubmitInteraction,
-} from 'discord.js';
+import type { ModalSubmitInteraction } from 'discord.js';
 import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    EmbedBuilder,
+    ContainerBuilder,
     escapeMarkdown,
+    SeparatorBuilder,
+    TextDisplayBuilder,
 } from 'discord.js';
 
 export default {
@@ -62,81 +57,79 @@ export default {
         const firstIndex = 5 * (page - 1) + 1;
         const pageSize = pages[page - 1].length;
         const largestIndexSize = (firstIndex + pageSize - 1).toString().length;
-        const original = {
-            embeds: interaction.message.embeds,
-            components: interaction.message.components,
-        };
-        if (original.embeds.length === 0) {
-            await interaction.message.delete();
-            return;
-        }
-        const updated: {
-            embeds: EmbedBuilder[];
-            components: ActionRowBuilder<MessageActionRowComponentBuilder>[];
-        } = { embeds: [], components: [] };
         const guildLocaleCode =
             (await data.guild.get<string>(
                 interaction.guildId,
                 'settings.locale',
             )) ?? settings.defaultLocaleCode;
-        updated.embeds[0] = EmbedBuilder.from(original.embeds[0])
-            .setDescription(
-                pages[page - 1]
-                    .map((track: Song, index: number): string => {
-                        const duration = msToTime(track.info.length);
-                        let durationString = track.info.isStream
-                            ? '∞'
-                            : msToTimeString(duration, true);
-                        if (durationString === 'MORE_THAN_A_DAY') {
-                            durationString = getLocaleString(
+        await interaction.replyHandler.reply(
+            new ContainerBuilder({
+                components: [
+                    new TextDisplayBuilder()
+                        .setContent(
+                            pages[page - 1]
+                                .map((track: Song, index): string => {
+                                    const duration = msToTime(
+                                        track.info.length,
+                                    );
+                                    let durationString = track.info.isStream
+                                        ? '∞'
+                                        : msToTimeString(duration, true);
+                                    if (durationString === 'MORE_THAN_A_DAY') {
+                                        durationString = getLocaleString(
+                                            guildLocaleCode,
+                                            'MISC.MORE_THAN_A_DAY',
+                                        );
+                                    }
+                                    return `\`${(firstIndex + index)
+                                        .toString()
+                                        .padStart(largestIndexSize, ' ')}.\` ${
+                                        track.info.title === track.info.uri
+                                            ? `**${track.info.uri}**`
+                                            : `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`
+                                    } \`[${durationString}]\` <@${track.requesterId}>`;
+                                })
+                                .join('\n'),
+                        )
+                        .toJSON(),
+                    new TextDisplayBuilder()
+                        .setContent(
+                            getLocaleString(
                                 guildLocaleCode,
-                                'MISC.MORE_THAN_A_DAY',
-                            );
-                        }
-                        return `\`${(firstIndex + index)
-                            .toString()
-                            .padStart(largestIndexSize, ' ')}.\` ${
-                            track.info.title === track.info.uri
-                                ? `**${track.info.uri}**`
-                                : `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`
-                        } \`[${durationString}]\` <@${track.requesterId}>`;
-                    })
-                    .join('\n'),
-            )
-            .setFooter({
-                text: await getGuildLocaleString(
-                    interaction.guildId,
-                    'MISC.PAGE',
-                    page.toString(),
-                    pages.length.toString(),
-                ),
-            });
-        updated.components[0] =
-            new ActionRowBuilder<ButtonBuilder>().addComponents(
-                new ButtonBuilder()
-                    .setCustomId(`queue:${page - 1}`)
-                    .setEmoji('⬅️')
-                    .setDisabled(page - 1 < 1)
-                    .setStyle(ButtonStyle.Primary),
-                new ButtonBuilder()
-                    .setCustomId('queue:goto')
-                    .setStyle(ButtonStyle.Secondary)
-                    .setLabel(
-                        await getGuildLocaleString(
-                            interaction.guildId,
-                            'MISC.GO_TO',
-                        ),
-                    ),
-                new ButtonBuilder()
-                    .setCustomId(`queue:${page + 1}`)
-                    .setEmoji('➡️')
-                    .setDisabled(page + 1 > pages.length)
-                    .setStyle(ButtonStyle.Primary),
-            );
-        await interaction.replyHandler.reply(updated.embeds, {
-            components: updated.components,
-            force: ForceType.Update,
-        });
+                                'MISC.PAGE',
+                                page.toString(),
+                                pages.length.toString(),
+                            ),
+                        )
+                        .toJSON(),
+                    new SeparatorBuilder().toJSON(),
+                    new ActionRowBuilder<ButtonBuilder>()
+                        .addComponents(
+                            new ButtonBuilder()
+                                .setCustomId(`queue:${page - 1}`)
+                                .setEmoji('⬅️')
+                                .setDisabled(page - 1 < 1)
+                                .setStyle(ButtonStyle.Primary),
+                            new ButtonBuilder()
+                                .setCustomId('queue:goto')
+                                .setStyle(ButtonStyle.Secondary)
+                                .setLabel(
+                                    getLocaleString(
+                                        guildLocaleCode,
+                                        'MISC.GO_TO',
+                                    ),
+                                ),
+                            new ButtonBuilder()
+                                .setCustomId(`queue:${page + 1}`)
+                                .setEmoji('➡️')
+                                .setDisabled(page + 1 > pages.length)
+                                .setStyle(ButtonStyle.Primary),
+                        )
+                        .toJSON(),
+                ],
+            }),
+            { force: ForceType.Update },
+        );
         return;
     },
 };
