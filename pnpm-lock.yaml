@@ -44,8 +44,8 @@ dependencies:
     specifier: ^6.4.3
     version: 6.4.3
   cacheable:
-    specifier: ^1.10.1
-    version: 1.10.1
+    specifier: ^1.10.2
+    version: 1.10.2
   crypto-js:
     specifier: ^4.2.0
     version: 4.2.0
@@ -1439,8 +1439,8 @@ packages:
       keyv: 5.3.3(patch_hash=tg3f223bx2dgo6xy4spszqtwma)
     dev: false
 
-  /cacheable@1.10.1:
-    resolution: {integrity: sha512-Fa2BZY0CS9F0PFc/6aVA6tgpOdw+hmv9dkZOlHXII5v5Hw+meJBIWDcPrG9q/dXxGcNbym5t77fzmawrBQfTmQ==}
+  /cacheable@1.10.2:
+    resolution: {integrity: sha512-hMkETCRV4hwBAvjQY1/xGw15tlPj+7cM4d5HOlYJJFftLQVRCboVX+mT6AJ6eL0fsqUhSUwDiF+pgfTR2r2Hxg==}
     dependencies:
       hookified: 1.10.0
       keyv: 5.3.4
