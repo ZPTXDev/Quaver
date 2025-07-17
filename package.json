@@ -13,7 +13,7 @@
     "@napi-rs/pinyin": "^1.7.5",
     "@zptxdev/zptx-lib": "^1.1.0",
     "cache-manager": "^6.4.3",
-    "cacheable": "^1.10.1",
+    "cacheable": "^1.10.2",
     "crypto-js": "^4.2.0",
     "discord.js": "<=14.22.0",
     "express": "^5.1.0",
