@@ -1,33 +1,17 @@
 import PlayerHandler from '#src/lib/PlayerHandler.js';
-import type {
-    QuaverChannels,
-    QuaverInteraction,
-    QuaverPlayer,
-    QuaverSong,
-} from '#src/lib/util/common.d.js';
+import type { QuaverChannels, QuaverInteraction, QuaverPlayer, QuaverSong } from '#src/lib/util/common.d.js';
 import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import {
-    acceptableSources,
-    Check,
-    queryOverrides,
-} from '#src/lib/util/constants.js';
+import { acceptableSources, Check, queryOverrides } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
-import {
-    cleanURIForMarkdown,
-    getGuildLocaleString,
-    getLocaleString,
-} from '#src/lib/util/util.js';
-import type {
-    ChatInputCommandInteraction,
-    SlashCommandBooleanOption,
-    SlashCommandStringOption,
-} from 'discord.js';
+import { getLocaleString, getTrackMarkdownLocaleString } from '#src/lib/util/util.js';
+import type { ChatInputCommandInteraction, SlashCommandBooleanOption, SlashCommandStringOption } from 'discord.js';
 import {
     ChannelType,
-    EmbedBuilder,
+    ContainerBuilder,
     GuildMember,
     PermissionsBitField,
     SlashCommandBuilder,
+    TextDisplayBuilder,
 } from 'discord.js';
 import { LavalinkWSClientState } from 'lavalink-ws-client';
 
@@ -105,7 +89,7 @@ export default {
         }
         if (
             interaction.member.voice.channel.type ===
-                ChannelType.GuildStageVoice &&
+            ChannelType.GuildStageVoice &&
             !permissions.has(PermissionsBitField.StageModerator)
         ) {
             await interaction.replyHandler.locale(
@@ -145,6 +129,11 @@ export default {
                 )) ?? Object.keys(acceptableSources)[0];
             searchQuery = `${acceptableSources[source]}${query}`;
         }
+        const guildLocaleCode =
+            (await data.guild.get<string>(
+                interaction.guildId,
+                'settings.locale',
+            )) ?? settings.defaultLocaleCode;
         const result =
             await interaction.client.music.api.loadTracks(searchQuery);
         switch (result.loadType) {
@@ -155,8 +144,9 @@ export default {
                     : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
                 extras = [
                     tracks.length.toString(),
-                    result.data.info.name,
-                    query,
+                    result.data.info.name === query
+                        ? result.data.info.name
+                        : `[${result.data.info.name}](${query})`,
                 ];
                 break;
             case 'track':
@@ -167,31 +157,32 @@ export default {
                 msg = insert
                     ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.INSERTED'
                     : 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
-                if (track.info.title === track.info.uri) msg += '_DIRECT_LINK';
-                extras = [
-                    ...(track.info.title !== track.info.uri
-                        ? [cleanURIForMarkdown(track.info.title)]
-                        : []),
-                    track.info.uri,
-                ];
+                extras = [getTrackMarkdownLocaleString(track)];
                 break;
             }
             case 'empty':
-                await interaction.replyHandler.locale(
-                    'CMD.PLAY.RESPONSE.NO_RESULTS',
+                await interaction.replyHandler.reply(
+                    getLocaleString(
+                        guildLocaleCode,
+                        'CMD.PLAY.RESPONSE.NO_RESULTS',
+                    ),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             case 'error':
-                await interaction.replyHandler.locale(
-                    'CMD.PLAY.RESPONSE.LOAD_FAILED',
+                await interaction.replyHandler.reply(
+                    getLocaleString(
+                        guildLocaleCode,
+                        'CMD.PLAY.RESPONSE.LOAD_FAILED',
+                    ),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             default:
-                await interaction.replyHandler.locale('DISCORD.GENERIC_ERROR', {
-                    type: MessageOptionsBuilderType.Error,
-                });
+                await interaction.replyHandler.reply(
+                    getLocaleString(guildLocaleCode, 'DISCORD.GENERIC_ERROR'),
+                    { type: MessageOptionsBuilderType.Error },
+                );
                 return;
         }
         let player = (await interaction.client.music.players.fetch(
@@ -203,7 +194,7 @@ export default {
             ) as QuaverPlayer;
             player.handler = new PlayerHandler(interaction.client, player);
             player.queue.channel = interaction.channel as QuaverChannels;
-            await player.voice.connect(interaction.member.voice.channelId, {
+            player.voice.connect(interaction.member.voice.channelId, {
                 deafened: true,
             });
             // Ensure that Quaver destroys the player if the user leaves the channel while Quaver is queuing tracks
@@ -218,14 +209,20 @@ export default {
             ) {
                 if (interaction.guild) {
                     if (timedOut) {
-                        await interaction.replyHandler.locale(
-                            'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
+                        await interaction.replyHandler.reply(
+                            getLocaleString(
+                                guildLocaleCode,
+                                'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
+                            ),
                             { type: MessageOptionsBuilderType.Error },
                         );
                     } else {
-                        await interaction.replyHandler.locale(
-                            'DISCORD.INTERACTION.CANCELED',
-                            { vars: [interaction.user.id] },
+                        await interaction.replyHandler.reply(
+                            getLocaleString(
+                                guildLocaleCode,
+                                'DISCORD.INTERACTION.CANCELED',
+                                interaction.user.id,
+                            ),
                         );
                     }
                 }
@@ -245,28 +242,39 @@ export default {
             'settings.smartqueue',
         );
         await interaction.replyHandler.reply(
-            new EmbedBuilder()
-                .setDescription(
-                    await getGuildLocaleString(
-                        interaction.guildId,
-                        msg,
-                        ...extras,
-                    ),
-                )
-                .setFooter({
-                    text:
-                        started && !smartQueue
-                            ? `${await getGuildLocaleString(
-                                  interaction.guildId,
-                                  'MISC.POSITION',
-                              )}: ${firstPosition}${
-                                  endPosition !== firstPosition
-                                      ? ` - ${endPosition}`
-                                      : ''
-                              }`
-                            : null,
-                }),
-            { type: MessageOptionsBuilderType.Success, ephemeral: true },
+            new ContainerBuilder({
+                components: [
+                    new TextDisplayBuilder()
+                        .setContent(
+                            `${getLocaleString(
+                                guildLocaleCode,
+                                msg,
+                                ...extras,
+                            )}`,
+                        )
+                        .toJSON(),
+                    ...(started && !smartQueue
+                        ? [
+                            new TextDisplayBuilder()
+                                .setContent(
+                                    `-# ${getLocaleString(
+                                        guildLocaleCode,
+                                        'MISC.POSITION',
+                                    )}: ${firstPosition}${
+                                        endPosition !== firstPosition
+                                            ? ` - ${endPosition}`
+                                            : ''
+                                    }`,
+                                )
+                                .toJSON(),
+                        ]
+                        : []),
+                ],
+            }),
+            {
+                type: MessageOptionsBuilderType.Success,
+                ephemeral: true,
+            },
         );
         if (!started) await player.queue.start();
         if (smartQueue) await player.handler.sort();

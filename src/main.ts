@@ -28,9 +28,12 @@ import {
     AttachmentBuilder,
     Client,
     Collection,
-    EmbedBuilder,
+    ContainerBuilder,
+    FileBuilder,
     GatewayDispatchEvents,
     GatewayIntentBits,
+    SeparatorBuilder,
+    TextDisplayBuilder,
 } from 'discord.js';
 import type { Express } from 'express';
 import express from 'express';
@@ -47,8 +50,8 @@ import { inspect } from 'util';
 import { version } from './lib/util/version.js';
 import type { QuaverEvent, QuaverMusicEvent } from './main.d.js';
 import type {
-    ChatInputCommandHandler,
     AutocompleteHandler,
+    ChatInputCommandHandler,
     ComponentTypeHandler,
 } from './events/interactionCreate.d.js';
 
@@ -440,33 +443,48 @@ export async function shuttingDown(
                 }
                 await player.handler.disconnect();
                 await player.handler.send(
-                    new EmbedBuilder()
-                        .setDescription(
-                            `${await getGuildLocaleString(
-                                player.id,
-                                [
-                                    'exit',
-                                    'SIGINT',
-                                    'SIGTERM',
-                                    'lavalink',
-                                ].includes(eventType)
-                                    ? 'MUSIC.PLAYER.RESTARTING.DEFAULT'
-                                    : 'MUSIC.PLAYER.RESTARTING.CRASHED',
-                            )}${
-                                fileBuffer.length > 0
-                                    ? `\n${await getGuildLocaleString(
-                                          player.id,
-                                          'MUSIC.PLAYER.RESTARTING.QUEUE_DATA_ATTACHED',
-                                      )}`
-                                    : ''
-                            }`,
-                        )
-                        .setFooter({
-                            text: await getGuildLocaleString(
-                                player.id,
-                                'MUSIC.PLAYER.RESTARTING.APOLOGY',
-                            ),
-                        }),
+                    new ContainerBuilder({
+                        components: [
+                            new TextDisplayBuilder()
+                                .setContent(
+                                    `${await getGuildLocaleString(
+                                        player.id,
+                                        [
+                                            'exit',
+                                            'SIGINT',
+                                            'SIGTERM',
+                                            'lavalink',
+                                        ].includes(eventType)
+                                            ? 'MUSIC.PLAYER.RESTARTING.DEFAULT'
+                                            : 'MUSIC.PLAYER.RESTARTING.CRASHED',
+                                    )}${
+                                        fileBuffer.length > 0
+                                            ? `\n${await getGuildLocaleString(
+                                                  player.id,
+                                                  'MUSIC.PLAYER.RESTARTING.QUEUE_DATA_ATTACHED',
+                                              )}`
+                                            : ''
+                                    }`,
+                                )
+                                .toJSON(),
+                            new TextDisplayBuilder()
+                                .setContent(
+                                    await getGuildLocaleString(
+                                        player.id,
+                                        'MUSIC.PLAYER.RESTARTING.APOLOGY',
+                                    ),
+                                )
+                                .toJSON(),
+                            ...(fileBuffer.length > 0
+                                ? [
+                                      new SeparatorBuilder().toJSON(),
+                                      new FileBuilder()
+                                          .setURL('attachment://queue.txt')
+                                          .toJSON(),
+                                  ]
+                                : []),
+                        ],
+                    }),
                     {
                         type: MessageOptionsBuilderType.Warning,
                         files:

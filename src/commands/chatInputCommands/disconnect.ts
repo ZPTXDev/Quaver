@@ -5,25 +5,24 @@ import type {
 } from '#src/lib/util/common.d.js';
 import {
     confirmationTimeout,
+    data,
     logger,
     MessageOptionsBuilderType,
 } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
-import {
-    buildMessageOptions,
-    getGuildLocaleString,
-    getLocaleString,
-} from '#src/lib/util/util.js';
+import { buildMessageOptions, getLocaleString } from '#src/lib/util/util.js';
 import type { ChatInputCommandInteraction } from 'discord.js';
 import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    EmbedBuilder,
+    ContainerBuilder,
     InteractionCallbackResponse,
     Message,
+    SeparatorBuilder,
     SlashCommandBuilder,
+    TextDisplayBuilder,
 } from 'discord.js';
 
 export default {
@@ -68,44 +67,57 @@ export default {
                     return;
             }
         }
+        const guildLocaleCode =
+            (await data.guild.get<string>(
+                interaction.guildId,
+                'settings.locale',
+            )) ?? settings.defaultLocaleCode;
         const response = await interaction.replyHandler.reply(
-            new EmbedBuilder()
-                .setDescription(
-                    await getGuildLocaleString(
-                        interaction.guildId,
-                        'CMD.DISCONNECT.RESPONSE.CONFIRMATION',
-                    ),
-                )
-                .setFooter({
-                    text: await getGuildLocaleString(
-                        interaction.guildId,
-                        'MISC.ACTION_IRREVERSIBLE',
-                    ),
-                }),
+            new ContainerBuilder({
+                components: [
+                    new TextDisplayBuilder()
+                        .setContent(
+                            getLocaleString(
+                                guildLocaleCode,
+                                'CMD.DISCONNECT.RESPONSE.CONFIRMATION',
+                            ),
+                        )
+                        .toJSON(),
+                    new TextDisplayBuilder()
+                        .setContent(
+                            getLocaleString(
+                                guildLocaleCode,
+                                'MISC.ACTION_IRREVERSIBLE',
+                            ),
+                        )
+                        .toJSON(),
+                    new SeparatorBuilder().toJSON(),
+                    new ActionRowBuilder<ButtonBuilder>()
+                        .addComponents(
+                            new ButtonBuilder()
+                                .setCustomId('disconnect')
+                                .setStyle(ButtonStyle.Danger)
+                                .setLabel(
+                                    getLocaleString(
+                                        guildLocaleCode,
+                                        'MISC.CONFIRM',
+                                    ),
+                                ),
+                            new ButtonBuilder()
+                                .setCustomId('cancel')
+                                .setStyle(ButtonStyle.Secondary)
+                                .setLabel(
+                                    getLocaleString(
+                                        guildLocaleCode,
+                                        'MISC.CANCEL',
+                                    ),
+                                ),
+                        )
+                        .toJSON(),
+                ],
+            }),
             {
                 type: MessageOptionsBuilderType.Warning,
-                components: [
-                    new ActionRowBuilder<ButtonBuilder>().addComponents(
-                        new ButtonBuilder()
-                            .setCustomId('disconnect')
-                            .setStyle(ButtonStyle.Danger)
-                            .setLabel(
-                                await getGuildLocaleString(
-                                    interaction.guildId,
-                                    'MISC.CONFIRM',
-                                ),
-                            ),
-                        new ButtonBuilder()
-                            .setCustomId('cancel')
-                            .setStyle(ButtonStyle.Secondary)
-                            .setLabel(
-                                await getGuildLocaleString(
-                                    interaction.guildId,
-                                    'MISC.CANCEL',
-                                ),
-                            ),
-                    ),
-                ],
                 withResponse: true,
             },
         );
@@ -114,22 +126,19 @@ export default {
                 response instanceof InteractionCallbackResponse ||
                 response instanceof Message
             )
-        ) {return;}
+        ) {
+            return;
+        }
         const msg =
             response instanceof InteractionCallbackResponse
                 ? response.resource.message
                 : response;
         confirmationTimeout[msg.id] = setTimeout(
-            async (message): Promise<void> => {
+            async (glc, message): Promise<void> => {
                 try {
                     await message.edit(
                         buildMessageOptions(
-                            new EmbedBuilder().setDescription(
-                                await getGuildLocaleString(
-                                    message.guildId,
-                                    'DISCORD.INTERACTION.EXPIRED',
-                                ),
-                            ),
+                            getLocaleString(glc, 'DISCORD.INTERACTION.EXPIRED'),
                             { components: [] },
                         ),
                     );
@@ -143,7 +152,8 @@ export default {
                 }
                 delete confirmationTimeout[message.id];
             },
-            5 * 1000,
+            10_000,
+            guildLocaleCode,
             msg,
         );
     },

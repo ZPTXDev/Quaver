@@ -14,9 +14,11 @@ import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    EmbedBuilder,
+    ContainerBuilder,
     escapeMarkdown,
+    SeparatorBuilder,
     SlashCommandBuilder,
+    TextDisplayBuilder,
 } from 'discord.js';
 
 export default {
@@ -58,62 +60,70 @@ export default {
                 'settings.locale',
             )) ?? settings.defaultLocaleCode;
         await interaction.replyHandler.reply(
-            new EmbedBuilder()
-                .setDescription(
-                    pages[0]
-                        .map((track: Song, index): string => {
-                            const duration = msToTime(track.info.length);
-                            let durationString = track.info.isStream
-                                ? '∞'
-                                : msToTimeString(duration, true);
-                            if (durationString === 'MORE_THAN_A_DAY') {
-                                durationString = getLocaleString(
-                                    guildLocaleCode,
-                                    'MISC.MORE_THAN_A_DAY',
-                                );
-                            }
-                            return `\`${index + 1}.\` ${
-                                track.info.title === track.info.uri
-                                    ? `**${track.info.uri}**`
-                                    : `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`
-                            } \`[${durationString}]\` <@${track.requesterId}>`;
-                        })
-                        .join('\n'),
-                )
-                .setFooter({
-                    text: await getGuildLocaleString(
-                        interaction.guildId,
-                        'MISC.PAGE',
-                        '1',
-                        pages.length.toString(),
-                    ),
-                }),
-            {
+            new ContainerBuilder({
                 components: [
-                    new ActionRowBuilder<ButtonBuilder>().addComponents(
-                        new ButtonBuilder()
-                            .setCustomId('queue:0')
-                            .setEmoji('⬅️')
-                            .setDisabled(true)
-                            .setStyle(ButtonStyle.Primary),
-                        new ButtonBuilder()
-                            .setCustomId('queue:goto')
-                            .setStyle(ButtonStyle.Secondary)
-                            .setLabel(
-                                await getGuildLocaleString(
-                                    interaction.guildId,
-                                    'MISC.GO_TO',
-                                ),
+                    new TextDisplayBuilder()
+                        .setContent(
+                            pages[0]
+                                .map((track: Song, index): string => {
+                                    const duration = msToTime(
+                                        track.info.length,
+                                    );
+                                    let durationString = track.info.isStream
+                                        ? '∞'
+                                        : msToTimeString(duration, true);
+                                    if (durationString === 'MORE_THAN_A_DAY') {
+                                        durationString = getLocaleString(
+                                            guildLocaleCode,
+                                            'MISC.MORE_THAN_A_DAY',
+                                        );
+                                    }
+                                    return `\`${index + 1}.\` ${
+                                        track.info.title === track.info.uri
+                                            ? `**${track.info.uri}**`
+                                            : `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`
+                                    } \`[${durationString}]\` <@${track.requesterId}>`;
+                                })
+                                .join('\n'),
+                        )
+                        .toJSON(),
+                    new TextDisplayBuilder()
+                        .setContent(
+                            await getGuildLocaleString(
+                                interaction.guildId,
+                                'MISC.PAGE',
+                                '1',
+                                pages.length.toString(),
                             ),
-                        new ButtonBuilder()
-                            .setCustomId('queue:2')
-                            .setEmoji('➡️')
-                            .setDisabled(pages.length === 1)
-                            .setStyle(ButtonStyle.Primary),
-                    ),
+                        )
+                        .toJSON(),
+                    new SeparatorBuilder().toJSON(),
+                    new ActionRowBuilder<ButtonBuilder>()
+                        .addComponents(
+                            new ButtonBuilder()
+                                .setCustomId('queue:0')
+                                .setEmoji('⬅️')
+                                .setDisabled(true)
+                                .setStyle(ButtonStyle.Primary),
+                            new ButtonBuilder()
+                                .setCustomId('queue:goto')
+                                .setStyle(ButtonStyle.Secondary)
+                                .setLabel(
+                                    await getGuildLocaleString(
+                                        interaction.guildId,
+                                        'MISC.GO_TO',
+                                    ),
+                                ),
+                            new ButtonBuilder()
+                                .setCustomId('queue:2')
+                                .setEmoji('➡️')
+                                .setDisabled(pages.length === 1)
+                                .setStyle(ButtonStyle.Primary),
+                        )
+                        .toJSON(),
                 ],
-                ephemeral: true,
-            },
+            }),
+            { ephemeral: true },
         );
     },
 };

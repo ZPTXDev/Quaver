@@ -1,7 +1,7 @@
 diff --git a/dist/index.d.ts b/dist/index.d.ts
-index 3db6576393eabb2253949ec4b9ee6a89f10589f5..aa1e6073ae66ccff29e414a44d252b04196f3fe7 100644
+index 50ca37d5254bee490408bf675255bb1e3d475e9f..74832c3ae75f13d17927b41a8d5e249ce63de6d0 100644
 --- a/dist/index.d.ts
-+++ b/dist/index.d.ts	
++++ b/dist/index.d.ts
 @@ -124,7 +124,7 @@ type KeyvOptions = {
  type KeyvOptions_ = Omit<KeyvOptions, 'store'> & {
      store: KeyvStoreAdapter | Map<any, any> & KeyvStoreAdapter;

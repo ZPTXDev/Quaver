@@ -7,9 +7,9 @@ import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
-    cleanURIForMarkdown,
     getLocaleString,
     getRequesterStatus,
+    getTrackMarkdownLocaleString,
     RequesterStatus,
 } from '#src/lib/util/util.js';
 import type {
@@ -88,22 +88,17 @@ export default {
                 });
                 return;
             default: {
-                let locale =
+                await interaction.replyHandler.locale(
                     requesterStatus === RequesterStatus.Requester
                         ? 'CMD.REMOVE.RESPONSE.SUCCESS.DEFAULT'
                         : requesterStatus === RequesterStatus.ManagerBypass
                           ? 'CMD.REMOVE.RESPONSE.SUCCESS.MANAGER'
-                          : 'CMD.REMOVE.RESPONSE.SUCCESS.FORCED';
-                if (track.info.title === track.info.uri) {locale += '_DIRECT_LINK';}
-                await interaction.replyHandler.locale(locale, {
-                    vars: [
-                        ...(track.info.title !== track.info.uri
-                            ? [cleanURIForMarkdown(track.info.title)]
-                            : []),
-                        track.info.uri,
-                    ],
-                    type: MessageOptionsBuilderType.Success,
-                });
+                          : 'CMD.REMOVE.RESPONSE.SUCCESS.FORCED',
+                    {
+                        type: MessageOptionsBuilderType.Success,
+                        vars: [getTrackMarkdownLocaleString(track)],
+                    },
+                );
             }
         }
     },

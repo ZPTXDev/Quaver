@@ -42,7 +42,7 @@ export default {
                     (track): ApplicationCommandOptionChoiceData => ({
                         name:
                             track.name.length >= 100
-                                ? `${track.name.substring(0, 97)}...`
+                                ? `${track.name.substring(0, 99)}…`
                                 : track.name,
                         value: track.value,
                     }),

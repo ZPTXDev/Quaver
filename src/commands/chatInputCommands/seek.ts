@@ -3,14 +3,13 @@ import type {
     QuaverInteraction,
     QuaverPlayer,
 } from '#src/lib/util/common.d.js';
-import { MessageOptionsBuilderType } from '#src/lib/util/common.js';
+import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
 import { Check } from '#src/lib/util/constants.js';
 import { settings } from '#src/lib/util/settings.js';
 import {
-    RequesterStatus,
-    getGuildLocaleString,
     getLocaleString,
     getRequesterStatus,
+    RequesterStatus,
 } from '#src/lib/util/util.js';
 import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import type {
@@ -107,55 +106,69 @@ export default {
             });
             return;
         }
+        const guildLocaleCode =
+            (await data.guild.get<string>(
+                interaction.guildId,
+                'settings.locale',
+            )) ?? settings.defaultLocaleCode;
         const duration = msToTime(player.queue.current.info.length);
         let durationString = msToTimeString(duration, true);
         if (durationString === 'MORE_THAN_A_DAY') {
-            durationString = await getGuildLocaleString(
-                interaction.guildId,
+            durationString = getLocaleString(
+                guildLocaleCode,
                 'MISC.MORE_THAN_A_DAY',
             );
         }
         const target = msToTime(position);
         let targetString = msToTimeString(target, true);
         if (targetString === 'MORE_THAN_A_DAY') {
-            targetString = await getGuildLocaleString(
-                interaction.guildId,
+            targetString = getLocaleString(
+                guildLocaleCode,
                 'MISC.MORE_THAN_A_DAY',
             );
         }
         const response = await player.handler.seek(position);
         switch (response) {
             case PlayerResponse.PlayerIdle:
-                await interaction.replyHandler.locale(
-                    'MUSIC.PLAYER.PLAYING.NOTHING',
+                await interaction.replyHandler.reply(
+                    getLocaleString(
+                        guildLocaleCode,
+                        'MUSIC.PLAYER.PLAYING.NOTHING',
+                    ),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             case PlayerResponse.PlayerIsStream:
-                await interaction.replyHandler.locale(
-                    'CMD.SEEK.RESPONSE.STREAM_CANNOT_SEEK',
+                await interaction.replyHandler.reply(
+                    getLocaleString(
+                        guildLocaleCode,
+                        'CMD.SEEK.RESPONSE.STREAM_CANNOT_SEEK',
+                    ),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             case PlayerResponse.InputOutOfRange:
-                await interaction.replyHandler.locale(
-                    'CMD.SEEK.RESPONSE.TIMESTAMP_INVALID',
-                    {
-                        vars: [durationString],
-                        type: MessageOptionsBuilderType.Error,
-                    },
+                await interaction.replyHandler.reply(
+                    getLocaleString(
+                        guildLocaleCode,
+                        'CMD.SEEK.RESPONSE.TIMESTAMP_INVALID',
+                        durationString,
+                    ),
+                    { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             case PlayerResponse.Success:
-                await interaction.replyHandler.locale(
-                    requesterStatus === RequesterStatus.Requester
-                        ? 'CMD.SEEK.RESPONSE.SUCCESS.DEFAULT'
-                        : requesterStatus === RequesterStatus.ManagerBypass
-                          ? 'CMD.SEEK.RESPONSE.SUCCESS.MANAGER'
-                          : 'CMD.SEEK.RESPONSE.SUCCESS.FORCED',
-                    {
-                        vars: [targetString, durationString],
-                    },
+                await interaction.replyHandler.reply(
+                    getLocaleString(
+                        guildLocaleCode,
+                        requesterStatus === RequesterStatus.Requester
+                            ? 'CMD.SEEK.RESPONSE.SUCCESS.DEFAULT'
+                            : requesterStatus === RequesterStatus.ManagerBypass
+                              ? 'CMD.SEEK.RESPONSE.SUCCESS.MANAGER'
+                              : 'CMD.SEEK.RESPONSE.SUCCESS.FORCED',
+                        targetString,
+                        durationString,
+                    ),
                 );
         }
     },
