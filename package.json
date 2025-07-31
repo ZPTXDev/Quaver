@@ -10,7 +10,7 @@
     "@keyv/sqlite": "^4.0.5",
     "@lavaclient/plugin-effects": "^1.0.0-rc.2",
     "@lavaclient/plugin-queue": "^0.0.1",
-    "@napi-rs/pinyin": "^1.7.5",
+    "@napi-rs/pinyin": "^1.7.6",
     "@zptxdev/zptx-lib": "^1.1.0",
     "cache-manager": "^7.1.0",
     "cacheable": "^1.10.3",
