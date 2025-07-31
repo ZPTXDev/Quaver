@@ -35,8 +35,8 @@ dependencies:
     specifier: ^0.0.1
     version: 0.0.1(patch_hash=m7cuycvh45g2vyq75bliiteena)(lavaclient@5.0.0-rc.3)(lavalink-protocol@1.1.1)
   '@napi-rs/pinyin':
-    specifier: ^1.7.5
-    version: 1.7.5
+    specifier: ^1.7.6
+    version: 1.7.6
   '@zptxdev/zptx-lib':
     specifier: ^1.1.0
     version: 1.1.0
@@ -463,8 +463,8 @@ packages:
     dev: false
     patched: true
 
-  /@napi-rs/pinyin-android-arm-eabi@1.7.5:
-    resolution: {integrity: sha512-dnurqJdedbU8D1Ngudf10nXvc4BbVSe4ki9U2LUZoGMDGa069t4c87BHRXvcy2By3YpOozORv9/QTMxAQFVOLg==}
+  /@napi-rs/pinyin-android-arm-eabi@1.7.6:
+    resolution: {integrity: sha512-s1jLGiHNWtOvYpKnXhywRs6A43yuSUo3++LSwPlkoIvdpRwGg8titI1pWmi+wy8NaiN+9NRN4pmNUYKDeOVVJA==}
     engines: {node: '>= 10.0'}
     cpu: [arm]
     os: [android]
@@ -472,8 +472,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/pinyin-android-arm64@1.7.5:
-    resolution: {integrity: sha512-75OFmFNpw3L1rDhs8rprG44inVSHouY0jaxL5a4WRHDErqE5PebDbpKUD3ATFUSENJV2iUFT4I9liP9PHOJHwQ==}
+  /@napi-rs/pinyin-android-arm64@1.7.6:
+    resolution: {integrity: sha512-7HmpUtnTm+UHup3UU+V9zMk8PK83SXaWQkFI78xWg2LQxP7GQAqnrhXqvbCB63fJJmgeiNyjC+4az4Td2rG5og==}
     engines: {node: '>= 10.0'}
     cpu: [arm64]
     os: [android]
@@ -481,8 +481,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/pinyin-darwin-arm64@1.7.5:
-    resolution: {integrity: sha512-DNtRvfiW7XLtTIv1iFYPAfmhFLoPqYFKs/LpElIuI7JKHpJIBfKs6/+9ln3WINji9cWz7lvW/XvT+DEpLVdSMA==}
+  /@napi-rs/pinyin-darwin-arm64@1.7.6:
+    resolution: {integrity: sha512-dIoLCUu4g1xw157HdCQ7DKheBKiOOCBcF+RopQdsbfVvkbTrXvkVbY7TELGDWJi3g4XKoZqipNjgY/2wpvJeyg==}
     engines: {node: '>= 10.0'}
     cpu: [arm64]
     os: [darwin]
@@ -490,8 +490,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/pinyin-darwin-x64@1.7.5:
-    resolution: {integrity: sha512-h0WwbhdooPwaSIeYkMW7RDnr7tvECgQRR78nsDPxX6lQa6iqQvwWTlGpXBZC1AO6L2O+nJRriphwL95mUBYZ8w==}
+  /@napi-rs/pinyin-darwin-x64@1.7.6:
+    resolution: {integrity: sha512-4FCLLM3mW4eyOo3mIbyz3rllPLM6OfSY0TFYw32GEiSttrVvVdCrIOTezFs5CbcEeMv84SynS3623p/rhnLsUQ==}
     engines: {node: '>= 10.0'}
     cpu: [x64]
     os: [darwin]
@@ -499,8 +499,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/pinyin-freebsd-x64@1.7.5:
-    resolution: {integrity: sha512-9ImT5sYKkqiFAIJkmZBLzQsc/2X0/ne7Jf6ZmrD7xFh3YIbSvFhEPc23qKqW6HDKV2FgA3FDfZeT9ZhCAL3l+w==}
+  /@napi-rs/pinyin-freebsd-x64@1.7.6:
+    resolution: {integrity: sha512-oKlqgNYvOh6udyh2+3kZMPaiE/62zhZ2nF1A5gLzRq4ZFMnppNQsgpPb5OB8f8ntvvZr0svysCv/Btd2Eag2sA==}
     engines: {node: '>= 10.0'}
     cpu: [x64]
     os: [freebsd]
@@ -508,8 +508,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/pinyin-linux-arm-gnueabihf@1.7.5:
-    resolution: {integrity: sha512-OslQ3DJDXCrd8hdXXUu2HWdb2o5bqTbOzRqvh5dp8gVkXlx/L8mUwBlDy62hxJkpkFxC7NaL8lJRzEvlpEdnBg==}
+  /@napi-rs/pinyin-linux-arm-gnueabihf@1.7.6:
+    resolution: {integrity: sha512-X81NGd4n27rfYNgGGpj+AGttKTlAWyStVQOG03mHJKeJvIdo3pfBmSz+t27i+FdEEA7dHFZ53nYYJrF4cZHMCw==}
     engines: {node: '>= 10.0'}
     cpu: [arm]
     os: [linux]
@@ -517,8 +517,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/pinyin-linux-arm64-gnu@1.7.5:
-    resolution: {integrity: sha512-xGAB86BZFFmZ9BDRmAoZmsaxAGqBAek9+paGDze8/cIgIhK9rvNTfknyZjUQUeGXlESL5XuMsIp0VtjcOr6m5A==}
+  /@napi-rs/pinyin-linux-arm64-gnu@1.7.6:
+    resolution: {integrity: sha512-CR84PT3TakDK+x+arxPxIElejgtuXU4oCgRkOvlmCe1IWNSXUrCUNIk75P4u0RhI9YXuZSghpo8QA0LZrRvqog==}
     engines: {node: '>= 10.0'}
     cpu: [arm64]
     os: [linux]
@@ -526,8 +526,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/pinyin-linux-arm64-musl@1.7.5:
-    resolution: {integrity: sha512-aK2VLMjde8/1AkoH+BqQ94r3w8YVdTCl5hJLI05GhhrNSz62ScrgPAsKNJmD9+8dcfexTdl/ORedAnenodnPzA==}
+  /@napi-rs/pinyin-linux-arm64-musl@1.7.6:
+    resolution: {integrity: sha512-EAj1Pa+QzR/VM2VO7R1su1GMmZgxqpXYZkMeD+WrLn1WPnc4qh+uv/Y4dRD3mhWwAu8Q3q192KVoQHW3HUsTNA==}
     engines: {node: '>= 10.0'}
     cpu: [arm64]
     os: [linux]
@@ -535,8 +535,44 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/pinyin-linux-x64-gnu@1.7.5:
-    resolution: {integrity: sha512-duTEnMo2m9H8AyQY32bM0OrLvZ14na6AH1DAD7/e3HX/TGow9p3LF1v4b8IlGeLZFZRyTdkWX6olHkolQ9fQkA==}
+  /@napi-rs/pinyin-linux-arm64-ohos@1.7.6:
+    resolution: {integrity: sha512-aQG3cRvOYOT6ZkO5VcjEoJsHzb3hnQz2kV/1RIn89fmStzq8RLsd8/Dim6HBPZbNMq9NHYuRC2Aa8pEJwSMOig==}
+    engines: {node: '>= 10.0'}
+    cpu: [arm64]
+    os: [openharmony]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@napi-rs/pinyin-linux-ppc64-gnu@1.7.6:
+    resolution: {integrity: sha512-4KWN8RO34g6bsKWa/gF/8QubWCqjshuMzVsRiuFKayXT2VIMIiMWdIAd3OoLiBGP3P5DVzUELYMXa4JQ173p+A==}
+    engines: {node: '>= 10.0'}
+    cpu: [ppc64]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@napi-rs/pinyin-linux-riscv64-gnu@1.7.6:
+    resolution: {integrity: sha512-6tp5E/XOsB0g0CRPZVsbzWdvj1FHXFKKVWSZY5iT82lm/uGkD2i9xgIk4600jnu4Umb0sjgblGgkmBUs+CVYGA==}
+    engines: {node: '>= 10.0'}
+    cpu: [riscv64]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@napi-rs/pinyin-linux-s390x-gnu@1.7.6:
+    resolution: {integrity: sha512-nXSp6+X8d0esfdxVSJKsLJXOT6Hb6mSD9hjM9pqFrnjU1SLPfNKdOiiKfJY5sFbqJwFsNxFlotk+vwzqGVtH/A==}
+    engines: {node: '>= 10.0'}
+    cpu: [s390x]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@napi-rs/pinyin-linux-x64-gnu@1.7.6:
+    resolution: {integrity: sha512-zzocB3KoJG8bkzwjcDq6x6HPgExwwFdsnsSsJVSQzhyZmP/yNDXZrGXXERCpxGbR/R5R1Ud3+G2s8aWy/5YAuw==}
     engines: {node: '>= 10.0'}
     cpu: [x64]
     os: [linux]
@@ -544,8 +580,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/pinyin-linux-x64-musl@1.7.5:
-    resolution: {integrity: sha512-aZhzqTZh3VFwy5rs0LFEtpyqKwWZMWxrRYJk5awbwJg+nu4rSrFtv/9QbmfFhY5vJT2rc4ICabyxmSHngiNKog==}
+  /@napi-rs/pinyin-linux-x64-musl@1.7.6:
+    resolution: {integrity: sha512-xtPgxoCRqSVKUv2UTokquqbylYXCu28T0jx+/yqybURhM6Fs0bYc8yzwx3sdbuxKSdBfP5AgMOkEczFpDFl85A==}
     engines: {node: '>= 10.0'}
     cpu: [x64]
     os: [linux]
@@ -553,8 +589,18 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/pinyin-win32-arm64-msvc@1.7.5:
-    resolution: {integrity: sha512-qMlqDnRXM/dzt3KQKntZ53ea3E0vVXMWOp8EmyQaXhppkaPUBurCKsEYVNu4tO3R9LWFv6crT02bs7uTu1eUHw==}
+  /@napi-rs/pinyin-wasm32-wasi@1.7.6:
+    resolution: {integrity: sha512-7RtA9YHeQNNXj1ugAGBc//ldGCPJwSCZApY+qh0ZQHkK5fxCM7YUgwhX4yZxCIcQgIkJxq1W3n1px6qgjOqzFQ==}
+    engines: {node: '>=14.0.0'}
+    cpu: [wasm32]
+    requiresBuild: true
+    dependencies:
+      '@napi-rs/wasm-runtime': 1.0.1
+    dev: false
+    optional: true
+
+  /@napi-rs/pinyin-win32-arm64-msvc@1.7.6:
+    resolution: {integrity: sha512-o0u5oAsdAReHEhzaiCogL5XsAVjE6XFmYDrhy5WUjKbpb0WsTll6UATiYEOlSADLXni6HoEPMClGXPSVyW9GtQ==}
     engines: {node: '>= 10.0'}
     cpu: [arm64]
     os: [win32]
@@ -562,8 +608,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/pinyin-win32-ia32-msvc@1.7.5:
-    resolution: {integrity: sha512-lmpmY6FM4SymqsDM+1v0469Wpjc1CGvUUedMDzoqHAmdKHaxl4Db95km/DrvvFb9SPWFx6Gma1I8BbztJRlzeA==}
+  /@napi-rs/pinyin-win32-ia32-msvc@1.7.6:
+    resolution: {integrity: sha512-5Q4YsS5qM+jWZWIXtym3le5Ub9iFTEFJCjiWoNTQSKvhbw8fcgn8lgplJJ6dKP70e7jt2WRZIhpzGmsoziq8iA==}
     engines: {node: '>= 10.0'}
     cpu: [ia32]
     os: [win32]
@@ -571,8 +617,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/pinyin-win32-x64-msvc@1.7.5:
-    resolution: {integrity: sha512-0GrSIMZ4kVJzj3/hG76t4mPPLQbiQbQZk8AEBbFNakNnyoms6aCfbmxAG1qoqs1o+M+TAEJlW6mmI6VmSPqTfg==}
+  /@napi-rs/pinyin-win32-x64-msvc@1.7.6:
+    resolution: {integrity: sha512-VAaIK5DXnUui+B+xpjS6zVPkHJS0IsxtWmzc0XNq8BQf5kukVyK11wfbWSLVPNXLmRknFtvfBFu7unClluYb9g==}
     engines: {node: '>= 10.0'}
     cpu: [x64]
     os: [win32]
@@ -580,26 +626,31 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/pinyin@1.7.5:
-    resolution: {integrity: sha512-RaONcl+ue1xt31ScGajc1SJ45TQcyEuNugAZ9ZDsJ+EgjnvVpw0qpD7VvK8+E8Nvc1VW3BfdTF0Ej+zIBtwHSw==}
+  /@napi-rs/pinyin@1.7.6:
+    resolution: {integrity: sha512-alF2O/+eJtqXpcsqmxK6h3g//yaLaH1i6DqMIE7McLIE52lgTUffGB1Cu4EgRmX6hL1vIBWievThxc4Lfsd12w==}
     engines: {node: '>= 10.0'}
     requiresBuild: true
     dependencies:
-      '@napi-rs/triples': 1.2.0
+      '@napi-rs/triples': 2.0.3
     optionalDependencies:
-      '@napi-rs/pinyin-android-arm-eabi': 1.7.5
-      '@napi-rs/pinyin-android-arm64': 1.7.5
-      '@napi-rs/pinyin-darwin-arm64': 1.7.5
-      '@napi-rs/pinyin-darwin-x64': 1.7.5
-      '@napi-rs/pinyin-freebsd-x64': 1.7.5
-      '@napi-rs/pinyin-linux-arm-gnueabihf': 1.7.5
-      '@napi-rs/pinyin-linux-arm64-gnu': 1.7.5
-      '@napi-rs/pinyin-linux-arm64-musl': 1.7.5
-      '@napi-rs/pinyin-linux-x64-gnu': 1.7.5
-      '@napi-rs/pinyin-linux-x64-musl': 1.7.5
-      '@napi-rs/pinyin-win32-arm64-msvc': 1.7.5
-      '@napi-rs/pinyin-win32-ia32-msvc': 1.7.5
-      '@napi-rs/pinyin-win32-x64-msvc': 1.7.5
+      '@napi-rs/pinyin-android-arm-eabi': 1.7.6
+      '@napi-rs/pinyin-android-arm64': 1.7.6
+      '@napi-rs/pinyin-darwin-arm64': 1.7.6
+      '@napi-rs/pinyin-darwin-x64': 1.7.6
+      '@napi-rs/pinyin-freebsd-x64': 1.7.6
+      '@napi-rs/pinyin-linux-arm-gnueabihf': 1.7.6
+      '@napi-rs/pinyin-linux-arm64-gnu': 1.7.6
+      '@napi-rs/pinyin-linux-arm64-musl': 1.7.6
+      '@napi-rs/pinyin-linux-arm64-ohos': 1.7.6
+      '@napi-rs/pinyin-linux-ppc64-gnu': 1.7.6
+      '@napi-rs/pinyin-linux-riscv64-gnu': 1.7.6
+      '@napi-rs/pinyin-linux-s390x-gnu': 1.7.6
+      '@napi-rs/pinyin-linux-x64-gnu': 1.7.6
+      '@napi-rs/pinyin-linux-x64-musl': 1.7.6
+      '@napi-rs/pinyin-wasm32-wasi': 1.7.6
+      '@napi-rs/pinyin-win32-arm64-msvc': 1.7.6
+      '@napi-rs/pinyin-win32-ia32-msvc': 1.7.6
+      '@napi-rs/pinyin-win32-x64-msvc': 1.7.6
     dev: false
 
   /@napi-rs/snappy-android-arm-eabi@7.3.0:
@@ -765,12 +816,22 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/triples@1.2.0:
-    resolution: {integrity: sha512-HAPjR3bnCsdXBsATpDIP5WCrw0JcACwhhrwIAQhiR46n+jm+a2F8kBsfseAuWtSyQ+H3Yebt2k43B5dy+04yMA==}
+  /@napi-rs/triples@2.0.3:
+    resolution: {integrity: sha512-K/RMRH7UDQrGy/jue1Zj3IAvuLaACKgqMOAjUWmf43Y3tj5zcHGYzsJR2FYKdTGNX5sMcXTXGgT6qzQn50KSlQ==}
     dev: false
 
   /@napi-rs/wasm-runtime@0.2.12:
     resolution: {integrity: sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ==}
+    requiresBuild: true
+    dependencies:
+      '@emnapi/core': 1.4.5
+      '@emnapi/runtime': 1.4.5
+      '@tybys/wasm-util': 0.10.0
+    dev: false
+    optional: true
+
+  /@napi-rs/wasm-runtime@1.0.1:
+    resolution: {integrity: sha512-KVlQ/jgywZpixGCKMNwxStmmbYEMyokZpCf2YuIChhfJA2uqfAKNEM8INz7zzTo55iEXfBhIIs3VqYyqzDLj8g==}
     requiresBuild: true
     dependencies:
       '@emnapi/core': 1.4.5
