@@ -356,6 +356,20 @@ export default {
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
+                const member = await bot.guilds.cache
+                    .get(guildId)
+                    .members.fetch(socket.user.id);
+                if (!(member instanceof GuildMember)) {
+                    return callback({ status: Response.GenericError });
+                }
+                const failedChecks: Check[] = await getFailedChecks(
+                    [Check.InVoice, Check.InSessionVoice],
+                    guildId,
+                    member,
+                );
+                if (failedChecks.length > 0) {
+                    return callback({ status: Response.UserNotInChannelError });
+                }
                 const response = await player.handler.stay(item.value);
                 switch (response) {
                     case PlayerResponse.FeatureDisabled:
