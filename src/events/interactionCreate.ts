@@ -16,17 +16,19 @@ import type {
     InteractionIdType,
 } from './interactionCreate.d.js';
 
-const CHANNEL_SELECTMENUS_MAP_KEY = 'channelSelectMenus';
-const MENTIONABLE_SELECTMENUS_MAP_KEY = 'mentionableSelectMenus';
-const ROLE_SELECTMENUS_MAP_KEY = 'roleSelectMenus';
-const STRING_SELECTMENUS_MAP_KEY = 'stringSelectMenus';
-const USER_SELECTMENUS_MAP_KEY = 'userSelectMenus';
-const AUTOCOMPLETES_MAP_KEY = 'autocompletes';
-const BUTTONS_MAP_KEY = 'buttons';
-const CHATINPUT_COMMANDS_MAP_KEY = 'chatInputCommands';
-const MESSAGECONTEXTMENU_COMMANDS_MAP_KEY = 'messageContextMenuCommands';
-const USERCONTEXTMENU_COMMANDS_MAP_KEY = 'userContextMenuCommands';
-const MODALSUBMITS_MAP_KEY = 'modalSubmits';
+enum InteractionMapKeys {
+    ChannelSelectMenus = 'channelSelectMenus',
+    MentionableSelectMenus = 'mentionableSelectMenus',
+    RoleSelectMenus = 'roleSelectMenus',
+    StringSelectMenus = 'stringSelectMenus',
+    UserSelectMenus = 'userSelectMenus',
+    Autocompletes = 'autocompletes',
+    Buttons = 'buttons',
+    ChatInputCommands = 'chatInputCommands',
+    MessageContextMenuCommands = 'messageContextMenuCommands',
+    UserContextMenuCommands = 'userContextMenuCommands',
+    ModalSubmits = 'modalSubmits',
+}
 
 const EMPTY_STRING = '';
 
@@ -385,7 +387,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                CHANNEL_SELECTMENUS_MAP_KEY,
+                InteractionMapKeys.ChannelSelectMenus,
             );
             return;
         }
@@ -393,7 +395,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                MENTIONABLE_SELECTMENUS_MAP_KEY,
+                InteractionMapKeys.MentionableSelectMenus,
             );
             return;
         }
@@ -401,7 +403,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                ROLE_SELECTMENUS_MAP_KEY,
+                InteractionMapKeys.RoleSelectMenus,
             );
             return;
         }
@@ -409,7 +411,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                STRING_SELECTMENUS_MAP_KEY,
+                InteractionMapKeys.StringSelectMenus,
             );
             return;
         }
@@ -417,7 +419,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                USER_SELECTMENUS_MAP_KEY,
+                InteractionMapKeys.UserSelectMenus,
             );
             return;
         }
@@ -425,7 +427,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                AUTOCOMPLETES_MAP_KEY,
+                InteractionMapKeys.Autocompletes,
             );
             return;
         }
@@ -433,7 +435,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                BUTTONS_MAP_KEY,
+                InteractionMapKeys.Buttons,
             );
             return;
         }
@@ -441,7 +443,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                CHATINPUT_COMMANDS_MAP_KEY,
+                InteractionMapKeys.ChatInputCommands,
             );
             return;
         }
@@ -451,7 +453,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                MESSAGECONTEXTMENU_COMMANDS_MAP_KEY,
+                InteractionMapKeys.MessageContextMenuCommands,
             );
             return;
         }
@@ -459,7 +461,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                USERCONTEXTMENU_COMMANDS_MAP_KEY,
+                InteractionMapKeys.UserContextMenuCommands,
             );
             return;
         }
@@ -467,7 +469,7 @@ export default {
             await onInteractionCreate(
                 interaction,
                 interactionHandlerMaps,
-                MODALSUBMITS_MAP_KEY,
+                InteractionMapKeys.ModalSubmits,
             );
             return;
         }
