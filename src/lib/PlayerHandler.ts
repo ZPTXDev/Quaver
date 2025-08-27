@@ -669,6 +669,25 @@ export default class PlayerHandler {
     }
 
     /**
+     * Skip to a specific position in the queue.
+     * @param position - The position to skip to.
+     * @returns Whether or not the player was skipped to the position.
+     */
+    async skipTo(position: number): Promise<PlayerResponse> {
+        if (this.player.queue.tracks.length > 1) {
+            const moveResponse = await this.move(position, 1);
+            if (moveResponse !== PlayerResponse.Success) {
+                return moveResponse;
+            }
+        }
+        const skipResponse = await this.skip();
+        if (skipResponse !== PlayerResponse.Success) {
+            return skipResponse;
+        }
+        return PlayerResponse.Success;
+    }
+
+    /**
      * Stop the player.
      * @returns Whether or not the player was stopped.
      */
