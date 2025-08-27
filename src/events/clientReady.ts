@@ -6,7 +6,7 @@ import type { PresenceStatusData } from 'discord.js';
 import { ActivityType } from 'discord.js';
 
 export default {
-    name: 'ready',
+    name: 'clientReady',
     once: true,
     async execute(client: QuaverClient): Promise<void> {
         const { startup } = await import('#src/main.js');
