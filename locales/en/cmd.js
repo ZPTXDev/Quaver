@@ -297,6 +297,21 @@ export default {
             },
         },
     },
+    SKIPTO: {
+        DESCRIPTION: 'Skip the current track and play a specific track in the queue.',
+        OPTION: {
+            POSITION: 'The position of the track to skip to.',
+        },
+        RESPONSE: {
+            NOT_REQUESTER: 'You are not the requester of the current track and do not have sufficient permissions to skip it.',
+            OUT_OF_RANGE: 'Your input was out of range.',
+            SUCCESS: {
+                DEFAULT: 'Skipped **%1**\nNow playing **%2**',
+                FORCED: 'Skipped **%1** by force\nNow playing **%2**',
+                MANAGER: 'Skipped **%1** by manager bypass\nNow playing **%2**',
+            },
+        },
+    },
     STOP: {
         DESCRIPTION: 'Stop the current track and clear the queue.',
         RESPONSE: {
