@@ -21,7 +21,7 @@ export default {
         });
         if (version.includes('-')) {
             logger.warn({
-                message: `You are running an ${version.includes('-next') ? 'experimental' : version.includes('-staging') ? 'pre-release' : 'unsupported'} version of Quaver. Please report bugs using the link above, and note that features may change or be removed entirely prior to release.`,
+                message: `You are running ${version.includes('-next') ? 'an experimental' : version.includes('-staging') ? 'a pre-release' : 'an unsupported'} version of Quaver. ${version.includes('-next') || version.includes('-staging') ? 'Please report bugs using the link above, and note that features may change or be removed entirely prior to release.' : 'Please switch to a supported version of Quaver if you encounter any issues.'}`,
                 label: 'Quaver',
             });
         }
