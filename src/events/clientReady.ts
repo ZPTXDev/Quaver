@@ -16,7 +16,7 @@ export default {
             label: 'Discord',
         });
         logger.info({
-            message: `Running version ${version}. For help, see https://github.com/ZPTXDev/Quaver/issues.`,
+            message: `Running version ${version}, started in ${Date.now() - startup.startTime}ms. For help, see https://github.com/ZPTXDev/Quaver/issues.`,
             label: 'Quaver',
         });
         if (version.includes('-')) {
