@@ -27,7 +27,7 @@ jobs:
       - name: Build
         run: pnpm build
       - name: Release
-        uses: cycjimmy/semantic-release-action@v4
+        uses: cycjimmy/semantic-release-action@v5
         with:
           branches: |
             [
