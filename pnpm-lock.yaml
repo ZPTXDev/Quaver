@@ -44,8 +44,8 @@ dependencies:
     specifier: ^7.2.0
     version: 7.2.0
   cacheable:
-    specifier: ^1.10.4
-    version: 1.10.4
+    specifier: ^2.0.0
+    version: 2.0.0
   crypto-js:
     specifier: ^4.2.0
     version: 4.2.0
@@ -156,6 +156,26 @@ packages:
   /@babel/runtime@7.28.2:
     resolution: {integrity: sha512-KHp2IflsnGywDjBWDkR9iEqiWSpc8GIi0lgTT3mOElT0PP1tG26P4tmFI2YvAdzgq9RGyoHZQEIEdZy6Ec5xCA==}
     engines: {node: '>=6.9.0'}
+    dev: false
+
+  /@cacheable/memoize@2.0.0:
+    resolution: {integrity: sha512-Q6PjhmFuLOKLFSLrs/2NaGvryuiTsUJON+rJlUxkzXQowja7hmqD9Y8iFU9UgocMoUbW31bMcpyGZWj5A8Q+1Q==}
+    dependencies:
+      '@cacheable/utils': 2.0.0
+    dev: false
+
+  /@cacheable/memory@2.0.0:
+    resolution: {integrity: sha512-zVRFSZvkRYmDPxn7H83c7GqzJeXCb8fEuz0q/McG9VtiF/somlQwyRFstBSyKFJyq/IvUGfir1uSKg/WkWiTTA==}
+    dependencies:
+      '@cacheable/memoize': 2.0.0
+      '@cacheable/utils': 2.0.0
+      '@keyv/bigmap': 1.0.0
+      hookified: 1.12.0
+      keyv: 5.5.0(patch_hash=h3er7bumu2j76zoshtmiqfeieq)
+    dev: false
+
+  /@cacheable/utils@2.0.0:
+    resolution: {integrity: sha512-Y+ZxdxSo2ErcROjNCdButjobQDuu4mpx875uhItK6ZqW3XmDikG+YIjh30ELfOZnVFjxfpvgjz57HbYJ0m1ApQ==}
     dev: false
 
   /@colors/colors@1.6.0:
@@ -424,6 +444,13 @@ packages:
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: /wrap-ansi@7.0.0
     dev: true
+
+  /@keyv/bigmap@1.0.0:
+    resolution: {integrity: sha512-N2UsRSXlWwbvYKdFVS7sKqj6oXGegELh+zr9VripWDc8grsq8KBNp8JHI+9AQuUEFiM1S7+tm6lLp/lmbBCqCw==}
+    engines: {node: '>= 20'}
+    dependencies:
+      hookified: 1.12.0
+    dev: false
 
   /@keyv/serialize@1.1.0:
     resolution: {integrity: sha512-RlDgexML7Z63Q8BSaqhXdCYNBy/JQnqYIwxofUrNLGCblOMHp+xux2Q8nLMLlPpgHQPoU0Do8Z6btCpRBEqZ8g==}
@@ -1548,10 +1575,13 @@ packages:
       keyv: 5.5.0(patch_hash=h3er7bumu2j76zoshtmiqfeieq)
     dev: false
 
-  /cacheable@1.10.4:
-    resolution: {integrity: sha512-Gd7ccIUkZ9TE2odLQVS+PDjIvQCdJKUlLdJRVvZu0aipj07Qfx+XIej7hhDrKGGoIxV5m5fT/kOJNJPQhQneRg==}
+  /cacheable@2.0.0:
+    resolution: {integrity: sha512-b8AHJNiDmWu7Eg83rRDhu6mbG2qRG+84tAFq1wS+vgHEp6x9qYeyPz5lszfefftbmXpvjzCqcvZiK4fOO1iNMQ==}
     dependencies:
-      hookified: 1.11.0
+      '@cacheable/memoize': 2.0.0
+      '@cacheable/memory': 2.0.0
+      '@cacheable/utils': 2.0.0
+      hookified: 1.12.0
       keyv: 5.5.0(patch_hash=h3er7bumu2j76zoshtmiqfeieq)
     dev: false
 
@@ -2422,8 +2452,8 @@ packages:
       function-bind: 1.1.2
     dev: false
 
-  /hookified@1.11.0:
-    resolution: {integrity: sha512-aDdIN3GyU5I6wextPplYdfmWCo+aLmjjVbntmX6HLD5RCi/xKsivYEBhnRD+d9224zFf008ZpLMPlWF0ZodYZw==}
+  /hookified@1.12.0:
+    resolution: {integrity: sha512-hMr1Y9TCLshScrBbV2QxJ9BROddxZ12MX9KsCtuGGy/3SmmN5H1PllKerrVlSotur9dlE8hmUKAOSa3WDzsZmQ==}
     dev: false
 
   /http-cache-semantics@4.2.0:
