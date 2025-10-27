@@ -115,8 +115,8 @@ devDependencies:
     specifier: ^4.2.2
     version: 4.2.2
   '@types/express':
-    specifier: ^5.0.4
-    version: 5.0.4
+    specifier: ^5.0.5
+    version: 5.0.5
   '@types/lodash-es':
     specifier: ^4.17.12
     version: 4.17.12
@@ -1003,8 +1003,8 @@ packages:
       '@types/send': 1.2.1
     dev: true
 
-  /@types/express@5.0.4:
-    resolution: {integrity: sha512-g64dbryHk7loCIrsa0R3shBnEu5p6LPJ09bu9NG58+jz+cRUjFrc3Bz0kNQ7j9bXeCsrRDvNET1G54P/GJkAyA==}
+  /@types/express@5.0.5:
+    resolution: {integrity: sha512-LuIQOcb6UmnF7C1PCFmEU1u2hmiHL43fgFQX67sN3H4Z+0Yk0Neo++mFsBjhOAuLzvlQeqAAkeDOZrJs9rzumQ==}
     dependencies:
       '@types/body-parser': 1.19.6
       '@types/express-serve-static-core': 5.1.0
