@@ -50,8 +50,8 @@ dependencies:
     specifier: ^4.2.0
     version: 4.2.0
   discord.js:
-    specifier: ^14.24.1
-    version: 14.24.1
+    specifier: ^14.24.2
+    version: 14.24.2
   express:
     specifier: ^5.1.0
     version: 5.1.0
@@ -1759,8 +1759,8 @@ packages:
     resolution: {integrity: sha512-kC94ANsk8ackj8ENTuO8joTNEL0KtymVhHy9dyEC/s4QAZ7GCx40dYEzQaadyo8w+oP0X8QydE/nzAWRylTGtQ==}
     dev: false
 
-  /discord.js@14.24.1:
-    resolution: {integrity: sha512-LzL+MTGxB9mBwD8FjvkMwcIL4UtgG04e713U3+euqPCvOphhoVEoPpUNTvBPw4iJOas2uiuuh3JcveYSxIn8Tg==}
+  /discord.js@14.24.2:
+    resolution: {integrity: sha512-VMEDbmguRdX/EeMaTsf9Mb0IQA90WdYF2cn4QDfslQFXgQ6LFtmlPn0FSotnS0kcFbFp+JBSIxtnF+bnAHG/hQ==}
     engines: {node: '>=18'}
     dependencies:
       '@discordjs/builders': 1.13.0
