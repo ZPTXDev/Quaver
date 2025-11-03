@@ -133,8 +133,8 @@ devDependencies:
     specifier: ^3.2.0
     version: 3.2.0
   globals:
-    specifier: ^16.4.0
-    version: 16.4.0
+    specifier: ^16.5.0
+    version: 16.5.0
   prettier:
     specifier: ^3.6.2
     version: 3.6.2
@@ -2384,8 +2384,8 @@ packages:
     engines: {node: '>=18'}
     dev: true
 
-  /globals@16.4.0:
-    resolution: {integrity: sha512-ob/2LcVVaVGCYN+r14cnwnoDPUufjiYgSqRhiFD0Q1iI4Odora5RE8Iv1D24hAz5oMophRGkGz+yuvQmmUMnMw==}
+  /globals@16.5.0:
+    resolution: {integrity: sha512-c/c15i26VrJ4IRt5Z89DnIzCGDn9EcebibhAOjw5ibqEHsE1wLUgkPn9RDmNcUKyU87GeaL633nyJ+pplFR2ZQ==}
     engines: {node: '>=18'}
     dev: true
 
