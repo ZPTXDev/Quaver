@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
-    "@eslint/js": "^9.39.0",
+    "@eslint/js": "^9.39.1",
     "@types/crypto-js": "^4.2.2",
     "@types/express": "^5.0.5",
     "@types/lodash-es": "^4.17.12",
