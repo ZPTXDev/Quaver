@@ -1,48 +1,38 @@
-import { ForceType } from '#src/lib/ReplyHandler.js';
-import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import {
-    confirmationTimeout,
-    data,
-    logger,
-    MessageOptionsBuilderType,
-} from '#src/lib/util/common.js';
-import type { Language } from '#src/lib/util/constants.js';
-import { Check } from '#src/lib/util/constants.js';
-import { settings } from '#src/lib/util/settings.js';
 import {
     buildMessageOptions,
     buildSettingsPage,
     checkLocaleCompletion,
-    getGuildLocaleString,
-    getLocaleString,
-} from '#src/lib/util/util.js';
+} from '#src/lib/util/util';
 import { roundTo } from '@zptxdev/zptx-lib';
-import type { StringSelectMenuInteraction } from 'discord.js';
 import { ContainerComponent } from 'discord.js';
+import { ForceType, QuaverGuild } from '#src/lib';
+import { StringSelectMenuHandler } from '#src/lib/builders';
+import {
+    confirmationTimeout,
+    logger,
+    MessageOptionsBuilderType,
+} from '#src/lib/util/common';
+import { Check } from '#src/lib/util/constants';
+import { settings } from '#src/lib/util/settings';
 
-export default {
-    name: 'language',
-    checks: [Check.InteractionStarter],
-    async execute(
-        interaction: QuaverInteraction<StringSelectMenuInteraction>,
-    ): Promise<void> {
+export default new StringSelectMenuHandler()
+    .setChecks([Check.InteractionStarter])
+    .setExecute(async function(interaction): Promise<void> {
+        const guild = await QuaverGuild.wrap(interaction.guild);
         if (!confirmationTimeout[interaction.message.id]) {
-            await interaction.replyHandler.locale(
-                'DISCORD.INTERACTION.EXPIRED',
+            await interaction.replyHandler.reply(
+                guild.locale('DISCORD.INTERACTION.EXPIRED'),
                 { components: [], force: ForceType.Update },
             );
             return;
         }
         clearTimeout(confirmationTimeout[interaction.message.id]);
         confirmationTimeout[interaction.message.id] = setTimeout(
-            async (message): Promise<void> => {
+            async (g, message): Promise<void> => {
                 try {
                     await message.edit(
                         buildMessageOptions(
-                            await getGuildLocaleString(
-                                message.guildId,
-                                'DISCORD.INTERACTION.EXPIRED',
-                            ),
+                            g.locale('DISCORD.INTERACTION.EXPIRED'),
                             { components: [] },
                         ),
                     );
@@ -56,7 +46,8 @@ export default {
                 }
                 delete confirmationTimeout[message.id];
             },
-            30 * 1000,
+            30_000,
+            guild,
             interaction.message,
         );
         const option = interaction.values[0];
@@ -68,7 +59,7 @@ export default {
             );
             return;
         }
-        await data.guild.set(interaction.guildId, 'settings.locale', option);
+        await guild.settings.set('locale', option);
         if (localeCompletion.completion !== 100) {
             await interaction.replyHandler.reply(
                 `This language is incomplete. Completion: \`${roundTo(
@@ -84,21 +75,12 @@ export default {
                 { type: MessageOptionsBuilderType.Warning, ephemeral: true },
             );
         }
-        const guildLocaleCode =
-            (await data.guild.get<keyof typeof Language>(
-                interaction.guildId,
-                'settings.locale',
-            )) ?? (settings.defaultLocaleCode as keyof typeof Language);
-        const { containers } = await buildSettingsPage(
-            interaction,
-            guildLocaleCode,
-            'language',
-        );
+        const { containers } = await buildSettingsPage(interaction, 'language');
         if (
             !(interaction.message.components[0] instanceof ContainerComponent)
         ) {
             await interaction.replyHandler.reply(
-                getLocaleString(guildLocaleCode, 'DISCORD.INTERACTION.EXPIRED'),
+                guild.locale('DISCORD.INTERACTION.EXPIRED'),
                 { components: [], force: ForceType.Update },
             );
             return;
@@ -110,5 +92,4 @@ export default {
         await interaction.replyHandler.reply(containers, {
             force: ForceType.Update,
         });
-    },
-};
+    });

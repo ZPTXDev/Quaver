@@ -1,38 +1,28 @@
-import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import type {
-    ApplicationCommandOptionChoiceData,
-    AutocompleteInteraction,
-} from 'discord.js';
-import { cache, data } from '#src/lib/util/common.js';
+import type { ApplicationCommandOptionChoiceData } from 'discord.js';
 import { request } from 'undici';
+import { QuaverGuild } from '#src/lib';
+import { AutocompleteHandler } from '#src/lib/builders';
+import { cache } from '#src/lib/util/common';
 import {
     acceptableSources,
     queryOverrides,
     sourceList,
     YOUTUBE_AUTOCOMPLETE_URL,
-} from '#src/lib/util/constants.js';
-import { getGuildLocaleString } from '#src/lib/util/util.js';
+} from '#src/lib/util/constants';
 
-export default {
-    name: 'play',
-    async execute(
-        interaction: QuaverInteraction<AutocompleteInteraction>,
-    ): Promise<void> {
+export default new AutocompleteHandler().setExecute(
+    async function(interaction): Promise<void> {
         const focused = interaction.options.getFocused();
         if (focused === '') return interaction.respond([]);
+        const guild = await QuaverGuild.wrap(interaction.guild);
         const matchingOverride = queryOverrides.find((q): boolean =>
             focused.startsWith(q),
         );
         const source = matchingOverride
             ? sourceList[matchingOverride]
-            : ((await data.guild.get<string>(
-                  interaction.guildId,
-                  'settings.source',
-              )) ?? Object.keys(acceptableSources)[0]);
-        const sourceName = await getGuildLocaleString(
-            interaction.guildId,
-            `MISC.SOURCES.${source.toUpperCase()}`,
-        );
+            : ((await guild.settings.get<string>('source')) ??
+              Object.keys(acceptableSources)[0]);
+        const sourceName = guild.locale(`MISC.SOURCES.${source.toUpperCase()}`);
         const query = matchingOverride
             ? focused.slice(matchingOverride.length)
             : focused;
@@ -95,4 +85,4 @@ export default {
             return interaction.respond([]);
         }
     },
-};
+);

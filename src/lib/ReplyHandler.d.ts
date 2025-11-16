@@ -1,4 +1,4 @@
-import type { ForceType } from './ReplyHandler.js';
+import type { ForceType } from '.';
 
 export type AdditionalBuilderOptions = {
     ephemeral?: boolean;

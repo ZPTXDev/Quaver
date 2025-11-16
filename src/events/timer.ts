@@ -1,24 +1,24 @@
-import type { QuaverPlayer } from '#src/lib/util/common.d.js';
+import { QuaverGuild } from '#src/lib';
+import { EventHandler } from '#src/lib/builders';
 
-export default {
-    name: 'timer',
-    once: false,
-    async execute(): Promise<void> {
-        const { bot, io } = await import('#src/main.js');
-        bot.music.players.cache.forEach((player: QuaverPlayer): void => {
-            if (!player.queue?.current) return;
-            const user = bot.users.cache.get(player.queue.current.requesterId);
-            player.queue.current.requesterTag = user?.tag;
-            player.queue.current.requesterAvatar = user?.avatar;
-            io.to(`guild:${player.id}`).emit('intervalTrackUpdate', {
-                elapsed: player.position ?? 0,
-                duration: player.queue.current.info.length,
-                track: player.queue.current,
-                skip: player.skip,
-                nothingPlaying:
-                    !player.queue.current ||
-                    (!player.playing && !player.paused),
-            });
+// no setEvent call as this event isn't emitted by discord.js
+export default new EventHandler().setExecute(async function(): Promise<void> {
+    const { client } = await import('#src/main');
+    for (const player of client.music.players.cache.values()) {
+        if (!player.queue?.current) continue;
+        const user = player.client.users.cache.get(
+            player.queue.current.requesterId,
+        );
+        const guild = await QuaverGuild.wrap(player.guild);
+        player.queue.current.requesterTag = user?.tag;
+        player.queue.current.requesterAvatar = user?.avatar;
+        guild.sendWebUpdate('intervalTrackUpdate', {
+            elapsed: player.position ?? 0,
+            duration: player.queue.current.info.length,
+            track: player.queue.current,
+            skip: player.memory.skip,
+            nothingPlaying:
+                !player.queue.current || (!player.playing && !player.paused),
         });
-    },
-};
+    }
+});

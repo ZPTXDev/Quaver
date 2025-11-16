@@ -1,21 +1,3 @@
-import type {
-    QuaverClient,
-    QuaverPlayer,
-    WhitelistedFeatures,
-} from '#src/lib/util/common.d.js';
-import {
-    data,
-    logger,
-    MessageOptionsBuilderType,
-    setLocales,
-} from '#src/lib/util/common.js';
-import { settings } from '#src/lib/util/settings.js';
-import {
-    getGuildLocaleString,
-    updateAcceptableSources,
-    updateQueryOverrides,
-    updateSourceManagers,
-} from '#src/lib/util/util.js';
 import { load as effectsLoad } from '@lavaclient/plugin-effects';
 import { load as queueLoad } from '@lavaclient/plugin-queue';
 import {
@@ -26,36 +8,45 @@ import {
 } from '@zptxdev/zptx-lib';
 import {
     AttachmentBuilder,
-    Client,
     Collection,
     ContainerBuilder,
     FileBuilder,
-    GatewayDispatchEvents,
     GatewayIntentBits,
     SeparatorBuilder,
     TextDisplayBuilder,
 } from 'discord.js';
-import type { Express } from 'express';
-import express from 'express';
-import { readdirSync, readFileSync } from 'fs';
-import { writeFile } from 'fs/promises';
-import * as http from 'http';
-import * as https from 'https';
+import { default as express, type Express } from 'express';
 import type { ClientEvents } from 'lavaclient';
-import { Node } from 'lavaclient';
-import { createInterface } from 'readline';
-import type { Socket } from 'socket.io';
-import { Server } from 'socket.io';
-import { inspect } from 'util';
-import { version } from './lib/util/version.js';
-import type { QuaverEvent, QuaverMusicEvent } from './main.d.js';
-import type {
-    AutocompleteHandler,
-    ChatInputCommandHandler,
-    ComponentTypeHandler,
-} from './events/interactionCreate.d.js';
+import { readdirSync, readFileSync } from 'node:fs';
+import { writeFile } from 'node:fs/promises';
+import * as http from 'node:http';
+import * as https from 'node:https';
+import { inspect } from 'node:util';
+import { createInterface } from 'node:readline';
+import { Server, type Socket } from 'socket.io';
 import yoctoSpinner from 'yocto-spinner';
 import colors from 'yoctocolors';
+import {
+    type InteractionHandlerMapsFlat,
+    QuaverClient,
+    QuaverGuild,
+    type QuaverPlayer,
+    type WhitelistedFeatures,
+} from './lib';
+import type { QuaverMusicEvent } from './main.d';
+import {
+    data,
+    logger,
+    MessageOptionsBuilderType,
+    setLocales,
+} from './lib/util/common';
+import { settings } from './lib/util/settings';
+import {
+    updateAcceptableSources,
+    updateQueryOverrides,
+    updateSourceManagers,
+} from './lib/util/util';
+import { version } from './lib/util/version';
 
 export const startup = { started: false, startTime: Date.now() };
 logger.info({
@@ -84,15 +75,15 @@ if (settings.features.web.enabled) {
             label: 'Quaver',
         });
         app.get('/stats', async (req, res): Promise<void> => {
-            const totalSessions = bot.music?.players?.cache.size;
+            const totalSessions = client.music?.players?.cache.size;
             const activeSessions = Array.from(
-                bot.music?.players?.cache.values(),
+                client.music?.players?.cache.values(),
             ).filter(
                 (player: QuaverPlayer): boolean =>
-                    !player.timeout && !player.pauseTimeout,
+                    !player.timeout.standard && !player.timeout.pause,
             ).length;
             const totalQueued = Array.from(
-                bot.music?.players?.cache.values(),
+                client.music?.players?.cache.values(),
             ).reduce(
                 (total: number, player: QuaverPlayer): number =>
                     total + player.queue?.tracks.length,
@@ -112,8 +103,8 @@ if (settings.features.web.enabled) {
                     quaver: version,
                 },
                 cache: {
-                    guilds: bot.guilds.cache.size,
-                    users: bot.users.cache.size,
+                    guilds: client.guilds.cache.size,
+                    users: client.users.cache.size,
                 },
                 memory: process.memoryUsage(),
             });
@@ -147,7 +138,7 @@ if (settings.features.web.enabled) {
 if (settings.features.web.enabled) {
     spinner.start(`Setting up ${colors.cyan('websocket server')}`);
 }
-export const io = settings.features.web.enabled
+const io = settings.features.web.enabled
     ? new Server(server, {
           cors: { origin: settings.features.web.allowedOrigins },
       })
@@ -158,9 +149,7 @@ if (io) {
     io.on('connection', async (socket): Promise<void> => {
         const webEventFiles = readdirSync(
             getAbsoluteFileURL(import.meta.url, ['events', 'web']),
-        ).filter(
-            (file): boolean => file.endsWith('.js') || file.endsWith('.ts'),
-        );
+        ).filter((file): boolean => file.endsWith('.mjs'));
         for await (const file of webEventFiles) {
             const event: {
                 default: {
@@ -204,57 +193,28 @@ data.guild.instance.on('error', async (err: Error): Promise<void> => {
 });
 
 spinner.start(`Setting up ${colors.cyan('Discord client')}`);
-export const bot: QuaverClient = new Client({
+export const client = new QuaverClient(io, {
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildVoiceStates,
         GatewayIntentBits.GuildMessages,
     ],
 });
-bot.chatInputCommands = new Collection();
-bot.autocompletes = new Collection();
 spinner.success();
 
 spinner.start(`Connecting to ${colors.cyan('Lavalink server')}`);
-bot.music = new Node({
-    info: {
-        host: settings.lavalink.host,
-        port: settings.lavalink.port,
-        auth: settings.lavalink.password,
-        tls: !!settings.lavalink.secure,
-    },
-    ws: {
-        reconnecting: {
-            delay: settings.lavalink.reconnect.delay ?? 3000,
-            tries: settings.lavalink.reconnect.tries ?? 5,
-        },
-    },
-    discord: {
-        sendGatewayCommand: (id, payload): void =>
-            bot.guilds.cache.get(id)?.shard?.send(payload),
-    },
-});
+client.connectToMusicNode();
 spinner.success();
-
-bot.ws.on(
-    GatewayDispatchEvents.VoiceServerUpdate,
-    async (payload): Promise<boolean> =>
-        bot.music.players.handleVoiceUpdate(payload),
-);
-bot.ws.on(
-    GatewayDispatchEvents.VoiceStateUpdate,
-    async (payload): Promise<boolean> =>
-        bot.music.players.handleVoiceUpdate(payload),
-);
 
 spinner.start(`Verifying ${colors.cyan('Lavalink plugins and sources')}`);
 const requiredPlugins = [
     'lavasrc-plugin',
+    // bundled in lavasrc
     'lavalyrics-plugin',
     'youtube-plugin',
     'java-lyrics-plugin',
 ];
-const info = await bot.music.api.info();
+const info = await client.music.api.info();
 if (
     info.plugins.length === 0 ||
     !info.plugins
@@ -315,14 +275,14 @@ rl.on('line', async (input): Promise<void> => {
             break;
         case 'sessions':
             console.log(
-                `There are currently ${bot.music.players.cache.size} active session(s).`,
+                `There are currently ${client.music.players.cache.size} active session(s).`,
             );
             break;
         case 'stats': {
-            const uptime = msToTime(bot.uptime);
+            const uptime = msToTime(client.uptime);
             const uptimeString = msToTimeString(uptime);
             console.log(
-                `Statistics:\nGuilds: ${bot.guilds.cache.size}\nUptime: ${uptimeString}`,
+                `Statistics:\nGuilds: ${client.guilds.cache.size}\nUptime: ${uptimeString}`,
             );
             break;
         }
@@ -335,7 +295,7 @@ rl.on('line', async (input): Promise<void> => {
                 console.log('Usage: whitelist <guildId> <feature> [duration]');
                 break;
             }
-            const guild = await bot.guilds.fetch(guildId);
+            const guild = await client.guilds.fetch(guildId);
             if (!guild) {
                 console.log('Guild not found.');
                 break;
@@ -427,7 +387,7 @@ rl.on('close', async (): Promise<void> => shuttingDown('SIGINT'));
 let inProgress = false;
 
 /**
- * Shuts the bot down gracefully.
+ * Shuts the client down gracefully.
  * @param eventType - The event type triggering the shutdown. This determines if the shutdown was caused by a crash.
  * @param err - The error object, if any.
  */
@@ -443,85 +403,72 @@ export async function shuttingDown(
     });
     try {
         if (startup.started) {
-            const players = bot.music.players;
+            const players = client.music.players;
             if (players.cache.size < 1) return;
             logger.info({
                 message: 'Disconnecting from all guilds...',
                 label: 'Quaver',
             });
             for (const pair of players.cache) {
-                const player: QuaverPlayer = pair[1];
+                const player = pair[1];
+                const guild = await QuaverGuild.wrap(player.guild);
                 logger.info({
-                    message: `[G ${player.id}] Disconnecting (restarting)`,
+                    message: `[G ${guild.id}] Disconnecting (restarting)`,
                     label: 'Quaver',
                 });
                 const fileBuffer = [];
                 if (player.queue.current && (player.playing || player.paused)) {
-                    fileBuffer.push(
-                        `${await getGuildLocaleString(
-                            player.id,
-                            'MISC.CURRENT',
-                        )}:`,
-                    );
+                    fileBuffer.push(`${guild.locale('MISC.CURRENT')}:`);
                     fileBuffer.push(player.queue.current.info.uri);
                 }
                 if (player.queue.tracks.length > 0) {
-                    fileBuffer.push(
-                        `${await getGuildLocaleString(
-                            player.id,
-                            'MISC.QUEUE',
-                        )}:`,
-                    );
+                    fileBuffer.push(`${guild.locale('MISC.QUEUE')}:`);
                     fileBuffer.push(
                         player.queue.tracks
                             .map((track): string => track.info.uri)
                             .join('\n'),
                     );
                 }
-                await player.handler.disconnect();
-                await player.handler.send(
-                    new ContainerBuilder({
-                        components: [
-                            new TextDisplayBuilder()
-                                .setContent(
-                                    `${await getGuildLocaleString(
-                                        player.id,
-                                        [
-                                            'exit',
-                                            'SIGINT',
-                                            'SIGTERM',
-                                            'lavalink',
-                                        ].includes(eventType)
-                                            ? 'MUSIC.PLAYER.RESTARTING.DEFAULT'
-                                            : 'MUSIC.PLAYER.RESTARTING.CRASHED',
-                                    )}${
-                                        fileBuffer.length > 0
-                                            ? `\n${await getGuildLocaleString(
-                                                  player.id,
-                                                  'MUSIC.PLAYER.RESTARTING.QUEUE_DATA_ATTACHED',
-                                              )}`
-                                            : ''
-                                    }`,
-                                )
-                                .toJSON(),
-                            new TextDisplayBuilder()
-                                .setContent(
-                                    await getGuildLocaleString(
-                                        player.id,
-                                        'MUSIC.PLAYER.RESTARTING.APOLOGY',
-                                    ),
-                                )
-                                .toJSON(),
+                await player.disconnect();
+                await player.sendMessage(
+                    new ContainerBuilder()
+                        .addTextDisplayComponents(
+                            new TextDisplayBuilder().setContent(
+                                `${guild.locale(
+                                    [
+                                        'exit',
+                                        'SIGINT',
+                                        'SIGTERM',
+                                        'lavalink',
+                                    ].includes(eventType)
+                                        ? 'MUSIC.PLAYER.RESTARTING.DEFAULT'
+                                        : 'MUSIC.PLAYER.RESTARTING.CRASHED',
+                                )}${
+                                    fileBuffer.length > 0
+                                        ? `\n${guild.locale(
+                                              'MUSIC.PLAYER.RESTARTING.QUEUE_DATA_ATTACHED',
+                                          )}`
+                                        : ''
+                                }`,
+                            ),
+                            guild.builders.textDisplayLocale(
+                                'MUSIC.PLAYER.RESTARTING.APOLOGY',
+                            ),
+                        )
+                        .addSeparatorComponents(
+                            ...(fileBuffer.length > 0
+                                ? [new SeparatorBuilder()]
+                                : []),
+                        )
+                        .addFileComponents(
                             ...(fileBuffer.length > 0
                                 ? [
-                                      new SeparatorBuilder().toJSON(),
-                                      new FileBuilder()
-                                          .setURL('attachment://queue.txt')
-                                          .toJSON(),
+                                      new FileBuilder().setURL(
+                                          'attachment://queue.txt',
+                                      ),
                                   ]
                                 : []),
-                        ],
-                    }),
+                        ),
                     {
                         type: MessageOptionsBuilderType.Warning,
                         files:
@@ -582,7 +529,7 @@ export async function shuttingDown(
                 }
             }
         }
-        await bot.destroy();
+        await client.destroy();
         process.exit();
     }
 }
@@ -616,31 +563,15 @@ setLocales(locales);
 spinner.success();
 
 spinner.start(`Loading ${colors.cyan('command handlers')}`);
-const commandFiles = readdirSync(
-    getAbsoluteFileURL(import.meta.url, ['commands', 'chatInputCommands']),
-).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
-for await (const file of commandFiles) {
-    const command: { default: ChatInputCommandHandler } = await import(
-        getAbsoluteFileURL(import.meta.url, [
-            'commands',
-            'chatInputCommands',
-            file,
-        ]).toString()
-    );
-    bot.chatInputCommands.set(command.default.data.name, command.default);
-}
+await client.loadHandlers(
+    import.meta.url,
+    ['commands', 'chatInputCommands'],
+    'chatInputCommands',
+);
 spinner.success();
 
 spinner.start(`Loading ${colors.cyan('autocomplete handlers')}`);
-const autocompleteFiles = readdirSync(
-    getAbsoluteFileURL(import.meta.url, ['autocompletes']),
-).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
-for await (const file of autocompleteFiles) {
-    const autocomplete: { default: AutocompleteHandler } = await import(
-        getAbsoluteFileURL(import.meta.url, ['autocompletes', file]).toString()
-    );
-    bot.autocompletes.set(autocomplete.default.name, autocomplete.default);
-}
+await client.loadHandlers(import.meta.url, ['autocompletes'], 'autocompletes');
 spinner.success();
 
 spinner.start(`Loading ${colors.cyan('component handlers')}`);
@@ -648,55 +579,22 @@ const componentsFolders = readdirSync(
     getAbsoluteFileURL(import.meta.url, ['components']),
 );
 for await (const folder of componentsFolders) {
-    const componentFiles = readdirSync(
-        getAbsoluteFileURL(import.meta.url, ['components', folder]),
-    ).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
-    for await (const file of componentFiles) {
-        const component: { default: ComponentTypeHandler } = await import(
-            getAbsoluteFileURL(import.meta.url, [
-                'components',
-                folder,
-                file,
-            ]).toString()
-        );
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if (!(bot as Record<string, any>)[folder]) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (bot as Record<string, any>)[folder] = new Collection();
-        }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (bot as Record<string, any>)[folder].set(
-            component.default.name,
-            component.default,
-        );
-    }
+    await client.loadHandlers(
+        import.meta.url,
+        ['components', folder],
+        folder as keyof InteractionHandlerMapsFlat,
+    );
 }
 spinner.success();
 
 spinner.start(`Loading ${colors.cyan('event handlers')}`);
-const eventFiles = readdirSync(
-    getAbsoluteFileURL(import.meta.url, ['events']),
-).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
-for await (const file of eventFiles) {
-    const event: { default: QuaverEvent } = await import(
-        getAbsoluteFileURL(import.meta.url, ['events', file]).toString()
-    );
-    if (event.default.once) {
-        bot.once(event.default.name, (...args): void | Promise<void> =>
-            event.default.execute(...args),
-        );
-    } else {
-        bot.on(event.default.name, (...args): void | Promise<void> =>
-            event.default.execute(...args),
-        );
-    }
-}
+await client.loadEvents(import.meta.url, ['events']);
 spinner.success();
 
 spinner.start(`Loading ${colors.cyan('lavaclient event handlers')}`);
 const musicEventFiles = readdirSync(
     getAbsoluteFileURL(import.meta.url, ['events', 'music']),
-).filter((file): boolean => file.endsWith('.js') || file.endsWith('.ts'));
+).filter((file): boolean => file.endsWith('.mjs'));
 for await (const file of musicEventFiles) {
     const event: { default: QuaverMusicEvent } = await import(
         getAbsoluteFileURL(import.meta.url, [
@@ -706,14 +604,14 @@ for await (const file of musicEventFiles) {
         ]).toString()
     );
     if (event.default.once) {
-        bot.music.once(
+        client.music.once(
             event.default.name as keyof ClientEvents,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (...args: any[]): void | Promise<void> =>
                 event.default.execute(...args),
         );
     } else {
-        bot.music.on(
+        client.music.on(
             event.default.name as keyof ClientEvents,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (...args: any[]): void | Promise<void> =>
@@ -724,11 +622,11 @@ for await (const file of musicEventFiles) {
 spinner.success();
 
 if (settings.features.web.enabled) {
-    setInterval((): boolean => bot.emit('timer'), 500);
+    setInterval((): boolean => client.emit('timer'), 500);
 }
 
 spinner.start(`Logging in to ${colors.cyan('Discord')}`);
-await bot.login(settings.token);
+await client.login(settings.token);
 spinner.success();
 
 [

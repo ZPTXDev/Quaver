@@ -1,14 +1,13 @@
-import { logger } from '#src/lib/util/common.js';
-import { settings } from '#src/lib/util/settings.js';
-import { version } from '#src/lib/util/version.js';
-import type { PresenceStatusData } from 'discord.js';
-import { ActivityType } from 'discord.js';
+import { ActivityType, type PresenceStatusData } from 'discord.js';
+import { EventHandler } from '#src/lib/builders';
+import { logger } from '#src/lib/util/common';
+import { settings } from '#src/lib/util/settings';
+import { version } from '#src/lib/util/version';
 
-export default {
-    name: 'shardResume',
-    once: false,
-    async execute(): Promise<void> {
-        const { bot } = await import('#src/main.js');
+export default new EventHandler()
+    .setEvent('shardResume')
+    .setExecute(async function(): Promise<void> {
+        const { client } = await import('#src/main');
         let activityType:
             | ActivityType.Playing
             | ActivityType.Streaming
@@ -41,7 +40,7 @@ export default {
             presence =
                 settings.status.presence.toLowerCase() as PresenceStatusData;
         }
-        bot.user.setPresence({
+        client.user.setPresence({
             status: presence,
             activities: [
                 {
@@ -57,5 +56,4 @@ export default {
             ],
         });
         logger.info({ message: 'Reconnected.', label: 'Discord' });
-    },
-};
+    });

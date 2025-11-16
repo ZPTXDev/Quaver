@@ -1,54 +1,40 @@
-import { PlayerResponse } from '#src/lib/PlayerHandler.js';
-import type {
-    QuaverInteraction,
-    QuaverPlayer,
-} from '#src/lib/util/common.d.js';
-import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import { Check } from '#src/lib/util/constants.js';
-import { settings } from '#src/lib/util/settings.js';
+import { type GuildMember, SlashCommandBuilder } from 'discord.js';
+import { PlayerResponse, QuaverGuild } from '#src/lib';
+import { ChatInputCommandHandler } from '#src/lib/builders';
+import { MessageOptionsBuilderType } from '#src/lib/util/common';
+import { Check } from '#src/lib/util/constants';
+import { settings } from '#src/lib/util/settings';
 import {
     getLocaleString,
     getRequesterStatus,
     getTrackMarkdownLocaleString,
     RequesterStatus,
-} from '#src/lib/util/util.js';
-import type { ChatInputCommandInteraction, GuildMember } from 'discord.js';
-import { SlashCommandBuilder } from 'discord.js';
+} from '#src/lib/util/util';
 
-export default {
-    data: new SlashCommandBuilder()
-        .setName('skip')
-        .setDescription(
-            getLocaleString(settings.defaultLocaleCode, 'CMD.SKIP.DESCRIPTION'),
-        ),
-    checks: [
+export default new ChatInputCommandHandler()
+    .setData(
+        new SlashCommandBuilder()
+            .setName('skip')
+            .setDescription(
+                getLocaleString(
+                    settings.defaultLocaleCode,
+                    'CMD.SKIP.DESCRIPTION',
+                ),
+            ),
+    )
+    .setChecks([
         Check.GuildOnly,
         Check.ActiveSession,
         Check.InVoice,
         Check.InSessionVoice,
-    ],
-    permissions: {
-        user: [],
-        bot: [],
-    },
-    async execute(
-        interaction: QuaverInteraction<ChatInputCommandInteraction>,
-    ): Promise<void> {
-        const guildLocaleCode =
-            (await data.guild.get<string>(
-                interaction.guildId,
-                'settings.locale',
-            )) ?? settings.defaultLocaleCode;
-        const player = (await interaction.client.music.players.fetch(
-            interaction.guildId,
-        )) as QuaverPlayer;
+    ])
+    .setExecute(async function(interaction): Promise<void> {
+        const guild = await QuaverGuild.wrap(interaction.guild);
+        const player = await guild.getPlayer();
         // this check already occurs in the PlayerHandler#skip() method, but we do it first as we need to check before running voteskip addition etc
         if (!player.queue.current || (!player.playing && !player.paused)) {
             await interaction.replyHandler.reply(
-                getLocaleString(
-                    guildLocaleCode,
-                    'MUSIC.PLAYER.PLAYING.NOTHING',
-                ),
+                guild.locale('MUSIC.PLAYER.PLAYING.NOTHING'),
                 { type: MessageOptionsBuilderType.Error },
             );
             return;
@@ -60,7 +46,7 @@ export default {
             player.queue.channel,
         );
         if (requesterStatus === RequesterStatus.NotRequester) {
-            const skip = player.skip ?? {
+            const skip = player.memory.skip ?? {
                 required: Math.ceil(
                     (
                         interaction.member as GuildMember
@@ -71,35 +57,27 @@ export default {
             };
             if (skip.users.includes(interaction.user.id)) {
                 await interaction.replyHandler.reply(
-                    getLocaleString(
-                        guildLocaleCode,
-                        'CMD.SKIP.RESPONSE.VOTED.STATE_UNCHANGED',
-                    ),
+                    guild.locale('CMD.SKIP.RESPONSE.VOTED.STATE_UNCHANGED'),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             }
             skip.users.push(interaction.user.id);
             if (skip.users.length >= skip.required) {
-                const response = await player.handler.skip();
+                const response = await player.skipCurrentTrack();
                 switch (response) {
                     case PlayerResponse.PlayerIdle:
                         await interaction.replyHandler.reply(
-                            getLocaleString(
-                                guildLocaleCode,
-                                'MUSIC.PLAYER.PLAYING.NOTHING',
-                            ),
+                            guild.locale('MUSIC.PLAYER.PLAYING.NOTHING'),
                             { type: MessageOptionsBuilderType.Error },
                         );
                         return;
                     case PlayerResponse.Success: {
                         await interaction.replyHandler.reply(
-                            `${getLocaleString(
-                                guildLocaleCode,
+                            `${guild.locale(
                                 'CMD.SKIP.RESPONSE.SUCCESS.VOTED',
                                 getTrackMarkdownLocaleString(track),
-                            )}\n${getLocaleString(
-                                guildLocaleCode,
+                            )}\n${guild.locale(
                                 'MISC.ADDED_BY',
                                 track.requesterId,
                             )}`,
@@ -108,10 +86,9 @@ export default {
                 }
                 return;
             }
-            player.skip = skip;
+            player.memory.skip = skip;
             await interaction.replyHandler.reply(
-                getLocaleString(
-                    guildLocaleCode,
+                guild.locale(
                     'CMD.SKIP.RESPONSE.VOTED.SUCCESS',
                     getTrackMarkdownLocaleString(track),
                     skip.users.length.toString(),
@@ -121,21 +98,17 @@ export default {
             );
             return;
         }
-        const response = await player.handler.skip();
+        const response = await player.skipCurrentTrack();
         switch (response) {
             case PlayerResponse.PlayerIdle:
                 await interaction.replyHandler.reply(
-                    getLocaleString(
-                        guildLocaleCode,
-                        'MUSIC.PLAYER.PLAYING.NOTHING',
-                    ),
+                    guild.locale('MUSIC.PLAYER.PLAYING.NOTHING'),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             case PlayerResponse.Success: {
                 await interaction.replyHandler.reply(
-                    `${getLocaleString(
-                        guildLocaleCode,
+                    `${guild.locale(
                         requesterStatus === RequesterStatus.Requester
                             ? 'CMD.SKIP.RESPONSE.SUCCESS.DEFAULT'
                             : requesterStatus === RequesterStatus.ManagerBypass
@@ -144,8 +117,7 @@ export default {
                         getTrackMarkdownLocaleString(track),
                     )}${
                         requesterStatus !== RequesterStatus.Requester
-                            ? `\n${getLocaleString(
-                                  guildLocaleCode,
+                            ? `\n${guild.locale(
                                   'MISC.ADDED_BY',
                                   track.requesterId,
                               )}`
@@ -154,5 +126,4 @@ export default {
                 );
             }
         }
-    },
-};
+    });

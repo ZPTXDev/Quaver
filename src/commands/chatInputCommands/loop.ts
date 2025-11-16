@@ -1,115 +1,88 @@
-import { PlayerResponse } from '#src/lib/PlayerHandler.js';
-import type {
-    QuaverInteraction,
-    QuaverPlayer,
-} from '#src/lib/util/common.d.js';
-import { Check } from '#src/lib/util/constants.js';
-import { settings } from '#src/lib/util/settings.js';
-import { getLocaleString } from '#src/lib/util/util.js';
 import { LoopType } from '@lavaclient/plugin-queue';
-import type {
-    ChatInputCommandInteraction,
-    SlashCommandStringOption,
-} from 'discord.js';
-import { SlashCommandBuilder } from 'discord.js';
-import { data } from '#src/lib/util/common.js';
+import { SlashCommandBuilder, type SlashCommandStringOption } from 'discord.js';
+import { PlayerResponse, QuaverGuild } from '#src/lib';
+import { ChatInputCommandHandler } from '#src/lib/builders';
+import { Check } from '#src/lib/util/constants';
+import { settings } from '#src/lib/util/settings';
+import { getLocaleString } from '#src/lib/util/util';
 
-export default {
-    data: new SlashCommandBuilder()
-        .setName('loop')
-        .setDescription(
-            getLocaleString(settings.defaultLocaleCode, 'CMD.LOOP.DESCRIPTION'),
-        )
-        .addStringOption(
-            (option): SlashCommandStringOption =>
-                option
-                    .setName('type')
-                    .setDescription(
-                        getLocaleString(
-                            settings.defaultLocaleCode,
-                            'CMD.LOOP.OPTION.TYPE.DESCRIPTION',
+export default new ChatInputCommandHandler()
+    .setData(
+        new SlashCommandBuilder()
+            .setName('loop')
+            .setDescription(
+                getLocaleString(
+                    settings.defaultLocaleCode,
+                    'CMD.LOOP.DESCRIPTION',
+                ),
+            )
+            .addStringOption(
+                (option): SlashCommandStringOption =>
+                    option
+                        .setName('type')
+                        .setDescription(
+                            getLocaleString(
+                                settings.defaultLocaleCode,
+                                'CMD.LOOP.OPTION.TYPE.DESCRIPTION',
+                            ),
+                        )
+                        .setRequired(true)
+                        .addChoices(
+                            {
+                                name: getLocaleString(
+                                    settings.defaultLocaleCode,
+                                    'CMD.LOOP.OPTION.TYPE.OPTION.DISABLED',
+                                ),
+                                value: 'disabled',
+                            },
+                            {
+                                name: getLocaleString(
+                                    settings.defaultLocaleCode,
+                                    'CMD.LOOP.OPTION.TYPE.OPTION.TRACK',
+                                ),
+                                value: 'track',
+                            },
+                            {
+                                name: getLocaleString(
+                                    settings.defaultLocaleCode,
+                                    'CMD.LOOP.OPTION.TYPE.OPTION.QUEUE',
+                                ),
+                                value: 'queue',
+                            },
                         ),
-                    )
-                    .setRequired(true)
-                    .addChoices(
-                        {
-                            name: getLocaleString(
-                                settings.defaultLocaleCode,
-                                'CMD.LOOP.OPTION.TYPE.OPTION.DISABLED',
-                            ),
-                            value: 'disabled',
-                        },
-                        {
-                            name: getLocaleString(
-                                settings.defaultLocaleCode,
-                                'CMD.LOOP.OPTION.TYPE.OPTION.TRACK',
-                            ),
-                            value: 'track',
-                        },
-                        {
-                            name: getLocaleString(
-                                settings.defaultLocaleCode,
-                                'CMD.LOOP.OPTION.TYPE.OPTION.QUEUE',
-                            ),
-                            value: 'queue',
-                        },
-                    ),
-        ),
-    checks: [
+            ),
+    )
+    .setChecks([
         Check.GuildOnly,
         Check.ActiveSession,
         Check.InVoice,
         Check.InSessionVoice,
-    ],
-    permissions: {
-        user: [],
-        bot: [],
-    },
-    async execute(
-        interaction: QuaverInteraction<ChatInputCommandInteraction>,
-    ): Promise<void> {
-        const player = (await interaction.client.music.players.fetch(
-            interaction.guildId,
-        )) as QuaverPlayer;
+    ])
+    .setExecute(async function(interaction): Promise<void> {
         const type = interaction.options.getString('type');
+        const guild = await QuaverGuild.wrap(interaction.guild);
+        const player = await guild.getPlayer();
         let loop, typeLocale;
-        const guildLocaleCode =
-            (await data.guild.get<string>(
-                interaction.guildId,
-                'settings.locale',
-            )) ?? settings.defaultLocaleCode;
         switch (type) {
             case 'disabled':
                 loop = LoopType.None;
-                typeLocale = getLocaleString(
-                    guildLocaleCode,
+                typeLocale = guild.locale(
                     'CMD.LOOP.OPTION.TYPE.OPTION.DISABLED',
                 );
                 break;
             case 'track':
                 loop = LoopType.Song;
-                typeLocale = getLocaleString(
-                    guildLocaleCode,
-                    'CMD.LOOP.OPTION.TYPE.OPTION.TRACK',
-                );
+                typeLocale = guild.locale('CMD.LOOP.OPTION.TYPE.OPTION.TRACK');
                 break;
             case 'queue':
                 loop = LoopType.Queue;
-                typeLocale = getLocaleString(
-                    guildLocaleCode,
-                    'CMD.LOOP.OPTION.TYPE.OPTION.QUEUE',
-                );
+                typeLocale = guild.locale('CMD.LOOP.OPTION.TYPE.OPTION.QUEUE');
                 break;
         }
         typeLocale = typeLocale.toLowerCase();
-        const response = await player.handler.loop(loop);
+        const response = await player.setLoopMode(loop);
         if (response !== PlayerResponse.Success) return;
         await interaction.replyHandler.reply(
-            getLocaleString(
-                guildLocaleCode,
-                'CMD.LOOP.RESPONSE.SUCCESS',
-                typeLocale,
-            ),
+            guild.locale('CMD.LOOP.RESPONSE.SUCCESS', typeLocale),
         );
-    },
-};
+    });

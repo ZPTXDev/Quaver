@@ -1,16 +1,16 @@
-import * as nodeUrl from 'node:url';
+import type EventEmitter from 'node:events';
+import type { Dirent } from 'node:fs';
+import * as nodeFsPromises from 'node:fs/promises';
 import * as nodePath from 'node:path';
 import * as nodeUtilTypes from 'node:util/types';
-import * as nodeFsPromises from 'node:fs/promises';
-import type EventEmitter from 'node:events';
+import * as nodeUrl from 'node:url';
 import type {
-    ProcessFolderPathOptions,
-    LoadInteractionHandlerMapOptions,
     LoadEventHandlerOptions,
+    LoadInteractionHandlerMapOptions,
     ProcessFileCallback,
     ProcessFileOverride,
+    ProcessFolderPathOptions,
 } from './moduleLoaderUtils.d.js';
-import type { Dirent } from 'node:fs';
 
 const DEFAULT_MODULE_EXPORT_NAME = 'default';
 

@@ -1,4 +1,4 @@
-import { settings } from './settings.js';
+import { settings } from './settings';
 
 export enum Check {
     /**
@@ -14,7 +14,7 @@ export enum Check {
      */
     InVoice = 'CHECK.IN_VOICE',
     /**
-     * Must be in the same voice channel (will not fail if the bot is not in a voice channel)
+     * Must be in the same voice channel (will not fail if the client is not in a voice channel)
      */
     InSessionVoice = 'CHECK.IN_SESSION_VOICE',
     /**

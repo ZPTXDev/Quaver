@@ -10,11 +10,11 @@ export default {
         callback: (cb: Record<string, any>) => void,
         guildId: Snowflake,
     ): Promise<void> {
-        const { bot } = await import('#src/main.js');
+        const { client } = await import('#src/main');
         if (!socket.guilds?.find((guild): boolean => guild.id === guildId)) {
             return callback({ status: 'error-auth' });
         }
-        if (!bot.guilds.cache.get(guildId)) {
+        if (!client.guilds.cache.get(guildId)) {
             return callback({ status: 'error-generic' });
         }
         if (socket.focused) socket.leave(`guild:${socket.focused}`);

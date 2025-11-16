@@ -1,56 +1,39 @@
-import { ForceType } from '#src/lib/ReplyHandler.js';
-import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import {
-    confirmationTimeout,
-    data,
-    logger,
-    MessageOptionsBuilderType,
-} from '#src/lib/util/common.js';
-import type { Language } from '#src/lib/util/constants.js';
-import { Check } from '#src/lib/util/constants.js';
-import { settings } from '#src/lib/util/settings.js';
-import {
-    buildMessageOptions,
-    buildSettingsPage,
-    getGuildFeatureWhitelisted,
-    getGuildLocaleString,
-    getLocaleString,
-    WhitelistStatus,
-} from '#src/lib/util/util.js';
-import type { ButtonInteraction } from 'discord.js';
 import {
     ActionRowBuilder,
-    ButtonBuilder,
+    type ButtonBuilder,
     ButtonStyle,
     ContainerBuilder,
     ContainerComponent,
-    TextDisplayBuilder,
 } from 'discord.js';
+import { ForceType, QuaverGuild, WhitelistStatus } from '#src/lib';
+import { ButtonHandler } from '#src/lib/builders';
+import {
+    confirmationTimeout,
+    logger,
+    MessageOptionsBuilderType,
+} from '#src/lib/util/common';
+import { Check } from '#src/lib/util/constants';
+import { settings } from '#src/lib/util/settings';
+import { buildMessageOptions, buildSettingsPage } from '#src/lib/util/util';
 
-export default {
-    name: 'autolyrics',
-    checks: [Check.InteractionStarter],
-    async execute(
-        interaction: QuaverInteraction<ButtonInteraction>,
-    ): Promise<void> {
-        const { io } = await import('#src/main.js');
+export default new ButtonHandler()
+    .setChecks([Check.InteractionStarter])
+    .setExecute(async function(interaction): Promise<void> {
+        const guild = await QuaverGuild.wrap(interaction.guild);
         if (!confirmationTimeout[interaction.message.id]) {
-            await interaction.replyHandler.locale(
-                'DISCORD.INTERACTION.EXPIRED',
+            await interaction.replyHandler.reply(
+                guild.locale('DISCORD.INTERACTION.EXPIRED'),
                 { components: [], force: ForceType.Update },
             );
             return;
         }
         clearTimeout(confirmationTimeout[interaction.message.id]);
         confirmationTimeout[interaction.message.id] = setTimeout(
-            async (message): Promise<void> => {
+            async (g, message): Promise<void> => {
                 try {
                     await message.edit(
                         buildMessageOptions(
-                            await getGuildLocaleString(
-                                message.guildId,
-                                'DISCORD.INTERACTION.EXPIRED',
-                            ),
+                            g.locale('DISCORD.INTERACTION.EXPIRED'),
                             { components: [] },
                         ),
                     );
@@ -65,29 +48,20 @@ export default {
                 delete confirmationTimeout[message.id];
             },
             30_000,
+            guild,
             interaction.message,
         );
         const option = interaction.customId.split(':')[1] === 'enable';
-        const guildLocaleCode =
-            (await data.guild.get<keyof typeof Language>(
-                interaction.guildId,
-                'settings.locale',
-            )) ?? (settings.defaultLocaleCode as keyof typeof Language);
         if (option) {
             if (!settings.features.autolyrics.enabled) {
                 await interaction.replyHandler.reply(
-                    getLocaleString(
-                        guildLocaleCode,
-                        'FEATURE.DISABLED.DEFAULT',
-                    ),
+                    guild.locale('FEATURE.DISABLED.DEFAULT'),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             }
-            const whitelisted = await getGuildFeatureWhitelisted(
-                interaction.guildId,
-                'autolyrics',
-            );
+            const whitelisted =
+                await guild.features.checkWhitelisted('autolyrics');
             if (
                 whitelisted === WhitelistStatus.NotWhitelisted ||
                 whitelisted === WhitelistStatus.Expired
@@ -97,61 +71,35 @@ export default {
                     settings.premiumURL
                 ) {
                     await interaction.replyHandler.reply(
-                        new ContainerBuilder({
-                            components: [
-                                new TextDisplayBuilder()
-                                    .setContent(
-                                        getLocaleString(
-                                            guildLocaleCode,
-                                            'FEATURE.NO_PERMISSION.PREMIUM',
-                                        ),
-                                    )
-                                    .toJSON(),
-                                new ActionRowBuilder<ButtonBuilder>()
-                                    .setComponents(
-                                        new ButtonBuilder()
-                                            .setLabel(
-                                                getLocaleString(
-                                                    guildLocaleCode,
-                                                    'MISC.GET_PREMIUM',
-                                                ),
-                                            )
-                                            .setStyle(ButtonStyle.Link)
-                                            .setURL(settings.premiumURL),
-                                    )
-                                    .toJSON(),
-                            ],
-                        }),
+                        new ContainerBuilder()
+                            .addTextDisplayComponents(
+                                guild.builders.textDisplayLocale(
+                                    'FEATURE.NO_PERMISSION.PREMIUM',
+                                ),
+                            )
+                            .addActionRowComponents(
+                                new ActionRowBuilder<ButtonBuilder>().setComponents(
+                                    guild.builders
+                                        .buttonLocale('MISC.GET_PREMIUM')
+                                        .setStyle(ButtonStyle.Link)
+                                        .setURL(settings.premiumURL),
+                                ),
+                            ),
                         { type: MessageOptionsBuilderType.Error },
                     );
                     return;
                 }
                 await interaction.replyHandler.reply(
-                    getLocaleString(
-                        guildLocaleCode,
-                        'FEATURE.NO_PERMISSION.DEFAULT',
-                    ),
+                    guild.locale('FEATURE.NO_PERMISSION.DEFAULT'),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             }
         }
-        await data.guild.set(
-            interaction.guildId,
-            'settings.autolyrics',
-            option,
-        );
-        if (settings.features.web.enabled) {
-            io.to(`guild:${interaction.guildId}`).emit(
-                'autoLyricsFeatureUpdate',
-                {
-                    enabled: option,
-                },
-            );
-        }
+        await guild.settings.set('autolyrics', option);
+        guild.sendWebUpdate('autoLyricsFeatureUpdate', { enabled: option });
         const { containers } = await buildSettingsPage(
             interaction,
-            guildLocaleCode,
             'autolyrics',
         );
         if (
@@ -162,5 +110,4 @@ export default {
         await interaction.replyHandler.reply(containers, {
             force: ForceType.Update,
         });
-    },
-};
+    });

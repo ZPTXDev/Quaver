@@ -1,19 +1,14 @@
-import { data, logger } from '#src/lib/util/common.js';
-import type {
-    QuaverChannels,
-    QuaverClient,
-    QuaverPlayer,
-} from '#src/lib/util/common.d.js';
 import { get } from 'lodash-es';
-import PlayerHandler from '#src/lib/PlayerHandler.js';
+import { data, logger } from '#src/lib/util/common';
+import type { QuaverChannels } from '#src/lib/util/common.d';
 
 export default {
     name: 'connected',
     once: false,
     async execute(): Promise<void> {
-        const { bot } = await import('#src/main.js');
+        const { client } = await import('#src/main.js');
         logger.info({ message: 'Ready.', label: 'Lavalink' });
-        if (!bot.music.ws.session) {
+        if (!client.music.ws.session) {
             logger.warn({
                 message:
                     'Waiting 5 seconds before re-triggering ready event for Lavalink WS session...',
@@ -29,12 +24,9 @@ export default {
             guildData,
         ] of data.guild.instance.iterator()) {
             if (get(guildData, 'settings.stay.enabled')) {
-                const guild = bot.guilds.cache.get(guildId);
+                const guild = client.guilds.cache.get(guildId);
                 if (!guild) continue;
-                const player = bot.music.players.create(
-                    guildId,
-                ) as QuaverPlayer;
-                player.handler = new PlayerHandler(bot as QuaverClient, player);
+                const player = client.music.players.create(guild);
                 player.queue.channel = guild.channels.cache.get(
                     get(guildData, 'settings.stay.text'),
                 ) as QuaverChannels;

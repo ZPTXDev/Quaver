@@ -1,17 +1,11 @@
-import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import type {
-    ApplicationCommandOptionChoiceData,
-    AutocompleteInteraction,
-} from 'discord.js';
+import type { ApplicationCommandOptionChoiceData } from 'discord.js';
 import { request } from 'undici';
-import { YOUTUBE_AUTOCOMPLETE_URL } from '#src/lib/util/constants.js';
-import { cache } from '#src/lib/util/common.js';
+import { AutocompleteHandler } from '#src/lib/builders';
+import { cache } from '#src/lib/util/common';
+import { YOUTUBE_AUTOCOMPLETE_URL } from '#src/lib/util/constants';
 
-export default {
-    name: 'search',
-    async execute(
-        interaction: QuaverInteraction<AutocompleteInteraction>,
-    ): Promise<void> {
+export default new AutocompleteHandler().setExecute(
+    async function(interaction): Promise<void> {
         const focused = interaction.options.getFocused();
         if (focused === '') return interaction.respond([]);
         const existingResults = await cache.get(focused.toLowerCase());
@@ -73,4 +67,4 @@ export default {
             return interaction.respond([]);
         }
     },
-};
+);

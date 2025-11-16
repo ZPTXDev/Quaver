@@ -1,53 +1,42 @@
-import type {
-    QuaverInteraction,
-    SettingsPageOptions,
-} from '#src/lib/util/common.d.js';
-import { confirmationTimeout, data, logger } from '#src/lib/util/common.js';
-import type { Language } from '#src/lib/util/constants.js';
-import { Check, settingsOptions } from '#src/lib/util/constants.js';
-import { settings } from '#src/lib/util/settings.js';
-import {
-    buildMessageOptions,
-    buildSettingsPage,
-    getLocaleString,
-} from '#src/lib/util/util.js';
-import type { ChatInputCommandInteraction } from 'discord.js';
 import {
     InteractionCallbackResponse,
     Message,
     PermissionsBitField,
     SlashCommandBuilder,
 } from 'discord.js';
+import { QuaverGuild } from '#src/lib';
+import { ChatInputCommandHandler } from '#src/lib/builders';
+import { confirmationTimeout, logger } from '#src/lib/util/common';
+import type { SettingsPageOptions } from '#src/lib/util/common.d';
+import { Check, settingsOptions } from '#src/lib/util/constants';
+import { settings } from '#src/lib/util/settings';
+import {
+    buildMessageOptions,
+    buildSettingsPage,
+    getLocaleString,
+} from '#src/lib/util/util';
 
-export default {
-    data: new SlashCommandBuilder()
-        .setName('settings')
-        .setDescription(
-            getLocaleString(
-                settings.defaultLocaleCode,
-                'CMD.SETTINGS.DESCRIPTION',
-            ),
-        )
-        .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild),
-    checks: [Check.GuildOnly],
-    permissions: {
+export default new ChatInputCommandHandler()
+    .setData(
+        new SlashCommandBuilder()
+            .setName('settings')
+            .setDescription(
+                getLocaleString(
+                    settings.defaultLocaleCode,
+                    'CMD.SETTINGS.DESCRIPTION',
+                ),
+            )
+            .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild),
+    )
+    .setChecks([Check.GuildOnly])
+    .setPermissions({
         user: [PermissionsBitField.Flags.ManageGuild],
         bot: [],
-    },
-    async execute(
-        interaction: QuaverInteraction<ChatInputCommandInteraction>,
-    ): Promise<void> {
+    })
+    .setExecute(async function(interaction): Promise<void> {
+        const guild = await QuaverGuild.wrap(interaction.guild);
         const option = settingsOptions[0] as SettingsPageOptions;
-        const guildLocaleCode =
-            (await data.guild.get<keyof typeof Language>(
-                interaction.guild.id,
-                'settings.locale',
-            )) ?? (settings.defaultLocaleCode as keyof typeof Language);
-        const { containers } = await buildSettingsPage(
-            interaction,
-            guildLocaleCode,
-            option,
-        );
+        const { containers } = await buildSettingsPage(interaction, option);
         const response = await interaction.replyHandler.reply(containers, {
             withResponse: true,
         });
@@ -64,11 +53,11 @@ export default {
                 ? response.resource.message
                 : response;
         confirmationTimeout[msg.id] = setTimeout(
-            async (glc, message): Promise<void> => {
+            async (g, message): Promise<void> => {
                 try {
                     await message.edit(
                         buildMessageOptions(
-                            getLocaleString(glc, 'DISCORD.INTERACTION.EXPIRED'),
+                            g.locale('DISCORD.INTERACTION.EXPIRED'),
                             { components: [] },
                         ),
                     );
@@ -83,8 +72,7 @@ export default {
                 delete confirmationTimeout[message.id];
             },
             30_000,
-            guildLocaleCode,
+            guild,
             msg,
         );
-    },
-};
+    });

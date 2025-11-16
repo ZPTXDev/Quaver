@@ -1,27 +1,26 @@
-import PlayerHandler, { PlayerResponse } from '#src/lib/PlayerHandler.js';
-import type {
-    QuaverChannels,
-    QuaverPlayer,
-    QuaverSong,
-} from '#src/lib/util/common.d.js';
-import { data } from '#src/lib/util/common.js';
+import {
+    type APIGuild,
+    type APIUser,
+    ChannelType,
+    GuildMember,
+    PermissionsBitField,
+    type Snowflake,
+} from 'discord.js';
+import { LavalinkWSClientState } from 'lavalink-ws-client';
+import type { Socket } from 'socket.io';
+import { PlayerResponse, QuaverGuild, WhitelistStatus } from '#src/lib';
+import type { QuaverChannels, QuaverSong } from '#src/lib/util/common.d';
 import {
     acceptableSources,
     Check,
     queryOverrides,
-} from '#src/lib/util/constants.js';
-import { settings } from '#src/lib/util/settings.js';
+} from '#src/lib/util/constants';
+import { settings } from '#src/lib/util/settings';
 import {
     getFailedChecks,
-    getGuildFeatureWhitelisted,
     getRequesterStatus,
     RequesterStatus,
-    WhitelistStatus,
-} from '#src/lib/util/util.js';
-import type { APIGuild, APIUser, Snowflake } from 'discord.js';
-import { ChannelType, GuildMember, PermissionsBitField } from 'discord.js';
-import type { Socket } from 'socket.io';
-import { LavalinkWSClientState } from 'lavalink-ws-client';
+} from '#src/lib/util/util';
 
 export default {
     name: 'update',
@@ -34,13 +33,14 @@ export default {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         item: { type: UpdateItemType; value?: any },
     ): Promise<void> {
-        const { bot, io } = await import('#src/main.js');
+        const { client } = await import('#src/main');
         if (!socket.guilds) {
             return callback({ status: Response.AuthenticationError });
         }
         if (!socket.guilds.find((guild): boolean => guild.id === guildId)) {
             return callback({ status: Response.AuthenticationError });
         }
+        const guild = await QuaverGuild.wrap(client.guilds.cache.get(guildId));
         if (
             ![
                 UpdateItemType.StayFeature,
@@ -48,30 +48,27 @@ export default {
                 UpdateItemType.SmartQueueFeature,
                 UpdateItemType.Add,
             ].includes(item.type) &&
-            (await bot.guilds.cache.get(guildId)?.members.fetch(socket.user.id))
-                ?.voice.channelId !==
-                bot.guilds.cache.get(guildId).members.me.voice.channelId
+            (await guild?.members.fetch(socket.user.id))?.voice.channelId !==
+                guild.members.me.voice.channelId
         ) {
             return callback({ status: Response.ChannelMismatchError });
         }
         switch (item.type) {
             case UpdateItemType.Add: {
-                const member = await bot.guilds.cache
-                    .get(guildId)
-                    .members.fetch(socket.user.id);
+                const member = await guild.members.fetch(socket.user.id);
                 if (!(member instanceof GuildMember)) {
                     return callback({ status: Response.GenericError });
                 }
                 const failedChecks: Check[] = await getFailedChecks(
                     [Check.InVoice, Check.InSessionVoice],
-                    guildId,
+                    guild.id,
                     member,
                 );
                 if (failedChecks.length > 0) {
                     return callback({ status: Response.UserNotInChannelError });
                 }
                 const permissions = member.voice.channel?.permissionsFor(
-                    bot.user.id,
+                    client.user.id,
                 );
                 if (
                     !permissions.has(
@@ -88,11 +85,11 @@ export default {
                 ) {
                     return callback({ status: Response.BotPermissionError });
                 }
-                let me = await bot.guilds.cache.get(guildId).members.fetchMe();
+                let me = await guild.members.fetchMe();
                 if (me.isCommunicationDisabled()) {
                     return callback({ status: Response.BotTimedOutError });
                 }
-                if (bot.music.ws.state !== LavalinkWSClientState.Ready) {
+                if (client.music.ws.state !== LavalinkWSClientState.Ready) {
                     return callback({ status: Response.NotReadyError });
                 }
                 const query = item.value;
@@ -102,13 +99,11 @@ export default {
                     searchQuery = query;
                 } else {
                     const source =
-                        (await data.guild.get<string>(
-                            guildId,
-                            'settings.source',
-                        )) ?? Object.keys(acceptableSources)[0];
+                        (await guild.settings.get<string>('source')) ??
+                        Object.keys(acceptableSources)[0];
                     searchQuery = `${acceptableSources[source]}${query}`;
                 }
-                const result = await bot.music.api.loadTracks(searchQuery);
+                const result = await client.music.api.loadTracks(searchQuery);
                 switch (result.loadType) {
                     case 'playlist':
                         tracks = [...result.data.tracks];
@@ -130,12 +125,9 @@ export default {
                     default:
                         return callback({ status: Response.GenericError });
                 }
-                let player = (await bot.music.players.fetch(
-                    guildId,
-                )) as QuaverPlayer;
+                let player = await client.music.players.fetch(guild.id);
                 if (!player?.voice.connected) {
-                    player = bot.music.players.create(guildId) as QuaverPlayer;
-                    player.handler = new PlayerHandler(bot, player);
+                    player = client.music.players.create(guild);
                     player.queue.channel = member.voice
                         .channel as QuaverChannels;
                     player.voice.connect(member.voice.channelId, {
@@ -144,14 +136,10 @@ export default {
                     // Ensure that Quaver destroys the player if the user leaves the channel while Quaver is queuing tracks
                     // Ensure that Quaver destroys the player if Quaver gets timed out by the user while Quaver is queuing tracks
                     // Ensure that Quaver destroys the player if Quaver gets kicked or banned by the user while Quaver is queuing tracks
-                    me = await bot.guilds.cache.get(guildId).members.fetchMe();
+                    me = await guild.members.fetchMe();
                     const timedOut = me.isCommunicationDisabled();
-                    if (
-                        !member.voice.channelId ||
-                        timedOut ||
-                        !bot.guilds.cache.get(guildId)
-                    ) {
-                        await player.handler.disconnect();
+                    if (!member.voice.channelId || timedOut || !guild) {
+                        await player.disconnect();
                         return callback({ status: Response.GenericError });
                     }
                 }
@@ -160,94 +148,72 @@ export default {
                     next: false,
                 });
                 const started = player.playing || player.paused;
-                const smartQueue = await data.guild.get<boolean>(
-                    guildId,
-                    'settings.smartqueue',
-                );
+                const smartQueue =
+                    await guild.settings.get<boolean>('smartqueue');
                 if (!started) await player.queue.start();
-                if (smartQueue) await player.handler.sort();
-                if (settings.features.web.enabled) {
-                    io.to(`guild:${guildId}`).emit(
-                        'queueUpdate',
-                        player.queue.tracks.map(
-                            (track: QuaverSong): QuaverSong => {
-                                const user = bot.users.cache.get(
-                                    track.requesterId,
-                                );
-                                track.requesterTag = user?.tag;
-                                track.requesterAvatar = user?.avatar;
-                                return track;
-                            },
-                        ),
-                    );
-                }
+                if (smartQueue) await player.sortQueue();
+                guild.sendWebUpdate(
+                    'queueUpdate',
+                    player.queue.tracks.map((track: QuaverSong): QuaverSong => {
+                        const user = client.users.cache.get(track.requesterId);
+                        track.requesterTag = user?.tag;
+                        track.requesterAvatar = user?.avatar;
+                        return track;
+                    }),
+                );
                 break;
             }
             case UpdateItemType.Loop: {
-                const player = (await bot.music.players.fetch(
-                    guildId,
-                )) as QuaverPlayer;
+                const player = await client.music.players.fetch(guild.id);
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
-                await player.handler.loop(item.value);
+                await player.setLoopMode(item.value);
                 break;
             }
             case UpdateItemType.Volume: {
-                const player = (await bot.music.players.fetch(
-                    guildId,
-                )) as QuaverPlayer;
+                const player = await client.music.players.fetch(guild.id);
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
-                const response = await player.handler.volume(item.value);
+                const response = await player.setVolumeTo(item.value);
                 if (response !== PlayerResponse.Success) {
                     return callback({ status: Response.GenericError });
                 }
                 break;
             }
             case UpdateItemType.Paused: {
-                const player = (await bot.music.players.fetch(
-                    guildId,
-                )) as QuaverPlayer;
+                const player = await client.music.players.fetch(guild.id);
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
-                const response = item.value
-                    ? await player.handler.pause()
-                    : await player.handler.resume();
+                const response = await player.setPause(item.value);
                 if (response !== PlayerResponse.Success) {
                     return callback({ status: Response.GenericError });
                 }
                 break;
             }
             case UpdateItemType.Skip: {
-                const player = (await bot.music.players.fetch(
-                    guildId,
-                )) as QuaverPlayer;
+                const player = await client.music.players.fetch(guild.id);
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
                 const requesterStatus = await getRequesterStatus(
                     player.queue.current,
-                    (await bot.guilds.cache
-                        .get(guildId)
-                        .members.fetch(socket.user.id)) as GuildMember,
+                    (await guild.members.fetch(socket.user.id)) as GuildMember,
                     player.queue.channel,
                 );
                 if (requesterStatus !== RequesterStatus.NotRequester) {
-                    const response = await player.handler.skip();
+                    const response = await player.skipCurrentTrack();
                     if (response !== PlayerResponse.Success) {
                         return callback({ status: Response.GenericError });
                     }
                     break;
                 }
-                const skip = player.skip ?? {
+                const skip = player.memory.skip ?? {
                     required: Math.ceil(
                         (
-                            await bot.guilds.cache
-                                .get(guildId)
-                                .members.fetchMe()
+                            await guild.members.fetchMe()
                         ).voice.channel.members.filter(
                             (m): boolean => !m.user.bot,
                         ).size / 2,
@@ -259,45 +225,39 @@ export default {
                 }
                 skip.users.push(socket.user.id);
                 if (skip.users.length >= skip.required) {
-                    const response = await player.handler.skip();
+                    const response = await player.skipCurrentTrack();
                     if (response !== PlayerResponse.Success) {
                         return callback({ status: Response.GenericError });
                     }
                     break;
                 }
-                player.skip = skip;
+                player.memory.skip = skip;
                 break;
             }
             case UpdateItemType.Bassboost: {
-                const player = (await bot.music.players.fetch(
-                    guildId,
-                )) as QuaverPlayer;
+                const player = await client.music.players.fetch(guild.id);
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
-                await player.handler.bassboost(item.value);
+                await player.setBassboost(item.value);
                 break;
             }
             case UpdateItemType.Nightcore: {
-                const player = (await bot.music.players.fetch(
-                    guildId,
-                )) as QuaverPlayer;
+                const player = await client.music.players.fetch(guild.id);
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
-                await player.handler.nightcore(item.value);
+                await player.setNightcore(item.value);
                 break;
             }
             case UpdateItemType.Seek: {
-                const player = (await bot.music.players.fetch(
-                    guildId,
-                )) as QuaverPlayer;
+                const player = await client.music.players.fetch(guild.id);
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
                 const requesterStatus = await getRequesterStatus(
                     player.queue.current,
-                    (await bot.guilds.cache
+                    (await client.guilds.cache
                         .get(guildId)
                         .members.fetch(socket.user.id)) as GuildMember,
                     player.queue.channel,
@@ -305,16 +265,14 @@ export default {
                 if (requesterStatus === RequesterStatus.NotRequester) {
                     return callback({ status: Response.AuthenticationError });
                 }
-                const response = await player.handler.seek(item.value);
+                const response = await player.seekTo(item.value);
                 if (response !== PlayerResponse.Success) {
                     return callback({ status: Response.GenericError });
                 }
                 break;
             }
             case UpdateItemType.Remove: {
-                const player = (await bot.music.players.fetch(
-                    guildId,
-                )) as QuaverPlayer;
+                const player = await client.music.players.fetch(guild.id);
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
@@ -322,7 +280,7 @@ export default {
                 if (!track) return callback({ status: Response.GenericError });
                 const requesterStatus = await getRequesterStatus(
                     player.queue.tracks[item.value],
-                    (await bot.guilds.cache
+                    (await client.guilds.cache
                         .get(guildId)
                         .members.fetch(socket.user.id)) as GuildMember,
                     player.queue.channel,
@@ -330,47 +288,41 @@ export default {
                 if (requesterStatus === RequesterStatus.NotRequester) {
                     return callback({ status: Response.AuthenticationError });
                 }
-                const response = await player.handler.remove(item.value + 1);
+                const response = await player.removeQueuedTrack(item.value + 1);
                 if (response !== PlayerResponse.Success) {
                     return callback({ status: Response.GenericError });
                 }
                 break;
             }
             case UpdateItemType.Shuffle: {
-                const player = (await bot.music.players.fetch(
-                    guildId,
-                )) as QuaverPlayer;
+                const player = await client.music.players.fetch(guild.id);
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
-                const response = await player.handler.shuffle();
+                const response = await player.shuffleQueue();
                 if (response !== PlayerResponse.Success) {
                     return callback({ status: Response.GenericError });
                 }
                 break;
             }
             case UpdateItemType.StayFeature: {
-                const player = (await bot.music.players.fetch(
-                    guildId,
-                )) as QuaverPlayer;
+                const player = await client.music.players.fetch(guild.id);
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
-                const member = await bot.guilds.cache
-                    .get(guildId)
-                    .members.fetch(socket.user.id);
+                const member = await guild.members.fetch(socket.user.id);
                 if (!(member instanceof GuildMember)) {
                     return callback({ status: Response.GenericError });
                 }
                 const failedChecks: Check[] = await getFailedChecks(
                     [Check.InVoice, Check.InSessionVoice],
-                    guildId,
+                    guild.id,
                     member,
                 );
                 if (failedChecks.length > 0) {
                     return callback({ status: Response.UserNotInChannelError });
                 }
-                const response = await player.handler.stay(item.value);
+                const response = await player.setStay(item.value);
                 switch (response) {
                     case PlayerResponse.FeatureDisabled:
                         return callback({
@@ -390,9 +342,7 @@ export default {
             case UpdateItemType.AutoLyricsFeature: {
                 if (
                     !(
-                        await bot.guilds.cache
-                            .get(guildId)
-                            ?.members.fetch(socket.user.id)
+                        await guild?.members.fetch(socket.user.id)
                     )?.permissions.has(PermissionsBitField.Flags.ManageGuild)
                 ) {
                     return callback({ status: Response.AuthenticationError });
@@ -403,10 +353,8 @@ export default {
                             status: Response.FeatureDisabledError,
                         });
                     }
-                    const whitelisted = await getGuildFeatureWhitelisted(
-                        guildId,
-                        'autolyrics',
-                    );
+                    const whitelisted =
+                        await guild.features.checkWhitelisted('autolyrics');
                     if (
                         whitelisted === WhitelistStatus.NotWhitelisted ||
                         whitelisted === WhitelistStatus.Expired
@@ -416,24 +364,16 @@ export default {
                         });
                     }
                 }
-                await data.guild.set(
-                    guildId,
-                    'settings.autolyrics',
-                    item.value,
-                );
-                if (settings.features.web.enabled) {
-                    io.to(`guild:${guildId}`).emit('autoLyricsFeatureUpdate', {
-                        enabled: item.value,
-                    });
-                }
+                await guild.settings.set('autolyrics', item.value);
+                guild.sendWebUpdate('autoLyricsFeatureUpdate', {
+                    enabled: item.value,
+                });
                 break;
             }
             case UpdateItemType.SmartQueueFeature: {
                 if (
                     !(
-                        await bot.guilds.cache
-                            .get(guildId)
-                            ?.members.fetch(socket.user.id)
+                        await guild?.members.fetch(socket.user.id)
                     )?.permissions.has(PermissionsBitField.Flags.ManageGuild)
                 ) {
                     return callback({ status: Response.AuthenticationError });
@@ -444,10 +384,8 @@ export default {
                             status: Response.FeatureDisabledError,
                         });
                     }
-                    const whitelisted = await getGuildFeatureWhitelisted(
-                        guildId,
-                        'smartqueue',
-                    );
+                    const whitelisted =
+                        await guild.features.checkWhitelisted('smartqueue');
                     if (
                         whitelisted === WhitelistStatus.NotWhitelisted ||
                         whitelisted === WhitelistStatus.Expired
@@ -457,16 +395,10 @@ export default {
                         });
                     }
                 }
-                await data.guild.set(
-                    guildId,
-                    'settings.smartqueue',
-                    item.value,
-                );
-                if (settings.features.web.enabled) {
-                    io.to(`guild:${guildId}`).emit('smartQueueFeatureUpdate', {
-                        enabled: item.value,
-                    });
-                }
+                await guild.settings.set('smartqueue', item.value);
+                guild.sendWebUpdate('smartQueueFeatureUpdate', {
+                    enabled: item.value,
+                });
                 break;
             }
         }

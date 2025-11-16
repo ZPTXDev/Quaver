@@ -1,28 +1,29 @@
-import type { QuaverClient, QuaverPlayer } from '#src/lib/util/common.d.js';
-import { data, logger } from '#src/lib/util/common.js';
 import type { Guild } from 'discord.js';
+import { QuaverGuild } from '#src/lib';
+import { EventHandler } from '#src/lib/builders';
+import { logger } from '#src/lib/util/common';
+import type { QuaverClient } from '#src/lib/util/common.d';
 
-export default {
-    name: 'guildDelete',
-    once: false,
-    async execute(guild: Guild & { client: QuaverClient }): Promise<void> {
+export default new EventHandler()
+    .setEvent('guildDelete')
+    .setExecute(async function(
+        guild: Guild & { client: QuaverClient },
+    ): Promise<void> {
         logger.info({
             message: `[G ${guild.id}] Left guild ${guild.name}`,
             label: 'Discord',
         });
-        const player = (await guild.client.music.players.fetch(
-            guild.id,
-        )) as QuaverPlayer;
+        const player = await guild.client.music.players.fetch(guild.id);
+        const g = await QuaverGuild.wrap(guild);
         if (player) {
             logger.info({
-                message: `[G ${guild.id}] Cleaning up (left guild)`,
+                message: `[G ${g.id}] Cleaning up (left guild)`,
                 label: 'Quaver',
             });
             player.voice.channelId = null;
-            if (await data.guild.get(player.id, 'settings.stay.enabled')) {
-                await data.guild.set(player.id, 'settings.stay.enabled', false);
+            if (await g.settings.get<boolean>('stay.enabled')) {
+                await g.settings.set('stay.enabled', false);
             }
-            await player.handler.disconnect();
+            await player.disconnect();
         }
-    },
-};
+    });

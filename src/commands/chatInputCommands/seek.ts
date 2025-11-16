@@ -1,95 +1,89 @@
-import { PlayerResponse } from '#src/lib/PlayerHandler.js';
-import type {
-    QuaverInteraction,
-    QuaverPlayer,
-} from '#src/lib/util/common.d.js';
-import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import { Check } from '#src/lib/util/constants.js';
-import { settings } from '#src/lib/util/settings.js';
+import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
+import {
+    type GuildMember,
+    SlashCommandBuilder,
+    type SlashCommandIntegerOption,
+} from 'discord.js';
+import { PlayerResponse, QuaverGuild } from '#src/lib';
+import { ChatInputCommandHandler } from '#src/lib/builders';
+import { MessageOptionsBuilderType } from '#src/lib/util/common';
+import { Check } from '#src/lib/util/constants';
+import { settings } from '#src/lib/util/settings';
 import {
     getLocaleString,
     getRequesterStatus,
     RequesterStatus,
-} from '#src/lib/util/util.js';
-import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
-import type {
-    ChatInputCommandInteraction,
-    GuildMember,
-    SlashCommandIntegerOption,
-} from 'discord.js';
-import { SlashCommandBuilder } from 'discord.js';
+} from '#src/lib/util/util';
 
-export default {
-    data: new SlashCommandBuilder()
-        .setName('seek')
-        .setDescription(
-            getLocaleString(settings.defaultLocaleCode, 'CMD.SEEK.DESCRIPTION'),
-        )
-        .addIntegerOption(
-            (option): SlashCommandIntegerOption =>
-                option
-                    .setName('hours')
-                    .setDescription(
-                        getLocaleString(
-                            settings.defaultLocaleCode,
-                            'CMD.SEEK.OPTION.HOURS',
-                        ),
-                    )
-                    .setMinValue(0)
-                    .setMaxValue(23),
-        )
-        .addIntegerOption(
-            (option): SlashCommandIntegerOption =>
-                option
-                    .setName('minutes')
-                    .setDescription(
-                        getLocaleString(
-                            settings.defaultLocaleCode,
-                            'CMD.SEEK.OPTION.MINUTES',
-                        ),
-                    )
-                    .setMinValue(0)
-                    .setMaxValue(59),
-        )
-        .addIntegerOption(
-            (option): SlashCommandIntegerOption =>
-                option
-                    .setName('seconds')
-                    .setDescription(
-                        getLocaleString(
-                            settings.defaultLocaleCode,
-                            'CMD.SEEK.OPTION.SECONDS',
-                        ),
-                    )
-                    .setMinValue(0)
-                    .setMaxValue(59),
-        ),
-    checks: [
+export default new ChatInputCommandHandler()
+    .setData(
+        new SlashCommandBuilder()
+            .setName('seek')
+            .setDescription(
+                getLocaleString(
+                    settings.defaultLocaleCode,
+                    'CMD.SEEK.DESCRIPTION',
+                ),
+            )
+            .addIntegerOption(
+                (option): SlashCommandIntegerOption =>
+                    option
+                        .setName('hours')
+                        .setDescription(
+                            getLocaleString(
+                                settings.defaultLocaleCode,
+                                'CMD.SEEK.OPTION.HOURS',
+                            ),
+                        )
+                        .setMinValue(0)
+                        .setMaxValue(23),
+            )
+            .addIntegerOption(
+                (option): SlashCommandIntegerOption =>
+                    option
+                        .setName('minutes')
+                        .setDescription(
+                            getLocaleString(
+                                settings.defaultLocaleCode,
+                                'CMD.SEEK.OPTION.MINUTES',
+                            ),
+                        )
+                        .setMinValue(0)
+                        .setMaxValue(59),
+            )
+            .addIntegerOption(
+                (option): SlashCommandIntegerOption =>
+                    option
+                        .setName('seconds')
+                        .setDescription(
+                            getLocaleString(
+                                settings.defaultLocaleCode,
+                                'CMD.SEEK.OPTION.SECONDS',
+                            ),
+                        )
+                        .setMinValue(0)
+                        .setMaxValue(59),
+            ),
+    )
+    .setChecks([
         Check.GuildOnly,
         Check.ActiveSession,
         Check.InVoice,
         Check.InSessionVoice,
-    ],
-    permissions: {
-        user: [],
-        bot: [],
-    },
-    async execute(
-        interaction: QuaverInteraction<ChatInputCommandInteraction>,
-    ): Promise<void> {
-        const player = (await interaction.client.music.players.fetch(
-            interaction.guildId,
-        )) as QuaverPlayer;
+    ])
+    .setExecute(async function(interaction): Promise<void> {
         const hours = interaction.options.getInteger('hours') ?? 0,
             minutes = interaction.options.getInteger('minutes') ?? 0,
             seconds = interaction.options.getInteger('seconds') ?? 0;
+        const guild = await QuaverGuild.wrap(interaction.guild);
+        const player = await guild.getPlayer();
         if (
             interaction.options.getInteger('hours') === null &&
             interaction.options.getInteger('minutes') === null &&
             interaction.options.getInteger('seconds') === null
         ) {
-            await interaction.replyHandler.locale(
-                'CMD.SEEK.RESPONSE.TIMESTAMP_MISSING',
+            await interaction.replyHandler.reply(
+                guild.locale('CMD.SEEK.RESPONSE.TIMESTAMP_MISSING'),
                 { type: MessageOptionsBuilderType.Error },
             );
             return;
@@ -101,56 +95,41 @@ export default {
             player.queue.channel,
         );
         if (requesterStatus === RequesterStatus.NotRequester) {
-            await interaction.replyHandler.locale('CHECK.NOT_REQUESTER', {
-                type: MessageOptionsBuilderType.Error,
-            });
+            await interaction.replyHandler.reply(
+                guild.locale('CHECK.NOT_REQUESTER'),
+                {
+                    type: MessageOptionsBuilderType.Error,
+                },
+            );
             return;
         }
-        const guildLocaleCode =
-            (await data.guild.get<string>(
-                interaction.guildId,
-                'settings.locale',
-            )) ?? settings.defaultLocaleCode;
         const duration = msToTime(player.queue.current.info.length);
         let durationString = msToTimeString(duration, true);
         if (durationString === 'MORE_THAN_A_DAY') {
-            durationString = getLocaleString(
-                guildLocaleCode,
-                'MISC.MORE_THAN_A_DAY',
-            );
+            durationString = guild.locale('MISC.MORE_THAN_A_DAY');
         }
         const target = msToTime(position);
         let targetString = msToTimeString(target, true);
         if (targetString === 'MORE_THAN_A_DAY') {
-            targetString = getLocaleString(
-                guildLocaleCode,
-                'MISC.MORE_THAN_A_DAY',
-            );
+            targetString = guild.locale('MISC.MORE_THAN_A_DAY');
         }
-        const response = await player.handler.seek(position);
+        const response = await player.seekTo(position);
         switch (response) {
             case PlayerResponse.PlayerIdle:
                 await interaction.replyHandler.reply(
-                    getLocaleString(
-                        guildLocaleCode,
-                        'MUSIC.PLAYER.PLAYING.NOTHING',
-                    ),
+                    guild.locale('MUSIC.PLAYER.PLAYING.NOTHING'),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             case PlayerResponse.PlayerIsStream:
                 await interaction.replyHandler.reply(
-                    getLocaleString(
-                        guildLocaleCode,
-                        'CMD.SEEK.RESPONSE.STREAM_CANNOT_SEEK',
-                    ),
+                    guild.locale('CMD.SEEK.RESPONSE.STREAM_CANNOT_SEEK'),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             case PlayerResponse.InputOutOfRange:
                 await interaction.replyHandler.reply(
-                    getLocaleString(
-                        guildLocaleCode,
+                    guild.locale(
                         'CMD.SEEK.RESPONSE.TIMESTAMP_INVALID',
                         durationString,
                     ),
@@ -159,8 +138,7 @@ export default {
                 return;
             case PlayerResponse.Success:
                 await interaction.replyHandler.reply(
-                    getLocaleString(
-                        guildLocaleCode,
+                    guild.locale(
                         requesterStatus === RequesterStatus.Requester
                             ? 'CMD.SEEK.RESPONSE.SUCCESS.DEFAULT'
                             : requesterStatus === RequesterStatus.ManagerBypass
@@ -171,5 +149,4 @@ export default {
                     ),
                 );
         }
-    },
-};
+    });

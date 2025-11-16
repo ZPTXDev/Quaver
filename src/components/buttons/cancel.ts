@@ -1,23 +1,24 @@
-import { ForceType } from '#src/lib/ReplyHandler.js';
-import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import { confirmationTimeout, searchState } from '#src/lib/util/common.js';
-import { Check } from '#src/lib/util/constants.js';
-import type { ButtonInteraction } from 'discord.js';
+import { ForceType, QuaverGuild } from '#src/lib';
+import { ButtonHandler } from '#src/lib/builders';
+import { confirmationTimeout, searchState } from '#src/lib/util/common';
+import { Check } from '#src/lib/util/constants';
 
-export default {
-    name: 'cancel',
-    checks: [Check.InteractionStarter],
-    async execute(
-        interaction: QuaverInteraction<ButtonInteraction>,
-    ): Promise<void> {
+export default new ButtonHandler()
+    .setChecks([Check.InteractionStarter])
+    .setExecute(async function(interaction): Promise<void> {
+        const guild = await QuaverGuild.wrap(interaction.guild);
         clearTimeout(confirmationTimeout[interaction.message.id]);
         clearTimeout(searchState[interaction.message.id]?.timeout);
         delete confirmationTimeout[interaction.message.id];
         delete searchState[interaction.message.id];
-        await interaction.replyHandler.locale('DISCORD.INTERACTION.CANCELED', {
-            vars: [interaction.message.interactionMetadata.user.id],
-            components: [],
-            force: ForceType.Update,
-        });
-    },
-};
+        await interaction.replyHandler.reply(
+            guild.locale(
+                'DISCORD.INTERACTION.CANCELED',
+                interaction.message.interactionMetadata.user.id,
+            ),
+            {
+                components: [],
+                force: ForceType.Update,
+            },
+        );
+    });

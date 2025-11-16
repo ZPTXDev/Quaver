@@ -1,10 +1,10 @@
 diff --git a/dist/index.d.ts b/dist/index.d.ts
-index 91b3dfb0916ce5ba2e0d223e0a45f14c880e275d..693521826045494b352bae75af199d6521b3901b 100644
+index fbfc1842f1f81c872305649195ba19c0000b4acb..96fce6908ce6ba7e07aa337051ac3a28248ebacd 100644
 --- a/dist/index.d.ts
 +++ b/dist/index.d.ts
 @@ -161,7 +161,7 @@ type KeyvOptions = {
- type KeyvOptions_ = Omit<KeyvOptions, 'store'> & {
-     store: KeyvStoreAdapter | Map<any, any> & KeyvStoreAdapter;
+ type KeyvOptions_ = Omit<KeyvOptions, "store"> & {
+     store: KeyvStoreAdapter | (Map<any, any> & KeyvStoreAdapter);
  };
 -type IteratorFunction = (argument: any) => AsyncGenerator<any, void>;
 +type IteratorFunction = () => AsyncGenerator<any, void>;

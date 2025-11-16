@@ -1,11 +1,7 @@
-import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import { getLocaleString } from '#src/lib/util/util.js';
 import { pinyin as romanizeFromChinese, PINYIN_STYLE } from '@napi-rs/pinyin';
-import type { ButtonInteraction } from 'discord.js';
 import {
     ActionRowBuilder,
-    ButtonBuilder,
+    type ButtonBuilder,
     ButtonStyle,
     ComponentType,
     ContainerBuilder,
@@ -16,17 +12,16 @@ import { convert as romanizeFromKorean } from 'hangul-romanization';
 import Kuroshiro from 'kuroshiro';
 import KuromojiAnalyzer from 'kuroshiro-analyzer-kuromoji';
 import { toRomaji as romanizeFromJapanese } from 'wanakana';
-import { settings } from '#src/lib/util/settings.js';
+import { QuaverGuild } from '#src/lib';
+import { ButtonHandler } from '#src/lib/builders';
+import { MessageOptionsBuilderType } from '#src/lib/util/common';
 
 const kuroshiro = new Kuroshiro.default();
 await kuroshiro.init(new KuromojiAnalyzer());
 
-export default {
-    name: 'lyrics',
-    checks: [],
-    async execute(
-        interaction: QuaverInteraction<ButtonInteraction>,
-    ): Promise<void> {
+export default new ButtonHandler().setExecute(
+    async function(interaction): Promise<void> {
+        const guild = await QuaverGuild.wrap(interaction.guild);
         const romanizeFrom = interaction.customId.split(':')[1];
         if (
             interaction.message.components[0]?.type !==
@@ -36,8 +31,8 @@ export default {
             interaction.message.components[0].components[1]?.type !==
                 ComponentType.TextDisplay
         ) {
-            await interaction.replyHandler.locale(
-                'CMD.LYRICS.RESPONSE.ROMANIZATION_FAILED',
+            await interaction.replyHandler.reply(
+                guild.locale('CMD.LYRICS.RESPONSE.ROMANIZATION_FAILED'),
                 { type: MessageOptionsBuilderType.Error },
             );
             return;
@@ -63,13 +58,8 @@ export default {
                     )
                     .join('\n');
         }
-        const guildLocaleCode =
-            (await data.guild.get<string>(
-                interaction.guildId,
-                'settings.locale',
-            )) ?? settings.defaultLocaleCode;
-        const japaneseInaccurate = getLocaleString(
-            guildLocaleCode,
+        // we'll re-use this since the length limit is affected by it
+        const japaneseInaccurate = guild.locale(
             'CMD.LYRICS.MISC.JAPANESE_INACCURATE',
         );
         const maxLength =
@@ -81,46 +71,41 @@ export default {
         }
         if (lyrics.length === 0) {
             await interaction.replyHandler.reply(
-                getLocaleString(
-                    guildLocaleCode,
-                    'CMD.LYRICS.RESPONSE.ROMANIZATION_FAILED',
-                ),
+                guild.locale('CMD.LYRICS.RESPONSE.ROMANIZATION_FAILED'),
                 { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
         await interaction.replyHandler.reply(
-            new ContainerBuilder({
-                components: [
-                    new TextDisplayBuilder().setContent(title).toJSON(),
-                    new TextDisplayBuilder().setContent(lyrics).toJSON(),
+            new ContainerBuilder()
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(title),
+                    new TextDisplayBuilder().setContent(lyrics),
                     ...(romanizeFrom === 'japanese'
                         ? [
-                              new TextDisplayBuilder()
-                                  .setContent(japaneseInaccurate)
-                                  .toJSON(),
+                              new TextDisplayBuilder().setContent(
+                                  japaneseInaccurate,
+                              ),
                           ]
                         : []),
+                )
+                .addSeparatorComponents(
+                    ...(romanizeFrom ? [new SeparatorBuilder()] : []),
+                )
+                .addActionRowComponents(
                     ...(romanizeFrom
                         ? [
-                              new SeparatorBuilder().toJSON(),
-                              new ActionRowBuilder<ButtonBuilder>()
-                                  .addComponents(
-                                      new ButtonBuilder()
-                                          .setCustomId(`lyrics:${romanizeFrom}`)
-                                          .setStyle(ButtonStyle.Secondary)
-                                          .setLabel(
-                                              getLocaleString(
-                                                  guildLocaleCode,
-                                                  `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}`,
-                                              ),
-                                          ),
-                                  )
-                                  .toJSON(),
+                              new ActionRowBuilder<ButtonBuilder>().addComponents(
+                                  guild.builders
+                                      .buttonLocale(
+                                          `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}`,
+                                      )
+                                      .setStyle(ButtonStyle.Secondary)
+                                      .setCustomId(`lyrics:${romanizeFrom}`),
+                              ),
                           ]
                         : []),
-                ],
-            }),
+                ),
         );
     },
-};
+);

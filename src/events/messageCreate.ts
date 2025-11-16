@@ -1,19 +1,15 @@
 import {
-    buildMessageOptions,
-    getGuildLocaleString,
-} from '#src/lib/util/util.js';
-import type {
-    Message,
-    MessageCreateOptions } from 'discord.js';
-import {
+    type MessageCreateOptions,
     MessageFlags,
     PermissionsBitField,
 } from 'discord.js';
+import { QuaverGuild } from '#src/lib';
+import { EventHandler } from '#src/lib/builders';
+import { buildMessageOptions } from '#src/lib/util/util';
 
-export default {
-    name: 'messageCreate',
-    once: false,
-    async execute(message: Message): Promise<void> {
+export default new EventHandler()
+    .setEvent('messageCreate')
+    .setExecute(async function(message): Promise<void> {
         if (
             message.mentions.has(message.client.user.id, {
                 ignoreRoles: true,
@@ -33,9 +29,9 @@ export default {
             if (applicationCommands.cache.size === 0) {
                 await applicationCommands.fetch();
             }
+            const guild = await QuaverGuild.wrap(message.guild);
             const opts: MessageCreateOptions = buildMessageOptions(
-                await getGuildLocaleString(
-                    message.guildId,
+                guild.locale(
                     'CMD.INFO.RESPONSE.MENTION',
                     applicationCommands.cache.find(
                         (command): boolean => command.name === 'info',
@@ -54,5 +50,4 @@ export default {
             opts.flags = [MessageFlags.IsComponentsV2];
             await message.reply(opts);
         }
-    },
-};
+    });

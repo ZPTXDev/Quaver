@@ -1,18 +1,13 @@
-import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import type {
-    ApplicationCommandOptionChoiceData,
-    AutocompleteInteraction,
-} from 'discord.js';
+import type { ApplicationCommandOptionChoiceData } from 'discord.js';
+import { QuaverGuild } from '#src/lib';
+import { AutocompleteHandler } from '#src/lib/builders';
 
-export default {
-    name: 'move',
-    async execute(
-        interaction: QuaverInteraction<AutocompleteInteraction>,
-    ): Promise<void> {
+export default new AutocompleteHandler().setExecute(
+    async function(interaction): Promise<void> {
         const focused = interaction.options.getFocused();
-        const player = await interaction.client.music.players.fetch(
-            interaction.guildId,
-        );
+        // no usage of locale, so no need to run updateLocaleCode
+        const guild = await QuaverGuild.wrap(interaction.guild);
+        const player = await guild.getPlayer();
         if (!player) return interaction.respond([]);
         return interaction.respond(
             player.queue.tracks
@@ -43,4 +38,4 @@ export default {
                 .slice(0, 25),
         );
     },
-};
+);

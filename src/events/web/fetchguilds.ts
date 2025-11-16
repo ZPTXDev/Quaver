@@ -1,18 +1,16 @@
-import type {
-    JSONResponse,
-    WhitelistedFeatures,
-} from '#src/lib/util/common.d.js';
-import { settings } from '#src/lib/util/settings.js';
-import {
-    WhitelistStatus,
-    getGuildFeatureWhitelisted,
-} from '#src/lib/util/util.js';
-import { version } from '#src/lib/util/version.js';
 import { getJSONResponse } from '@zptxdev/zptx-lib';
 import CryptoJS from 'crypto-js';
 import type { Socket } from 'socket.io';
 import { request } from 'undici';
-import type { WebGuild } from './fetchguilds.d.js';
+import type { WebGuild } from './fetchguilds.d';
+import {
+    QuaverGuild,
+    type WhitelistedFeatures,
+    WhitelistStatus,
+} from '#src/lib';
+import type { JSONResponse } from '#src/lib/util/common.d';
+import { settings } from '#src/lib/util/settings';
+import { version } from '#src/lib/util/version';
 
 export default {
     name: 'fetchguilds',
@@ -23,15 +21,15 @@ export default {
         callback: (cb: Record<string, any>) => void,
         token?: string,
     ): Promise<void> {
-        const { bot } = await import('#src/main.js');
+        const { client } = await import('#src/main.js');
         if (socket.guilds) {
             return callback({
                 status: 'success',
                 guilds: socket.guilds.map((guild): WebGuild => {
-                    guild.botInGuild = !!bot.guilds.cache.get(guild.id);
+                    guild.botInGuild = !!client.guilds.cache.get(guild.id);
                     const player =
                         guild.botInGuild &&
-                        bot.music.players.cache.get(guild.id);
+                        client.music.players.cache.get(guild.id);
                     guild.idle =
                         guild.botInGuild && player
                             ? !player.queue.current ||
@@ -64,9 +62,9 @@ export default {
         >;
         if (response.message) return callback({ status: 'error-auth' });
         const webGuilds = response.map((guild): WebGuild => {
-            guild.botInGuild = !!bot.guilds.cache.get(guild.id);
+            guild.botInGuild = !!client.guilds.cache.get(guild.id);
             const player =
-                guild.botInGuild && bot.music.players.cache.get(guild.id);
+                guild.botInGuild && client.music.players.cache.get(guild.id);
             guild.idle =
                 guild.botInGuild && player
                     ? !player.queue.current ||
@@ -81,6 +79,9 @@ export default {
         if (settings.premiumURL) {
             for (const webGuild of webGuilds) {
                 if (!webGuild.botInGuild) continue;
+                const guild = await QuaverGuild.wrap(
+                    client.guilds.cache.get(webGuild.id),
+                );
                 for (const feature of [
                     'stay',
                     'autolyrics',
@@ -91,8 +92,7 @@ export default {
                         settings.features[feat].whitelist &&
                         settings.features[feat].premium,
                 )) {
-                    const whitelisted = await getGuildFeatureWhitelisted(
-                        webGuild.id,
+                    const whitelisted = await guild.features.checkWhitelisted(
                         feature as WhitelistedFeatures,
                     );
                     if (

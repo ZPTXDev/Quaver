@@ -1,20 +1,20 @@
-import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions } from '#src/lib/util/common.d.js';
-import { logger, MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import { buildMessageOptions, getGuildLocaleString } from '#src/lib/util/util.js';
-import type {
-    InteractionCallbackResponse,
-    InteractionEditReplyOptions,
-    InteractionReplyOptions,
-    InteractionResponse,
-    InteractionUpdateOptions,
-    Message,
+import {
+    type InteractionCallbackResponse,
+    type InteractionEditReplyOptions,
+    type InteractionReplyOptions,
+    type InteractionResponse,
+    type InteractionUpdateOptions,
+    type Message,
+    MessageFlags,
+    PermissionsBitField,
 } from 'discord.js';
-import { MessageFlags, PermissionsBitField } from 'discord.js';
-import type { AdditionalBuilderOptions } from './ReplyHandler.d.js';
-import type { NonSpecialInteractions } from '#src/events/interactionCreate.d.js';
+import type { AdditionalBuilderOptions, NonSpecialInteractions } from '.';
+import { logger, MessageOptionsBuilderType } from './util/common';
+import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions } from './util/common.d';
+import { buildMessageOptions } from './util/util';
 
 /** Class for handling replies to interactions. */
-export default class ReplyHandler {
+export class ReplyHandler {
     interaction: NonSpecialInteractions;
 
     /**
@@ -154,82 +154,6 @@ export default class ReplyHandler {
             }
             return undefined;
         }
-    }
-
-    /**
-     * Replies with a localized message.
-     * @param stringPath - The code of the locale string to be used.
-     * @param options - Extra data, such as type or components.
-     * @returns The message that was sent.
-     */
-    async locale(
-        stringPath: string,
-        {
-            vars,
-            type,
-            components,
-            files,
-            ephemeral,
-            force,
-            withResponse,
-        }?: MessageOptionsBuilderOptions &
-            AdditionalBuilderOptions & {
-                vars?: string[];
-                withResponse?: false;
-            },
-    ): Promise<InteractionResponse>;
-    async locale(
-        stringPath: string,
-        {
-            vars,
-            type,
-            components,
-            files,
-            ephemeral,
-            force,
-            withResponse,
-        }?: MessageOptionsBuilderOptions &
-            AdditionalBuilderOptions & { vars?: string[]; withResponse: true },
-    ): Promise<Message>;
-    async locale(
-        stringPath: string,
-        {
-            vars,
-            type,
-            components,
-            files,
-            ephemeral,
-            force,
-            withResponse,
-        }?: MessageOptionsBuilderOptions &
-            AdditionalBuilderOptions & { vars?: string[] },
-    ): Promise<InteractionResponse>;
-    async locale(
-        stringPath: string,
-        {
-            vars = [],
-            type = MessageOptionsBuilderType.Neutral,
-            components = null,
-            files = null,
-            ephemeral = false,
-            force = null,
-            withResponse = false,
-        }: MessageOptionsBuilderOptions &
-            AdditionalBuilderOptions & { vars?: string[] } = {},
-    ): Promise<InteractionResponse | Message | undefined> {
-        const guildLocaleString = await getGuildLocaleString(
-            this.interaction.guildId,
-            stringPath,
-            ...vars,
-        );
-        return this.reply(guildLocaleString, {
-            type,
-            components,
-            files,
-            ephemeral,
-            force,
-            withResponse,
-        });
     }
 }
 

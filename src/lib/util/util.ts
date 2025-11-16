@@ -1,9 +1,39 @@
+import type { Song } from '@lavaclient/plugin-queue';
+import { getAbsoluteFileURL } from '@zptxdev/zptx-lib';
+import {
+    ActionRowBuilder,
+    type APISelectMenuOption,
+    type BaseMessageOptions,
+    ButtonBuilder,
+    ButtonStyle,
+    ContainerBuilder,
+    escapeMarkdown,
+    type Guild,
+    GuildMember,
+    type Interaction,
+    type MessageActionRowComponentBuilder,
+    PermissionsBitField,
+    resolveColor,
+    RoleSelectMenuBuilder,
+    SectionBuilder,
+    type SelectMenuComponentOptionData,
+    SeparatorBuilder,
+    type Snowflake,
+    StringSelectMenuBuilder,
+    TextDisplayBuilder,
+    ThumbnailBuilder,
+} from 'discord.js';
+import { get } from 'lodash-es';
+import { readdirSync } from 'node:fs';
+import type { ColorTypes, LocaleCompletionState, LyricsResponse } from './util.d';
+import { type Initialized, QuaverGuild, type QuaverPlayer, type WhitelistedFeatures } from '#src/lib';
+import type { ComponentInteractions } from '#src/lib/InteractionHandler.d';
+import { data, locales, MessageOptionsBuilderType } from '#src/lib/util/common';
 import type {
     MessageOptionsBuilderInputs,
     MessageOptionsBuilderOptions,
     QuaverChannels,
     QuaverClient,
-    QuaverPlayer,
     QuaverSong,
     SettingsPage,
     SettingsPageFormatOptions,
@@ -11,9 +41,7 @@ import type {
     SettingsPageOptions,
     SettingsPagePremiumOptions,
     TopLevelComponentBuilders,
-    WhitelistedFeatures,
-} from '#src/lib/util/common.d.js';
-import { data, locales, MessageOptionsBuilderType } from '#src/lib/util/common.js';
+} from '#src/lib/util/common.d';
 import {
     acceptableSources,
     Check,
@@ -21,38 +49,8 @@ import {
     queryOverrides,
     settingsOptions,
     sourceManagers as extSourceManagers,
-} from '#src/lib/util/constants.js';
-import { settings } from '#src/lib/util/settings.js';
-import { getAbsoluteFileURL } from '@zptxdev/zptx-lib';
-import type {
-    APISelectMenuOption,
-    BaseMessageOptions,
-    Interaction,
-    MessageActionRowComponentBuilder,
-    Snowflake,
-} from 'discord.js';
-import {
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    ContainerBuilder,
-    escapeMarkdown,
-    GuildMember,
-    PermissionsBitField,
-    resolveColor,
-    RoleSelectMenuBuilder,
-    SectionBuilder,
-    type SelectMenuComponentOptionData,
-    SeparatorBuilder,
-    StringSelectMenuBuilder,
-    TextDisplayBuilder,
-    ThumbnailBuilder,
-} from 'discord.js';
-import { readdirSync } from 'fs';
-import { get } from 'lodash-es';
-import type { ColorTypes, LocaleCompletionState, LyricsResponse } from './util.d.js';
-import type { ComponentInteractions } from '#src/events/interactionCreate.d.js';
-import type { Song } from '@lavaclient/plugin-queue';
+} from '#src/lib/util/constants';
+import { settings } from '#src/lib/util/settings';
 
 /**
  * Returns the localized string.
@@ -90,24 +88,6 @@ export function getLocaleString(
         return decodeURI(varMap[match]);
     });
     return localeString;
-}
-
-/**
- * Returns the localized string for the specified guild.
- * @param guildId - The guild ID.
- * @param stringPath - The string to get.
- * @param vars - The extra variables required in some localized strings.
- * @returns The localized string, or LOCALE_MISSING if the locale is missing, or stringPath if the string is missing.
- */
-export async function getGuildLocaleString(
-    guildId: Snowflake,
-    stringPath: string,
-    ...vars: string[]
-): Promise<string | 'LOCALE_MISSING'> {
-    const guildLocaleCode =
-        (await data.guild.get<string>(guildId, 'settings.locale')) ??
-        settings.defaultLocaleCode;
-    return getLocaleString(guildLocaleCode, stringPath, ...vars);
 }
 
 /**
@@ -152,48 +132,6 @@ export function checkLocaleCompletion(
         };
     }
     return { completion: 100, missing: [] };
-}
-
-export enum WhitelistStatus {
-    /**
-     * The guild is not whitelisted
-     */
-    NotWhitelisted,
-    /**
-     * The whitelist has expired
-     */
-    Expired,
-    /**
-     * The whitelist is temporary
-     */
-    Temporary,
-    /**
-     * The whitelist is permanent
-     */
-    Permanent,
-}
-
-/**
- * Checks if a guild is whitelisted for a feature. Returns Permanent status if the feature does not have whitelist enabled.
- * @param guildId - The guild ID.
- * @param feature - The feature to check.
- * @returns Whether the guild is whitelisted.
- */
-export async function getGuildFeatureWhitelisted(
-    guildId: Snowflake,
-    feature: WhitelistedFeatures,
-): Promise<WhitelistStatus> {
-    if (!settings.features[feature].whitelist) return WhitelistStatus.Permanent;
-    const whitelisted = await data.guild.get<number>(
-        guildId,
-        `features.${feature}.whitelisted`,
-    );
-    if (!whitelisted) return WhitelistStatus.NotWhitelisted;
-    if (whitelisted !== -1 && Date.now() > whitelisted) {
-        return WhitelistStatus.Expired;
-    }
-    if (whitelisted === -1) return WhitelistStatus.Permanent;
-    return WhitelistStatus.Temporary;
 }
 
 export enum RequesterStatus {
@@ -314,32 +252,27 @@ export async function getFailedChecks(
  * Returns the Enable and Disable button components used in settings.
  * @param customId - The custom ID of the button.
  * @param enabled - Whether the setting is enabled.
- * @param guildLocaleCode - The guild's locale code.
+ * @param guild - The guild.
  * @returns An array of ButtonBuilder components for enabling and disabling the setting.
  */
 export function getButtonToggleComponents(
     customId: string,
     enabled: boolean,
-    guildLocaleCode: keyof typeof Language,
+    guild: QuaverGuild<Initialized> & Guild,
 ): ButtonBuilder[] {
     return ['enable', 'disable'].map(
         (state): ButtonBuilder =>
             new ButtonBuilder()
                 .setCustomId(`${customId}:${state}`)
-                .setLabel(
-                    getLocaleString(
-                        guildLocaleCode,
-                        `MISC.${state.toUpperCase()}`,
-                    ),
-                )
+                .setLabel(guild.locale(`MISC.${state.toUpperCase()}`))
                 .setStyle(
                     state === 'enable'
                         ? enabled
                             ? ButtonStyle.Success
                             : ButtonStyle.Secondary
                         : !enabled
-                            ? ButtonStyle.Success
-                            : ButtonStyle.Secondary,
+                          ? ButtonStyle.Success
+                          : ButtonStyle.Secondary,
                 )
                 .setDisabled(state === 'enable' ? enabled : !enabled),
     );
@@ -395,7 +328,7 @@ export function formatResponse(
     return json.type === 'text'
         ? json.text
         : json.type === 'timed'
-            ? json.lines
+          ? json.lines
                 .map((line): string =>
                     player?.position >= line.range.start &&
                     player?.position < line.range.end
@@ -403,7 +336,7 @@ export function formatResponse(
                         : line.line,
                 )
                 .join('\n')
-            : new Error('No results');
+          : new Error('No results');
 }
 
 /**
@@ -423,7 +356,7 @@ export function buildMessageOptions(
     const messageData = Array.isArray(inputData) ? inputData : [inputData];
     const color: ColorTypes = MessageOptionsBuilderType[
         type
-        ].toLowerCase() as ColorTypes;
+    ].toLowerCase() as ColorTypes;
     const containerData = messageData.map((msg): TopLevelComponentBuilders => {
         if (typeof msg === 'string') {
             return new ContainerBuilder()
@@ -445,23 +378,22 @@ export function buildMessageOptions(
 
 /**
  * (For internal use) Returns a settings page premium options object.
- * @param guildId - The guild ID.
- * @param guildLocaleCode - The guild's locale code.
+ * @param guild - The guild.
  * @returns A Promise of a SettingsPagePremiumOptions object.
  */
-async function buildSettingsPagePremiumOptions(guildId: Snowflake, guildLocaleCode: keyof typeof Language): Promise<SettingsPagePremiumOptions> {
+async function buildSettingsPagePremiumOptions(
+    guild: QuaverGuild<Initialized> & Guild,
+): Promise<SettingsPagePremiumOptions> {
     const components = [
-        new ButtonBuilder()
-            .setLabel(
-                getLocaleString(guildLocaleCode, 'MISC.GET_PREMIUM'),
-            )
+        guild.builders
+            .buttonLocale('MISC.GET_PREMIUM')
             .setStyle(ButtonStyle.Link)
             .setURL(settings.premiumURL),
     ];
     const whitelisted = {
-        stay: await data.guild.get<number>(guildId, 'features.stay.whitelisted'),
-        autolyrics: await data.guild.get<number>(guildId, 'features.autolyrics.whitelisted'),
-        smartqueue: await data.guild.get<number>(guildId, 'features.smartqueue.whitelisted'),
+        stay: await guild.features.get<number>('stay.whitelisted'),
+        autolyrics: await guild.features.get<number>('autolyrics.whitelisted'),
+        smartqueue: await guild.features.get<number>('smartqueue.whitelisted'),
     };
     const features = Object.keys(whitelisted)
         .filter(
@@ -472,36 +404,29 @@ async function buildSettingsPagePremiumOptions(guildId: Snowflake, guildLocaleCo
         )
         .map(
             (key: WhitelistedFeatures): string =>
-                `**${getLocaleString(
-                    guildLocaleCode,
+                `**${guild.locale(
                     `CMD.SETTINGS.MISC.PREMIUM.FEATURES.${key.toUpperCase()}`,
                 )}** ─ ${
                     !whitelisted[key]
-                        ? getLocaleString(
-                            guildLocaleCode,
-                            'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.LOCKED.DEFAULT',
-                        )
+                        ? guild.locale(
+                              'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.LOCKED.DEFAULT',
+                          )
                         : whitelisted[key] !== -1 &&
-                        Date.now() > whitelisted[key]
-                            ? getLocaleString(
-                                guildLocaleCode,
+                            Date.now() > whitelisted[key]
+                          ? guild.locale(
                                 'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.LOCKED.EXPIRED',
-                                Math.floor(
-                                    whitelisted[key] / 1000,
-                                ).toString(),
+                                Math.floor(whitelisted[key] / 1000).toString(),
                             )
-                            : whitelisted[key] === -1
-                                ? getLocaleString(
-                                    guildLocaleCode,
-                                    'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.UNLOCKED.PERMANENT',
-                                )
-                                : getLocaleString(
-                                    guildLocaleCode,
-                                    'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.UNLOCKED.TEMPORARY',
-                                    Math.floor(
-                                        whitelisted[key] / 1000,
-                                    ).toString(),
-                                )
+                          : whitelisted[key] === -1
+                            ? guild.locale(
+                                  'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.UNLOCKED.PERMANENT',
+                              )
+                            : guild.locale(
+                                  'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.UNLOCKED.TEMPORARY',
+                                  Math.floor(
+                                      whitelisted[key] / 1000,
+                                  ).toString(),
+                              )
                 }`,
         );
     return { components, features };
@@ -509,35 +434,30 @@ async function buildSettingsPagePremiumOptions(guildId: Snowflake, guildLocaleCo
 
 /**
  * (For internal use) Returns a settings page language options object.
- * @param guildLocaleCode - The guild's locale code.
+ * @param guild - The guild.
  * @returns A SettingsPageGenericOptions object.
  */
 function buildSettingsPageLanguageOptions(
-    guildLocaleCode: keyof typeof Language,
+    guild: QuaverGuild<Initialized> & Guild,
 ): SettingsPageGenericOptions {
     const components = [
-        new StringSelectMenuBuilder()
-            .setCustomId('language')
-            .addOptions(
-                readdirSync(
-                    getAbsoluteFileURL(import.meta.url, [
-                        '..',
-                        '..',
-                        '..',
-                        'locales',
-                    ]),
-                ).map(
-                    (
-                        file: keyof typeof Language,
-                    ): APISelectMenuOption => ({
-                        label: `${
-                            Language[file] ?? 'Unknown'
-                        } (${file})`,
-                        value: file,
-                        default: file === guildLocaleCode,
-                    }),
-                ),
+        new StringSelectMenuBuilder().setCustomId('language').addOptions(
+            readdirSync(
+                getAbsoluteFileURL(import.meta.url, [
+                    '..',
+                    '..',
+                    '..',
+                    'locales',
+                ]),
+            ).map(
+                (file: keyof typeof Language): APISelectMenuOption => ({
+                    label: `${Language[file] ?? 'Unknown'} (${file})`,
+                    value: file,
+                    default:
+                        file === (guild.localeCode as keyof typeof Language),
+                }),
             ),
+        ),
     ];
     return { components };
 }
@@ -546,161 +466,122 @@ function buildSettingsPageLanguageOptions(
  * (For internal use) Returns a settings page format options object.
  * @param current - The current format setting.
  * @param userId - The user ID.
- * @param guildId - The guild ID.
- * @param guildLocaleCode - The guild's locale code.
+ * @param guild - The guild.
  * @returns A SettingsPageFormatOptions object.
  */
 function buildSettingsPageFormatOptions(
     current: string,
     userId: Snowflake,
-    guildId: Snowflake,
-    guildLocaleCode: keyof typeof Language,
+    guild: QuaverGuild<Initialized> & Guild,
 ): SettingsPageFormatOptions {
     const exampleId = 'dQw4w9WgXcQ';
     const emoji = settings.emojis?.youtube ?? '';
     const components = [
-        new ButtonBuilder()
-            .setCustomId('format:simple')
-            .setLabel(
-                getLocaleString(
-                    guildLocaleCode,
-                    'CMD.SETTINGS.MISC.FORMAT.OPTIONS.SIMPLE',
-                ),
-            )
+        guild.builders
+            .buttonLocale('CMD.SETTINGS.MISC.FORMAT.OPTIONS.SIMPLE')
             .setStyle(
                 current === 'simple'
                     ? ButtonStyle.Success
                     : ButtonStyle.Secondary,
             )
-            .setDisabled(current === 'simple'),
-        new ButtonBuilder()
-            .setCustomId('format:detailed')
-            .setLabel(
-                getLocaleString(
-                    guildLocaleCode,
-                    'CMD.SETTINGS.MISC.FORMAT.OPTIONS.DETAILED',
-                ),
-            )
+            .setDisabled(current === 'simple')
+            .setCustomId('format:simple'),
+        guild.builders
+            .buttonLocale('CMD.SETTINGS.MISC.FORMAT.OPTIONS.DETAILED')
             .setStyle(
                 current === 'detailed'
                     ? ButtonStyle.Success
                     : ButtonStyle.Secondary,
             )
-            .setDisabled(current === 'detailed'),
+            .setDisabled(current === 'detailed')
+            .setCustomId('format:detailed'),
     ];
     const containers = [
         current === 'simple'
-            ? new ContainerBuilder({
-                components: [
-                    new TextDisplayBuilder()
-                        .setContent(
-                            `${getLocaleString(
-                                guildLocaleCode,
-                                'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
-                                `[${getLocaleString(
-                                    guildLocaleCode,
-                                    'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.SIMPLE',
-                                )}](https://www.youtube.com/watch?v=${exampleId})`,
-                                '4:20',
-                            )}\n${getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${getLocaleString(guildLocaleCode, 'MISC.SOURCES.YOUTUBE')}** ─ ${getLocaleString(
-                                guildLocaleCode,
-                                'MISC.ADDED_BY',
-                                userId,
-                            )}`,
-                        )
-                        .toJSON(),
-                    ...(settings.features.web.dashboardURL
-                        ? [
-                            new SeparatorBuilder().toJSON(),
-                            new ActionRowBuilder<ButtonBuilder>()
-                                .addComponents(
-                                    new ButtonBuilder()
+            ? new ContainerBuilder()
+                  .addTextDisplayComponents(
+                      new TextDisplayBuilder().setContent(
+                          `${guild.locale(
+                              'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
+                              `[${guild.locale(
+                                  'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.SIMPLE',
+                              )}](https://www.youtube.com/watch?v=${exampleId})`,
+                              '4:20',
+                          )}\n${guild.locale('MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${guild.locale('MISC.SOURCES.YOUTUBE')}** ─ ${guild.locale(
+                              'MISC.ADDED_BY',
+                              userId,
+                          )}`,
+                      ),
+                  )
+                  .addSeparatorComponents(
+                      ...(settings.features.web.dashboardURL
+                          ? [new SeparatorBuilder()]
+                          : []),
+                  )
+                  .addActionRowComponents(
+                      ...(settings.features.web.dashboardURL
+                          ? [
+                                new ActionRowBuilder<ButtonBuilder>().addComponents(
+                                    guild.builders
+                                        .buttonLocale('MISC.DASHBOARD')
+                                        .setStyle(ButtonStyle.Link)
                                         .setURL(
                                             `${settings.features.web.dashboardURL.replace(
                                                 /\/+$/,
                                                 '',
-                                            )}/guild/${guildId}`,
-                                        )
-                                        .setStyle(ButtonStyle.Link)
-                                        .setLabel(
-                                            getLocaleString(
-                                                guildLocaleCode,
-                                                'MISC.DASHBOARD',
-                                            ),
+                                            )}/guild/${guild.id}`,
                                         ),
-                                )
-                                .toJSON(),
-                        ]
-                        : []),
-                ],
-            }).setAccentColor(resolveColor(settings.colors.neutral))
-            : new ContainerBuilder({
-                components: [
-                    new SectionBuilder({
-                        components: [
-                            new TextDisplayBuilder()
-                                .setContent(
-                                    getLocaleString(
-                                        guildLocaleCode,
-                                        'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE',
-                                    ),
-                                )
-                                .toJSON(),
-                            new TextDisplayBuilder()
-                                .setContent(
-                                    `${getLocaleString(
-                                        guildLocaleCode,
-                                        'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TEXT',
-                                        `[Rick Astley - ${getLocaleString(guildLocaleCode, 'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.DETAILED')}](https://www.youtube.com/watch?v=${exampleId})`,
-                                        '4:20',
-                                    )}\n${getLocaleString(guildLocaleCode, 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${getLocaleString(guildLocaleCode, 'MISC.SOURCES.YOUTUBE')}** ─ ${getLocaleString(
-                                        guildLocaleCode,
-                                        'MISC.ADDED_BY',
-                                        userId,
-                                    )}`,
-                                )
-                                .toJSON(),
-                            new TextDisplayBuilder()
-                                .setContent(
-                                    getLocaleString(
-                                        guildLocaleCode,
-                                        'MUSIC.PLAYER.PLAYING.NOW.DETAILED.REMAINING',
-                                        '1',
-                                    ),
-                                )
-                                .toJSON(),
-                        ],
-                        accessory: new ThumbnailBuilder()
-                            .setURL(
-                                `https://i.ytimg.com/vi/${exampleId}/hqdefault.jpg`,
-                            )
-                            .toJSON(),
-                    }).toJSON(),
-                    ...(settings.features.web.dashboardURL
-                        ? [
-                            new SeparatorBuilder().toJSON(),
-                            new ActionRowBuilder<ButtonBuilder>()
-                                .addComponents(
-                                    new ButtonBuilder()
-                                        .setURL(
-                                            `${settings.features.web.dashboardURL.replace(
-                                                /\/+$/,
-                                                '',
-                                            )}/guild/${guildId}`,
-                                        )
-                                        .setStyle(ButtonStyle.Link)
-                                        .setLabel(
-                                            getLocaleString(
-                                                guildLocaleCode,
-                                                'MISC.DASHBOARD',
-                                            ),
-                                        ),
-                                )
-                                .toJSON(),
-                        ]
-                        : []),
-                ],
-            }),
+                                ),
+                            ]
+                          : []),
+                  )
+                  .setAccentColor(resolveColor(settings.colors.neutral))
+            : new ContainerBuilder()
+                  .addSectionComponents(
+                      new SectionBuilder()
+                          .addTextDisplayComponents(
+                              guild.builders.textDisplayLocale(
+                                  'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE',
+                              ),
+                              new TextDisplayBuilder().setContent(
+                                  `${guild.locale(
+                                      'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TEXT',
+                                      `[Rick Astley - ${guild.locale('CMD.SETTINGS.MISC.FORMAT.EXAMPLE.DETAILED')}](https://www.youtube.com/watch?v=${exampleId})`,
+                                      '4:20',
+                                  )}\n${guild.locale('MUSIC.PLAYER.PLAYING.NOW.DETAILED.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${guild.locale('MISC.SOURCES.YOUTUBE')}** ─ ${guild.locale(
+                                      'MISC.ADDED_BY',
+                                      userId,
+                                  )}`,
+                              ),
+                              guild.builders.textDisplayLocale(
+                                  'MUSIC.PLAYER.PLAYING.NOW.DETAILED.REMAINING',
+                                  '1',
+                              ),
+                          )
+                          .setThumbnailAccessory(
+                              new ThumbnailBuilder().setURL(
+                                  `https://i.ytimg.com/vi/${exampleId}/hqdefault.jpg`,
+                              ),
+                          ),
+                  )
+                  .addSeparatorComponents(
+                      ...(settings.features.web.dashboardURL
+                          ? [new SeparatorBuilder()]
+                          : []),
+                  )
+                  .addActionRowComponents(
+                      new ActionRowBuilder<ButtonBuilder>().addComponents(
+                          guild.builders
+                              .buttonLocale('MISC.DASHBOARD')
+                              .setStyle(ButtonStyle.Link)
+                              .setURL(
+                                  `${settings.features.web.dashboardURL.replace(
+                                      /\/+$/,
+                                      '',
+                                  )}/guild/${guild.id}`,
+                              ),
+                      ),
+                  ),
     ];
     return { components, containers };
 }
@@ -724,16 +605,13 @@ function buildSettingsPageDJOptions(
 
 function buildSettingsPageSourceOptions(
     current: string,
-    guildLocaleCode: keyof typeof Language,
+    guild: QuaverGuild<Initialized> & Guild,
 ): SettingsPageGenericOptions {
     const components = [
         new StringSelectMenuBuilder().setCustomId('source').addOptions(
             Object.keys(acceptableSources).map(
                 (source: string): APISelectMenuOption => ({
-                    label: getLocaleString(
-                        guildLocaleCode,
-                        `MISC.SOURCES.${source.toUpperCase()}`,
-                    ),
+                    label: guild.locale(`MISC.SOURCES.${source.toUpperCase()}`),
                     value: source,
                     default: current === source,
                 }),
@@ -746,15 +624,15 @@ function buildSettingsPageSourceOptions(
 /**
  * Returns a SettingsPage object.
  * @param interaction - The interaction to use for context.
- * @param guildLocaleCode - The guild's locale code.
  * @param option - The option to display.
  * @returns A Promise of a SettingsPage object.
  */
 export async function buildSettingsPage(
     interaction: Interaction,
-    guildLocaleCode: keyof typeof Language,
     option: SettingsPageOptions,
 ): Promise<SettingsPage> {
+    const guild = await QuaverGuild.wrap(interaction.guild);
+    const guildLocaleCode = guild.localeCode as keyof typeof Language;
     let current: string;
     const containers: ContainerBuilder[] = [];
     const baseContainer = new ContainerBuilder();
@@ -762,10 +640,8 @@ export async function buildSettingsPage(
     switch (option) {
         case 'premium': {
             current = '';
-            const { components, features } = await buildSettingsPagePremiumOptions(
-                interaction.guildId,
-                guildLocaleCode,
-            );
+            const { components, features } =
+                await buildSettingsPagePremiumOptions(guild);
             actionRow.addComponents(...components);
             baseContainer.addTextDisplayComponents(
                 new TextDisplayBuilder().setContent(features.join('\n')),
@@ -776,61 +652,43 @@ export async function buildSettingsPage(
             current = `\`${
                 Language[guildLocaleCode] ?? 'Unknown'
             } (${guildLocaleCode})\``;
-            const { components } = buildSettingsPageLanguageOptions(guildLocaleCode);
+            const { components } = buildSettingsPageLanguageOptions(guild);
             actionRow.addComponents(...components);
             break;
         }
         case 'notifyin247': {
             const enabled =
-                (await data.guild.get<boolean>(
-                    interaction.guildId,
-                    'settings.notifyin247',
-                )) ?? true;
+                (await guild.settings.get<boolean>('notifyin247')) ?? true;
             actionRow.addComponents(
-                ...getButtonToggleComponents(
-                    'notifyin247',
-                    !!enabled,
-                    guildLocaleCode,
-                ),
+                ...getButtonToggleComponents('notifyin247', !!enabled, guild),
             );
             current = `\`${
                 enabled
-                    ? getLocaleString(guildLocaleCode, 'MISC.ENABLED')
-                    : getLocaleString(guildLocaleCode, 'MISC.DISABLED')
+                    ? guild.locale('MISC.ENABLED')
+                    : guild.locale('MISC.DISABLED')
             }\``;
             break;
         }
         case 'format': {
-            current =
-                (await data.guild.get<string>(
-                    interaction.guildId,
-                    'settings.format',
-                )) ?? 'simple';
-            const { components, containers: container } = buildSettingsPageFormatOptions(
-                current,
-                interaction.user.id,
-                interaction.guildId,
-                guildLocaleCode,
-            );
+            current = (await guild.settings.get<string>('format')) ?? 'simple';
+            const { components, containers: container } =
+                buildSettingsPageFormatOptions(
+                    current,
+                    interaction.user.id,
+                    guild,
+                );
             actionRow.addComponents(...components);
             containers.push(...container);
-            current = `\`${getLocaleString(
-                guildLocaleCode,
+            current = `\`${guild.locale(
                 `CMD.SETTINGS.MISC.FORMAT.OPTIONS.${current.toUpperCase()}`,
             )}\``;
             break;
         }
         case 'dj': {
-            current = await data.guild.get<Snowflake>(
-                interaction.guildId,
-                'settings.dj',
-            );
+            current = await guild.settings.get<Snowflake>('dj');
             let raw = undefined;
             if (!current) {
-                current = `\`${getLocaleString(
-                    guildLocaleCode,
-                    'MISC.NONE',
-                )}\``;
+                current = `\`${guild.locale('MISC.NONE')}\``;
             } else {
                 raw = current;
                 current = `<@&${current}>`;
@@ -841,56 +699,39 @@ export async function buildSettingsPage(
         }
         case 'source': {
             current =
-                (await data.guild.get<string>(
-                    interaction.guildId,
-                    'settings.source',
-                )) ?? Object.keys(acceptableSources)[0];
+                (await guild.settings.get<string>('source')) ??
+                Object.keys(acceptableSources)[0];
             const { components } = buildSettingsPageSourceOptions(
                 current,
-                guildLocaleCode,
+                guild,
             );
             actionRow.addComponents(...components);
-            current = `\`${getLocaleString(
-                guildLocaleCode,
+            current = `\`${guild.locale(
                 `MISC.SOURCES.${current.toUpperCase()}`,
             )}\``;
             break;
         }
         case 'autolyrics': {
-            const enabled = await data.guild.get<boolean>(
-                interaction.guildId,
-                'settings.autolyrics',
-            );
+            const enabled = await guild.settings.get<boolean>('autolyrics');
             actionRow.addComponents(
-                ...getButtonToggleComponents(
-                    'autolyrics',
-                    !!enabled,
-                    guildLocaleCode,
-                ),
+                ...getButtonToggleComponents('autolyrics', !!enabled, guild),
             );
             current = `\`${
                 enabled
-                    ? getLocaleString(guildLocaleCode, 'MISC.ENABLED')
-                    : getLocaleString(guildLocaleCode, 'MISC.DISABLED')
+                    ? guild.locale('MISC.ENABLED')
+                    : guild.locale('MISC.DISABLED')
             }\``;
             break;
         }
         case 'smartqueue': {
-            const enabled = await data.guild.get<boolean>(
-                interaction.guildId,
-                'settings.smartqueue',
-            );
+            const enabled = await guild.settings.get<boolean>('smartqueue');
             actionRow.addComponents(
-                ...getButtonToggleComponents(
-                    'smartqueue',
-                    !!enabled,
-                    guildLocaleCode,
-                ),
+                ...getButtonToggleComponents('smartqueue', !!enabled, guild),
             );
             current = `\`${
                 enabled
-                    ? getLocaleString(guildLocaleCode, 'MISC.ENABLED')
-                    : getLocaleString(guildLocaleCode, 'MISC.DISABLED')
+                    ? guild.locale('MISC.ENABLED')
+                    : guild.locale('MISC.DISABLED')
             }\``;
         }
     }
@@ -899,22 +740,16 @@ export async function buildSettingsPage(
             0,
             0,
             new TextDisplayBuilder().setContent(
-                `${getLocaleString(
-                    guildLocaleCode,
+                `${guild.locale(
                     'CMD.SETTINGS.RESPONSE.HEADER',
-                    interaction.guild.name,
-                )}\n\n**${getLocaleString(
-                    guildLocaleCode,
+                    guild.name,
+                )}\n\n**${guild.locale(
                     `CMD.SETTINGS.MISC.${option.toUpperCase()}.NAME`,
-                )}** ─ ${getLocaleString(
-                    guildLocaleCode,
+                )}** ─ ${guild.locale(
                     `CMD.SETTINGS.MISC.${option.toUpperCase()}.DESCRIPTION`,
                 )}${
                     current
-                        ? `\n> ${getLocaleString(
-                            guildLocaleCode,
-                            'MISC.CURRENT',
-                        )}: ${current}`
+                        ? `\n> ${guild.locale('MISC.CURRENT')}: ${current}`
                         : ''
                 }`,
             ),
@@ -928,12 +763,10 @@ export async function buildSettingsPage(
                     .addOptions(
                         settingsOptions.map(
                             (opt): SelectMenuComponentOptionData => ({
-                                label: getLocaleString(
-                                    guildLocaleCode,
+                                label: guild.locale(
                                     `CMD.SETTINGS.MISC.${opt.toUpperCase()}.NAME`,
                                 ),
-                                description: getLocaleString(
-                                    guildLocaleCode,
+                                description: guild.locale(
                                     `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION`,
                                 ),
                                 value: opt,

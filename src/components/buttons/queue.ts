@@ -1,15 +1,5 @@
-import { ForceType } from '#src/lib/ReplyHandler.js';
-import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import { settings } from '#src/lib/util/settings.js';
-import {
-    cleanURIForMarkdown,
-    getGuildLocaleString,
-    getLocaleString,
-} from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
-import type { ButtonInteraction } from 'discord.js';
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -23,46 +13,37 @@ import {
     TextInputBuilder,
     TextInputStyle,
 } from 'discord.js';
+import { ForceType, QuaverGuild } from '#src/lib';
+import { ButtonHandler } from '#src/lib/builders';
+import { MessageOptionsBuilderType } from '#src/lib/util/common';
+import { cleanURIForMarkdown } from '#src/lib/util/util';
 
-export default {
-    name: 'queue',
-    async execute(
-        interaction: QuaverInteraction<ButtonInteraction>,
-    ): Promise<void> {
-        const player = await interaction.client.music.players.fetch(
-                interaction.guildId,
-            ),
-            pages = player ? paginate(player.queue.tracks, 5) : [];
+export default new ButtonHandler().setExecute(
+    async function(interaction): Promise<void> {
+        const guild = await QuaverGuild.wrap(interaction.guild);
+        const player = await guild.getPlayer();
+        const pages = player ? paginate(player.queue.tracks, 5) : [];
         const target = interaction.customId.split(':')[1];
         if (player && target === 'goto' && pages.length !== 0) {
             return interaction.showModal(
                 new ModalBuilder()
-                    .setTitle(
-                        await getGuildLocaleString(
-                            interaction.guildId,
-                            'CMD.QUEUE.MISC.MODAL_TITLE',
-                        ),
-                    )
+                    .setTitle(guild.locale('CMD.QUEUE.MISC.MODAL_TITLE'))
                     .setCustomId('queue:goto')
-                    .addComponents(
-                        new ActionRowBuilder<TextInputBuilder>().addComponents(
-                            new TextInputBuilder()
-                                .setCustomId('queue:goto:input')
-                                .setLabel(
-                                    await getGuildLocaleString(
-                                        interaction.guildId,
-                                        'CMD.QUEUE.MISC.PAGE',
-                                    ),
-                                )
-                                .setStyle(TextInputStyle.Short),
-                        ),
+                    .addLabelComponents(
+                        guild.builders
+                            .labelLocale('CMD.QUEUE.MISC.PAGE')
+                            .setTextInputComponent(
+                                new TextInputBuilder()
+                                    .setCustomId('queue:goto:input')
+                                    .setStyle(TextInputStyle.Short),
+                            ),
                     ),
             );
         }
         const page = parseInt(target);
         if (!player || pages.length === 0 || page < 1 || page > pages.length) {
-            await interaction.replyHandler.locale(
-                'CMD.QUEUE.RESPONSE.QUEUE_EMPTY',
+            await interaction.replyHandler.reply(
+                guild.locale('CMD.QUEUE.RESPONSE.QUEUE_EMPTY'),
                 {
                     type: MessageOptionsBuilderType.Error,
                     components: [],
@@ -74,87 +55,66 @@ export default {
         const firstIndex = 5 * (page - 1) + 1;
         const pageSize = pages[page - 1].length;
         const largestIndexSize = (firstIndex + pageSize - 1).toString().length;
-        const guildLocaleCode =
-            (await data.guild.get<string>(
-                interaction.guildId,
-                'settings.locale',
-            )) ?? settings.defaultLocaleCode;
         if (
             !(interaction.message.components[0] instanceof ContainerComponent)
         ) {
             await interaction.replyHandler.reply(
-                getLocaleString(guildLocaleCode, 'DISCORD.INTERACTION.EXPIRED'),
+                guild.locale('DISCORD.INTERACTION.EXPIRED'),
                 { components: [], force: ForceType.Update },
             );
             return;
         }
         await interaction.replyHandler.reply(
-            new ContainerBuilder({
-                components: [
-                    new TextDisplayBuilder()
-                        .setContent(
-                            pages[page - 1]
-                                .map((track: Song, index): string => {
-                                    const duration = msToTime(
-                                        track.info.length,
+            new ContainerBuilder()
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(
+                        pages[page - 1]
+                            .map((track: Song, index): string => {
+                                const duration = msToTime(track.info.length);
+                                let durationString = track.info.isStream
+                                    ? '∞'
+                                    : msToTimeString(duration, true);
+                                if (durationString === 'MORE_THAN_A_DAY') {
+                                    durationString = guild.locale(
+                                        'MISC.MORE_THAN_A_DAY',
                                     );
-                                    let durationString = track.info.isStream
-                                        ? '∞'
-                                        : msToTimeString(duration, true);
-                                    if (durationString === 'MORE_THAN_A_DAY') {
-                                        durationString = getLocaleString(
-                                            guildLocaleCode,
-                                            'MISC.MORE_THAN_A_DAY',
-                                        );
-                                    }
-                                    return `\`${(firstIndex + index)
-                                        .toString()
-                                        .padStart(largestIndexSize, ' ')}.\` ${
-                                        track.info.title === track.info.uri
-                                            ? `**${track.info.uri}**`
-                                            : `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`
-                                    } \`[${durationString}]\` <@${track.requesterId}>`;
-                                })
-                                .join('\n'),
-                        )
-                        .toJSON(),
-                    new TextDisplayBuilder()
-                        .setContent(
-                            await getGuildLocaleString(
-                                interaction.guildId,
-                                'MISC.PAGE',
-                                page.toString(),
-                                pages.length.toString(),
-                            ),
-                        )
-                        .toJSON(),
-                    new SeparatorBuilder().toJSON(),
-                    new ActionRowBuilder<ButtonBuilder>()
-                        .addComponents(
-                            new ButtonBuilder()
-                                .setCustomId(`queue:${page - 1}`)
-                                .setEmoji('⬅️')
-                                .setDisabled(page - 1 < 1)
-                                .setStyle(ButtonStyle.Primary),
-                            new ButtonBuilder()
-                                .setCustomId('queue:goto')
-                                .setStyle(ButtonStyle.Secondary)
-                                .setLabel(
-                                    await getGuildLocaleString(
-                                        interaction.guildId,
-                                        'MISC.GO_TO',
-                                    ),
-                                ),
-                            new ButtonBuilder()
-                                .setCustomId(`queue:${page + 1}`)
-                                .setEmoji('➡️')
-                                .setDisabled(page + 1 > pages.length)
-                                .setStyle(ButtonStyle.Primary),
-                        )
-                        .toJSON(),
-                ],
-            }),
+                                }
+                                return `\`${(firstIndex + index)
+                                    .toString()
+                                    .padStart(largestIndexSize, ' ')}.\` ${
+                                    track.info.title === track.info.uri
+                                        ? `**${track.info.uri}**`
+                                        : `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`
+                                } \`[${durationString}]\` <@${track.requesterId}>`;
+                            })
+                            .join('\n'),
+                    ),
+                    guild.builders.textDisplayLocale(
+                        'MISC.PAGE',
+                        page.toString(),
+                        pages.length.toString(),
+                    ),
+                )
+                .addSeparatorComponents(new SeparatorBuilder())
+                .addActionRowComponents(
+                    new ActionRowBuilder<ButtonBuilder>().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId(`queue:${page - 1}`)
+                            .setEmoji('⬅️')
+                            .setDisabled(page - 1 < 1)
+                            .setStyle(ButtonStyle.Primary),
+                        guild.builders
+                            .buttonLocale('MISC.GO_TO')
+                            .setStyle(ButtonStyle.Secondary)
+                            .setCustomId('queue:goto'),
+                        new ButtonBuilder()
+                            .setCustomId(`queue:${page + 1}`)
+                            .setEmoji('➡️')
+                            .setDisabled(page + 1 > pages.length)
+                            .setStyle(ButtonStyle.Primary),
+                    ),
+                ),
             { force: ForceType.Update },
         );
     },
-};
+);

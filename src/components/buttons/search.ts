@@ -1,55 +1,42 @@
-import PlayerHandler from '#src/lib/PlayerHandler.js';
-import { ForceType } from '#src/lib/ReplyHandler.js';
-import type { QuaverChannels, QuaverInteraction, QuaverPlayer, QuaverSong } from '#src/lib/util/common.d.js';
-import { data, logger, MessageOptionsBuilderType, searchState } from '#src/lib/util/common.js';
-import { Check } from '#src/lib/util/constants.js';
-import { settings } from '#src/lib/util/settings.js';
-import {
-    buildMessageOptions,
-    getFailedChecks,
-    getGuildLocaleString,
-    getLocaleString,
-    getTrackMarkdownLocaleString,
-} from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
-import type {
-    APIActionRowComponent,
-    APIButtonComponent,
-    APISelectMenuOption,
-    APIStringSelectComponent,
-    ButtonInteraction,
-    GuildMember,
-} from 'discord.js';
 import {
     ActionRowBuilder,
+    type APIActionRowComponent,
+    type APIButtonComponent,
+    type APISelectMenuOption,
+    type APIStringSelectComponent,
     ButtonBuilder,
     ChannelType,
     ContainerBuilder,
     ContainerComponent,
+    type GuildMember,
     PermissionsBitField,
     StringSelectMenuBuilder,
     TextDisplayBuilder,
 } from 'discord.js';
 import { LavalinkWSClientState } from 'lavalink-ws-client';
+import { ForceType, QuaverGuild, type QuaverPlayer } from '#src/lib';
+import { ButtonHandler } from '#src/lib/builders';
+import { logger, MessageOptionsBuilderType, searchState } from '#src/lib/util/common';
+import type { QuaverChannels, QuaverSong } from '#src/lib/util/common.d';
+import { Check } from '#src/lib/util/constants';
+import { buildMessageOptions, getFailedChecks, getTrackMarkdownLocaleString } from '#src/lib/util/util';
 
-export default {
-    name: 'search',
-    checks: [Check.InteractionStarter],
-    async execute(
-        interaction: QuaverInteraction<ButtonInteraction>,
-    ): Promise<void> {
+export default new ButtonHandler()
+    .setChecks([Check.InteractionStarter])
+    .setExecute(async function(interaction): Promise<void> {
+        const guild = await QuaverGuild.wrap(interaction.guild);
         const state = searchState[interaction.message.id];
         if (!state) {
-            await interaction.replyHandler.locale(
-                'DISCORD.INTERACTION.EXPIRED',
+            await interaction.replyHandler.reply(
+                guild.locale('DISCORD.INTERACTION.EXPIRED'),
                 { components: [], force: ForceType.Update },
             );
             return;
         }
         const target = interaction.customId.split(':')[1];
         if (target === 'add') {
-            const { bot, io } = await import('#src/main.js');
             const tracks = state.selected;
             let player = (await interaction.client.music.players.fetch(
                 interaction.guildId,
@@ -61,9 +48,10 @@ export default {
                 member,
             );
             if (failedChecks.length > 0) {
-                await interaction.replyHandler.locale(failedChecks[0], {
-                    type: MessageOptionsBuilderType.Error,
-                });
+                await interaction.replyHandler.reply(
+                    guild.locale(failedChecks[0]),
+                    { type: MessageOptionsBuilderType.Error },
+                );
                 return;
             }
             // check for connect, speak permission for channel
@@ -79,8 +67,8 @@ export default {
                     ]),
                 )
             ) {
-                await interaction.replyHandler.locale(
-                    'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC',
+                await interaction.replyHandler.reply(
+                    guild.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC'),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
@@ -89,16 +77,18 @@ export default {
                 member?.voice.channel.type === ChannelType.GuildStageVoice &&
                 !permissions.has(PermissionsBitField.StageModerator)
             ) {
-                await interaction.replyHandler.locale(
-                    'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE',
+                await interaction.replyHandler.reply(
+                    guild.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE'),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             }
             let me = await interaction.guild.members.fetchMe();
             if (me.isCommunicationDisabled()) {
-                await interaction.replyHandler.locale(
-                    'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
+                await interaction.replyHandler.reply(
+                    guild.locale(
+                        'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
+                    ),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
@@ -107,13 +97,14 @@ export default {
                 interaction.client.music.ws.state !==
                 LavalinkWSClientState.Ready
             ) {
-                await interaction.replyHandler.locale('MUSIC.NOT_READY', {
-                    type: MessageOptionsBuilderType.Error,
-                });
+                await interaction.replyHandler.reply(
+                    guild.locale('MUSIC.NOT_READY'),
+                    { type: MessageOptionsBuilderType.Error },
+                );
                 return;
             }
             clearTimeout(state.timeout);
-            await interaction.replyHandler.locale('MISC.LOADING', {
+            await interaction.replyHandler.reply(guild.locale('MISC.LOADING'), {
                 components: [],
                 force: ForceType.Update,
             });
@@ -126,8 +117,8 @@ export default {
                 }
             }
             if (resolvedTracks.length === 0) {
-                await interaction.replyHandler.locale(
-                    'CMD.SEARCH.RESPONSE.LOAD_FAILED',
+                await interaction.replyHandler.reply(
+                    guild.locale('CMD.SEARCH.RESPONSE.LOAD_FAILED'),
                     {
                         type: MessageOptionsBuilderType.Error,
                         components: [],
@@ -144,17 +135,11 @@ export default {
                 msg = 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
                 extras = [
                     resolvedTracks.length.toString(),
-                    await getGuildLocaleString(
-                        interaction.guildId,
-                        'MISC.YOUR_SEARCH',
-                    ),
+                    guild.locale('MISC.YOUR_SEARCH'),
                 ];
             }
             if (!player?.voice.connected) {
-                player = interaction.client.music.players.create(
-                    interaction.guildId,
-                ) as QuaverPlayer;
-                player.handler = new PlayerHandler(interaction.client, player);
+                player = interaction.client.music.players.create(guild);
                 player.queue.channel = interaction.channel as QuaverChannels;
                 player.voice.connect(member.voice.channelId, {
                     deafened: true,
@@ -162,29 +147,31 @@ export default {
                 // Ensure that Quaver destroys the player if the user leaves the channel while Quaver is queuing tracks
                 // Ensure that Quaver destroys the player if Quaver gets timed out by the user while Quaver is queuing tracks
                 // Ensure that Quaver destroys the player if Quaver gets kicked or banned by the user while Quaver is queuing tracks
-                me = await interaction.guild.members.fetchMe();
+                me = await guild.members.fetchMe();
                 const timedOut = me.isCommunicationDisabled();
-                if (!member.voice.channelId || timedOut || !interaction.guild) {
-                    if (interaction.guild) {
+                if (!member.voice.channelId || timedOut || !guild) {
+                    if (guild) {
                         if (timedOut) {
-                            await interaction.replyHandler.locale(
-                                'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
+                            await interaction.replyHandler.reply(
+                                guild.locale(
+                                    'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
+                                ),
                                 {
                                     type: MessageOptionsBuilderType.Error,
                                     components: [],
                                 },
                             );
                         } else {
-                            await interaction.replyHandler.locale(
-                                'DISCORD.INTERACTION.CANCELED',
-                                {
-                                    vars: [interaction.user.id],
-                                    components: [],
-                                },
+                            await interaction.replyHandler.reply(
+                                guild.locale(
+                                    'DISCORD.INTERACTION.CANCELED',
+                                    interaction.user.id,
+                                ),
+                                { components: [] },
                             );
                         }
                     }
-                    await player.handler.disconnect();
+                    await player.disconnect();
                     return;
                 }
             }
@@ -194,69 +181,50 @@ export default {
                 requester: interaction.user.id,
             });
             const started = player.playing || player.paused;
-            const smartQueue = await data.guild.get<boolean>(
-                interaction.guildId,
-                'settings.smartqueue',
-            );
+            const smartQueue = await guild.settings.get<boolean>('smartqueue');
             await interaction.replyHandler.reply(
-                new ContainerBuilder({
-                    components: [
-                        new TextDisplayBuilder()
-                            .setContent(
-                                await getGuildLocaleString(
-                                    interaction.guildId,
-                                    msg,
-                                    ...extras,
-                                ),
-                            )
-                            .toJSON(),
-                        ...(started && !smartQueue
-                            ? [
-                                new TextDisplayBuilder()
-                                    .setContent(
-                                        `${await getGuildLocaleString(
-                                            interaction.guildId,
-                                            'MISC.POSITION',
-                                        )}: ${firstPosition}${
-                                            endPosition !== firstPosition
-                                                ? ` - ${endPosition}`
-                                                : ''
-                                        }`,
-                                    )
-                                    .toJSON(),
-                            ]
-                            : []),
-                    ],
-                }),
+                new ContainerBuilder().addTextDisplayComponents(
+                    guild.builders.textDisplayLocale(msg, ...extras),
+                    ...(started && !smartQueue
+                        ? [
+                              new TextDisplayBuilder().setContent(
+                                  `${guild.locale(
+                                      'MISC.POSITION',
+                                  )}: ${firstPosition}${
+                                      endPosition !== firstPosition
+                                          ? ` - ${endPosition}`
+                                          : ''
+                                  }`,
+                              ),
+                          ]
+                        : []),
+                ),
                 { type: MessageOptionsBuilderType.Success, components: [] },
             );
             if (!started) await player.queue.start();
-            if (smartQueue) await player.handler.sort();
-            if (settings.features.web.enabled) {
-                io.to(`guild:${interaction.guildId}`).emit(
-                    'queueUpdate',
-                    player.queue.tracks.map((track: QuaverSong): QuaverSong => {
-                        const user = bot.users.cache.get(track.requesterId);
-                        track.requesterTag = user?.tag;
-                        track.requesterAvatar = user?.avatar;
-                        return track;
-                    }),
-                );
-            }
+            if (smartQueue) await player.sortQueue();
+            guild.sendWebUpdate(
+                'queueUpdate',
+                player.queue.tracks.map((track: QuaverSong): QuaverSong => {
+                    const user = interaction.client.users.cache.get(
+                        track.requesterId,
+                    );
+                    track.requesterTag = user?.tag;
+                    track.requesterAvatar = user?.avatar;
+                    return track;
+                }),
+            );
             delete searchState[interaction.message.id];
             return;
         }
         const page = parseInt(target);
         clearTimeout(state.timeout);
         state.timeout = setTimeout(
-            async (message): Promise<void> => {
+            async (g, message): Promise<void> => {
                 try {
                     await message.edit(
                         buildMessageOptions(
-                            await getGuildLocaleString(
-                                message.guildId,
-                                'DISCORD.INTERACTION.EXPIRED',
-                            ),
+                            g.locale('DISCORD.INTERACTION.EXPIRED'),
                             { components: [] },
                         ),
                     );
@@ -270,18 +238,14 @@ export default {
                 }
                 delete searchState[message.id];
             },
-            30 * 1000,
+            30_000,
+            guild,
             interaction.message,
         );
         const pages = state.pages;
         const firstIndex = 10 * (page - 1) + 1;
         const pageSize = pages[page - 1].length;
         const largestIndexSize = (firstIndex + pageSize - 1).toString().length;
-        const guildLocaleCode =
-            (await data.guild.get<string>(
-                interaction.guildId,
-                'settings.locale',
-            )) ?? settings.defaultLocaleCode;
         if (
             !(interaction.message.components[0] instanceof ContainerComponent)
         ) {
@@ -301,10 +265,7 @@ export default {
                         ? '∞'
                         : msToTimeString(duration, true);
                     if (durationString === 'MORE_THAN_A_DAY') {
-                        durationString = getLocaleString(
-                            guildLocaleCode,
-                            'MISC.MORE_THAN_A_DAY',
-                        );
+                        durationString = guild.locale('MISC.MORE_THAN_A_DAY');
                     }
                     return `\`${(firstIndex + index)
                         .toString()
@@ -318,13 +279,10 @@ export default {
                 .join('\n'),
         );
         if (!(container.components[1] instanceof TextDisplayBuilder)) return;
-        container.components[1] = new TextDisplayBuilder().setContent(
-            getLocaleString(
-                guildLocaleCode,
-                'MISC.PAGE',
-                page.toString(),
-                pages.length.toString(),
-            ),
+        container.components[1] = guild.builders.textDisplayLocale(
+            'MISC.PAGE',
+            page.toString(),
+            pages.length.toString(),
         );
         const selectMenuActionRow =
             ActionRowBuilder.from<StringSelectMenuBuilder>(
@@ -411,5 +369,4 @@ export default {
         await interaction.replyHandler.reply(container, {
             force: ForceType.Update,
         });
-    },
-};
+    });

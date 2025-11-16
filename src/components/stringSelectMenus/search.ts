@@ -1,55 +1,41 @@
-import { ForceType } from '#src/lib/ReplyHandler.js';
-import type { QuaverInteraction } from '#src/lib/util/common.d.js';
-import { data, logger, searchState } from '#src/lib/util/common.js';
-import { Check } from '#src/lib/util/constants.js';
-import { buildMessageOptions, getLocaleString } from '#src/lib/util/util.js';
 import type { Song } from '@lavaclient/plugin-queue';
-import type {
-    APIActionRowComponent,
-    APIButtonComponent,
-    APIStringSelectComponent,
-    SelectMenuComponentOptionData,
-    StringSelectMenuInteraction,
-    StringSelectMenuOptionBuilder,
-} from 'discord.js';
 import {
     ActionRowBuilder,
+    type APIActionRowComponent,
+    type APIButtonComponent,
+    type APIStringSelectComponent,
     ButtonBuilder,
     ContainerBuilder,
     ContainerComponent,
+    type SelectMenuComponentOptionData,
     StringSelectMenuBuilder,
+    type StringSelectMenuOptionBuilder,
 } from 'discord.js';
-import { settings } from '#src/lib/util/settings.js';
+import { ForceType, QuaverGuild } from '#src/lib';
+import { StringSelectMenuHandler } from '#src/lib/builders';
+import { logger, searchState } from '#src/lib/util/common';
+import { Check } from '#src/lib/util/constants';
+import { buildMessageOptions } from '#src/lib/util/util';
 
-export default {
-    name: 'search',
-    checks: [Check.InteractionStarter],
-    async execute(
-        interaction: QuaverInteraction<StringSelectMenuInteraction>,
-    ): Promise<void> {
+export default new StringSelectMenuHandler()
+    .setChecks([Check.InteractionStarter])
+    .setExecute(async function(interaction): Promise<void> {
+        const guild = await QuaverGuild.wrap(interaction.guild);
         const state = searchState[interaction.message.id];
-        const guildLocaleCode =
-            (await data.guild.get<string>(
-                interaction.guildId,
-                'settings.locale',
-            )) ?? settings.defaultLocaleCode;
         if (!state) {
             await interaction.replyHandler.reply(
-                getLocaleString(guildLocaleCode, 'DISCORD.INTERACTION.EXPIRED'),
+                guild.locale('DISCORD.INTERACTION.EXPIRED'),
                 { components: [], force: ForceType.Update },
             );
             return;
         }
         clearTimeout(state.timeout);
         state.timeout = setTimeout(
-            async (message): Promise<void> => {
+            async (g, message): Promise<void> => {
                 try {
                     await message.edit(
                         buildMessageOptions(
-                            getLocaleString(
-                                guildLocaleCode,
-                                'DISCORD.INTERACTION.EXPIRED',
-                            ),
+                            g.locale('DISCORD.INTERACTION.EXPIRED'),
                             { components: [] },
                         ),
                     );
@@ -64,6 +50,7 @@ export default {
                 delete searchState[message.id];
             },
             30_000,
+            guild,
             interaction.message,
         );
         state.selected = interaction.values;
@@ -159,5 +146,4 @@ export default {
         await interaction.replyHandler.reply(container, {
             force: ForceType.Update,
         });
-    },
-};
+    });

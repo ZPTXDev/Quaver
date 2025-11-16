@@ -66,32 +66,23 @@ export type LavalinkReconnectSettingsObject = {
 };
 
 export type FeaturesSettingsObject = {
-    autolyrics?: AutoLyricsFeatureSettingsObject;
-    stay?: StayFeatureSettingsObject;
-    smartqueue?: SmartQueueFeatureSettingsObject;
+    autolyrics?: GenericPremiumFeatureSettingsObject;
+    stay?: GenericPremiumFeatureSettingsObject;
+    smartqueue?: GenericPremiumFeatureSettingsObject;
     web?: WebFeatureSettingsObject;
 };
 
-export type AutoLyricsFeatureSettingsObject = {
+export type GenericFeatureSettingsObject = {
     enabled?: boolean;
-    whitelist?: boolean;
-    premium?: boolean;
 };
 
-export type StayFeatureSettingsObject = {
-    enabled?: boolean;
-    whitelist?: boolean;
-    premium?: boolean;
-};
+export type GenericPremiumFeatureSettingsObject =
+    GenericFeatureSettingsObject & {
+        whitelist?: boolean;
+        premium?: boolean;
+    };
 
-export type SmartQueueFeatureSettingsObject = {
-    enabled?: boolean;
-    whitelist?: boolean;
-    premium?: boolean;
-};
-
-export type WebFeatureSettingsObject = {
-    enabled?: boolean;
+export type WebFeatureSettingsObject = GenericFeatureSettingsObject & {
     port?: number;
     allowedOrigins?: string[];
     encryptionKey?: string;

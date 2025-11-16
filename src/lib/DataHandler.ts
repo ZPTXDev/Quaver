@@ -1,7 +1,7 @@
+import KeyvSqlite from '@keyv/sqlite';
 import Keyv from 'keyv';
 import { get as _get, set as _set, unset as _unset } from 'lodash-es';
-import type { DatabaseObject } from './DataHandler.d.js';
-import KeyvSqlite from '@keyv/sqlite';
+import type { DatabaseObject } from '.';
 
 /** Class for handling data through Keyv. */
 export default class DataHandler {

@@ -1,49 +1,37 @@
-import type {
-    QuaverInteraction,
-    QuaverPlayer,
-} from '#src/lib/util/common.d.js';
-import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import { Check } from '#src/lib/util/constants.js';
-import { settings } from '#src/lib/util/settings.js';
-import {
-    cleanURIForMarkdown,
-    getGuildLocaleString,
-    getLocaleString,
-} from '#src/lib/util/util.js';
 import { LoopType } from '@lavaclient/plugin-queue';
 import { getBar, msToTime, msToTimeString } from '@zptxdev/zptx-lib';
-import type { ChatInputCommandInteraction } from 'discord.js';
 import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
+import { QuaverGuild } from '#src/lib';
+import { ChatInputCommandHandler } from '#src/lib/builders';
+import { MessageOptionsBuilderType } from '#src/lib/util/common';
+import { Check } from '#src/lib/util/constants';
+import { settings } from '#src/lib/util/settings';
+import { cleanURIForMarkdown, getLocaleString } from '#src/lib/util/util';
 
-export default {
-    data: new SlashCommandBuilder()
-        .setName('playing')
-        .setDescription(
-            getLocaleString(
-                settings.defaultLocaleCode,
-                'CMD.PLAYING.DESCRIPTION',
+export default new ChatInputCommandHandler()
+    .setData(
+        new SlashCommandBuilder()
+            .setName('playing')
+            .setDescription(
+                getLocaleString(
+                    settings.defaultLocaleCode,
+                    'CMD.PLAYING.DESCRIPTION',
+                ),
             ),
-        ),
-    checks: [
+    )
+    .setChecks([
         Check.GuildOnly,
         Check.ActiveSession,
         Check.InVoice,
         Check.InSessionVoice,
-    ],
-    permissions: {
-        user: [],
-        bot: [],
-    },
-    async execute(
-        interaction: QuaverInteraction<ChatInputCommandInteraction>,
-    ): Promise<void> {
-        const player = (await interaction.client.music.players.fetch(
-            interaction.guildId,
-        )) as QuaverPlayer;
+    ])
+    .setExecute(async function(interaction): Promise<void> {
+        const guild = await QuaverGuild.wrap(interaction.guild);
+        const player = await guild.getPlayer();
         // workaround: seems like current track doesn't get removed after the track, an issue with @lavaclient/queue
         if (!player.queue.current || (!player.playing && !player.paused)) {
-            await interaction.replyHandler.locale(
-                'MUSIC.PLAYER.PLAYING.NOTHING',
+            await interaction.replyHandler.reply(
+                guild.locale('MUSIC.PLAYER.PLAYING.NOTHING'),
                 { type: MessageOptionsBuilderType.Error },
             );
             return;
@@ -57,33 +45,21 @@ export default {
         }
         let elapsedString = msToTimeString(elapsed, true);
         if (elapsedString === 'MORE_THAN_A_DAY') {
-            elapsedString = await getGuildLocaleString(
-                interaction.guildId,
-                'MISC.MORE_THAN_A_DAY',
-            );
+            elapsedString = guild.locale('MISC.MORE_THAN_A_DAY');
         }
         const duration = msToTime(player.queue.current.info.length);
         let durationString = msToTimeString(duration, true);
         if (durationString === 'MORE_THAN_A_DAY') {
-            durationString = await getGuildLocaleString(
-                interaction.guildId,
-                'MISC.MORE_THAN_A_DAY',
-            );
+            durationString = guild.locale('MISC.MORE_THAN_A_DAY');
         }
         if (player.queue.current.info.isStream) {
-            const guildLocaleCode =
-                (await data.guild.get<string>(
-                    interaction.guildId,
-                    'settings.locale',
-                )) ?? settings.defaultLocaleCode;
             await interaction.replyHandler.reply(
                 `${
                     player.queue.current.info.title ===
                     player.queue.current.info.uri
                         ? `**${player.queue.current.info.uri}**`
                         : `[**${escapeMarkdown(cleanURIForMarkdown(player.queue.current.info.title))}**](${player.queue.current.info.uri})`
-                }\n🔴 **${getLocaleString(
-                    guildLocaleCode,
+                }\n🔴 **${guild.locale(
                     'MISC.LIVE',
                 )}** ${'▬'.repeat(10)}${player.paused ? ' ⏸️' : ''}${
                     player.queue.loop.type !== LoopType.None
@@ -93,11 +69,9 @@ export default {
                                   : '🔂'
                           }`
                         : ''
-                }${player.bassboost ? ' 🅱️' : ''}\n\`[${getLocaleString(
-                    guildLocaleCode,
+                }${player.memory.bassboost ? ' 🅱️' : ''}\n\`[${guild.locale(
                     'MISC.STREAMING',
-                )}]\` | ${getLocaleString(
-                    guildLocaleCode,
+                )}]\` | ${guild.locale(
                     'MISC.ADDED_BY',
                     player.queue.current.requesterId,
                 )}`,
@@ -116,14 +90,12 @@ export default {
                               : '🔂'
                       }`
                     : ''
-            }${player.bassboost ? ' 🅱️' : ''}${
-                player.nightcore ? ' 🇳' : ''
-            }\n\`[${elapsedString} / ${durationString}]\` | ${await getGuildLocaleString(
-                interaction.guildId,
+            }${player.memory.bassboost ? ' 🅱️' : ''}${
+                player.memory.nightcore ? ' 🇳' : ''
+            }\n\`[${elapsedString} / ${durationString}]\` | ${guild.locale(
                 'MISC.ADDED_BY',
                 player.queue.current.requesterId,
             )}`,
             { ephemeral: true },
         );
-    },
-};
+    });

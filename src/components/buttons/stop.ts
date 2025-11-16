@@ -1,37 +1,28 @@
-import { PlayerResponse } from '#src/lib/PlayerHandler.js';
-import { ForceType } from '#src/lib/ReplyHandler.js';
-import type {
-    QuaverInteraction,
-    QuaverPlayer,
-} from '#src/lib/util/common.d.js';
+import { ForceType, PlayerResponse, QuaverGuild } from '#src/lib';
+import { ButtonHandler } from '#src/lib/builders';
 import {
-    MessageOptionsBuilderType,
     confirmationTimeout,
-} from '#src/lib/util/common.js';
-import { Check } from '#src/lib/util/constants.js';
-import type { ButtonInteraction } from 'discord.js';
+    MessageOptionsBuilderType,
+} from '#src/lib/util/common';
+import { Check } from '#src/lib/util/constants';
 
-export default {
-    name: 'stop',
-    checks: [
+export default new ButtonHandler()
+    .setChecks([
         Check.InteractionStarter,
         Check.ActiveSession,
         Check.InVoice,
         Check.InSessionVoice,
-    ],
-    async execute(
-        interaction: QuaverInteraction<ButtonInteraction>,
-    ): Promise<void> {
-        const player = (await interaction.client.music.players.fetch(
-            interaction.guildId,
-        )) as QuaverPlayer;
+    ])
+    .setExecute(async function(interaction): Promise<void> {
+        const guild = await QuaverGuild.wrap(interaction.guild);
+        const player = await guild.getPlayer();
         clearTimeout(confirmationTimeout[interaction.message.id]);
         delete confirmationTimeout[interaction.message.id];
-        const response = await player.handler.stop();
+        const response = await player.reset();
         switch (response) {
             case PlayerResponse.PlayerIdle:
-                await interaction.replyHandler.locale(
-                    'MUSIC.PLAYER.PLAYING.NOTHING',
+                await interaction.replyHandler.reply(
+                    guild.locale('MUSIC.PLAYER.PLAYING.NOTHING'),
                     {
                         type: MessageOptionsBuilderType.Error,
                         components: [],
@@ -40,8 +31,8 @@ export default {
                 );
                 return;
             case PlayerResponse.Success:
-                await interaction.replyHandler.locale(
-                    'CMD.STOP.RESPONSE.SUCCESS',
+                await interaction.replyHandler.reply(
+                    guild.locale('CMD.STOP.RESPONSE.SUCCESS'),
                     {
                         type: MessageOptionsBuilderType.Success,
                         components: [],
@@ -49,5 +40,4 @@ export default {
                     },
                 );
         }
-    },
-};
+    });

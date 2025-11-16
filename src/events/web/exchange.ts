@@ -1,9 +1,9 @@
-import { settings } from '#src/lib/util/settings.js';
 import { getJSONResponse } from '@zptxdev/zptx-lib';
 import CryptoJS from 'crypto-js';
 import type { Socket } from 'socket.io';
 import { request } from 'undici';
-import type { OAuth2Data } from './exchange.d.js';
+import type { OAuth2Data } from './exchange.d';
+import { settings } from '#src/lib/util/settings';
 
 export default {
     name: 'exchange',

@@ -1,6 +1,3 @@
-import type { InteractionHandlerMapsFlat } from '#src/events/interactionCreate.d.js';
-import type PlayerHandler from '#src/lib/PlayerHandler.js';
-import type ReplyHandler from '#src/lib/ReplyHandler.js';
 import type { Queue, Song } from '@lavaclient/plugin-queue';
 import type {
     ActionRowBuilder,
@@ -19,7 +16,14 @@ import type {
     TextDisplayBuilder,
     VoiceChannel,
 } from 'discord.js';
-import type { Node, Player } from 'lavaclient';
+import type { Server } from 'socket.io';
+import type {
+    InteractionHandlerMapsFlat,
+    QuaverNode,
+    QuaverPlayer,
+    ReplyHandler,
+} from '#src/lib';
+import type { MessageOptionsBuilderType } from '#src/lib/util/common';
 
 export type SearchStateRecord = {
     pages: Song[][];
@@ -27,19 +31,17 @@ export type SearchStateRecord = {
     selected: Snowflake[];
 };
 
-export type WhitelistedFeatures = 'stay' | 'autolyrics' | 'smartqueue';
-
 export type SettingsPageGenericOptions = {
     components: Array<MessageActionRowComponentBuilder>;
-}
+};
 
 export type SettingsPagePremiumOptions = SettingsPageGenericOptions & {
     features: string[];
-}
+};
 
 export type SettingsPageFormatOptions = SettingsPageGenericOptions & {
     containers: ContainerBuilder[];
-}
+};
 
 export type SettingsPageOptions =
     | 'premium'
@@ -82,34 +84,31 @@ export type JSONResponse<T> = { message?: string } & T;
 export type QuaverChannels = TextChannel | VoiceChannel | StageChannel;
 
 export type QuaverClient = Client &
-    InteractionHandlerMapsFlat & { music?: Node };
+    InteractionHandlerMapsFlat & { music?: QuaverNode; io?: Server };
 
 export type QuaverSong = Song & {
     requesterTag?: string;
     requesterAvatar?: string;
 };
 
-export type QuaverPlayer = Player<Node> & {
-    timeout?: ReturnType<typeof setTimeout>;
-    pauseTimeout?: ReturnType<typeof setTimeout>;
-    timeoutEnd?: number;
-    queue?: QuaverQueue;
-    bassboost?: boolean;
-    nightcore?: boolean;
-    handler?: PlayerHandler;
-    skip?: QuaverPlayerSkipObject;
-    failed?: number;
-};
+// export type QuaverPlayer = Player<Node> & {
+//     guild?: Guild;
+//     timeout?: ReturnType<typeof setTimeout>;
+//     pauseTimeout?: ReturnType<typeof setTimeout>;
+//     timeoutEnd?: number;
+//     queue?: QuaverQueue;
+//     bassboost?: boolean;
+//     nightcore?: boolean;
+//     handler?: PlayerHandler;
+//     skip?: QuaverPlayerSkipObject;
+//     failed?: number;
+// };
 
 export type QuaverQueue = Queue & {
     channel?: QuaverChannels;
     player: QuaverPlayer;
     current: QuaverSong;
-};
-
-export type QuaverPlayerSkipObject = {
-    required: number;
-    users: Snowflake[];
+    tracks: QuaverSong[];
 };
 
 export type QuaverInteraction<T> = T extends AutocompleteInteraction

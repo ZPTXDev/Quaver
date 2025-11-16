@@ -1,15 +1,15 @@
-import type { QuaverClient } from '#src/lib/util/common.d.js';
-import { logger } from '#src/lib/util/common.js';
-import { settings } from '#src/lib/util/settings.js';
-import { version } from '#src/lib/util/version.js';
-import type { PresenceStatusData } from 'discord.js';
-import { ActivityType } from 'discord.js';
+import { ActivityType, type PresenceStatusData } from 'discord.js';
+import type { QuaverClient } from '#src/lib';
+import { EventHandler } from '#src/lib/builders';
+import { logger } from '#src/lib/util/common';
+import { settings } from '#src/lib/util/settings';
+import { version } from '#src/lib/util/version';
 
-export default {
-    name: 'clientReady',
-    once: true,
-    async execute(client: QuaverClient): Promise<void> {
-        const { startup } = await import('#src/main.js');
+export default new EventHandler()
+    .setOnce(true)
+    .setEvent('clientReady')
+    .setExecute(async function(client): Promise<void> {
+        const { startup } = await import('#src/main');
         startup.started = true;
         logger.info({
             message: `Connected. Logged in as ${client.user.tag}.`,
@@ -89,7 +89,6 @@ export default {
                 },
             ],
         });
-        client.music.connect({ userId: client.user.id });
+        (client as QuaverClient).music.connect({ userId: client.user.id });
         await client.application.commands.fetch();
-    },
-};
+    });

@@ -1,16 +1,9 @@
-import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.d.js';
-import {
-    data,
-    logger,
-    MessageOptionsBuilderType,
-} from '#src/lib/util/common.js';
 import { LoopType } from '@lavaclient/plugin-queue';
 import type { Collection, GuildMember, Snowflake } from 'discord.js';
-import {
-    getLocaleString,
-    getTrackMarkdownLocaleString,
-} from '#src/lib/util/util.js';
-import { settings } from '#src/lib/util/settings.js';
+import { QuaverGuild } from '#src/lib';
+import { logger, MessageOptionsBuilderType } from '#src/lib/util/common';
+import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.d';
+import { getTrackMarkdownLocaleString } from '#src/lib/util/util';
 
 export default {
     name: 'trackEnd',
@@ -20,37 +13,30 @@ export default {
         track: QuaverSong,
         reason: 'cleanup' | 'finished' | 'loadFailed' | 'replaced' | 'stopped',
     ): Promise<void> {
-        const { bot } = await import('#src/main.js');
-        delete queue.player.skip;
+        const guild = await QuaverGuild.wrap(queue.player.guild);
+        delete queue.player.memory.skip;
         if (reason === 'loadFailed') {
             logger.warn({
-                message: `[G ${queue.player.id}] Track skipped as it failed to load`,
+                message: `[G ${guild.id}] Track skipped as it failed to load`,
                 label: 'Quaver',
             });
-            const guildLocaleCode =
-                (await data.guild.get<string>(
-                    queue.player.id,
-                    'settings.locale',
-                )) ?? settings.defaultLocaleCode;
-            await queue.player.handler.send(
-                getLocaleString(
-                    guildLocaleCode,
+            await queue.player.sendMessage(
+                guild.locale(
                     'MUSIC.PLAYER.TRACK_SKIPPED_ERROR',
                     getTrackMarkdownLocaleString(track),
                 ),
                 { type: MessageOptionsBuilderType.Warning },
             );
-            if (!queue.player.failed) queue.player.failed = 0;
-            queue.player.failed++;
-            if (queue.player.failed >= 3) {
+            if (!queue.player.memory.failureCount) {
+                queue.player.memory.failureCount = 0;
+            }
+            queue.player.memory.failureCount++;
+            if (queue.player.memory.failureCount >= 3) {
                 queue.clear();
                 await queue.skip();
                 await queue.start();
-                await queue.player.handler.send(
-                    getLocaleString(
-                        guildLocaleCode,
-                        'MUSIC.PLAYER.QUEUE_CLEARED_ERROR',
-                    ),
+                await queue.player.sendMessage(
+                    guild.locale('MUSIC.PLAYER.QUEUE_CLEARED_ERROR'),
                     { type: MessageOptionsBuilderType.Warning },
                 );
             }
@@ -60,8 +46,8 @@ export default {
             case LoopType.Song:
                 if (track.info.length <= 15 * 1000) {
                     queue.setLoop(LoopType.None);
-                    await queue.player.handler.locale(
-                        'MUSIC.PLAYER.LOOP_TRACK_DISABLED',
+                    await queue.player.sendMessage(
+                        guild.locale('MUSIC.PLAYER.LOOP_TRACK_DISABLED'),
                         { type: MessageOptionsBuilderType.Warning },
                     );
                     await queue.skip();
@@ -77,30 +63,30 @@ export default {
                     15 * 1000
                 ) {
                     queue.setLoop(LoopType.None);
-                    await queue.player.handler.locale(
-                        'MUSIC.PLAYER.LOOP_QUEUE_DISABLED',
+                    await queue.player.sendMessage(
+                        guild.locale('MUSIC.PLAYER.LOOP_QUEUE_DISABLED'),
                         { type: MessageOptionsBuilderType.Warning },
                     );
                 }
         }
-        if (queue.player.failed) delete queue.player.failed;
-        const members = bot.guilds.cache
-            .get(queue.player.id)
-            .channels.cache.get(queue.player.voice.channelId)
+        if (queue.player.memory.failureCount) {
+            delete queue.player.memory.failureCount;
+        }
+        const members = guild.channels.cache.get(queue.player.voice.channelId)
             .members as Collection<Snowflake, GuildMember>;
         if (
             members?.filter((m): boolean => !m.user.bot).size < 1 &&
-            !(await data.guild.get(queue.player.id, 'settings.stay.enabled'))
+            !(await guild.settings.get<boolean>('stay.enabled'))
         ) {
             logger.info({
-                message: `[G ${queue.player.id}] Disconnecting (alone)`,
+                message: `[G ${guild.id} Disconnecting (alone)`,
                 label: 'Quaver',
             });
-            await queue.player.handler.locale(
-                'MUSIC.DISCONNECT.ALONE.DISCONNECTED.DEFAULT',
+            await queue.player.sendMessage(
+                guild.locale('MUSIC.DISCONNECT.ALONE.DISCONNECTED.DEFAULT'),
                 { type: MessageOptionsBuilderType.Warning },
             );
-            await queue.player.handler.disconnect();
+            await queue.player.disconnect();
         }
     },
 };

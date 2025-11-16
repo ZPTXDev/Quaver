@@ -1,102 +1,90 @@
-import { PlayerResponse } from '#src/lib/PlayerHandler.js';
-import type {
-    QuaverInteraction,
-    QuaverPlayer,
-} from '#src/lib/util/common.d.js';
-import { data, MessageOptionsBuilderType } from '#src/lib/util/common.js';
-import { Check } from '#src/lib/util/constants.js';
-import { settings } from '#src/lib/util/settings.js';
+import { PlayerResponse, QuaverGuild } from '#src/lib';
+import { MessageOptionsBuilderType } from '#src/lib/util/common';
+import { Check } from '#src/lib/util/constants';
+import { settings } from '#src/lib/util/settings';
 import {
     getLocaleString,
     getTrackMarkdownLocaleString,
-} from '#src/lib/util/util.js';
-import type {
-    ChatInputCommandInteraction,
-    SlashCommandIntegerOption,
+} from '#src/lib/util/util';
+import {
+    SlashCommandBuilder,
+    type SlashCommandIntegerOption,
 } from 'discord.js';
-import { SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandHandler } from '#src/lib/builders';
 
-export default {
-    data: new SlashCommandBuilder()
-        .setName('move')
-        .setDescription(
-            getLocaleString(settings.defaultLocaleCode, 'CMD.MOVE.DESCRIPTION'),
-        )
-        .addIntegerOption(
-            (option): SlashCommandIntegerOption =>
-                option
-                    .setName('old_position')
-                    .setDescription(
-                        getLocaleString(
-                            settings.defaultLocaleCode,
-                            'CMD.MOVE.OPTION.OLD_POSITION',
-                        ),
-                    )
-                    .setMinValue(1)
-                    .setRequired(true)
-                    .setAutocomplete(true),
-        )
-        .addIntegerOption(
-            (option): SlashCommandIntegerOption =>
-                option
-                    .setName('new_position')
-                    .setDescription(
-                        getLocaleString(
-                            settings.defaultLocaleCode,
-                            'CMD.MOVE.OPTION.NEW_POSITION',
-                        ),
-                    )
-                    .setMinValue(1)
-                    .setRequired(true),
-        ),
-    checks: [
+export default new ChatInputCommandHandler()
+    .setData(
+        new SlashCommandBuilder()
+            .setName('move')
+            .setDescription(
+                getLocaleString(
+                    settings.defaultLocaleCode,
+                    'CMD.MOVE.DESCRIPTION',
+                ),
+            )
+            .addIntegerOption(
+                (option): SlashCommandIntegerOption =>
+                    option
+                        .setName('old_position')
+                        .setDescription(
+                            getLocaleString(
+                                settings.defaultLocaleCode,
+                                'CMD.MOVE.OPTION.OLD_POSITION',
+                            ),
+                        )
+                        .setMinValue(1)
+                        .setRequired(true)
+                        .setAutocomplete(true),
+            )
+            .addIntegerOption(
+                (option): SlashCommandIntegerOption =>
+                    option
+                        .setName('new_position')
+                        .setDescription(
+                            getLocaleString(
+                                settings.defaultLocaleCode,
+                                'CMD.MOVE.OPTION.NEW_POSITION',
+                            ),
+                        )
+                        .setMinValue(1)
+                        .setRequired(true),
+            ),
+    )
+    .setChecks([
         Check.GuildOnly,
         Check.ActiveSession,
         Check.InVoice,
         Check.InSessionVoice,
-    ],
-    permissions: {
-        user: [],
-        bot: [],
-    },
-    async execute(
-        interaction: QuaverInteraction<ChatInputCommandInteraction>,
-    ): Promise<void> {
-        const player = (await interaction.client.music.players.fetch(
-            interaction.guildId,
-        )) as QuaverPlayer;
+    ])
+    .setExecute(async function(interaction): Promise<void> {
         const oldPosition = interaction.options.getInteger('old_position');
         const newPosition = interaction.options.getInteger('new_position');
-        const response = await player.handler.move(oldPosition, newPosition);
+        const guild = await QuaverGuild.wrap(interaction.guild);
+        const player = await guild.getPlayer();
+        const response = await player.moveQueuedTrack(oldPosition, newPosition);
         switch (response) {
             case PlayerResponse.QueueInsufficientTracks:
-                await interaction.replyHandler.locale(
-                    'CMD.MOVE.RESPONSE.QUEUE_INSUFFICIENT_TRACKS',
+                await interaction.replyHandler.reply(
+                    guild.locale('CMD.MOVE.RESPONSE.QUEUE_INSUFFICIENT_TRACKS'),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             case PlayerResponse.InputOutOfRange:
-                await interaction.replyHandler.locale(
-                    'CMD.MOVE.RESPONSE.OUT_OF_RANGE',
+                await interaction.replyHandler.reply(
+                    guild.locale('CMD.MOVE.RESPONSE.OUT_OF_RANGE'),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             case PlayerResponse.InputInvalid:
-                await interaction.replyHandler.locale(
-                    'CMD.MOVE.RESPONSE.MOVING_IN_PLACE',
+                await interaction.replyHandler.reply(
+                    guild.locale('CMD.MOVE.RESPONSE.MOVING_IN_PLACE'),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
             case PlayerResponse.Success: {
                 const track = player.queue.tracks[newPosition - 1];
-                const guildLocaleCode =
-                    (await data.guild.get<string>(
-                        interaction.guildId,
-                        'settings.locale',
-                    )) ?? settings.defaultLocaleCode;
                 await interaction.replyHandler.reply(
-                    getLocaleString(
-                        guildLocaleCode,
+                    guild.locale(
                         'CMD.MOVE.RESPONSE.SUCCESS',
                         getTrackMarkdownLocaleString(track),
                         oldPosition.toString(),
@@ -106,5 +94,4 @@ export default {
                 );
             }
         }
-    },
-};
+    });

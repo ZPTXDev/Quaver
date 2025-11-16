@@ -1,9 +1,8 @@
-import { logger } from '#src/lib/util/common.js';
+import { EventHandler } from '#src/lib/builders';
+import { logger } from '#src/lib/util/common';
 
-export default {
-    name: 'shardDisconnect',
-    once: false,
-    execute(): void {
+export default new EventHandler()
+    .setEvent('shardDisconnect')
+    .setExecute(function(): void {
         logger.warn({ message: 'Disconnected.', label: 'Discord' });
-    },
-};
+    });

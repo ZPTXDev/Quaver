@@ -1,24 +1,19 @@
-import type { QuaverClient, QuaverPlayer } from '#src/lib/util/common.d.js';
-import {
-    data,
-    logger,
-    MessageOptionsBuilderType,
-} from '#src/lib/util/common.js';
-import { settings } from '#src/lib/util/settings.js';
-import { getGuildLocaleString, getLocaleString } from '#src/lib/util/util.js';
-import type { GuildMember, VoiceState } from 'discord.js';
 import {
     ChannelType,
     ContainerBuilder,
+    type GuildMember,
     PermissionsBitField,
     StageInstancePrivacyLevel,
     TextDisplayBuilder,
+    type VoiceState,
 } from 'discord.js';
 import type { DefaultEventsMap, Server } from 'socket.io';
+import { QuaverGuild, type QuaverPlayer } from '#src/lib';
+import { EventHandler } from '#src/lib/builders';
+import { logger, MessageOptionsBuilderType } from '#src/lib/util/common';
+import type { QuaverClient } from '#src/lib/util/common.d';
 
 const PAUSE_TIMEOUT_SECONDS = 5 * 60;
-
-const guildDatabase = data.guild;
 
 function isUser(member: GuildMember): boolean {
     return !member.user.bot;
@@ -28,71 +23,52 @@ async function pauseChannelSession(
     io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>,
     player: QuaverPlayer,
 ): Promise<void> {
+    const guild = await QuaverGuild.wrap(player.guild);
     await player.pause();
-    const playerId = player.id;
-    if (settings.features.web.enabled) {
-        io.to(`guild:${playerId}`).emit('pauseUpdate', player.paused);
-    }
+    guild.sendWebUpdate('pauseUpdate', player.paused);
     logger.info({
-        message: `[G ${playerId}] Setting pause timeout`,
+        message: `[G ${guild.id}] Setting pause timeout`,
         label: 'Quaver',
     });
     // As a failsafe, clear the pauseTimeout first before setting a new pauseTimeout
-    clearTimeout(player.pauseTimeout);
-    player.pauseTimeout = null;
-    player.pauseTimeout = setTimeout(
-        (p): void => {
-            const pHandler = p.handler;
+    clearTimeout(player.timeout.pause);
+    player.timeout.pause = null;
+    player.timeout.pause = setTimeout(
+        (p, g): void => {
             logger.info({
-                message: `[G ${p.id}] Disconnecting (inactivity)`,
+                message: `[G ${g.id}] Disconnecting (inactivity)`,
                 label: 'Quaver',
             });
-            pHandler.locale('MUSIC.DISCONNECT.INACTIVITY.DISCONNECTED', {
-                type: MessageOptionsBuilderType.Warning,
-            });
-            pHandler.disconnect();
+            p.sendMessage(
+                g.locale('MUSIC.DISCONNECT.INACTIVITY.DISCONNECTED'),
+                {
+                    type: MessageOptionsBuilderType.Warning,
+                },
+            );
+            p.disconnect();
         },
-        PAUSE_TIMEOUT_SECONDS * 1000,
+        PAUSE_TIMEOUT_SECONDS * 1_000,
         player,
+        guild,
     );
-    player.timeoutEnd = Date.now() + PAUSE_TIMEOUT_SECONDS * 1000;
-    if (settings.features.web.enabled) {
-        io.to(`guild:${playerId}`).emit(
-            'pauseTimeoutUpdate',
-            player.timeoutEnd,
-        );
-    }
-    const guildLocaleCode =
-        (await data.guild.get<string>(playerId, 'settings.locale')) ??
-        settings.defaultLocaleCode;
-    await player.handler.send(
-        new ContainerBuilder({
-            components: [
-                new TextDisplayBuilder()
-                    .setContent(
-                        `${getLocaleString(
-                            guildLocaleCode,
-                            'MUSIC.DISCONNECT.ALONE.WARNING',
-                        )} ${getLocaleString(
-                            guildLocaleCode,
-                            'MUSIC.DISCONNECT.INACTIVITY.WARNING',
-                            (
-                                Math.floor(Date.now() / 1000) +
-                                PAUSE_TIMEOUT_SECONDS
-                            ).toString(),
-                        )}`,
-                    )
-                    .toJSON(),
-                new TextDisplayBuilder()
-                    .setContent(
-                        getLocaleString(
-                            guildLocaleCode,
-                            'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME',
-                        ),
-                    )
-                    .toJSON(),
-            ],
-        }),
+    player.timeout.end = Date.now() + PAUSE_TIMEOUT_SECONDS * 1_000;
+    guild.sendWebUpdate('pauseTimeoutUpdate', player.timeout.end);
+    await player.sendMessage(
+        new ContainerBuilder().addTextDisplayComponents(
+            new TextDisplayBuilder().setContent(
+                `${guild.locale(
+                    'MUSIC.DISCONNECT.ALONE.WARNING',
+                )} ${guild.locale(
+                    'MUSIC.DISCONNECT.INACTIVITY.WARNING',
+                    (
+                        Math.floor(Date.now() / 1000) + PAUSE_TIMEOUT_SECONDS
+                    ).toString(),
+                )}`,
+            ),
+            guild.builders.textDisplayLocale(
+                'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME',
+            ),
+        ),
         { type: MessageOptionsBuilderType.Warning },
     );
 }
@@ -101,22 +77,17 @@ async function resumeChannelSession(
     io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>,
     player: QuaverPlayer,
 ): Promise<void> {
-    const playerId = player.id;
+    const guild = await QuaverGuild.wrap(player.guild);
     logger.info({
-        message: `[G ${playerId}] Resuming session`,
+        message: `[G ${guild.id}] Resuming session`,
         label: 'Quaver',
     });
     await player.resume();
-    clearTimeout(player.pauseTimeout);
-    player.pauseTimeout = null;
-    if (settings.features.web.enabled) {
-        io.to(`guild:${playerId}`).emit('pauseUpdate', player.paused);
-        io.to(`guild:${playerId}`).emit(
-            'pauseTimeoutUpdate',
-            !!player.pauseTimeout,
-        );
-    }
-    await player.handler.locale('MUSIC.DISCONNECT.ALONE.RESUMING', {
+    clearTimeout(player.timeout.pause);
+    player.timeout.pause = null;
+    guild.sendWebUpdate('pauseUpdate', player.paused);
+    guild.sendWebUpdate('pauseTimeoutUpdate', !!player.timeout.pause);
+    await player.sendMessage(guild.locale('MUSIC.DISCONNECT.ALONE.RESUMING'), {
         type: MessageOptionsBuilderType.Success,
     });
 }
@@ -128,32 +99,35 @@ async function onChannelEmpty(
     isOldQuaverStateUpdate: boolean,
     isGuildStayEnabled: boolean | unknown,
 ): Promise<void> {
-    const playerId = player.id;
+    const guild = await QuaverGuild.wrap(player.guild);
     const isPlayerIdle =
         !player.queue.current || (!player.playing && !player.paused);
     // To ensure Quaver does not persist in an inactive session, disable stay feature for this guild
     if (isOldQuaverStateUpdate && isPlayerIdle && isGuildStayEnabled) {
-        await guildDatabase.set(playerId, 'settings.stay.enabled', false);
+        await guild.settings.set('stay.enabled', false);
     }
-    const playerHandler = player.handler;
-    const playerVoice = player.voice;
-    const playerVoiceChannelId = playerVoice.channelId;
-    if (isPlayerIdle && playerVoiceChannelId) {
+    if (isPlayerIdle && player.voice.channelId) {
         logger.info({
-            message: `[G ${playerId}] Disconnecting (alone)`,
+            message: `[G ${guild.id}] Disconnecting (alone)`,
             label: 'Quaver',
         });
-        await playerHandler.locale(
-            isOldQuaverStateUpdate
-                ? 'MUSIC.DISCONNECT.ALONE.DISCONNECTED.MOVED'
-                : 'MUSIC.DISCONNECT.ALONE.DISCONNECTED.DEFAULT',
+        await player.sendMessage(
+            guild.locale(
+                isOldQuaverStateUpdate
+                    ? 'MUSIC.DISCONNECT.ALONE.DISCONNECTED.MOVED'
+                    : 'MUSIC.DISCONNECT.ALONE.DISCONNECTED.DEFAULT',
+            ),
             { type: MessageOptionsBuilderType.Warning },
         );
-        await playerHandler.disconnect();
+        await player.disconnect();
         return;
     }
     // To ensure that Quaver does not set pauseTimeout if timeout or pauseTimeout already exists, do not pause the session
-    if (player.timeout || player.pauseTimeout || !playerVoiceChannelId) {
+    if (
+        player.timeout.standard ||
+        player.timeout.pause ||
+        !player.voice.channelId
+    ) {
         return;
     }
     await pauseChannelSession(io, player);
@@ -166,20 +140,14 @@ async function onChannelJoinOrMove(
     isGuildStayEnabled: boolean | unknown,
     isOldQuaverStateUpdate: boolean,
 ): Promise<void> {
-    const guildStayChannelId = await guildDatabase.get(
-        player.id,
-        'settings.stay.channel',
-    );
+    const guild = await QuaverGuild.wrap(player.guild);
+    const guildStayChannelId = await guild.settings.get<string>('stay.channel');
     if (isGuildStayEnabled && guildStayChannelId !== newState.channelId) {
-        await guildDatabase.set(
-            player.id,
-            'settings.stay.channel',
-            newState.channelId,
-        );
+        await guild.settings.set('stay.channel', newState.channelId);
     }
     // In this context newState#channel is always defined for join/move states, so optional chaining is unnecessary
     const hasNewChannelUsers = newState.channel.members.filter(isUser).size > 0;
-    if (hasNewChannelUsers && player.pauseTimeout) {
+    if (hasNewChannelUsers && player.timeout.pause) {
         await resumeChannelSession(io, player);
     }
     // To prevent Quaver from handling a channel that still has users or the guild's stay feature is enabled, do not handle the channel
@@ -194,15 +162,14 @@ async function onChannelJoinOrMove(
     );
 }
 
-export default {
-    name: 'voiceStateUpdate',
-    once: false,
-    async execute(oldState: VoiceState, newState: VoiceState): Promise<void> {
+export default new EventHandler()
+    .setEvent('voiceStateUpdate')
+    .setExecute(async function(oldState, newState): Promise<void> {
         const oldClient = oldState.client as QuaverClient;
         const oldClientUserId = oldClient.user.id;
         const oldUser = oldState.member.user;
         const isOldQuaverStateUpdate = oldUser.id === oldClientUserId;
-        // Since we don't handle state updates for another bot, do not operate
+        // Since we don't handle state updates for another client, do not operate
         if (!isOldQuaverStateUpdate && oldUser.bot) {
             return;
         }
@@ -233,61 +200,46 @@ export default {
         if (!isOldQuaverStateUpdate && hasSameChannelStateUpdates) {
             return;
         }
-        const oldGuildId = oldState.guild.id;
-        const player = (await oldClient.music.players.fetch(
-            oldGuildId,
-        )) as QuaverPlayer;
+        const guild = await QuaverGuild.wrap(oldState.guild);
+        const player = await oldClient.music.players.fetch(guild.id);
         // To prevent further operations on an uninitialized player session / player handler, do not operate
         if (!player) {
             return;
         }
-        const playerHandler = player.handler;
-        if (!playerHandler) {
-            return;
-        }
-        const playerId = player.id;
-        const isGuildStayEnabled = await guildDatabase.get(
-            playerId,
-            'settings.stay.enabled',
-        );
-        const playerVoice = player.voice;
+        const isGuildStayEnabled =
+            await guild.settings.get<boolean>('stay.enabled');
         const hasQuaverDisconnected = isOldQuaverStateUpdate && !newChannelId;
         // To ensure Quaver does not persist in an inactive session, disable stay feature for this guild
         if (hasQuaverDisconnected && isGuildStayEnabled) {
-            await guildDatabase.set(playerId, 'settings.stay.enabled', false);
+            await guild.settings.set('stay.enabled', false);
         }
         // To reset states, properly handle disconnection
-        if (hasQuaverDisconnected && !playerVoice.channelId) {
+        if (hasQuaverDisconnected && !player.voice.channelId) {
             logger.info({
-                message: `[G ${playerId}] Cleaning up (disconnected)`,
+                message: `[G ${guild.id}] Cleaning up (disconnected)`,
                 label: 'Quaver',
             });
-            await playerHandler.locale(
-                'MUSIC.SESSION_ENDED.FORCED.DISCONNECTED',
+            await player.sendMessage(
+                guild.locale('MUSIC.SESSION_ENDED.FORCED.DISCONNECTED'),
                 { type: MessageOptionsBuilderType.Warning },
             );
-            await playerHandler.disconnect(oldChannelId);
+            await player.disconnect(oldChannelId);
             return;
         }
-        const { io } = await import('#src/main.js');
         // To help Quaver remain unsuppressed in stage channels, explicitly use booleans for Quaver's state update and newState#channelId
         const isQuaverJoinOrMoveState = isOldQuaverStateUpdate && newChannelId;
         const newChannel = newState.channel;
         // In this context newState#channel can be null because of leave states, so optional chaining is necessary
         const newChannelType = newChannel?.type;
         // To keep the dashboard updated with the latest session details, emit channel events for this guild
-        if (isQuaverJoinOrMoveState && settings.features.web.enabled) {
-            io.to(`guild:${playerId}`).emit(
-                'textChannelUpdate',
-                player.queue.channel.name,
-            );
-            io.to(`guild:${playerId}`).emit('channelUpdate', newChannel?.name);
+        if (isQuaverJoinOrMoveState) {
+            guild.sendWebUpdate('textChannelUpdate', player.queue.channel.name);
+            guild.sendWebUpdate('ChannelUpdate', newChannel?.name);
         }
         // For type consistency, create an empty map for unhandled states
         const channelPermissions = isQuaverJoinOrMoveState
-            ? oldClient.guilds.cache
-                  .get(oldGuildId)
-                  .channels.cache.get(newChannelId)
+            ? guild.channels.cache
+                  .get(newChannelId)
                   .permissionsFor(oldClientUserId)
             : new Map();
         const hasBasicChannelPermissions = channelPermissions.has(
@@ -303,15 +255,15 @@ export default {
         ) {
             // To prevent permission errors, properly disconnect Quaver
             if (!hasBasicChannelPermissions) {
-                await playerHandler.locale(
-                    'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC',
+                await player.sendMessage(
+                    guild.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC'),
                     { type: MessageOptionsBuilderType.Error },
                 );
-                await playerHandler.disconnect();
+                await player.disconnect();
                 return;
             }
             await onChannelJoinOrMove(
-                io,
+                guild.client.io,
                 player,
                 newState,
                 isGuildStayEnabled,
@@ -326,39 +278,34 @@ export default {
         ) {
             // To prevent permission errors, properly disconnect Quaver
             if (!hasBasicChannelPermissions) {
-                await playerHandler.locale(
-                    'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC',
+                await player.sendMessage(
+                    guild.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC'),
                     { type: MessageOptionsBuilderType.Error },
                 );
-                await playerHandler.disconnect();
+                await player.disconnect();
                 return;
             }
             const hasStageModerator = channelPermissions.has(
                 PermissionsBitField.StageModerator,
             );
             if (!hasStageModerator && isGuildStayEnabled) {
-                await guildDatabase.set(
-                    playerId,
-                    'settings.stay.enabled',
-                    false,
-                );
+                await guild.settings.set('stay.enabled', false);
             }
             if (!hasStageModerator) {
-                await playerHandler.locale(
-                    'MUSIC.SESSION_ENDED.FORCED.STAGE_NOT_MODERATOR',
+                await player.sendMessage(
+                    guild.locale(
+                        'MUSIC.SESSION_ENDED.FORCED.STAGE_NOT_MODERATOR',
+                    ),
                     { type: MessageOptionsBuilderType.Warning },
                 );
-                await playerHandler.disconnect();
+                await player.disconnect();
                 return;
             }
             // To avoid errors from recreating a stage instance, only create one if it doesn't already exist
             if (!newChannel.stageInstance) {
                 try {
                     await newChannel.createStageInstance({
-                        topic: await getGuildLocaleString(
-                            playerId,
-                            'MISC.STAGE_TOPIC',
-                        ),
+                        topic: guild.locale('MISC.STAGE_TOPIC'),
                         privacyLevel: StageInstancePrivacyLevel.GuildOnly,
                     });
                 } catch (error) {
@@ -374,7 +321,7 @@ export default {
             // Also handles unsuppressing Quaver mid-track as suppress state updates were intentionally written not to be ignored by Quaver
             await newState.setSuppressed(false);
             await onChannelJoinOrMove(
-                io,
+                guild.client.io,
                 player,
                 newState,
                 isGuildStayEnabled,
@@ -385,14 +332,14 @@ export default {
         // Since a user joined Quaver's channel while the session was paused, resume the session
         if (
             !isOldQuaverStateUpdate &&
-            newChannelId === playerVoice.channelId &&
-            player.pauseTimeout
+            newChannelId === player.voice.channelId &&
+            player.timeout.pause
         ) {
-            await resumeChannelSession(io, player);
+            await resumeChannelSession(guild.client.io, player);
             return;
         }
         const isUserLeaveOrMoveState =
-            !isOldQuaverStateUpdate && oldChannelId === playerVoice.channelId;
+            !isOldQuaverStateUpdate && oldChannelId === player.voice.channelId;
         // Since the last user left or moved out from Quaver's channel and the guild's stay feature is disabled, handle the empty channel
         if (
             isUserLeaveOrMoveState &&
@@ -400,11 +347,10 @@ export default {
             !isGuildStayEnabled
         ) {
             await onChannelEmpty(
-                io,
+                guild.client.io,
                 player,
                 isOldQuaverStateUpdate,
                 isGuildStayEnabled,
             );
         }
-    },
-};
+    });

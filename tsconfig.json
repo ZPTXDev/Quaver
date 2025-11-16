@@ -1,21 +1,17 @@
 {
 	"compilerOptions": {
+        "module": "esnext",
+        "target": "es2022",
+        "moduleResolution": "bundler",
 		"baseUrl": ".",
 		"rootDir": "./src",
-		"outDir": "./dist",
-		"target": "ES2022",
-		"module": "Node16",
-		"allowJs": true,
 		"alwaysStrict": true,
-		"noEmitOnError": false,
-		"noImplicitAny": true,
-		"moduleResolution": "Node16",
-		"skipLibCheck": true,
-		"sourceMap": true,
+		"noEmit": true,
+        "noImplicitAny": true,
 		"paths": {
 			"#src/*": ["src/*"]
 		},
-		"allowSyntheticDefaultImports": true
 	},
-	"include": ["src/**/*"]
+	"include": ["src/**/*"],
+    "exclude": ["locales", "scripts"]
 }
