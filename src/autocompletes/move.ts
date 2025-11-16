@@ -5,7 +5,6 @@ import { AutocompleteHandler } from '#src/lib/builders';
 export default new AutocompleteHandler().setExecute(
     async function(interaction): Promise<void> {
         const focused = interaction.options.getFocused();
-        // no usage of locale, so no need to run updateLocaleCode
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
         if (!player) return interaction.respond([]);

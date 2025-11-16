@@ -10,7 +10,7 @@ import type {
     ProcessFileCallback,
     ProcessFileOverride,
     ProcessFolderPathOptions,
-} from './moduleLoaderUtils.d.js';
+} from './moduleLoaderUtils.d';
 
 const DEFAULT_MODULE_EXPORT_NAME = 'default';
 

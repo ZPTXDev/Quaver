@@ -23,10 +23,11 @@ export class EventHandler<E extends AcceptedEventTypes> extends BaseHandler {
     }
 
     /**
-     * Sets the event for this handler.
+     * Sets the event for this handler. Used for typing the setExecute function.
      * @param _event - The event.
      * @returns This instance for chaining.
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setEvent<K extends keyof ClientEvents>(_event: K): EventHandler<K> {
         const newInstance = new EventHandler<K>();
         newInstance.once = this.once;
