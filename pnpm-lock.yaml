@@ -41,8 +41,8 @@ dependencies:
     specifier: ^1.1.0
     version: 1.1.0
   cache-manager:
-    specifier: ^7.2.4
-    version: 7.2.4
+    specifier: ^7.2.5
+    version: 7.2.5
   cacheable:
     specifier: ^2.2.0
     version: 2.2.0
@@ -201,12 +201,6 @@ packages:
       '@cacheable/utils': 2.3.1
       '@keyv/bigmap': 1.2.0(keyv@5.5.4)
       hookified: 1.13.0
-      keyv: 5.5.4(patch_hash=xtm6nhclkwmse6ymbyf3zp3mwa)
-    dev: false
-
-  /@cacheable/utils@2.2.0:
-    resolution: {integrity: sha512-7xaQayO3msdVcxXLYcLU5wDqJBNdQcPPPHr6mdTEIQI7N7TbtSVVTpWOTfjyhg0L6AQwQdq7miKdWtTDBoBldQ==}
-    dependencies:
       keyv: 5.5.4(patch_hash=xtm6nhclkwmse6ymbyf3zp3mwa)
     dev: false
 
@@ -1779,10 +1773,10 @@ packages:
     dev: false
     optional: true
 
-  /cache-manager@7.2.4:
-    resolution: {integrity: sha512-skmhkqXjPCBmrb70ctEx4zwFk7vb0RdFXlVGYWnFZ8pKvkzdFrFFKSJ1IaKduGfkryHOJvb7q2PkGmonmL+UGw==}
+  /cache-manager@7.2.5:
+    resolution: {integrity: sha512-Y5LF7olTrcKJn1NoKiWPOvjEiO5DfDVPxqZHETCRMaliC60KBNb4Ge/vEYep5TyaqpXvnpnPPo8zauCe6UzZwA==}
     dependencies:
-      '@cacheable/utils': 2.2.0
+      '@cacheable/utils': 2.3.1
       keyv: 5.5.4(patch_hash=xtm6nhclkwmse6ymbyf3zp3mwa)
     dev: false
 
