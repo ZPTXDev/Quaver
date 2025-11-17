@@ -44,8 +44,8 @@ dependencies:
     specifier: ^7.2.4
     version: 7.2.4
   cacheable:
-    specifier: ^2.1.1
-    version: 2.1.1
+    specifier: ^2.2.0
+    version: 2.2.0
   crypto-js:
     specifier: ^4.2.0
     version: 4.2.0
@@ -195,17 +195,11 @@ packages:
       '@babel/helper-validator-identifier': 7.28.5
     dev: true
 
-  /@cacheable/memoize@2.0.3:
-    resolution: {integrity: sha512-hl9wfQgpiydhQEIv7fkjEzTGE+tcosCXLKFDO707wYJ/78FVOlowb36djex5GdbSyeHnG62pomYLMuV/OT8Pbw==}
+  /@cacheable/memory@2.0.5:
+    resolution: {integrity: sha512-fkiAxCvssEyJZ5fxX4tcdZFRmW9JehSTGvvqmXn6rTzG5cH6V/3C4ad8yb01vOjp2xBydHkHrgpW0qeGtzt6VQ==}
     dependencies:
-      '@cacheable/utils': 2.2.0
-    dev: false
-
-  /@cacheable/memory@2.0.4:
-    resolution: {integrity: sha512-cCmJKCKlT1t7hNBI1+gFCwmKFd9I4pS3zqBeNGXTSODnpa0EeDmORHY8oEMTuozfdg3cgsVh8ojLaPYb6eC7Cg==}
-    dependencies:
-      '@cacheable/utils': 2.2.0
-      '@keyv/bigmap': 1.1.0(keyv@5.5.4)
+      '@cacheable/utils': 2.3.1
+      '@keyv/bigmap': 1.2.0(keyv@5.5.4)
       hookified: 1.13.0
       keyv: 5.5.4(patch_hash=xtm6nhclkwmse6ymbyf3zp3mwa)
     dev: false
@@ -213,6 +207,13 @@ packages:
   /@cacheable/utils@2.2.0:
     resolution: {integrity: sha512-7xaQayO3msdVcxXLYcLU5wDqJBNdQcPPPHr6mdTEIQI7N7TbtSVVTpWOTfjyhg0L6AQwQdq7miKdWtTDBoBldQ==}
     dependencies:
+      keyv: 5.5.4(patch_hash=xtm6nhclkwmse6ymbyf3zp3mwa)
+    dev: false
+
+  /@cacheable/utils@2.3.1:
+    resolution: {integrity: sha512-38NJXjIr4W1Sghun8ju+uYWD8h2c61B4dKwfnQHVDFpAJ9oS28RpfqZQJ6Dgd3RceGkILDY9YT+72HJR3LoeSQ==}
+    dependencies:
+      hashery: 1.2.0
       keyv: 5.5.4(patch_hash=xtm6nhclkwmse6ymbyf3zp3mwa)
     dev: false
 
@@ -495,12 +496,13 @@ packages:
       '@jridgewell/sourcemap-codec': 1.5.5
     dev: true
 
-  /@keyv/bigmap@1.1.0(keyv@5.5.4):
-    resolution: {integrity: sha512-MX7XIUNwVRK+hjZcAbNJ0Z8DREo+Weu9vinBOjGU1thEi9F6vPhICzBbk4CCf3eEefKRz7n6TfZXwUFZTSgj8Q==}
+  /@keyv/bigmap@1.2.0(keyv@5.5.4):
+    resolution: {integrity: sha512-4Lme8NejkyetZ9oJ6u8NSf0iJEFFt7I+tyDI48wZlaFmbhDEh4nZg7bEPFPwCWkpIuL50/ukWBC9AHQTmdJLUA==}
     engines: {node: '>= 18'}
     peerDependencies:
-      keyv: ^5.5.3
+      keyv: ^5.5.4
     dependencies:
+      hashery: 1.2.0
       hookified: 1.13.0
       keyv: 5.5.4(patch_hash=xtm6nhclkwmse6ymbyf3zp3mwa)
     dev: false
@@ -1719,12 +1721,11 @@ packages:
       keyv: 5.5.4(patch_hash=xtm6nhclkwmse6ymbyf3zp3mwa)
     dev: false
 
-  /cacheable@2.1.1:
-    resolution: {integrity: sha512-LmF4AXiSNdiRbI2UjH8pAp9NIXxeQsTotpEaegPiDcnN0YPygDJDV3l/Urc0mL72JWdATEorKqIHEx55nDlONg==}
+  /cacheable@2.2.0:
+    resolution: {integrity: sha512-LEJxRqfeomiiRd2t0uON6hxAtgOoWDfY3fugebbz+J3vDLO+SkdfFChQcOHTZhj9SYa9iwE9MGYNX72dKiOE4w==}
     dependencies:
-      '@cacheable/memoize': 2.0.3
-      '@cacheable/memory': 2.0.4
-      '@cacheable/utils': 2.2.0
+      '@cacheable/memory': 2.0.5
+      '@cacheable/utils': 2.3.1
       hookified: 1.13.0
       keyv: 5.5.4(patch_hash=xtm6nhclkwmse6ymbyf3zp3mwa)
       qified: 0.5.2
@@ -2567,6 +2568,13 @@ packages:
     requiresBuild: true
     dev: false
     optional: true
+
+  /hashery@1.2.0:
+    resolution: {integrity: sha512-43XJKpwle72Ik5Zpam7MuzRWyNdwwdf6XHlh8wCj2PggvWf+v/Dm5B0dxGZOmddidgeO6Ofu9As/o231Ti/9PA==}
+    engines: {node: '>=20'}
+    dependencies:
+      hookified: 1.13.0
+    dev: false
 
   /hasown@2.0.2:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
