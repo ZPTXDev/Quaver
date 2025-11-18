@@ -1,12 +1,10 @@
 import type { ClientEvents } from 'discord.js';
-import { BaseHandler, type GenericExecuteFunction } from '.';
+import { type AcceptedEventTypes, BaseHandler, type GenericExecuteFunction } from '.';
 
 type GenericEventExecuteFunction<K extends keyof ClientEvents> = (
     this: EventHandler<K>,
     ...args: ClientEvents[K]
 ) => Promise<void> | void;
-
-export type AcceptedEventTypes = keyof ClientEvents | string | symbol;
 
 export class EventHandler<E extends AcceptedEventTypes> extends BaseHandler {
     once = false;

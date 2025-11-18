@@ -16,6 +16,7 @@ import type {
 } from '#src/lib';
 import { Check } from '#src/lib/util/constants';
 
+// only exported for builders extending from BaseHandler
 export type GenericExecuteFunction = (
     ...args: unknown[]
 ) => Promise<void> | void;

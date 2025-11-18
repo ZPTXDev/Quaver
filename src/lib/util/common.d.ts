@@ -17,12 +17,8 @@ import type {
     VoiceChannel,
 } from 'discord.js';
 import type { Server } from 'socket.io';
-import type {
-    InteractionHandlerMapsFlat,
-    QuaverNode,
-    QuaverPlayer,
-    ReplyHandler,
-} from '#src/lib';
+import type { InteractionHandlerMapsFlat, ReplyHandler } from '#src/lib';
+import type { QuaverNode, QuaverPlayer } from '#src/lib/music';
 import type { MessageOptionsBuilderType } from '#src/lib/util/common';
 
 export type SearchStateRecord = {
@@ -90,19 +86,6 @@ export type QuaverSong = Song & {
     requesterTag?: string;
     requesterAvatar?: string;
 };
-
-// export type QuaverPlayer = Player<Node> & {
-//     guild?: Guild;
-//     timeout?: ReturnType<typeof setTimeout>;
-//     pauseTimeout?: ReturnType<typeof setTimeout>;
-//     timeoutEnd?: number;
-//     queue?: QuaverQueue;
-//     bassboost?: boolean;
-//     nightcore?: boolean;
-//     handler?: PlayerHandler;
-//     skip?: QuaverPlayerSkipObject;
-//     failed?: number;
-// };
 
 export type QuaverQueue = Queue & {
     channel?: QuaverChannels;

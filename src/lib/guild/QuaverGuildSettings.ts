@@ -1,5 +1,5 @@
 import type { Guild } from 'discord.js';
-import { data } from './util/common';
+import { data } from '#src/lib/util/common';
 
 export class QuaverGuildSettings {
     guild;

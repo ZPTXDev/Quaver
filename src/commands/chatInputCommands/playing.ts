@@ -1,8 +1,8 @@
 import { LoopType } from '@lavaclient/plugin-queue';
 import { getBar, msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
-import { QuaverGuild } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
 import { MessageOptionsBuilderType } from '#src/lib/util/common';
 import { Check } from '#src/lib/util/constants';
 import { settings } from '#src/lib/util/settings';

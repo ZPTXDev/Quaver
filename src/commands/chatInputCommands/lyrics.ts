@@ -8,8 +8,8 @@ import {
     type SlashCommandStringOption,
     TextDisplayBuilder,
 } from 'discord.js';
-import { QuaverGuild } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
 import { MessageOptionsBuilderType } from '#src/lib/util/common';
 import { settings } from '#src/lib/util/settings';
 import { formatLavaLyricsResponse, formatResponse, getLocaleString } from '#src/lib/util/util';

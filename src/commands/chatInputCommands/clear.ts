@@ -8,13 +8,13 @@ import {
     SeparatorBuilder,
     SlashCommandBuilder,
 } from 'discord.js';
+import { ChatInputCommandHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
 import {
     confirmationTimeout,
     logger,
     MessageOptionsBuilderType,
 } from '#src/lib/util/common';
-import { QuaverGuild } from '#src/lib';
-import { ChatInputCommandHandler } from '#src/lib/builders';
 import { Check } from '#src/lib/util/constants';
 import { settings } from '#src/lib/util/settings';
 import { buildMessageOptions, getLocaleString } from '#src/lib/util/util';

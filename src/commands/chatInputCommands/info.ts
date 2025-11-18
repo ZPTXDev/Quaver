@@ -11,8 +11,8 @@ import {
     TextDisplayBuilder,
     ThumbnailBuilder,
 } from 'discord.js';
-import { QuaverGuild } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/music';
 import { settings } from '#src/lib/util/settings';
 import { getLocaleString } from '#src/lib/util/util';
 import { version } from '#src/lib/util/version';

@@ -3,8 +3,9 @@ import {
     SlashCommandBuilder,
     type SlashCommandChannelOption,
 } from 'discord.js';
-import { PlayerResponse, QuaverGuild } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
+import { PlayerResponse } from '#src/lib/music';
 import { Check } from '#src/lib/util/constants';
 import { MessageOptionsBuilderType } from '#src/lib/util/common';
 import type { QuaverChannels } from '#src/lib/util/common.d';

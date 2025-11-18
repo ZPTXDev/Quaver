@@ -5,8 +5,9 @@ import {
 } from '#src/lib/util/util';
 import { roundTo } from '@zptxdev/zptx-lib';
 import { ContainerComponent } from 'discord.js';
-import { ForceType, QuaverGuild } from '#src/lib';
+import { ForceType } from '#src/lib';
 import { StringSelectMenuHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
 import {
     confirmationTimeout,
     logger,

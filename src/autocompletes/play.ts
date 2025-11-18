@@ -1,7 +1,7 @@
 import type { ApplicationCommandOptionChoiceData } from 'discord.js';
 import { request } from 'undici';
-import { QuaverGuild } from '#src/lib';
 import { AutocompleteHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
 import { cache } from '#src/lib/util/common';
 import {
     acceptableSources,

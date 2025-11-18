@@ -1,6 +1,6 @@
 import { LoopType } from '@lavaclient/plugin-queue';
 import type { Collection, GuildMember, Snowflake } from 'discord.js';
-import { QuaverGuild } from '#src/lib';
+import { QuaverGuild } from '#src/lib/guild';
 import { logger, MessageOptionsBuilderType } from '#src/lib/util/common';
 import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.d';
 import { getTrackMarkdownLocaleString } from '#src/lib/util/util';

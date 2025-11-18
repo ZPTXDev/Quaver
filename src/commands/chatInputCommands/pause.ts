@@ -1,6 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { PlayerResponse, QuaverGuild } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
+import { PlayerResponse } from '#src/lib/music';
 import { MessageOptionsBuilderType } from '#src/lib/util/common';
 import { Check } from '#src/lib/util/constants';
 import { settings } from '#src/lib/util/settings';

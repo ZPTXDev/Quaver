@@ -8,8 +8,9 @@ import {
     type VoiceState,
 } from 'discord.js';
 import type { DefaultEventsMap, Server } from 'socket.io';
-import { QuaverGuild, type QuaverPlayer } from '#src/lib';
 import { EventHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
+import type { QuaverPlayer } from '#src/lib/music';
 import { logger, MessageOptionsBuilderType } from '#src/lib/util/common';
 import type { QuaverClient } from '#src/lib/util/common.d';
 

@@ -4,8 +4,8 @@ import {
     PermissionsBitField,
     SlashCommandBuilder,
 } from 'discord.js';
-import { QuaverGuild } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
 import { confirmationTimeout, logger } from '#src/lib/util/common';
 import type { SettingsPageOptions } from '#src/lib/util/common.d';
 import { Check, settingsOptions } from '#src/lib/util/constants';

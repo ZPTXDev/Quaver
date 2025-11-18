@@ -6,7 +6,6 @@ import {
     type AllInteractions,
     type InteractionHandlerMapsFlat,
     type QuaverClient,
-    QuaverGuild,
     ReplyHandler,
 } from '.';
 import {
@@ -18,6 +17,7 @@ import {
     type RoleSelectMenuHandler,
     type StringSelectMenuHandler,
 } from './builders';
+import { QuaverGuild } from './guild';
 import { logger, MessageOptionsBuilderType } from './util/common';
 import type { QuaverInteraction } from './util/common.d';
 import { settings } from './util/settings';

@@ -18,8 +18,8 @@ import {
     TextDisplayBuilder,
 } from 'discord.js';
 import { LavalinkWSClientState } from 'lavalink-ws-client';
-import { QuaverGuild } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
 import {
     logger,
     MessageOptionsBuilderType,

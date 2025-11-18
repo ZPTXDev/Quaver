@@ -26,8 +26,9 @@ import {
 import { get } from 'lodash-es';
 import { readdirSync } from 'node:fs';
 import type { ColorTypes, LavaLyricsResponse, LocaleCompletionState, LyricsResponse } from './util.d';
-import { type Initialized, QuaverGuild, type QuaverPlayer, type WhitelistedFeatures } from '#src/lib';
-import type { ComponentInteractions } from '#src/lib/InteractionHandler.d';
+import type { ComponentInteractions } from '#src/lib';
+import { type Initialized, QuaverGuild, type WhitelistedFeatures } from '#src/lib/guild';
+import type { QuaverPlayer } from '#src/lib/music';
 import { data, locales, MessageOptionsBuilderType } from '#src/lib/util/common';
 import type {
     MessageOptionsBuilderInputs,
@@ -246,36 +247,6 @@ export async function getFailedChecks(
         }
     }
     return failedChecks;
-}
-
-/**
- * Returns the Enable and Disable button components used in settings.
- * @param customId - The custom ID of the button.
- * @param enabled - Whether the setting is enabled.
- * @param guild - The guild.
- * @returns An array of ButtonBuilder components for enabling and disabling the setting.
- */
-export function getButtonToggleComponents(
-    customId: string,
-    enabled: boolean,
-    guild: QuaverGuild<Initialized> & Guild,
-): ButtonBuilder[] {
-    return ['enable', 'disable'].map(
-        (state): ButtonBuilder =>
-            new ButtonBuilder()
-                .setCustomId(`${customId}:${state}`)
-                .setLabel(guild.locale(`MISC.${state.toUpperCase()}`))
-                .setStyle(
-                    state === 'enable'
-                        ? enabled
-                            ? ButtonStyle.Success
-                            : ButtonStyle.Secondary
-                        : !enabled
-                          ? ButtonStyle.Success
-                          : ButtonStyle.Secondary,
-                )
-                .setDisabled(state === 'enable' ? enabled : !enabled),
-    );
 }
 
 /**
@@ -681,7 +652,7 @@ export async function buildSettingsPage(
             const enabled =
                 (await guild.settings.get<boolean>('notifyin247')) ?? true;
             actionRow.addComponents(
-                ...getButtonToggleComponents('notifyin247', !!enabled, guild),
+                ...guild.builders.buttonToggles('notifyin247', !!enabled),
             );
             current = `\`${
                 enabled
@@ -735,7 +706,7 @@ export async function buildSettingsPage(
         case 'autolyrics': {
             const enabled = await guild.settings.get<boolean>('autolyrics');
             actionRow.addComponents(
-                ...getButtonToggleComponents('autolyrics', !!enabled, guild),
+                ...guild.builders.buttonToggles('autolyrics', !!enabled),
             );
             current = `\`${
                 enabled
@@ -747,7 +718,7 @@ export async function buildSettingsPage(
         case 'smartqueue': {
             const enabled = await guild.settings.get<boolean>('smartqueue');
             actionRow.addComponents(
-                ...getButtonToggleComponents('smartqueue', !!enabled, guild),
+                ...guild.builders.buttonToggles('smartqueue', !!enabled),
             );
             current = `\`${
                 enabled

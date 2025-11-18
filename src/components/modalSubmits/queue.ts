@@ -9,8 +9,9 @@ import {
     SeparatorBuilder,
     TextDisplayBuilder,
 } from 'discord.js';
-import { ForceType, QuaverGuild } from '#src/lib';
+import { ForceType } from '#src/lib';
 import { ModalSubmitHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
 import { MessageOptionsBuilderType } from '#src/lib/util/common';
 import { cleanURIForMarkdown } from '#src/lib/util/util';
 

@@ -9,7 +9,7 @@ import {
     TextDisplayBuilder,
     ThumbnailBuilder,
 } from 'discord.js';
-import { QuaverGuild, WhitelistStatus } from '#src/lib';
+import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
 import { logger } from '#src/lib/util/common';
 import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.d';
 import { settings } from '#src/lib/util/settings';

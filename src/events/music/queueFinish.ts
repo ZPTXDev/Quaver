@@ -1,4 +1,4 @@
-import { QuaverGuild } from '#src/lib';
+import { QuaverGuild } from '#src/lib/guild';
 import { logger, MessageOptionsBuilderType } from '#src/lib/util/common';
 import type { QuaverQueue } from '#src/lib/util/common.d';
 

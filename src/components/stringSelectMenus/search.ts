@@ -11,8 +11,9 @@ import {
     StringSelectMenuBuilder,
     type StringSelectMenuOptionBuilder,
 } from 'discord.js';
-import { ForceType, QuaverGuild } from '#src/lib';
+import { ForceType } from '#src/lib';
 import { StringSelectMenuHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
 import { logger, searchState } from '#src/lib/util/common';
 import { Check } from '#src/lib/util/constants';
 import { buildMessageOptions } from '#src/lib/util/util';

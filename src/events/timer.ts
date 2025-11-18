@@ -1,5 +1,5 @@
-import { QuaverGuild } from '#src/lib';
 import { EventHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
 
 // no setEvent call as this event isn't emitted by discord.js
 export default new EventHandler().setExecute(async function(): Promise<void> {

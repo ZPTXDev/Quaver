@@ -7,7 +7,7 @@ import {
     QuaverGuild,
     type WhitelistedFeatures,
     WhitelistStatus,
-} from '#src/lib';
+} from '#src/lib/guild';
 import type { JSONResponse } from '#src/lib/util/common.d';
 import { settings } from '#src/lib/util/settings';
 import { version } from '#src/lib/util/version';

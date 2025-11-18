@@ -1,5 +1,7 @@
-import { ForceType, PlayerResponse, QuaverGuild } from '#src/lib';
+import { ForceType } from '#src/lib';
 import { ButtonHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
+import { PlayerResponse } from '#src/lib/music';
 import {
     confirmationTimeout,
     MessageOptionsBuilderType,

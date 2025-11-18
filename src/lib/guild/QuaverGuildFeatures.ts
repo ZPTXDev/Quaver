@@ -1,27 +1,7 @@
 import type { Guild } from 'discord.js';
-import { data } from './util/common';
-import { settings } from './util/settings';
-
-export type WhitelistedFeatures = 'stay' | 'autolyrics' | 'smartqueue';
-
-export enum WhitelistStatus {
-    /**
-     * The guild is not whitelisted
-     */
-    NotWhitelisted,
-    /**
-     * The whitelist has expired
-     */
-    Expired,
-    /**
-     * The whitelist is temporary
-     */
-    Temporary,
-    /**
-     * The whitelist is permanent
-     */
-    Permanent,
-}
+import { WhitelistStatus, type WhitelistedFeatures } from '.';
+import { data } from '#src/lib/util/common';
+import { settings } from '#src/lib/util/settings';
 
 export class QuaverGuildFeatures {
     guild;

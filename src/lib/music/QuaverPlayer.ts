@@ -10,7 +10,8 @@ import {
     type Snowflake,
 } from 'discord.js';
 import { type Node, Player } from 'lavaclient';
-import { QuaverGuild, WhitelistStatus } from '.';
+import { PlayerResponse, WhitelistStatus } from '.';
+import { QuaverGuild } from './guild';
 import { logger, MessageOptionsBuilderType } from './util/common';
 import type {
     MessageOptionsBuilderInputs,
@@ -68,21 +69,6 @@ const effects: Record<string, PlayerEffect> = {
         },
     },
 };
-
-export enum PlayerResponse {
-    FeatureDisabled,
-    FeatureNotWhitelisted,
-    FeatureConflict,
-    QueueChannelMissing,
-    InsufficientPermissions,
-    QueueInsufficientTracks,
-    InputOutOfRange,
-    InputInvalid,
-    PlayerStateUnchanged,
-    PlayerIdle,
-    PlayerIsStream,
-    Success,
-}
 
 export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     client: QuaverClient;

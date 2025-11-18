@@ -1,11 +1,12 @@
 import type { Guild } from 'discord.js';
-import { QuaverGuildBuilders, QuaverGuildFeatures, QuaverGuildSettings, type QuaverPlayer } from '.';
-import type { QuaverClient } from './util/common.d.js';
-import { settings } from './util/settings.js';
-import { getLocaleString } from './util/util.js';
+import { QuaverGuildBuilders, QuaverGuildFeatures, QuaverGuildSettings } from '.';
+import type { QuaverClient } from '#src/lib';
+import type { QuaverPlayer } from '#src/lib/music';
+import { settings } from '#src/lib/util/settings';
+import { getLocaleString } from '#src/lib/util/util';
 
-type Uninitialized = { localeCode: undefined };
 export type Initialized = { localeCode: string };
+export type Uninitialized = { localeCode: undefined };
 
 export class QuaverGuild<S extends Uninitialized | Initialized> {
     builders!: QuaverGuildBuilders;

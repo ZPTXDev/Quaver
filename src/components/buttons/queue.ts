@@ -13,8 +13,9 @@ import {
     TextInputBuilder,
     TextInputStyle,
 } from 'discord.js';
-import { ForceType, QuaverGuild } from '#src/lib';
+import { ForceType } from '#src/lib';
 import { ButtonHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
 import { MessageOptionsBuilderType } from '#src/lib/util/common';
 import { cleanURIForMarkdown } from '#src/lib/util/util';
 

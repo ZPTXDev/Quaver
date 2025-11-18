@@ -6,8 +6,8 @@ import {
     type SlashCommandOptionsOnlyBuilder,
     type SlashCommandSubcommandsOnlyBuilder,
 } from 'discord.js';
-import { BaseHandler } from '.';
-import { QuaverGuild } from '#src/lib';
+import { BaseHandler, type ChatInputCommandPermissions } from '.';
+import { QuaverGuild } from '#src/lib/guild';
 import { MessageOptionsBuilderType } from '#src/lib/util/common';
 import type { QuaverInteraction } from '#src/lib/util/common.d';
 import { settings } from '#src/lib/util/settings';
@@ -17,11 +17,6 @@ type GenericChatInputCommandExecuteFunction = (
     this: ChatInputCommandInteraction,
     interaction: QuaverInteraction<ChatInputCommandInteraction>,
 ) => Promise<void> | void;
-
-export type ChatInputCommandPermissions = {
-    user: bigint[];
-    bot: bigint[];
-};
 
 type FailedCommandPermissions = {
     user: PermissionsString[];

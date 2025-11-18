@@ -6,3 +6,4 @@ export * from './EventHandler';
 export * from './ModalSubmitHandler';
 export * from './RoleSelectMenuHandler';
 export * from './StringSelectMenuHandler';
+export * from './types';

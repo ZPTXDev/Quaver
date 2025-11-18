@@ -8,7 +8,8 @@ import {
 } from 'discord.js';
 import { LavalinkWSClientState } from 'lavalink-ws-client';
 import type { Socket } from 'socket.io';
-import { PlayerResponse, QuaverGuild, WhitelistStatus } from '#src/lib';
+import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
+import { PlayerResponse } from '#src/lib/music';
 import type { QuaverChannels, QuaverSong } from '#src/lib/util/common.d';
 import {
     acceptableSources,

@@ -1,4 +1,5 @@
-import { PlayerResponse, QuaverGuild } from '#src/lib';
+import { QuaverGuild } from '#src/lib/guild';
+import { PlayerResponse } from '#src/lib/music';
 import { Check } from '#src/lib/util/constants';
 import { settings } from '#src/lib/util/settings';
 import { getLocaleString } from '#src/lib/util/util';

@@ -5,8 +5,9 @@ import {
     ContainerBuilder,
     ContainerComponent,
 } from 'discord.js';
-import { ForceType, QuaverGuild, WhitelistStatus } from '#src/lib';
+import { ForceType } from '#src/lib';
 import { ButtonHandler } from '#src/lib/builders';
+import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
 import {
     confirmationTimeout,
     logger,

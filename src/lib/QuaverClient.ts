@@ -2,13 +2,10 @@ import { getAbsoluteFileURL } from '@zptxdev/zptx-lib';
 import { Client, GatewayDispatchEvents } from 'discord.js';
 import { readdirSync } from 'node:fs';
 import type { Server } from 'socket.io';
-import {
-    InteractionHandler,
-    type InteractionHandlerMapsFlat,
-    QuaverNode,
-} from '.';
+import { InteractionHandler, type InteractionHandlerMapsFlat } from '.';
 import type { EventHandler } from './builders';
-import { settings } from './util/settings.js';
+import { QuaverNode } from './music';
+import { settings } from './util/settings';
 
 export class QuaverClient extends Client {
     io?: Server;

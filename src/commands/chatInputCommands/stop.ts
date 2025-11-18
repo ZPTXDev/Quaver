@@ -8,8 +8,8 @@ import {
     SeparatorBuilder,
     SlashCommandBuilder,
 } from 'discord.js';
-import { QuaverGuild } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
 import {
     confirmationTimeout,
     logger,

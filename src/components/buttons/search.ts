@@ -16,8 +16,10 @@ import {
     TextDisplayBuilder,
 } from 'discord.js';
 import { LavalinkWSClientState } from 'lavalink-ws-client';
-import { ForceType, QuaverGuild, type QuaverPlayer } from '#src/lib';
+import { ForceType } from '#src/lib';
 import { ButtonHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
+import type { QuaverPlayer } from '#src/lib/music';
 import { logger, MessageOptionsBuilderType, searchState } from '#src/lib/util/common';
 import type { QuaverChannels, QuaverSong } from '#src/lib/util/common.d';
 import { Check } from '#src/lib/util/constants';

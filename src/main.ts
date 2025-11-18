@@ -21,14 +21,10 @@ import { createInterface } from 'node:readline';
 import { Server, type Socket } from 'socket.io';
 import yoctoSpinner from 'yocto-spinner';
 import colors from 'yoctocolors';
-import {
-    type InteractionHandlerMapsFlat,
-    QuaverClient,
-    QuaverGuild,
-    type QuaverPlayer,
-    type WhitelistedFeatures,
-} from './lib';
+import { type InteractionHandlerMapsFlat, QuaverClient } from './lib';
 import type { QuaverMusicEvent } from './main.d';
+import { QuaverGuild, type WhitelistedFeatures } from './lib/guild';
+import type { QuaverPlayer } from './lib/music';
 import { data, logger, MessageOptionsBuilderType, setLocales } from './lib/util/common';
 import { settings } from './lib/util/settings';
 import { updateAcceptableSources, updateQueryOverrides, updateSourceManagers } from './lib/util/util';

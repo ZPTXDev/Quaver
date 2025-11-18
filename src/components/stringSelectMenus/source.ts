@@ -1,6 +1,7 @@
 import { ContainerComponent } from 'discord.js';
-import { ForceType, QuaverGuild } from '#src/lib';
+import { ForceType } from '#src/lib';
 import { StringSelectMenuHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
 import { confirmationTimeout, logger } from '#src/lib/util/common';
 import { Check } from '#src/lib/util/constants';
 import { buildMessageOptions, buildSettingsPage } from '#src/lib/util/util';
