@@ -1,23 +1,10 @@
-import { pinyin as romanizeFromChinese, PINYIN_STYLE } from '@napi-rs/pinyin';
-import {
-    ActionRowBuilder,
-    type ButtonBuilder,
-    ButtonStyle,
-    ComponentType,
-    ContainerBuilder,
-    SeparatorBuilder,
-    TextDisplayBuilder,
-} from 'discord.js';
+import { ComponentType, ContainerBuilder, TextDisplayBuilder } from 'discord.js';
 import { convert as romanizeFromKorean } from 'hangul-romanization';
-import Kuroshiro from 'kuroshiro';
-import KuromojiAnalyzer from 'kuroshiro-analyzer-kuromoji';
+import { pinyin as romanizeFromChinese } from 'pinyin-pro';
 import { toRomaji as romanizeFromJapanese } from 'wanakana';
 import { QuaverGuild } from '#src/lib';
 import { ButtonHandler } from '#src/lib/builders';
 import { MessageOptionsBuilderType } from '#src/lib/util/common';
-
-const kuroshiro = new Kuroshiro.default();
-await kuroshiro.init(new KuromojiAnalyzer());
 
 export default new ButtonHandler().setExecute(
     async function(interaction): Promise<void> {
@@ -44,18 +31,37 @@ export default new ButtonHandler().setExecute(
                 lyrics = romanizeFromKorean(lyrics);
                 break;
             case 'japanese': {
-                lyrics = await kuroshiro.convert(lyrics);
                 lyrics = romanizeFromJapanese(lyrics);
                 break;
             }
             case 'chinese':
                 lyrics = lyrics
-                    .split('\n')
-                    .map((line): string =>
-                        romanizeFromChinese(line, {
-                            style: PINYIN_STYLE.WithTone,
-                        }).join(' '),
-                    )
+                    // keep line structure (including empty lines)
+                    .split(/\r?\n/)
+                    .map((line): string => {
+                        // preserve completely blank lines as-is
+                        if (!line.trim()) return '';
+
+                        // per-character conversion, only for Hanzi
+                        const converted = [...line]
+                            .map((ch): string => {
+                                if (/[\u4e00-\u9fff]/.test(ch)) {
+                                    // add a space after each syllable so they don’t glue together
+                                    return romanizeFromChinese(ch) + ' ';
+                                }
+                                return ch;
+                            })
+                            .join('');
+
+                        // clean up punctuation + extra spaces *for this line only*
+                        return converted
+                            .replace(/，/g, ',')
+                            .replace(/。/g, '.')
+                            .replace(/\s*,\s*/g, ', ')
+                            .replace(/\s*\.\s*/g, '. ')
+                            .replace(/[ \t]+/g, ' ')
+                            .trimEnd();
+                    })
                     .join('\n');
         }
         // we'll re-use this since the length limit is affected by it
@@ -77,35 +83,13 @@ export default new ButtonHandler().setExecute(
             return;
         }
         await interaction.replyHandler.reply(
-            new ContainerBuilder()
-                .addTextDisplayComponents(
-                    new TextDisplayBuilder().setContent(title),
-                    new TextDisplayBuilder().setContent(lyrics),
-                    ...(romanizeFrom === 'japanese'
-                        ? [
-                              new TextDisplayBuilder().setContent(
-                                  japaneseInaccurate,
-                              ),
-                          ]
-                        : []),
-                )
-                .addSeparatorComponents(
-                    ...(romanizeFrom ? [new SeparatorBuilder()] : []),
-                )
-                .addActionRowComponents(
-                    ...(romanizeFrom
-                        ? [
-                              new ActionRowBuilder<ButtonBuilder>().addComponents(
-                                  guild.builders
-                                      .buttonLocale(
-                                          `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}`,
-                                      )
-                                      .setStyle(ButtonStyle.Secondary)
-                                      .setCustomId(`lyrics:${romanizeFrom}`),
-                              ),
-                          ]
-                        : []),
-                ),
+            new ContainerBuilder().addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(title),
+                new TextDisplayBuilder().setContent(lyrics),
+                ...(romanizeFrom === 'japanese'
+                    ? [new TextDisplayBuilder().setContent(japaneseInaccurate)]
+                    : []),
+            ),
         );
     },
 );

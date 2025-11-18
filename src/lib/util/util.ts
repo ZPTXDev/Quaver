@@ -25,7 +25,7 @@ import {
 } from 'discord.js';
 import { get } from 'lodash-es';
 import { readdirSync } from 'node:fs';
-import type { ColorTypes, LocaleCompletionState, LyricsResponse } from './util.d';
+import type { ColorTypes, LavaLyricsResponse, LocaleCompletionState, LyricsResponse } from './util.d';
 import { type Initialized, QuaverGuild, type QuaverPlayer, type WhitelistedFeatures } from '#src/lib';
 import type { ComponentInteractions } from '#src/lib/InteractionHandler.d';
 import { data, locales, MessageOptionsBuilderType } from '#src/lib/util/common';
@@ -337,6 +337,27 @@ export function formatResponse(
                 )
                 .join('\n')
           : new Error('No results');
+}
+
+export function formatLavaLyricsResponse(
+    json: LavaLyricsResponse,
+    player?: QuaverPlayer,
+): string | Error {
+    if (json.lines?.length === 0 && !json.text) {
+        return new Error('No results');
+    }
+    // text has better formatting than lines, so prefer it if available
+    if (json.text) return json.text;
+    return json.lines
+        .map((line): string =>
+            player?.position >= line.timestamp &&
+            (line.duration
+                ? player.position < line.timestamp + line.duration
+                : true)
+                ? `**__${line.line}__**`
+                : line.line,
+        )
+        .join('\n');
 }
 
 /**

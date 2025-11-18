@@ -18,3 +18,18 @@ export type LyricsResponse = {
     };
     source?: string;
 };
+
+export type LavaLyricsLine = {
+    timestamp: number;
+    duration?: number;
+    line: string;
+    plugin: object;
+};
+
+export type LavaLyricsResponse = {
+    sourceName: string;
+    provider: string;
+    lines: LavaLyricsLine[];
+    text?: string;
+    plugin: object;
+};

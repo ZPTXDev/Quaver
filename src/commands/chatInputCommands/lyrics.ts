@@ -12,7 +12,8 @@ import { QuaverGuild } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
 import { MessageOptionsBuilderType } from '#src/lib/util/common';
 import { settings } from '#src/lib/util/settings';
-import { formatResponse, getLocaleString } from '#src/lib/util/util';
+import { formatLavaLyricsResponse, formatResponse, getLocaleString } from '#src/lib/util/util';
+import type { LavaLyricsResponse } from '#src/lib/util/util.d';
 
 export default new ChatInputCommandHandler()
     .setData(
@@ -57,11 +58,14 @@ export default new ChatInputCommandHandler()
             }
             try {
                 const response = await interaction.client.music.rest.execute({
-                    path: `/v4/sessions/${player.api.session.id}/players/${interaction.guildId}/lyrics`,
+                    path: `/v4/sessions/${player.api.session.id}/players/${interaction.guildId}/track/lyrics`,
                     method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${settings.lavalink.password}`,
+                    },
                 });
-                json = await response.json();
-                lyrics = formatResponse(json, player);
+                json = (await response.json()) as LavaLyricsResponse;
+                lyrics = formatLavaLyricsResponse(json, player);
             } catch {
                 await interaction.replyHandler.reply(
                     guild.locale('CMD.LYRICS.RESPONSE.NO_RESULTS'),
@@ -105,7 +109,9 @@ export default new ChatInputCommandHandler()
         } else if (lyrics.match(/[\u4e00-\u9fff]/g)) {
             romanizeFrom = 'chinese';
         }
-        const title = `**${json.track.override ?? `${json.track.author} - ${json.track.title}`}**`;
+        const title = json.track
+            ? `**${json.track.override ?? `${json.track.author} - ${json.track.title}`}**`
+            : `**${player.queue.current.info.author} - ${player.queue.current.info.title}**`;
         lyrics =
             lyrics.length > 4000 - title.length
                 ? `${lyrics.slice(0, 3999 - title.length)}…`

@@ -1,11 +1,10 @@
 import type { Guild } from 'discord.js';
-import type { Initialized, QuaverGuild } from '.';
 import { data } from './util/common';
 
 export class QuaverGuildSettings {
     guild;
 
-    constructor(guild: QuaverGuild<Initialized> & Guild) {
+    constructor(guild: Guild) {
         this.guild = guild;
     }
 

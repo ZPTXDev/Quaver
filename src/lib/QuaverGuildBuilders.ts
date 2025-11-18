@@ -1,6 +1,5 @@
 import {
     ButtonBuilder,
-    type Guild,
     LabelBuilder,
     StringSelectMenuBuilder,
     TextDisplayBuilder,
@@ -10,7 +9,7 @@ import type { Initialized, QuaverGuild } from '.';
 export class QuaverGuildBuilders {
     guild;
 
-    constructor(guild: QuaverGuild<Initialized> & Guild) {
+    constructor(guild: QuaverGuild<Initialized>) {
         this.guild = guild;
     }
 

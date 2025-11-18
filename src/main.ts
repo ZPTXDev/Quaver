@@ -1,11 +1,6 @@
 import { load as effectsLoad } from '@lavaclient/plugin-effects';
 import { load as queueLoad } from '@lavaclient/plugin-queue';
-import {
-    getAbsoluteFileURL,
-    msToTime,
-    msToTimeString,
-    parseTimeString,
-} from '@zptxdev/zptx-lib';
+import { getAbsoluteFileURL, msToTime, msToTimeString, parseTimeString } from '@zptxdev/zptx-lib';
 import {
     AttachmentBuilder,
     Collection,
@@ -34,18 +29,9 @@ import {
     type WhitelistedFeatures,
 } from './lib';
 import type { QuaverMusicEvent } from './main.d';
-import {
-    data,
-    logger,
-    MessageOptionsBuilderType,
-    setLocales,
-} from './lib/util/common';
+import { data, logger, MessageOptionsBuilderType, setLocales } from './lib/util/common';
 import { settings } from './lib/util/settings';
-import {
-    updateAcceptableSources,
-    updateQueryOverrides,
-    updateSourceManagers,
-} from './lib/util/util';
+import { updateAcceptableSources, updateQueryOverrides, updateSourceManagers } from './lib/util/util';
 import { version } from './lib/util/version';
 
 export const startup = { started: false, startTime: Date.now() };
@@ -295,7 +281,8 @@ rl.on('line', async (input): Promise<void> => {
                 console.log('Usage: whitelist <guildId> <feature> [duration]');
                 break;
             }
-            const guild = await client.guilds.fetch(guildId);
+            const discordGuild = await client.guilds.fetch(guildId);
+            const guild = await QuaverGuild.wrap(discordGuild);
             if (!guild) {
                 console.log('Guild not found.');
                 break;
@@ -326,23 +313,18 @@ rl.on('line', async (input): Promise<void> => {
                 }
                 durationMs = parseTimeString(duration);
             }
-            const whitelisted = !!(await data.guild.get<number>(
-                guildId,
-                `features.${feature}.whitelisted`,
-            ));
+            const whitelisted = await guild.features.checkWhitelisted(
+                feature as WhitelistedFeatures,
+            );
             if (whitelisted && !duration) {
-                await data.guild.unset(
-                    guildId,
-                    `features.${feature}.whitelisted`,
-                );
+                await guild.features.unset(`${feature}.whitelisted`);
                 console.log(
                     `Removed ${guild.name} from the ${featureName} whitelist.`,
                 );
                 break;
             }
-            await data.guild.set(
-                guildId,
-                `features.${feature}.whitelisted`,
+            await guild.features.set(
+                `${feature}.whitelisted`,
                 durationMs === -1 ? durationMs : Date.now() + durationMs,
             );
             console.log(

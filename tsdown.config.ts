@@ -1,5 +1,4 @@
 import { defineConfig } from 'tsdown';
-// @ts-expect-error - idk
 import fg from 'fast-glob';
 
 const entries = await fg([

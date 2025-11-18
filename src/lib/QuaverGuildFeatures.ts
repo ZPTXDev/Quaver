@@ -1,5 +1,4 @@
 import type { Guild } from 'discord.js';
-import type { Initialized, QuaverGuild } from '.';
 import { data } from './util/common';
 import { settings } from './util/settings';
 
@@ -27,7 +26,7 @@ export enum WhitelistStatus {
 export class QuaverGuildFeatures {
     guild;
 
-    constructor(guild: QuaverGuild<Initialized> & Guild) {
+    constructor(guild: Guild) {
         this.guild = guild;
     }
 

@@ -13,10 +13,8 @@ import { QuaverGuild, WhitelistStatus } from '#src/lib';
 import { logger } from '#src/lib/util/common';
 import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.d';
 import { settings } from '#src/lib/util/settings';
-import {
-    formatResponse,
-    getTrackMarkdownLocaleString,
-} from '#src/lib/util/util';
+import { formatLavaLyricsResponse, getTrackMarkdownLocaleString } from '#src/lib/util/util';
+import type { LavaLyricsResponse } from '#src/lib/util/util.d';
 
 export default {
     name: 'trackStart',
@@ -174,11 +172,14 @@ export default {
             let lyrics: string | Error;
             try {
                 const response = await queue.player.client.music.rest.execute({
-                    path: `/v4/sessions/${queue.player.api.session.id}/players/${guild.id}/lyrics`,
+                    path: `/v4/sessions/${queue.player.api.session.id}/players/${guild.id}/track/lyrics`,
                     method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${settings.lavalink.password}`,
+                    },
                 });
-                json = await response.json();
-                lyrics = formatResponse(json, queue.player);
+                json = (await response.json()) as LavaLyricsResponse;
+                lyrics = formatLavaLyricsResponse(json, queue.player);
             } catch {
                 return;
             }
@@ -198,7 +199,7 @@ export default {
             } else if (lyrics.match(/[\u4e00-\u9fff]/g)) {
                 romanizeFrom = 'chinese';
             }
-            const title = `**${json.track.override ?? `${json.track.author} - ${json.track.title}`}**`;
+            const title = `**${queue.current.info.author} - ${queue.current.info.title}**`;
             lyrics =
                 lyrics.length > 4000 - title.length
                     ? `${lyrics.slice(0, 3999 - title.length)}…`

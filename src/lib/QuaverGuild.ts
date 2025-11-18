@@ -19,15 +19,13 @@ export class QuaverGuild<S extends Uninitialized | Initialized> {
         this.client = guild.client as QuaverClient;
     }
 
-    private async init(): Promise<QuaverGuild<Initialized> & Guild> {
-        const self = this as unknown as QuaverGuild<Initialized> & Guild;
-        this.settings = new QuaverGuildSettings(self);
+    private async init(): Promise<void> {
+        this.settings = new QuaverGuildSettings(this.guild);
         this.localeCode =
             (await this.settings.get<string>('locale')) ??
             settings.defaultLocaleCode;
-        this.builders = new QuaverGuildBuilders(self);
-        this.features = new QuaverGuildFeatures(self);
-        return this as unknown as QuaverGuild<Initialized> & Guild;
+        this.builders = new QuaverGuildBuilders(this);
+        this.features = new QuaverGuildFeatures(this.guild);
     }
 
     sendWebUpdate(event: string, ...args: unknown[]): void {
