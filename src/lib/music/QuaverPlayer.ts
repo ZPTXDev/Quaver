@@ -10,9 +10,9 @@ import {
     type Snowflake,
 } from 'discord.js';
 import { type Node, Player } from 'lavaclient';
-import { PlayerResponse, WhitelistStatus } from '.';
-import { QuaverGuild } from './guild';
-import { logger, MessageOptionsBuilderType } from './util/common';
+import { PlayerResponse } from '.';
+import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
+import { logger, MessageOptionsBuilderType } from '#src/lib/util/common';
 import type {
     MessageOptionsBuilderInputs,
     MessageOptionsBuilderOptions,
@@ -20,9 +20,9 @@ import type {
     QuaverClient,
     QuaverQueue,
     QuaverSong,
-} from './util/common.d';
-import { buildMessageOptions, sortQueue } from './util/util';
-import { settings } from './util/settings';
+} from '#src/lib/util/common.d';
+import { buildMessageOptions, sortQueue } from '#src/lib/util/util';
+import { settings } from '#src/lib/util/settings';
 
 const effects: Record<string, PlayerEffect> = {
     bassboost: {

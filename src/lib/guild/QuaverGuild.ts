@@ -46,9 +46,7 @@ export class QuaverGuild<S extends Uninitialized | Initialized> {
         return getLocaleString(this.localeCode, key, ...args);
     }
 
-    static async wrap(
-        guild: Guild & { client: QuaverClient },
-    ): Promise<QuaverGuild<Initialized> & Guild> {
+    static async wrap(guild: Guild): Promise<QuaverGuild<Initialized> & Guild> {
         if (!guild) {
             throw new Error(
                 'Guild is required and cannot be null or undefined',
