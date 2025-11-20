@@ -50,6 +50,9 @@ typings/
 # Optional npm cache directory
 .npm
 
+# pnpm workspace
+.pnpm-workspace.yaml
+
 # Optional eslint cache
 .eslintcache
 

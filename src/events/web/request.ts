@@ -1,10 +1,6 @@
 import type { APIGuild, Snowflake } from 'discord.js';
 import type { Socket } from 'socket.io';
-import {
-    QuaverGuild,
-    type WhitelistedFeatures,
-    WhitelistStatus,
-} from '#src/lib';
+import { QuaverGuild, type WhitelistedFeatures, WhitelistStatus } from '#src/lib/guild';
 import { data } from '#src/lib/util/common';
 import type { QuaverSong } from '#src/lib/util/common.d';
 import { settings } from '#src/lib/util/settings';

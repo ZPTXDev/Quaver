@@ -12,7 +12,7 @@ import {
     ThumbnailBuilder,
 } from 'discord.js';
 import { ChatInputCommandHandler } from '#src/lib/builders';
-import { QuaverGuild } from '#src/lib/music';
+import { QuaverGuild } from '#src/lib/guild';
 import { settings } from '#src/lib/util/settings';
 import { getLocaleString } from '#src/lib/util/util';
 import { version } from '#src/lib/util/version';
