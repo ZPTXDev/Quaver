@@ -32,7 +32,7 @@ works within Quaver without having to read any documentation.
 
 ## Prerequisites
 
-- Node.js v22.6.0 (or higher) with [pnpm](https://pnpm.io/) 8.15.9
+- Node.js v22.12.0 (or higher) with [pnpm](https://pnpm.io/) 8.15.9
 
 > [!TIP]
 > Alternatively, you may use [Bun](https://bun.com/) v1.3.2 (or higher) instead of Node.js and pnpm.
