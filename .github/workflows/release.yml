@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
       - name: Setup Bun
@@ -30,7 +30,7 @@ jobs:
           cp LICENSE release/ || true
           zip -r quaver-release.zip release/
       - name: Release
-        uses: cycjimmy/semantic-release-action@v4
+        uses: cycjimmy/semantic-release-action@v6
         with:
           branches: |
             [
