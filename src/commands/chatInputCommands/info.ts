@@ -73,7 +73,7 @@ export default new ChatInputCommandHandler()
                             new TextDisplayBuilder().setContent('## Quaver'),
                             guild.builders.textDisplayLocale(
                                 'CMD.INFO.RESPONSE.SUCCESS',
-                                version,
+                                version.version,
                             ),
                         )
                         .setThumbnailAccessory(

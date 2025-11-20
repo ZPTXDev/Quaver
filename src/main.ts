@@ -1,6 +1,11 @@
 import { load as effectsLoad } from '@lavaclient/plugin-effects';
 import { load as queueLoad } from '@lavaclient/plugin-queue';
-import { getAbsoluteFileURL, msToTime, msToTimeString, parseTimeString } from '@zptxdev/zptx-lib';
+import {
+    getAbsoluteFileURL,
+    msToTime,
+    msToTimeString,
+    parseTimeString,
+} from '@zptxdev/zptx-lib';
 import {
     AttachmentBuilder,
     Collection,
@@ -25,14 +30,25 @@ import { type InteractionHandlerMapsFlat, QuaverClient } from './lib';
 import type { QuaverMusicEvent } from './main.d';
 import { QuaverGuild, type WhitelistedFeatures } from './lib/guild';
 import type { QuaverPlayer } from './lib/music';
-import { data, logger, MessageOptionsBuilderType, setLocales } from './lib/util/common';
+import {
+    data,
+    logger,
+    MessageOptionsBuilderType,
+    setLocales,
+} from './lib/util/common';
 import { settings } from './lib/util/settings';
-import { updateAcceptableSources, updateQueryOverrides, updateSourceManagers } from './lib/util/util';
-import { version } from './lib/util/version';
+import {
+    updateAcceptableSources,
+    updateQueryOverrides,
+    updateSourceManagers,
+} from './lib/util/util';
+import { loadVersion, version } from './lib/util/version';
+
+await loadVersion();
 
 export const startup = { started: false, startTime: Date.now() };
 logger.info({
-    message: `Starting ${colors.magenta(`Quaver ${version}`)}...`,
+    message: `Starting ${colors.magenta(`Quaver ${version.version}`)}...`,
     label: 'Quaver',
 });
 
@@ -82,7 +98,7 @@ if (settings.features.web.enabled) {
                 },
                 versions: {
                     node: process.version,
-                    quaver: version,
+                    quaver: version.version,
                 },
                 cache: {
                     guilds: client.guilds.cache.size,

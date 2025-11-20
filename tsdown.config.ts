@@ -13,7 +13,6 @@ export default defineConfig({
     outDir: 'dist',
     format: 'esm',
     platform: 'node',
-    sourcemap: true,
     unbundle: true,
     tsconfig: 'tsconfig.json',
 });

@@ -6,7 +6,7 @@ export default {
     name: 'connected',
     once: false,
     async execute(): Promise<void> {
-        const { client } = await import('#src/main.js');
+        const { client } = await import('#src/main');
         logger.info({ message: 'Ready.', label: 'Lavalink' });
         if (!client.music.ws.session) {
             logger.warn({

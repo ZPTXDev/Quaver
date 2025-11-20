@@ -19,16 +19,6 @@ jobs:
         run: bun install
       - name: Build
         run: bun run build
-      - name: Package release bundle
-        run: |
-          mkdir -p release
-          cp -r dist release/
-          cp package.json release/
-          cp bun.lock release/ || true
-          cp pnpm-lock.yaml release/ || true
-          cp README.md release/ || true
-          cp LICENSE release/ || true
-          zip -r quaver-release.zip release/
       - name: Release
         uses: cycjimmy/semantic-release-action@v6
         with:
@@ -40,5 +30,6 @@ jobs:
             ]
           extra_plugins: |
             @semantic-release/git
+            @semantic-release/exec
         env:
           GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}

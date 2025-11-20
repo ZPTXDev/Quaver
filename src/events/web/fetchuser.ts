@@ -18,7 +18,11 @@ export default {
         token?: string,
     ): Promise<void> {
         if (socket.user) {
-            return callback({ status: 'success', user: socket.user, version });
+            return callback({
+                status: 'success',
+                user: socket.user,
+                version: version.version,
+            });
         }
         if (!token) return;
         let decryptedToken;
@@ -42,6 +46,10 @@ export default {
         const webUser = response as WebUser;
         webUser.manager = settings.managers.includes(response.id);
         socket.user = response;
-        return callback({ status: 'success', user: response, version });
+        return callback({
+            status: 'success',
+            user: response,
+            version: version.version,
+        });
     },
 };

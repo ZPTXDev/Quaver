@@ -21,7 +21,7 @@ export default {
         callback: (cb: Record<string, any>) => void,
         token?: string,
     ): Promise<void> {
-        const { client } = await import('#src/main.js');
+        const { client } = await import('#src/main');
         if (socket.guilds) {
             return callback({
                 status: 'success',
@@ -41,7 +41,7 @@ export default {
                             : '';
                     return guild;
                 }),
-                version,
+                version: version.version,
             });
         }
         if (!token) return;
@@ -108,6 +108,10 @@ export default {
             }
         }
         socket.guilds = webGuilds;
-        return callback({ status: 'success', guilds: webGuilds, version });
+        return callback({
+            status: 'success',
+            guilds: webGuilds,
+            version: version.version,
+        });
     },
 };

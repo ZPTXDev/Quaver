@@ -42,7 +42,6 @@
     "@typescript-eslint/parser": "^8.47.0",
     "eslint": "^9.39.1",
     "fast-glob": "^3.3.3",
-    "genversion": "^3.2.0",
     "globals": "^16.5.0",
     "prettier": "^3.6.2",
     "rimraf": "^6.1.2",
@@ -56,7 +55,7 @@
     "slash:delete:global": "node scripts/delete-global-commands.js",
     "slash:delete:guild": "node scripts/delete-guild-commands.js",
     "migrate": "node scripts/migrate.js",
-    "build": "rimraf dist/ && genversion --es6 --semi src/lib/util/version.ts && tsdown",
+    "build": "rimraf dist/ && tsdown",
     "start": "node .",
     "start:bun": "bun run .",
     "lint": "eslint . --ext .ts"
@@ -73,6 +72,12 @@
         "@semantic-release/npm",
         {
           "npmPublish": false
+        }
+      ],
+      [
+        "@semantic-release/exec",
+        {
+          "prepareCmd": "jq --arg v \"${nextRelease.version}\" '.version = $v' package.json > package.json.tmp && mv package.json.tmp package.json && echo \"export default '${nextRelease.version}';\" > dist/version.mjs && cp -r dist package.json bun.lock pnpm-lock.yaml README.md LICENSE release/ 2>/dev/null || true && cd release && zip -r ../quaver-release.zip ."
         }
       ],
       [

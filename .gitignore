@@ -115,9 +115,6 @@ dist
 /settings.json
 /database.sqlite
 
-# Generated version file
-/src/lib/util/version.ts
-
 # TypeScript
 dist/
 

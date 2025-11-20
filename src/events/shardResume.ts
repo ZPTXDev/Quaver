@@ -45,7 +45,9 @@ export default new EventHandler()
             activities: [
                 {
                     name: `${settings.status.name}${
-                        settings.status.showVersion ? ` | ${version}` : ''
+                        settings.status.showVersion
+                            ? ` | ${version.version}`
+                            : ''
                     }`,
                     type: activityType,
                     url:

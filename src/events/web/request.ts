@@ -1,6 +1,10 @@
 import type { APIGuild, Snowflake } from 'discord.js';
 import type { Socket } from 'socket.io';
-import { QuaverGuild, type WhitelistedFeatures, WhitelistStatus } from '#src/lib/guild';
+import {
+    QuaverGuild,
+    type WhitelistedFeatures,
+    WhitelistStatus,
+} from '#src/lib/guild';
 import { data } from '#src/lib/util/common';
 import type { QuaverSong } from '#src/lib/util/common.d';
 import { settings } from '#src/lib/util/settings';
@@ -16,7 +20,7 @@ export default {
         guildId: Snowflake,
         item: 'player' | 'settings',
     ): Promise<void> {
-        const { client } = await import('#src/main.js');
+        const { client } = await import('#src/main');
         if (!socket.guilds) return callback({ status: 'error-auth' });
         if (!socket.guilds.find((guild): boolean => guild.id === guildId)) {
             return callback({ status: 'error-auth' });
@@ -116,6 +120,10 @@ export default {
                 }
             }
         }
-        return callback({ status: 'success', response, version });
+        return callback({
+            status: 'success',
+            response,
+            version: version.version,
+        });
     },
 };

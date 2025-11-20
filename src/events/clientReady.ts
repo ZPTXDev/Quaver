@@ -16,12 +16,22 @@ export default new EventHandler()
             label: 'Discord',
         });
         logger.info({
-            message: `Running version ${version}, started in ${Date.now() - startup.startTime}ms. For help, see https://github.com/ZPTXDev/Quaver/issues.`,
+            message: `Running version ${version.version}, started in ${Date.now() - startup.startTime}ms. For help, see https://github.com/ZPTXDev/Quaver/issues.`,
             label: 'Quaver',
         });
-        if (version.includes('-')) {
+        if (
+            version.version.includes('-next') ||
+            version.version.includes('-staging')
+        ) {
             logger.warn({
-                message: `You are running ${version.includes('-next') ? 'an experimental' : version.includes('-staging') ? 'a pre-release' : 'an unsupported'} version of Quaver. ${version.includes('-next') || version.includes('-staging') ? 'Please report bugs using the link above, and note that features may change or be removed entirely prior to release.' : 'Please switch to a supported version of Quaver if you encounter any issues.'}`,
+                message: `You are running ${version.version.includes('-next') ? 'an experimental' : 'a pre-release'} version of Quaver. Please report bugs using the link above, and note that features may change or be removed entirely prior to release.`,
+                label: 'Quaver',
+            });
+        }
+        if (!version.official) {
+            logger.warn({
+                message:
+                    'You are not running an official build of Quaver. For support, please switch to an official version obtained from the Releases tab on GitHub.',
                 label: 'Quaver',
             });
         }
@@ -79,7 +89,9 @@ export default new EventHandler()
             activities: [
                 {
                     name: `${settings.status.name}${
-                        settings.status.showVersion ? ` | ${version}` : ''
+                        settings.status.showVersion
+                            ? ` | ${version.version}`
+                            : ''
                     }`,
                     type: activityType,
                     url:
