@@ -32,28 +32,37 @@ works within Quaver without having to read any documentation.
 
 ## Prerequisites
 
-- Node.js v20 (or higher)
+- Node.js v22.6.0 (or higher) with [pnpm](https://pnpm.io/) 8.15.9
+
+> [!TIP]
+> Alternatively, you may use [Bun](https://bun.com/) v1.3.2 (or higher) instead of Node.js and pnpm.
+
 - [Lavalink](https://github.com/lavalink-devs/Lavalink) v4 (or higher)
     - [youtube-source plugin](https://github.com/lavalink-devs/youtube-source#plugin) installed
     - [LavaSrc plugin](https://github.com/topi314/LavaSrc#lavalink-usage) installed
     - [java-timed-lyrics plugin](https://github.com/DuncteBot/java-timed-lyrics#using-with-lavalink) installed
 
+> [!NOTE]
 > Please note the connection details of your Lavalink instance. You will need to specify them in `settings.json` later.
 
 - Bot token from [Discord](https://discord.com/developers/applications)
 
 ## Setup
 
-1. Clone the repository
-2. Make a copy of `settings.example.json` and rename it to `settings.json`
-3. Edit the fields in `settings.json` as necessary
+1. Download the latest release from [here](https://github.com/ZPTXDev/Quaver/releases/latest/download/quaver-release.zip)
+2. Extract the contents of the ZIP file
+3. Run `bun i --production` or `pnpm i --prod` to install packages required to run Quaver
+4. Make a copy of `settings.example.json` and rename it to `settings.json`
+5. Edit the fields in `settings.json` as necessary
 
+> [!TIP]
 > Refer to [CONFIGURATION.md](CONFIGURATION.md) for a detailed explanation on configuration.
 
-4. Run `pnpm i` to install packages required to run Quaver
-5. Run `pnpm build` to compile the source code
-6. Run `pnpm run slash:deploy` to deploy slash commands
-7. Run `pnpm start` to start Quaver
+6. Run `bun run slash:deploy` or `pnpm run slash:deploy` to deploy slash commands
+7. Run `bun run start:bun` or `pnpm start` to start Quaver
+
+> [!WARNING]
+> Please use only one package manager (Bun or pnpm) to avoid potential issues.
 
 # ❔ FAQ
 
@@ -68,14 +77,14 @@ I'll consider it! Submit an issue [here](https://github.com/ZPTXDev/Quaver/issue
 
 ## I changed the language through the `/settings` command. Why isn't it updating in slash commands?
 
-Slash commands are defined when running `npm run slash-deploy`.
+Slash commands are defined when running `bun run slash:deploy` or `pnpm run slash:deploy`.
 
 This means that slash command descriptions will follow the language set in `settings.json` (`defaultLocaleCode` key),
 and not the language set through the `/settings` command.
 
 ## I changed `defaultLocaleCode`, but it isn't updating in slash command descriptions. Why?
 
-You need to re-deploy the commands using `npm run slash-deploy` for the new locale to take effect.
+You need to re-deploy the commands using `bun run slash:deploy` or `pnpm run slash:deploy` for the new locale to take effect.
 
 Due to Discord's limitations and the localizations we have, we don't currently use Discord's localized command name &
 description functionality. This may be worked on in the future.
@@ -87,11 +96,15 @@ note that this is an optional addon and is not required to run Quaver normally.
 
 ## What happened to Spotify support?
 
-As of **7.0.0**, Spotify support is provided through Lavalink. Please use
+As of **7.0.2**, Spotify support is provided through Lavalink. Please use
 the [LavaSrc plugin](https://github.com/topi314/LavaSrc) with Lavalink to enable Spotify support.
 
-> **NOTE:** To enable support via Lavalink, version **7.0.2** or higher is required. Older versions may block Spotify
-> queries locally.
+## Lyrics aren't showing up. What do I do?
+
+Make sure you have the [java-timed-lyrics plugin](https://github.com/DuncteBot/java-timed-lyrics#using-with-lavalink)
+installed, and ensure `plugins.lavasrc.lyrics-sources` is defined in your
+[Lavalink configuration](https://github.com/topi314/LavaSrc?tab=readme-ov-file#configuration). Quaver uses a combination
+of both plugins to fetch and display lyrics.
 
 # 💬 Translating
 

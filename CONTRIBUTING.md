@@ -21,26 +21,28 @@ There's no need to make a folder/directory as it will be generated when you run 
 
 Run `git clone https://github.com/ZPTXDev/Quaver.git` to clone the repository to the 'Quaver' folder/directory.
 
-Then, navigate to the newly created folder/directory through your terminal and run `npm ci` to install all dependencies.
+Then, navigate to the newly created folder/directory through your terminal and run `bun i` or `pnpm i` to install all dependencies.
 
-You may follow [this](README.md#starting-quaver-for-the-first-time) to verify Quaver is installed correctly.
+> [!IMPORTANT]
+> For pnpm, ensure you have your NODE_ENV environment variable set to `development` to install dev dependencies as well.
+> This is crucial for your build to succeed.
+
+Finally, run `bun run build` or `pnpm run build` to build the project.
+
+Follow the steps in [README.md](README.md#setup) from step 4 onwards to complete the setup.
+
+If you're able to run Quaver through `bun run start:bun` or `pnpm start`, then your environment is set up correctly!
 
 ## ESLint
 This project uses ESLint.
 
-The configuration file is provided at the base of the repository [here](.eslintrc.json).
+The configuration file is provided at the base of the repository [here](eslint.config.mjs).
 
 To ensure ESLint is enabled and linting, you must have it installed on your IDE as well.
 
 ### Visual Studio Code
 1. From the IDE, open Extensions on the left panel
 2. Search for ESLint in the Marketplace
-3. Click Install
-
-### Atom
-1. Open Settings / Preferences
-2. Navigate to the Install tab
-3. Search for `linter-eslint`
 3. Click Install
 
 ### IntelliJ IDEA Ultimate / Webstorm
@@ -55,7 +57,7 @@ Try searching for ESLint installation steps on Google for your IDE.
 
 ## Documentation and References
 discord.js
-- https://discord.js.org/#/docs/discord.js/main/general/welcome
+- https://discord.js.org/docs/packages/discord.js/main
 
 ## Commit messages
 This project uses [Semantic Commit Messages](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716).

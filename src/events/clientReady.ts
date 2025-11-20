@@ -31,7 +31,7 @@ export default new EventHandler()
         if (!version.official) {
             logger.warn({
                 message:
-                    'You are not running an official build of Quaver. For support, please switch to an official version obtained from the Releases tab on GitHub.',
+                    'You are not running an official build of Quaver. For support, please switch to an official version from https://github.com/ZPTXDev/Quaver/releases.',
                 label: 'Quaver',
             });
         }

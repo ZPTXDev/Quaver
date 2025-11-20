@@ -93,7 +93,6 @@
           "assets": [
             {
               "path": "quaver-release.zip",
-              "name": "quaver-${nextRelease.version}.zip",
               "label": "Quaver ${nextRelease.version}"
             }
           ]
