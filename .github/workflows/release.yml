@@ -30,7 +30,7 @@ jobs:
           cp LICENSE release/ || true
           zip -r quaver-release.zip release/
       - name: Release
-        uses: cycjimmy/semantic-release-action@v4
+        uses: cycjimmy/semantic-release-action@v6
         with:
           branches: |
             [
