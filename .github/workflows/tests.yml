@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [ 20, 22 ]
+        node-version: [ 22, 24 ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -42,3 +42,40 @@ jobs:
         uses: reviewdog/action-eslint@v1
         with:
           reporter: github-check
+  buildable:
+    name: Check if buildable
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package-manager: [ 'bun', 'pnpm' ]
+        node-version: [ 22, 24 ]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup ${{ matrix.package-manager }}
+        if: matrix.package-manager == 'bun'
+        uses: oven-sh/setup-bun@v2
+      - name: Install pnpm
+        if: matrix.package-manager == 'pnpm'
+        uses: pnpm/action-setup@v4
+        with:
+          version: '8.15.9'
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: |
+          if [ "${{ matrix.package-manager }}" = "bun" ]; then
+            bun install
+          else
+            pnpm install --no-frozen-lockfile
+          fi
+      - name: Build
+        run: |
+          if [ "${{ matrix.package-manager }}" = "bun" ]; then
+            bun run build
+          else
+            pnpm run build
+          fi

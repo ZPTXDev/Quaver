@@ -85,7 +85,16 @@
           "message": "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}"
         }
       ],
-      "@semantic-release/github"
+      "@semantic-release/github",
+      {
+        "assets": [
+          {
+            "path": "quaver-release.zip",
+            "name": "quaver-${nextRelease.version}.zip",
+            "label": "Quaver ${nextRelease.version}"
+          }
+        ]
+      }
     ]
   },
   "trustedDependencies": [
