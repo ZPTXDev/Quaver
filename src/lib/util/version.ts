@@ -4,6 +4,7 @@ import { getAbsoluteFileURL } from '@zptxdev/zptx-lib';
 
 type VersionInfo = {
     version: string;
+    buildTime?: string;
     official: boolean;
     commit?: string | null;
     dirty?: boolean;
@@ -29,8 +30,8 @@ export async function loadVersion(): Promise<void> {
         'version.mjs',
     ]);
     if (existsSync(embedded)) {
-        const { default: v } = await import(embedded.toString());
-        version = { version: v, official: true };
+        const { version: v, buildTime } = await import(embedded.toString());
+        version = { version: v, buildTime, official: true };
     }
 
     let pkgVersion = null;

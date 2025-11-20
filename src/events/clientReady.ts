@@ -16,7 +16,7 @@ export default new EventHandler()
             label: 'Discord',
         });
         logger.info({
-            message: `Running version ${version.version}, started in ${Date.now() - startup.startTime}ms. For help, see https://github.com/ZPTXDev/Quaver/issues.`,
+            message: `Running version ${version.version}${version.buildTime ? ` (${new Date(version.buildTime).toLocaleString()})` : ''}, started in ${Date.now() - startup.startTime}ms. For help, see https://github.com/ZPTXDev/Quaver/issues.`,
             label: 'Quaver',
         });
         if (
