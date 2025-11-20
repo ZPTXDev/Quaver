@@ -4,7 +4,7 @@ import {
     ActionRowBuilder,
     type APISelectMenuOption,
     type BaseMessageOptions,
-    ButtonBuilder,
+    type ButtonBuilder,
     ButtonStyle,
     ContainerBuilder,
     escapeMarkdown,

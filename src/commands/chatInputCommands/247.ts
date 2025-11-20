@@ -9,7 +9,7 @@ import {
 } from 'discord.js';
 import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
-import { QuaverPlayer } from '#src/lib/music';
+import { PlayerResponse } from '#src/lib/music';
 import { MessageOptionsBuilderType } from '#src/lib/util/common';
 import { Check } from '#src/lib/util/constants';
 import { settings } from '#src/lib/util/settings';

@@ -1,5 +1,6 @@
 import {
     ButtonBuilder,
+    ButtonStyle,
     LabelBuilder,
     StringSelectMenuBuilder,
     TextDisplayBuilder,
@@ -34,11 +35,11 @@ export class QuaverGuildBuilders {
                                 ? ButtonStyle.Success
                                 : ButtonStyle.Secondary
                             : !enabled
-                                ? ButtonStyle.Success
-                                : ButtonStyle.Secondary,
+                              ? ButtonStyle.Success
+                              : ButtonStyle.Secondary,
                     )
                     .setCustomId(`${customId}:${state}`)
-                    .setDisabled(state === 'enable' ? enabled : !enabled)
+                    .setDisabled(state === 'enable' ? enabled : !enabled),
         );
     }
 
