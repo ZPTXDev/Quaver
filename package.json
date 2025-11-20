@@ -77,24 +77,20 @@
       ],
       [
         "@semantic-release/git",
+        { "message": "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}" }
+      ],
+      [
+        "@semantic-release/github",
         {
           "assets": [
-            "package.json",
-            "package-lock.json"
-          ],
-          "message": "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}"
+            {
+              "path": "quaver-release.zip",
+              "name": "quaver-${nextRelease.version}.zip",
+              "label": "Quaver ${nextRelease.version}"
+            }
+          ]
         }
-      ],
-      "@semantic-release/github",
-      {
-        "assets": [
-          {
-            "path": "quaver-release.zip",
-            "name": "quaver-${nextRelease.version}.zip",
-            "label": "Quaver ${nextRelease.version}"
-          }
-        ]
-      }
+      ]
     ]
   },
   "trustedDependencies": [
