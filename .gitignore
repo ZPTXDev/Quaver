@@ -120,3 +120,6 @@ dist
 
 # TypeScript
 dist/
+
+# Bun config
+bunfig.toml
