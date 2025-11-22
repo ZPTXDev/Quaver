@@ -1,9 +1,9 @@
 import type { Guild } from 'discord.js';
-import { WhitelistStatus, type WhitelistedFeatures } from '.';
+import { type WhitelistedFeatures, WhitelistStatus } from '.';
 import { data } from '#src/lib/util/common';
 import { settings } from '#src/lib/util/settings';
 
-export class QuaverGuildFeatures {
+export class GuildFeatures {
     guild;
 
     constructor(guild: Guild) {

@@ -1,5 +1,6 @@
 import { Node } from 'lavaclient';
-import { type QuaverClient, QuaverPlayerManager } from '.';
+import { QuaverPlayerManager } from '.';
+import type { QuaverClient } from '#src/lib';
 
 export class QuaverNode extends Node {
     declare readonly client: QuaverClient;
