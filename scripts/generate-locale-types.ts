@@ -10,6 +10,10 @@ import { dirname, resolve } from 'node:path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Constants for JSDoc comment formatting
+const MAX_COMMENT_LENGTH = 100;
+const TRUNCATION_LENGTH = 97;
+
 // Type to represent nested object structure
 type NestedObject = {
     [key: string]: string | NestedObject;
@@ -71,8 +75,9 @@ async function generateLocaleTypes(): Promise<void> {
         const categoryName = file.split('.')[0].toUpperCase();
         const filePath = resolve(localesDir, file);
         
-        // Import the file
-        const module = await import(`file://${filePath}`);
+        // Import the file using a properly formatted file URL
+        const fileUrl = new URL(`file:///${filePath.replace(/\\/g, '/')}`);
+        const module = await import(fileUrl.href);
         const localeData = module.default as NestedObject;
         
         // Generate paths with values for this category
@@ -93,8 +98,8 @@ async function generateLocaleTypes(): Promise<void> {
     const typeMembers = allPathsWithValues.map(({ path, value }) => {
         const escapedValue = escapeForJSDoc(value);
         // Truncate long strings for readability
-        const displayValue = escapedValue.length > 100 
-            ? escapedValue.substring(0, 97) + '...'
+        const displayValue = escapedValue.length > MAX_COMMENT_LENGTH
+            ? escapedValue.substring(0, TRUNCATION_LENGTH) + '...'
             : escapedValue;
         return `    /** ${displayValue} */\n    | '${path}'`;
     }).join('\n');
