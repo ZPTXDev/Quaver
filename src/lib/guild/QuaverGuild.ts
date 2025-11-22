@@ -4,6 +4,7 @@ import type { QuaverClient } from '#src/lib';
 import type { QuaverPlayer } from '#src/lib/music';
 import { settings } from '#src/lib/util/settings';
 import { getLocaleString } from '#src/lib/util/util';
+import type { LocaleKey } from '#src/lib/util/LocaleKeys';
 
 export type Initialized = { localeCode: string };
 export type Uninitialized = { localeCode: undefined };
@@ -40,7 +41,7 @@ export class QuaverGuild<S extends Uninitialized | Initialized> {
 
     locale(
         this: QuaverGuild<Initialized>,
-        key: string,
+        key: LocaleKey,
         ...args: string[]
     ): string {
         return getLocaleString(this.localeCode, key, ...args);

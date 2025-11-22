@@ -30,6 +30,7 @@ import type { ComponentInteractions } from '#src/lib';
 import { type Initialized, QuaverGuild, type WhitelistedFeatures } from '#src/lib/guild';
 import type { QuaverPlayer } from '#src/lib/music';
 import { data, locales, MessageOptionsBuilderType } from '#src/lib/util/common';
+import type { LocaleKey } from '#src/lib/util/LocaleKeys';
 import type {
     MessageOptionsBuilderInputs,
     MessageOptionsBuilderOptions,
@@ -63,7 +64,7 @@ import { settings } from '#src/lib/util/settings';
  */
 export function getLocaleString(
     localeCode: string,
-    stringPath: string,
+    stringPath: LocaleKey,
     ...vars: string[]
 ): string | 'LOCALE_MISSING' {
     if (!locales.get(localeCode)) return 'LOCALE_MISSING';
