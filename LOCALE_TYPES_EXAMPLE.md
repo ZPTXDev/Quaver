@@ -30,12 +30,25 @@ guild.locale('DISCORD.INSUFFICIENT_PERMISIONS.BOT.STAGE'); // Typo! Would fail a
 // Hover over the string to see: "Quaver needs to be a **Stage Moderator** of the stage channel."
 guild.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE');
 
-// TypeScript error if you make a typo
+// TypeScript suggests corrections if you make a typo
 guild.locale('DISCORD.INSUFFICIENT_PERMISIONS.BOT.STAGE'); 
-// Error: Argument of type '"DISCORD.INSUFFICIENT_PERMISIONS.BOT.STAGE"' is not assignable to parameter of type 'LocaleKey'
+// IDE highlights this and suggests the correct path
 
 // Autocomplete suggests all available paths starting with 'DISCORD.'
 guild.locale('DISCORD.'); // Shows all DISCORD.* paths
+```
+
+### Dynamic Keys (Still Supported)
+The type system is flexible and allows dynamic string construction for cases where locale keys are computed at runtime:
+
+```typescript
+// Dynamic keys still work when needed
+const state = 'enable';
+guild.locale(`MISC.${state.toUpperCase()}`); // Works fine
+
+// Or with template strings
+const category = 'DISCORD';
+guild.locale(`${category}.GENERIC_ERROR`);
 ```
 
 ## Regenerating Types

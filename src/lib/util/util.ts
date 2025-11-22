@@ -64,7 +64,7 @@ import { settings } from '#src/lib/util/settings';
  */
 export function getLocaleString(
     localeCode: string,
-    stringPath: LocaleKey,
+    stringPath: LocaleKey | string,
     ...vars: string[]
 ): string | 'LOCALE_MISSING' {
     if (!locales.get(localeCode)) return 'LOCALE_MISSING';

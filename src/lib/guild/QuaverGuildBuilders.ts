@@ -6,6 +6,7 @@ import {
     TextDisplayBuilder,
 } from 'discord.js';
 import type { Initialized, QuaverGuild } from '.';
+import type { LocaleKey } from '#src/lib/util/LocaleKeys';
 
 // TODO: move all settings page builders here to prevent exporting Initialized type from QuaverGuild
 export class QuaverGuildBuilders {
@@ -15,7 +16,7 @@ export class QuaverGuildBuilders {
         this.guild = guild;
     }
 
-    buttonLocale(key: string, ...args: string[]): ButtonBuilder {
+    buttonLocale(key: LocaleKey | string, ...args: string[]): ButtonBuilder {
         return new ButtonBuilder().setLabel(this.guild.locale(key, ...args));
     }
 
@@ -43,12 +44,12 @@ export class QuaverGuildBuilders {
         );
     }
 
-    labelLocale(key: string, ...args: string[]): LabelBuilder {
+    labelLocale(key: LocaleKey | string, ...args: string[]): LabelBuilder {
         return new LabelBuilder().setLabel(this.guild.locale(key, ...args));
     }
 
     stringSelectMenuLocale(
-        key: string,
+        key: LocaleKey | string,
         ...args: string[]
     ): StringSelectMenuBuilder {
         return new StringSelectMenuBuilder().setPlaceholder(
@@ -56,7 +57,7 @@ export class QuaverGuildBuilders {
         );
     }
 
-    textDisplayLocale(key: string, ...args: string[]): TextDisplayBuilder {
+    textDisplayLocale(key: LocaleKey | string, ...args: string[]): TextDisplayBuilder {
         return new TextDisplayBuilder().setContent(
             this.guild.locale(key, ...args),
         );
