@@ -2,6 +2,8 @@
 
 This document demonstrates the new type-safe locale string access feature.
 
+> **Note**: This feature has been merged with the latest changes from the `next` branch.
+
 ## Overview
 
 The project now includes auto-generated TypeScript types for all locale string paths, providing:
