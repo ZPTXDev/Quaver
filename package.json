@@ -47,7 +47,6 @@
     "prettier": "^3.6.2",
     "rimraf": "^6.1.2",
     "tsdown": "^0.16.5",
-    "tsx": "^4.19.2",
     "typescript": "^5.9.3"
   },
   "main": "dist/main.mjs",
@@ -57,7 +56,7 @@
     "slash:delete:global": "node scripts/delete-global-commands.js",
     "slash:delete:guild": "node scripts/delete-guild-commands.js",
     "migrate": "node scripts/migrate.js",
-    "generate:locale-types": "tsx scripts/generate-locale-types.ts",
+    "generate:locale-types": "node scripts/generate-locale-types.js",
     "build": "npm run generate:locale-types && rimraf dist/ && tsdown",
     "start": "node .",
     "start:bun": "bun run .",

@@ -11,7 +11,7 @@ The project now includes auto-generated TypeScript types for all locale string p
 
 ## How It Works
 
-1. The script `scripts/generate-locale-types.ts` reads all locale files from `locales/en/`
+1. The script `scripts/generate-locale-types.js` reads all locale files from `locales/en/`
 2. It generates a union type `LocaleKey` containing all possible locale paths
 3. The type includes JSDoc comments with the English string value for each key
 4. This type is used in `QuaverGuild.locale()` and `getLocaleString()` functions
@@ -69,8 +69,8 @@ This should be done whenever:
 - `src/lib/guild/QuaverGuild.ts` - Updated `locale()` method signature
 - `src/lib/util/util.ts` - Updated `getLocaleString()` function signature
 - `src/lib/util/LocaleKeys.d.ts` - Auto-generated type definitions (239 locale paths)
-- `scripts/generate-locale-types.ts` - Type generation script
-- `package.json` - Added `generate:locale-types` script and `tsx` dev dependency
+- `scripts/generate-locale-types.js` - Type generation script
+- `package.json` - Added `generate:locale-types` script
 
 ## Crowdin Compatibility
 
