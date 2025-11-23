@@ -1,5 +1,9 @@
 import type { ClientEvents } from 'discord.js';
-import { type AcceptedEventTypes, BaseHandler, type GenericExecuteFunction } from '.';
+import {
+    type AcceptedEventTypes,
+    BaseHandler,
+    type GenericExecuteFunction,
+} from '.';
 
 type GenericEventExecuteFunction<K extends keyof ClientEvents> = (
     this: EventHandler<K>,

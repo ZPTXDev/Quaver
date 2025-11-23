@@ -45,7 +45,7 @@ export default new ChatInputCommandHandler()
         Check.InVoice,
         Check.InSessionVoice,
     ])
-    .setExecute(async function(interaction): Promise<void> {
+    .setExecute(async function (interaction): Promise<void> {
         const channel = interaction.options.getChannel(
             'new_channel',
         ) as QuaverChannels;

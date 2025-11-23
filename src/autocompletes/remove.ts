@@ -7,7 +7,7 @@ import { AutocompleteHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import type { QuaverInteraction } from '#src/lib/util/common.d';
 
-export default new AutocompleteHandler().setExecute(async function(
+export default new AutocompleteHandler().setExecute(async function (
     interaction: QuaverInteraction<AutocompleteInteraction>,
 ): Promise<void> {
     const focused = interaction.options.getFocused();

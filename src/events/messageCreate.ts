@@ -9,7 +9,7 @@ import { buildMessageOptions } from '#src/lib/util/util';
 
 export default new EventHandler()
     .setEvent('messageCreate')
-    .setExecute(async function(message): Promise<void> {
+    .setExecute(async function (message): Promise<void> {
         if (
             message.mentions.has(message.client.user.id, {
                 ignoreRoles: true,

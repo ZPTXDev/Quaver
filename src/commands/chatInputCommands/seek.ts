@@ -72,7 +72,7 @@ export default new ChatInputCommandHandler()
         Check.InVoice,
         Check.InSessionVoice,
     ])
-    .setExecute(async function(interaction): Promise<void> {
+    .setExecute(async function (interaction): Promise<void> {
         const hours = interaction.options.getInteger('hours') ?? 0,
             minutes = interaction.options.getInteger('minutes') ?? 0,
             seconds = interaction.options.getInteger('seconds') ?? 0;

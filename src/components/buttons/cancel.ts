@@ -6,7 +6,7 @@ import { Check } from '#src/lib/util/constants';
 
 export default new ButtonHandler()
     .setChecks([Check.InteractionStarter])
-    .setExecute(async function(interaction): Promise<void> {
+    .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         clearTimeout(confirmationTimeout[interaction.message.id]);
         clearTimeout(searchState[interaction.message.id]?.timeout);

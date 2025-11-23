@@ -12,7 +12,11 @@ import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import { MessageOptionsBuilderType } from '#src/lib/util/common';
 import { settings } from '#src/lib/util/settings';
-import { formatLavaLyricsResponse, formatResponse, getLocaleString } from '#src/lib/util/util';
+import {
+    formatLavaLyricsResponse,
+    formatResponse,
+    getLocaleString,
+} from '#src/lib/util/util';
 import type { LavaLyricsResponse } from '#src/lib/util/util.d';
 
 export default new ChatInputCommandHandler()
@@ -37,7 +41,7 @@ export default new ChatInputCommandHandler()
                         ),
             ),
     )
-    .setExecute(async function(interaction): Promise<void> {
+    .setExecute(async function (interaction): Promise<void> {
         const query = interaction.options.getString('query');
         const guild = await QuaverGuild.wrap(interaction.guild);
         let json;

@@ -11,7 +11,7 @@ import {
 } from '#src/lib/util/constants';
 
 export default new AutocompleteHandler().setExecute(
-    async function(interaction): Promise<void> {
+    async function (interaction): Promise<void> {
         const focused = interaction.options.getFocused();
         if (focused === '') return interaction.respond([]);
         const guild = await QuaverGuild.wrap(interaction.guild);

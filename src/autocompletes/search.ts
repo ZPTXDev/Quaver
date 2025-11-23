@@ -5,7 +5,7 @@ import { cache } from '#src/lib/util/common';
 import { YOUTUBE_AUTOCOMPLETE_URL } from '#src/lib/util/constants';
 
 export default new AutocompleteHandler().setExecute(
-    async function(interaction): Promise<void> {
+    async function (interaction): Promise<void> {
         const focused = interaction.options.getFocused();
         if (focused === '') return interaction.respond([]);
         const existingResults = await cache.get(focused.toLowerCase());

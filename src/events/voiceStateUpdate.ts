@@ -165,7 +165,7 @@ async function onChannelJoinOrMove(
 
 export default new EventHandler()
     .setEvent('voiceStateUpdate')
-    .setExecute(async function(oldState, newState): Promise<void> {
+    .setExecute(async function (oldState, newState): Promise<void> {
         const oldClient = oldState.client as QuaverClient;
         const oldClientUserId = oldClient.user.id;
         const oldUser = oldState.member.user;

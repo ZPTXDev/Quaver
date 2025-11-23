@@ -15,7 +15,7 @@ export default new ButtonHandler()
         Check.InVoice,
         Check.InSessionVoice,
     ])
-    .setExecute(async function(interaction): Promise<void> {
+    .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
         clearTimeout(confirmationTimeout[interaction.message.id]);

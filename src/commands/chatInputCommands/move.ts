@@ -57,7 +57,7 @@ export default new ChatInputCommandHandler()
         Check.InVoice,
         Check.InSessionVoice,
     ])
-    .setExecute(async function(interaction): Promise<void> {
+    .setExecute(async function (interaction): Promise<void> {
         const oldPosition = interaction.options.getInteger('old_position');
         const newPosition = interaction.options.getInteger('new_position');
         const guild = await QuaverGuild.wrap(interaction.guild);

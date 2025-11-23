@@ -10,7 +10,10 @@ import {
 } from 'discord.js';
 import type { AdditionalBuilderOptions, NonSpecialInteractions } from '.';
 import { logger, MessageOptionsBuilderType } from './util/common';
-import type { MessageOptionsBuilderInputs, MessageOptionsBuilderOptions } from './util/common.d';
+import type {
+    MessageOptionsBuilderInputs,
+    MessageOptionsBuilderOptions,
+} from './util/common.d';
 import { buildMessageOptions } from './util/util';
 
 /** Class for handling replies to interactions. */

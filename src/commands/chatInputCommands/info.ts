@@ -28,7 +28,7 @@ export default new ChatInputCommandHandler()
                 ),
             ),
     )
-    .setExecute(async function(interaction): Promise<void> {
+    .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const buttons = {
             invite: guild.builders

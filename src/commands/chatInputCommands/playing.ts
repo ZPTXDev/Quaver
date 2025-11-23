@@ -25,7 +25,7 @@ export default new ChatInputCommandHandler()
         Check.InVoice,
         Check.InSessionVoice,
     ])
-    .setExecute(async function(interaction): Promise<void> {
+    .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
         // workaround: seems like current track doesn't get removed after the track, an issue with @lavaclient/queue

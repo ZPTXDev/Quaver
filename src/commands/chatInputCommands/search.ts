@@ -59,7 +59,7 @@ export default new ChatInputCommandHandler()
             ),
     )
     .setChecks([Check.GuildOnly])
-    .setExecute(async function(interaction): Promise<void> {
+    .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         if (
             ![

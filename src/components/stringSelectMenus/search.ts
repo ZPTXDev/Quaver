@@ -20,7 +20,7 @@ import { buildMessageOptions } from '#src/lib/util/util';
 
 export default new StringSelectMenuHandler()
     .setChecks([Check.InteractionStarter])
-    .setExecute(async function(interaction): Promise<void> {
+    .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const state = searchState[interaction.message.id];
         if (!state) {

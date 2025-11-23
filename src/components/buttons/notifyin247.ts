@@ -8,7 +8,7 @@ import { buildMessageOptions, buildSettingsPage } from '#src/lib/util/util';
 
 export default new ButtonHandler()
     .setChecks([Check.InteractionStarter])
-    .setExecute(async function(interaction): Promise<void> {
+    .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         if (!confirmationTimeout[interaction.message.id]) {
             await interaction.replyHandler.reply(

@@ -3,7 +3,7 @@ import { AutocompleteHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 
 export default new AutocompleteHandler().setExecute(
-    async function(interaction): Promise<void> {
+    async function (interaction): Promise<void> {
         const focused = interaction.options.getFocused();
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();

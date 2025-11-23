@@ -43,7 +43,7 @@ export default new ChatInputCommandHandler()
         Check.InVoice,
         Check.InSessionVoice,
     ])
-    .setExecute(async function(interaction): Promise<void> {
+    .setExecute(async function (interaction): Promise<void> {
         const enabled = interaction.options.getBoolean('enabled');
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
