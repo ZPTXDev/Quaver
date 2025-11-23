@@ -123,6 +123,7 @@ export default defineConfig(
     eslint.configs.recommended,
     // TSESLint recommended config handles rules, files, languageOptions: parser, plugin
     tsEslint.configs.recommended,
+    // Custom config
     [
         globalIgnores(['**/locales/', '**/dist/', '**/scripts/']),
         {
