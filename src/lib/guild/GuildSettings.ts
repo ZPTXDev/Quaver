@@ -1,7 +1,7 @@
 import type { Guild } from 'discord.js';
 import { data } from '#src/lib/util/common';
 
-export class QuaverGuildSettings {
+export class GuildSettings {
     guild;
 
     constructor(guild: Guild) {

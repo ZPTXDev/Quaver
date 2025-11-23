@@ -9,7 +9,7 @@ import type { Initialized, QuaverGuild } from '.';
 import type { LocaleKey } from '#src/lib/util/LocaleKeys';
 
 // TODO: move all settings page builders here to prevent exporting Initialized type from QuaverGuild
-export class QuaverGuildBuilders {
+export class GuildBuilders {
     guild;
 
     constructor(guild: QuaverGuild<Initialized>) {

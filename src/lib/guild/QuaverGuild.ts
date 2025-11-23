@@ -1,5 +1,5 @@
 import type { Guild } from 'discord.js';
-import { QuaverGuildBuilders, QuaverGuildFeatures, QuaverGuildSettings } from '.';
+import { GuildBuilders, GuildFeatures, GuildSettings } from '.';
 import type { QuaverClient } from '#src/lib';
 import type { QuaverPlayer } from '#src/lib/music';
 import { settings } from '#src/lib/util/settings';
@@ -10,9 +10,9 @@ export type Initialized = { localeCode: string };
 export type Uninitialized = { localeCode: undefined };
 
 export class QuaverGuild<S extends Uninitialized | Initialized> {
-    builders!: QuaverGuildBuilders;
-    features!: QuaverGuildFeatures;
-    settings!: QuaverGuildSettings;
+    builders!: GuildBuilders;
+    features!: GuildFeatures;
+    settings!: GuildSettings;
     localeCode: S['localeCode'];
     client: QuaverClient;
 
@@ -22,12 +22,12 @@ export class QuaverGuild<S extends Uninitialized | Initialized> {
     }
 
     private async init(): Promise<void> {
-        this.settings = new QuaverGuildSettings(this.guild);
+        this.settings = new GuildSettings(this.guild);
         this.localeCode =
             (await this.settings.get<string>('locale')) ??
             settings.defaultLocaleCode;
-        this.builders = new QuaverGuildBuilders(this);
-        this.features = new QuaverGuildFeatures(this.guild);
+        this.builders = new GuildBuilders(this);
+        this.features = new GuildFeatures(this.guild);
     }
 
     sendWebUpdate(event: string, ...args: unknown[]): void {
