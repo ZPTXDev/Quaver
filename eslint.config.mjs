@@ -139,7 +139,7 @@ export default defineConfig(
                 ...preferredRules,
                 // Lastly, let prettier override rules that may conflict with the rules above
                 ...eslintConfigPrettier.rules,
-                // Rules we don't want to be overriden no matter what rules are set by other configs
+                // Rules we don't want to be overridden no matter what rules are set by other configs
                 ...reinforcedRules,
             },
         },
