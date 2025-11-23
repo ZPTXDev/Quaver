@@ -85,15 +85,18 @@ async function generateLocaleTypes() {
     // Sort paths for readability
     allPathsWithValues.sort((a, b) => a.path.localeCompare(b.path));
 
-    // Generate the type members with JSDoc comments showing the English string
-    const typeMembers = allPathsWithValues.map(({ path, value }) => {
+    // Generate interface members with JSDoc comments
+    const interfaceMembers = allPathsWithValues.map(({ path, value }) => {
         const escapedValue = escapeForJSDoc(value);
         // Truncate long strings for readability
         const displayValue = escapedValue.length > MAX_COMMENT_LENGTH
             ? escapedValue.substring(0, TRUNCATION_LENGTH) + '...'
             : escapedValue;
-        return `    /** ${displayValue} */\n    | '${path}'`;
+        return `    /** ${displayValue} */\n    '${path}': string;`;
     }).join('\n');
+
+    // Generate union type from interface keys
+    const unionType = allPathsWithValues.map(({ path }) => `    | '${path}'`).join('\n');
 
     // Generate the TypeScript type definition file
     const typeDefinition = `/**
@@ -104,16 +107,23 @@ async function generateLocaleTypes() {
  */
 
 /**
+ * Interface containing all locale keys with their English translations.
+ * Each property includes a JSDoc comment showing the English string value.
+ * Hover over any key to see its translation.
+ */
+export interface LocaleStrings {
+${interfaceMembers}
+}
+
+/**
  * Union type of all available locale string paths.
  * Provides autocomplete and type safety when accessing locale strings.
- * Each locale key includes a JSDoc comment showing the English string value.
  *
  * @example
  * guild.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE')
  * guild.locale('CMD.PLAY.DESCRIPTION')
  */
-export type LocaleKey =
-${typeMembers};
+export type LocaleKey = keyof LocaleStrings;
 `;
 
     // Write the type definition file

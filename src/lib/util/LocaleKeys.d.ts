@@ -6,490 +6,497 @@
  */
 
 /**
+ * Interface containing all locale keys with their English translations.
+ * Each property includes a JSDoc comment showing the English string value.
+ * Hover over any key to see its translation.
+ */
+export interface LocaleStrings {
+    /** There is no session in this server. */
+    'CHECK.ACTIVE_SESSION': string;
+    /** This command only works in servers. */
+    'CHECK.GUILD_ONLY': string;
+    /** You need to be in Quaver's voice channel. */
+    'CHECK.IN_SESSION_VOICE': string;
+    /** You need to be in a voice channel. */
+    'CHECK.IN_VOICE': string;
+    /** That is not your interaction menu. */
+    'CHECK.INTERACTION_STARTER': string;
+    /** Please specify a valid index. */
+    'CHECK.INVALID_INDEX': string;
+    /** You are not the requester of that track. */
+    'CHECK.NOT_REQUESTER': string;
+    /** 24/7 mode prevents Quaver from leaving. */
+    'CMD.247.DESCRIPTION': string;
+    /** -# Quaver will use the current voice and text channel if it restarts. */
+    'CMD.247.MISC.NOTE': string;
+    /** Whether or not 24/7 mode is enabled. If not specified, it will be toggled. */
+    'CMD.247.OPTION.ENABLED': string;
+    /** 24/7 mode has been \*\*disabled\*\* */
+    'CMD.247.RESPONSE.DISABLED': string;
+    /** 24/7 mode has been \*\*enabled\*\* */
+    'CMD.247.RESPONSE.ENABLED': string;
+    /** The queue channel is missing. Try using </bind:%1>. */
+    'CMD.247.RESPONSE.QUEUE_CHANNEL_MISSING': string;
+    /** Bass boost mode amplifies the bass levels. */
+    'CMD.BASSBOOST.DESCRIPTION': string;
+    /** Whether or not bass boost mode is enabled. If not specified, it will be toggled. */
+    'CMD.BASSBOOST.OPTION.ENABLED': string;
+    /** Bass boost mode has been \*\*disabled\*\* */
+    'CMD.BASSBOOST.RESPONSE.DISABLED': string;
+    /** Bass boost mode has been \*\*enabled\*\* */
+    'CMD.BASSBOOST.RESPONSE.ENABLED': string;
+    /** Change the channel used by Quaver to send messages automatically. */
+    'CMD.BIND.DESCRIPTION': string;
+    /** The channel to bind to. */
+    'CMD.BIND.OPTION.NEW_CHANNEL': string;
+    /** Quaver does not have sufficient permission(s) in <#%1>. */
+    'CMD.BIND.RESPONSE.PERMISSIONS_INSUFFICIENT': string;
+    /** Quaver will send new "Now playing" messages to <#%1> */
+    'CMD.BIND.RESPONSE.SUCCESS': string;
+    /** Clear the queue. */
+    'CMD.CLEAR.DESCRIPTION': string;
+    /** Are you sure you want to clear the queue? */
+    'CMD.CLEAR.RESPONSE.CONFIRMATION': string;
+    /** There are no tracks in the queue to clear. */
+    'CMD.CLEAR.RESPONSE.QUEUE_EMPTY': string;
+    /** The queue has been cleared. */
+    'CMD.CLEAR.RESPONSE.SUCCESS': string;
+    /** Disconnect Quaver. */
+    'CMD.DISCONNECT.DESCRIPTION': string;
+    /** Are you sure you want Quaver to disconnect? You will also lose your current queue. */
+    'CMD.DISCONNECT.RESPONSE.CONFIRMATION': string;
+    /** Quaver is unable to disconnect as 24/7 mode is enabled. */
+    'CMD.DISCONNECT.RESPONSE.FEATURE_247_ENABLED': string;
+    /** Disconnected from the voice channel. */
+    'CMD.DISCONNECT.RESPONSE.SUCCESS': string;
+    /** Show information about Quaver. */
+    'CMD.INFO.DESCRIPTION': string;
+    /** Invite */
+    'CMD.INFO.MISC.INVITE': string;
+    /** Source Code */
+    'CMD.INFO.MISC.SOURCE_CODE': string;
+    /** Sponsor Us */
+    'CMD.INFO.MISC.SPONSOR_US': string;
+    /** Support Server */
+    'CMD.INFO.MISC.SUPPORT_SERVER': string;
+    /** Translate for Us */
+    'CMD.INFO.MISC.TRANSLATE_FOR_US': string;
+    /** Hi! Quaver uses [Slash Commands](https://support-apps.discord.com/hc/en-us/articles/2650183778677... */
+    'CMD.INFO.RESPONSE.MENTION': string;
+    /** Open-source music bot for small communities. Made with ❤️ by \*\*ZPTX\*\*. Running version `%1`. */
+    'CMD.INFO.RESPONSE.SUCCESS': string;
+    /** Change the looping mode. */
+    'CMD.LOOP.DESCRIPTION': string;
+    /** The looping mode. */
+    'CMD.LOOP.OPTION.TYPE.DESCRIPTION': string;
+    /** Disabled */
+    'CMD.LOOP.OPTION.TYPE.OPTION.DISABLED': string;
+    /** Queue */
+    'CMD.LOOP.OPTION.TYPE.OPTION.QUEUE': string;
+    /** Track */
+    'CMD.LOOP.OPTION.TYPE.OPTION.TRACK': string;
+    /** Looping mode set to \*\*%1\*\* */
+    'CMD.LOOP.RESPONSE.SUCCESS': string;
+    /** Look up lyrics. */
+    'CMD.LYRICS.DESCRIPTION': string;
+    /** -# Romanizing kanji might result in slight inaccuracies. */
+    'CMD.LYRICS.MISC.JAPANESE_INACCURATE': string;
+    /** Romanize from Chinese */
+    'CMD.LYRICS.MISC.ROMANIZE_FROM_CHINESE': string;
+    /** Romanize from Japanese */
+    'CMD.LYRICS.MISC.ROMANIZE_FROM_JAPANESE': string;
+    /** Romanize from Korean */
+    'CMD.LYRICS.MISC.ROMANIZE_FROM_KOREAN': string;
+    /** Search query. If not specified, uses the currently playing track. */
+    'CMD.LYRICS.OPTION.QUERY': string;
+    /** No search query was specified. */
+    'CMD.LYRICS.RESPONSE.NO_QUERY': string;
+    /** Your search yielded no results. */
+    'CMD.LYRICS.RESPONSE.NO_RESULTS': string;
+    /** An internal error occurred. Please try again later. */
+    'CMD.LYRICS.RESPONSE.ROMANIZATION_FAILED': string;
+    /** Move a track within the queue. */
+    'CMD.MOVE.DESCRIPTION': string;
+    /** The new position of the track. */
+    'CMD.MOVE.OPTION.NEW_POSITION': string;
+    /** The position of the track to move. */
+    'CMD.MOVE.OPTION.OLD_POSITION': string;
+    /** You can't move a track to the same position it is already in. */
+    'CMD.MOVE.RESPONSE.MOVING_IN_PLACE': string;
+    /** Your input was out of range. */
+    'CMD.MOVE.RESPONSE.OUT_OF_RANGE': string;
+    /** There aren't enough tracks in the queue to perform a move. */
+    'CMD.MOVE.RESPONSE.QUEUE_INSUFFICIENT_TRACKS': string;
+    /** Moved \*\*%1\*\* `%2 -> %3` */
+    'CMD.MOVE.RESPONSE.SUCCESS': string;
+    /** Nightcore mode speeds up your music. */
+    'CMD.NIGHTCORE.DESCRIPTION': string;
+    /** Whether or not nightcore mode is enabled. If not specified, it will be toggled. */
+    'CMD.NIGHTCORE.OPTION.ENABLED': string;
+    /** Nightcore mode has been \*\*disabled\*\* */
+    'CMD.NIGHTCORE.RESPONSE.DISABLED': string;
+    /** Nightcore mode has been \*\*enabled\*\* */
+    'CMD.NIGHTCORE.RESPONSE.ENABLED': string;
+    /** Pause Quaver. */
+    'CMD.PAUSE.DESCRIPTION': string;
+    /** The player is already paused. */
+    'CMD.PAUSE.RESPONSE.STATE_UNCHANGED': string;
+    /** The player has been paused. */
+    'CMD.PAUSE.RESPONSE.SUCCESS': string;
+    /** Show Quaver's latency and uptime. */
+    'CMD.PING.DESCRIPTION': string;
+    /** -# Uptime: %1 */
+    'CMD.PING.MISC.UPTIME': string;
+    /** Pong! Heartbeat: %1 */
+    'CMD.PING.RESPONSE.SUCCESS': string;
+    /** Add a track to the queue. */
+    'CMD.PLAY.DESCRIPTION': string;
+    /** Whether or not to play the track next. */
+    'CMD.PLAY.OPTION.INSERT': string;
+    /** Your search query or a link. */
+    'CMD.PLAY.OPTION.QUERY': string;
+    /** An internal error prevented the track(s) from loading. Please try again later. */
+    'CMD.PLAY.RESPONSE.LOAD_FAILED': string;
+    /** Your search yielded no results. */
+    'CMD.PLAY.RESPONSE.NO_RESULTS': string;
+    /** Show what's currently playing. */
+    'CMD.PLAYING.DESCRIPTION': string;
+    /** Show the queue. */
+    'CMD.QUEUE.DESCRIPTION': string;
+    /** Go to page */
+    'CMD.QUEUE.MISC.MODAL_TITLE': string;
+    /** Page */
+    'CMD.QUEUE.MISC.PAGE': string;
+    /** Your input was invalid. */
+    'CMD.QUEUE.RESPONSE.OUT_OF_RANGE': string;
+    /** There is nothing coming up. */
+    'CMD.QUEUE.RESPONSE.QUEUE_EMPTY': string;
+    /** Remove a track from the queue. */
+    'CMD.REMOVE.DESCRIPTION': string;
+    /** The position of the track to remove. */
+    'CMD.REMOVE.OPTION.POSITION': string;
+    /** The queue is empty. */
+    'CMD.REMOVE.RESPONSE.QUEUE_EMPTY': string;
+    /** Removed \*\*%1\*\* */
+    'CMD.REMOVE.RESPONSE.SUCCESS.DEFAULT': string;
+    /** Removed \*\*%1\*\* by force */
+    'CMD.REMOVE.RESPONSE.SUCCESS.FORCED': string;
+    /** Removed \*\*%1\*\* by manager bypass */
+    'CMD.REMOVE.RESPONSE.SUCCESS.MANAGER': string;
+    /** Resume Quaver. */
+    'CMD.RESUME.DESCRIPTION': string;
+    /** The player is already playing. */
+    'CMD.RESUME.RESPONSE.STATE_UNCHANGED': string;
+    /** The player has been resumed. */
+    'CMD.RESUME.RESPONSE.SUCCESS': string;
+    /** Search for a track. */
+    'CMD.SEARCH.DESCRIPTION': string;
+    /** Pick track(s) */
+    'CMD.SEARCH.MISC.PICK': string;
+    /** Your search query. */
+    'CMD.SEARCH.OPTION.QUERY': string;
+    /** An internal error prevented the track(s) from loading. Please try again later. */
+    'CMD.SEARCH.RESPONSE.LOAD_FAILED': string;
+    /** Your search failed due to an internal error. Please try using </play:%1> for this query instead, ... */
+    'CMD.SEARCH.RESPONSE.USE_PLAY_CMD': string;
+    /** Seek to a specific time in the current track. */
+    'CMD.SEEK.DESCRIPTION': string;
+    /** The hours position for the target timestamp. */
+    'CMD.SEEK.OPTION.HOURS': string;
+    /** The minutes position for the target timestamp. */
+    'CMD.SEEK.OPTION.MINUTES': string;
+    /** The seconds position for the target timestamp. */
+    'CMD.SEEK.OPTION.SECONDS': string;
+    /** Seek cannot be used for streams. */
+    'CMD.SEEK.RESPONSE.STREAM_CANNOT_SEEK': string;
+    /** Seeking to `[%1 / %2]` */
+    'CMD.SEEK.RESPONSE.SUCCESS.DEFAULT': string;
+    /** Seeking to `[%1 / %2]` by force */
+    'CMD.SEEK.RESPONSE.SUCCESS.FORCED': string;
+    /** Seeking to `[%1 / %2]` by manager bypass */
+    'CMD.SEEK.RESPONSE.SUCCESS.MANAGER': string;
+    /** The timestamp provided exceeds the track's duration of `%1`. */
+    'CMD.SEEK.RESPONSE.TIMESTAMP_INVALID': string;
+    /** Please specify a timestamp to seek to. */
+    'CMD.SEEK.RESPONSE.TIMESTAMP_MISSING': string;
+    /** Change Quaver's settings in this server. */
+    'CMD.SETTINGS.DESCRIPTION': string;
+    /** Automatically send lyrics for every track. */
+    'CMD.SETTINGS.MISC.AUTOLYRICS.DESCRIPTION': string;
+    /** Auto Lyrics */
+    'CMD.SETTINGS.MISC.AUTOLYRICS.NAME': string;
+    /** A role allowing requester check bypass. */
+    'CMD.SETTINGS.MISC.DJ.DESCRIPTION': string;
+    /** DJ Role */
+    'CMD.SETTINGS.MISC.DJ.NAME': string;
+    /** The "Now playing" format to use for this server. */
+    'CMD.SETTINGS.MISC.FORMAT.DESCRIPTION': string;
+    /** Detailed Format Display */
+    'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.DETAILED': string;
+    /** Simple Format Display */
+    'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.SIMPLE': string;
+    /** Format */
+    'CMD.SETTINGS.MISC.FORMAT.NAME': string;
+    /** Detailed */
+    'CMD.SETTINGS.MISC.FORMAT.OPTIONS.DETAILED': string;
+    /** Simple */
+    'CMD.SETTINGS.MISC.FORMAT.OPTIONS.SIMPLE': string;
+    /** The language to use for this server. */
+    'CMD.SETTINGS.MISC.LANGUAGE.DESCRIPTION': string;
+    /** Language */
+    'CMD.SETTINGS.MISC.LANGUAGE.NAME': string;
+    /** Whether or not to send "Now playing" messages in 24/7 mode. */
+    'CMD.SETTINGS.MISC.NOTIFYIN247.DESCRIPTION': string;
+    /** Notify in 24/7 mode */
+    'CMD.SETTINGS.MISC.NOTIFYIN247.NAME': string;
+    /** Premium features for this server. */
+    'CMD.SETTINGS.MISC.PREMIUM.DESCRIPTION': string;
+    /** Requires Premium */
+    'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.LOCKED.DEFAULT': string;
+    /** Expired at \*\*<t:%1:f>\*\* */
+    'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.LOCKED.EXPIRED': string;
+    /** Available \*\*forever\*\* */
+    'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.UNLOCKED.PERMANENT': string;
+    /** Available until \*\*<t:%1:f>\*\* */
+    'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.UNLOCKED.TEMPORARY': string;
+    /** Auto Lyrics */
+    'CMD.SETTINGS.MISC.PREMIUM.FEATURES.AUTOLYRICS': string;
+    /** Smart Queue */
+    'CMD.SETTINGS.MISC.PREMIUM.FEATURES.SMARTQUEUE': string;
+    /** 24/7 Mode */
+    'CMD.SETTINGS.MISC.PREMIUM.FEATURES.STAY': string;
+    /** Premium */
+    'CMD.SETTINGS.MISC.PREMIUM.NAME': string;
+    /** Sorts the queue to alternate between requesters. */
+    'CMD.SETTINGS.MISC.SMARTQUEUE.DESCRIPTION': string;
+    /** Smart Queue */
+    'CMD.SETTINGS.MISC.SMARTQUEUE.NAME': string;
+    /** The default source to use. Affects the /play command. */
+    'CMD.SETTINGS.MISC.SOURCE.DESCRIPTION': string;
+    /** Source */
+    'CMD.SETTINGS.MISC.SOURCE.NAME': string;
+    /** Settings for \*\*%1\*\* */
+    'CMD.SETTINGS.RESPONSE.HEADER': string;
+    /** Shuffle the queue. */
+    'CMD.SHUFFLE.DESCRIPTION': string;
+    /** There aren't enough tracks in the queue to perform a shuffle. */
+    'CMD.SHUFFLE.RESPONSE.QUEUE_INSUFFICIENT_TRACKS': string;
+    /** Shuffled the queue. */
+    'CMD.SHUFFLE.RESPONSE.SUCCESS': string;
+    /** Skip the current track. */
+    'CMD.SKIP.DESCRIPTION': string;
+    /** Skipped \*\*%1\*\* */
+    'CMD.SKIP.RESPONSE.SUCCESS.DEFAULT': string;
+    /** Skipped \*\*%1\*\* by force */
+    'CMD.SKIP.RESPONSE.SUCCESS.FORCED': string;
+    /** Skipped \*\*%1\*\* by manager bypass */
+    'CMD.SKIP.RESPONSE.SUCCESS.MANAGER': string;
+    /** Skipped \*\*%1\*\* by voting */
+    'CMD.SKIP.RESPONSE.SUCCESS.VOTED': string;
+    /** You have already voted to skip this track. */
+    'CMD.SKIP.RESPONSE.VOTED.STATE_UNCHANGED': string;
+    /** Voted to skip %1 `[%2 / %3]` */
+    'CMD.SKIP.RESPONSE.VOTED.SUCCESS': string;
+    /** Skip the current track and play a specific track in the queue. */
+    'CMD.SKIPTO.DESCRIPTION': string;
+    /** The position of the track to skip to. */
+    'CMD.SKIPTO.OPTION.POSITION': string;
+    /** You are not the requester of the current track and do not have sufficient permissions to skip it. */
+    'CMD.SKIPTO.RESPONSE.NOT_REQUESTER': string;
+    /** Your input was out of range. */
+    'CMD.SKIPTO.RESPONSE.OUT_OF_RANGE': string;
+    /** Skipped \*\*%1\*\* Now playing \*\*%2\*\* */
+    'CMD.SKIPTO.RESPONSE.SUCCESS.DEFAULT': string;
+    /** Skipped \*\*%1\*\* by force Now playing \*\*%2\*\* */
+    'CMD.SKIPTO.RESPONSE.SUCCESS.FORCED': string;
+    /** Skipped \*\*%1\*\* by manager bypass Now playing \*\*%2\*\* */
+    'CMD.SKIPTO.RESPONSE.SUCCESS.MANAGER': string;
+    /** Stop the current track and clear the queue. */
+    'CMD.STOP.DESCRIPTION': string;
+    /** Are you sure you want to stop the current track and clear the queue? */
+    'CMD.STOP.RESPONSE.CONFIRMATION': string;
+    /** Stopped the current track and cleared the queue. */
+    'CMD.STOP.RESPONSE.SUCCESS': string;
+    /** Adjust the volume of Quaver. */
+    'CMD.VOLUME.DESCRIPTION': string;
+    /** The new volume to adjust to. */
+    'CMD.VOLUME.OPTION.NEW_VOLUME': string;
+    /** That is not within the valid range of `0%` to `200%`. */
+    'CMD.VOLUME.RESPONSE.OUT_OF_RANGE': string;
+    /** Volume adjusted to `%1%` */
+    'CMD.VOLUME.RESPONSE.SUCCESS': string;
+    /** The channel you're in is currently an unsupported channel type. Sorry! */
+    'DISCORD.CHANNEL_UNSUPPORTED': string;
+    /** There was an error while processing your request. */
+    'DISCORD.GENERIC_ERROR': string;
+    /** Quaver needs the \*\*Connect\*\* and \*\*Speak\*\* permissions in the voice channel. */
+    'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC': string;
+    /** Quaver is missing permission(s): %1 */
+    'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.DEFAULT': string;
+    /** Quaver needs to be a \*\*Stage Moderator\*\* of the stage channel. */
+    'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE': string;
+    /** Quaver is currently timed out. */
+    'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT': string;
+    /** Quaver needs the \*\*View Channel\*\* and \*\*Send Messages\*\* permissions in this channel. */
+    'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.VIEW': string;
+    /** You are missing permission(s): %1 */
+    'DISCORD.INSUFFICIENT_PERMISSIONS.USER': string;
+    /** This interaction was canceled by <@%1>. */
+    'DISCORD.INTERACTION.CANCELED': string;
+    /** This interaction has expired. */
+    'DISCORD.INTERACTION.EXPIRED': string;
+    /** This feature is currently disabled. */
+    'FEATURE.DISABLED.DEFAULT': string;
+    /** This feature is temporarily disabled. */
+    'FEATURE.DISABLED.TEMPORARY': string;
+    /** This server is not whitelisted to use this feature. */
+    'FEATURE.NO_PERMISSION.DEFAULT': string;
+    /** This feature is only available to premium servers. */
+    'FEATURE.NO_PERMISSION.PREMIUM': string;
+    /** -# This action is irreversible. */
+    'MISC.ACTION_IRREVERSIBLE': string;
+    /** Add */
+    'MISC.ADD': string;
+    /** Added by <@%1> */
+    'MISC.ADDED_BY': string;
+    /** Cancel */
+    'MISC.CANCEL': string;
+    /** Confirm */
+    'MISC.CONFIRM': string;
+    /** Current */
+    'MISC.CURRENT': string;
+    /** Dashboard */
+    'MISC.DASHBOARD': string;
+    /** Disable */
+    'MISC.DISABLE': string;
+    /** Disabled */
+    'MISC.DISABLED': string;
+    /** Enable */
+    'MISC.ENABLE': string;
+    /** Enabled */
+    'MISC.ENABLED': string;
+    /** Get Premium */
+    'MISC.GET_PREMIUM': string;
+    /** Go to */
+    'MISC.GO_TO': string;
+    /** LIVE */
+    'MISC.LIVE': string;
+    /** Loading... */
+    'MISC.LOADING': string;
+    /** more than a day */
+    'MISC.MORE_THAN_A_DAY': string;
+    /** None */
+    'MISC.NONE': string;
+    /** -# Page %1 of %2 */
+    'MISC.PAGE': string;
+    /** Position */
+    'MISC.POSITION': string;
+    /** Queue */
+    'MISC.QUEUE': string;
+    /** Apple Music */
+    'MISC.SOURCES.APPLEMUSIC': string;
+    /** Deezer */
+    'MISC.SOURCES.DEEZER': string;
+    /** Flowery TTS */
+    'MISC.SOURCES.FLOWERY-TTS': string;
+    /** Web */
+    'MISC.SOURCES.HTTP': string;
+    /** SoundCloud */
+    'MISC.SOURCES.SOUNDCLOUD': string;
+    /** Spotify */
+    'MISC.SOURCES.SPOTIFY': string;
+    /** Tidal */
+    'MISC.SOURCES.TIDAL': string;
+    /** VK Music */
+    'MISC.SOURCES.VKMUSIC': string;
+    /** Yandex Music */
+    'MISC.SOURCES.YANDEXMUSIC': string;
+    /** YouTube */
+    'MISC.SOURCES.YOUTUBE': string;
+    /** YouTube Music */
+    'MISC.SOURCES.YOUTUBEMUSIC': string;
+    /** Music by Quaver */
+    'MISC.STAGE_TOPIC': string;
+    /** Streaming */
+    'MISC.STREAMING': string;
+    /** your search */
+    'MISC.YOUR_SEARCH': string;
+    /** Disconnected as everyone left. */
+    'MUSIC.DISCONNECT.ALONE.DISCONNECTED.DEFAULT': string;
+    /** Disconnected as there was no one in the target channel. */
+    'MUSIC.DISCONNECT.ALONE.DISCONNECTED.MOVED': string;
+    /** -# Rejoin to resume your session. */
+    'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME': string;
+    /** Resuming your session. */
+    'MUSIC.DISCONNECT.ALONE.RESUMING': string;
+    /** There's nobody here. */
+    'MUSIC.DISCONNECT.ALONE.WARNING': string;
+    /** Disconnected due to inactivity. */
+    'MUSIC.DISCONNECT.INACTIVITY.DISCONNECTED': string;
+    /** Quaver will disconnect <t:%1:R>. */
+    'MUSIC.DISCONNECT.INACTIVITY.WARNING': string;
+    /** One moment please! Quaver is still starting up. */
+    'MUSIC.NOT_READY': string;
+    /** -# This may take a few seconds to apply */
+    'MUSIC.PLAYER.FILTER_NOTE': string;
+    /** Disabled looping as the queue is less than 15 seconds long. */
+    'MUSIC.PLAYER.LOOP_QUEUE_DISABLED': string;
+    /** Disabled looping as the track is less than 15 seconds long. */
+    'MUSIC.PLAYER.LOOP_TRACK_DISABLED': string;
+    /** There is nothing playing right now. */
+    'MUSIC.PLAYER.PLAYING.NOTHING': string;
+    /** Added by */
+    'MUSIC.PLAYER.PLAYING.NOW.DETAILED.ADDED_BY': string;
+    /** Duration */
+    'MUSIC.PLAYER.PLAYING.NOW.DETAILED.DURATION': string;
+    /** -# Remaining: %1 */
+    'MUSIC.PLAYER.PLAYING.NOW.DETAILED.REMAINING': string;
+    /** Source */
+    'MUSIC.PLAYER.PLAYING.NOW.DETAILED.SOURCE': string;
+    /** \*\*%1\*\* `[%2]` */
+    'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TEXT': string;
+    /** ### Now playing */
+    'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE': string;
+    /** Uploader */
+    'MUSIC.PLAYER.PLAYING.NOW.DETAILED.UPLOADER': string;
+    /** Source */
+    'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE': string;
+    /** Now playing \*\*%1\*\* `[%2]` */
+    'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT': string;
+    /** Cleared queue as an error occurred multiple times consecutively. */
+    'MUSIC.PLAYER.QUEUE_CLEARED_ERROR': string;
+    /** -# Sorry for the inconvenience caused. */
+    'MUSIC.PLAYER.RESTARTING.APOLOGY': string;
+    /** Quaver has crashed and will disconnect. */
+    'MUSIC.PLAYER.RESTARTING.CRASHED': string;
+    /** Quaver is restarting and will disconnect. */
+    'MUSIC.PLAYER.RESTARTING.DEFAULT': string;
+    /** Your queue data has been attached. */
+    'MUSIC.PLAYER.RESTARTING.QUEUE_DATA_ATTACHED': string;
+    /** Skipped \*\*%1\*\* as an internal error prevented the track from loading. */
+    'MUSIC.PLAYER.TRACK_SKIPPED_ERROR': string;
+    /** There's nothing left in the queue. */
+    'MUSIC.QUEUE.EMPTY': string;
+    /** Added \*\*%1\*\* tracks from \*\*%2\*\* to queue */
+    'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT': string;
+    /** Added \*\*%1\*\* tracks from \*\*%2\*\* to start of queue */
+    'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.INSERTED': string;
+    /** Added \*\*%1\*\* to queue */
+    'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT': string;
+    /** Added \*\*%1\*\* to start of queue */
+    'MUSIC.QUEUE.TRACK_ADDED.SINGLE.INSERTED': string;
+    /** Session ended as Quaver was disconnected. */
+    'MUSIC.SESSION_ENDED.FORCED.DISCONNECTED': string;
+    /** Session ended as Quaver was moved to a stage channel that Quaver isn't a stage moderator of. */
+    'MUSIC.SESSION_ENDED.FORCED.STAGE_NOT_MODERATOR': string;
+}
+
+/**
  * Union type of all available locale string paths.
  * Provides autocomplete and type safety when accessing locale strings.
- * Each locale key includes a JSDoc comment showing the English string value.
  *
  * @example
  * guild.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE')
  * guild.locale('CMD.PLAY.DESCRIPTION')
  */
-export type LocaleKey =
-    /** There is no session in this server. */
-    | 'CHECK.ACTIVE_SESSION'
-    /** This command only works in servers. */
-    | 'CHECK.GUILD_ONLY'
-    /** You need to be in Quaver's voice channel. */
-    | 'CHECK.IN_SESSION_VOICE'
-    /** You need to be in a voice channel. */
-    | 'CHECK.IN_VOICE'
-    /** That is not your interaction menu. */
-    | 'CHECK.INTERACTION_STARTER'
-    /** Please specify a valid index. */
-    | 'CHECK.INVALID_INDEX'
-    /** You are not the requester of that track. */
-    | 'CHECK.NOT_REQUESTER'
-    /** 24/7 mode prevents Quaver from leaving. */
-    | 'CMD.247.DESCRIPTION'
-    /** -# Quaver will use the current voice and text channel if it restarts. */
-    | 'CMD.247.MISC.NOTE'
-    /** Whether or not 24/7 mode is enabled. If not specified, it will be toggled. */
-    | 'CMD.247.OPTION.ENABLED'
-    /** 24/7 mode has been \*\*disabled\*\* */
-    | 'CMD.247.RESPONSE.DISABLED'
-    /** 24/7 mode has been \*\*enabled\*\* */
-    | 'CMD.247.RESPONSE.ENABLED'
-    /** The queue channel is missing. Try using </bind:%1>. */
-    | 'CMD.247.RESPONSE.QUEUE_CHANNEL_MISSING'
-    /** Bass boost mode amplifies the bass levels. */
-    | 'CMD.BASSBOOST.DESCRIPTION'
-    /** Whether or not bass boost mode is enabled. If not specified, it will be toggled. */
-    | 'CMD.BASSBOOST.OPTION.ENABLED'
-    /** Bass boost mode has been \*\*disabled\*\* */
-    | 'CMD.BASSBOOST.RESPONSE.DISABLED'
-    /** Bass boost mode has been \*\*enabled\*\* */
-    | 'CMD.BASSBOOST.RESPONSE.ENABLED'
-    /** Change the channel used by Quaver to send messages automatically. */
-    | 'CMD.BIND.DESCRIPTION'
-    /** The channel to bind to. */
-    | 'CMD.BIND.OPTION.NEW_CHANNEL'
-    /** Quaver does not have sufficient permission(s) in <#%1>. */
-    | 'CMD.BIND.RESPONSE.PERMISSIONS_INSUFFICIENT'
-    /** Quaver will send new "Now playing" messages to <#%1> */
-    | 'CMD.BIND.RESPONSE.SUCCESS'
-    /** Clear the queue. */
-    | 'CMD.CLEAR.DESCRIPTION'
-    /** Are you sure you want to clear the queue? */
-    | 'CMD.CLEAR.RESPONSE.CONFIRMATION'
-    /** There are no tracks in the queue to clear. */
-    | 'CMD.CLEAR.RESPONSE.QUEUE_EMPTY'
-    /** The queue has been cleared. */
-    | 'CMD.CLEAR.RESPONSE.SUCCESS'
-    /** Disconnect Quaver. */
-    | 'CMD.DISCONNECT.DESCRIPTION'
-    /** Are you sure you want Quaver to disconnect? You will also lose your current queue. */
-    | 'CMD.DISCONNECT.RESPONSE.CONFIRMATION'
-    /** Quaver is unable to disconnect as 24/7 mode is enabled. */
-    | 'CMD.DISCONNECT.RESPONSE.FEATURE_247_ENABLED'
-    /** Disconnected from the voice channel. */
-    | 'CMD.DISCONNECT.RESPONSE.SUCCESS'
-    /** Show information about Quaver. */
-    | 'CMD.INFO.DESCRIPTION'
-    /** Invite */
-    | 'CMD.INFO.MISC.INVITE'
-    /** Source Code */
-    | 'CMD.INFO.MISC.SOURCE_CODE'
-    /** Sponsor Us */
-    | 'CMD.INFO.MISC.SPONSOR_US'
-    /** Support Server */
-    | 'CMD.INFO.MISC.SUPPORT_SERVER'
-    /** Translate for Us */
-    | 'CMD.INFO.MISC.TRANSLATE_FOR_US'
-    /** Hi! Quaver uses [Slash Commands](https://support-apps.discord.com/hc/en-us/articles/2650183778677... */
-    | 'CMD.INFO.RESPONSE.MENTION'
-    /** Open-source music bot for small communities. Made with ❤️ by \*\*ZPTX\*\*. Running version `%1`. */
-    | 'CMD.INFO.RESPONSE.SUCCESS'
-    /** Change the looping mode. */
-    | 'CMD.LOOP.DESCRIPTION'
-    /** The looping mode. */
-    | 'CMD.LOOP.OPTION.TYPE.DESCRIPTION'
-    /** Disabled */
-    | 'CMD.LOOP.OPTION.TYPE.OPTION.DISABLED'
-    /** Queue */
-    | 'CMD.LOOP.OPTION.TYPE.OPTION.QUEUE'
-    /** Track */
-    | 'CMD.LOOP.OPTION.TYPE.OPTION.TRACK'
-    /** Looping mode set to \*\*%1\*\* */
-    | 'CMD.LOOP.RESPONSE.SUCCESS'
-    /** Look up lyrics. */
-    | 'CMD.LYRICS.DESCRIPTION'
-    /** -# Romanizing kanji might result in slight inaccuracies. */
-    | 'CMD.LYRICS.MISC.JAPANESE_INACCURATE'
-    /** Romanize from Chinese */
-    | 'CMD.LYRICS.MISC.ROMANIZE_FROM_CHINESE'
-    /** Romanize from Japanese */
-    | 'CMD.LYRICS.MISC.ROMANIZE_FROM_JAPANESE'
-    /** Romanize from Korean */
-    | 'CMD.LYRICS.MISC.ROMANIZE_FROM_KOREAN'
-    /** Search query. If not specified, uses the currently playing track. */
-    | 'CMD.LYRICS.OPTION.QUERY'
-    /** No search query was specified. */
-    | 'CMD.LYRICS.RESPONSE.NO_QUERY'
-    /** Your search yielded no results. */
-    | 'CMD.LYRICS.RESPONSE.NO_RESULTS'
-    /** An internal error occurred. Please try again later. */
-    | 'CMD.LYRICS.RESPONSE.ROMANIZATION_FAILED'
-    /** Move a track within the queue. */
-    | 'CMD.MOVE.DESCRIPTION'
-    /** The new position of the track. */
-    | 'CMD.MOVE.OPTION.NEW_POSITION'
-    /** The position of the track to move. */
-    | 'CMD.MOVE.OPTION.OLD_POSITION'
-    /** You can't move a track to the same position it is already in. */
-    | 'CMD.MOVE.RESPONSE.MOVING_IN_PLACE'
-    /** Your input was out of range. */
-    | 'CMD.MOVE.RESPONSE.OUT_OF_RANGE'
-    /** There aren't enough tracks in the queue to perform a move. */
-    | 'CMD.MOVE.RESPONSE.QUEUE_INSUFFICIENT_TRACKS'
-    /** Moved \*\*%1\*\* `%2 -> %3` */
-    | 'CMD.MOVE.RESPONSE.SUCCESS'
-    /** Nightcore mode speeds up your music. */
-    | 'CMD.NIGHTCORE.DESCRIPTION'
-    /** Whether or not nightcore mode is enabled. If not specified, it will be toggled. */
-    | 'CMD.NIGHTCORE.OPTION.ENABLED'
-    /** Nightcore mode has been \*\*disabled\*\* */
-    | 'CMD.NIGHTCORE.RESPONSE.DISABLED'
-    /** Nightcore mode has been \*\*enabled\*\* */
-    | 'CMD.NIGHTCORE.RESPONSE.ENABLED'
-    /** Pause Quaver. */
-    | 'CMD.PAUSE.DESCRIPTION'
-    /** The player is already paused. */
-    | 'CMD.PAUSE.RESPONSE.STATE_UNCHANGED'
-    /** The player has been paused. */
-    | 'CMD.PAUSE.RESPONSE.SUCCESS'
-    /** Show Quaver's latency and uptime. */
-    | 'CMD.PING.DESCRIPTION'
-    /** -# Uptime: %1 */
-    | 'CMD.PING.MISC.UPTIME'
-    /** Pong! Heartbeat: %1 */
-    | 'CMD.PING.RESPONSE.SUCCESS'
-    /** Add a track to the queue. */
-    | 'CMD.PLAY.DESCRIPTION'
-    /** Whether or not to play the track next. */
-    | 'CMD.PLAY.OPTION.INSERT'
-    /** Your search query or a link. */
-    | 'CMD.PLAY.OPTION.QUERY'
-    /** An internal error prevented the track(s) from loading. Please try again later. */
-    | 'CMD.PLAY.RESPONSE.LOAD_FAILED'
-    /** Your search yielded no results. */
-    | 'CMD.PLAY.RESPONSE.NO_RESULTS'
-    /** Show what's currently playing. */
-    | 'CMD.PLAYING.DESCRIPTION'
-    /** Show the queue. */
-    | 'CMD.QUEUE.DESCRIPTION'
-    /** Go to page */
-    | 'CMD.QUEUE.MISC.MODAL_TITLE'
-    /** Page */
-    | 'CMD.QUEUE.MISC.PAGE'
-    /** Your input was invalid. */
-    | 'CMD.QUEUE.RESPONSE.OUT_OF_RANGE'
-    /** There is nothing coming up. */
-    | 'CMD.QUEUE.RESPONSE.QUEUE_EMPTY'
-    /** Remove a track from the queue. */
-    | 'CMD.REMOVE.DESCRIPTION'
-    /** The position of the track to remove. */
-    | 'CMD.REMOVE.OPTION.POSITION'
-    /** The queue is empty. */
-    | 'CMD.REMOVE.RESPONSE.QUEUE_EMPTY'
-    /** Removed \*\*%1\*\* */
-    | 'CMD.REMOVE.RESPONSE.SUCCESS.DEFAULT'
-    /** Removed \*\*%1\*\* by force */
-    | 'CMD.REMOVE.RESPONSE.SUCCESS.FORCED'
-    /** Removed \*\*%1\*\* by manager bypass */
-    | 'CMD.REMOVE.RESPONSE.SUCCESS.MANAGER'
-    /** Resume Quaver. */
-    | 'CMD.RESUME.DESCRIPTION'
-    /** The player is already playing. */
-    | 'CMD.RESUME.RESPONSE.STATE_UNCHANGED'
-    /** The player has been resumed. */
-    | 'CMD.RESUME.RESPONSE.SUCCESS'
-    /** Search for a track. */
-    | 'CMD.SEARCH.DESCRIPTION'
-    /** Pick track(s) */
-    | 'CMD.SEARCH.MISC.PICK'
-    /** Your search query. */
-    | 'CMD.SEARCH.OPTION.QUERY'
-    /** An internal error prevented the track(s) from loading. Please try again later. */
-    | 'CMD.SEARCH.RESPONSE.LOAD_FAILED'
-    /** Your search failed due to an internal error. Please try using </play:%1> for this query instead, ... */
-    | 'CMD.SEARCH.RESPONSE.USE_PLAY_CMD'
-    /** Seek to a specific time in the current track. */
-    | 'CMD.SEEK.DESCRIPTION'
-    /** The hours position for the target timestamp. */
-    | 'CMD.SEEK.OPTION.HOURS'
-    /** The minutes position for the target timestamp. */
-    | 'CMD.SEEK.OPTION.MINUTES'
-    /** The seconds position for the target timestamp. */
-    | 'CMD.SEEK.OPTION.SECONDS'
-    /** Seek cannot be used for streams. */
-    | 'CMD.SEEK.RESPONSE.STREAM_CANNOT_SEEK'
-    /** Seeking to `[%1 / %2]` */
-    | 'CMD.SEEK.RESPONSE.SUCCESS.DEFAULT'
-    /** Seeking to `[%1 / %2]` by force */
-    | 'CMD.SEEK.RESPONSE.SUCCESS.FORCED'
-    /** Seeking to `[%1 / %2]` by manager bypass */
-    | 'CMD.SEEK.RESPONSE.SUCCESS.MANAGER'
-    /** The timestamp provided exceeds the track's duration of `%1`. */
-    | 'CMD.SEEK.RESPONSE.TIMESTAMP_INVALID'
-    /** Please specify a timestamp to seek to. */
-    | 'CMD.SEEK.RESPONSE.TIMESTAMP_MISSING'
-    /** Change Quaver's settings in this server. */
-    | 'CMD.SETTINGS.DESCRIPTION'
-    /** Automatically send lyrics for every track. */
-    | 'CMD.SETTINGS.MISC.AUTOLYRICS.DESCRIPTION'
-    /** Auto Lyrics */
-    | 'CMD.SETTINGS.MISC.AUTOLYRICS.NAME'
-    /** A role allowing requester check bypass. */
-    | 'CMD.SETTINGS.MISC.DJ.DESCRIPTION'
-    /** DJ Role */
-    | 'CMD.SETTINGS.MISC.DJ.NAME'
-    /** The "Now playing" format to use for this server. */
-    | 'CMD.SETTINGS.MISC.FORMAT.DESCRIPTION'
-    /** Detailed Format Display */
-    | 'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.DETAILED'
-    /** Simple Format Display */
-    | 'CMD.SETTINGS.MISC.FORMAT.EXAMPLE.SIMPLE'
-    /** Format */
-    | 'CMD.SETTINGS.MISC.FORMAT.NAME'
-    /** Detailed */
-    | 'CMD.SETTINGS.MISC.FORMAT.OPTIONS.DETAILED'
-    /** Simple */
-    | 'CMD.SETTINGS.MISC.FORMAT.OPTIONS.SIMPLE'
-    /** The language to use for this server. */
-    | 'CMD.SETTINGS.MISC.LANGUAGE.DESCRIPTION'
-    /** Language */
-    | 'CMD.SETTINGS.MISC.LANGUAGE.NAME'
-    /** Whether or not to send "Now playing" messages in 24/7 mode. */
-    | 'CMD.SETTINGS.MISC.NOTIFYIN247.DESCRIPTION'
-    /** Notify in 24/7 mode */
-    | 'CMD.SETTINGS.MISC.NOTIFYIN247.NAME'
-    /** Premium features for this server. */
-    | 'CMD.SETTINGS.MISC.PREMIUM.DESCRIPTION'
-    /** Requires Premium */
-    | 'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.LOCKED.DEFAULT'
-    /** Expired at \*\*<t:%1:f>\*\* */
-    | 'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.LOCKED.EXPIRED'
-    /** Available \*\*forever\*\* */
-    | 'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.UNLOCKED.PERMANENT'
-    /** Available until \*\*<t:%1:f>\*\* */
-    | 'CMD.SETTINGS.MISC.PREMIUM.DISPLAY.UNLOCKED.TEMPORARY'
-    /** Auto Lyrics */
-    | 'CMD.SETTINGS.MISC.PREMIUM.FEATURES.AUTOLYRICS'
-    /** Smart Queue */
-    | 'CMD.SETTINGS.MISC.PREMIUM.FEATURES.SMARTQUEUE'
-    /** 24/7 Mode */
-    | 'CMD.SETTINGS.MISC.PREMIUM.FEATURES.STAY'
-    /** Premium */
-    | 'CMD.SETTINGS.MISC.PREMIUM.NAME'
-    /** Sorts the queue to alternate between requesters. */
-    | 'CMD.SETTINGS.MISC.SMARTQUEUE.DESCRIPTION'
-    /** Smart Queue */
-    | 'CMD.SETTINGS.MISC.SMARTQUEUE.NAME'
-    /** The default source to use. Affects the /play command. */
-    | 'CMD.SETTINGS.MISC.SOURCE.DESCRIPTION'
-    /** Source */
-    | 'CMD.SETTINGS.MISC.SOURCE.NAME'
-    /** Settings for \*\*%1\*\* */
-    | 'CMD.SETTINGS.RESPONSE.HEADER'
-    /** Shuffle the queue. */
-    | 'CMD.SHUFFLE.DESCRIPTION'
-    /** There aren't enough tracks in the queue to perform a shuffle. */
-    | 'CMD.SHUFFLE.RESPONSE.QUEUE_INSUFFICIENT_TRACKS'
-    /** Shuffled the queue. */
-    | 'CMD.SHUFFLE.RESPONSE.SUCCESS'
-    /** Skip the current track. */
-    | 'CMD.SKIP.DESCRIPTION'
-    /** Skipped \*\*%1\*\* */
-    | 'CMD.SKIP.RESPONSE.SUCCESS.DEFAULT'
-    /** Skipped \*\*%1\*\* by force */
-    | 'CMD.SKIP.RESPONSE.SUCCESS.FORCED'
-    /** Skipped \*\*%1\*\* by manager bypass */
-    | 'CMD.SKIP.RESPONSE.SUCCESS.MANAGER'
-    /** Skipped \*\*%1\*\* by voting */
-    | 'CMD.SKIP.RESPONSE.SUCCESS.VOTED'
-    /** You have already voted to skip this track. */
-    | 'CMD.SKIP.RESPONSE.VOTED.STATE_UNCHANGED'
-    /** Voted to skip %1 `[%2 / %3]` */
-    | 'CMD.SKIP.RESPONSE.VOTED.SUCCESS'
-    /** Skip the current track and play a specific track in the queue. */
-    | 'CMD.SKIPTO.DESCRIPTION'
-    /** The position of the track to skip to. */
-    | 'CMD.SKIPTO.OPTION.POSITION'
-    /** You are not the requester of the current track and do not have sufficient permissions to skip it. */
-    | 'CMD.SKIPTO.RESPONSE.NOT_REQUESTER'
-    /** Your input was out of range. */
-    | 'CMD.SKIPTO.RESPONSE.OUT_OF_RANGE'
-    /** Skipped \*\*%1\*\* Now playing \*\*%2\*\* */
-    | 'CMD.SKIPTO.RESPONSE.SUCCESS.DEFAULT'
-    /** Skipped \*\*%1\*\* by force Now playing \*\*%2\*\* */
-    | 'CMD.SKIPTO.RESPONSE.SUCCESS.FORCED'
-    /** Skipped \*\*%1\*\* by manager bypass Now playing \*\*%2\*\* */
-    | 'CMD.SKIPTO.RESPONSE.SUCCESS.MANAGER'
-    /** Stop the current track and clear the queue. */
-    | 'CMD.STOP.DESCRIPTION'
-    /** Are you sure you want to stop the current track and clear the queue? */
-    | 'CMD.STOP.RESPONSE.CONFIRMATION'
-    /** Stopped the current track and cleared the queue. */
-    | 'CMD.STOP.RESPONSE.SUCCESS'
-    /** Adjust the volume of Quaver. */
-    | 'CMD.VOLUME.DESCRIPTION'
-    /** The new volume to adjust to. */
-    | 'CMD.VOLUME.OPTION.NEW_VOLUME'
-    /** That is not within the valid range of `0%` to `200%`. */
-    | 'CMD.VOLUME.RESPONSE.OUT_OF_RANGE'
-    /** Volume adjusted to `%1%` */
-    | 'CMD.VOLUME.RESPONSE.SUCCESS'
-    /** The channel you're in is currently an unsupported channel type. Sorry! */
-    | 'DISCORD.CHANNEL_UNSUPPORTED'
-    /** There was an error while processing your request. */
-    | 'DISCORD.GENERIC_ERROR'
-    /** Quaver needs the \*\*Connect\*\* and \*\*Speak\*\* permissions in the voice channel. */
-    | 'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC'
-    /** Quaver is missing permission(s): %1 */
-    | 'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.DEFAULT'
-    /** Quaver needs to be a \*\*Stage Moderator\*\* of the stage channel. */
-    | 'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE'
-    /** Quaver is currently timed out. */
-    | 'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT'
-    /** Quaver needs the \*\*View Channel\*\* and \*\*Send Messages\*\* permissions in this channel. */
-    | 'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.VIEW'
-    /** You are missing permission(s): %1 */
-    | 'DISCORD.INSUFFICIENT_PERMISSIONS.USER'
-    /** This interaction was canceled by <@%1>. */
-    | 'DISCORD.INTERACTION.CANCELED'
-    /** This interaction has expired. */
-    | 'DISCORD.INTERACTION.EXPIRED'
-    /** This feature is currently disabled. */
-    | 'FEATURE.DISABLED.DEFAULT'
-    /** This feature is temporarily disabled. */
-    | 'FEATURE.DISABLED.TEMPORARY'
-    /** This server is not whitelisted to use this feature. */
-    | 'FEATURE.NO_PERMISSION.DEFAULT'
-    /** This feature is only available to premium servers. */
-    | 'FEATURE.NO_PERMISSION.PREMIUM'
-    /** -# This action is irreversible. */
-    | 'MISC.ACTION_IRREVERSIBLE'
-    /** Add */
-    | 'MISC.ADD'
-    /** Added by <@%1> */
-    | 'MISC.ADDED_BY'
-    /** Cancel */
-    | 'MISC.CANCEL'
-    /** Confirm */
-    | 'MISC.CONFIRM'
-    /** Current */
-    | 'MISC.CURRENT'
-    /** Dashboard */
-    | 'MISC.DASHBOARD'
-    /** Disable */
-    | 'MISC.DISABLE'
-    /** Disabled */
-    | 'MISC.DISABLED'
-    /** Enable */
-    | 'MISC.ENABLE'
-    /** Enabled */
-    | 'MISC.ENABLED'
-    /** Get Premium */
-    | 'MISC.GET_PREMIUM'
-    /** Go to */
-    | 'MISC.GO_TO'
-    /** LIVE */
-    | 'MISC.LIVE'
-    /** Loading... */
-    | 'MISC.LOADING'
-    /** more than a day */
-    | 'MISC.MORE_THAN_A_DAY'
-    /** None */
-    | 'MISC.NONE'
-    /** -# Page %1 of %2 */
-    | 'MISC.PAGE'
-    /** Position */
-    | 'MISC.POSITION'
-    /** Queue */
-    | 'MISC.QUEUE'
-    /** Apple Music */
-    | 'MISC.SOURCES.APPLEMUSIC'
-    /** Deezer */
-    | 'MISC.SOURCES.DEEZER'
-    /** Flowery TTS */
-    | 'MISC.SOURCES.FLOWERY-TTS'
-    /** Web */
-    | 'MISC.SOURCES.HTTP'
-    /** SoundCloud */
-    | 'MISC.SOURCES.SOUNDCLOUD'
-    /** Spotify */
-    | 'MISC.SOURCES.SPOTIFY'
-    /** Tidal */
-    | 'MISC.SOURCES.TIDAL'
-    /** VK Music */
-    | 'MISC.SOURCES.VKMUSIC'
-    /** Yandex Music */
-    | 'MISC.SOURCES.YANDEXMUSIC'
-    /** YouTube */
-    | 'MISC.SOURCES.YOUTUBE'
-    /** YouTube Music */
-    | 'MISC.SOURCES.YOUTUBEMUSIC'
-    /** Music by Quaver */
-    | 'MISC.STAGE_TOPIC'
-    /** Streaming */
-    | 'MISC.STREAMING'
-    /** your search */
-    | 'MISC.YOUR_SEARCH'
-    /** Disconnected as everyone left. */
-    | 'MUSIC.DISCONNECT.ALONE.DISCONNECTED.DEFAULT'
-    /** Disconnected as there was no one in the target channel. */
-    | 'MUSIC.DISCONNECT.ALONE.DISCONNECTED.MOVED'
-    /** -# Rejoin to resume your session. */
-    | 'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME'
-    /** Resuming your session. */
-    | 'MUSIC.DISCONNECT.ALONE.RESUMING'
-    /** There's nobody here. */
-    | 'MUSIC.DISCONNECT.ALONE.WARNING'
-    /** Disconnected due to inactivity. */
-    | 'MUSIC.DISCONNECT.INACTIVITY.DISCONNECTED'
-    /** Quaver will disconnect <t:%1:R>. */
-    | 'MUSIC.DISCONNECT.INACTIVITY.WARNING'
-    /** One moment please! Quaver is still starting up. */
-    | 'MUSIC.NOT_READY'
-    /** -# This may take a few seconds to apply */
-    | 'MUSIC.PLAYER.FILTER_NOTE'
-    /** Disabled looping as the queue is less than 15 seconds long. */
-    | 'MUSIC.PLAYER.LOOP_QUEUE_DISABLED'
-    /** Disabled looping as the track is less than 15 seconds long. */
-    | 'MUSIC.PLAYER.LOOP_TRACK_DISABLED'
-    /** There is nothing playing right now. */
-    | 'MUSIC.PLAYER.PLAYING.NOTHING'
-    /** Added by */
-    | 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.ADDED_BY'
-    /** Duration */
-    | 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.DURATION'
-    /** -# Remaining: %1 */
-    | 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.REMAINING'
-    /** Source */
-    | 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.SOURCE'
-    /** \*\*%1\*\* `[%2]` */
-    | 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TEXT'
-    /** ### Now playing */
-    | 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE'
-    /** Uploader */
-    | 'MUSIC.PLAYER.PLAYING.NOW.DETAILED.UPLOADER'
-    /** Source */
-    | 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE'
-    /** Now playing \*\*%1\*\* `[%2]` */
-    | 'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT'
-    /** Cleared queue as an error occurred multiple times consecutively. */
-    | 'MUSIC.PLAYER.QUEUE_CLEARED_ERROR'
-    /** -# Sorry for the inconvenience caused. */
-    | 'MUSIC.PLAYER.RESTARTING.APOLOGY'
-    /** Quaver has crashed and will disconnect. */
-    | 'MUSIC.PLAYER.RESTARTING.CRASHED'
-    /** Quaver is restarting and will disconnect. */
-    | 'MUSIC.PLAYER.RESTARTING.DEFAULT'
-    /** Your queue data has been attached. */
-    | 'MUSIC.PLAYER.RESTARTING.QUEUE_DATA_ATTACHED'
-    /** Skipped \*\*%1\*\* as an internal error prevented the track from loading. */
-    | 'MUSIC.PLAYER.TRACK_SKIPPED_ERROR'
-    /** There's nothing left in the queue. */
-    | 'MUSIC.QUEUE.EMPTY'
-    /** Added \*\*%1\*\* tracks from \*\*%2\*\* to queue */
-    | 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT'
-    /** Added \*\*%1\*\* tracks from \*\*%2\*\* to start of queue */
-    | 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.INSERTED'
-    /** Added \*\*%1\*\* to queue */
-    | 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT'
-    /** Added \*\*%1\*\* to start of queue */
-    | 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.INSERTED'
-    /** Session ended as Quaver was disconnected. */
-    | 'MUSIC.SESSION_ENDED.FORCED.DISCONNECTED'
-    /** Session ended as Quaver was moved to a stage channel that Quaver isn't a stage moderator of. */
-    | 'MUSIC.SESSION_ENDED.FORCED.STAGE_NOT_MODERATOR';
+export type LocaleKey = keyof LocaleStrings;
