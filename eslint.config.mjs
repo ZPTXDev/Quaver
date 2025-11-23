@@ -121,7 +121,7 @@ const reinforcedRules = {
 export default defineConfig(
     // ESLint recommended config only contains rules. This'll be our base rules
     eslint.configs.recommended,
-    // TSESLint recommended config handles rules, files, languageOptions: parser, plugin
+    // TSESLint recommended config handles rules, files, languageOptions: parser, plugin, sourceType
     tsEslint.configs.recommended,
     // Custom config
     [
