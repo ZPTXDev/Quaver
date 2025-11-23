@@ -123,3 +123,6 @@ dist/
 
 # Bun config
 bunfig.toml
+
+# Dev-only LocaleKeys file
+src/lib/util/LocaleKeys.d.ts
