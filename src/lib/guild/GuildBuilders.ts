@@ -16,7 +16,7 @@ export class GuildBuilders {
         this.guild = guild;
     }
 
-    buttonLocale(key: LocaleKey | string, ...args: string[]): ButtonBuilder {
+    buttonLocale(key: LocaleKey, ...args: string[]): ButtonBuilder {
         return new ButtonBuilder().setLabel(this.guild.locale(key, ...args));
     }
 
@@ -29,7 +29,7 @@ export class GuildBuilders {
     buttonToggles(customId: string, enabled: boolean): ButtonBuilder[] {
         return ['enable', 'disable'].map(
             (state): ButtonBuilder =>
-                this.buttonLocale(`MISC.${state.toUpperCase()}`)
+                this.buttonLocale(`MISC.${state.toUpperCase()}` as LocaleKey)
                     .setStyle(
                         state === 'enable'
                             ? enabled
@@ -44,12 +44,12 @@ export class GuildBuilders {
         );
     }
 
-    labelLocale(key: LocaleKey | string, ...args: string[]): LabelBuilder {
+    labelLocale(key: LocaleKey, ...args: string[]): LabelBuilder {
         return new LabelBuilder().setLabel(this.guild.locale(key, ...args));
     }
 
     stringSelectMenuLocale(
-        key: LocaleKey | string,
+        key: LocaleKey,
         ...args: string[]
     ): StringSelectMenuBuilder {
         return new StringSelectMenuBuilder().setPlaceholder(
@@ -57,7 +57,7 @@ export class GuildBuilders {
         );
     }
 
-    textDisplayLocale(key: LocaleKey | string, ...args: string[]): TextDisplayBuilder {
+    textDisplayLocale(key: LocaleKey, ...args: string[]): TextDisplayBuilder {
         return new TextDisplayBuilder().setContent(
             this.guild.locale(key, ...args),
         );

@@ -41,7 +41,7 @@ export class QuaverGuild<S extends Uninitialized | Initialized> {
 
     locale(
         this: QuaverGuild<Initialized>,
-        key: LocaleKey | string,
+        key: LocaleKey,
         ...args: string[]
     ): string {
         return getLocaleString(this.localeCode, key, ...args);

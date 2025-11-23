@@ -134,7 +134,9 @@ export type LocaleKey = keyof LocaleStrings;
 }
 
 // Run the script
-generateLocaleTypes().catch(error => {
-    console.error('Error generating locale types:', error);
+try {
+    await generateLocaleTypes();
+} catch (err) {
+    console.error(`Encountered error while generating locale types.\n${err.message}\n${err.stack}`);
     process.exit(1);
-});
+}

@@ -64,7 +64,7 @@ import { settings } from '#src/lib/util/settings';
  */
 export function getLocaleString(
     localeCode: string,
-    stringPath: LocaleKey | string,
+    stringPath: LocaleKey,
     ...vars: string[]
 ): string | 'LOCALE_MISSING' {
     if (!locales.get(localeCode)) return 'LOCALE_MISSING';
@@ -604,7 +604,7 @@ function buildSettingsPageSourceOptions(
         new StringSelectMenuBuilder().setCustomId('source').addOptions(
             Object.keys(acceptableSources).map(
                 (source: string): APISelectMenuOption => ({
-                    label: guild.locale(`MISC.SOURCES.${source.toUpperCase()}`),
+                    label: guild.locale(`MISC.SOURCES.${source.toUpperCase()}` as LocaleKey),
                     value: source,
                     default: current === source,
                 }),
