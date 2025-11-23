@@ -135,7 +135,7 @@ export default defineConfig(
                 ecmaVersion: 2022,
             },
             rules: {
-                // Override ESLint and TSESLint rules with our preferred rules
+                // Override some ESLint and TSESLint rules with our preferred rules
                 ...preferredRules,
                 // Lastly, let prettier override rules that may conflict with the rules above
                 ...eslintConfigPrettier.rules,
