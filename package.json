@@ -58,7 +58,7 @@
     "slash:delete:guild": "path-exists node_modules/.pnpm && node scripts/delete-guild-commands.js || bun scripts/delete-guild-commands.js",
     "migrate": "path-exists node_modules/.pnpm && node scripts/migrate.js || bun scripts/migrate.js",
     "generate-locale-types": "path-exists node_modules/.pnpm && node scripts/generate-locale-types.js || bun scripts/generate-locale-types.js",
-    "build": "rimraf dist/ && tsdown",
+    "build": "(path-exists node_modules/.pnpm && pnpm run generate-locale-types || bun run generate-locale-types) && rimraf dist/ && tsdown",
     "start": "path-exists node_modules/.pnpm && node . || bun .",
     "lint": "eslint . --ext .ts",
     "typecheck": "tsc --noEmit"
