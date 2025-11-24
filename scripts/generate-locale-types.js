@@ -95,9 +95,6 @@ async function generateLocaleTypes() {
         return `    /** ${displayValue} */\n    '${path}': string;`;
     }).join('\n');
 
-    // Generate union type from interface keys
-    const unionType = allPathsWithValues.map(({ path }) => `    | '${path}'`).join('\n');
-
     // Generate the TypeScript type definition file
     const typeDefinition = `/**
  * Auto-generated type definitions for locale string paths.
