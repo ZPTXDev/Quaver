@@ -101,4 +101,4 @@ export function checkLocaleCompletion(
     return { completion: 100, missing: [] };
 }
 
-export * from './LocaleKeys';
+export * from './types';
