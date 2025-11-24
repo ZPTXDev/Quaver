@@ -50,6 +50,9 @@ typings/
 # Optional npm cache directory
 .npm
 
+# Lock files (project uses pnpm-lock.yaml and bun.lock)
+package-lock.json
+
 # pnpm workspace
 .pnpm-workspace.yaml
 
@@ -120,3 +123,6 @@ dist/
 
 # Bun config
 bunfig.toml
+
+# Dev-only LocaleKeys file
+src/lib/util/LocaleKeys.d.ts

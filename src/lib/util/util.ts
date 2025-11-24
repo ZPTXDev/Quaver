@@ -25,6 +25,7 @@ import {
 } from 'discord.js';
 import { get } from 'lodash-es';
 import { readdirSync } from 'node:fs';
+import type { LocaleKey } from './LocaleKeys';
 import type {
     ColorTypes,
     LavaLyricsResponse,
@@ -72,7 +73,7 @@ import { settings } from '#src/lib/util/settings';
  */
 export function getLocaleString(
     localeCode: string,
-    stringPath: string,
+    stringPath: LocaleKey,
     ...vars: string[]
 ): string | 'LOCALE_MISSING' {
     if (!locales.get(localeCode)) return 'LOCALE_MISSING';
@@ -406,7 +407,7 @@ async function buildSettingsPagePremiumOptions(
         .map(
             (key: WhitelistedFeatures): string =>
                 `**${guild.locale(
-                    `CMD.SETTINGS.MISC.PREMIUM.FEATURES.${key.toUpperCase()}`,
+                    `CMD.SETTINGS.MISC.PREMIUM.FEATURES.${key.toUpperCase()}` as LocaleKey,
                 )}** ─ ${
                     !whitelisted[key]
                         ? guild.locale(
@@ -612,7 +613,9 @@ function buildSettingsPageSourceOptions(
         new StringSelectMenuBuilder().setCustomId('source').addOptions(
             Object.keys(acceptableSources).map(
                 (source: string): APISelectMenuOption => ({
-                    label: guild.locale(`MISC.SOURCES.${source.toUpperCase()}`),
+                    label: guild.locale(
+                        `MISC.SOURCES.${source.toUpperCase()}` as LocaleKey,
+                    ),
                     value: source,
                     default: current === source,
                 }),
@@ -681,7 +684,7 @@ export async function buildSettingsPage(
             actionRow.addComponents(...components);
             containers.push(...container);
             current = `\`${guild.locale(
-                `CMD.SETTINGS.MISC.FORMAT.OPTIONS.${current.toUpperCase()}`,
+                `CMD.SETTINGS.MISC.FORMAT.OPTIONS.${current.toUpperCase()}` as LocaleKey,
             )}\``;
             break;
         }
@@ -708,7 +711,7 @@ export async function buildSettingsPage(
             );
             actionRow.addComponents(...components);
             current = `\`${guild.locale(
-                `MISC.SOURCES.${current.toUpperCase()}`,
+                `MISC.SOURCES.${current.toUpperCase()}` as LocaleKey,
             )}\``;
             break;
         }
@@ -745,9 +748,9 @@ export async function buildSettingsPage(
                     'CMD.SETTINGS.RESPONSE.HEADER',
                     guild.name,
                 )}\n\n**${guild.locale(
-                    `CMD.SETTINGS.MISC.${option.toUpperCase()}.NAME`,
+                    `CMD.SETTINGS.MISC.${option.toUpperCase()}.NAME` as LocaleKey,
                 )}** ─ ${guild.locale(
-                    `CMD.SETTINGS.MISC.${option.toUpperCase()}.DESCRIPTION`,
+                    `CMD.SETTINGS.MISC.${option.toUpperCase()}.DESCRIPTION` as LocaleKey,
                 )}${
                     current
                         ? `\n> ${guild.locale('MISC.CURRENT')}: ${current}`
@@ -765,10 +768,10 @@ export async function buildSettingsPage(
                         settingsOptions.map(
                             (opt): SelectMenuComponentOptionData => ({
                                 label: guild.locale(
-                                    `CMD.SETTINGS.MISC.${opt.toUpperCase()}.NAME`,
+                                    `CMD.SETTINGS.MISC.${opt.toUpperCase()}.NAME` as LocaleKey,
                                 ),
                                 description: guild.locale(
-                                    `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION`,
+                                    `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION` as LocaleKey,
                                 ),
                                 value: opt,
                                 default: opt === option,

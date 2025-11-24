@@ -10,6 +10,7 @@ import {
 } from 'discord.js';
 import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
+import type { LocaleKey } from '#src/lib/util/LocaleKeys';
 import { MessageOptionsBuilderType } from '#src/lib/util/common';
 import { settings } from '#src/lib/util/settings';
 import {
@@ -142,7 +143,7 @@ export default new ChatInputCommandHandler()
                               new ActionRowBuilder<ButtonBuilder>().addComponents(
                                   guild.builders
                                       .buttonLocale(
-                                          `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}`,
+                                          `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}` as LocaleKey,
                                       )
                                       .setStyle(ButtonStyle.Secondary)
                                       .setCustomId(

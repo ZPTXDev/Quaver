@@ -20,6 +20,7 @@ import { ForceType } from '#src/lib';
 import { ButtonHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import type { QuaverPlayer } from '#src/lib/music';
+import type { LocaleKey } from '#src/lib/util/LocaleKeys';
 import {
     logger,
     MessageOptionsBuilderType,
@@ -136,7 +137,7 @@ export default new ButtonHandler()
                 );
                 return;
             }
-            let msg,
+            let msg: LocaleKey,
                 extras = [];
             if (resolvedTracks.length === 1) {
                 msg = 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
