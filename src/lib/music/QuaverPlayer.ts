@@ -6,13 +6,7 @@ import {
 } from '#src/lib';
 import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
 import { logger } from '#src/lib/logger';
-import {
-    buildMessageOptions,
-    type QuaverChannels,
-    type QuaverQueue,
-    type QuaverSong,
-    settings,
-} from '#src/lib/util';
+import { buildMessageOptions, type QuaverChannels, type QuaverQueue, type QuaverSong, settings, } from '#src/lib/util';
 import type { PlayerEffect } from '@lavaclient/plugin-effects';
 import { type LoopType, Queue } from '@lavaclient/plugin-queue';
 import {
@@ -287,8 +281,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      */
     async setBassboost(enabled: boolean): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
-        const response = await this.effects.toggle(effects.bassboost);
-        if (response !== enabled) {
+        if (
+            enabled !==
+            !!this.effects.toJSON().find((e): boolean => e.id === 'bassboost')
+        ) {
             await this.effects.toggle(effects.bassboost);
         }
         this.memory.bassboost = enabled;
@@ -491,8 +487,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      */
     async setNightcore(enabled: boolean): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
-        const response = await this.effects.toggle(effects.nightcore);
-        if (response !== enabled) {
+        if (
+            enabled !==
+            !!this.effects.toJSON().find((e): boolean => e.id === 'nightcore')
+        ) {
             await this.effects.toggle(effects.nightcore);
         }
         this.memory.nightcore = enabled;
