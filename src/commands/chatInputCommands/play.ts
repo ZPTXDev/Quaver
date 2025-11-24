@@ -11,6 +11,7 @@ import {
 import { LavalinkWSClientState } from 'lavalink-ws-client';
 import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
+import type { LocaleKey } from '#src/lib/util/LocaleKeys';
 import { MessageOptionsBuilderType } from '#src/lib/util/common';
 import type { QuaverChannels, QuaverSong } from '#src/lib/util/common.d';
 import {
@@ -18,7 +19,6 @@ import {
     Check,
     queryOverrides,
 } from '#src/lib/util/constants';
-import type { LocaleKey } from '#src/lib/util/LocaleKeys';
 import { settings } from '#src/lib/util/settings';
 import {
     getLocaleString,

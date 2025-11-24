@@ -10,12 +10,15 @@ import {
     ThumbnailBuilder,
 } from 'discord.js';
 import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
+import type { LocaleKey } from '#src/lib/util/LocaleKeys';
 import { logger } from '#src/lib/util/common';
 import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.d';
 import { settings } from '#src/lib/util/settings';
-import { formatLavaLyricsResponse, getTrackMarkdownLocaleString } from '#src/lib/util/util';
+import {
+    formatLavaLyricsResponse,
+    getTrackMarkdownLocaleString,
+} from '#src/lib/util/util';
 import type { LavaLyricsResponse } from '#src/lib/util/util.d';
-import type { LocaleKey } from '#src/lib/util/LocaleKeys';
 
 export default {
     name: 'trackStart',

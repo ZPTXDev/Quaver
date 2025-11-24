@@ -10,11 +10,15 @@ import {
 } from 'discord.js';
 import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
+import type { LocaleKey } from '#src/lib/util/LocaleKeys';
 import { MessageOptionsBuilderType } from '#src/lib/util/common';
 import { settings } from '#src/lib/util/settings';
-import { formatLavaLyricsResponse, formatResponse, getLocaleString } from '#src/lib/util/util';
+import {
+    formatLavaLyricsResponse,
+    formatResponse,
+    getLocaleString,
+} from '#src/lib/util/util';
 import type { LavaLyricsResponse } from '#src/lib/util/util.d';
-import type { LocaleKey } from '#src/lib/util/LocaleKeys';
 
 export default new ChatInputCommandHandler()
     .setData(

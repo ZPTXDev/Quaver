@@ -2,6 +2,7 @@ import type { ApplicationCommandOptionChoiceData } from 'discord.js';
 import { request } from 'undici';
 import { AutocompleteHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
+import type { LocaleKey } from '#src/lib/util/LocaleKeys';
 import { cache } from '#src/lib/util/common';
 import {
     acceptableSources,
@@ -9,7 +10,6 @@ import {
     sourceList,
     YOUTUBE_AUTOCOMPLETE_URL,
 } from '#src/lib/util/constants';
-import type { LocaleKey } from '#src/lib/util/LocaleKeys';
 
 export default new AutocompleteHandler().setExecute(
     async function(interaction): Promise<void> {
@@ -23,7 +23,9 @@ export default new AutocompleteHandler().setExecute(
             ? sourceList[matchingOverride]
             : ((await guild.settings.get<string>('source')) ??
               Object.keys(acceptableSources)[0]);
-        const sourceName = guild.locale(`MISC.SOURCES.${source.toUpperCase()}` as LocaleKey);
+        const sourceName = guild.locale(
+            `MISC.SOURCES.${source.toUpperCase()}` as LocaleKey,
+        );
         const query = matchingOverride
             ? focused.slice(matchingOverride.length)
             : focused;
