@@ -31,6 +31,36 @@ export default {
             message: `[G ${guild.id}] Starting track`,
             label: 'Quaver',
         });
+        if (queue.player.memory.alternate) {
+            const whitelisted =
+                await guild.features.checkWhitelisted('smartqueue');
+            if (
+                whitelisted === WhitelistStatus.NotWhitelisted ||
+                whitelisted === WhitelistStatus.Expired
+            ) {
+                await queue.player.setAlternate(false);
+            }
+        }
+        const transformsActive =
+            queue.player.memory.shuffle || queue.player.memory.alternate;
+        if (transformsActive) {
+            // Remove this track from the canonical originalQueue snapshot
+            if (queue.player.memory.originalQueue) {
+                const base = queue.player.memory.originalQueue;
+                const idx = base.findIndex(
+                    (s: QuaverSong): boolean => s.id === track.id,
+                );
+                if (idx !== -1) base.splice(idx, 1);
+            }
+            // And from the stable shuffled order, if present
+            if (queue.player.memory.shuffledQueue) {
+                const i = queue.player.memory.shuffledQueue.indexOf(track.id);
+                if (i !== -1) queue.player.memory.shuffledQueue.splice(i, 1);
+            }
+            // Recompute the transformed queue (shuffle + alternate) for the
+            // upcoming tracks, taking the new current into account.
+            queue.player.recomputeQueue();
+        }
         await queue.player.pause(false);
         guild.sendWebUpdate('pauseUpdate', queue.player.paused);
         if (queue.player.timeout.standard) {
@@ -109,7 +139,7 @@ export default {
                         ),
                 );
                 break;
-            case 'detailed': {
+            case 'detailed':
                 await queue.player.sendMessage(
                     new ContainerBuilder()
                         .addSectionComponents(
@@ -159,7 +189,6 @@ export default {
                             ),
                         ),
                 );
-            }
         }
         if (settings.features.autolyrics.enabled) {
             if (!(await guild.settings.get<boolean>('autolyrics'))) {

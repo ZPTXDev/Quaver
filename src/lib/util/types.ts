@@ -59,6 +59,7 @@ export type QuaverChannels = TextChannel | VoiceChannel | StageChannel;
 export type QuaverSong = Song & {
     requesterTag?: string;
     requesterAvatar?: string;
+    id?: string;
 };
 
 export type QuaverQueue = Queue & {

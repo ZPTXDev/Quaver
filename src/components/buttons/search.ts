@@ -128,6 +128,9 @@ export default new ButtonHandler()
                 const result =
                     await interaction.client.music.api.loadTracks(track);
                 if (result.loadType === 'track') {
+                    const data: QuaverSong = result.data;
+                    data.requesterId = interaction.user.id;
+                    data.id = crypto.randomUUID();
                     resolvedTracks.push(result.data);
                 }
             }
@@ -189,35 +192,28 @@ export default new ButtonHandler()
                     await player.disconnect();
                     return;
                 }
+                const smartQueue =
+                    await guild.settings.get<boolean>('smartqueue');
+                if (smartQueue) {
+                    await player.setAlternate(true);
+                }
             }
-            const firstPosition = player.queue.tracks.length + 1;
-            const endPosition = firstPosition + resolvedTracks.length - 1;
-            player.queue.add(resolvedTracks, {
-                requester: interaction.user.id,
-            });
-            const started = player.playing || player.paused;
-            const smartQueue = await guild.settings.get<boolean>('smartqueue');
+            const position = await player.addTracksToQueue(resolvedTracks);
             await interaction.replyHandler.reply(
                 new ContainerBuilder().addTextDisplayComponents(
                     guild.builders.textDisplayLocale(msg, ...extras),
-                    ...(started && !smartQueue
+                    ...(position !== '0'
                         ? [
                               new TextDisplayBuilder().setContent(
                                   `${guild.locale(
                                       'MISC.POSITION',
-                                  )}: ${firstPosition}${
-                                      endPosition !== firstPosition
-                                          ? ` - ${endPosition}`
-                                          : ''
-                                  }`,
+                                  )}: ${position}`,
                               ),
                           ]
                         : []),
                 ),
                 { type: MessageOptionsBuilderType.Success, components: [] },
             );
-            if (!started) await player.queue.start();
-            if (smartQueue) await player.sortQueue();
             guild.sendWebUpdate(
                 'queueUpdate',
                 player.queue.tracks.map((track: QuaverSong): QuaverSong => {

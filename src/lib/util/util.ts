@@ -187,44 +187,6 @@ export async function getFailedChecks(
 }
 
 /**
- * Returns a sorted queue to ensure all requesters have a fair chance of playing their track.
- * @param queue - The queue to sort.
- * @returns The sorted queue.
- */
-export function sortQueue(queue: QuaverSong[]): QuaverSong[] {
-    if (queue.length === 0) return [];
-    const sorted = [];
-    const copy = [...queue];
-    while (copy.length > 0) {
-        // sorted is empty, so we start it off
-        if (sorted.length === 0) {
-            sorted.push(copy.shift());
-            continue;
-        }
-        if (
-            // the last requester is the same as the next requester
-            sorted[sorted.length - 1].requesterId === copy[0].requesterId &&
-            // and there is more than 1 requester in the queue
-            new Set(copy.map((song): Snowflake => song.requesterId)).size >= 2
-        ) {
-            // deal with the next requester later, move them to the next position behind another requester
-            copy.splice(
-                copy.findIndex(
-                    (element: QuaverSong): boolean =>
-                        element.requesterId !== copy[0].requesterId,
-                ),
-                0,
-                copy.shift(),
-            );
-            continue;
-        }
-        // the last requester is not the same as the next requester, or there is only 1 requester in the queue
-        sorted.push(copy.shift());
-    }
-    return sorted;
-}
-
-/**
  * Formats LyricResponse into a string.
  * @param json - The LyricsResponse object.
  * @param player - The QuaverPlayer object. (for marking position in lyrics)

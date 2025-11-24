@@ -106,14 +106,24 @@ export default {
                 const result = await client.music.api.loadTracks(searchQuery);
                 switch (result.loadType) {
                     case 'playlist':
-                        tracks = [...result.data.tracks];
+                        tracks = [
+                            ...result.data.tracks.map(
+                                (t: QuaverSong): QuaverSong => {
+                                    t.requesterId = socket.user.id;
+                                    t.id = crypto.randomUUID();
+                                    return t;
+                                },
+                            ),
+                        ];
                         break;
                     case 'track':
                     case 'search': {
-                        const track =
+                        const track: QuaverSong =
                             result.loadType === 'search'
                                 ? result.data[0]
                                 : result.data;
+                        track.requesterId = socket.user.id;
+                        track.id = crypto.randomUUID();
                         tracks = [track];
                         break;
                     }
@@ -142,16 +152,13 @@ export default {
                         await player.disconnect();
                         return callback({ status: Response.GenericError });
                     }
+                    const smartQueue =
+                        await guild.settings.get<boolean>('smartqueue');
+                    if (smartQueue) {
+                        await player.setAlternate(true);
+                    }
                 }
-                player.queue.add(tracks, {
-                    requester: socket.user.id,
-                    next: false,
-                });
-                const started = player.playing || player.paused;
-                const smartQueue =
-                    await guild.settings.get<boolean>('smartqueue');
-                if (!started) await player.queue.start();
-                if (smartQueue) await player.sortQueue();
+                await player.addTracksToQueue(tracks);
                 guild.sendWebUpdate(
                     'queueUpdate',
                     player.queue.tracks.map((track: QuaverSong): QuaverSong => {
@@ -299,10 +306,7 @@ export default {
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
-                const response = await player.shuffleQueue();
-                if (response !== PlayerResponse.Success) {
-                    return callback({ status: Response.GenericError });
-                }
+                await player.setShuffle(item.value);
                 break;
             }
             case UpdateItemType.StayFeature: {

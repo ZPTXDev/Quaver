@@ -277,9 +277,12 @@ export default {
     },
     SHUFFLE: {
         DESCRIPTION: 'Shuffle the queue.',
+        OPTION: {
+            ENABLED: 'Whether or not shuffle is enabled. If not specified, it will be toggled.',
+        },
         RESPONSE: {
-            QUEUE_INSUFFICIENT_TRACKS: 'There aren\'t enough tracks in the queue to perform a shuffle.',
-            SUCCESS: 'Shuffled the queue.',
+            DISABLED: 'Shuffle has been **disabled**',
+            ENABLED: 'Shuffle has been **enabled**',
         },
     },
     SKIP: {

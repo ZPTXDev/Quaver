@@ -12,7 +12,6 @@ import {
     type QuaverQueue,
     type QuaverSong,
     settings,
-    sortQueue,
 } from '#src/lib/util';
 import type { PlayerEffect } from '@lavaclient/plugin-effects';
 import { type LoopType, Queue } from '@lavaclient/plugin-queue';
@@ -91,10 +90,16 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             required: number;
             users: Snowflake[];
         };
+        shuffle: boolean;
+        alternate: boolean;
+        originalQueue?: QuaverSong[];
+        shuffledQueue?: string[];
         failureCount?: number;
     } = {
         bassboost: false,
         nightcore: false,
+        shuffle: false,
+        alternate: false,
     };
 
     constructor(node: TNode, guild: Guild) {
@@ -158,6 +163,61 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             }
             return undefined;
         }
+    }
+
+    /**
+     * Add a track to the queue.
+     * @param tracks - The track(s) to add.
+     * @param next - Whether or not to insert the track in the next position.
+     * @returns The position of the track in the queue. (e.g. 1 - 10, 34, etc.)
+     */
+    async addTracksToQueue(
+        tracks: QuaverSong | QuaverSong[],
+        next = false,
+    ): Promise<string> {
+        const added = Array.isArray(tracks) ? tracks : [tracks];
+        const wasEmptyBeforeAdd =
+            !this.queue.current && this.queue.tracks.length === 0;
+        this.queue.add(added, { next });
+        const transformsActive = this.memory.shuffle || this.memory.alternate;
+        if (transformsActive) {
+            if (!this.memory.originalQueue) {
+                this.memory.originalQueue = [...this.queue.tracks];
+            } else if (next && this.queue.current) {
+                const base = this.memory.originalQueue;
+                base.splice(0, 0, ...added);
+            } else {
+                this.memory.originalQueue.push(...added);
+            }
+            this.recomputeQueue();
+        }
+        const positions: number[] = [];
+        const ids = new Set(added.map((t): string => t.id));
+        if (wasEmptyBeforeAdd) {
+            positions.push(0);
+            for (let i = 1; i < added.length; i++) {
+                positions.push(i);
+            }
+        } else {
+            for (let i = 0; i < this.queue.tracks.length; i++) {
+                if (ids.has(this.queue.tracks[i].id)) {
+                    positions.push(i + 1);
+                }
+            }
+        }
+        let result: string;
+        if (positions.length === 1) {
+            result = positions[0].toString();
+        } else if (positions.length === 2) {
+            result = `${positions[0]} - ${positions[1]}`;
+        } else {
+            const firstFive = positions.slice(0, 5).join(', ');
+            result = positions.length > 5 ? `${firstFive}, ...` : firstFive;
+        }
+        if (!this.playing && !this.paused) {
+            await this.queue.start();
+        }
+        return result;
     }
 
     /**
@@ -274,6 +334,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         }
         const guild = await QuaverGuild.wrap(this.guild);
         this.queue.clear();
+        delete this.memory.originalQueue;
+        delete this.memory.shuffledQueue;
         guild.sendWebUpdate('queueUpdate', []);
         return PlayerResponse.Success;
     }
@@ -366,30 +428,57 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             return PlayerResponse.QueueInsufficientTracks;
         }
         if (
+            oldPosition < 1 ||
+            newPosition < 1 ||
             oldPosition > this.queue.tracks.length ||
             newPosition > this.queue.tracks.length
         ) {
             return PlayerResponse.InputOutOfRange;
         }
-        if (oldPosition === newPosition) return PlayerResponse.InputInvalid;
         const guild = await QuaverGuild.wrap(this.guild);
-        this.queue.tracks.splice(
-            newPosition - 1,
-            0,
-            this.queue.tracks.splice(oldPosition - 1, 1)[0],
-        );
+        const transformsActive = this.memory.shuffle || this.memory.alternate;
+        // When no transforms, move from this.queue.tracks directly
+        if (!transformsActive) {
+            const moved = this.queue.tracks.splice(oldPosition - 1, 1)[0];
+            this.queue.tracks.splice(newPosition - 1, 0, moved);
+            guild.sendWebUpdate(
+                'queueUpdate',
+                this.queue.tracks.map(
+                    (t): QuaverSong => ({
+                        ...t,
+                        requesterTag: this.client.users.cache.get(t.requesterId)
+                            ?.tag,
+                        requesterAvatar: this.client.users.cache.get(
+                            t.requesterId,
+                        )?.avatar,
+                    }),
+                ),
+            );
+            return PlayerResponse.Success;
+        }
+        const visible = this.queue.tracks;
+        const fromSong = visible[oldPosition - 1];
+        const toSong = visible[newPosition - 1];
+        const base = this.memory.originalQueue!;
+        const fromIdx = base.findIndex((s): boolean => s.id === fromSong.id);
+        let toIdx = base.findIndex((s): boolean => s.id === toSong.id);
+        if (fromIdx === -1 || toIdx === -1) return PlayerResponse.InputInvalid;
+        const [moved] = base.splice(fromIdx, 1);
+        if (fromIdx < toIdx) toIdx--;
+        base.splice(toIdx, 0, moved);
+        this.recomputeQueue();
         guild.sendWebUpdate(
             'queueUpdate',
-            this.queue.tracks.map((t: QuaverSong): QuaverSong => {
-                const user = this.client.users.cache.get(t.requesterId);
-                t.requesterTag = user?.tag;
-                t.requesterAvatar = user?.avatar;
-                return t;
-            }),
+            this.queue.tracks.map(
+                (t): QuaverSong => ({
+                    ...t,
+                    requesterTag: this.client.users.cache.get(t.requesterId)
+                        ?.tag,
+                    requesterAvatar: this.client.users.cache.get(t.requesterId)
+                        ?.avatar,
+                }),
+            ),
         );
-        if (await guild.settings.get<boolean>('smartqueue')) {
-            await this.sortQueue();
-        }
         return PlayerResponse.Success;
     }
 
@@ -440,26 +529,42 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @returns Whether or not the track was removed.
      */
     async removeQueuedTrack(position: number): Promise<PlayerResponse> {
-        if (this.queue.tracks.length === 0) {
+        if (this.queue.tracks.length === 0)
             return PlayerResponse.QueueInsufficientTracks;
-        }
-        if (position > this.queue.tracks.length) {
+        if (position < 1 || position > this.queue.tracks.length)
             return PlayerResponse.InputOutOfRange;
-        }
         const guild = await QuaverGuild.wrap(this.guild);
+        const transformsActive = this.memory.shuffle || this.memory.alternate;
+        const visible = this.queue.tracks;
+        const removedSong = visible[position - 1];
         this.queue.remove(position - 1);
+        if (transformsActive && this.memory.originalQueue) {
+            // Remove from canonical order
+            const base = this.memory.originalQueue;
+            const baseIdx = base.findIndex(
+                (s): boolean => s.id === removedSong.id,
+            );
+            if (baseIdx !== -1) base.splice(baseIdx, 1);
+            // Remove from shuffledQueue if present
+            if (this.memory.shuffledQueue) {
+                const idx = this.memory.shuffledQueue.indexOf(removedSong.id);
+                if (idx !== -1) this.memory.shuffledQueue.splice(idx, 1);
+            }
+            // Recompute final visible queue
+            this.recomputeQueue();
+        }
         guild.sendWebUpdate(
             'queueUpdate',
-            this.queue.tracks.map((t: QuaverSong): QuaverSong => {
-                const user = this.client.users.cache.get(t.requesterId);
-                t.requesterTag = user?.tag;
-                t.requesterAvatar = user?.avatar;
-                return t;
-            }),
+            this.queue.tracks.map(
+                (t): QuaverSong => ({
+                    ...t,
+                    requesterTag: this.client.users.cache.get(t.requesterId)
+                        ?.tag,
+                    requesterAvatar: this.client.users.cache.get(t.requesterId)
+                        ?.avatar,
+                }),
+            ),
         );
-        if (await guild.settings.get<boolean>('smartqueue')) {
-            await this.sortQueue();
-        }
         return PlayerResponse.Success;
     }
 
@@ -475,33 +580,127 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         if (this.queue.current.info.isStream) {
             return PlayerResponse.PlayerIsStream;
         }
-        if (position > this.queue.current.info.length) {
+        if (position < 0 || position > this.queue.current.info.length) {
             return PlayerResponse.InputOutOfRange;
         }
         await this.seek(position);
         return PlayerResponse.Success;
     }
 
+    private shuffleQueue(base: QuaverSong[]): QuaverSong[] {
+        if (base.length === 0) return [];
+        const ids = base.map((s): string => s.id);
+        // If we already have a shuffledQueue, reuse it and only
+        // sync changes (added/removed tracks) instead of reshuffling.
+        if (!this.memory.shuffledQueue) {
+            // Initial shuffle: Fisher–Yates on ids
+            const arr = [...ids];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            this.memory.shuffledQueue = arr;
+        } else {
+            // Sync existing shuffledQueue with current base
+            const inBase = new Set(ids);
+            // 1. Drop ids that no longer exist
+            const shuffled = this.memory.shuffledQueue.filter((id): boolean =>
+                inBase.has(id),
+            );
+            // 2. Add new ids (those not in shuffled yet) at random positions
+            const inShuffled = new Set(shuffled);
+            const missing = ids.filter((id): boolean => !inShuffled.has(id));
+            for (const id of missing) {
+                const pos = Math.floor(Math.random() * (shuffled.length + 1));
+                shuffled.splice(pos, 0, id);
+            }
+            this.memory.shuffledQueue = shuffled;
+        }
+        const byId = new Map<string, QuaverSong>(
+            base.map((song): [string, QuaverSong] => [song.id, song]),
+        );
+        return this.memory.shuffledQueue
+            .map((id): QuaverSong | undefined => byId.get(id))
+            .filter((s): s is QuaverSong => !!s);
+    }
+
+    private alternateQueue(base: QuaverSong[]): QuaverSong[] {
+        if (base.length === 0) return [];
+        const groups = new Map<Snowflake, QuaverSong[]>();
+        for (const song of base) {
+            if (!groups.has(song.requesterId)) groups.set(song.requesterId, []);
+            groups.get(song.requesterId)!.push(song);
+        }
+        const result: QuaverSong[] = [];
+        while ([...groups.values()].some((g): boolean => g.length > 0)) {
+            for (const songs of groups.values()) {
+                if (songs.length > 0) {
+                    result.push(songs.shift()!);
+                }
+            }
+        }
+        return result;
+    }
+
+    recomputeQueue(): void {
+        const transformsActive = this.memory.shuffle || this.memory.alternate;
+        if (!transformsActive) {
+            delete this.memory.originalQueue;
+            delete this.memory.shuffledQueue;
+            return;
+        }
+        const current = this.queue.current || null;
+        const currentId = current?.id;
+        // baseSource EXCLUDES current track
+        const baseSource =
+            (this.memory.originalQueue ??
+                this.queue.tracks.filter(
+                    (t: QuaverSong): boolean => t.id !== currentId,
+                )) ||
+            [];
+        let transformed = [...baseSource];
+        if (this.memory.shuffle) {
+            transformed = this.shuffleQueue(transformed);
+        } else {
+            delete this.memory.shuffledQueue;
+        }
+        if (this.memory.alternate) {
+            // INCLUDE current for fairness
+            const withCurrent = current
+                ? [current, ...transformed]
+                : transformed;
+            const alternated = this.alternateQueue(withCurrent);
+            // REMOVE current again after alternation
+            transformed = alternated.filter((t): boolean => t.id !== currentId);
+        }
+        this.queue.tracks = transformed;
+    }
+
     /**
-     * Shuffle the queue.
-     * @returns Whether or not the queue was shuffled.
+     * Toggle shuffle.
+     * @param enabled - Whether or not to enable shuffle.
+     * @returns Whether or not shuffle was enabled.
      */
-    async shuffleQueue(): Promise<PlayerResponse> {
-        if (this.queue.tracks.length <= 1) {
-            return PlayerResponse.QueueInsufficientTracks;
-        }
+    async setShuffle(enabled: boolean): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
-        let currentIndex = this.queue.tracks.length,
-            randomIndex;
-        while (currentIndex !== 0) {
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex--;
-            [this.queue.tracks[currentIndex], this.queue.tracks[randomIndex]] =
-                [
-                    this.queue.tracks[randomIndex],
-                    this.queue.tracks[currentIndex],
-                ];
+        const wasActive = this.memory.shuffle || this.memory.alternate;
+        this.memory.shuffle = enabled;
+        const isActive = this.memory.shuffle || this.memory.alternate;
+        if (!wasActive && isActive) {
+            // First time any transform is turned on → snapshot.
+            this.memory.originalQueue = [...this.queue.tracks];
         }
+        if (wasActive && !isActive) {
+            // All transforms are now off → restore and clear state.
+            if (this.memory.originalQueue) {
+                this.queue.tracks = [...this.memory.originalQueue];
+            }
+            delete this.memory.originalQueue;
+            delete this.memory.shuffledQueue;
+        } else {
+            this.recomputeQueue();
+        }
+        guild.sendWebUpdate('shuffleUpdate', { enabled });
         guild.sendWebUpdate(
             'queueUpdate',
             this.queue.tracks.map((t: QuaverSong): QuaverSong => {
@@ -511,17 +710,15 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
                 return t;
             }),
         );
-        if (await guild.settings.get<boolean>('smartqueue')) {
-            await this.sortQueue();
-        }
         return PlayerResponse.Success;
     }
 
     /**
-     * Sort the queue. (Smart Queue)
-     * @returns Whether or not the queue was sorted.
+     * Toggle alternating (smart queue).
+     * @param enabled - Whether or not to enable alternating.
+     * @returns Whether or not alternating was enabled.
      */
-    async sortQueue(): Promise<PlayerResponse> {
+    async setAlternate(enabled: boolean): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
         if (!settings.features.smartqueue.enabled) {
             return PlayerResponse.FeatureDisabled;
@@ -536,7 +733,24 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
                 return PlayerResponse.FeatureNotWhitelisted;
             }
         }
-        this.queue.tracks = sortQueue(this.queue.tracks);
+        const wasActive = this.memory.shuffle || this.memory.alternate;
+        this.memory.alternate = enabled;
+        const isActive = this.memory.shuffle || this.memory.alternate;
+        if (!wasActive && isActive) {
+            // First time any transform is turned on → snapshot.
+            this.memory.originalQueue = [...this.queue.tracks];
+        }
+        if (wasActive && !isActive) {
+            // All transforms off → restore and clear.
+            if (this.memory.originalQueue) {
+                this.queue.tracks = [...this.memory.originalQueue];
+            }
+            delete this.memory.originalQueue;
+            delete this.memory.shuffledQueue;
+        } else {
+            this.recomputeQueue();
+        }
+        guild.sendWebUpdate('smartQueueFeatureUpdate', { enabled });
         guild.sendWebUpdate(
             'queueUpdate',
             this.queue.tracks.map((t: QuaverSong): QuaverSong => {
@@ -591,6 +805,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         }
         const guild = await QuaverGuild.wrap(this.guild);
         this.queue.clear();
+        delete this.memory.originalQueue;
+        delete this.memory.shuffledQueue;
         await this.queue.skip();
         await this.queue.start();
         guild.sendWebUpdate('queueUpdate', []);

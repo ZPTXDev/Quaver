@@ -141,7 +141,13 @@ export default new ChatInputCommandHandler()
             await interaction.client.music.api.loadTracks(searchQuery);
         switch (result.loadType) {
             case 'playlist':
-                tracks = [...result.data.tracks] as unknown as QuaverSong[];
+                tracks = [
+                    ...result.data.tracks.map((t: QuaverSong): QuaverSong => {
+                        t.requesterId = interaction.user.id;
+                        t.id = crypto.randomUUID();
+                        return t;
+                    }),
+                ];
                 msg = insert
                     ? 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.INSERTED'
                     : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
@@ -154,8 +160,10 @@ export default new ChatInputCommandHandler()
                 break;
             case 'track':
             case 'search': {
-                const track =
+                const track: QuaverSong =
                     result.loadType === 'search' ? result.data[0] : result.data;
+                track.requesterId = interaction.user.id;
+                track.id = crypto.randomUUID();
                 tracks = [track];
                 msg = insert
                     ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.INSERTED'
@@ -219,31 +227,25 @@ export default new ChatInputCommandHandler()
                 await player.disconnect();
                 return;
             }
+            const smartQueue = await guild.settings.get<boolean>('smartqueue');
+            if (smartQueue) {
+                await player.setAlternate(true);
+            }
         }
-        const firstPosition = insert ? 1 : player.queue.tracks.length + 1;
-        const endPosition = firstPosition + tracks.length - 1;
-        player.queue.add(tracks, {
-            requester: interaction.user.id,
-            next: insert,
-        });
-        const started = player.playing || player.paused;
-        const smartQueue = await guild.settings.get<boolean>('smartqueue');
+        const position = await player.addTracksToQueue(tracks, insert);
         await interaction.replyHandler.reply(
             new ContainerBuilder().addTextDisplayComponents(
                 guild.builders.textDisplayLocale(msg as LocaleKey, ...extras),
-                new TextDisplayBuilder().setContent(
-                    `-# ${guild.locale('MISC.POSITION')}: ${firstPosition}${
-                        endPosition !== firstPosition ? ` - ${endPosition}` : ''
-                    }`,
-                ),
+                ...(position !== '0'
+                    ? [
+                          new TextDisplayBuilder().setContent(
+                              `-# ${guild.locale('MISC.POSITION')}: ${position}`,
+                          ),
+                      ]
+                    : []),
             ),
-            {
-                type: MessageOptionsBuilderType.Success,
-                ephemeral: true,
-            },
+            { type: MessageOptionsBuilderType.Success },
         );
-        if (!started) await player.queue.start();
-        if (smartQueue) await player.sortQueue();
         guild.sendWebUpdate(
             'queueUpdate',
             player.queue.tracks.map((track: QuaverSong): QuaverSong => {
