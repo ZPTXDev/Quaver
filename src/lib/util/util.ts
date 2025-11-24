@@ -398,7 +398,7 @@ async function buildSettingsPagePremiumOptions(
         .map(
             (key: WhitelistedFeatures): string =>
                 `**${guild.locale(
-                    `CMD.SETTINGS.MISC.PREMIUM.FEATURES.${key.toUpperCase()}`,
+                    `CMD.SETTINGS.MISC.PREMIUM.FEATURES.${key.toUpperCase()}` as LocaleKey,
                 )}** ─ ${
                     !whitelisted[key]
                         ? guild.locale(
@@ -673,7 +673,7 @@ export async function buildSettingsPage(
             actionRow.addComponents(...components);
             containers.push(...container);
             current = `\`${guild.locale(
-                `CMD.SETTINGS.MISC.FORMAT.OPTIONS.${current.toUpperCase()}`,
+                `CMD.SETTINGS.MISC.FORMAT.OPTIONS.${current.toUpperCase()}` as LocaleKey,
             )}\``;
             break;
         }
@@ -700,7 +700,7 @@ export async function buildSettingsPage(
             );
             actionRow.addComponents(...components);
             current = `\`${guild.locale(
-                `MISC.SOURCES.${current.toUpperCase()}`,
+                `MISC.SOURCES.${current.toUpperCase()}` as LocaleKey,
             )}\``;
             break;
         }
@@ -737,9 +737,9 @@ export async function buildSettingsPage(
                     'CMD.SETTINGS.RESPONSE.HEADER',
                     guild.name,
                 )}\n\n**${guild.locale(
-                    `CMD.SETTINGS.MISC.${option.toUpperCase()}.NAME`,
+                    `CMD.SETTINGS.MISC.${option.toUpperCase()}.NAME` as LocaleKey,
                 )}** ─ ${guild.locale(
-                    `CMD.SETTINGS.MISC.${option.toUpperCase()}.DESCRIPTION`,
+                    `CMD.SETTINGS.MISC.${option.toUpperCase()}.DESCRIPTION` as LocaleKey,
                 )}${
                     current
                         ? `\n> ${guild.locale('MISC.CURRENT')}: ${current}`
@@ -757,10 +757,10 @@ export async function buildSettingsPage(
                         settingsOptions.map(
                             (opt): SelectMenuComponentOptionData => ({
                                 label: guild.locale(
-                                    `CMD.SETTINGS.MISC.${opt.toUpperCase()}.NAME`,
+                                    `CMD.SETTINGS.MISC.${opt.toUpperCase()}.NAME` as LocaleKey,
                                 ),
                                 description: guild.locale(
-                                    `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION`,
+                                    `CMD.SETTINGS.MISC.${opt.toUpperCase()}.DESCRIPTION` as LocaleKey,
                                 ),
                                 value: opt,
                                 default: opt === option,

@@ -14,6 +14,7 @@ import { MessageOptionsBuilderType } from '#src/lib/util/common';
 import { settings } from '#src/lib/util/settings';
 import { formatLavaLyricsResponse, formatResponse, getLocaleString } from '#src/lib/util/util';
 import type { LavaLyricsResponse } from '#src/lib/util/util.d';
+import type { LocaleKey } from '#src/lib/util/LocaleKeys';
 
 export default new ChatInputCommandHandler()
     .setData(
@@ -138,7 +139,7 @@ export default new ChatInputCommandHandler()
                               new ActionRowBuilder<ButtonBuilder>().addComponents(
                                   guild.builders
                                       .buttonLocale(
-                                          `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}`,
+                                          `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}` as LocaleKey,
                                       )
                                       .setStyle(ButtonStyle.Secondary)
                                       .setCustomId(

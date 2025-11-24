@@ -18,6 +18,7 @@ import {
     Check,
     queryOverrides,
 } from '#src/lib/util/constants';
+import type { LocaleKey } from '#src/lib/util/LocaleKeys';
 import { settings } from '#src/lib/util/settings';
 import {
     getLocaleString,
@@ -231,7 +232,7 @@ export default new ChatInputCommandHandler()
         const smartQueue = await guild.settings.get<boolean>('smartqueue');
         await interaction.replyHandler.reply(
             new ContainerBuilder().addTextDisplayComponents(
-                guild.builders.textDisplayLocale(msg, ...extras),
+                guild.builders.textDisplayLocale(msg as LocaleKey, ...extras),
                 new TextDisplayBuilder().setContent(
                     `-# ${guild.locale('MISC.POSITION')}: ${firstPosition}${
                         endPosition !== firstPosition ? ` - ${endPosition}` : ''

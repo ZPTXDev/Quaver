@@ -18,6 +18,7 @@ import {
 import { LavalinkWSClientState } from 'lavalink-ws-client';
 import { ForceType } from '#src/lib';
 import { ButtonHandler } from '#src/lib/builders';
+import type { LocaleKey } from '#src/lib/util/LocaleKeys';
 import { QuaverGuild } from '#src/lib/guild';
 import type { QuaverPlayer } from '#src/lib/music';
 import { logger, MessageOptionsBuilderType, searchState } from '#src/lib/util/common';
@@ -186,7 +187,7 @@ export default new ButtonHandler()
             const smartQueue = await guild.settings.get<boolean>('smartqueue');
             await interaction.replyHandler.reply(
                 new ContainerBuilder().addTextDisplayComponents(
-                    guild.builders.textDisplayLocale(msg, ...extras),
+                    guild.builders.textDisplayLocale(msg as LocaleKey, ...extras),
                     ...(started && !smartQueue
                         ? [
                               new TextDisplayBuilder().setContent(

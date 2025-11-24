@@ -221,7 +221,7 @@ export default {
                                   new ActionRowBuilder<ButtonBuilder>().addComponents(
                                       guild.builders
                                           .buttonLocale(
-                                              `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}`,
+                                              `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}` as LocaleKey,
                                           )
                                           .setStyle(ButtonStyle.Secondary)
                                           .setCustomId(
