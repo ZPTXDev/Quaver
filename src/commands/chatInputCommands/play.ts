@@ -232,7 +232,11 @@ export default new ChatInputCommandHandler()
                 await player.setAlternate(true);
             }
         }
-        const position = await player.addTracksToQueue(tracks, insert);
+        const position = await player.addTracksToQueue(
+            tracks,
+            interaction.user.id,
+            insert,
+        );
         await interaction.replyHandler.reply(
             new ContainerBuilder().addTextDisplayComponents(
                 guild.builders.textDisplayLocale(msg as LocaleKey, ...extras),

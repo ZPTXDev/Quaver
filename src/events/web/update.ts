@@ -158,7 +158,7 @@ export default {
                         await player.setAlternate(true);
                     }
                 }
-                await player.addTracksToQueue(tracks);
+                await player.addTracksToQueue(tracks, socket.user.id);
                 guild.sendWebUpdate(
                     'queueUpdate',
                     player.queue.tracks.map((track: QuaverSong): QuaverSong => {

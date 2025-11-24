@@ -168,17 +168,19 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Add a track to the queue.
      * @param tracks - The track(s) to add.
+     * @param requesterId - The ID of the user who requested the track(s).
      * @param next - Whether or not to insert the track in the next position.
      * @returns The position of the track in the queue. (e.g. 1 - 10, 34, etc.)
      */
     async addTracksToQueue(
         tracks: QuaverSong | QuaverSong[],
+        requesterId: Snowflake,
         next = false,
     ): Promise<string> {
         const added = Array.isArray(tracks) ? tracks : [tracks];
         const wasEmptyBeforeAdd =
             !this.queue.current && this.queue.tracks.length === 0;
-        this.queue.add(added, { next });
+        this.queue.add(added, { requester: requesterId, next });
         const transformsActive = this.memory.shuffle || this.memory.alternate;
         if (transformsActive) {
             if (!this.memory.originalQueue) {

@@ -198,7 +198,10 @@ export default new ButtonHandler()
                     await player.setAlternate(true);
                 }
             }
-            const position = await player.addTracksToQueue(resolvedTracks);
+            const position = await player.addTracksToQueue(
+                resolvedTracks,
+                interaction.user.id,
+            );
             await interaction.replyHandler.reply(
                 new ContainerBuilder().addTextDisplayComponents(
                     guild.builders.textDisplayLocale(msg, ...extras),
