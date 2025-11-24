@@ -235,7 +235,7 @@ export default new EventHandler()
         // To keep the dashboard updated with the latest session details, emit channel events for this guild
         if (isQuaverJoinOrMoveState) {
             guild.sendWebUpdate('textChannelUpdate', player.queue.channel.name);
-            guild.sendWebUpdate('ChannelUpdate', newChannel?.name);
+            guild.sendWebUpdate('channelUpdate', newChannel?.name);
         }
         // For type consistency, create an empty map for unhandled states
         const channelPermissions = isQuaverJoinOrMoveState
