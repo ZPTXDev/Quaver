@@ -4,7 +4,7 @@ import { getJsonCommands } from './modules/jsonCommands.js';
 import { rootSettingsJson } from './modules/configHandler.js';
 import scriptSettingsJson from './settings.json' with { type: 'json' };
 import { getLocalesMap } from './modules/localesMap.js';
-import { setLocales } from '../dist/lib/util/common.js';
+import { setLocales } from '../dist/lib/locales/index.mjs';
 
 const guildIds = scriptSettingsJson.guildIds;
 if (guildIds.length === 0) {

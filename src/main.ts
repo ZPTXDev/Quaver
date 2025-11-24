@@ -1,11 +1,6 @@
 import { load as effectsLoad } from '@lavaclient/plugin-effects';
 import { load as queueLoad } from '@lavaclient/plugin-queue';
-import {
-    getAbsoluteFileURL,
-    msToTime,
-    msToTimeString,
-    parseTimeString,
-} from '@zptxdev/zptx-lib';
+import { getAbsoluteFileURL, msToTime, msToTimeString, parseTimeString, } from '@zptxdev/zptx-lib';
 import {
     AttachmentBuilder,
     Collection,
@@ -16,33 +11,37 @@ import {
     TextDisplayBuilder,
 } from 'discord.js';
 import { default as express, type Express } from 'express';
-import type { ClientEvents } from 'lavaclient';
+import type { ClientEvents, NodeEvents } from 'lavaclient';
 import { readdirSync, readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import * as http from 'node:http';
 import * as https from 'node:https';
-import { inspect } from 'node:util';
 import { createInterface } from 'node:readline';
+import { inspect } from 'node:util';
 import { Server, type Socket } from 'socket.io';
 import yoctoSpinner from 'yocto-spinner';
 import colors from 'yoctocolors';
-import { type InteractionHandlerMapsFlat, QuaverClient } from './lib';
-import type { QuaverMusicEvent } from './main.d';
+import { MessageOptionsBuilderType, QuaverClient } from './lib';
+import { data } from './lib/data';
 import { QuaverGuild, type WhitelistedFeatures } from './lib/guild';
+import type { InteractionHandlerMapsFlat } from './lib/interactions';
+import { setLocales } from './lib/locales';
+import { logger } from './lib/logger';
 import type { QuaverPlayer } from './lib/music';
 import {
-    data,
-    logger,
-    MessageOptionsBuilderType,
-    setLocales,
-} from './lib/util/common';
-import { settings } from './lib/util/settings';
-import {
+    loadVersion,
+    settings,
     updateAcceptableSources,
     updateQueryOverrides,
     updateSourceManagers,
-} from './lib/util/util';
-import { loadVersion, version } from './lib/util/version';
+    version,
+} from './lib/util';
+
+type QuaverMusicEvent = {
+    name: keyof NodeEvents;
+    once: boolean;
+    execute(...args: unknown[]): void | Promise<void>;
+};
 
 await loadVersion();
 
@@ -600,15 +599,13 @@ for await (const file of musicEventFiles) {
     if (event.default.once) {
         client.music.once(
             event.default.name as keyof ClientEvents,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (...args: any[]): void | Promise<void> =>
+            (...args: unknown[]): void | Promise<void> =>
                 event.default.execute(...args),
         );
     } else {
         client.music.on(
             event.default.name as keyof ClientEvents,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (...args: any[]): void | Promise<void> =>
+            (...args: unknown[]): void | Promise<void> =>
                 event.default.execute(...args),
         );
     }

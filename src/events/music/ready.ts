@@ -1,6 +1,7 @@
+import { data } from '#src/lib/data';
+import { logger } from '#src/lib/logger';
+import type { QuaverChannels } from '#src/lib/util';
 import { get } from 'lodash-es';
-import { data, logger } from '#src/lib/util/common';
-import type { QuaverChannels } from '#src/lib/util/common.d';
 
 export default {
     name: 'connected',

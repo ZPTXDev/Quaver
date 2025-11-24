@@ -1,20 +1,17 @@
+import { ForceType, MessageOptionsBuilderType } from '#src/lib';
+import { StringSelectMenuHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
+import { checkLocaleCompletion } from '#src/lib/locales';
+import { logger } from '#src/lib/logger';
+import { confirmationTimeout } from '#src/lib/state';
 import {
     buildMessageOptions,
     buildSettingsPage,
-    checkLocaleCompletion,
-} from '#src/lib/util/util';
+    Check,
+    settings,
+} from '#src/lib/util';
 import { roundTo } from '@zptxdev/zptx-lib';
 import { ContainerComponent } from 'discord.js';
-import { ForceType } from '#src/lib';
-import { StringSelectMenuHandler } from '#src/lib/builders';
-import { QuaverGuild } from '#src/lib/guild';
-import {
-    confirmationTimeout,
-    logger,
-    MessageOptionsBuilderType,
-} from '#src/lib/util/common';
-import { Check } from '#src/lib/util/constants';
-import { settings } from '#src/lib/util/settings';
 
 export default new StringSelectMenuHandler()
     .setChecks([Check.InteractionStarter])

@@ -1,13 +1,8 @@
-import { getAbsoluteFileURL } from '@zptxdev/zptx-lib';
-import { Collection } from 'discord.js';
-import { readdirSync } from 'node:fs';
-import { isAsyncFunction } from 'node:util/types';
 import {
-    type AllInteractions,
-    type InteractionHandlerMapsFlat,
+    MessageOptionsBuilderType,
     type QuaverClient,
     ReplyHandler,
-} from '.';
+} from '#src/lib';
 import {
     type AutocompleteHandler,
     type ButtonHandler,
@@ -16,12 +11,17 @@ import {
     type ModalSubmitHandler,
     type RoleSelectMenuHandler,
     type StringSelectMenuHandler,
-} from './builders';
-import { QuaverGuild } from './guild';
-import { logger, MessageOptionsBuilderType } from './util/common';
-import type { QuaverInteraction } from './util/common.d';
-import { settings } from './util/settings';
-import { getLocaleString } from './util/util';
+} from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
+import type { QuaverInteraction } from '#src/lib/interactions';
+import { getLocaleString } from '#src/lib/locales';
+import { logger } from '#src/lib/logger';
+import { settings } from '#src/lib/util';
+import { getAbsoluteFileURL } from '@zptxdev/zptx-lib';
+import { Collection } from 'discord.js';
+import { readdirSync } from 'node:fs';
+import { isAsyncFunction } from 'node:util/types';
+import type { AllInteractions, InteractionHandlerMapsFlat } from '.';
 
 enum InteractionType {
     ChannelSelectMenus = 'channelSelectMenus',

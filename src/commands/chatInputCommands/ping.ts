@@ -1,9 +1,9 @@
-import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
-import { ContainerBuilder, SlashCommandBuilder } from 'discord.js';
 import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
-import { settings } from '#src/lib/util/settings';
-import { getLocaleString } from '#src/lib/util/util';
+import { getLocaleString } from '#src/lib/locales';
+import { settings } from '#src/lib/util';
+import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
+import { ContainerBuilder, SlashCommandBuilder } from 'discord.js';
 
 export default new ChatInputCommandHandler()
     .setData(

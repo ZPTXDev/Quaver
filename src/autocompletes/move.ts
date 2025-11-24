@@ -1,6 +1,6 @@
-import type { ApplicationCommandOptionChoiceData } from 'discord.js';
 import { AutocompleteHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
+import type { ApplicationCommandOptionChoiceData } from 'discord.js';
 
 export default new AutocompleteHandler().setExecute(
     async function (interaction): Promise<void> {

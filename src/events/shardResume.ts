@@ -1,8 +1,7 @@
-import { ActivityType, type PresenceStatusData } from 'discord.js';
 import { EventHandler } from '#src/lib/builders';
-import { logger } from '#src/lib/util/common';
-import { settings } from '#src/lib/util/settings';
-import { version } from '#src/lib/util/version';
+import { logger } from '#src/lib/logger';
+import { settings, version } from '#src/lib/util';
+import { ActivityType, type PresenceStatusData } from 'discord.js';
 
 export default new EventHandler()
     .setEvent('shardResume')

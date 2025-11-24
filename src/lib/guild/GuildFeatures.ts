@@ -1,7 +1,7 @@
+import { data } from '#src/lib/data';
+import { settings } from '#src/lib/util';
 import type { Guild } from 'discord.js';
 import { type WhitelistedFeatures, WhitelistStatus } from '.';
-import { data } from '#src/lib/util/common';
-import { settings } from '#src/lib/util/settings';
 
 export class GuildFeatures {
     guild;

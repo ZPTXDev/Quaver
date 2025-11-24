@@ -1,3 +1,15 @@
+import type { QuaverClient } from '#src/lib';
+import { type ReplyHandler } from '#src/lib';
+import type {
+    AcceptedEventTypes,
+    AutocompleteHandler,
+    ButtonHandler,
+    ChatInputCommandHandler,
+    EventHandler,
+    ModalSubmitHandler,
+    RoleSelectMenuHandler,
+    StringSelectMenuHandler,
+} from '#src/lib/builders';
 import type {
     AutocompleteInteraction,
     ButtonInteraction,
@@ -15,16 +27,10 @@ import type {
     UserContextMenuCommandInteraction,
     UserSelectMenuInteraction,
 } from 'discord.js';
-import type {
-    AcceptedEventTypes,
-    AutocompleteHandler,
-    ButtonHandler,
-    ChatInputCommandHandler,
-    EventHandler,
-    ModalSubmitHandler,
-    RoleSelectMenuHandler,
-    StringSelectMenuHandler,
-} from './builders';
+
+export type QuaverInteraction<T> = T extends AutocompleteInteraction
+    ? T & { client: QuaverClient }
+    : T & { client: QuaverClient; replyHandler: ReplyHandler };
 
 export type SpecialInteractions = AutocompleteInteraction<'cached'>;
 

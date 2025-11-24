@@ -1,8 +1,8 @@
-import type { Guild } from 'discord.js';
+import type { QuaverClient } from '#src/lib';
 import { EventHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
-import { logger } from '#src/lib/util/common';
-import type { QuaverClient } from '#src/lib/util/common.d';
+import { logger } from '#src/lib/logger';
+import type { Guild } from 'discord.js';
 
 export default new EventHandler()
     .setEvent('guildDelete')

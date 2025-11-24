@@ -1,20 +1,58 @@
 import {
+    type ActionRowBuilder,
+    type AttachmentBuilder,
+    type ContainerBuilder,
+    type FileBuilder,
     type InteractionCallbackResponse,
     type InteractionEditReplyOptions,
     type InteractionReplyOptions,
     type InteractionResponse,
     type InteractionUpdateOptions,
+    type MediaGalleryBuilder,
     type Message,
+    type MessageActionRowComponentBuilder,
     MessageFlags,
     PermissionsBitField,
+    type SectionBuilder,
+    type SeparatorBuilder,
+    type TextDisplayBuilder,
 } from 'discord.js';
-import type { AdditionalBuilderOptions, NonSpecialInteractions } from '.';
-import { logger, MessageOptionsBuilderType } from './util/common';
-import type {
-    MessageOptionsBuilderInputs,
-    MessageOptionsBuilderOptions,
-} from './util/common.d';
-import { buildMessageOptions } from './util/util';
+import type { NonSpecialInteractions } from './interactions';
+import { logger } from './logger';
+import { buildMessageOptions } from './util';
+
+type AdditionalBuilderOptions = {
+    ephemeral?: boolean;
+    force?: ForceType;
+    withResponse?: boolean;
+};
+
+export type TopLevelComponentBuilders =
+    | ActionRowBuilder<MessageActionRowComponentBuilder>
+    | SectionBuilder
+    | TextDisplayBuilder
+    | MediaGalleryBuilder
+    | FileBuilder
+    | SeparatorBuilder
+    | ContainerBuilder;
+
+export type MessageOptionsBuilderInputs =
+    | string
+    | TopLevelComponentBuilders
+    | Array<string | TopLevelComponentBuilders>;
+
+export type MessageOptionsBuilderOptions = {
+    type?: MessageOptionsBuilderType;
+    components?: Array<TopLevelComponentBuilders>;
+    files?: AttachmentBuilder[];
+};
+
+export enum MessageOptionsBuilderType {
+    Success,
+    Neutral,
+    Warning,
+    Error,
+}
 
 /** Class for handling replies to interactions. */
 export class ReplyHandler {

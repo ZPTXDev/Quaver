@@ -1,6 +1,6 @@
+import type { QuaverInteraction } from '#src/lib/interactions';
 import type { AutocompleteInteraction } from 'discord.js';
 import { BaseHandler } from '.';
-import type { QuaverInteraction } from '#src/lib/util/common.d';
 
 type GenericAutocompleteExecuteFunction = (
     this: AutocompleteHandler,

@@ -55,7 +55,7 @@ function escapeForJSDoc(str) {
  */
 async function generateLocaleTypes() {
     const localesDir = resolve(__dirname, '..', 'locales', 'en');
-    const outputPath = resolve(__dirname, '..', 'src', 'lib', 'util', 'LocaleKeys.d.ts');
+    const outputPath = resolve(__dirname, '..', 'src', 'lib', 'locales', 'LocaleKeys.d.ts');
 
     const localeFiles = readdirSync(localesDir).filter(file => file.endsWith('.js'));
 

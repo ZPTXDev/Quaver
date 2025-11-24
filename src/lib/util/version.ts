@@ -1,6 +1,6 @@
+import { getAbsoluteFileURL } from '@zptxdev/zptx-lib';
 import { execSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
-import { getAbsoluteFileURL } from '@zptxdev/zptx-lib';
 
 type VersionInfo = {
     version: string;

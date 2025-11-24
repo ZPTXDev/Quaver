@@ -1,15 +1,15 @@
-import type { ApplicationCommandOptionChoiceData } from 'discord.js';
-import { request } from 'undici';
 import { AutocompleteHandler } from '#src/lib/builders';
+import { cache } from '#src/lib/data';
 import { QuaverGuild } from '#src/lib/guild';
-import type { LocaleKey } from '#src/lib/util/LocaleKeys';
-import { cache } from '#src/lib/util/common';
+import type { LocaleKey } from '#src/lib/locales';
 import {
     acceptableSources,
     queryOverrides,
     sourceList,
     YOUTUBE_AUTOCOMPLETE_URL,
-} from '#src/lib/util/constants';
+} from '#src/lib/util';
+import type { ApplicationCommandOptionChoiceData } from 'discord.js';
+import { request } from 'undici';
 
 export default new AutocompleteHandler().setExecute(
     async function (interaction): Promise<void> {

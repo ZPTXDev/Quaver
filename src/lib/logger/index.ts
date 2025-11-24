@@ -1,9 +1,4 @@
-import { createCache } from 'cache-manager';
-import { KeyvCacheableMemory } from 'cacheable';
-import { Collection, type Snowflake } from 'discord.js';
-import Keyv from 'keyv';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { settings } from '#src/lib/util';
 import {
     addColors,
     createLogger,
@@ -13,27 +8,7 @@ import {
     transports,
 } from 'winston';
 import LokiTransport from 'winston-loki';
-import type { SearchStateRecord } from './common.d';
-import DataHandler from '#src/lib/DataHandler';
-import { settings } from '#src/lib/util/settings';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-export const data = {
-    guild: new DataHandler({
-        cache: settings.database
-            ? `${settings.database.protocol}://${resolve(
-                  __dirname,
-                  '..',
-                  '..',
-                  settings.database.path,
-              )}`
-            : `sqlite://${resolve(__dirname, '..', '..', 'database.sqlite')}`,
-        namespace: 'guild',
-    }),
-};
-export const cache = createCache({
-    stores: [new Keyv({ store: new KeyvCacheableMemory({ ttl: '10m' }) })],
-});
 addColors({
     verbose: 'blackBG dim bold',
     info: 'greenBG white bold',
@@ -104,21 +79,3 @@ export const logger = createLogger({
             : []),
     ],
 });
-export let locales = new Collection();
-
-export function setLocales(newLocales: Collection<string, unknown>): void {
-    locales = newLocales;
-}
-
-export const confirmationTimeout: Record<
-    Snowflake,
-    ReturnType<typeof setTimeout>
-> = {};
-export const searchState: Record<Snowflake, SearchStateRecord> = {};
-
-export enum MessageOptionsBuilderType {
-    Success,
-    Neutral,
-    Warning,
-    Error,
-}

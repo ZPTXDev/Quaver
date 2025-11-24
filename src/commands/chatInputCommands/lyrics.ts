@@ -1,3 +1,13 @@
+import { MessageOptionsBuilderType } from '#src/lib';
+import { ChatInputCommandHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
+import { getLocaleString, type LocaleKey } from '#src/lib/locales';
+import {
+    formatLavaLyricsResponse,
+    formatResponse,
+    type LavaLyricsResponse,
+    settings,
+} from '#src/lib/util';
 import {
     ActionRowBuilder,
     type ButtonBuilder,
@@ -8,17 +18,6 @@ import {
     type SlashCommandStringOption,
     TextDisplayBuilder,
 } from 'discord.js';
-import { ChatInputCommandHandler } from '#src/lib/builders';
-import { QuaverGuild } from '#src/lib/guild';
-import type { LocaleKey } from '#src/lib/util/LocaleKeys';
-import { MessageOptionsBuilderType } from '#src/lib/util/common';
-import { settings } from '#src/lib/util/settings';
-import {
-    formatLavaLyricsResponse,
-    formatResponse,
-    getLocaleString,
-} from '#src/lib/util/util';
-import type { LavaLyricsResponse } from '#src/lib/util/util.d';
 
 export default new ChatInputCommandHandler()
     .setData(

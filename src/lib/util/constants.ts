@@ -23,12 +23,6 @@ export enum Check {
     InteractionStarter = 'CHECK.INTERACTION_STARTER',
 }
 
-export enum Language {
-    ceb = 'Cebuano',
-    en = 'English',
-    fil = 'Filipino',
-}
-
 export const settingsOptions = [
     ...(settings.premiumURL &&
     ['autolyrics', 'stay', 'smartqueue'].some((feature: string): boolean => {

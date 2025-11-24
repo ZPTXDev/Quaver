@@ -1,12 +1,9 @@
-import { ForceType } from '#src/lib';
+import { ForceType, MessageOptionsBuilderType } from '#src/lib';
 import { ButtonHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import { PlayerResponse } from '#src/lib/music';
-import {
-    confirmationTimeout,
-    MessageOptionsBuilderType,
-} from '#src/lib/util/common';
-import { Check } from '#src/lib/util/constants';
+import { confirmationTimeout } from '#src/lib/state';
+import { Check } from '#src/lib/util';
 
 export default new ButtonHandler()
     .setChecks([

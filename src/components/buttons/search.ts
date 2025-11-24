@@ -1,3 +1,22 @@
+import {
+    ForceType,
+    MessageOptionsBuilderType,
+    type QuaverClient,
+} from '#src/lib';
+import { ButtonHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
+import type { LocaleKey } from '#src/lib/locales';
+import { logger } from '#src/lib/logger';
+import type { QuaverPlayer } from '#src/lib/music';
+import { searchState } from '#src/lib/state';
+import {
+    buildMessageOptions,
+    Check,
+    getFailedChecks,
+    getTrackMarkdownLocaleString,
+    type QuaverChannels,
+    type QuaverSong,
+} from '#src/lib/util';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import {
@@ -16,23 +35,6 @@ import {
     TextDisplayBuilder,
 } from 'discord.js';
 import { LavalinkWSClientState } from 'lavalink-ws-client';
-import { ForceType } from '#src/lib';
-import { ButtonHandler } from '#src/lib/builders';
-import { QuaverGuild } from '#src/lib/guild';
-import type { QuaverPlayer } from '#src/lib/music';
-import type { LocaleKey } from '#src/lib/util/LocaleKeys';
-import {
-    logger,
-    MessageOptionsBuilderType,
-    searchState,
-} from '#src/lib/util/common';
-import type { QuaverChannels, QuaverSong } from '#src/lib/util/common.d';
-import { Check } from '#src/lib/util/constants';
-import {
-    buildMessageOptions,
-    getFailedChecks,
-    getTrackMarkdownLocaleString,
-} from '#src/lib/util/util';
 
 export default new ButtonHandler()
     .setChecks([Check.InteractionStarter])
@@ -52,7 +54,9 @@ export default new ButtonHandler()
             let player = (await interaction.client.music.players.fetch(
                 interaction.guildId,
             )) as QuaverPlayer;
-            const member = interaction.member as GuildMember;
+            const member = interaction.member as GuildMember & {
+                client: QuaverClient;
+            };
             const failedChecks: Check[] = await getFailedChecks(
                 [Check.InVoice, Check.InSessionVoice],
                 interaction.guildId,

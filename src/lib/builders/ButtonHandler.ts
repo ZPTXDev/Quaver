@@ -1,6 +1,6 @@
+import type { QuaverInteraction } from '#src/lib/interactions';
 import type { ButtonInteraction } from 'discord.js';
 import { BaseHandler } from '.';
-import type { QuaverInteraction } from '#src/lib/util/common.d';
 
 type GenericButtonExecuteFunction = (
     this: ButtonHandler,

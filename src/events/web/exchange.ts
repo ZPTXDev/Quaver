@@ -1,9 +1,15 @@
+import { settings } from '#src/lib/util';
 import { getJSONResponse } from '@zptxdev/zptx-lib';
 import CryptoJS from 'crypto-js';
 import type { Socket } from 'socket.io';
 import { request } from 'undici';
-import type { OAuth2Data } from './exchange.d';
-import { settings } from '#src/lib/util/settings';
+
+type OAuth2Data = {
+    token_type: string;
+    access_token: string;
+    error?: string;
+    error_description?: string;
+};
 
 export default {
     name: 'exchange',

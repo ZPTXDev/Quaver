@@ -1,11 +1,11 @@
+import { EventHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
+import { buildMessageOptions } from '#src/lib/util';
 import {
     type MessageCreateOptions,
     MessageFlags,
     PermissionsBitField,
 } from 'discord.js';
-import { EventHandler } from '#src/lib/builders';
-import { QuaverGuild } from '#src/lib/guild';
-import { buildMessageOptions } from '#src/lib/util/util';
 
 export default new EventHandler()
     .setEvent('messageCreate')

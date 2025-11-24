@@ -1,6 +1,7 @@
+import { MessageOptionsBuilderType } from '#src/lib';
 import { QuaverGuild } from '#src/lib/guild';
-import { logger, MessageOptionsBuilderType } from '#src/lib/util/common';
-import type { QuaverQueue } from '#src/lib/util/common.d';
+import { logger } from '#src/lib/logger';
+import type { QuaverQueue } from '#src/lib/util';
 
 export default {
     name: 'queueFinish',

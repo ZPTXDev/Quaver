@@ -1,4 +1,4 @@
-import { logger } from '#src/lib/util/common';
+import { logger } from '#src/lib/logger';
 
 export default {
     name: 'connected',

@@ -1,3 +1,14 @@
+import { ForceType, MessageOptionsBuilderType } from '#src/lib';
+import { ButtonHandler } from '#src/lib/builders';
+import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
+import { logger } from '#src/lib/logger';
+import { confirmationTimeout } from '#src/lib/state';
+import {
+    buildMessageOptions,
+    buildSettingsPage,
+    Check,
+    settings,
+} from '#src/lib/util';
 import {
     ActionRowBuilder,
     type ButtonBuilder,
@@ -5,17 +16,6 @@ import {
     ContainerBuilder,
     ContainerComponent,
 } from 'discord.js';
-import { ForceType } from '#src/lib';
-import { ButtonHandler } from '#src/lib/builders';
-import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
-import {
-    confirmationTimeout,
-    logger,
-    MessageOptionsBuilderType,
-} from '#src/lib/util/common';
-import { Check } from '#src/lib/util/constants';
-import { settings } from '#src/lib/util/settings';
-import { buildMessageOptions, buildSettingsPage } from '#src/lib/util/util';
 
 export default new ButtonHandler()
     .setChecks([Check.InteractionStarter])

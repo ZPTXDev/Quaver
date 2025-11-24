@@ -3,7 +3,7 @@ import { rest } from './modules/restHandler.js';
 import { getJsonCommands } from './modules/jsonCommands.js';
 import { rootSettingsJson } from './modules/configHandler.js';
 import { getLocalesMap } from './modules/localesMap.js';
-import { setLocales } from '../dist/lib/util/common.js';
+import { setLocales } from '../dist/lib/locales/index.mjs';
 
 const clientId = rootSettingsJson.applicationId;
 

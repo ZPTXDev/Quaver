@@ -1,10 +1,25 @@
 import KeyvSqlite from '@keyv/sqlite';
+import type { Snowflake } from 'discord.js';
 import Keyv from 'keyv';
 import { get as _get, set as _set, unset as _unset } from 'lodash-es';
-import type { DatabaseObject } from '.';
+
+type DatabaseObject = {
+    settings?: GuildSettingsObject;
+};
+
+type GuildSettingsObject = {
+    stay?: StaySettingObject;
+    locale?: string;
+};
+
+type StaySettingObject = {
+    enabled: boolean;
+    channel?: Snowflake;
+    text?: Snowflake;
+};
 
 /** Class for handling data through Keyv. */
-export default class DataHandler {
+export class DataHandler {
     cache: Keyv;
 
     /**

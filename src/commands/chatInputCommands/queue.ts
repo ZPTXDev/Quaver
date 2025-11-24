@@ -1,3 +1,8 @@
+import { MessageOptionsBuilderType } from '#src/lib';
+import { ChatInputCommandHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
+import { getLocaleString } from '#src/lib/locales';
+import { Check, cleanURIForMarkdown, settings } from '#src/lib/util';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
 import {
@@ -10,12 +15,6 @@ import {
     SlashCommandBuilder,
     TextDisplayBuilder,
 } from 'discord.js';
-import { ChatInputCommandHandler } from '#src/lib/builders';
-import { QuaverGuild } from '#src/lib/guild';
-import { MessageOptionsBuilderType } from '#src/lib/util/common';
-import { Check } from '#src/lib/util/constants';
-import { settings } from '#src/lib/util/settings';
-import { cleanURIForMarkdown, getLocaleString } from '#src/lib/util/util';
 
 export default new ChatInputCommandHandler()
     .setData(

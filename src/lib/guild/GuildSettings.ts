@@ -1,5 +1,5 @@
+import { data } from '#src/lib/data';
 import type { Guild } from 'discord.js';
-import { data } from '#src/lib/util/common';
 
 export class GuildSettings {
     guild;

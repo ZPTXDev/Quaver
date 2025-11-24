@@ -1,14 +1,13 @@
+import { ChatInputCommandHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
+import { getLocaleString } from '#src/lib/locales';
+import { PlayerResponse } from '#src/lib/music';
+import { Check, settings } from '#src/lib/util';
 import {
     ContainerBuilder,
     type SlashCommandBooleanOption,
     SlashCommandBuilder,
 } from 'discord.js';
-import { ChatInputCommandHandler } from '#src/lib/builders';
-import { QuaverGuild } from '#src/lib/guild';
-import { PlayerResponse } from '#src/lib/music';
-import { Check } from '#src/lib/util/constants';
-import { settings } from '#src/lib/util/settings';
-import { getLocaleString } from '#src/lib/util/util';
 
 export default new ChatInputCommandHandler()
     .setData(

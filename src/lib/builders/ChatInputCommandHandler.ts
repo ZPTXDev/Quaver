@@ -1,3 +1,8 @@
+import { MessageOptionsBuilderType } from '#src/lib';
+import { QuaverGuild } from '#src/lib/guild';
+import type { QuaverInteraction } from '#src/lib/interactions';
+import { getLocaleString } from '#src/lib/locales';
+import { settings } from '#src/lib/util';
 import {
     type ChatInputCommandInteraction,
     PermissionsBitField,
@@ -7,11 +12,6 @@ import {
     type SlashCommandSubcommandsOnlyBuilder,
 } from 'discord.js';
 import { BaseHandler, type ChatInputCommandPermissions } from '.';
-import { QuaverGuild } from '#src/lib/guild';
-import { MessageOptionsBuilderType } from '#src/lib/util/common';
-import type { QuaverInteraction } from '#src/lib/util/common.d';
-import { settings } from '#src/lib/util/settings';
-import { getLocaleString } from '#src/lib/util/util';
 
 type GenericChatInputCommandExecuteFunction = (
     this: ChatInputCommandInteraction,

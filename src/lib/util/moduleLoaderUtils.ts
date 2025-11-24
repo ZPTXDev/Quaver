@@ -2,15 +2,31 @@ import type EventEmitter from 'node:events';
 import type { Dirent } from 'node:fs';
 import * as nodeFsPromises from 'node:fs/promises';
 import * as nodePath from 'node:path';
-import * as nodeUtilTypes from 'node:util/types';
 import * as nodeUrl from 'node:url';
-import type {
-    LoadEventHandlerOptions,
-    LoadInteractionHandlerMapOptions,
-    ProcessFileCallback,
-    ProcessFileOverride,
-    ProcessFolderPathOptions,
-} from './moduleLoaderUtils.d';
+import * as nodeUtilTypes from 'node:util/types';
+
+interface ProcessFolderPathOptions {
+    isFileConcurrent?: boolean;
+    isFolderConcurrent?: boolean;
+}
+
+interface LoadInteractionHandlerMapOptions {
+    isFileConcurrent?: boolean;
+    isFolderConcurrent?: boolean;
+}
+
+interface LoadEventHandlerOptions {
+    isFileConcurrent?: boolean;
+    isFolderConcurrent?: boolean;
+    listenerPrependedArgs?: unknown[];
+}
+
+type ProcessFileCallback = (
+    file: Dirent,
+    folderPath: string,
+) => void | Promise<void>;
+
+type ProcessFileOverride = (file: Dirent, folderPath: string) => Promise<void>;
 
 const DEFAULT_MODULE_EXPORT_NAME = 'default';
 

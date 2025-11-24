@@ -1,16 +1,21 @@
-import { getJSONResponse } from '@zptxdev/zptx-lib';
-import CryptoJS from 'crypto-js';
-import type { Socket } from 'socket.io';
-import { request } from 'undici';
-import type { WebGuild } from './fetchguilds.d';
 import {
     QuaverGuild,
     type WhitelistedFeatures,
     WhitelistStatus,
 } from '#src/lib/guild';
-import type { JSONResponse } from '#src/lib/util/common.d';
-import { settings } from '#src/lib/util/settings';
-import { version } from '#src/lib/util/version';
+import { type JSONResponse, settings, version } from '#src/lib/util';
+import { getJSONResponse } from '@zptxdev/zptx-lib';
+import CryptoJS from 'crypto-js';
+import type { APIGuild } from 'discord.js';
+import type { Socket } from 'socket.io';
+import { request } from 'undici';
+
+type WebGuild = APIGuild & {
+    botInGuild?: boolean;
+    idle?: boolean;
+    track?: string;
+    premium?: boolean;
+};
 
 export default {
     name: 'fetchguilds',

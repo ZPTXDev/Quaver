@@ -1,5 +1,5 @@
 import { EventHandler } from '#src/lib/builders';
-import { logger } from '#src/lib/util/common';
+import { logger } from '#src/lib/logger';
 
 export default new EventHandler()
     .setEvent('shardDisconnect')

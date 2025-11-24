@@ -1,3 +1,8 @@
+import { MessageOptionsBuilderType, type QuaverClient } from '#src/lib';
+import { EventHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
+import { logger } from '#src/lib/logger';
+import type { QuaverPlayer } from '#src/lib/music';
 import {
     ChannelType,
     ContainerBuilder,
@@ -8,11 +13,6 @@ import {
     type VoiceState,
 } from 'discord.js';
 import type { DefaultEventsMap, Server } from 'socket.io';
-import { EventHandler } from '#src/lib/builders';
-import { QuaverGuild } from '#src/lib/guild';
-import type { QuaverPlayer } from '#src/lib/music';
-import { logger, MessageOptionsBuilderType } from '#src/lib/util/common';
-import type { QuaverClient } from '#src/lib/util/common.d';
 
 const PAUSE_TIMEOUT_SECONDS = 5 * 60;
 

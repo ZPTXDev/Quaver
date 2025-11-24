@@ -1,3 +1,4 @@
+import type { LocaleKey } from '#src/lib/locales';
 import {
     ButtonBuilder,
     ButtonStyle,
@@ -6,7 +7,6 @@ import {
     TextDisplayBuilder,
 } from 'discord.js';
 import type { Initialized, QuaverGuild } from '.';
-import type { LocaleKey } from '#src/lib/util/LocaleKeys';
 
 // TODO: move all settings page builders here to prevent exporting Initialized type from QuaverGuild
 export class GuildBuilders {

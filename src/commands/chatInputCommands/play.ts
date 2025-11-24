@@ -1,3 +1,16 @@
+import { MessageOptionsBuilderType } from '#src/lib';
+import { ChatInputCommandHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
+import { getLocaleString, type LocaleKey } from '#src/lib/locales';
+import {
+    acceptableSources,
+    Check,
+    getTrackMarkdownLocaleString,
+    type QuaverChannels,
+    type QuaverSong,
+    queryOverrides,
+    settings,
+} from '#src/lib/util';
 import {
     ChannelType,
     ContainerBuilder,
@@ -9,21 +22,6 @@ import {
     TextDisplayBuilder,
 } from 'discord.js';
 import { LavalinkWSClientState } from 'lavalink-ws-client';
-import { ChatInputCommandHandler } from '#src/lib/builders';
-import { QuaverGuild } from '#src/lib/guild';
-import type { LocaleKey } from '#src/lib/util/LocaleKeys';
-import { MessageOptionsBuilderType } from '#src/lib/util/common';
-import type { QuaverChannels, QuaverSong } from '#src/lib/util/common.d';
-import {
-    acceptableSources,
-    Check,
-    queryOverrides,
-} from '#src/lib/util/constants';
-import { settings } from '#src/lib/util/settings';
-import {
-    getLocaleString,
-    getTrackMarkdownLocaleString,
-} from '#src/lib/util/util';
 
 export default new ChatInputCommandHandler()
     .setData(

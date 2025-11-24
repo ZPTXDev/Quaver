@@ -1,8 +1,8 @@
+import { AutocompleteHandler } from '#src/lib/builders';
+import { cache } from '#src/lib/data';
+import { YOUTUBE_AUTOCOMPLETE_URL } from '#src/lib/util';
 import type { ApplicationCommandOptionChoiceData } from 'discord.js';
 import { request } from 'undici';
-import { AutocompleteHandler } from '#src/lib/builders';
-import { cache } from '#src/lib/util/common';
-import { YOUTUBE_AUTOCOMPLETE_URL } from '#src/lib/util/constants';
 
 export default new AutocompleteHandler().setExecute(
     async function (interaction): Promise<void> {

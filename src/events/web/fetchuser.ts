@@ -1,12 +1,13 @@
+import { type JSONResponse, settings, version } from '#src/lib/util';
 import { getJSONResponse } from '@zptxdev/zptx-lib';
 import CryptoJS from 'crypto-js';
 import type { APIUser } from 'discord.js';
 import type { Socket } from 'socket.io';
 import { request } from 'undici';
-import type { WebUser } from './fetchuser.d';
-import type { JSONResponse } from '#src/lib/util/common.d';
-import { settings } from '#src/lib/util/settings';
-import { version } from '#src/lib/util/version';
+
+type WebUser = APIUser & {
+    manager?: boolean;
+};
 
 export default {
     name: 'fetchuser',

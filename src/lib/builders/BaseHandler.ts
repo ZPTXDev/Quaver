@@ -1,3 +1,9 @@
+import type { QuaverClient } from '#src/lib';
+import type {
+    AllInteractions,
+    ComponentInteractions,
+} from '#src/lib/interactions';
+import { Check } from '#src/lib/util';
 import { GuildMember, type Snowflake } from 'discord.js';
 import type {
     AcceptedEventTypes,
@@ -9,12 +15,6 @@ import type {
     RoleSelectMenuHandler,
     StringSelectMenuHandler,
 } from '.';
-import type {
-    AllInteractions,
-    ComponentInteractions,
-    QuaverClient,
-} from '#src/lib';
-import { Check } from '#src/lib/util/constants';
 
 // only exported for builders extending from BaseHandler
 export type GenericExecuteFunction = (

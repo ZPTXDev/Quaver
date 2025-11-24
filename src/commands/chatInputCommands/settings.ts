@@ -1,20 +1,22 @@
+import { ChatInputCommandHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
+import { getLocaleString } from '#src/lib/locales';
+import { logger } from '#src/lib/logger';
+import { confirmationTimeout } from '#src/lib/state';
+import type { SettingsPageOptions } from '#src/lib/util';
+import {
+    buildMessageOptions,
+    buildSettingsPage,
+    Check,
+    settings,
+    settingsOptions,
+} from '#src/lib/util';
 import {
     InteractionCallbackResponse,
     Message,
     PermissionsBitField,
     SlashCommandBuilder,
 } from 'discord.js';
-import { ChatInputCommandHandler } from '#src/lib/builders';
-import { QuaverGuild } from '#src/lib/guild';
-import { confirmationTimeout, logger } from '#src/lib/util/common';
-import type { SettingsPageOptions } from '#src/lib/util/common.d';
-import { Check, settingsOptions } from '#src/lib/util/constants';
-import { settings } from '#src/lib/util/settings';
-import {
-    buildMessageOptions,
-    buildSettingsPage,
-    getLocaleString,
-} from '#src/lib/util/util';
 
 export default new ChatInputCommandHandler()
     .setData(

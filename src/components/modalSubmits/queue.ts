@@ -1,3 +1,7 @@
+import { ForceType, MessageOptionsBuilderType } from '#src/lib';
+import { ModalSubmitHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
+import { cleanURIForMarkdown } from '#src/lib/util';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
 import {
@@ -9,11 +13,6 @@ import {
     SeparatorBuilder,
     TextDisplayBuilder,
 } from 'discord.js';
-import { ForceType } from '#src/lib';
-import { ModalSubmitHandler } from '#src/lib/builders';
-import { QuaverGuild } from '#src/lib/guild';
-import { MessageOptionsBuilderType } from '#src/lib/util/common';
-import { cleanURIForMarkdown } from '#src/lib/util/util';
 
 export default new ModalSubmitHandler().setExecute(
     async function (interaction): Promise<void> {

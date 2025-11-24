@@ -1,3 +1,16 @@
+import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
+import { PlayerResponse } from '#src/lib/music';
+import {
+    acceptableSources,
+    Check,
+    getFailedChecks,
+    getRequesterStatus,
+    type QuaverChannels,
+    type QuaverSong,
+    queryOverrides,
+    RequesterStatus,
+    settings,
+} from '#src/lib/util';
 import {
     type APIGuild,
     type APIUser,
@@ -8,20 +21,6 @@ import {
 } from 'discord.js';
 import { LavalinkWSClientState } from 'lavalink-ws-client';
 import type { Socket } from 'socket.io';
-import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
-import { PlayerResponse } from '#src/lib/music';
-import type { QuaverChannels, QuaverSong } from '#src/lib/util/common.d';
-import {
-    acceptableSources,
-    Check,
-    queryOverrides,
-} from '#src/lib/util/constants';
-import { settings } from '#src/lib/util/settings';
-import {
-    getFailedChecks,
-    getRequesterStatus,
-    RequesterStatus,
-} from '#src/lib/util/util';
 
 export default {
     name: 'update',
@@ -63,7 +62,7 @@ export default {
                 const failedChecks: Check[] = await getFailedChecks(
                     [Check.InVoice, Check.InSessionVoice],
                     guild.id,
-                    member,
+                    member as GuildMember & { client: typeof client },
                 );
                 if (failedChecks.length > 0) {
                     return callback({ status: Response.UserNotInChannelError });
@@ -318,7 +317,7 @@ export default {
                 const failedChecks: Check[] = await getFailedChecks(
                     [Check.InVoice, Check.InSessionVoice],
                     guild.id,
-                    member,
+                    member as GuildMember & { client: typeof client },
                 );
                 if (failedChecks.length > 0) {
                     return callback({ status: Response.UserNotInChannelError });
