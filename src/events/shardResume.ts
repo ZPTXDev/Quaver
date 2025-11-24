@@ -6,7 +6,7 @@ import { version } from '#src/lib/util/version';
 
 export default new EventHandler()
     .setEvent('shardResume')
-    .setExecute(async function(): Promise<void> {
+    .setExecute(async function (): Promise<void> {
         const { client } = await import('#src/main');
         let activityType:
             | ActivityType.Playing

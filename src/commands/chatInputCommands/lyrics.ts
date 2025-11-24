@@ -42,7 +42,7 @@ export default new ChatInputCommandHandler()
                         ),
             ),
     )
-    .setExecute(async function(interaction): Promise<void> {
+    .setExecute(async function (interaction): Promise<void> {
         const query = interaction.options.getString('query');
         const guild = await QuaverGuild.wrap(interaction.guild);
         let json;

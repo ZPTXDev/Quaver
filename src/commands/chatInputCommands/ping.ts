@@ -16,7 +16,7 @@ export default new ChatInputCommandHandler()
                 ),
             ),
     )
-    .setExecute(async function(interaction): Promise<void> {
+    .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const uptime = msToTime(interaction.client.uptime);
         const uptimeString = msToTimeString(uptime);

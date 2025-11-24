@@ -8,7 +8,7 @@ import { version } from '#src/lib/util/version';
 export default new EventHandler()
     .setOnce(true)
     .setEvent('clientReady')
-    .setExecute(async function(client): Promise<void> {
+    .setExecute(async function (client): Promise<void> {
         const { startup } = await import('#src/main');
         startup.started = true;
         logger.info({

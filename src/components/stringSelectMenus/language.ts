@@ -18,7 +18,7 @@ import { settings } from '#src/lib/util/settings';
 
 export default new StringSelectMenuHandler()
     .setChecks([Check.InteractionStarter])
-    .setExecute(async function(interaction): Promise<void> {
+    .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         if (!confirmationTimeout[interaction.message.id]) {
             await interaction.replyHandler.reply(

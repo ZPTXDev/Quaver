@@ -6,7 +6,7 @@ import type { QuaverClient } from '#src/lib/util/common.d';
 
 export default new EventHandler()
     .setEvent('guildDelete')
-    .setExecute(async function(
+    .setExecute(async function (
         guild: Guild & { client: QuaverClient },
     ): Promise<void> {
         logger.info({

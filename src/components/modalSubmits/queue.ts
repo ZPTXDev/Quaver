@@ -16,7 +16,7 @@ import { MessageOptionsBuilderType } from '#src/lib/util/common';
 import { cleanURIForMarkdown } from '#src/lib/util/util';
 
 export default new ModalSubmitHandler().setExecute(
-    async function(interaction): Promise<void> {
+    async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
         const page = parseInt(

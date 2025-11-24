@@ -26,9 +26,18 @@ import {
 import { get } from 'lodash-es';
 import { readdirSync } from 'node:fs';
 import type { LocaleKey } from './LocaleKeys';
-import type { ColorTypes, LavaLyricsResponse, LocaleCompletionState, LyricsResponse } from './util.d';
+import type {
+    ColorTypes,
+    LavaLyricsResponse,
+    LocaleCompletionState,
+    LyricsResponse,
+} from './util.d';
 import type { ComponentInteractions } from '#src/lib';
-import { type Initialized, QuaverGuild, type WhitelistedFeatures } from '#src/lib/guild';
+import {
+    type Initialized,
+    QuaverGuild,
+    type WhitelistedFeatures,
+} from '#src/lib/guild';
 import type { QuaverPlayer } from '#src/lib/music';
 import { data, locales, MessageOptionsBuilderType } from '#src/lib/util/common';
 import type {

@@ -1,4 +1,8 @@
-import { ComponentType, ContainerBuilder, TextDisplayBuilder } from 'discord.js';
+import {
+    ComponentType,
+    ContainerBuilder,
+    TextDisplayBuilder,
+} from 'discord.js';
 import { convert as romanizeFromKorean } from 'hangul-romanization';
 import { pinyin as romanizeFromChinese } from 'pinyin-pro';
 import { toRomaji as romanizeFromJapanese } from 'wanakana';
@@ -7,7 +11,7 @@ import { QuaverGuild } from '#src/lib/guild';
 import { MessageOptionsBuilderType } from '#src/lib/util/common';
 
 export default new ButtonHandler().setExecute(
-    async function(interaction): Promise<void> {
+    async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const romanizeFrom = interaction.customId.split(':')[1];
         if (

@@ -33,7 +33,7 @@ export default new ChatInputCommandHandler()
         user: [PermissionsBitField.Flags.ManageGuild],
         bot: [],
     })
-    .setExecute(async function(interaction): Promise<void> {
+    .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const option = settingsOptions[0] as SettingsPageOptions;
         const { containers } = await buildSettingsPage(interaction, option);
