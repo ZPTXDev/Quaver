@@ -33,6 +33,11 @@ Follow the steps in [README.md](README.md#setup) from step 4 onwards to complete
 
 If you're able to run Quaver through `bun run start` or `pnpm start`, then your environment is set up correctly!
 
+> [!TIP]
+> To make development with locales easier, run `bun run generate-locale-types` or `pnpm run generate-locale-types` to generate TypeScript types for locales.
+> This enables auto-completion and type checking when working with locales.
+> Additionally, hovering over locale keys will show you the corresponding locale string.
+
 ## ESLint
 This project uses ESLint.
 
