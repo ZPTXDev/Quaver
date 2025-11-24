@@ -23,6 +23,7 @@
     "lavalink-protocol": "^1.1.1",
     "lavalink-ws-client": "^1.0.2",
     "lodash-es": "^4.17.21",
+    "path-exists-cli": "^2.0.0",
     "pinyin-pro": "^3.27.0",
     "socket.io": "^4.8.1",
     "sqlite3": "^5.1.7",
@@ -51,16 +52,16 @@
   },
   "main": "dist/main.mjs",
   "scripts": {
-    "slash:register:global": "node scripts/register-global-commands.js",
-    "slash:register:guild": "node scripts/register-guild-commands.js",
-    "slash:delete:global": "node scripts/delete-global-commands.js",
-    "slash:delete:guild": "node scripts/delete-guild-commands.js",
-    "migrate": "node scripts/migrate.js",
-    "generate:locale-types": "node scripts/generate-locale-types.js",
-    "build": "npm run generate:locale-types && rimraf dist/ && tsdown",
-    "start": "node .",
-    "start:bun": "bun run .",
-    "lint": "eslint . --ext .ts"
+    "slash:register:global": "path-exists node_modules/.pnpm && node scripts/register-global-commands.js || bun scripts/register-global-commands.js",
+    "slash:register:guild": "path-exists node_modules/.pnpm && node scripts/register-guild-commands.js || bun scripts/register-guild-commands.js",
+    "slash:delete:global": "path-exists node_modules/.pnpm && node scripts/delete-global-commands.js || bun scripts/delete-global-commands.js",
+    "slash:delete:guild": "path-exists node_modules/.pnpm && node scripts/delete-guild-commands.js || bun scripts/delete-guild-commands.js",
+    "migrate": "path-exists node_modules/.pnpm && node scripts/migrate.js || bun scripts/migrate.js",
+    "generate-locale-types": "path-exists node_modules/.pnpm && node scripts/generate-locale-types.js || bun scripts/generate-locale-types.js",
+    "build": "rimraf dist/ && tsdown",
+    "start": "path-exists node_modules/.pnpm && node . || bun .",
+    "lint": "eslint . --ext .ts",
+    "typecheck": "tsc --noEmit"
   },
   "imports": {
     "#src/*": "./src/*"

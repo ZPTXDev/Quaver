@@ -58,8 +58,8 @@ works within Quaver without having to read any documentation.
 > [!TIP]
 > Refer to [CONFIGURATION.md](CONFIGURATION.md) for a detailed explanation on configuration.
 
-6. Run `bun run slash:deploy` or `pnpm run slash:deploy` to deploy slash commands
-7. Run `bun run start:bun` or `pnpm start` to start Quaver
+6. Run `bun run slash:register:global` or `pnpm run slash:register:global` to deploy slash commands
+7. Run `bun run start` or `pnpm start` to start Quaver
 
 > [!WARNING]
 > Please use only one package manager (Bun or pnpm) to avoid potential issues.
@@ -77,14 +77,14 @@ I'll consider it! Submit an issue [here](https://github.com/ZPTXDev/Quaver/issue
 
 ## I changed the language through the `/settings` command. Why isn't it updating in slash commands?
 
-Slash commands are defined when running `bun run slash:deploy` or `pnpm run slash:deploy`.
+Slash commands are defined when running `bun run slash:register:global` or `pnpm run slash:register:global`.
 
 This means that slash command descriptions will follow the language set in `settings.json` (`defaultLocaleCode` key),
 and not the language set through the `/settings` command.
 
 ## I changed `defaultLocaleCode`, but it isn't updating in slash command descriptions. Why?
 
-You need to re-deploy the commands using `bun run slash:deploy` or `pnpm run slash:deploy` for the new locale to take effect.
+You need to re-deploy the commands using `bun run slash:register:global` or `pnpm run slash:register:global` for the new locale to take effect.
 
 Due to Discord's limitations and the localizations we have, we don't currently use Discord's localized command name &
 description functionality. This may be worked on in the future.

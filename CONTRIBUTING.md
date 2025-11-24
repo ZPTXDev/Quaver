@@ -31,7 +31,7 @@ Finally, run `bun run build` or `pnpm run build` to build the project.
 
 Follow the steps in [README.md](README.md#setup) from step 4 onwards to complete the setup.
 
-If you're able to run Quaver through `bun run start:bun` or `pnpm start`, then your environment is set up correctly!
+If you're able to run Quaver through `bun run start` or `pnpm start`, then your environment is set up correctly!
 
 ## ESLint
 This project uses ESLint.
