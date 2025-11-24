@@ -68,7 +68,7 @@ export default new ChatInputCommandHandler()
                                   : '🔂'
                           }`
                         : ''
-                }${player.memory.bassboost ? ' 🅱️' : ''}\n\`[${guild.locale(
+                }${player.memory.shuffle ? ' 🔀' : ''}${player.memory.bassboost ? ' 🅱️' : ''}\n\`[${guild.locale(
                     'MISC.STREAMING',
                 )}]\` | ${guild.locale(
                     'MISC.ADDED_BY',
