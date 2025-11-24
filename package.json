@@ -56,7 +56,8 @@
     "slash:delete:global": "node scripts/delete-global-commands.js",
     "slash:delete:guild": "node scripts/delete-guild-commands.js",
     "migrate": "node scripts/migrate.js",
-    "build": "rimraf dist/ && tsdown",
+    "generate:locale-types": "node scripts/generate-locale-types.js",
+    "build": "npm run generate:locale-types && rimraf dist/ && tsdown",
     "start": "node .",
     "start:bun": "bun run .",
     "lint": "eslint . --ext .ts"

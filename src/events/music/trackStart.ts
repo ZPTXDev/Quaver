@@ -10,10 +10,14 @@ import {
     ThumbnailBuilder,
 } from 'discord.js';
 import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
+import type { LocaleKey } from '#src/lib/util/LocaleKeys';
 import { logger } from '#src/lib/util/common';
 import type { QuaverQueue, QuaverSong } from '#src/lib/util/common.d';
 import { settings } from '#src/lib/util/settings';
-import { formatLavaLyricsResponse, getTrackMarkdownLocaleString } from '#src/lib/util/util';
+import {
+    formatLavaLyricsResponse,
+    getTrackMarkdownLocaleString,
+} from '#src/lib/util/util';
 import type { LavaLyricsResponse } from '#src/lib/util/util.d';
 
 export default {
@@ -72,7 +76,7 @@ export default {
                                     'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
                                     getTrackMarkdownLocaleString(track),
                                     durationString,
-                                )}\n${guild.locale('MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${guild.locale(`MISC.SOURCES.${track.info.sourceName.toUpperCase()}`)}** ─ ${guild.locale(
+                                )}\n${guild.locale('MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${guild.locale(`MISC.SOURCES.${track.info.sourceName.toUpperCase()}` as LocaleKey)}** ─ ${guild.locale(
                                     'MISC.ADDED_BY',
                                     track.requesterId,
                                 )}`,
@@ -118,7 +122,7 @@ export default {
                                             'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TEXT',
                                             `[${track.info.author} - ${track.info.title}](${track.info.uri})`,
                                             durationString,
-                                        )}\n${guild.locale('MUSIC.PLAYER.PLAYING.NOW.DETAILED.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${guild.locale(`MISC.SOURCES.${track.info.sourceName.toUpperCase()}`)}** ─ ${guild.locale(
+                                        )}\n${guild.locale('MUSIC.PLAYER.PLAYING.NOW.DETAILED.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${guild.locale(`MISC.SOURCES.${track.info.sourceName.toUpperCase()}` as LocaleKey)}** ─ ${guild.locale(
                                             'MISC.ADDED_BY',
                                             track.requesterId,
                                         )}`,
@@ -220,7 +224,7 @@ export default {
                                   new ActionRowBuilder<ButtonBuilder>().addComponents(
                                       guild.builders
                                           .buttonLocale(
-                                              `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}`,
+                                              `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}` as LocaleKey,
                                           )
                                           .setStyle(ButtonStyle.Secondary)
                                           .setCustomId(

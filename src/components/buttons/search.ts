@@ -20,10 +20,19 @@ import { ForceType } from '#src/lib';
 import { ButtonHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import type { QuaverPlayer } from '#src/lib/music';
-import { logger, MessageOptionsBuilderType, searchState } from '#src/lib/util/common';
+import type { LocaleKey } from '#src/lib/util/LocaleKeys';
+import {
+    logger,
+    MessageOptionsBuilderType,
+    searchState,
+} from '#src/lib/util/common';
 import type { QuaverChannels, QuaverSong } from '#src/lib/util/common.d';
 import { Check } from '#src/lib/util/constants';
-import { buildMessageOptions, getFailedChecks, getTrackMarkdownLocaleString } from '#src/lib/util/util';
+import {
+    buildMessageOptions,
+    getFailedChecks,
+    getTrackMarkdownLocaleString,
+} from '#src/lib/util/util';
 
 export default new ButtonHandler()
     .setChecks([Check.InteractionStarter])
@@ -128,7 +137,7 @@ export default new ButtonHandler()
                 );
                 return;
             }
-            let msg,
+            let msg: LocaleKey,
                 extras = [];
             if (resolvedTracks.length === 1) {
                 msg = 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
