@@ -129,7 +129,7 @@ export default new ButtonHandler()
                 );
                 return;
             }
-            let msg,
+            let msg: LocaleKey,
                 extras = [];
             if (resolvedTracks.length === 1) {
                 msg = 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
@@ -187,7 +187,7 @@ export default new ButtonHandler()
             const smartQueue = await guild.settings.get<boolean>('smartqueue');
             await interaction.replyHandler.reply(
                 new ContainerBuilder().addTextDisplayComponents(
-                    guild.builders.textDisplayLocale(msg as LocaleKey, ...extras),
+                    guild.builders.textDisplayLocale(msg, ...extras),
                     ...(started && !smartQueue
                         ? [
                               new TextDisplayBuilder().setContent(
