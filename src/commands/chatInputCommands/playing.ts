@@ -89,7 +89,7 @@ export default new ChatInputCommandHandler()
                               : '🔂'
                       }`
                     : ''
-            }${player.memory.bassboost ? ' 🅱️' : ''}${
+            }${player.memory.shuffle ? ' 🔀' : ''}${player.memory.bassboost ? ' 🅱️' : ''}${
                 player.memory.nightcore ? ' 🇳' : ''
             }\n\`[${elapsedString} / ${durationString}]\` | ${guild.locale(
                 'MISC.ADDED_BY',
