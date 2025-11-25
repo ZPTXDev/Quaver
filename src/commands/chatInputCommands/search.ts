@@ -1,27 +1,30 @@
 import { MessageOptionsBuilderType } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
-import { getLocaleString } from '#src/lib/locales';
+import { getLocaleString, type LocaleKey } from '#src/lib/locales';
 import { logger } from '#src/lib/logger';
 import { searchState } from '#src/lib/state';
+import type { QuaverChannels, QuaverSong } from '#src/lib/util';
 import {
+    acceptableSources,
     buildMessageOptions,
     Check,
-    cleanURIForMarkdown,
+    getTrackMarkdownLocaleString,
+    queryOverrides,
     settings,
 } from '#src/lib/util';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
 import {
     ActionRowBuilder,
-    type ApplicationCommandManager,
     ButtonBuilder,
     ButtonStyle,
     ChannelType,
     ContainerBuilder,
-    escapeMarkdown,
+    GuildMember,
     InteractionCallbackResponse,
     Message,
+    PermissionsBitField,
     type SelectMenuComponentOptionData,
     SeparatorBuilder,
     SlashCommandBuilder,
@@ -81,32 +84,166 @@ export default new ChatInputCommandHandler()
         }
         await interaction.deferReply();
         const query = interaction.options.getString('query');
-        // this should be Track[] but lavaclient doesn't export it so
-        // we should be using ReturnType<typeof x> but can't seem to
-        // figure it out rn so we'll deal with this in subsequent
-        // commits
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let tracks: any[] = [];
-        const result = await interaction.client.music.api.loadTracks(
-            `ytsearch:${query}`,
-        );
-        if (result.loadType === 'search') tracks = [...result.data];
-        if (tracks.length <= 1) {
-            const applicationCommands: ApplicationCommandManager =
-                interaction.client.application?.commands;
-            if (applicationCommands.cache.size === 0) {
-                await applicationCommands.fetch();
+        let tracks: QuaverSong[] = [];
+        let searchQuery;
+        if (queryOverrides.some((q): boolean => query.startsWith(q))) {
+            searchQuery = query;
+        } else {
+            const source =
+                (await guild.settings.get<string>('source')) ??
+                Object.keys(acceptableSources)[0];
+            searchQuery = `${acceptableSources[source]}${query}`;
+        }
+        const result =
+            await interaction.client.music.api.loadTracks(searchQuery);
+        switch (result.loadType) {
+            case 'playlist':
+            case 'track': {
+                tracks =
+                    result.loadType === 'track'
+                        ? [result.data]
+                        : result.data.tracks.map(
+                              (t: QuaverSong): QuaverSong => {
+                                  t.requesterId = interaction.user.id;
+                                  t.id = crypto.randomUUID();
+                                  return t;
+                              },
+                          );
+                const msg =
+                    result.loadType === 'track'
+                        ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT'
+                        : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
+                const extras =
+                    result.loadType === 'track'
+                        ? [getTrackMarkdownLocaleString(tracks[0])]
+                        : [
+                              tracks.length.toString(),
+                              result.data.info.name === query
+                                  ? result.data.info.name
+                                  : `[${result.data.info.name}](${query})`,
+                          ];
+                if (
+                    ![
+                        ChannelType.GuildText,
+                        ChannelType.GuildVoice,
+                        ChannelType.GuildStageVoice,
+                    ].includes(interaction.channel.type)
+                ) {
+                    await interaction.replyHandler.reply(
+                        guild.locale('DISCORD.CHANNEL_UNSUPPORTED'),
+                        { type: MessageOptionsBuilderType.Error },
+                    );
+                    return;
+                }
+                // check for connect, speak permission for channel
+                if (!(interaction.member instanceof GuildMember)) return;
+                const permissions =
+                    interaction.member.voice.channel.permissionsFor(
+                        interaction.client.user.id,
+                    );
+                if (
+                    !permissions.has(
+                        new PermissionsBitField([
+                            PermissionsBitField.Flags.ViewChannel,
+                            PermissionsBitField.Flags.Connect,
+                            PermissionsBitField.Flags.Speak,
+                        ]),
+                    )
+                ) {
+                    await interaction.replyHandler.reply(
+                        guild.locale(
+                            'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC',
+                        ),
+                        { type: MessageOptionsBuilderType.Error },
+                    );
+                    return;
+                }
+                if (
+                    interaction.member.voice.channel.type ===
+                        ChannelType.GuildStageVoice &&
+                    !permissions.has(PermissionsBitField.StageModerator)
+                ) {
+                    await interaction.replyHandler.reply(
+                        guild.locale(
+                            'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE',
+                        ),
+                        { type: MessageOptionsBuilderType.Error },
+                    );
+                    return;
+                }
+                if (
+                    interaction.client.music.ws.state !==
+                    LavalinkWSClientState.Ready
+                ) {
+                    await interaction.replyHandler.reply(
+                        guild.locale('MUSIC.NOT_READY'),
+                        {
+                            type: MessageOptionsBuilderType.Error,
+                        },
+                    );
+                    return;
+                }
+                const player = await guild.getPlayer({
+                    textChannel: interaction.channel as QuaverChannels,
+                    voiceChannelId: interaction.member.voice.channelId,
+                    replyHandler: interaction.replyHandler,
+                });
+                if (!player) return;
+                const position = await player.addTracksToQueue(
+                    tracks,
+                    interaction.user.id,
+                );
+                await interaction.replyHandler.reply(
+                    new ContainerBuilder().addTextDisplayComponents(
+                        guild.builders.textDisplayLocale(
+                            msg as LocaleKey,
+                            ...extras,
+                        ),
+                        ...(position !== '0'
+                            ? [
+                                  new TextDisplayBuilder().setContent(
+                                      `-# ${guild.locale('MISC.POSITION')}: ${position}`,
+                                  ),
+                              ]
+                            : []),
+                    ),
+                    { type: MessageOptionsBuilderType.Success },
+                );
+                guild.sendWebUpdate(
+                    'queueUpdate',
+                    player.queue.tracks.map((track: QuaverSong): QuaverSong => {
+                        const user = interaction.client.users.cache.get(
+                            track.requesterId,
+                        );
+                        track.requesterTag = user?.tag;
+                        track.requesterAvatar = user?.avatar;
+                        return track;
+                    }),
+                );
+                return;
             }
-            await interaction.replyHandler.reply(
-                guild.locale(
-                    'CMD.SEARCH.RESPONSE.USE_PLAY_CMD',
-                    applicationCommands.cache.find(
-                        (command): boolean => command.name === 'play',
-                    )?.id ?? '1',
-                ),
-                { type: MessageOptionsBuilderType.Error },
-            );
-            return;
+            case 'search': {
+                tracks = [...result.data];
+                break;
+            }
+            case 'empty':
+                await interaction.replyHandler.reply(
+                    guild.locale('CMD.PLAY.RESPONSE.NO_RESULTS'),
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
+            case 'error':
+                await interaction.replyHandler.reply(
+                    guild.locale('CMD.PLAY.RESPONSE.LOAD_FAILED'),
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
+            default:
+                await interaction.replyHandler.reply(
+                    guild.locale('DISCORD.GENERIC_ERROR'),
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
         }
         const pages = paginate(tracks, 10);
         const response = await interaction.replyHandler.reply(
@@ -129,11 +266,9 @@ export default new ChatInputCommandHandler()
                                     .padStart(
                                         tracks.length.toString().length,
                                         ' ',
-                                    )}.\` ${
-                                    track.info.title === track.info.uri
-                                        ? `**${track.info.uri}**`
-                                        : `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`
-                                } \`[${durationString}]\``;
+                                    )}.\` **${getTrackMarkdownLocaleString(
+                                    track,
+                                )}** \`[${durationString}]\``;
                             })
                             .join('\n'),
                     ),
@@ -167,7 +302,7 @@ export default new ChatInputCommandHandler()
                                         return {
                                             label: label,
                                             description: track.info.author,
-                                            value: track.info.identifier,
+                                            value: track.info.uri,
                                         };
                                     },
                                 ),

@@ -81,47 +81,40 @@ export default new StringSelectMenuHandler()
                             description: value.data.description,
                             value: value.data.value,
                             default: !!state.selected.find(
-                                (identifier: string): boolean =>
-                                    identifier === value.data.value,
+                                (uri: string): boolean =>
+                                    uri === value.data.value,
                             ),
                         };
                     },
                 )
                 .concat(
                     state.selected
-                        .map(
-                            (
-                                identifier: string,
-                            ): SelectMenuComponentOptionData => {
-                                const refPg = pages.indexOf(
-                                    pages.find(
-                                        (pg): Song =>
-                                            pg.find(
-                                                (t): boolean =>
-                                                    t.info.identifier ===
-                                                    identifier,
-                                            ),
-                                    ),
-                                );
-                                const firstIdx = 10 * refPg + 1;
-                                const refTrack = pages[refPg].find(
-                                    (t): boolean =>
-                                        t.info.identifier === identifier,
-                                );
-                                let label = `${
-                                    firstIdx + pages[refPg].indexOf(refTrack)
-                                }. ${refTrack.info.title}`;
-                                if (label.length >= 100) {
-                                    label = `${label.substring(0, 99)}…`;
-                                }
-                                return {
-                                    label: label,
-                                    description: refTrack.info.author,
-                                    value: identifier,
-                                    default: true,
-                                };
-                            },
-                        )
+                        .map((uri: string): SelectMenuComponentOptionData => {
+                            const refPg = pages.indexOf(
+                                pages.find(
+                                    (pg): Song =>
+                                        pg.find(
+                                            (t): boolean => t.info.uri === uri,
+                                        ),
+                                ),
+                            );
+                            const firstIdx = 10 * refPg + 1;
+                            const refTrack = pages[refPg].find(
+                                (t): boolean => t.info.uri === uri,
+                            );
+                            let label = `${
+                                firstIdx + pages[refPg].indexOf(refTrack)
+                            }. ${refTrack.info.title}`;
+                            if (label.length >= 100) {
+                                label = `${label.substring(0, 99)}…`;
+                            }
+                            return {
+                                label: label,
+                                description: refTrack.info.author,
+                                value: uri,
+                                default: true,
+                            };
+                        })
                         .filter(
                             (options): boolean =>
                                 !selectMenuActionRow.components[0].options.find(

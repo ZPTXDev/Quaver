@@ -85,7 +85,7 @@ export default {
                 ) {
                     return callback({ status: Response.BotPermissionError });
                 }
-                let me = await guild.members.fetchMe();
+                const me = await guild.members.fetchMe();
                 if (me.isCommunicationDisabled()) {
                     return callback({ status: Response.BotTimedOutError });
                 }
@@ -135,28 +135,12 @@ export default {
                     default:
                         return callback({ status: Response.GenericError });
                 }
-                let player = await client.music.players.fetch(guild.id);
-                if (!player?.voice.connected) {
-                    player = client.music.players.create(guild);
-                    player.queue.channel = member.voice
-                        .channel as QuaverChannels;
-                    player.voice.connect(member.voice.channelId, {
-                        deafened: true,
-                    });
-                    // Ensure that Quaver destroys the player if the user leaves the channel while Quaver is queuing tracks
-                    // Ensure that Quaver destroys the player if Quaver gets timed out by the user while Quaver is queuing tracks
-                    // Ensure that Quaver destroys the player if Quaver gets kicked or banned by the user while Quaver is queuing tracks
-                    me = await guild.members.fetchMe();
-                    const timedOut = me.isCommunicationDisabled();
-                    if (!member.voice.channelId || timedOut || !guild) {
-                        await player.disconnect();
-                        return callback({ status: Response.GenericError });
-                    }
-                    const smartQueue =
-                        await guild.settings.get<boolean>('smartqueue');
-                    if (smartQueue) {
-                        await player.setAlternate(true);
-                    }
+                const player = await guild.getPlayer({
+                    textChannel: member.voice.channel as QuaverChannels,
+                    voiceChannelId: member.voice.channelId,
+                });
+                if (!player) {
+                    return callback({ status: Response.GenericError });
                 }
                 await player.addTracksToQueue(tracks, socket.user.id);
                 guild.sendWebUpdate(

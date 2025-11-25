@@ -1,9 +1,17 @@
-import type { QuaverClient } from '#src/lib';
+import type { QuaverClient, ReplyHandler } from '#src/lib';
+import { MessageOptionsBuilderType } from '#src/lib';
 import { getLocaleString, type LocaleKey } from '#src/lib/locales';
-import type { QuaverPlayer } from '#src/lib/music';
+import type { QuaverNode, QuaverPlayer } from '#src/lib/music';
+import type { QuaverChannels } from '#src/lib/util';
 import { settings } from '#src/lib/util';
-import type { Guild } from 'discord.js';
+import type { Guild, Snowflake } from 'discord.js';
 import { GuildBuilders, GuildFeatures, GuildSettings } from '.';
+
+type PlayerCreationData = {
+    textChannel: QuaverChannels;
+    voiceChannelId: Snowflake;
+    replyHandler?: ReplyHandler;
+};
 
 export type Initialized = { localeCode: string };
 export type Uninitialized = { localeCode: undefined };
@@ -34,8 +42,60 @@ export class QuaverGuild<S extends Uninitialized | Initialized> {
         this.client.io.to(`guild:${this.guild.id}`).emit(event, ...args);
     }
 
-    getPlayer(): Promise<QuaverPlayer> {
-        return this.client.music.players.fetch(this.guild.id);
+    async getPlayer(
+        options?: PlayerCreationData,
+    ): Promise<QuaverPlayer<QuaverNode> | undefined> {
+        let player = await this.client.music.players.fetch(this.guild.id);
+        if (
+            player?.voice.connected ||
+            !options.textChannel ||
+            !options.voiceChannelId
+        )
+            return player;
+        player = this.client.music.players.create(this.guild);
+        player.queue.channel = options.textChannel;
+        player.voice.connect(options.voiceChannelId, {
+            deafened: true,
+        });
+        // Ensure that Quaver destroys the player if the user leaves the channel while Quaver is queuing tracks
+        // Ensure that Quaver destroys the player if Quaver gets timed out by the user while Quaver is queuing tracks
+        // Ensure that Quaver destroys the player if Quaver gets kicked or banned by the user while Quaver is queuing tracks
+        const me = await this.guild?.members.fetchMe();
+        const timedOut = me.isCommunicationDisabled();
+        if (!this.guild) {
+            await player.disconnect();
+            if (options.replyHandler) {
+                await options.replyHandler.reply(
+                    this.locale('DISCORD.GENERIC_ERROR'),
+                    { type: MessageOptionsBuilderType.Error },
+                );
+            }
+            return;
+        }
+        if (timedOut) {
+            if (options.replyHandler) {
+                await options.replyHandler.reply(
+                    this.locale(
+                        'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
+                    ),
+                    { type: MessageOptionsBuilderType.Error },
+                );
+            }
+            return;
+        }
+        if (!options.voiceChannelId) {
+            if (options.replyHandler) {
+                await options.replyHandler.reply(
+                    this.locale('DISCORD.INTERACTION.CANCELED'),
+                );
+            }
+            return;
+        }
+        const smartQueue = await this.settings.get<boolean>('smartqueue');
+        if (smartQueue) {
+            await player.setAlternate(true);
+        }
+        return player;
     }
 
     locale(

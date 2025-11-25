@@ -7,7 +7,6 @@ import { ButtonHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import type { LocaleKey } from '#src/lib/locales';
 import { logger } from '#src/lib/logger';
-import type { QuaverPlayer } from '#src/lib/music';
 import { searchState } from '#src/lib/state';
 import {
     buildMessageOptions,
@@ -51,9 +50,6 @@ export default new ButtonHandler()
         const target = interaction.customId.split(':')[1];
         if (target === 'add') {
             const tracks = state.selected;
-            let player = (await interaction.client.music.players.fetch(
-                interaction.guildId,
-            )) as QuaverPlayer;
             const member = interaction.member as GuildMember & {
                 client: QuaverClient;
             };
@@ -98,7 +94,7 @@ export default new ButtonHandler()
                 );
                 return;
             }
-            let me = await interaction.guild.members.fetchMe();
+            const me = await interaction.guild.members.fetchMe();
             if (me.isCommunicationDisabled()) {
                 await interaction.replyHandler.reply(
                     guild.locale(
@@ -156,48 +152,12 @@ export default new ButtonHandler()
                     guild.locale('MISC.YOUR_SEARCH'),
                 ];
             }
-            if (!player?.voice.connected) {
-                player = interaction.client.music.players.create(guild);
-                player.queue.channel = interaction.channel as QuaverChannels;
-                player.voice.connect(member.voice.channelId, {
-                    deafened: true,
-                });
-                // Ensure that Quaver destroys the player if the user leaves the channel while Quaver is queuing tracks
-                // Ensure that Quaver destroys the player if Quaver gets timed out by the user while Quaver is queuing tracks
-                // Ensure that Quaver destroys the player if Quaver gets kicked or banned by the user while Quaver is queuing tracks
-                me = await guild.members.fetchMe();
-                const timedOut = me.isCommunicationDisabled();
-                if (!member.voice.channelId || timedOut || !guild) {
-                    if (guild) {
-                        if (timedOut) {
-                            await interaction.replyHandler.reply(
-                                guild.locale(
-                                    'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
-                                ),
-                                {
-                                    type: MessageOptionsBuilderType.Error,
-                                    components: [],
-                                },
-                            );
-                        } else {
-                            await interaction.replyHandler.reply(
-                                guild.locale(
-                                    'DISCORD.INTERACTION.CANCELED',
-                                    interaction.user.id,
-                                ),
-                                { components: [] },
-                            );
-                        }
-                    }
-                    await player.disconnect();
-                    return;
-                }
-                const smartQueue =
-                    await guild.settings.get<boolean>('smartqueue');
-                if (smartQueue) {
-                    await player.setAlternate(true);
-                }
-            }
+            const player = await guild.getPlayer({
+                textChannel: interaction.channel as QuaverChannels,
+                voiceChannelId: member.voice.channelId,
+                replyHandler: interaction.replyHandler,
+            });
+            if (!player) return;
             const position = await player.addTracksToQueue(
                 resolvedTracks,
                 interaction.user.id,
@@ -208,7 +168,7 @@ export default new ButtonHandler()
                     ...(position !== '0'
                         ? [
                               new TextDisplayBuilder().setContent(
-                                  `${guild.locale(
+                                  `-# ${guild.locale(
                                       'MISC.POSITION',
                                   )}: ${position}`,
                               ),
@@ -286,9 +246,9 @@ export default new ButtonHandler()
                         .padStart(
                             largestIndexSize,
                             ' ',
-                        )}.\` ${getTrackMarkdownLocaleString(
+                        )}.\` **${getTrackMarkdownLocaleString(
                         track,
-                    )} \`[${durationString}]\``;
+                    )}** \`[${durationString}]\``;
                 })
                 .join('\n'),
         );
@@ -311,28 +271,24 @@ export default new ButtonHandler()
                 return {
                     label: label,
                     description: track.info.author,
-                    value: track.info.identifier,
+                    value: track.info.uri,
                     default: !!state.selected.find(
-                        (identifier: string): boolean =>
-                            identifier === track.info.identifier,
+                        (uri: string): boolean => uri === track.info.uri,
                     ),
                 };
             })
             .concat(
                 state.selected
-                    .map((identifier: string): APISelectMenuOption => {
+                    .map((uri: string): APISelectMenuOption => {
                         const refPg = pages.indexOf(
                             pages.find(
                                 (pg): Song =>
-                                    pg.find(
-                                        (t): boolean =>
-                                            t.info.identifier === identifier,
-                                    ),
+                                    pg.find((t): boolean => t.info.uri === uri),
                             ),
                         );
                         const firstIdx = 10 * refPg + 1;
                         const refTrack = pages[refPg].find(
-                            (t): boolean => t.info.identifier === identifier,
+                            (t): boolean => t.info.uri === uri,
                         );
                         let label = `${
                             firstIdx + pages[refPg].indexOf(refTrack)
@@ -343,7 +299,7 @@ export default new ButtonHandler()
                         return {
                             label: label,
                             description: refTrack.info.author,
-                            value: identifier,
+                            value: uri,
                             default: true,
                         };
                     })
@@ -351,7 +307,7 @@ export default new ButtonHandler()
                         (options): boolean =>
                             !pages[page - 1].find(
                                 (track): boolean =>
-                                    track.info.identifier === options.value,
+                                    track.info.uri === options.value,
                             ),
                     ),
             )

@@ -188,7 +188,7 @@ export default {
         },
         RESPONSE: {
             LOAD_FAILED: 'An internal error prevented the track(s) from loading. Please try again later.',
-            USE_PLAY_CMD: 'Your search failed due to an internal error. Please try using </play:%1> for this query instead, or try again later.',
+            NO_RESULTS: 'Your search yielded no results.',
         },
         MISC: {
             PICK: 'Pick track(s)',
@@ -270,7 +270,7 @@ export default {
                 NAME: 'Smart Queue',
             },
             SOURCE: {
-                DESCRIPTION: 'The default source to use. Affects the /play command.',
+                DESCRIPTION: 'The default source to use. Affects the /play and /search commands.',
                 NAME: 'Source',
             },
         },

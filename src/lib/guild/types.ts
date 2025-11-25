@@ -18,3 +18,9 @@ export enum WhitelistStatus {
      */
     Permanent,
 }
+
+export enum PlayerCreationError {
+    BotTimedOut,
+    NoVoiceChannel,
+    GuildUnavailable,
+}

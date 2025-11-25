@@ -105,7 +105,7 @@ export default new ChatInputCommandHandler()
             );
             return;
         }
-        let me = await interaction.guild.members.fetchMe();
+        const me = await interaction.guild.members.fetchMe();
         if (me.isCommunicationDisabled()) {
             await interaction.replyHandler.reply(
                 guild.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT'),
@@ -190,48 +190,12 @@ export default new ChatInputCommandHandler()
                 );
                 return;
         }
-        let player = await guild.getPlayer();
-        if (!player?.voice.connected) {
-            player = interaction.client.music.players.create(interaction.guild);
-            player.queue.channel = interaction.channel as QuaverChannels;
-            player.voice.connect(interaction.member.voice.channelId, {
-                deafened: true,
-            });
-            // Ensure that Quaver destroys the player if the user leaves the channel while Quaver is queuing tracks
-            // Ensure that Quaver destroys the player if Quaver gets timed out by the user while Quaver is queuing tracks
-            // Ensure that Quaver destroys the player if Quaver gets kicked or banned by the user while Quaver is queuing tracks
-            me = await interaction.guild?.members.fetchMe();
-            const timedOut = me.isCommunicationDisabled();
-            if (
-                !interaction.member.voice.channelId ||
-                timedOut ||
-                !interaction.guild
-            ) {
-                if (interaction.guild) {
-                    if (timedOut) {
-                        await interaction.replyHandler.reply(
-                            guild.locale(
-                                'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
-                            ),
-                            { type: MessageOptionsBuilderType.Error },
-                        );
-                    } else {
-                        await interaction.replyHandler.reply(
-                            guild.locale(
-                                'DISCORD.INTERACTION.CANCELED',
-                                interaction.user.id,
-                            ),
-                        );
-                    }
-                }
-                await player.disconnect();
-                return;
-            }
-            const smartQueue = await guild.settings.get<boolean>('smartqueue');
-            if (smartQueue) {
-                await player.setAlternate(true);
-            }
-        }
+        const player = await guild.getPlayer({
+            textChannel: interaction.channel as QuaverChannels,
+            voiceChannelId: interaction.member.voice.channelId,
+            replyHandler: interaction.replyHandler,
+        });
+        if (!player) return;
         const position = await player.addTracksToQueue(
             tracks,
             interaction.user.id,
