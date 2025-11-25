@@ -1,11 +1,7 @@
 import { MessageOptionsBuilderType } from '#src/lib';
 import { QuaverGuild } from '#src/lib/guild';
 import { logger } from '#src/lib/logger';
-import {
-    getTrackMarkdownLocaleString,
-    type QuaverQueue,
-    type QuaverSong,
-} from '#src/lib/util';
+import { getTrackMarkdownLocaleString, type QuaverQueue, type QuaverSong, } from '#src/lib/util';
 import { LoopType } from '@lavaclient/plugin-queue';
 import type { Collection, GuildMember, Snowflake } from 'discord.js';
 
@@ -36,7 +32,7 @@ export default {
             }
             queue.player.memory.failureCount++;
             if (queue.player.memory.failureCount >= 3) {
-                queue.clear();
+                await queue.player.clearQueue();
                 await queue.skip();
                 await queue.start();
                 await queue.player.sendMessage(
@@ -58,7 +54,7 @@ export default {
                     await queue.start();
                 }
                 break;
-            case LoopType.Queue:
+            case LoopType.Queue: {
                 if (
                     queue.tracks.reduce(
                         (a: number, b: QuaverSong): number => a + b.info.length,
@@ -71,7 +67,20 @@ export default {
                         guild.locale('MUSIC.PLAYER.LOOP_QUEUE_DISABLED'),
                         { type: MessageOptionsBuilderType.Warning },
                     );
+                    break;
                 }
+                const transformsActive =
+                    queue.player.memory.shuffle ||
+                    queue.player.memory.alternate;
+                if (transformsActive) {
+                    if (queue.player.memory.originalQueue) {
+                        queue.player.memory.originalQueue.push(track);
+                    }
+                    if (queue.player.memory.shuffledQueue) {
+                        queue.player.memory.shuffledQueue.push(track.id);
+                    }
+                }
+            }
         }
         if (queue.player.memory.failureCount) {
             delete queue.player.memory.failureCount;
