@@ -12,16 +12,13 @@ import {
     settings,
 } from '#src/lib/util';
 import {
-    ChannelType,
     ContainerBuilder,
-    GuildMember,
-    PermissionsBitField,
+    type GuildMember,
     type SlashCommandBooleanOption,
     SlashCommandBuilder,
     type SlashCommandStringOption,
     TextDisplayBuilder,
 } from 'discord.js';
-import { LavalinkWSClientState } from 'lavalink-ws-client';
 
 export default new ChatInputCommandHandler()
     .setData(
@@ -61,67 +58,12 @@ export default new ChatInputCommandHandler()
     .setChecks([Check.GuildOnly, Check.InVoice, Check.InSessionVoice])
     .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
-        if (
-            ![
-                ChannelType.GuildText,
-                ChannelType.GuildVoice,
-                ChannelType.GuildStageVoice,
-            ].includes(interaction.channel.type)
-        ) {
-            await interaction.replyHandler.reply(
-                guild.locale('DISCORD.CHANNEL_UNSUPPORTED'),
-                { type: MessageOptionsBuilderType.Error },
-            );
-            return;
-        }
-        // check for connect, speak permission for channel
-        if (!(interaction.member instanceof GuildMember)) return;
-        const permissions = interaction.member.voice.channel.permissionsFor(
-            interaction.client.user.id,
-        );
-        if (
-            !permissions.has(
-                new PermissionsBitField([
-                    PermissionsBitField.Flags.ViewChannel,
-                    PermissionsBitField.Flags.Connect,
-                    PermissionsBitField.Flags.Speak,
-                ]),
-            )
-        ) {
-            await interaction.replyHandler.reply(
-                guild.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC'),
-                { type: MessageOptionsBuilderType.Error },
-            );
-            return;
-        }
-        if (
-            interaction.member.voice.channel.type ===
-                ChannelType.GuildStageVoice &&
-            !permissions.has(PermissionsBitField.StageModerator)
-        ) {
-            await interaction.replyHandler.reply(
-                guild.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE'),
-                { type: MessageOptionsBuilderType.Error },
-            );
-            return;
-        }
-        const me = await interaction.guild.members.fetchMe();
-        if (me.isCommunicationDisabled()) {
-            await interaction.replyHandler.reply(
-                guild.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT'),
-                { type: MessageOptionsBuilderType.Error },
-            );
-            return;
-        }
-        if (interaction.client.music.ws.state !== LavalinkWSClientState.Ready) {
-            await interaction.replyHandler.reply(
-                guild.locale('MUSIC.NOT_READY'),
-                {
-                    type: MessageOptionsBuilderType.Error,
-                },
-            );
-            return;
-        }
+        const compatible = await guild.checkPlayerCompatibility({
+            member: interaction.member as GuildMember,
+            textChannel: interaction.channel,
+            replyHandler: interaction.replyHandler,
+        });
+        if (!compatible) return;
         await interaction.deferReply();
         const query = interaction.options.getString('query');
         const insert = interaction.options.getBoolean('insert');
@@ -192,7 +134,7 @@ export default new ChatInputCommandHandler()
         }
         const player = await guild.getPlayer({
             textChannel: interaction.channel as QuaverChannels,
-            voiceChannelId: interaction.member.voice.channelId,
+            voiceChannelId: (interaction.member as GuildMember).voice.channelId,
             replyHandler: interaction.replyHandler,
         });
         if (!player) return;

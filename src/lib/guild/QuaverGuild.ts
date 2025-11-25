@@ -1,16 +1,27 @@
+import { Response } from '#src/events/web/update';
 import type { QuaverClient, ReplyHandler } from '#src/lib';
 import { MessageOptionsBuilderType } from '#src/lib';
 import { getLocaleString, type LocaleKey } from '#src/lib/locales';
 import type { QuaverNode, QuaverPlayer } from '#src/lib/music';
 import type { QuaverChannels } from '#src/lib/util';
-import { settings } from '#src/lib/util';
-import type { Guild, Snowflake } from 'discord.js';
+import { Check, getFailedChecks, settings } from '#src/lib/util';
+import type { Guild, GuildTextBasedChannel, Snowflake } from 'discord.js';
+import { ChannelType, GuildMember, PermissionsBitField } from 'discord.js';
+import { LavalinkWSClientState } from 'lavalink-ws-client';
 import { GuildBuilders, GuildFeatures, GuildSettings } from '.';
 
 type PlayerCreationData = {
     textChannel: QuaverChannels;
     voiceChannelId: Snowflake;
     replyHandler?: ReplyHandler;
+};
+
+type PlayerCompatibilityData = {
+    member: GuildMember;
+    textChannel?: GuildTextBasedChannel;
+    runChecks?: boolean;
+    replyHandler?: ReplyHandler;
+    webResponse?: boolean;
 };
 
 export type Initialized = { localeCode: string };
@@ -42,6 +53,95 @@ export class QuaverGuild<S extends Uninitialized | Initialized> {
         this.client.io.to(`guild:${this.guild.id}`).emit(event, ...args);
     }
 
+    async checkPlayerCompatibility(
+        options: PlayerCompatibilityData & { webResponse: true },
+    ): Promise<Response>;
+    async checkPlayerCompatibility(
+        options?: PlayerCompatibilityData,
+    ): Promise<boolean>;
+    async checkPlayerCompatibility(
+        options?: PlayerCompatibilityData,
+    ): Promise<boolean | Response> {
+        if (
+            options.textChannel &&
+            ![
+                ChannelType.GuildText,
+                ChannelType.GuildVoice,
+                ChannelType.GuildStageVoice,
+            ].includes(options.textChannel.type)
+        ) {
+            await options.replyHandler?.reply(
+                this.locale('DISCORD.CHANNEL_UNSUPPORTED'),
+                { type: MessageOptionsBuilderType.Error },
+            );
+            return options.webResponse ? Response.GenericError : false;
+        }
+        if (!(options.member instanceof GuildMember))
+            return options.webResponse ? Response.GenericError : false;
+        if (options.runChecks) {
+            const failedChecks = await getFailedChecks(
+                [Check.InVoice, Check.InSessionVoice],
+                this.guild.id,
+                options.member as GuildMember & { client: QuaverClient },
+            );
+            if (failedChecks.length > 0) {
+                await options.replyHandler?.reply(
+                    this.locale(failedChecks[0]),
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return options.webResponse
+                    ? Response.UserNotInChannelError
+                    : false;
+            }
+        }
+        const permissions = options.member.voice.channel.permissionsFor(
+            this.client.user.id,
+        );
+        if (
+            !permissions.has(
+                new PermissionsBitField([
+                    PermissionsBitField.Flags.ViewChannel,
+                    ...(options.webResponse
+                        ? [PermissionsBitField.Flags.SendMessages]
+                        : []),
+                    PermissionsBitField.Flags.Connect,
+                    PermissionsBitField.Flags.Speak,
+                ]),
+            )
+        ) {
+            await options.replyHandler?.reply(
+                this.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC'),
+                { type: MessageOptionsBuilderType.Error },
+            );
+            return options.webResponse ? Response.BotPermissionError : false;
+        }
+        if (
+            options.member.voice.channel.type === ChannelType.GuildStageVoice &&
+            !permissions.has(PermissionsBitField.StageModerator)
+        ) {
+            await options.replyHandler?.reply(
+                this.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE'),
+                { type: MessageOptionsBuilderType.Error },
+            );
+            return options.webResponse ? Response.BotPermissionError : false;
+        }
+        const me = await this.guild.members.fetchMe();
+        if (me.isCommunicationDisabled()) {
+            await options.replyHandler?.reply(
+                this.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT'),
+                { type: MessageOptionsBuilderType.Error },
+            );
+            return options.webResponse ? Response.BotTimedOutError : false;
+        }
+        if (this.client.music.ws.state !== LavalinkWSClientState.Ready) {
+            await options.replyHandler?.reply(this.locale('MUSIC.NOT_READY'), {
+                type: MessageOptionsBuilderType.Error,
+            });
+            return options.webResponse ? Response.NotReadyError : false;
+        }
+        return options.webResponse ? Response.Success : true;
+    }
+
     async getPlayer(
         options?: PlayerCreationData,
     ): Promise<QuaverPlayer<QuaverNode> | undefined> {
@@ -64,31 +164,23 @@ export class QuaverGuild<S extends Uninitialized | Initialized> {
         const timedOut = me.isCommunicationDisabled();
         if (!this.guild) {
             await player.disconnect();
-            if (options.replyHandler) {
-                await options.replyHandler.reply(
-                    this.locale('DISCORD.GENERIC_ERROR'),
-                    { type: MessageOptionsBuilderType.Error },
-                );
-            }
+            await options.replyHandler?.reply(
+                this.locale('DISCORD.GENERIC_ERROR'),
+                { type: MessageOptionsBuilderType.Error },
+            );
             return;
         }
         if (timedOut) {
-            if (options.replyHandler) {
-                await options.replyHandler.reply(
-                    this.locale(
-                        'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
-                    ),
-                    { type: MessageOptionsBuilderType.Error },
-                );
-            }
+            await options.replyHandler?.reply(
+                this.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT'),
+                { type: MessageOptionsBuilderType.Error },
+            );
             return;
         }
         if (!options.voiceChannelId) {
-            if (options.replyHandler) {
-                await options.replyHandler.reply(
-                    this.locale('DISCORD.INTERACTION.CANCELED'),
-                );
-            }
+            await options.replyHandler?.reply(
+                this.locale('DISCORD.INTERACTION.CANCELED'),
+            );
             return;
         }
         const smartQueue = await this.settings.get<boolean>('smartqueue');

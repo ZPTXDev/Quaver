@@ -1,8 +1,4 @@
-import {
-    ForceType,
-    MessageOptionsBuilderType,
-    type QuaverClient,
-} from '#src/lib';
+import { ForceType, MessageOptionsBuilderType } from '#src/lib';
 import { ButtonHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import type { LocaleKey } from '#src/lib/locales';
@@ -11,7 +7,6 @@ import { searchState } from '#src/lib/state';
 import {
     buildMessageOptions,
     Check,
-    getFailedChecks,
     getTrackMarkdownLocaleString,
     type QuaverChannels,
     type QuaverSong,
@@ -25,15 +20,12 @@ import {
     type APISelectMenuOption,
     type APIStringSelectComponent,
     ButtonBuilder,
-    ChannelType,
     ContainerBuilder,
     ContainerComponent,
     type GuildMember,
-    PermissionsBitField,
     StringSelectMenuBuilder,
     TextDisplayBuilder,
 } from 'discord.js';
-import { LavalinkWSClientState } from 'lavalink-ws-client';
 
 export default new ButtonHandler()
     .setChecks([Check.InteractionStarter])
@@ -50,70 +42,13 @@ export default new ButtonHandler()
         const target = interaction.customId.split(':')[1];
         if (target === 'add') {
             const tracks = state.selected;
-            const member = interaction.member as GuildMember & {
-                client: QuaverClient;
-            };
-            const failedChecks: Check[] = await getFailedChecks(
-                [Check.InVoice, Check.InSessionVoice],
-                interaction.guildId,
-                member,
-            );
-            if (failedChecks.length > 0) {
-                await interaction.replyHandler.reply(
-                    guild.locale(failedChecks[0]),
-                    { type: MessageOptionsBuilderType.Error },
-                );
-                return;
-            }
-            // check for connect, speak permission for channel
-            const permissions = member?.voice.channel.permissionsFor(
-                interaction.client.user.id,
-            );
-            if (
-                !permissions.has(
-                    new PermissionsBitField([
-                        PermissionsBitField.Flags.ViewChannel,
-                        PermissionsBitField.Flags.Connect,
-                        PermissionsBitField.Flags.Speak,
-                    ]),
-                )
-            ) {
-                await interaction.replyHandler.reply(
-                    guild.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.BASIC'),
-                    { type: MessageOptionsBuilderType.Error },
-                );
-                return;
-            }
-            if (
-                member?.voice.channel.type === ChannelType.GuildStageVoice &&
-                !permissions.has(PermissionsBitField.StageModerator)
-            ) {
-                await interaction.replyHandler.reply(
-                    guild.locale('DISCORD.INSUFFICIENT_PERMISSIONS.BOT.STAGE'),
-                    { type: MessageOptionsBuilderType.Error },
-                );
-                return;
-            }
-            const me = await interaction.guild.members.fetchMe();
-            if (me.isCommunicationDisabled()) {
-                await interaction.replyHandler.reply(
-                    guild.locale(
-                        'DISCORD.INSUFFICIENT_PERMISSIONS.BOT.TIMED_OUT',
-                    ),
-                    { type: MessageOptionsBuilderType.Error },
-                );
-                return;
-            }
-            if (
-                interaction.client.music.ws.state !==
-                LavalinkWSClientState.Ready
-            ) {
-                await interaction.replyHandler.reply(
-                    guild.locale('MUSIC.NOT_READY'),
-                    { type: MessageOptionsBuilderType.Error },
-                );
-                return;
-            }
+            const compatible = await guild.checkPlayerCompatibility({
+                member: interaction.member as GuildMember,
+                textChannel: interaction.channel,
+                runChecks: true,
+                replyHandler: interaction.replyHandler,
+            });
+            if (!compatible) return;
             clearTimeout(state.timeout);
             await interaction.replyHandler.reply(guild.locale('MISC.LOADING'), {
                 components: [],
@@ -154,7 +89,8 @@ export default new ButtonHandler()
             }
             const player = await guild.getPlayer({
                 textChannel: interaction.channel as QuaverChannels,
-                voiceChannelId: member.voice.channelId,
+                voiceChannelId: (interaction.member as GuildMember).voice
+                    .channelId,
                 replyHandler: interaction.replyHandler,
             });
             if (!player) return;

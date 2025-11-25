@@ -11,15 +11,7 @@ import {
     RequesterStatus,
     settings,
 } from '#src/lib/util';
-import {
-    type APIGuild,
-    type APIUser,
-    ChannelType,
-    GuildMember,
-    PermissionsBitField,
-    type Snowflake,
-} from 'discord.js';
-import { LavalinkWSClientState } from 'lavalink-ws-client';
+import { type APIGuild, type APIUser, GuildMember, PermissionsBitField, type Snowflake, } from 'discord.js';
 import type { Socket } from 'socket.io';
 
 export default {
@@ -56,42 +48,13 @@ export default {
         switch (item.type) {
             case UpdateItemType.Add: {
                 const member = await guild.members.fetch(socket.user.id);
-                if (!(member instanceof GuildMember)) {
-                    return callback({ status: Response.GenericError });
-                }
-                const failedChecks: Check[] = await getFailedChecks(
-                    [Check.InVoice, Check.InSessionVoice],
-                    guild.id,
-                    member as GuildMember & { client: typeof client },
-                );
-                if (failedChecks.length > 0) {
-                    return callback({ status: Response.UserNotInChannelError });
-                }
-                const permissions = member.voice.channel?.permissionsFor(
-                    client.user.id,
-                );
-                if (
-                    !permissions.has(
-                        new PermissionsBitField([
-                            PermissionsBitField.Flags.ViewChannel,
-                            PermissionsBitField.Flags.SendMessages,
-                            PermissionsBitField.Flags.Connect,
-                            PermissionsBitField.Flags.Speak,
-                        ]),
-                    ) ||
-                    (member.voice.channel.type ===
-                        ChannelType.GuildStageVoice &&
-                        !permissions.has(PermissionsBitField.StageModerator))
-                ) {
-                    return callback({ status: Response.BotPermissionError });
-                }
-                const me = await guild.members.fetchMe();
-                if (me.isCommunicationDisabled()) {
-                    return callback({ status: Response.BotTimedOutError });
-                }
-                if (client.music.ws.state !== LavalinkWSClientState.Ready) {
-                    return callback({ status: Response.NotReadyError });
-                }
+                const compatible = await guild.checkPlayerCompatibility({
+                    member: member as GuildMember,
+                    runChecks: true,
+                    webResponse: true,
+                });
+                if (compatible !== Response.Success)
+                    return callback({ status: compatible });
                 const query = item.value;
                 let tracks = [];
                 let searchQuery;
@@ -410,7 +373,7 @@ export enum UpdateItemType {
     SmartQueueFeature = 'smartQueueFeature',
 }
 
-enum Response {
+export enum Response {
     Success = 'success',
     AuthenticationError = 'error-auth',
     GenericError = 'error-generic',
