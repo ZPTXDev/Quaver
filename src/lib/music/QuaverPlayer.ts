@@ -202,10 +202,16 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             }
         }
         let result: string;
-        if (positions.length === 1) {
+        if (positions.length === 0) {
+            result = '?';
+        } else if (positions.length === 1) {
             result = positions[0].toString();
-        } else if (positions.length === 2) {
-            result = `${positions[0]} - ${positions[1]}`;
+        } else if (
+            positions.every(
+                (v, i): boolean => i === 0 || v === positions[i - 1] + 1,
+            )
+        ) {
+            result = `${positions[0]} - ${positions[positions.length - 1]}`;
         } else {
             const firstFive = positions.slice(0, 5).join(', ');
             result = positions.length > 5 ? `${firstFive}, ...` : firstFive;
