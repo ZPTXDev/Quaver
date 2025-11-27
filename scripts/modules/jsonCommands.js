@@ -16,7 +16,7 @@ async function loadCommandsFromPath(directoryPath) {
     const commandFileNames = await nodeFsPromises.readdir(directoryPath);
     await Promise.all(
         commandFileNames.map(async (fileName) => {
-            if (!fileName.endsWith('.js')) {
+            if (!fileName.endsWith('.mjs')) {
                 return;
             }
             const filePath = nodePath.join(directoryPath, fileName);
