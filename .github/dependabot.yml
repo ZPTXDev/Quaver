@@ -1,7 +1,15 @@
 version: 2
+
+multi-ecosystem-groups:
+  core:
+    schedule:
+      interval: daily
+      time: "21:00"
+
 updates:
 - package-ecosystem: npm
   directory: "/"
+  patterns: ["*"]
   schedule:
     interval: daily
     time: "21:00"
@@ -14,8 +22,10 @@ updates:
   - "status:tested"
   - "status:confirmed"
   - "type:enhancement"
+  multi-ecosystem-group: "core"
 - package-ecosystem: bun
   directory: "/"
+  patterns: ["*"]
   schedule:
     interval: daily
     time: "21:00"
@@ -28,6 +38,7 @@ updates:
     - "status:tested"
     - "status:confirmed"
     - "type:enhancement"
+  multi-ecosystem-group: "core"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
