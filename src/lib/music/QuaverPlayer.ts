@@ -706,7 +706,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         } else {
             this.recomputeQueue();
         }
-        guild.sendWebUpdate('shuffleUpdate', { enabled });
+        guild.sendWebUpdate('shuffleUpdate', enabled);
         guild.sendWebUpdate(
             'queueUpdate',
             this.queue.tracks.map((t: QuaverSong): QuaverSong => {
