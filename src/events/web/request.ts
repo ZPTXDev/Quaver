@@ -1,9 +1,5 @@
 import { data } from '#src/lib/data';
-import {
-    QuaverGuild,
-    type WhitelistedFeatures,
-    WhitelistStatus,
-} from '#src/lib/guild';
+import { QuaverGuild, type WhitelistedFeatures, WhitelistStatus, } from '#src/lib/guild';
 import { type QuaverSong, settings, version } from '#src/lib/util';
 import type { APIGuild, Snowflake } from 'discord.js';
 import type { Socket } from 'socket.io';
@@ -51,6 +47,7 @@ export default {
                           ),
                           volume: player.volume,
                           loop: player.queue.loop.type,
+                          shuffle: player.memory.shuffle,
                           filters: {
                               bassboost: player.memory.bassboost,
                               nightcore: player.memory.nightcore,
