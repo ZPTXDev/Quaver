@@ -35,7 +35,7 @@
     "yoctocolors": "^2.1.2"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/eslintrc": "^3.3.3",
     "@eslint/js": "^9.39.1",
     "@types/crypto-js": "^4.2.2",
     "@types/express": "^5.0.5",
