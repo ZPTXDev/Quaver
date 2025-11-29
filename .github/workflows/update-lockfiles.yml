@@ -12,6 +12,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          token: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -43,11 +44,8 @@ jobs:
         env:
           USER_NAME: ${{ secrets.ZPTX_BOT_NAME }}
           USER_EMAIL: ${{ secrets.ZPTX_BOT_EMAIL }}
-          PAT: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
-          REPO: ${{ github.repository }}
         run: |
           git config user.name "$USER_NAME"
           git config user.email "$USER_EMAIL"
           git commit -m "chore: update lockfiles"
-          git remote set-url origin https://$PAT@github.com/$REPO.git
           git push
