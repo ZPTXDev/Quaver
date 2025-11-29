@@ -16,10 +16,7 @@ export default new EventHandler()
         const player = await guild.client.music.players.fetch(guild.id);
         const g = await QuaverGuild.wrap(guild);
         if (player) {
-            logger.info({
-                message: `[G ${g.id}] Cleaning up (left guild)`,
-                label: 'Quaver',
-            });
+            logger.info(`[G ${g.id}] Cleaning up (left guild)`);
             player.voice.channelId = null;
             if (await g.settings.get<boolean>('stay.enabled')) {
                 await g.settings.set('stay.enabled', false);

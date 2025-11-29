@@ -27,10 +27,7 @@ export default {
     async execute(queue: QuaverQueue, track: QuaverSong): Promise<void> {
         const guild = await QuaverGuild.wrap(queue.player.guild);
         delete queue.player.memory.skip;
-        logger.info({
-            message: `[G ${guild.id}] Starting track`,
-            label: 'Quaver',
-        });
+        logger.info(`[G ${guild.id}] Starting track`);
         if (queue.player.memory.alternate) {
             const whitelisted =
                 await guild.features.checkWhitelisted('smartqueue');

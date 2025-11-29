@@ -27,19 +27,13 @@ async function pauseChannelSession(
     const guild = await QuaverGuild.wrap(player.guild);
     await player.pause();
     guild.sendWebUpdate('pauseUpdate', player.paused);
-    logger.info({
-        message: `[G ${guild.id}] Setting pause timeout`,
-        label: 'Quaver',
-    });
+    logger.info(`[G ${guild.id}] Setting pause timeout`);
     // As a failsafe, clear the pauseTimeout first before setting a new pauseTimeout
     clearTimeout(player.timeout.pause);
     player.timeout.pause = null;
     player.timeout.pause = setTimeout(
         (p, g): void => {
-            logger.info({
-                message: `[G ${g.id}] Disconnecting (inactivity)`,
-                label: 'Quaver',
-            });
+            logger.info(`[G ${g.id}] Disconnecting (inactivity)`);
             p.sendMessage(
                 g.locale('MUSIC.DISCONNECT.INACTIVITY.DISCONNECTED'),
                 {
@@ -79,10 +73,7 @@ async function resumeChannelSession(
     player: QuaverPlayer,
 ): Promise<void> {
     const guild = await QuaverGuild.wrap(player.guild);
-    logger.info({
-        message: `[G ${guild.id}] Resuming session`,
-        label: 'Quaver',
-    });
+    logger.info(`[G ${guild.id}] Resuming session`);
     await player.resume();
     clearTimeout(player.timeout.pause);
     player.timeout.pause = null;
@@ -108,10 +99,7 @@ async function onChannelEmpty(
         await guild.settings.set('stay.enabled', false);
     }
     if (isPlayerIdle && player.voice.channelId) {
-        logger.info({
-            message: `[G ${guild.id}] Disconnecting (alone)`,
-            label: 'Quaver',
-        });
+        logger.info(`[G ${guild.id}] Disconnecting (alone)`);
         await player.sendMessage(
             guild.locale(
                 isOldQuaverStateUpdate
@@ -216,10 +204,7 @@ export default new EventHandler()
         }
         // To reset states, properly handle disconnection
         if (hasQuaverDisconnected && !player.voice.channelId) {
-            logger.info({
-                message: `[G ${guild.id}] Cleaning up (disconnected)`,
-                label: 'Quaver',
-            });
+            logger.info(`[G ${guild.id}] Cleaning up (disconnected)`);
             await player.sendMessage(
                 guild.locale('MUSIC.SESSION_ENDED.FORCED.DISCONNECTED'),
                 { type: MessageOptionsBuilderType.Warning },
@@ -311,10 +296,7 @@ export default new EventHandler()
                     });
                 } catch (error) {
                     if (error instanceof Error) {
-                        logger.error({
-                            message: `${error.message}\n${error.stack}`,
-                            label: 'Quaver',
-                        });
+                        logger.error(`${error.message}\n${error.stack}`);
                     }
                 }
             }

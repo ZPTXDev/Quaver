@@ -10,11 +10,9 @@ export default {
         const { client } = await import('#src/main');
         logger.info({ message: 'Ready.', label: 'Lavalink' });
         if (!client.music.ws.session) {
-            logger.warn({
-                message:
-                    'Waiting 5 seconds before re-triggering ready event for Lavalink WS session...',
-                label: 'Quaver',
-            });
+            logger.warn(
+                'Waiting 5 seconds before re-triggering ready event for Lavalink WS session...',
+            );
             setTimeout((): void => {
                 this.execute();
             }, 5_000);

@@ -1,7 +1,11 @@
 import { MessageOptionsBuilderType } from '#src/lib';
 import { QuaverGuild } from '#src/lib/guild';
 import { logger } from '#src/lib/logger';
-import { getTrackMarkdownLocaleString, type QuaverQueue, type QuaverSong, } from '#src/lib/util';
+import {
+    getTrackMarkdownLocaleString,
+    type QuaverQueue,
+    type QuaverSong,
+} from '#src/lib/util';
 import { LoopType } from '@lavaclient/plugin-queue';
 import type { Collection, GuildMember, Snowflake } from 'discord.js';
 
@@ -16,10 +20,7 @@ export default {
         const guild = await QuaverGuild.wrap(queue.player.guild);
         delete queue.player.memory.skip;
         if (reason === 'loadFailed') {
-            logger.warn({
-                message: `[G ${guild.id}] Track skipped as it failed to load`,
-                label: 'Quaver',
-            });
+            logger.warn(`[G ${guild.id}] Track skipped as it failed to load`);
             await queue.player.sendMessage(
                 guild.locale(
                     'MUSIC.PLAYER.TRACK_SKIPPED_ERROR',
@@ -91,10 +92,7 @@ export default {
             members?.filter((m): boolean => !m.user.bot).size < 1 &&
             !(await guild.settings.get<boolean>('stay.enabled'))
         ) {
-            logger.info({
-                message: `[G ${guild.id} Disconnecting (alone)`,
-                label: 'Quaver',
-            });
+            logger.info(`[G ${guild.id} Disconnecting (alone)`);
             await queue.player.sendMessage(
                 guild.locale('MUSIC.DISCONNECT.ALONE.DISCONNECTED.DEFAULT'),
                 { type: MessageOptionsBuilderType.Warning },

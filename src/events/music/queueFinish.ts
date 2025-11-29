@@ -14,19 +14,13 @@ export default {
         }
         // rare case where the client sets timeout after setting pause timeout
         if (queue.player.timeout.pause) return;
-        logger.info({
-            message: `[G ${guild.id}] Setting timeout`,
-            label: 'Quaver',
-        });
+        logger.info(`[G ${guild.id}] Setting timeout`);
         if (queue.player.timeout.standard) {
             clearTimeout(queue.player.timeout.standard);
         }
         queue.player.timeout.standard = setTimeout(
             (p, g): void => {
-                logger.info({
-                    message: `[G ${g.id}] Disconnecting (inactivity)`,
-                    label: 'Quaver',
-                });
+                logger.info(`[G ${g.id}] Disconnecting (inactivity)`);
                 p.sendMessage(
                     g.locale('MUSIC.DISCONNECT.INACTIVITY.DISCONNECTED'),
                     {

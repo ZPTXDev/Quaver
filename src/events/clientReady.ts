@@ -14,42 +14,32 @@ export default new EventHandler()
             message: `Connected. Logged in as ${client.user.tag}.`,
             label: 'Discord',
         });
-        logger.info({
-            message: `Running version ${version.version}${version.buildTime ? ` (${new Date(version.buildTime).toLocaleString()})` : ''}, started in ${Date.now() - startup.startTime}ms. For help, see https://github.com/ZPTXDev/Quaver/issues.`,
-            label: 'Quaver',
-        });
+        logger.info(
+            `Running version ${version.version}${version.buildTime ? ` (${new Date(version.buildTime).toLocaleString()})` : ''}, started in ${Date.now() - startup.startTime}ms. For help, see https://github.com/ZPTXDev/Quaver/issues.`,
+        );
         if (
             version.version.includes('-next') ||
             version.version.includes('-staging')
         ) {
-            logger.warn({
-                message: `You are running ${version.version.includes('-next') ? 'an experimental' : 'a pre-release'} version of Quaver. Please report bugs using the link above, and note that features may change or be removed entirely prior to release.`,
-                label: 'Quaver',
-            });
+            logger.warn(
+                `You are running ${version.version.includes('-next') ? 'an experimental' : 'a pre-release'} version of Quaver. Please report bugs using the link above, and note that features may change or be removed entirely prior to release.`,
+            );
         }
         if (!version.official) {
-            logger.warn({
-                message:
-                    'You are not running an official build of Quaver. For support, please switch to an official version from https://github.com/ZPTXDev/Quaver/releases.',
-                label: 'Quaver',
-            });
+            logger.warn(
+                'You are not running an official build of Quaver. For support, please switch to an official version from https://github.com/ZPTXDev/Quaver/releases.',
+            );
         }
         if (settings.developerMode) {
-            logger.warn({
-                message:
-                    'Developer mode is enabled. This should not be enabled unless you know what you are doing.',
-                label: 'Quaver',
-            });
-            logger.warn({
-                message:
-                    'If someone is requesting information obtained through developer mode, they are likely trying to steal your credentials.',
-                label: 'Quaver',
-            });
-            logger.warn({
-                message:
-                    'We are not responsible for damages caused by negligent use of developer mode.',
-                label: 'Quaver',
-            });
+            logger.warn(
+                'Developer mode is enabled. This should not be enabled unless you know what you are doing.',
+            );
+            logger.warn(
+                'If someone is requesting information obtained through developer mode, they are likely trying to steal your credentials.',
+            );
+            logger.warn(
+                'We are not responsible for damages caused by negligent use of developer mode.',
+            );
         }
         let activityType:
             | ActivityType.Playing

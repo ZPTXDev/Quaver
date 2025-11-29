@@ -235,10 +235,7 @@ export class InteractionHandler {
                 'Encountered error while executing handler',
                 'error',
             );
-            logger.error({
-                message: `${error.message}\n${error.stack}`,
-                label: 'Quaver',
-            });
+            logger.error(`${error.message}\n${error.stack}`);
             // Since ReplyHandler is not available with autocomplete interaction, do not send the locale
             if (interaction.isAutocomplete()) {
                 return;

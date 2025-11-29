@@ -1,6 +1,11 @@
 import { load as effectsLoad } from '@lavaclient/plugin-effects';
 import { load as queueLoad } from '@lavaclient/plugin-queue';
-import { getAbsoluteFileURL, msToTime, msToTimeString, parseTimeString, } from '@zptxdev/zptx-lib';
+import {
+    getAbsoluteFileURL,
+    msToTime,
+    msToTimeString,
+    parseTimeString,
+} from '@zptxdev/zptx-lib';
 import {
     AttachmentBuilder,
     Collection,
@@ -46,10 +51,7 @@ type QuaverMusicEvent = {
 await loadVersion();
 
 export const startup = { started: false, startTime: Date.now() };
-logger.info({
-    message: `Starting ${colors.magenta(`Quaver ${version.version}`)}...`,
-    label: 'Quaver',
-});
+logger.info(`Starting ${colors.magenta(`Quaver ${version.version}`)}...`);
 
 const spinner = yoctoSpinner();
 
@@ -60,17 +62,15 @@ spinner.success();
 
 let app: Express, server;
 if (settings.features.web.enabled) {
-    logger.info({
-        message: `Web integration is ${colors.green('enabled')}. For more information, visit ${colors.underline(colors.cyan('https://github.com/ZPTXDev/Quaver-Web'))}.`,
-        label: 'Quaver',
-    });
+    logger.info(
+        `Web integration is ${colors.green('enabled')}. For more information, visit ${colors.underline(colors.cyan('https://github.com/ZPTXDev/Quaver-Web'))}.`,
+    );
     spinner.start(`Starting ${colors.cyan('web server')}`);
     app = express();
     if (settings.grafanaLogging) {
-        logger.info({
-            message: `Grafana logging is ${colors.green('enabled')}. Statistics will be accessible through the /stats endpoint.`,
-            label: 'Quaver',
-        });
+        logger.info(
+            `Grafana logging is ${colors.green('enabled')}. Statistics will be accessible through the /stats endpoint.`,
+        );
         app.get('/stats', async (req, res): Promise<void> => {
             const totalSessions = client.music?.players?.cache.size;
             const activeSessions = Array.from(
@@ -390,25 +390,16 @@ export async function shuttingDown(
 ): Promise<void> {
     if (inProgress) return;
     inProgress = true;
-    logger.info({
-        message: `Shutting down${eventType ? ` due to ${eventType}` : ''}...`,
-        label: 'Quaver',
-    });
+    logger.info(`Shutting down${eventType ? ` due to ${eventType}` : ''}...`);
     try {
         if (startup.started) {
             const players = client.music.players;
             if (players.cache.size < 1) return;
-            logger.info({
-                message: 'Disconnecting from all guilds...',
-                label: 'Quaver',
-            });
+            logger.info('Disconnecting from all guilds...');
             for (const pair of players.cache) {
                 const player = pair[1];
                 const guild = await QuaverGuild.wrap(player.guild);
-                logger.info({
-                    message: `[G ${guild.id}] Disconnecting (restarting)`,
-                    label: 'Quaver',
-                });
+                logger.info(`[G ${guild.id}] Disconnecting (restarting)`);
                 const fileBuffer = [];
                 if (player.queue.current && (player.playing || player.paused)) {
                     fileBuffer.push(`${guild.locale('MISC.CURRENT')}:`);
@@ -479,28 +470,16 @@ export async function shuttingDown(
         }
     } catch (error) {
         if (error instanceof Error) {
-            logger.error({
-                message: 'Encountered error while shutting down.',
-                label: 'Quaver',
-            });
-            logger.error({
-                message: `${error.message}\n${error.stack}`,
-                label: 'Quaver',
-            });
+            logger.error('Encountered error while shutting down.');
+            logger.error(`${error.message}\n${error.stack}`);
         }
     } finally {
         if (
             !['exit', 'SIGINT', 'SIGTERM'].includes(eventType) &&
             err instanceof Error
         ) {
-            logger.error({
-                message: `${err.message}\n${err.stack}`,
-                label: 'Quaver',
-            });
-            logger.info({
-                message: 'Logging additional output to error.log.',
-                label: 'Quaver',
-            });
+            logger.error(`${err.message}\n${err.stack}`);
+            logger.info('Logging additional output to error.log.');
             try {
                 await writeFile(
                     'error.log',
@@ -510,15 +489,10 @@ export async function shuttingDown(
                 );
             } catch (e) {
                 if (e instanceof Error) {
-                    logger.error({
-                        message:
-                            'Encountered error while writing to error.log.',
-                        label: 'Quaver',
-                    });
-                    logger.error({
-                        message: `${e.message}\n${e.stack}`,
-                        label: 'Quaver',
-                    });
+                    logger.error(
+                        'Encountered error while writing to error.log.',
+                    );
+                    logger.error(`${e.message}\n${e.stack}`);
                 }
             }
         }

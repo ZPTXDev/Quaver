@@ -154,10 +154,7 @@ export class ReplyHandler {
                 return await this.interaction.reply(replyMsgOpts);
             } catch (error) {
                 if (error instanceof Error) {
-                    logger.error({
-                        message: `${error.message}\n${error.stack}`,
-                        label: 'Quaver',
-                    });
+                    logger.error(`${error.message}\n${error.stack}`);
                 }
                 return undefined;
             }
@@ -174,10 +171,7 @@ export class ReplyHandler {
                 );
             } catch (error) {
                 if (error instanceof Error) {
-                    logger.error({
-                        message: `${error.message}\n${error.stack}`,
-                        label: 'Quaver',
-                    });
+                    logger.error(`${error.message}\n${error.stack}`);
                 }
                 return undefined;
             }
@@ -188,10 +182,7 @@ export class ReplyHandler {
             );
         } catch (error) {
             if (error instanceof Error) {
-                logger.error({
-                    message: `${error.message}\n${error.stack}`,
-                    label: 'Quaver',
-                });
+                logger.error(`${error.message}\n${error.stack}`);
             }
             return undefined;
         }

@@ -15,14 +15,13 @@ import {
 } from '#src/lib/util';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
-import type {
-    GuildMember} from 'discord.js';
 import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
     ChannelType,
     ContainerBuilder,
+    type GuildMember,
     InteractionCallbackResponse,
     Message,
     type SelectMenuComponentOptionData,
@@ -307,10 +306,7 @@ export default new ChatInputCommandHandler()
                         );
                     } catch (error) {
                         if (error instanceof Error) {
-                            logger.error({
-                                message: `${error.message}\n${error.stack}`,
-                                label: 'Quaver',
-                            });
+                            logger.error(`${error.message}\n${error.stack}`);
                         }
                     }
                     delete searchState[message.id];

@@ -6,7 +6,13 @@ import {
 } from '#src/lib';
 import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
 import { logger } from '#src/lib/logger';
-import { buildMessageOptions, type QuaverChannels, type QuaverQueue, type QuaverSong, settings, } from '#src/lib/util';
+import {
+    buildMessageOptions,
+    type QuaverChannels,
+    type QuaverQueue,
+    type QuaverSong,
+    settings,
+} from '#src/lib/util';
 import type { PlayerEffect } from '@lavaclient/plugin-effects';
 import { type LoopType, Queue } from '@lavaclient/plugin-queue';
 import {
@@ -150,10 +156,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             return await channel.send(sendMsgOpts);
         } catch (error) {
             if (error instanceof Error) {
-                logger.error({
-                    message: `${error.message}\n${error.stack}`,
-                    label: 'Quaver',
-                });
+                logger.error(`${error.message}\n${error.stack}`);
             }
             return undefined;
         }
@@ -257,10 +260,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             if (this.timeout.standard) clearTimeout(this.timeout.standard);
             this.timeout.standard = setTimeout(
                 (p, g): void => {
-                    logger.info({
-                        message: `[G ${g.id}] Disconnecting (inactivity)`,
-                        label: 'Quaver',
-                    });
+                    logger.info(`[G ${g.id}] Disconnecting (inactivity)`);
                     p.sendMessage(
                         g.locale('MUSIC.DISCONNECT.INACTIVITY.DISCONNECTED'),
                         {
@@ -397,10 +397,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             await voiceChannel.stageInstance.delete();
         } catch (error) {
             if (error instanceof Error) {
-                logger.error({
-                    message: `${error.message}\n${error.stack}`,
-                    label: 'Quaver',
-                });
+                logger.error(`${error.message}\n${error.stack}`);
             }
         }
         return PlayerResponse.Success;

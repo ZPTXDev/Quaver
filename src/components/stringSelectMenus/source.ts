@@ -29,10 +29,7 @@ export default new StringSelectMenuHandler()
                     );
                 } catch (error) {
                     if (error instanceof Error) {
-                        logger.error({
-                            message: `${error.message}\n${error.stack}`,
-                            label: 'Quaver',
-                        });
+                        logger.error(`${error.message}\n${error.stack}`);
                     }
                 }
                 delete confirmationTimeout[message.id];
