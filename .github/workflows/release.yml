@@ -33,3 +33,7 @@ jobs:
             @semantic-release/exec
         env:
           GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
+          GIT_AUTHOR_NAME: ${{ secrets.ZPTX_BOT_NAME }}
+          GIT_AUTHOR_EMAIL: ${{ secrets.ZPTX_BOT_EMAIL }}
+          GIT_COMMITTER_NAME: ${{ secrets.ZPTX_BOT_NAME }}
+          GIT_COMMITTER_EMAIL: ${{ secrets.ZPTX_BOT_EMAIL }}
