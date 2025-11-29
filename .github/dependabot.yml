@@ -1,40 +1,29 @@
 version: 2
-
-multi-ecosystem-groups:
-  core:
+updates:
+  - package-ecosystem: npm
+    directory: "/"
     schedule:
       interval: daily
       time: "21:00"
-    target-branch: next
     open-pull-requests-limit: 10
+    target-branch: next
+    versioning-strategy: increase
     labels:
       - "affects:dependencies"
       - "priority:p2"
       - "status:tested"
       - "status:confirmed"
       - "type:enhancement"
-
-updates:
-- package-ecosystem: npm
-  directory: "/"
-  patterns: ["*"]
-  versioning-strategy: increase
-  multi-ecosystem-group: "core"
-- package-ecosystem: bun
-  directory: "/"
-  patterns: ["*"]
-  versioning-strategy: increase
-  multi-ecosystem-group: "core"
-- package-ecosystem: github-actions
-  directory: "/"
-  schedule:
-    interval: daily
-    time: "21:00"
-  open-pull-requests-limit: 10
-  target-branch: next
-  labels:
-  - "affects:dependencies"
-  - "priority:p2"
-  - "status:tested"
-  - "status:confirmed"
-  - "type:enhancement"
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: daily
+      time: "21:00"
+    open-pull-requests-limit: 10
+    target-branch: next
+    labels:
+      - "affects:dependencies"
+      - "priority:p2"
+      - "status:tested"
+      - "status:confirmed"
+      - "type:enhancement"
