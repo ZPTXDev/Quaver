@@ -1,5 +1,5 @@
 import { AutocompleteHandler } from '#src/lib/builders';
-import { cache } from '#src/lib/data';
+import { data } from '#src/lib/data';
 import { QuaverGuild } from '#src/lib/guild';
 import type { LocaleKey } from '#src/lib/locales';
 import {
@@ -29,7 +29,7 @@ export default new AutocompleteHandler().setExecute(
         const query = matchingOverride
             ? focused.slice(matchingOverride.length)
             : focused;
-        const existingResults = await cache.get(query.toLowerCase());
+        const existingResults = await data.cache.get(query.toLowerCase());
         if (existingResults) {
             const searchSuggestionsResponse =
                 existingResults as ApplicationCommandOptionChoiceData[];
@@ -78,7 +78,10 @@ export default new AutocompleteHandler().setExecute(
                         value: suggestion,
                     }),
                 );
-            await cache.set(query.toLowerCase(), searchSuggestionsResponse);
+            await data.cache.set(
+                query.toLowerCase(),
+                searchSuggestionsResponse,
+            );
             searchSuggestionsResponse.unshift({
                 name: `${sourceName}: ${query}`,
                 value: focused,

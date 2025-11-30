@@ -1,6 +1,7 @@
 import type { QuaverClient } from '#src/lib';
 import { EventHandler } from '#src/lib/builders';
 import { logger } from '#src/lib/logger';
+import { startup } from '#src/lib/state';
 import { settings, version } from '#src/lib/util';
 import { ActivityType, type PresenceStatusData } from 'discord.js';
 
@@ -8,7 +9,6 @@ export default new EventHandler()
     .setOnce(true)
     .setEvent('clientReady')
     .setExecute(async function (client): Promise<void> {
-        const { startup } = await import('#src/main');
         startup.started = true;
         logger.info({
             message: `Connected. Logged in as ${client.user.tag}.`,

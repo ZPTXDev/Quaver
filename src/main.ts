@@ -1,12 +1,6 @@
 import { load as effectsLoad } from '@lavaclient/plugin-effects';
 import { load as queueLoad } from '@lavaclient/plugin-queue';
 import {
-    getAbsoluteFileURL,
-    msToTime,
-    msToTimeString,
-    parseTimeString,
-} from '@zptxdev/zptx-lib';
-import {
     AttachmentBuilder,
     Collection,
     ContainerBuilder,
@@ -15,24 +9,31 @@ import {
     SeparatorBuilder,
     TextDisplayBuilder,
 } from 'discord.js';
+import { getAbsoluteFileURL, msToTime, msToTimeString, parseTimeString, } from '@zptxdev/zptx-lib';
+import { createCache } from 'cache-manager';
+import { KeyvCacheableMemory } from 'cacheable';
 import { default as express, type Express } from 'express';
+import Keyv from 'keyv';
 import type { ClientEvents, NodeEvents } from 'lavaclient';
 import { readdirSync, readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import * as http from 'node:http';
 import * as https from 'node:https';
+import { dirname, resolve } from 'node:path';
 import { createInterface } from 'node:readline';
+import { fileURLToPath } from 'node:url';
 import { inspect } from 'node:util';
 import { Server, type Socket } from 'socket.io';
 import yoctoSpinner from 'yocto-spinner';
 import colors from 'yoctocolors';
 import { MessageOptionsBuilderType, QuaverClient } from './lib';
-import { data } from './lib/data';
+import { data, DataHandler } from './lib/data';
 import { QuaverGuild, type WhitelistedFeatures } from './lib/guild';
 import type { InteractionHandlerMapsFlat } from './lib/interactions';
 import { setLocales } from './lib/locales';
 import { logger } from './lib/logger';
 import type { QuaverPlayer } from './lib/music';
+import { startup } from './lib/state';
 import {
     loadVersion,
     settings,
@@ -48,9 +49,11 @@ type QuaverMusicEvent = {
     execute(...args: unknown[]): void | Promise<void>;
 };
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 await loadVersion();
 
-export const startup = { started: false, startTime: Date.now() };
+startup.startTime = Date.now();
 logger.info(`Starting ${colors.magenta(`Quaver ${version.version}`)}...`);
 
 const spinner = yoctoSpinner();
@@ -58,6 +61,25 @@ const spinner = yoctoSpinner();
 spinner.start(`Loading ${colors.cyan('lavaclient plugins')}`);
 effectsLoad();
 queueLoad();
+spinner.success();
+
+spinner.start(`Setting up ${colors.cyan('data handler')}`);
+data.guild = new DataHandler({
+    cache: settings.database
+        ? `${settings.database.protocol}://${resolve(
+              __dirname,
+              '..',
+              settings.database.path,
+          )}`
+        : `sqlite://${resolve(__dirname, '..', 'database.sqlite')}`,
+    namespace: 'guild',
+});
+spinner.success();
+
+spinner.start(`Setting up ${colors.cyan('cache')}`);
+data.cache = createCache({
+    stores: [new Keyv({ store: new KeyvCacheableMemory({ ttl: '10m' }) })],
+});
 spinner.success();
 
 let app: Express, server;
