@@ -11,7 +11,7 @@
     "@lavaclient/plugin-effects": "^1.0.0-rc.2",
     "@lavaclient/plugin-queue": "^0.0.1",
     "@zptxdev/zptx-lib": "^1.1.0",
-    "cache-manager": "^7.2.5",
+    "cache-manager": "^7.2.6",
     "cacheable": "^2.3.0",
     "crypto-js": "^4.2.0",
     "discord.js": "^14.25.1",

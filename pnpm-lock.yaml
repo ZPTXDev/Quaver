@@ -32,8 +32,8 @@ dependencies:
     specifier: ^1.1.0
     version: 1.1.0
   cache-manager:
-    specifier: ^7.2.5
-    version: 7.2.5
+    specifier: ^7.2.6
+    version: 7.2.6
   cacheable:
     specifier: ^2.3.0
     version: 2.3.0
@@ -198,17 +198,10 @@ packages:
       keyv: 5.5.4(patch_hash=xtm6nhclkwmse6ymbyf3zp3mwa)
     dev: false
 
-  /@cacheable/utils@2.3.1:
-    resolution: {integrity: sha512-38NJXjIr4W1Sghun8ju+uYWD8h2c61B4dKwfnQHVDFpAJ9oS28RpfqZQJ6Dgd3RceGkILDY9YT+72HJR3LoeSQ==}
-    dependencies:
-      hashery: 1.2.0
-      keyv: 5.5.4(patch_hash=xtm6nhclkwmse6ymbyf3zp3mwa)
-    dev: false
-
   /@cacheable/utils@2.3.2:
     resolution: {integrity: sha512-8kGE2P+HjfY8FglaOiW+y8qxcaQAfAhVML+i66XJR3YX5FtyDqn6Txctr3K2FrbxLKixRRYYBWMbuGciOhYNDg==}
     dependencies:
-      hashery: 1.2.0
+      hashery: 1.3.0
       keyv: 5.5.4(patch_hash=xtm6nhclkwmse6ymbyf3zp3mwa)
     dev: false
 
@@ -487,7 +480,7 @@ packages:
     peerDependencies:
       keyv: ^5.5.4
     dependencies:
-      hashery: 1.2.0
+      hashery: 1.3.0
       hookified: 1.13.0
       keyv: 5.5.4(patch_hash=xtm6nhclkwmse6ymbyf3zp3mwa)
     dev: false
@@ -1490,10 +1483,10 @@ packages:
     dev: false
     optional: true
 
-  /cache-manager@7.2.5:
-    resolution: {integrity: sha512-Y5LF7olTrcKJn1NoKiWPOvjEiO5DfDVPxqZHETCRMaliC60KBNb4Ge/vEYep5TyaqpXvnpnPPo8zauCe6UzZwA==}
+  /cache-manager@7.2.6:
+    resolution: {integrity: sha512-brlumw/nDaCO/AeJGoTWDNYvTRrr9y7n8o4hbE642hr6OPdnNdl2IPiq7d560iDUa9AM0Xe8CAYJPSPFEVTnDA==}
     dependencies:
-      '@cacheable/utils': 2.3.1
+      '@cacheable/utils': 2.3.2
       keyv: 5.5.4(patch_hash=xtm6nhclkwmse6ymbyf3zp3mwa)
     dev: false
 
@@ -2327,8 +2320,8 @@ packages:
     dev: false
     optional: true
 
-  /hashery@1.2.0:
-    resolution: {integrity: sha512-43XJKpwle72Ik5Zpam7MuzRWyNdwwdf6XHlh8wCj2PggvWf+v/Dm5B0dxGZOmddidgeO6Ofu9As/o231Ti/9PA==}
+  /hashery@1.3.0:
+    resolution: {integrity: sha512-fWltioiy5zsSAs9ouEnvhsVJeAXRybGCNNv0lvzpzNOSDbULXRy7ivFWwCCv4I5Am6kSo75hmbsCduOoc2/K4w==}
     engines: {node: '>=20'}
     dependencies:
       hookified: 1.13.0
