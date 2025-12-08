@@ -41,7 +41,7 @@
     "@types/express": "^5.0.6",
     "@types/lodash-es": "^4.17.12",
     "eslint": "^9.39.1",
-    "typescript-eslint": "^8.48.1",
+    "typescript-eslint": "^8.49.0",
     "eslint-config-prettier": "^10.1.8",
     "fast-glob": "^3.3.3",
     "globals": "^16.5.0",
