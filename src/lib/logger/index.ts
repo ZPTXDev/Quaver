@@ -16,7 +16,10 @@ addColors({
 export const logger = createLogger({
     level: 'verbose',
     format: format.combine(
-        format.label({ label: 'Quaver' }),
+        format((info: Logform.TransformableInfo) => {
+            if (!info.label) info.label = 'Quaver';
+            return info;
+        })(),
         format.errors({ stack: true }),
         format.timestamp(),
         format.printf(
