@@ -17,6 +17,7 @@ try {
     console.log(`[GLOBAL | U ${clientId}] Registering ${commands.length} application global commands...`);
     const applicationGlobalCommands = await rest.put(applicationGlobalCommandsRoute, { body: commands });
     console.log(`[GLOBAL | U ${clientId}] Successfully registered ${applicationGlobalCommands.length} application global commands.`);
+    process.exit();
 } catch (error) {
     console.error(error);
     process.exit(1);
