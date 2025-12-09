@@ -259,6 +259,7 @@ export class UpdateHandler {
                                 `${guild.locale(
                                     [
                                         'exit',
+                                        'update',
                                         'SIGINT',
                                         'SIGTERM',
                                         'lavalink',
@@ -286,7 +287,7 @@ export class UpdateHandler {
             }
         } finally {
             if (
-                !['exit', 'SIGINT', 'SIGTERM'].includes(eventType) &&
+                !['exit', 'update', 'SIGINT', 'SIGTERM'].includes(eventType) &&
                 err instanceof Error
             ) {
                 logger.error(`${err.message}\n${err.stack}`);
