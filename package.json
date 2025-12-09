@@ -19,7 +19,7 @@
     "effect": "2.4.19",
     "express": "^5.2.1",
     "hangul-romanization": "^1.0.1",
-    "keyv": "^5.5.4",
+    "keyv": "^5.5.5",
     "lavaclient": "^5.0.0-rc.3",
     "lavalink-protocol": "^1.1.1",
     "lavalink-ws-client": "^1.0.2",
