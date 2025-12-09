@@ -1,6 +1,8 @@
+import { MessageOptionsBuilderType } from '#src/lib';
 import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
 import type { LocaleKey } from '#src/lib/locales';
 import { logger } from '#src/lib/logger';
+import { updateHandler } from '#src/lib/state';
 import {
     formatLavaLyricsResponse,
     getTrackMarkdownLocaleString,
@@ -84,6 +86,27 @@ export default {
                 return t;
             }),
         );
+        if (
+            updateHandler.restartInProgress &&
+            updateHandler.restartStrategy === 'track'
+        ) {
+            await queue.player.setPause(true);
+            await queue.player.sendMessage(
+                new ContainerBuilder().addTextDisplayComponents(
+                    guild.builders.textDisplayLocale(
+                        'MUSIC.PLAYER.RESTARTING.PENDING',
+                    ),
+                    guild.builders.textDisplayLocale(
+                        'MUSIC.PLAYER.RESTARTING.SESSION_RECOVERY_EXPLANATION',
+                    ),
+                    guild.builders.textDisplayLocale(
+                        'MUSIC.PLAYER.RESTARTING.APOLOGY',
+                    ),
+                ),
+                { type: MessageOptionsBuilderType.Warning },
+            );
+            return;
+        }
         let notify = (await guild.settings.get<boolean>('notifyin247')) ?? true;
         notify = !(
             !notify && (await guild.settings.get<boolean>('stay.enabled'))

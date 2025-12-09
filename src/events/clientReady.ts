@@ -1,7 +1,8 @@
 import type { QuaverClient } from '#src/lib';
+import { UpdateHandler } from '#src/lib';
 import { EventHandler } from '#src/lib/builders';
 import { logger } from '#src/lib/logger';
-import { startup } from '#src/lib/state';
+import { setUpdateHandler, startup } from '#src/lib/state';
 import { settings, version } from '#src/lib/util';
 import { ActivityType, type PresenceStatusData } from 'discord.js';
 
@@ -41,6 +42,7 @@ export default new EventHandler()
                 'We are not responsible for damages caused by negligent use of developer mode.',
             );
         }
+        setUpdateHandler(new UpdateHandler(client as QuaverClient));
         let activityType:
             | ActivityType.Playing
             | ActivityType.Streaming

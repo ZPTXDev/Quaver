@@ -1,22 +1,13 @@
 import { load as effectsLoad } from '@lavaclient/plugin-effects';
 import { load as queueLoad } from '@lavaclient/plugin-queue';
-import {
-    AttachmentBuilder,
-    Collection,
-    ContainerBuilder,
-    FileBuilder,
-    GatewayIntentBits,
-    SeparatorBuilder,
-    TextDisplayBuilder,
-} from 'discord.js';
 import { getAbsoluteFileURL, msToTime, msToTimeString, parseTimeString, } from '@zptxdev/zptx-lib';
 import { createCache } from 'cache-manager';
 import { KeyvCacheableMemory } from 'cacheable';
+import { Collection, GatewayIntentBits } from 'discord.js';
 import { default as express, type Express } from 'express';
 import Keyv from 'keyv';
 import type { ClientEvents, NodeEvents } from 'lavaclient';
 import { readdirSync, readFileSync } from 'node:fs';
-import { writeFile } from 'node:fs/promises';
 import * as http from 'node:http';
 import * as https from 'node:https';
 import { dirname, resolve } from 'node:path';
@@ -26,14 +17,14 @@ import { inspect } from 'node:util';
 import { Server, type Socket } from 'socket.io';
 import yoctoSpinner from 'yocto-spinner';
 import colors from 'yoctocolors';
-import { MessageOptionsBuilderType, QuaverClient } from './lib';
+import { QuaverClient } from './lib';
 import { data, DataHandler } from './lib/data';
 import { QuaverGuild, type WhitelistedFeatures } from './lib/guild';
 import type { InteractionHandlerMapsFlat } from './lib/interactions';
 import { setLocales } from './lib/locales';
 import { logger } from './lib/logger';
 import type { QuaverPlayer } from './lib/music';
-import { startup } from './lib/state';
+import { startup, updateHandler } from './lib/state';
 import {
     loadVersion,
     settings,
@@ -206,11 +197,6 @@ if (io) {
     spinner.success();
 }
 
-data.guild.instance.on('error', async (err: Error): Promise<void> => {
-    logger.error({ message: 'Failed to connect to database.', label: 'Keyv' });
-    await shuttingDown('keyv', err);
-});
-
 spinner.start(`Setting up ${colors.cyan('Discord client')}`);
 export const client = new QuaverClient(io, {
     intents: [
@@ -220,6 +206,11 @@ export const client = new QuaverClient(io, {
     ],
 });
 spinner.success();
+
+data.guild.instance.on('error', async (err: Error): Promise<void> => {
+    logger.error({ message: 'Failed to connect to database.', label: 'Keyv' });
+    await updateHandler.restart('immediate', 'keyv', err);
+});
 
 spinner.start(`Connecting to ${colors.cyan('Lavalink server')}`);
 client.connectToMusicNode();
@@ -289,9 +280,19 @@ rl.on('line', async (input): Promise<void> => {
         return;
     }
     switch (command) {
-        case 'exit':
-            await shuttingDown('exit');
+        case 'exit': {
+            const strategy = input.split(' ')[1] ?? 'immediate';
+            if (
+                strategy !== 'immediate' &&
+                strategy !== 'track' &&
+                strategy !== 'queue'
+            ) {
+                console.log('Usage: exit [immediate|track|queue]');
+                break;
+            }
+            await updateHandler.restart(strategy, 'exit');
             break;
+        }
         case 'sessions':
             console.log(
                 `There are currently ${client.music.players.cache.size} active session(s).`,
@@ -397,131 +398,10 @@ rl.on('line', async (input): Promise<void> => {
     }
 });
 // 'close' event catches ctrl+c, therefore we pass it to shuttingDown as a ctrl+c event
-rl.on('close', async (): Promise<void> => shuttingDown('SIGINT'));
-
-let inProgress = false;
-
-/**
- * Shuts the client down gracefully.
- * @param eventType - The event type triggering the shutdown. This determines if the shutdown was caused by a crash.
- * @param err - The error object, if any.
- */
-export async function shuttingDown(
-    eventType: string,
-    err?: Error,
-): Promise<void> {
-    if (inProgress) return;
-    inProgress = true;
-    logger.info(`Shutting down${eventType ? ` due to ${eventType}` : ''}...`);
-    try {
-        if (startup.started) {
-            const players = client.music.players;
-            if (players.cache.size < 1) return;
-            logger.info('Disconnecting from all guilds...');
-            for (const pair of players.cache) {
-                const player = pair[1];
-                const guild = await QuaverGuild.wrap(player.guild);
-                logger.info(`[G ${guild.id}] Disconnecting (restarting)`);
-                const fileBuffer = [];
-                if (player.queue.current && (player.playing || player.paused)) {
-                    fileBuffer.push(`${guild.locale('MISC.CURRENT')}:`);
-                    fileBuffer.push(player.queue.current.info.uri);
-                }
-                if (player.queue.tracks.length > 0) {
-                    fileBuffer.push(`${guild.locale('MISC.QUEUE')}:`);
-                    fileBuffer.push(
-                        player.queue.tracks
-                            .map((track): string => track.info.uri)
-                            .join('\n'),
-                    );
-                }
-                await player.disconnect();
-                await player.sendMessage(
-                    new ContainerBuilder()
-                        .addTextDisplayComponents(
-                            new TextDisplayBuilder().setContent(
-                                `${guild.locale(
-                                    [
-                                        'exit',
-                                        'SIGINT',
-                                        'SIGTERM',
-                                        'lavalink',
-                                    ].includes(eventType)
-                                        ? 'MUSIC.PLAYER.RESTARTING.DEFAULT'
-                                        : 'MUSIC.PLAYER.RESTARTING.CRASHED',
-                                )}${
-                                    fileBuffer.length > 0
-                                        ? `\n${guild.locale(
-                                              'MUSIC.PLAYER.RESTARTING.QUEUE_DATA_ATTACHED',
-                                          )}`
-                                        : ''
-                                }`,
-                            ),
-                            guild.builders.textDisplayLocale(
-                                'MUSIC.PLAYER.RESTARTING.APOLOGY',
-                            ),
-                        )
-                        .addSeparatorComponents(
-                            ...(fileBuffer.length > 0
-                                ? [new SeparatorBuilder()]
-                                : []),
-                        )
-                        .addFileComponents(
-                            ...(fileBuffer.length > 0
-                                ? [
-                                      new FileBuilder().setURL(
-                                          'attachment://queue.txt',
-                                      ),
-                                  ]
-                                : []),
-                        ),
-                    {
-                        type: MessageOptionsBuilderType.Warning,
-                        files:
-                            fileBuffer.length > 0
-                                ? [
-                                      new AttachmentBuilder(
-                                          Buffer.from(fileBuffer.join('\n')),
-                                          { name: 'queue.txt' },
-                                      ),
-                                  ]
-                                : [],
-                    },
-                );
-            }
-        }
-    } catch (error) {
-        if (error instanceof Error) {
-            logger.error('Encountered error while shutting down.');
-            logger.error(`${error.message}\n${error.stack}`);
-        }
-    } finally {
-        if (
-            !['exit', 'SIGINT', 'SIGTERM'].includes(eventType) &&
-            err instanceof Error
-        ) {
-            logger.error(`${err.message}\n${err.stack}`);
-            logger.info('Logging additional output to error.log.');
-            try {
-                await writeFile(
-                    'error.log',
-                    `${eventType}${err.message ? `\n${err.message}` : ''}${
-                        err.stack ? `\n${err.stack}` : ''
-                    }`,
-                );
-            } catch (e) {
-                if (e instanceof Error) {
-                    logger.error(
-                        'Encountered error while writing to error.log.',
-                    );
-                    logger.error(`${e.message}\n${e.stack}`);
-                }
-            }
-        }
-        await client.destroy();
-        process.exit();
-    }
-}
+rl.on(
+    'close',
+    async (): Promise<void> => updateHandler.restart('immediate', 'SIGINT'),
+);
 
 spinner.start(`Loading ${colors.cyan('locales')}`);
 const locales = new Collection<string, unknown>();
@@ -627,6 +507,9 @@ spinner.success();
 ].forEach((eventType): void => {
     process.on(
         eventType,
-        async (err): Promise<void> => shuttingDown(eventType, err),
+        async (err): Promise<void> =>
+            updateHandler.restartInProgress
+                ? null
+                : updateHandler.restart('immediate', eventType, err),
     );
 });

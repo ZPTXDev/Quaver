@@ -1,4 +1,5 @@
 export enum PlayerResponse {
+    RestartInProgress,
     FeatureDisabled,
     FeatureNotWhitelisted,
     FeatureConflict,

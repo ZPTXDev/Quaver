@@ -126,3 +126,6 @@ bunfig.toml
 
 # Dev-only LocaleKeys file
 src/lib/locales/types.ts
+
+# Temporary player states
+states.json

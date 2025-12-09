@@ -39,11 +39,14 @@ export default {
         },
         QUEUE_CLEARED_ERROR: 'Cleared queue as an error occurred multiple times consecutively.',
         RESTARTING: {
+            ACTION_BLOCKED: 'Sorry! Quaver is restarting soon and is unable to process your request.',
             APOLOGY: '-# Sorry for the inconvenience caused.',
-            CRASHED: 'Quaver has crashed and will disconnect.',
-            DEFAULT: 'Quaver is restarting and will disconnect.',
-            QUEUE_DATA_ATTACHED: 'Your queue data has been attached.',
+            CRASHED: 'Quaver has crashed and will disconnect briefly.',
+            DEFAULT: 'Quaver is restarting and will disconnect briefly.',
+            PENDING: 'Pardon the interruption! Quaver is restarting shortly.',
+            SESSION_RECOVERY_EXPLANATION: 'Your session will be restored when Quaver is back online.'
         },
+        RESTORING: 'Quaver is back online! Restoring your session...',
         TRACK_SKIPPED_ERROR: 'Skipped **%1** as an internal error prevented the track from loading.',
     },
     QUEUE: {

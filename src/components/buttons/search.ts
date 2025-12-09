@@ -3,7 +3,7 @@ import { ButtonHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import type { LocaleKey } from '#src/lib/locales';
 import { logger } from '#src/lib/logger';
-import { searchState } from '#src/lib/state';
+import { searchState, updateHandler } from '#src/lib/state';
 import {
     buildMessageOptions,
     Check,
@@ -50,6 +50,17 @@ export default new ButtonHandler()
             });
             if (!compatible) return;
             clearTimeout(state.timeout);
+            if (updateHandler.restartInProgress) {
+                await interaction.replyHandler.reply(
+                    guild.locale('MUSIC.PLAYER.RESTARTING.ACTION_BLOCKED'),
+                    {
+                        type: MessageOptionsBuilderType.Error,
+                        components: [],
+                        force: ForceType.Update,
+                    },
+                );
+                return;
+            }
             await interaction.replyHandler.reply(guild.locale('MISC.LOADING'), {
                 components: [],
                 force: ForceType.Update,

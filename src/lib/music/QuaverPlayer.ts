@@ -6,6 +6,7 @@ import {
 } from '#src/lib';
 import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
 import { logger } from '#src/lib/logger';
+import { updateHandler } from '#src/lib/state';
 import {
     buildMessageOptions,
     type QuaverChannels,
@@ -26,6 +27,37 @@ import {
 } from 'discord.js';
 import { type Node, Player } from 'lavaclient';
 import { PlayerResponse } from '.';
+
+export interface QuaverPlayerJSON {
+    version: 1;
+    guildId: Snowflake;
+    voiceChannelId: Snowflake | null;
+    textChannelId: Snowflake | null;
+    volume: number;
+    playing: boolean;
+    paused: boolean;
+    position: number;
+    loop: LoopType;
+    queue: {
+        current: QuaverSong | null;
+        tracks: QuaverSong[];
+    };
+    effects: {
+        bassboost: boolean;
+        nightcore: boolean;
+    };
+    memory: {
+        shuffle: boolean;
+        alternate: boolean;
+        originalQueue?: QuaverSong[];
+        shuffledQueue?: string[];
+        failureCount?: number;
+        skip?: {
+            required: number;
+            users: Snowflake[];
+        };
+    };
+}
 
 const effects: Record<string, PlayerEffect> = {
     bassboost: {
@@ -111,7 +143,6 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
                 void (await this.play(track)),
         }) as QuaverQueue;
         this.queue.channel = null;
-        this.queue.current = null;
         this.queue.tracks = [];
     }
 
@@ -162,6 +193,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         }
     }
 
+    get restartReady(): boolean {
+        return this.paused || !this.playing;
+    }
+
     /**
      * Add a track to the queue.
      * @param tracks - The track(s) to add.
@@ -173,7 +208,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         tracks: QuaverSong | QuaverSong[],
         requesterId: Snowflake,
         next = false,
-    ): Promise<string> {
+    ): Promise<PlayerResponse | string> {
+        if (updateHandler.restartInProgress) {
+            return PlayerResponse.RestartInProgress;
+        }
         const added = Array.isArray(tracks) ? tracks : [tracks];
         const wasEmptyBeforeAdd =
             !this.queue.current && this.queue.tracks.length === 0;
@@ -510,6 +548,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @returns Whether or not the player was paused.
      */
     async setPause(paused: boolean): Promise<PlayerResponse> {
+        // we only prevent pausing / resuming when we triggered the pause
+        // after pausing, we'll set restartReady to true, indicating end of a track
+        // (only for restartStrategy: track)
+        if (this.restartReady) return PlayerResponse.RestartInProgress;
         const guild = await QuaverGuild.wrap(this.guild);
         if (this.paused === paused) {
             return PlayerResponse.PlayerStateUnchanged;
@@ -577,6 +619,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @returns Whether or not the seeking was successful.
      */
     async seekTo(position: number): Promise<PlayerResponse> {
+        if (this.restartReady) return PlayerResponse.RestartInProgress;
         if (!this.queue.current || (!this.playing && !this.paused)) {
             return PlayerResponse.PlayerIdle;
         }
@@ -771,6 +814,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @returns Whether or not the track was skipped.
      */
     async skipCurrentTrack(): Promise<PlayerResponse> {
+        if (this.restartReady) return PlayerResponse.RestartInProgress;
         if (!this.queue.current || (!this.playing && !this.paused)) {
             return PlayerResponse.PlayerIdle;
         }
@@ -785,6 +829,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @returns Whether or not the player was skipped to the position.
      */
     async skipToQueuedTrack(position: number): Promise<PlayerResponse> {
+        if (this.restartReady) return PlayerResponse.RestartInProgress;
         if (this.queue.tracks.length > 1) {
             const moveResponse = await this.moveQueuedTrack(position, 1);
             if (moveResponse !== PlayerResponse.Success) {
@@ -829,5 +874,44 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         await this.setVolume(volume);
         guild.sendWebUpdate('volumeUpdate', volume);
         return PlayerResponse.Success;
+    }
+
+    toJSON(): QuaverPlayerJSON {
+        return {
+            version: 1,
+            guildId: this.guild.id,
+            voiceChannelId: this.voice.channelId ?? null,
+            textChannelId: this.queue.channel?.id ?? null,
+            volume: this.volume,
+            playing: this.playing,
+            paused: this.paused,
+            position: this.position ?? 0,
+            loop: this.queue.loop.type,
+            queue: {
+                current: this.queue.current ?? null,
+                tracks: [...this.queue.tracks],
+            },
+            effects: {
+                bassboost: this.memory.bassboost,
+                nightcore: this.memory.nightcore,
+            },
+            memory: {
+                shuffle: this.memory.shuffle,
+                alternate: this.memory.alternate,
+                originalQueue: this.memory.originalQueue
+                    ? [...this.memory.originalQueue]
+                    : undefined,
+                shuffledQueue: this.memory.shuffledQueue
+                    ? [...this.memory.shuffledQueue]
+                    : undefined,
+                failureCount: this.memory.failureCount,
+                skip: this.memory.skip
+                    ? {
+                          required: this.memory.skip.required,
+                          users: [...this.memory.skip.users],
+                      }
+                    : undefined,
+            },
+        };
     }
 }

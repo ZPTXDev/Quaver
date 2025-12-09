@@ -2,6 +2,7 @@ import { MessageOptionsBuilderType } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import { getLocaleString, type LocaleKey } from '#src/lib/locales';
+import { updateHandler } from '#src/lib/state';
 import {
     acceptableSources,
     Check,
@@ -64,6 +65,13 @@ export default new ChatInputCommandHandler()
             replyHandler: interaction.replyHandler,
         });
         if (!compatible) return;
+        if (updateHandler.restartInProgress) {
+            await interaction.replyHandler.reply(
+                guild.locale('MUSIC.PLAYER.RESTARTING.ACTION_BLOCKED'),
+                { type: MessageOptionsBuilderType.Error },
+            );
+            return;
+        }
         await interaction.deferReply();
         const query = interaction.options.getString('query');
         const insert = interaction.options.getBoolean('insert');

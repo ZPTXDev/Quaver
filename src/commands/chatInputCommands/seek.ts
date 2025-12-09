@@ -116,6 +116,12 @@ export default new ChatInputCommandHandler()
         }
         const response = await player.seekTo(position);
         switch (response) {
+            case PlayerResponse.RestartInProgress:
+                await interaction.replyHandler.reply(
+                    guild.locale('MUSIC.PLAYER.RESTARTING.ACTION_BLOCKED'),
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
             case PlayerResponse.PlayerIdle:
                 await interaction.replyHandler.reply(
                     guild.locale('MUSIC.PLAYER.PLAYING.NOTHING'),

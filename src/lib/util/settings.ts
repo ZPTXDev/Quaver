@@ -20,6 +20,7 @@ type SettingsObject = {
     database?: DatabaseSettingsObject;
     lavalink?: LavalinkSettingsObject;
     features?: FeaturesSettingsObject;
+    updater?: UpdaterSettingsObject;
 };
 
 type ColorsSettingsObject = {
@@ -102,6 +103,12 @@ type WebFeatureHttpsSettingsObject = {
     enabled?: boolean;
     key?: string;
     cert?: string;
+};
+
+type UpdaterSettingsObject = {
+    channel?: 'none' | 'stable' | 'staging' | 'next';
+    install?: boolean;
+    restartStrategy?: 'none' | 'immediate' | 'track' | 'queue';
 };
 
 export let settings: SettingsObject = {};

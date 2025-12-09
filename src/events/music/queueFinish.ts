@@ -1,13 +1,32 @@
 import { MessageOptionsBuilderType } from '#src/lib';
 import { QuaverGuild } from '#src/lib/guild';
 import { logger } from '#src/lib/logger';
+import { updateHandler } from '#src/lib/state';
 import type { QuaverQueue } from '#src/lib/util';
+import { ContainerBuilder } from 'discord.js';
 
 export default {
     name: 'queueFinish',
     once: false,
     async execute(queue: QuaverQueue): Promise<void> {
         const guild = await QuaverGuild.wrap(queue.player.guild);
+        if (updateHandler.restartInProgress) {
+            await queue.player.sendMessage(
+                new ContainerBuilder().addTextDisplayComponents(
+                    guild.builders.textDisplayLocale(
+                        'MUSIC.PLAYER.RESTARTING.PENDING',
+                    ),
+                    guild.builders.textDisplayLocale(
+                        'MUSIC.PLAYER.RESTARTING.SESSION_RECOVERY_EXPLANATION',
+                    ),
+                    guild.builders.textDisplayLocale(
+                        'MUSIC.PLAYER.RESTARTING.APOLOGY',
+                    ),
+                ),
+                { type: MessageOptionsBuilderType.Warning },
+            );
+            return;
+        }
         if (await guild.settings.get<boolean>('stay.enabled')) {
             await queue.player.sendMessage(guild.locale('MUSIC.QUEUE.EMPTY'));
             return;

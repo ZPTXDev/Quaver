@@ -3,7 +3,7 @@ import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import { getLocaleString, type LocaleKey } from '#src/lib/locales';
 import { logger } from '#src/lib/logger';
-import { searchState } from '#src/lib/state';
+import { searchState, updateHandler } from '#src/lib/state';
 import type { QuaverChannels, QuaverSong } from '#src/lib/util';
 import {
     acceptableSources,
@@ -61,6 +61,13 @@ export default new ChatInputCommandHandler()
     .setChecks([Check.GuildOnly])
     .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
+        if (updateHandler.restartInProgress) {
+            await interaction.replyHandler.reply(
+                guild.locale('MUSIC.PLAYER.RESTARTING.ACTION_BLOCKED'),
+                { type: MessageOptionsBuilderType.Error },
+            );
+            return;
+        }
         if (
             ![
                 ChannelType.GuildText,

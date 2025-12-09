@@ -28,6 +28,12 @@ export default new ChatInputCommandHandler()
         const player = await guild.getPlayer();
         const response = await player.setPause(true);
         switch (response) {
+            case PlayerResponse.RestartInProgress:
+                await interaction.replyHandler.reply(
+                    guild.locale('MUSIC.PLAYER.RESTARTING.ACTION_BLOCKED'),
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
             case PlayerResponse.PlayerStateUnchanged:
                 await interaction.replyHandler.reply(
                     guild.locale('CMD.PAUSE.RESPONSE.STATE_UNCHANGED'),
