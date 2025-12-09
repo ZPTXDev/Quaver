@@ -39,7 +39,7 @@ export default {
         },
         QUEUE_CLEARED_ERROR: 'Cleared queue as an error occurred multiple times consecutively.',
         RESTARTING: {
-            ACTION_BLOCKED: 'Sorry! Quaver is restarting soon and is unable to process your request.',
+            ACTION_BLOCKED: 'Sorry! Quaver is restarting soon and is unable to process your request right now.',
             APOLOGY: '-# Sorry for the inconvenience caused.',
             CRASHED: 'Quaver has crashed and will disconnect briefly.',
             DEFAULT: 'Quaver is restarting and will disconnect briefly.',
