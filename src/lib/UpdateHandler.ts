@@ -81,6 +81,7 @@ export class UpdateHandler {
     restartStrategy = settings.updater?.restartStrategy ?? 'none';
     restartInProgress = false;
     private restartTimeout: NodeJS.Timeout | null = null;
+    private restartInterval: NodeJS.Timeout | null = null;
     private updateInterval: NodeJS.Timeout | null = null;
 
     constructor(private client: QuaverClient) {
@@ -178,6 +179,8 @@ export class UpdateHandler {
         const zip = new AdmZip(Buffer.from(buffer));
         zip.extractAllTo('.', true);
         logger.info('Update installed successfully.');
+        clearInterval(this.updateInterval);
+        delete this.updateInterval;
         await this.restart(this.restartStrategy, 'update');
     }
 
@@ -218,7 +221,7 @@ export class UpdateHandler {
                 },
                 (strategy === 'track' ? 5 : 30) * 60_000,
             );
-            this.updateInterval = setInterval(async (): Promise<void> => {
+            this.restartInterval = setInterval(async (): Promise<void> => {
                 const res = this.checkRestartable();
                 if (res) {
                     logger.info(
@@ -226,11 +229,11 @@ export class UpdateHandler {
                     );
                     if (this.restartTimeout) {
                         clearTimeout(this.restartTimeout);
-                        this.restartTimeout = null;
+                        delete this.restartTimeout;
                     }
-                    if (this.updateInterval) {
-                        clearInterval(this.updateInterval);
-                        this.updateInterval = null;
+                    if (this.restartInterval) {
+                        clearInterval(this.restartInterval);
+                        delete this.restartInterval;
                     }
                     this.restartInProgress = false;
                     return this.restart('immediate', eventType);
