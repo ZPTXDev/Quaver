@@ -1,12 +1,5 @@
 import { settings } from '#src/lib/util';
-import {
-    addColors,
-    createLogger,
-    format,
-    type Logform,
-    type transport,
-    transports,
-} from 'winston';
+import { addColors, createLogger, format, type Logform, type transport, transports, } from 'winston';
 import LokiTransport from 'winston-loki';
 
 addColors({
@@ -23,6 +16,7 @@ addColors({
 export const logger = createLogger({
     level: 'verbose',
     format: format.combine(
+        format.label({ label: 'Quaver' }),
         format.errors({ stack: true }),
         format.timestamp(),
         format.printf(
@@ -36,7 +30,6 @@ export const logger = createLogger({
         new transports.Console({
             format: format.combine(
                 format((info): Logform.TransformableInfo => {
-                    if (!info.label) info.label = 'Quaver';
                     const colorizer = format.colorize();
                     info.timestamp = colorizer.colorize(
                         'meaningless',
