@@ -1,5 +1,12 @@
 import { settings } from '#src/lib/util';
-import { addColors, createLogger, format, type Logform, type transport, transports, } from 'winston';
+import {
+    addColors,
+    createLogger,
+    format,
+    type Logform,
+    type transport,
+    transports,
+} from 'winston';
 import LokiTransport from 'winston-loki';
 
 addColors({
