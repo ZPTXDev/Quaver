@@ -12,7 +12,7 @@
     "@lavaclient/plugin-queue": "^0.0.1",
     "@zptxdev/zptx-lib": "^1.1.0",
     "adm-zip": "^0.5.16",
-    "cache-manager": "^7.2.6",
+    "cache-manager": "^7.2.7",
     "cacheable": "^2.3.0",
     "crypto-js": "^4.2.0",
     "discord.js": "^14.25.1",
