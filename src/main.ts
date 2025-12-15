@@ -299,7 +299,7 @@ rl.on('line', async (input): Promise<void> => {
                 break;
             }
             if (updateHandler.restartInProgress) {
-                console.log('An update is already in progress.');
+                console.log('An update or restart is already in progress.');
                 break;
             }
             if (!version.official) {
