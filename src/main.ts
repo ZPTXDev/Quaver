@@ -293,6 +293,24 @@ rl.on('line', async (input): Promise<void> => {
             await updateHandler.restart(strategy, 'exit');
             break;
         }
+        case 'update':
+            if (updateHandler.channel === 'none') {
+                console.log('Automatic updates are disabled.');
+                break;
+            }
+            if (updateHandler.restartInProgress) {
+                console.log('An update is already in progress.');
+                break;
+            }
+            if (!version.official) {
+                console.log(
+                    'Automatic updates are disabled for unofficial builds.',
+                );
+                break;
+            }
+            console.log('Triggering an update check...');
+            await updateHandler.checkForUpdates();
+            break;
         case 'sessions':
             console.log(
                 `There are currently ${client.music.players.cache.size} active session(s).`,
@@ -393,7 +411,9 @@ rl.on('line', async (input): Promise<void> => {
             break;
         }
         default:
-            console.log('Available commands: exit, sessions, whitelist, stats');
+            console.log(
+                'Available commands: exit, update, sessions, whitelist, stats',
+            );
             break;
     }
 });
