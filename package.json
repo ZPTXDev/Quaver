@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
-    "@eslint/js": "^9.39.1",
+    "@eslint/js": "^9.39.2",
     "@types/adm-zip": "^0.5.7",
     "@types/crypto-js": "^4.2.2",
     "@types/express": "^5.0.6",
