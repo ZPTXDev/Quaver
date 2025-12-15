@@ -1,6 +1,11 @@
 import { load as effectsLoad } from '@lavaclient/plugin-effects';
 import { load as queueLoad } from '@lavaclient/plugin-queue';
-import { getAbsoluteFileURL, msToTime, msToTimeString, parseTimeString, } from '@zptxdev/zptx-lib';
+import {
+    getAbsoluteFileURL,
+    msToTime,
+    msToTimeString,
+    parseTimeString,
+} from '@zptxdev/zptx-lib';
 import { createCache } from 'cache-manager';
 import { KeyvCacheableMemory } from 'cacheable';
 import { Collection, GatewayIntentBits } from 'discord.js';
