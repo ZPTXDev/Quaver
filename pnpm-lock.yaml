@@ -68,8 +68,8 @@ dependencies:
     specifier: ^1.0.2
     version: 1.0.2(lavalink-api-client@1.0.2)(lavalink-protocol@1.1.1)
   lodash-es:
-    specifier: ^4.17.21
-    version: 4.17.21
+    specifier: ^4.17.22
+    version: 4.17.22
   path-exists-cli:
     specifier: ^2.0.0
     version: 2.0.0
@@ -2748,8 +2748,8 @@ packages:
     dependencies:
       p-locate: 5.0.0
 
-  /lodash-es@4.17.21:
-    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
+  /lodash-es@4.17.22:
+    resolution: {integrity: sha512-XEawp1t0gxSi9x01glktRZ5HDy0HXqrM0x5pXQM98EaI0NxO6jVM7omDOxsuEo5UIASAnm2bRp1Jt/e0a2XU8Q==}
     dev: false
 
   /lodash.merge@4.6.2:

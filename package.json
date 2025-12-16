@@ -23,7 +23,7 @@
     "lavaclient": "^5.0.0-rc.3",
     "lavalink-protocol": "^1.1.1",
     "lavalink-ws-client": "^1.0.2",
-    "lodash-es": "^4.17.21",
+    "lodash-es": "^4.17.22",
     "path-exists-cli": "^2.0.0",
     "pinyin-pro": "^3.27.0",
     "semver": "^7.7.3",
