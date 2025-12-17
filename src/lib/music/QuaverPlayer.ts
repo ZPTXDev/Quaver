@@ -45,6 +45,7 @@ export interface QuaverPlayerJSON {
         alternate: boolean;
         originalQueue?: QuaverSong[];
         shuffledQueue?: string[];
+        manuallyReordered?: boolean;
         failureCount?: number;
         skip?: {
             required: number;
@@ -120,6 +121,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         alternate: boolean;
         originalQueue?: QuaverSong[];
         shuffledQueue?: string[];
+        manuallyReordered?: boolean;
         failureCount?: number;
     } = {
         bassboost: false,
@@ -222,7 +224,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             } else {
                 this.memory.originalQueue.push(...added);
             }
-            this.recomputeQueue();
+            // Only recompute if queue hasn't been manually reordered
+            if (!this.memory.manuallyReordered) {
+                this.recomputeQueue();
+            }
         }
         const positions: number[] = [];
         const ids = new Set(added.map((t): string => t.id));
@@ -492,6 +497,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         if (this.memory.shuffledQueue) {
             this.memory.shuffledQueue = this.queue.tracks.map((t): string => t.id);
         }
+        // Mark that manual reordering has occurred
+        this.memory.manuallyReordered = true;
         guild.sendWebUpdate('queueUpdate', this.decorateQueue());
         return PlayerResponse.Success;
     }
@@ -707,6 +714,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             }
             delete this.memory.originalQueue;
             delete this.memory.shuffledQueue;
+            delete this.memory.manuallyReordered;
         } else {
             this.recomputeQueue();
         }
@@ -749,6 +757,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             }
             delete this.memory.originalQueue;
             delete this.memory.shuffledQueue;
+            delete this.memory.manuallyReordered;
         } else {
             this.recomputeQueue();
         }
@@ -867,6 +876,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
                 shuffledQueue: this.memory.shuffledQueue
                     ? [...this.memory.shuffledQueue]
                     : undefined,
+                manuallyReordered: this.memory.manuallyReordered,
                 failureCount: this.memory.failureCount,
                 skip: this.memory.skip
                     ? {
