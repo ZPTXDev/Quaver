@@ -148,8 +148,8 @@ export class QuaverGuild<S extends Uninitialized | Initialized> {
         let player = await this.client.music.players.fetch(this.guild.id);
         if (
             player?.voice.connected ||
-            !options.textChannel ||
-            !options.voiceChannelId
+            !options?.textChannel ||
+            !options?.voiceChannelId
         )
             return player;
         player = this.client.music.players.create(this.guild);
