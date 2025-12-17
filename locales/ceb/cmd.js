@@ -89,12 +89,7 @@ export default {
             NEW_POSITION: 'Ang bag-ong posisyon aron mabalhin ang track.'
         },
         RESPONSE: {
-            ALTERNATION_CONFLICT: 'Ang track wala mabalhin tungod kay ang **Smart Queue** nagpatuman sa pag-alternate sa mga track.',
-            MOVING_IN_PLACE: 'Dili nimo mabalhin ang usa ka track sa parehas nga posisyon nga naa na niini.',
             OUT_OF_RANGE: 'Ang imong input kay dili balido.',
-            POSITION_ADJUSTED: '-# Ang target posisyon sa track giusab sa **Smart Queue**.',
-            QUEUE_INSUFFICIENT_TRACKS: 'Walay igong mga track sa queue aron makahimo og usa ka pagbalhin.',
-            SUCCESS: 'Nabalhin ang [**%1**](%2) `%3 -> %4`',
         }
     },
     NIGHTCORE: {

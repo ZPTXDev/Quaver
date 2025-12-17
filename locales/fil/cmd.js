@@ -89,12 +89,7 @@ export default {
             NEW_POSITION: 'Ang bagong posisyon upang mailipat ang track.'
         },
         RESPONSE: {
-            ALTERNATION_CONFLICT: 'Ang track ay hindi nailipat dahil ang **Smart Queue** ay nag-enforce ng alternating tracks.',
-            MOVING_IN_PLACE: 'Hindi mo maaaring ilipat ang isang track sa parehong posisyon kung nasaan na ito.',
             OUT_OF_RANGE: 'Ang iyong input ay hindi wasto.',
-            POSITION_ADJUSTED: '-# Ang target position ng track ay binago ng **Smart Queue**.',
-            QUEUE_INSUFFICIENT_TRACKS: 'Walang sapat na mga track sa queue upang magsagawa ng isang paglipat.',
-            SUCCESS: 'Nailipat ang [**%1**](%2) `%3 -> %4`',
         }
     },
     NIGHTCORE: {
