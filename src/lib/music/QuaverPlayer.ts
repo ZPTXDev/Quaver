@@ -488,8 +488,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         this.queue.tracks.splice(newPosition - 1, 0, moved);
         // Update originalQueue to match the new visible order
         this.memory.originalQueue = [...this.queue.tracks];
-        // Clear shuffledQueue since manual reordering invalidates the shuffle
-        delete this.memory.shuffledQueue;
+        // Update shuffledQueue to match the new order (preserve shuffle state)
+        if (this.memory.shuffledQueue) {
+            this.memory.shuffledQueue = this.queue.tracks.map((t): string => t.id);
+        }
         guild.sendWebUpdate('queueUpdate', this.decorateQueue());
         return PlayerResponse.Success;
     }
