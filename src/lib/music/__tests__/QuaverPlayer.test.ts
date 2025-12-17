@@ -419,10 +419,16 @@ describe('QuaverPlayer', () => {
 			expect(tracks[2].id).toBe('b');
 		});
 
-		it('should handle move with transforms active', () => {
+		it('should move track in original queue when transforms active', () => {
 			/*
 			 * When shuffle/alternate is active, track must be moved in original queue
 			 * and then queue recomputed
+			 * 
+			 * NOTE: This test validates the current implementation logic, but there is
+			 * a known issue (https://github.com/ZPTXDev/Quaver/issues/1621) where
+			 * recomputeQueue() will reshuffle after the move, causing unexpected behavior.
+			 * This test only verifies the move happens in originalQueue, not that the
+			 * final visible queue is correct after recomputeQueue().
 			 */
 			const originalQueue = [
 				{ id: '1', title: 'Track 1' },
@@ -458,10 +464,39 @@ describe('QuaverPlayer', () => {
 
 			/*
 			 * Verify track was moved in original queue
+			 * After this, recomputeQueue() would be called which reshuffles,
+			 * making the final position unpredictable (known bug #1621)
 			 */
 			expect(originalQueue[0].id).toBe('2');
 			expect(originalQueue[1].id).toBe('1');
 		});
+
+		it.todo(
+			'should preserve track position after move with shuffle enabled (known bug #1621)',
+			/*
+			 * KNOWN BUG: When shuffle is enabled, moveQueuedTrack moves the track in
+			 * originalQueue but then calls recomputeQueue() which reshuffles,
+			 * causing the moved track to end up in an unpredictable position.
+			 * 
+			 * Expected behavior (not yet implemented):
+			 * - When user moves track from visible position 1 to position 3 in shuffled queue
+			 * - Track should remain at visible position 3 after the operation
+			 * - Shuffle order should be preserved with only the moved track repositioned
+			 * 
+			 * Current behavior (bug):
+			 * - Track is moved in originalQueue
+			 * - recomputeQueue() is called which reshuffles the entire queue
+			 * - Track ends up in an unpredictable position in the visible queue
+			 * 
+			 * Possible fixes:
+			 * 1. Move the track in shuffledQueue instead of originalQueue, OR
+			 * 2. Update shuffledQueue to reflect the move without reshuffling, OR
+			 * 3. Temporarily disable shuffle during the move operation
+			 * 
+			 * This test should be implemented and should pass once the bug is fixed.
+			 * See: https://github.com/ZPTXDev/Quaver/issues/1621
+			 */
+		);
 	});
 
 	describe('removeQueuedTrack logic', () => {
