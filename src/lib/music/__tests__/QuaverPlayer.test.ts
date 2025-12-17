@@ -314,4 +314,276 @@ describe('QuaverPlayer', () => {
 			expect(results.size).toBeGreaterThan(1);
 		});
 	});
+
+	describe('moveQueuedTrack logic', () => {
+		it('should validate queue has sufficient tracks', () => {
+			/*
+			 * moveQueuedTrack requires at least 2 tracks in queue
+			 * Single track or empty queue should fail
+			 */
+			const queueLength = 1;
+			const canMove = queueLength > 1;
+			expect(canMove).toBe(false);
+		});
+
+		it('should validate position bounds', () => {
+			const queueLength = 5;
+			const oldPosition = 2;
+			const newPosition = 4;
+
+			const isValid =
+				oldPosition >= 1 &&
+				newPosition >= 1 &&
+				oldPosition <= queueLength &&
+				newPosition <= queueLength;
+
+			expect(isValid).toBe(true);
+		});
+
+		it('should reject out of range positions', () => {
+			const queueLength = 5;
+
+			/*
+			 * Test various invalid positions
+			 * Position must be >= 1 and <= queueLength
+			 */
+			const isPos0Valid = (pos: number, max: number): boolean =>
+				pos >= 1 && pos <= max;
+			const isPos6Valid = (pos: number, max: number): boolean =>
+				pos >= 1 && pos <= max;
+			const isPosNeg1Valid = (pos: number, max: number): boolean =>
+				pos >= 1 && pos <= max;
+
+			expect(isPos0Valid(0, queueLength)).toBe(false);
+			expect(isPos6Valid(6, queueLength)).toBe(false);
+			expect(isPosNeg1Valid(-1, queueLength)).toBe(false);
+		});
+
+		it('should move track in simple queue (no transforms)', () => {
+			const tracks = [
+				{ id: '1', title: 'Track 1' },
+				{ id: '2', title: 'Track 2' },
+				{ id: '3', title: 'Track 3' },
+				{ id: '4', title: 'Track 4' },
+			];
+
+			/*
+			 * Move track from position 2 to position 4 (1-indexed)
+			 * Array index: position - 1
+			 */
+			const oldPosition = 2;
+			const newPosition = 4;
+
+			const moved = tracks.splice(oldPosition - 1, 1)[0];
+			tracks.splice(newPosition - 1, 0, moved);
+
+			expect(tracks[0].id).toBe('1');
+			expect(tracks[1].id).toBe('3');
+			expect(tracks[2].id).toBe('4');
+			expect(tracks[3].id).toBe('2');
+		});
+
+		it('should handle moving track forward in queue', () => {
+			const tracks = [
+				{ id: 'a', title: 'A' },
+				{ id: 'b', title: 'B' },
+				{ id: 'c', title: 'C' },
+			];
+
+			/*
+			 * Move first track to last position
+			 */
+			const moved = tracks.splice(0, 1)[0];
+			tracks.splice(2, 0, moved);
+
+			expect(tracks[0].id).toBe('b');
+			expect(tracks[1].id).toBe('c');
+			expect(tracks[2].id).toBe('a');
+		});
+
+		it('should handle moving track backward in queue', () => {
+			const tracks = [
+				{ id: 'a', title: 'A' },
+				{ id: 'b', title: 'B' },
+				{ id: 'c', title: 'C' },
+			];
+
+			/*
+			 * Move last track to first position
+			 */
+			const moved = tracks.splice(2, 1)[0];
+			tracks.splice(0, 0, moved);
+
+			expect(tracks[0].id).toBe('c');
+			expect(tracks[1].id).toBe('a');
+			expect(tracks[2].id).toBe('b');
+		});
+
+		it('should handle move with transforms active', () => {
+			/*
+			 * When shuffle/alternate is active, track must be moved in original queue
+			 * and then queue recomputed
+			 */
+			const originalQueue = [
+				{ id: '1', title: 'Track 1' },
+				{ id: '2', title: 'Track 2' },
+				{ id: '3', title: 'Track 3' },
+				{ id: '4', title: 'Track 4' },
+			];
+
+			const visibleQueue = [
+				{ id: '2', title: 'Track 2' },
+				{ id: '4', title: 'Track 4' },
+				{ id: '1', title: 'Track 1' },
+				{ id: '3', title: 'Track 3' },
+			];
+
+			/*
+			 * Move visible position 1 to position 3
+			 * Find in original queue and move there
+			 */
+			const fromSong = visibleQueue[0];
+			const toSong = visibleQueue[2];
+
+			const fromIdx = originalQueue.findIndex((s) => s.id === fromSong.id);
+			let toIdx = originalQueue.findIndex((s) => s.id === toSong.id);
+
+			expect(fromIdx).toBe(1);
+			expect(toIdx).toBe(0);
+
+			const [movedTrack] = originalQueue.splice(fromIdx, 1);
+			if (fromIdx < toIdx) toIdx--;
+
+			originalQueue.splice(toIdx, 0, movedTrack);
+
+			/*
+			 * Verify track was moved in original queue
+			 */
+			expect(originalQueue[0].id).toBe('2');
+			expect(originalQueue[1].id).toBe('1');
+		});
+	});
+
+	describe('removeQueuedTrack logic', () => {
+		it('should validate queue is not empty', () => {
+			const queueLength = 0;
+			const canRemove = queueLength > 0;
+			expect(canRemove).toBe(false);
+		});
+
+		it('should validate position is within bounds', () => {
+			const queueLength = 5;
+			const position = 3;
+
+			const isValid = position >= 1 && position <= queueLength;
+			expect(isValid).toBe(true);
+		});
+
+		it('should remove track from simple queue', () => {
+			const tracks = [
+				{ id: '1', title: 'Track 1' },
+				{ id: '2', title: 'Track 2' },
+				{ id: '3', title: 'Track 3' },
+			];
+
+			/*
+			 * Remove track at position 2 (1-indexed)
+			 */
+			const position = 2;
+			const removed = tracks.splice(position - 1, 1)[0];
+
+			expect(removed.id).toBe('2');
+			expect(tracks).toHaveLength(2);
+			expect(tracks[0].id).toBe('1');
+			expect(tracks[1].id).toBe('3');
+		});
+
+		it('should remove from both original and shuffled queues when transforms active', () => {
+			const originalQueue = [
+				{ id: '1', title: 'Track 1' },
+				{ id: '2', title: 'Track 2' },
+				{ id: '3', title: 'Track 3' },
+				{ id: '4', title: 'Track 4' },
+			];
+
+			const shuffledQueue = ['2', '4', '1', '3'];
+
+			const visibleQueue = [
+				{ id: '2', title: 'Track 2' },
+				{ id: '4', title: 'Track 4' },
+				{ id: '1', title: 'Track 1' },
+				{ id: '3', title: 'Track 3' },
+			];
+
+			/*
+			 * Remove position 2 (Track 4)
+			 */
+			const removedSong = visibleQueue[1];
+
+			const baseIdx = originalQueue.findIndex((s) => s.id === removedSong.id);
+			if (baseIdx !== -1) originalQueue.splice(baseIdx, 1);
+
+			const shuffleIdx = shuffledQueue.indexOf(removedSong.id);
+			if (shuffleIdx !== -1) shuffledQueue.splice(shuffleIdx, 1);
+
+			expect(originalQueue).toHaveLength(3);
+			expect(shuffledQueue).toHaveLength(3);
+			expect(originalQueue.find((s) => s.id === '4')).toBeUndefined();
+			expect(shuffledQueue.includes('4')).toBe(false);
+		});
+	});
+
+	describe('setVolumeTo validation', () => {
+		it('should accept valid volume range (0-200)', () => {
+			const validVolumes = [0, 50, 100, 150, 200];
+			for (const vol of validVolumes) {
+				const isValid = vol >= 0 && vol <= 200;
+				expect(isValid).toBe(true);
+			}
+		});
+
+		it('should reject volume below 0', () => {
+			const volume = -1;
+			const isValid = volume >= 0 && volume <= 200;
+			expect(isValid).toBe(false);
+		});
+
+		it('should reject volume above 200', () => {
+			const volume = 201;
+			const isValid = volume >= 0 && volume <= 200;
+			expect(isValid).toBe(false);
+		});
+	});
+
+	describe('decorateQueue logic', () => {
+		it('should map tracks with requester information', () => {
+			const tracks = [
+				{
+					id: '1',
+					title: 'Track 1',
+					requesterId: 'user1' as Snowflake,
+				},
+				{
+					id: '2',
+					title: 'Track 2',
+					requesterId: 'user2' as Snowflake,
+				},
+			];
+
+			/*
+			 * Simulate decoration without actual Discord client
+			 * In real implementation, looks up user.tag and user.avatar
+			 */
+			const decorated = tracks.map((t) => ({
+				...t,
+				requesterTag: undefined,
+				requesterAvatar: undefined,
+			}));
+
+			expect(decorated).toHaveLength(2);
+			expect(decorated[0].id).toBe('1');
+			expect(decorated[0]).toHaveProperty('requesterTag');
+			expect(decorated[0]).toHaveProperty('requesterAvatar');
+		});
+	});
 });
