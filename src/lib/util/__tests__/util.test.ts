@@ -93,32 +93,32 @@ describe('Utility functions - Pure functions', () => {
 
 	describe('updateQueryOverrides', () => {
 		// Manual implementation for testing based on the source code
-		function updateQueryOverrides(sourceManagers: readonly string[]): void {
+		function updateQueryOverrides(managers: readonly string[]): void {
 			queryOverrides.push(
-				...(sourceManagers.includes('http')
+				...(managers.includes('http')
 					? ['https://', 'http://']
 					: []),
-				...(sourceManagers.includes('spotify')
+				...(managers.includes('spotify')
 					? ['spsearch:', 'sprec:']
 					: []),
-				...(sourceManagers.includes('applemusic') ? ['amsearch:'] : []),
-				...(sourceManagers.includes('deezer')
+				...(managers.includes('applemusic') ? ['amsearch:'] : []),
+				...(managers.includes('deezer')
 					? ['dzsearch:', 'dzisrc:', 'dzrec:']
 					: []),
-				...(sourceManagers.includes('yandexmusic')
+				...(managers.includes('yandexmusic')
 					? ['ymsearch:', 'ymrec:']
 					: []),
-				...(sourceManagers.includes('flowery-tts') ? ['ftts://'] : []),
-				...(sourceManagers.includes('vkmusic')
+				...(managers.includes('flowery-tts') ? ['ftts://'] : []),
+				...(managers.includes('vkmusic')
 					? ['vksearch:', 'vkrec:']
 					: []),
-				...(sourceManagers.includes('tidal')
+				...(managers.includes('tidal')
 					? ['tdsearch:', 'tdrec:']
 					: []),
-				...(sourceManagers.includes('youtube')
+				...(managers.includes('youtube')
 					? ['ytsearch:', 'ytmsearch:']
 					: []),
-				...(sourceManagers.includes('soundcloud') ? ['scsearch:'] : []),
+				...(managers.includes('soundcloud') ? ['scsearch:'] : []),
 			);
 		}
 
@@ -232,9 +232,9 @@ describe('Utility functions - Pure functions', () => {
 	describe('updateAcceptableSources', () => {
 		// Manual implementation for testing based on the source code
 		function updateAcceptableSources(
-			sourceManagers: Record<string, string>,
+			sources: Record<string, string>,
 		): void {
-			for (const [key, value] of Object.entries(sourceManagers)) {
+			for (const [key, value] of Object.entries(sources)) {
 				acceptableSources[key] = value;
 			}
 		}

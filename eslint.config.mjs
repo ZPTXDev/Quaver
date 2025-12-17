@@ -137,6 +137,14 @@ export default defineConfig(
             // Override some ESLint and TSESLint rules with our preferred rules
             rules: preferredRules,
         },
+        // Relax rules for test files
+        {
+            files: ['**/__tests__/**/*.ts', '**/*.test.ts', '**/*.spec.ts'],
+            rules: {
+                '@typescript-eslint/explicit-function-return-type': 'off',
+                '@typescript-eslint/no-explicit-any': 'off',
+            },
+        },
     ],
     // Let prettier override rules that may conflict with the rules above
     eslintConfigPrettier,
