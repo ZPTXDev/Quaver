@@ -7,7 +7,6 @@ import {
     buildMessageOptions,
     buildSettingsPage,
     Check,
-    type QuaverSong,
     settings,
 } from '#src/lib/util';
 import {
@@ -100,15 +99,7 @@ export default new ButtonHandler()
         const player = await guild.getPlayer();
         if (player && player.memory.alternate !== option) {
             await player.setAlternate(option);
-            guild.sendWebUpdate(
-                'queueUpdate',
-                player.queue.tracks.map((t: QuaverSong): QuaverSong => {
-                    const user = player.client.users.cache.get(t.requesterId);
-                    t.requesterTag = user?.tag;
-                    t.requesterAvatar = user?.avatar;
-                    return t;
-                }),
-            );
+            guild.sendWebUpdate('queueUpdate', player.decorateQueue());
         }
         const { containers } = await buildSettingsPage(
             interaction,

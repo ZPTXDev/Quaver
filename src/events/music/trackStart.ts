@@ -77,15 +77,7 @@ export default {
         if (durationString === 'MORE_THAN_A_DAY') {
             durationString = guild.locale('MISC.MORE_THAN_A_DAY');
         }
-        guild.sendWebUpdate(
-            'queueUpdate',
-            queue.tracks.map((t: QuaverSong): QuaverSong => {
-                const user = queue.player.client.users.cache.get(t.requesterId);
-                t.requesterTag = user?.tag;
-                t.requesterAvatar = user?.avatar;
-                return t;
-            }),
-        );
+        guild.sendWebUpdate('queueUpdate', queue.player.decorateQueue());
         if (
             updateHandler.restartInProgress &&
             updateHandler.restartStrategy === 'track'

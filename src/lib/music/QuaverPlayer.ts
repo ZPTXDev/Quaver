@@ -476,19 +476,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         if (!transformsActive) {
             const moved = this.queue.tracks.splice(oldPosition - 1, 1)[0];
             this.queue.tracks.splice(newPosition - 1, 0, moved);
-            guild.sendWebUpdate(
-                'queueUpdate',
-                this.queue.tracks.map(
-                    (t): QuaverSong => ({
-                        ...t,
-                        requesterTag: this.client.users.cache.get(t.requesterId)
-                            ?.tag,
-                        requesterAvatar: this.client.users.cache.get(
-                            t.requesterId,
-                        )?.avatar,
-                    }),
-                ),
-            );
+            guild.sendWebUpdate('queueUpdate', this.decorateQueue());
             return PlayerResponse.Success;
         }
         const visible = this.queue.tracks;
@@ -502,18 +490,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         if (fromIdx < toIdx) toIdx--;
         base.splice(toIdx, 0, moved);
         this.recomputeQueue();
-        guild.sendWebUpdate(
-            'queueUpdate',
-            this.queue.tracks.map(
-                (t): QuaverSong => ({
-                    ...t,
-                    requesterTag: this.client.users.cache.get(t.requesterId)
-                        ?.tag,
-                    requesterAvatar: this.client.users.cache.get(t.requesterId)
-                        ?.avatar,
-                }),
-            ),
-        );
+        guild.sendWebUpdate('queueUpdate', this.decorateQueue());
         return PlayerResponse.Success;
     }
 
@@ -594,18 +571,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             // Recompute final visible queue
             this.recomputeQueue();
         }
-        guild.sendWebUpdate(
-            'queueUpdate',
-            this.queue.tracks.map(
-                (t): QuaverSong => ({
-                    ...t,
-                    requesterTag: this.client.users.cache.get(t.requesterId)
-                        ?.tag,
-                    requesterAvatar: this.client.users.cache.get(t.requesterId)
-                        ?.avatar,
-                }),
-            ),
-        );
+        guild.sendWebUpdate('queueUpdate', this.decorateQueue());
         return PlayerResponse.Success;
     }
 
@@ -743,15 +709,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             this.recomputeQueue();
         }
         guild.sendWebUpdate('shuffleUpdate', enabled);
-        guild.sendWebUpdate(
-            'queueUpdate',
-            this.queue.tracks.map((t: QuaverSong): QuaverSong => {
-                const user = this.client.users.cache.get(t.requesterId);
-                t.requesterTag = user?.tag;
-                t.requesterAvatar = user?.avatar;
-                return t;
-            }),
-        );
+        guild.sendWebUpdate('queueUpdate', this.decorateQueue());
         return PlayerResponse.Success;
     }
 
@@ -793,15 +751,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             this.recomputeQueue();
         }
         guild.sendWebUpdate('smartQueueFeatureUpdate', { enabled });
-        guild.sendWebUpdate(
-            'queueUpdate',
-            this.queue.tracks.map((t: QuaverSong): QuaverSong => {
-                const user = this.client.users.cache.get(t.requesterId);
-                t.requesterTag = user?.tag;
-                t.requesterAvatar = user?.avatar;
-                return t;
-            }),
-        );
+        guild.sendWebUpdate('queueUpdate', this.decorateQueue());
         return PlayerResponse.Success;
     }
 
@@ -870,6 +820,21 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         await this.setVolume(volume);
         guild.sendWebUpdate('volumeUpdate', volume);
         return PlayerResponse.Success;
+    }
+
+    /**
+     * Decorate the queue with requester info.
+     * @returns The decorated queue.
+     */
+    decorateQueue(): QuaverSong[] {
+        return this.queue.tracks.map((t): QuaverSong => {
+            const user = this.client.users.cache.get(t.requesterId);
+            return {
+                ...t,
+                requesterTag: user?.tag,
+                requesterAvatar: user?.avatar,
+            };
+        });
     }
 
     toJSON(): QuaverPlayerJSON {

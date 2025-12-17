@@ -106,15 +106,7 @@ export default {
                     return callback({ status: Response.GenericError });
                 }
                 await player.addTracksToQueue(tracks, socket.user.id);
-                guild.sendWebUpdate(
-                    'queueUpdate',
-                    player.queue.tracks.map((track: QuaverSong): QuaverSong => {
-                        const user = client.users.cache.get(track.requesterId);
-                        track.requesterTag = user?.tag;
-                        track.requesterAvatar = user?.avatar;
-                        return track;
-                    }),
-                );
+                guild.sendWebUpdate('queueUpdate', player.decorateQueue());
                 break;
             }
             case UpdateItemType.Loop: {
