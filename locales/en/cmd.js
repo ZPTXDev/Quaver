@@ -103,8 +103,10 @@ export default {
             OLD_POSITION: 'The position of the track to move.',
         },
         RESPONSE: {
+            ALTERNATION_CONFLICT: 'The track was not moved as **Smart Queue** is enforcing alternating tracks.',
             MOVING_IN_PLACE: 'You can\'t move a track to the same position it is already in.',
             OUT_OF_RANGE: 'Your input was out of range.',
+            POSITION_ADJUSTED: '-# The track\'s target position was altered by **Smart Queue**.',
             QUEUE_INSUFFICIENT_TRACKS: 'There aren\'t enough tracks in the queue to perform a move.',
             SUCCESS: 'Moved **%1** `%2 -> %3`',
         },

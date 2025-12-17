@@ -59,6 +59,26 @@ export default new ChatInputCommandHandler()
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
         const response = await player.moveQueuedTrack(oldPosition, newPosition);
+        
+        // Handle object response (with adjusted position)
+        if (typeof response === 'object' && 'response' in response) {
+            const { response: playerResponse, adjustedPosition } = response;
+            if (playerResponse === PlayerResponse.Success && adjustedPosition) {
+                const track = player.queue.tracks[adjustedPosition - 1];
+                await interaction.replyHandler.reply(
+                    guild.locale(
+                        'CMD.MOVE.RESPONSE.SUCCESS',
+                        getTrackMarkdownLocaleString(track),
+                        oldPosition.toString(),
+                        adjustedPosition.toString(),
+                    ) + '\n' + guild.locale('CMD.MOVE.RESPONSE.POSITION_ADJUSTED'),
+                    { type: MessageOptionsBuilderType.Success },
+                );
+                return;
+            }
+        }
+        
+        // Handle normal enum response
         switch (response) {
             case PlayerResponse.QueueInsufficientTracks:
                 await interaction.replyHandler.reply(
@@ -75,6 +95,12 @@ export default new ChatInputCommandHandler()
             case PlayerResponse.InputInvalid:
                 await interaction.replyHandler.reply(
                     guild.locale('CMD.MOVE.RESPONSE.MOVING_IN_PLACE'),
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
+            case PlayerResponse.FeatureConflict:
+                await interaction.replyHandler.reply(
+                    guild.locale('CMD.MOVE.RESPONSE.ALTERNATION_CONFLICT'),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;

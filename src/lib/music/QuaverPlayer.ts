@@ -45,7 +45,6 @@ export interface QuaverPlayerJSON {
         alternate: boolean;
         originalQueue?: QuaverSong[];
         shuffledQueue?: string[];
-        manuallyReordered?: boolean;
         failureCount?: number;
         skip?: {
             required: number;
@@ -121,7 +120,6 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         alternate: boolean;
         originalQueue?: QuaverSong[];
         shuffledQueue?: string[];
-        manuallyReordered?: boolean;
         failureCount?: number;
     } = {
         bassboost: false,
@@ -224,10 +222,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             } else {
                 this.memory.originalQueue.push(...added);
             }
-            // Only recompute if queue hasn't been manually reordered
-            if (!this.memory.manuallyReordered) {
-                this.recomputeQueue();
-            }
+            this.recomputeQueue();
         }
         const positions: number[] = [];
         const ids = new Set(added.map((t): string => t.id));
@@ -463,7 +458,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     async moveQueuedTrack(
         oldPosition: number,
         newPosition: number,
-    ): Promise<PlayerResponse> {
+    ): Promise<PlayerResponse | { response: PlayerResponse; adjustedPosition?: number }> {
         if (this.queue.tracks.length <= 1) {
             return PlayerResponse.QueueInsufficientTracks;
         }
@@ -479,27 +474,99 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             return PlayerResponse.InputInvalid;
         }
         const guild = await QuaverGuild.wrap(this.guild);
-        const transformsActive = this.memory.shuffle || this.memory.alternate;
+        
         // When no transforms, move from this.queue.tracks directly
-        if (!transformsActive) {
+        if (!this.memory.shuffle && !this.memory.alternate) {
             const moved = this.queue.tracks.splice(oldPosition - 1, 1)[0];
             this.queue.tracks.splice(newPosition - 1, 0, moved);
             guild.sendWebUpdate('queueUpdate', this.decorateQueue());
             return PlayerResponse.Success;
         }
-        // When transforms are active, move directly in the visible queue
-        // and sync the original queue to match the new order
+        
+        // When transforms are active
+        const movedTrack = this.queue.tracks[oldPosition - 1];
+        let actualNewPosition = newPosition;
+        
+        // If alternate is on, check if move would break alternation
+        if (this.memory.alternate) {
+            // Check neighbors at the target position (before removing the track)
+            const checkPosition = (pos: number): boolean => {
+                // After removing the track from oldPosition, check if placing at pos breaks alternation
+                const tempQueue = [...this.queue.tracks];
+                tempQueue.splice(oldPosition - 1, 1);
+                
+                // Check if placing movedTrack at pos-1 would create adjacent same requesters
+                if (pos > 1) {
+                    const prevTrack = tempQueue[pos - 2];
+                    if (prevTrack && prevTrack.requesterId === movedTrack.requesterId) {
+                        return false; // Same requester before
+                    }
+                }
+                if (pos <= tempQueue.length) {
+                    const nextTrack = tempQueue[pos - 1];
+                    if (nextTrack && nextTrack.requesterId === movedTrack.requesterId) {
+                        return false; // Same requester after
+                    }
+                }
+                return true;
+            };
+            
+            // Check if target position is valid
+            if (!checkPosition(newPosition)) {
+                // Try to find a nearby valid position
+                let foundValid = false;
+                const maxOffset = this.queue.tracks.length;
+                
+                // First try positions closer to the target in the direction of movement
+                const searchDirection = newPosition > oldPosition ? 1 : -1;
+                for (let offset = 1; offset <= maxOffset; offset++) {
+                    const testPos = newPosition + (offset * searchDirection);
+                    if (testPos < 1 || testPos > this.queue.tracks.length) continue;
+                    if (checkPosition(testPos)) {
+                        actualNewPosition = testPos;
+                        foundValid = true;
+                        break;
+                    }
+                }
+                
+                // If still not found, try the opposite direction
+                if (!foundValid) {
+                    for (let offset = 1; offset <= maxOffset; offset++) {
+                        const testPos = newPosition - (offset * searchDirection);
+                        if (testPos < 1 || testPos > this.queue.tracks.length) continue;
+                        if (checkPosition(testPos)) {
+                            actualNewPosition = testPos;
+                            foundValid = true;
+                            break;
+                        }
+                    }
+                }
+                
+                // If no valid position found, reject the move
+                if (!foundValid) {
+                    return PlayerResponse.FeatureConflict;
+                }
+            }
+        }
+        
+        // Perform the move
         const moved = this.queue.tracks.splice(oldPosition - 1, 1)[0];
-        this.queue.tracks.splice(newPosition - 1, 0, moved);
+        this.queue.tracks.splice(actualNewPosition - 1, 0, moved);
+        
         // Update originalQueue to match the new visible order
         this.memory.originalQueue = [...this.queue.tracks];
+        
         // Update shuffledQueue to match the new order (preserve shuffle state)
         if (this.memory.shuffledQueue) {
             this.memory.shuffledQueue = this.queue.tracks.map((t): string => t.id);
         }
-        // Mark that manual reordering has occurred
-        this.memory.manuallyReordered = true;
+        
         guild.sendWebUpdate('queueUpdate', this.decorateQueue());
+        
+        // Return success with adjusted position if it changed
+        if (actualNewPosition !== newPosition) {
+            return { response: PlayerResponse.Success, adjustedPosition: actualNewPosition };
+        }
         return PlayerResponse.Success;
     }
 
@@ -714,7 +781,6 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             }
             delete this.memory.originalQueue;
             delete this.memory.shuffledQueue;
-            delete this.memory.manuallyReordered;
         } else {
             this.recomputeQueue();
         }
@@ -757,7 +823,6 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             }
             delete this.memory.originalQueue;
             delete this.memory.shuffledQueue;
-            delete this.memory.manuallyReordered;
         } else {
             this.recomputeQueue();
         }
@@ -876,7 +941,6 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
                 shuffledQueue: this.memory.shuffledQueue
                     ? [...this.memory.shuffledQueue]
                     : undefined,
-                manuallyReordered: this.memory.manuallyReordered,
                 failureCount: this.memory.failureCount,
                 skip: this.memory.skip
                     ? {
