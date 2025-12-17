@@ -494,8 +494,10 @@ describe('QuaverPlayer', () => {
 			// Actual: After recomputeQueue reshuffles, '3' will be at a random position
 
 			// Simulate the move in originalQueue
-			const fromIdx = originalQueue.findIndex((t) => t.id === '3'); // index 2
-			let toIdx = originalQueue.findIndex((t) => t.id === '2'); // index 1
+			// fromIdx is index 2 (track '3')
+			const fromIdx = originalQueue.findIndex((t) => t.id === '3');
+			// toIdx is index 1 (track '2')
+			let toIdx = originalQueue.findIndex((t) => t.id === '2');
 
 			const [moved] = originalQueue.splice(fromIdx, 1);
 			if (fromIdx < toIdx) toIdx--;
@@ -508,12 +510,13 @@ describe('QuaverPlayer', () => {
 			 * Now simulate recomputeQueue with shuffle (the bug)
 			 * We'll use a fixed shuffle to make this deterministic
 			 */
+			// Order after reshuffle: 5, 1, 4, 2, 3
 			const afterReshuffle = [
-				originalQueue[4], // 5
-				originalQueue[0], // 1
-				originalQueue[3], // 4
-				originalQueue[2], // 2
-				originalQueue[1], // 3
+				originalQueue[4],
+				originalQueue[0],
+				originalQueue[3],
+				originalQueue[2],
+				originalQueue[1],
 			];
 
 			const finalVisibleOrder = afterReshuffle.map((t) => t.id);

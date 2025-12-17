@@ -15,7 +15,8 @@ export default defineConfig({
 				'**/dist/**',
 				'**/*.config.{js,ts}',
 				'**/scripts/**',
-				'**/locales/types.ts', // Generated file
+				// Generated file
+				'**/locales/types.ts',
 			],
 		},
 	},

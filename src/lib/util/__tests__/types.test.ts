@@ -4,7 +4,6 @@ import type {
 	SettingsPageOptions,
 	JSONResponse,
 	QuaverSong,
-	QuaverQueue,
 } from '../types';
 
 describe('util/types', () => {
