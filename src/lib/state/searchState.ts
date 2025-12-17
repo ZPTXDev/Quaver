@@ -1,8 +1,8 @@
-import type { Song } from '@lavaclient/plugin-queue';
+import type { QuaverSong } from '#src/lib/util';
 import type { Snowflake } from 'discord.js';
 
 type SearchStateRecord = {
-    pages: Song[][];
+    pages: QuaverSong[][];
     timeout: ReturnType<typeof setTimeout>;
     selected: Snowflake[];
 };
