@@ -520,29 +520,26 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             
             // Check if target position is valid
             if (!checkPosition(newPosition)) {
-                // Try to find a nearby valid position
                 let foundValid = false;
-                const maxOffset = this.queue.tracks.length;
                 
-                // First try positions closer to the target in the direction of movement
-                const searchDirection = newPosition > oldPosition ? 1 : -1;
-                for (let offset = 1; offset <= maxOffset; offset++) {
-                    const testPos = newPosition + (offset * searchDirection);
-                    if (testPos < 1 || testPos > this.queue.tracks.length) continue;
-                    if (testPos === oldPosition) continue; // Skip the original position
-                    if (checkPosition(testPos)) {
-                        actualNewPosition = testPos;
-                        foundValid = true;
-                        break;
+                // Determine direction of movement
+                const movingForward = newPosition > oldPosition;
+                const movingBackward = newPosition < oldPosition;
+                
+                if (movingForward) {
+                    // Moving forward: try positions after the target (e.g., 1->2 fails, try 1->3)
+                    for (let testPos = newPosition + 1; testPos <= this.queue.tracks.length; testPos++) {
+                        if (testPos === oldPosition) continue;
+                        if (checkPosition(testPos)) {
+                            actualNewPosition = testPos;
+                            foundValid = true;
+                            break;
+                        }
                     }
-                }
-                
-                // If still not found, try the opposite direction
-                if (!foundValid) {
-                    for (let offset = 1; offset <= maxOffset; offset++) {
-                        const testPos = newPosition - (offset * searchDirection);
-                        if (testPos < 1 || testPos > this.queue.tracks.length) continue;
-                        if (testPos === oldPosition) continue; // Skip the original position
+                } else if (movingBackward) {
+                    // Moving backward: try positions before the target (e.g., 3->2 fails, try 3->1)
+                    for (let testPos = newPosition - 1; testPos >= 1; testPos--) {
+                        if (testPos === oldPosition) continue;
                         if (checkPosition(testPos)) {
                             actualNewPosition = testPos;
                             foundValid = true;
@@ -573,6 +570,11 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         // Update shuffledQueue to match the new order (preserve shuffle state)
         if (this.memory.shuffledQueue) {
             this.memory.shuffledQueue = this.queue.tracks.map((t): string => t.id);
+        }
+        
+        // If alternate is on, recompute the queue to re-apply alternation
+        if (this.memory.alternate) {
+            this.recomputeQueue();
         }
         
         guild.sendWebUpdate('queueUpdate', this.decorateQueue());
