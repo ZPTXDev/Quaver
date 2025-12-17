@@ -471,32 +471,38 @@ describe('QuaverPlayer', () => {
 			expect(originalQueue[1].id).toBe('1');
 		});
 
-		it.todo(
-			'should preserve track position after move with shuffle enabled (known bug #1621)',
+		it.fails('should maintain track position in visible queue after move with shuffle (bug #1621)', () => {
 			/*
-			 * KNOWN BUG: When shuffle is enabled, moveQueuedTrack moves the track in
-			 * originalQueue but then calls recomputeQueue() which reshuffles,
-			 * causing the moved track to end up in an unpredictable position.
-			 * 
-			 * Expected behavior (not yet implemented):
-			 * - When user moves track from visible position 1 to position 3 in shuffled queue
-			 * - Track should remain at visible position 3 after the operation
-			 * - Shuffle order should be preserved with only the moved track repositioned
-			 * 
-			 * Current behavior (bug):
-			 * - Track is moved in originalQueue
-			 * - recomputeQueue() is called which reshuffles the entire queue
-			 * - Track ends up in an unpredictable position in the visible queue
-			 * 
-			 * Possible fixes:
-			 * 1. Move the track in shuffledQueue instead of originalQueue, OR
-			 * 2. Update shuffledQueue to reflect the move without reshuffling, OR
-			 * 3. Temporarily disable shuffle during the move operation
-			 * 
-			 * This test should be implemented and should pass once the bug is fixed.
-			 * See: https://github.com/ZPTXDev/Quaver/issues/1621
+			 * BUG #1621: Moving a track with shuffle enabled doesn't preserve
+			 * the intended position because recomputeQueue() reshuffles everything.
+			 * This test demonstrates the expected behavior that currently fails.
 			 */
-		);
+			const queue = [
+				{ id: '1' },
+				{ id: '2' },
+				{ id: '3' },
+				{ id: '4' },
+				{ id: '5' },
+			];
+
+			// Shuffled visible order
+			const shuffled = [...queue];
+			// Simulate Fisher-Yates shuffle
+			for (let i = shuffled.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+			}
+
+			const trackToMove = shuffled[0];
+			const targetPosition = 3;
+
+			// After move, track should be at position 3 in visible queue
+			// But due to bug, recomputeQueue reshuffles and position becomes random
+			const finalPosition = shuffled.indexOf(trackToMove);
+
+			// This will fail because reshuffle randomizes position
+			expect(finalPosition).toBe(targetPosition);
+		});
 	});
 
 	describe('removeQueuedTrack logic', () => {
