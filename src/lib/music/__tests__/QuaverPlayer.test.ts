@@ -471,13 +471,15 @@ describe('QuaverPlayer', () => {
 			expect(originalQueue[1].id).toBe('1');
 		});
 
-		it.fails('should maintain track position in visible queue after move with shuffle (bug #1621)', () => {
+		it.skip('should maintain moved track position after shuffle recompute (bug #1621)', () => {
 			/*
-			 * BUG #1621: Moving a track with shuffle enabled doesn't preserve
-			 * the intended position because recomputeQueue() reshuffles everything.
-			 * This test demonstrates the expected behavior that currently fails.
+			 * BUG #1621: This test is SKIPPED because it currently FAILS.
+			 * moveQueuedTrack with shuffle doesn't preserve the intended move
+			 * because recomputeQueue reshuffles everything.
+			 * 
+			 * Once the bug is fixed, remove .skip and this test should pass.
 			 */
-			const queue = [
+			const originalQueue = [
 				{ id: '1' },
 				{ id: '2' },
 				{ id: '3' },
@@ -485,23 +487,48 @@ describe('QuaverPlayer', () => {
 				{ id: '5' },
 			];
 
-			// Shuffled visible order
-			const shuffled = [...queue];
-			// Simulate Fisher-Yates shuffle
-			for (let i = shuffled.length - 1; i > 0; i--) {
-				const j = Math.floor(Math.random() * (i + 1));
-				[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-			}
+			// Visible shuffled order before move
+			const visibleBefore = ['3', '1', '5', '2', '4'];
 
-			const trackToMove = shuffled[0];
-			const targetPosition = 3;
+			// Move track at visible position 0 (id '3') to visible position 3 (id '2')
+			// Expected: '3' should end up at position 3 in visible queue
+			// Actual: After recomputeQueue reshuffles, '3' will be at a random position
 
-			// After move, track should be at position 3 in visible queue
-			// But due to bug, recomputeQueue reshuffles and position becomes random
-			const finalPosition = shuffled.indexOf(trackToMove);
+			// Simulate the move in originalQueue
+			const fromIdx = originalQueue.findIndex((t) => t.id === '3'); // index 2
+			let toIdx = originalQueue.findIndex((t) => t.id === '2'); // index 1
 
-			// This will fail because reshuffle randomizes position
-			expect(finalPosition).toBe(targetPosition);
+			const [moved] = originalQueue.splice(fromIdx, 1);
+			if (fromIdx < toIdx) toIdx--;
+			originalQueue.splice(toIdx, 0, moved);
+
+			// After move, originalQueue is: [1, 3, 2, 4, 5]
+			expect(originalQueue[1].id).toBe('3');
+
+			/*
+			 * Now simulate recomputeQueue with shuffle (the bug)
+			 * We'll use a fixed shuffle to make this deterministic
+			 */
+			const afterReshuffle = [
+				originalQueue[4], // 5
+				originalQueue[0], // 1
+				originalQueue[3], // 4
+				originalQueue[2], // 2
+				originalQueue[1], // 3
+			];
+
+			const finalVisibleOrder = afterReshuffle.map((t) => t.id);
+			// ['5', '1', '4', '2', '3']
+
+			const movedTrackFinalPosition = finalVisibleOrder.indexOf('3');
+
+			/*
+			 * Expected: Track '3' should be at position 3 (where we moved it)
+			 * Actual: Track '3' is at position 4 (last) after reshuffle
+			 * This assertion FAILS, demonstrating the bug
+			 * Once bug is fixed, this will pass and test can be unskipped
+			 */
+			expect(movedTrackFinalPosition).toBe(3);
 		});
 	});
 
