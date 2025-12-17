@@ -78,26 +78,24 @@ export default new StringSelectMenuHandler()
                             description: value.data.description,
                             value: value.data.value,
                             default: !!state.selected.find(
-                                (uri: string): boolean =>
-                                    uri === value.data.value,
+                                (id: string): boolean =>
+                                    id === value.data.value,
                             ),
                         };
                     },
                 )
                 .concat(
                     state.selected
-                        .map((uri: string): SelectMenuComponentOptionData => {
+                        .map((id: string): SelectMenuComponentOptionData => {
                             const refPg = pages.indexOf(
                                 pages.find(
                                     (pg): Song =>
-                                        pg.find(
-                                            (t): boolean => t.info.uri === uri,
-                                        ),
+                                        pg.find((t): boolean => t.id === id),
                                 ),
                             );
                             const firstIdx = 10 * refPg + 1;
                             const refTrack = pages[refPg].find(
-                                (t): boolean => t.info.uri === uri,
+                                (t): boolean => t.id === id,
                             );
                             let label = `${
                                 firstIdx + pages[refPg].indexOf(refTrack)
@@ -108,7 +106,7 @@ export default new StringSelectMenuHandler()
                             return {
                                 label: label,
                                 description: refTrack.info.author,
-                                value: uri,
+                                value: id,
                                 default: true,
                             };
                         })
