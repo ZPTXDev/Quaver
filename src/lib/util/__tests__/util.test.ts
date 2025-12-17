@@ -3,6 +3,9 @@ import { queryOverrides, sourceManagers, acceptableSources } from '../constants'
 
 // Import only the pure utility functions that can be tested without Discord.js
 // We'll test these by creating minimal implementations
+// NOTE: Manual implementations are used to avoid circular dependencies that occur
+// when importing from util.ts (which imports Discord.js and other complex dependencies)
+// This approach ensures tests remain isolated and don't require a full Discord bot setup
 
 describe('Utility functions - Pure functions', () => {
 	describe('cleanURIForMarkdown', () => {

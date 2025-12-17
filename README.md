@@ -113,3 +113,42 @@ Take a look at our [Crowdin project](https://translate.zptx.dev).
 # 📝 Contributing
 
 Refer to [CONTRIBUTING.md](CONTRIBUTING.md).
+
+# 🧪 Testing
+
+Quaver uses [Vitest](https://vitest.dev/) for unit testing. The test suite covers utility functions, locales, and other modules that can be tested without spinning up a Discord bot.
+
+## Running Tests
+
+```bash
+# Run all tests
+npm run test
+
+# Run tests in watch mode
+npm test
+
+# Run tests once (CI mode)
+npm run test:run
+
+# Run tests with UI
+npm run test:ui
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+## Writing Tests
+
+Tests are located in `__tests__` directories next to the modules they test. For example:
+- `src/lib/util/__tests__/util.test.ts` - Tests for `src/lib/util/util.ts`
+- `src/lib/locales/__tests__/locales.test.ts` - Tests for `src/lib/locales/index.ts`
+
+When writing tests:
+- Use semantic test descriptions
+- Test both success and failure cases
+- Focus on pure functions and modules that don't require Discord.js dependencies
+- Keep tests isolated and independent
+
+## Compatibility
+
+The test suite works with both Node.js (via pnpm) and Bun package managers. Vitest was chosen specifically for its compatibility with both runtimes.

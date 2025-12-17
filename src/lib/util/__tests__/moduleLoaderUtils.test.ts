@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest';
 
+// NOTE: Manual implementations of pure functions are tested here
+// to avoid importing the entire moduleLoaderUtils module which has
+// file system and dynamic import dependencies that are complex to mock
 describe('moduleLoaderUtils - Pure utility functions', () => {
 	describe('arrifyValue', () => {
 		// Manual implementation for testing based on the source code
