@@ -165,7 +165,11 @@ export default new ChatInputCommandHandler()
                 return;
             }
             case 'search': {
-                tracks = [...result.data];
+                tracks = result.data.map((t: QuaverSong): QuaverSong => {
+                    t.requesterId = interaction.user.id;
+                    t.id = crypto.randomUUID();
+                    return t;
+                });
                 break;
             }
             case 'empty':
@@ -244,7 +248,7 @@ export default new ChatInputCommandHandler()
                                         return {
                                             label: label,
                                             description: track.info.author,
-                                            value: track.info.uri,
+                                            value: track.id,
                                         };
                                     },
                                 ),
@@ -291,7 +295,7 @@ export default new ChatInputCommandHandler()
                 ? response.resource.message
                 : response;
         searchState[msg.id] = {
-            pages: pages,
+            pages,
             timeout: setTimeout(
                 async (g, message): Promise<void> => {
                     try {

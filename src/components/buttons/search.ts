@@ -4,13 +4,7 @@ import { QuaverGuild } from '#src/lib/guild';
 import type { LocaleKey } from '#src/lib/locales';
 import { logger } from '#src/lib/logger';
 import { searchState, updateHandler } from '#src/lib/state';
-import {
-    buildMessageOptions,
-    Check,
-    getTrackMarkdownLocaleString,
-    type QuaverChannels,
-    type QuaverSong,
-} from '#src/lib/util';
+import { buildMessageOptions, Check, getTrackMarkdownLocaleString, type QuaverChannels, } from '#src/lib/util';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import {
@@ -61,27 +55,16 @@ export default new ButtonHandler()
                 );
                 return;
             }
-            await interaction.replyHandler.reply(guild.locale('MISC.LOADING'), {
-                components: [],
-                force: ForceType.Update,
-            });
-            const resolvedTracks = [];
-            for (const track of tracks) {
-                const result =
-                    await interaction.client.music.api.loadTracks(track);
-                if (result.loadType === 'track') {
-                    const data: QuaverSong = result.data;
-                    data.requesterId = interaction.user.id;
-                    data.id = crypto.randomUUID();
-                    resolvedTracks.push(result.data);
-                }
-            }
+            const resolvedTracks = searchState[interaction.message.id].pages
+                .flat()
+                .filter((track): boolean => tracks.includes(track.id));
             if (resolvedTracks.length === 0) {
                 await interaction.replyHandler.reply(
                     guild.locale('CMD.SEARCH.RESPONSE.LOAD_FAILED'),
                     {
                         type: MessageOptionsBuilderType.Error,
                         components: [],
+                        force: ForceType.Update,
                     },
                 );
                 return;
@@ -122,7 +105,11 @@ export default new ButtonHandler()
                           ]
                         : []),
                 ),
-                { type: MessageOptionsBuilderType.Success, components: [] },
+                {
+                    type: MessageOptionsBuilderType.Success,
+                    components: [],
+                    force: ForceType.Update,
+                },
             );
             guild.sendWebUpdate('queueUpdate', player.decorateQueue());
             delete searchState[interaction.message.id];
@@ -205,24 +192,24 @@ export default new ButtonHandler()
                 return {
                     label: label,
                     description: track.info.author,
-                    value: track.info.uri,
+                    value: track.id,
                     default: !!state.selected.find(
-                        (uri: string): boolean => uri === track.info.uri,
+                        (id: string): boolean => id === track.id,
                     ),
                 };
             })
             .concat(
                 state.selected
-                    .map((uri: string): APISelectMenuOption => {
+                    .map((id: string): APISelectMenuOption => {
                         const refPg = pages.indexOf(
                             pages.find(
                                 (pg): Song =>
-                                    pg.find((t): boolean => t.info.uri === uri),
+                                    pg.find((t): boolean => t.id === id),
                             ),
                         );
                         const firstIdx = 10 * refPg + 1;
                         const refTrack = pages[refPg].find(
-                            (t): boolean => t.info.uri === uri,
+                            (t): boolean => t.id === id,
                         );
                         let label = `${
                             firstIdx + pages[refPg].indexOf(refTrack)
@@ -233,15 +220,14 @@ export default new ButtonHandler()
                         return {
                             label: label,
                             description: refTrack.info.author,
-                            value: uri,
+                            value: id,
                             default: true,
                         };
                     })
                     .filter(
                         (options): boolean =>
                             !pages[page - 1].find(
-                                (track): boolean =>
-                                    track.info.uri === options.value,
+                                (track): boolean => track.id === options.value,
                             ),
                     ),
             )
