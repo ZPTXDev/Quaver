@@ -89,7 +89,10 @@ export default {
             NEW_POSITION: 'Ang bag-ong posisyon aron mabalhin ang track.'
         },
         RESPONSE: {
+            SUCCESS: 'Nabalhin ang [**%1**](%2) `%3 -> %4`',
+            QUEUE_INSUFFICIENT_TRACKS: 'Walay igong mga track sa queue aron makahimo og usa ka pagbalhin.',
             OUT_OF_RANGE: 'Ang imong input kay dili balido.',
+            MOVING_IN_PLACE: 'Dili nimo mabalhin ang usa ka track sa parehas nga posisyon nga naa na niini.'
         }
     },
     NIGHTCORE: {

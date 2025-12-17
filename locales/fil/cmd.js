@@ -89,7 +89,10 @@ export default {
             NEW_POSITION: 'Ang bagong posisyon upang mailipat ang track.'
         },
         RESPONSE: {
+            SUCCESS: 'Nailipat ang [**%1**](%2) `%3 -> %4`',
+            QUEUE_INSUFFICIENT_TRACKS: 'Walang sapat na mga track sa queue upang magsagawa ng isang paglipat.',
             OUT_OF_RANGE: 'Ang iyong input ay hindi wasto.',
+            MOVING_IN_PLACE: 'Hindi mo maaaring ilipat ang isang track sa parehong posisyon kung nasaan na ito.'
         }
     },
     NIGHTCORE: {
