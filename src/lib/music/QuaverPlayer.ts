@@ -470,6 +470,9 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         ) {
             return PlayerResponse.InputOutOfRange;
         }
+        if (oldPosition === newPosition) {
+            return PlayerResponse.InputInvalid;
+        }
         const guild = await QuaverGuild.wrap(this.guild);
         const transformsActive = this.memory.shuffle || this.memory.alternate;
         // When no transforms, move from this.queue.tracks directly
@@ -491,17 +494,14 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             );
             return PlayerResponse.Success;
         }
-        const visible = this.queue.tracks;
-        const fromSong = visible[oldPosition - 1];
-        const toSong = visible[newPosition - 1];
-        const base = this.memory.originalQueue!;
-        const fromIdx = base.findIndex((s): boolean => s.id === fromSong.id);
-        let toIdx = base.findIndex((s): boolean => s.id === toSong.id);
-        if (fromIdx === -1 || toIdx === -1) return PlayerResponse.InputInvalid;
-        const [moved] = base.splice(fromIdx, 1);
-        if (fromIdx < toIdx) toIdx--;
-        base.splice(toIdx, 0, moved);
-        this.recomputeQueue();
+        // When transforms are active, move directly in the visible queue
+        // and sync the original queue to match the new order
+        const moved = this.queue.tracks.splice(oldPosition - 1, 1)[0];
+        this.queue.tracks.splice(newPosition - 1, 0, moved);
+        // Update originalQueue to match the new visible order
+        this.memory.originalQueue = [...this.queue.tracks];
+        // Clear shuffledQueue since manual reordering invalidates the shuffle
+        delete this.memory.shuffledQueue;
         guild.sendWebUpdate(
             'queueUpdate',
             this.queue.tracks.map(
