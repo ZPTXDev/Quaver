@@ -38,8 +38,8 @@ dependencies:
     specifier: ^7.2.7
     version: 7.2.7
   cacheable:
-    specifier: ^2.3.0
-    version: 2.3.0
+    specifier: ^2.3.1
+    version: 2.3.1
   crypto-js:
     specifier: ^4.2.0
     version: 4.2.0
@@ -206,7 +206,7 @@ packages:
     dependencies:
       '@cacheable/utils': 2.3.2
       '@keyv/bigmap': 1.3.0(keyv@5.5.5)
-      hookified: 1.13.0
+      hookified: 1.14.0
       keyv: 5.5.5
     dev: false
 
@@ -493,7 +493,7 @@ packages:
       keyv: ^5.5.4
     dependencies:
       hashery: 1.3.0
-      hookified: 1.13.0
+      hookified: 1.14.0
       keyv: 5.5.5
     dev: false
 
@@ -1511,14 +1511,14 @@ packages:
       keyv: 5.5.4(patch_hash=xtm6nhclkwmse6ymbyf3zp3mwa)
     dev: false
 
-  /cacheable@2.3.0:
-    resolution: {integrity: sha512-HHiAvOBmlcR2f3SQ7kdlYD8+AUJG+wlFZ/Ze8tl1Vzvz0MdOh8IYA/EFU4ve8t1/sZ0j4MGi7ST5MoTwHessQA==}
+  /cacheable@2.3.1:
+    resolution: {integrity: sha512-yr+FSHWn1ZUou5LkULX/S+jhfgfnLbuKQjE40tyEd4fxGZVMbBL5ifno0J0OauykS8UiCSgHi+DV/YD+rjFxFg==}
     dependencies:
       '@cacheable/memory': 2.0.6
       '@cacheable/utils': 2.3.2
-      hookified: 1.13.0
+      hookified: 1.14.0
       keyv: 5.5.5
-      qified: 0.5.2
+      qified: 0.5.3
     dev: false
 
   /call-bind-apply-helpers@1.0.2:
@@ -2358,10 +2358,6 @@ packages:
   /hookable@5.5.3:
     resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}
     dev: true
-
-  /hookified@1.13.0:
-    resolution: {integrity: sha512-6sPYUY8olshgM/1LDNW4QZQN0IqgKhtl/1C8koNZBJrKLBk3AZl6chQtNwpNztvfiApHMEwMHek5rv993PRbWw==}
-    dev: false
 
   /hookified@1.14.0:
     resolution: {integrity: sha512-pi1ynXIMFx/uIIwpWJ/5CEtOHLGtnUB0WhGeeYT+fKcQ+WCQbm3/rrkAXnpfph++PgepNqPdTC2WTj8A6k6zoQ==}
@@ -3375,8 +3371,8 @@ packages:
     resolution: {integrity: sha512-bVWawvoZoBYpp6yIoQtQXHZjmz35RSVHnUOTefl8Vcjr8snTPY1wnpSPMWekcFwbxI6gtmT7rSYPFvz71ldiOA==}
     dev: false
 
-  /qified@0.5.2:
-    resolution: {integrity: sha512-7gJ6mxcQb9vUBOtbKm5mDevbe2uRcOEVp1g4gb/Q+oLntB3HY8eBhOYRxFI2mlDFlY1e4DOSCptzxarXRvzxCA==}
+  /qified@0.5.3:
+    resolution: {integrity: sha512-kXuQdQTB6oN3KhI6V4acnBSZx8D2I4xzZvn9+wFLLFCoBNQY/sFnCW6c43OL7pOQ2HvGV4lnWIXNmgfp7cTWhQ==}
     engines: {node: '>=20'}
     dependencies:
       hookified: 1.14.0
