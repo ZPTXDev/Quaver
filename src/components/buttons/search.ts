@@ -124,17 +124,7 @@ export default new ButtonHandler()
                 ),
                 { type: MessageOptionsBuilderType.Success, components: [] },
             );
-            guild.sendWebUpdate(
-                'queueUpdate',
-                player.queue.tracks.map((track: QuaverSong): QuaverSong => {
-                    const user = interaction.client.users.cache.get(
-                        track.requesterId,
-                    );
-                    track.requesterTag = user?.tag;
-                    track.requesterAvatar = user?.avatar;
-                    return track;
-                }),
-            );
+            guild.sendWebUpdate('queueUpdate', player.decorateQueue());
             delete searchState[interaction.message.id];
             return;
         }
