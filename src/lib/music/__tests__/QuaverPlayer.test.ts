@@ -471,13 +471,13 @@ describe('QuaverPlayer', () => {
 			expect(originalQueue[1].id).toBe('1');
 		});
 
-		it.skip('should maintain moved track position after shuffle recompute (bug #1621)', () => {
+		it('should maintain moved track position after shuffle recompute (bug #1621 - currently failing)', () => {
 			/*
-			 * BUG #1621: This test is SKIPPED because it currently FAILS.
+			 * BUG #1621: This test currently FAILS.
 			 * moveQueuedTrack with shuffle doesn't preserve the intended move
 			 * because recomputeQueue reshuffles everything.
 			 * 
-			 * Once the bug is fixed, remove .skip and this test should pass.
+			 * Once the bug is fixed, this test should pass.
 			 */
 			const originalQueue = [
 				{ id: '1' },
@@ -487,8 +487,7 @@ describe('QuaverPlayer', () => {
 				{ id: '5' },
 			];
 
-			// Visible shuffled order before move
-			const visibleBefore = ['3', '1', '5', '2', '4'];
+			// Visible shuffled order before move: ['3', '1', '5', '2', '4']
 
 			// Move track at visible position 0 (id '3') to visible position 3 (id '2')
 			// Expected: '3' should end up at position 3 in visible queue
@@ -526,7 +525,7 @@ describe('QuaverPlayer', () => {
 			 * Expected: Track '3' should be at position 3 (where we moved it)
 			 * Actual: Track '3' is at position 4 (last) after reshuffle
 			 * This assertion FAILS, demonstrating the bug
-			 * Once bug is fixed, this will pass and test can be unskipped
+			 * Once bug is fixed, this will pass
 			 */
 			expect(movedTrackFinalPosition).toBe(3);
 		});
