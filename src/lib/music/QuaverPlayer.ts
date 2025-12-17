@@ -489,25 +489,32 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         
         // If alternate is on, check if move would break alternation
         if (this.memory.alternate) {
-            // Check neighbors at the target position (before removing the track)
+            // Function to check if a position would break alternation
             const checkPosition = (pos: number): boolean => {
-                // After removing the track from oldPosition, check if placing at pos breaks alternation
+                // Simulate removing the track and inserting at new position
                 const tempQueue = [...this.queue.tracks];
-                tempQueue.splice(oldPosition - 1, 1);
+                tempQueue.splice(oldPosition - 1, 1); // Remove from old position
+                tempQueue.splice(pos - 1, 0, movedTrack); // Insert at new position
                 
-                // Check if placing movedTrack at pos-1 would create adjacent same requesters
-                if (pos > 1) {
-                    const prevTrack = tempQueue[pos - 2];
-                    if (prevTrack && prevTrack.requesterId === movedTrack.requesterId) {
+                // Check if the insertion created adjacent tracks from same requester
+                const insertIndex = pos - 1;
+                
+                // Check the track before the inserted position
+                if (insertIndex > 0) {
+                    const prevTrack = tempQueue[insertIndex - 1];
+                    if (prevTrack.requesterId === movedTrack.requesterId) {
                         return false; // Same requester before
                     }
                 }
-                if (pos <= tempQueue.length) {
-                    const nextTrack = tempQueue[pos - 1];
-                    if (nextTrack && nextTrack.requesterId === movedTrack.requesterId) {
+                
+                // Check the track after the inserted position
+                if (insertIndex < tempQueue.length - 1) {
+                    const nextTrack = tempQueue[insertIndex + 1];
+                    if (nextTrack.requesterId === movedTrack.requesterId) {
                         return false; // Same requester after
                     }
                 }
+                
                 return true;
             };
             
@@ -522,6 +529,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
                 for (let offset = 1; offset <= maxOffset; offset++) {
                     const testPos = newPosition + (offset * searchDirection);
                     if (testPos < 1 || testPos > this.queue.tracks.length) continue;
+                    if (testPos === oldPosition) continue; // Skip the original position
                     if (checkPosition(testPos)) {
                         actualNewPosition = testPos;
                         foundValid = true;
@@ -534,6 +542,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
                     for (let offset = 1; offset <= maxOffset; offset++) {
                         const testPos = newPosition - (offset * searchDirection);
                         if (testPos < 1 || testPos > this.queue.tracks.length) continue;
+                        if (testPos === oldPosition) continue; // Skip the original position
                         if (checkPosition(testPos)) {
                             actualNewPosition = testPos;
                             foundValid = true;
@@ -547,6 +556,11 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
                     return PlayerResponse.FeatureConflict;
                 }
             }
+        }
+        
+        // If the actual position ends up being the same as old position, reject
+        if (actualNewPosition === oldPosition) {
+            return PlayerResponse.FeatureConflict;
         }
         
         // Perform the move
