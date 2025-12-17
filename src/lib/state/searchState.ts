@@ -4,7 +4,7 @@ import type { Snowflake } from 'discord.js';
 type SearchStateRecord = {
     pages: QuaverSong[][];
     timeout: ReturnType<typeof setTimeout>;
-    selected: Snowflake[];
+    selected: string[];
 };
 
 export const searchState: Record<Snowflake, SearchStateRecord> = {};
