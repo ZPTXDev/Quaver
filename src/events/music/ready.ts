@@ -21,7 +21,7 @@ async function readPlayerStates(): Promise<Record<string, QuaverPlayerJSON>> {
 }
 
 export default {
-    name: 'connected',
+    name: 'ready',
     once: false,
     async execute(): Promise<void> {
         const { client } = await import('#src/main');
