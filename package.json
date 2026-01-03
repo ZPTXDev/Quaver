@@ -1,6 +1,6 @@
 {
   "name": "quaver",
-  "version": "8.0.0-next.27",
+  "version": "8.0.0-next.28",
   "type": "module",
   "engines": {
     "node": ">=22.12.0"
@@ -13,7 +13,7 @@
     "@zptxdev/zptx-lib": "^1.1.0",
     "adm-zip": "^0.5.16",
     "cache-manager": "^7.2.7",
-    "cacheable": "^2.3.0",
+    "cacheable": "^2.3.1",
     "crypto-js": "^4.2.0",
     "discord.js": "^14.25.1",
     "effect": "2.4.19",
@@ -27,7 +27,7 @@
     "path-exists-cli": "^2.0.0",
     "pinyin-pro": "^3.27.0",
     "semver": "^7.7.3",
-    "socket.io": "^4.8.1",
+    "socket.io": "^4.8.3",
     "sqlite3": "^5.1.7",
     "undici": "^7.16.0",
     "wanakana": "^5.3.1",
@@ -52,9 +52,9 @@
     "globals": "^16.5.0",
     "prettier": "^3.7.4",
     "rimraf": "^6.1.2",
-    "tsdown": "^0.18.0",
+    "tsdown": "^0.18.4",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.50.0",
+    "typescript-eslint": "^8.51.0",
     "vitest": "^4.0.16"
   },
   "main": "dist/main.mjs",

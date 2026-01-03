@@ -3,11 +3,9 @@ import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import { getLocaleString } from '#src/lib/locales';
 import { PlayerResponse } from '#src/lib/music';
-import { Check, getTrackMarkdownLocaleString, settings } from '#src/lib/util';
-import {
-    SlashCommandBuilder,
-    type SlashCommandIntegerOption,
-} from 'discord.js';
+import type { QuaverSong} from '#src/lib/util';
+import { Check, getTrackMarkdownLocaleString, settings, } from '#src/lib/util';
+import { SlashCommandBuilder, type SlashCommandIntegerOption, } from 'discord.js';
 
 export default new ChatInputCommandHandler()
     .setData(
@@ -58,6 +56,7 @@ export default new ChatInputCommandHandler()
         const newPosition = interaction.options.getInteger('new_position');
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
+        const track = player.queue.tracks[oldPosition - 1];
         const response = await player.moveQueuedTrack(oldPosition, newPosition);
         switch (response) {
             case PlayerResponse.QueueInsufficientTracks:
@@ -78,14 +77,23 @@ export default new ChatInputCommandHandler()
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
+            case PlayerResponse.FeatureConflict:
+                await interaction.replyHandler.reply(
+                    guild.locale('CMD.MOVE.RESPONSE.FEATURE_CONFLICT'),
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
             case PlayerResponse.Success: {
-                const track = player.queue.tracks[newPosition - 1];
+                const updatedPosition =
+                    player.queue.tracks.findIndex(
+                        (t: QuaverSong): boolean => t.id === track.id,
+                    ) + 1;
                 await interaction.replyHandler.reply(
                     guild.locale(
                         'CMD.MOVE.RESPONSE.SUCCESS',
                         getTrackMarkdownLocaleString(track),
                         oldPosition.toString(),
-                        newPosition.toString(),
+                        updatedPosition.toString(),
                     ),
                     { type: MessageOptionsBuilderType.Success },
                 );

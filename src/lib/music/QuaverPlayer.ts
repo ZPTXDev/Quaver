@@ -7,7 +7,13 @@ import {
 import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
 import { logger } from '#src/lib/logger';
 import { updateHandler } from '#src/lib/state';
-import { buildMessageOptions, type QuaverChannels, type QuaverQueue, type QuaverSong, settings, } from '#src/lib/util';
+import {
+    buildMessageOptions,
+    type QuaverChannels,
+    type QuaverQueue,
+    type QuaverSong,
+    settings,
+} from '#src/lib/util';
 import type { PlayerEffect } from '@lavaclient/plugin-effects';
 import { type LoopType, Queue } from '@lavaclient/plugin-queue';
 import {
@@ -470,26 +476,13 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         ) {
             return PlayerResponse.InputOutOfRange;
         }
-        const guild = await QuaverGuild.wrap(this.guild);
-        const transformsActive = this.memory.shuffle || this.memory.alternate;
-        // When no transforms, move from this.queue.tracks directly
-        if (!transformsActive) {
-            const moved = this.queue.tracks.splice(oldPosition - 1, 1)[0];
-            this.queue.tracks.splice(newPosition - 1, 0, moved);
-            guild.sendWebUpdate('queueUpdate', this.decorateQueue());
-            return PlayerResponse.Success;
+        // FIXME: Improve UX by allowing move when transforms are active - currently disabled as it's bugged out
+        if (this.memory.shuffle || this.memory.alternate) {
+            return PlayerResponse.FeatureConflict;
         }
-        const visible = this.queue.tracks;
-        const fromSong = visible[oldPosition - 1];
-        const toSong = visible[newPosition - 1];
-        const base = this.memory.originalQueue!;
-        const fromIdx = base.findIndex((s): boolean => s.id === fromSong.id);
-        let toIdx = base.findIndex((s): boolean => s.id === toSong.id);
-        if (fromIdx === -1 || toIdx === -1) return PlayerResponse.InputInvalid;
-        const [moved] = base.splice(fromIdx, 1);
-        if (fromIdx < toIdx) toIdx--;
-        base.splice(toIdx, 0, moved);
-        this.recomputeQueue();
+        const guild = await QuaverGuild.wrap(this.guild);
+        const moved = this.queue.tracks.splice(oldPosition - 1, 1)[0];
+        this.queue.tracks.splice(newPosition - 1, 0, moved);
         guild.sendWebUpdate('queueUpdate', this.decorateQueue());
         return PlayerResponse.Success;
     }

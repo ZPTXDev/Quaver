@@ -103,6 +103,7 @@ export default {
             OLD_POSITION: 'The position of the track to move.',
         },
         RESPONSE: {
+            FEATURE_CONFLICT: 'Moving tracks is disabled while **Shuffle** or **Smart Queue** is enabled.',
             MOVING_IN_PLACE: 'You can\'t move a track to the same position it is already in.',
             OUT_OF_RANGE: 'Your input was out of range.',
             QUEUE_INSUFFICIENT_TRACKS: 'There aren\'t enough tracks in the queue to perform a move.',
@@ -306,6 +307,7 @@ export default {
             POSITION: 'The position of the track to skip to.',
         },
         RESPONSE: {
+            FEATURE_CONFLICT: 'Skipping to a specific track is disabled while **Shuffle** or **Smart Queue** is enabled.',
             NOT_REQUESTER: 'You are not the requester of the current track and do not have sufficient permissions to skip it.',
             OUT_OF_RANGE: 'Your input was out of range.',
             SUCCESS: {
