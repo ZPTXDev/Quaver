@@ -4,10 +4,7 @@ import { QuaverGuild } from '#src/lib/guild';
 import { getLocaleString } from '#src/lib/locales';
 import { PlayerResponse } from '#src/lib/music';
 import { Check, getTrackMarkdownLocaleString, settings } from '#src/lib/util';
-import {
-    SlashCommandBuilder,
-    type SlashCommandIntegerOption,
-} from 'discord.js';
+import { SlashCommandBuilder, type SlashCommandIntegerOption, } from 'discord.js';
 
 export default new ChatInputCommandHandler()
     .setData(
@@ -75,6 +72,12 @@ export default new ChatInputCommandHandler()
             case PlayerResponse.InputInvalid:
                 await interaction.replyHandler.reply(
                     guild.locale('CMD.MOVE.RESPONSE.MOVING_IN_PLACE'),
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
+            case PlayerResponse.FeatureConflict:
+                await interaction.replyHandler.reply(
+                    guild.locale('CMD.MOVE.RESPONSE.FEATURE_CONFLICT'),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;

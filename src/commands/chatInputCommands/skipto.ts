@@ -3,18 +3,8 @@ import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import { getLocaleString } from '#src/lib/locales';
 import { PlayerResponse } from '#src/lib/music';
-import {
-    Check,
-    getRequesterStatus,
-    getTrackMarkdownLocaleString,
-    RequesterStatus,
-    settings,
-} from '#src/lib/util';
-import {
-    type GuildMember,
-    SlashCommandBuilder,
-    type SlashCommandIntegerOption,
-} from 'discord.js';
+import { Check, getRequesterStatus, getTrackMarkdownLocaleString, RequesterStatus, settings, } from '#src/lib/util';
+import { type GuildMember, SlashCommandBuilder, type SlashCommandIntegerOption, } from 'discord.js';
 
 export default new ChatInputCommandHandler()
     .setData(
@@ -88,6 +78,12 @@ export default new ChatInputCommandHandler()
             case PlayerResponse.InputOutOfRange:
                 await interaction.replyHandler.reply(
                     guild.locale('CMD.SKIPTO.RESPONSE.OUT_OF_RANGE'),
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
+            case PlayerResponse.FeatureConflict:
+                await interaction.replyHandler.reply(
+                    guild.locale('CMD.SKIPTO.RESPONSE.FEATURE_CONFLICT'),
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
