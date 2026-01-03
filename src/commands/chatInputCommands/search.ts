@@ -191,6 +191,13 @@ export default new ChatInputCommandHandler()
                 );
                 return;
         }
+        if (tracks.length === 0) {
+            await interaction.replyHandler.reply(
+                guild.locale('CMD.PLAY.RESPONSE.NO_RESULTS'),
+                { type: MessageOptionsBuilderType.Error },
+            );
+            return;
+        }
         const pages = paginate(tracks, 10);
         const response = await interaction.replyHandler.reply(
             new ContainerBuilder()
