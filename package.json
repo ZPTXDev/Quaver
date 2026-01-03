@@ -44,6 +44,8 @@
     "@types/express": "^5.0.6",
     "@types/lodash-es": "^4.17.12",
     "@types/semver": "^7.7.1",
+    "@vitest/coverage-v8": "^4.0.16",
+    "@vitest/ui": "^4.0.16",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "fast-glob": "^3.3.3",
@@ -52,7 +54,8 @@
     "rimraf": "^6.1.2",
     "tsdown": "^0.18.4",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.51.0"
+    "typescript-eslint": "^8.51.0",
+    "vitest": "^4.0.16"
   },
   "main": "dist/main.mjs",
   "scripts": {
@@ -65,7 +68,11 @@
     "build": "(path-exists node_modules/.pnpm && pnpm run generate-locale-types || bun run generate-locale-types) && rimraf dist/ && tsdown",
     "start": "path-exists node_modules/.pnpm && node . || bun .",
     "lint": "eslint . --ext .ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "imports": {
     "#src/*": "./src/*"
