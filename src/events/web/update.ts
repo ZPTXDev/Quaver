@@ -85,6 +85,11 @@ export default {
                             result.loadType === 'search'
                                 ? result.data[0]
                                 : result.data;
+                        if (!track) {
+                            return callback({
+                                status: Response.NoResultsError,
+                            });
+                        }
                         track.requesterId = socket.user.id;
                         track.id = crypto.randomUUID();
                         tracks = [track];

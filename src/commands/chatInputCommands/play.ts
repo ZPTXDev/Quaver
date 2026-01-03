@@ -112,6 +112,13 @@ export default new ChatInputCommandHandler()
             case 'search': {
                 const track: QuaverSong =
                     result.loadType === 'search' ? result.data[0] : result.data;
+                if (!track) {
+                    await interaction.replyHandler.reply(
+                        guild.locale('CMD.PLAY.RESPONSE.NO_RESULTS'),
+                        { type: MessageOptionsBuilderType.Error },
+                    );
+                    return;
+                }
                 track.requesterId = interaction.user.id;
                 track.id = crypto.randomUUID();
                 tracks = [track];
