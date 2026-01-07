@@ -1,8 +1,5 @@
 import type { QuaverClient } from '#src/lib';
-import type {
-    AllInteractions,
-    ComponentInteractions,
-} from '#src/lib/interactions';
+import type { AllInteractions, ComponentInteractions, } from '#src/lib/interactions';
 import { Check } from '#src/lib/util';
 import { GuildMember, type Snowflake } from 'discord.js';
 import type {
@@ -86,7 +83,7 @@ export abstract class BaseHandler {
                 ? (interaction as ComponentInteractions)
                 : (guildIdOrInteraction as AllInteractions),
         };
-        if (!data.member) {
+        if (data.guildId && !data.member) {
             throw new Error(
                 'Member must be provided when guild ID is provided.',
             );
