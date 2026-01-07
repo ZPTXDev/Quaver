@@ -11,6 +11,7 @@ export default new AutocompleteHandler().setExecute(async function (
     interaction: QuaverInteraction<AutocompleteInteraction>,
 ): Promise<void> {
     const focused = interaction.options.getFocused();
+    if (!interaction.guild) return interaction.respond([]);
     const guild = await QuaverGuild.wrap(interaction.guild);
     const player = await guild.getPlayer();
     if (!player) return interaction.respond([]);
