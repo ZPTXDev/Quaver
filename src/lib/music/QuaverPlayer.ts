@@ -7,13 +7,7 @@ import {
 import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
 import { logger } from '#src/lib/logger';
 import { updateHandler } from '#src/lib/state';
-import {
-    buildMessageOptions,
-    type QuaverChannels,
-    type QuaverQueue,
-    type QuaverSong,
-    settings,
-} from '#src/lib/util';
+import { buildMessageOptions, type QuaverChannels, type QuaverQueue, type QuaverSong, settings, } from '#src/lib/util';
 import type { PlayerEffect } from '@lavaclient/plugin-effects';
 import { type LoopType, Queue } from '@lavaclient/plugin-queue';
 import {
@@ -216,7 +210,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         }
         const added = Array.isArray(tracks) ? tracks : [tracks];
         const wasEmptyBeforeAdd =
-            !this.queue.current && this.queue.tracks.length === 0;
+            (!this.queue.current || (!this.playing && !this.paused)) &&
+            this.queue.tracks.length === 0;
         this.queue.add(added, { requester: requesterId, next });
         const transformsActive = this.memory.shuffle || this.memory.alternate;
         if (transformsActive) {
