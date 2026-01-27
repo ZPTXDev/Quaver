@@ -29,7 +29,7 @@
     "semver": "^7.7.3",
     "socket.io": "^4.8.3",
     "sqlite3": "^5.1.7",
-    "undici": "^7.19.1",
+    "undici": "^7.19.2",
     "wanakana": "^5.3.1",
     "winston": "^3.19.0",
     "winston-loki": "^6.1.3",
