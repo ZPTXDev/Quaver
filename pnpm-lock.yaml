@@ -9,7 +9,7 @@ patchedDependencies:
     hash: xtm6nhclkwmse6ymbyf3zp3mwa
     path: patches/keyv@5.6.0.patch
   winston-loki@6.1.4:
-    hash: neisgvmvcdg2aqpym6qbdhqxjm
+    hash: 32snqi5dy3rdioixvoeeabdayq
     path: patches/winston-loki@6.1.4.patch
 
 dependencies:
@@ -93,7 +93,7 @@ dependencies:
     version: 3.19.0
   winston-loki:
     specifier: ^6.1.4
-    version: 6.1.4(patch_hash=neisgvmvcdg2aqpym6qbdhqxjm)
+    version: 6.1.4(patch_hash=32snqi5dy3rdioixvoeeabdayq)
   yocto-spinner:
     specifier: ^1.1.0
     version: 1.1.0
@@ -4273,7 +4273,7 @@ packages:
     dev: false
     optional: true
 
-  /winston-loki@6.1.4(patch_hash=neisgvmvcdg2aqpym6qbdhqxjm):
+  /winston-loki@6.1.4(patch_hash=32snqi5dy3rdioixvoeeabdayq):
     resolution: {integrity: sha512-/j/Zf7TGLjgSBck29BkPnpJlEnGQr5xqlx8A0N6LZnXYYYvyK7lFk6FPpWiD+VMO8xjaxOu1KNF9SzWaRDsigA==}
     dependencies:
       async-exit-hook: 2.0.1
