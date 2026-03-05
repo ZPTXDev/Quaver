@@ -96,7 +96,7 @@ export default {
             const snapshot = states[guildId];
             if (snapshot) {
                 try {
-                    if (!snapshot.voiceChannelId) return;
+                    if (!snapshot.voiceChannelId) continue;
                     const player = await client.music.players.createFromJSON(
                         guild,
                         snapshot,
