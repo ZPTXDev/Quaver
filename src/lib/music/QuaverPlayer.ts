@@ -197,7 +197,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * Add a track to the queue.
      * @param tracks - The track(s) to add.
      * @param requesterId - The ID of the user who requested the track(s).
-     * @param next - Whether or not to insert the track in the next position.
+     * @param next - Whether to insert the track in the next position.
      * @returns The position of the track in the queue. (e.g. 1 - 10, 34, etc.)
      */
     async addTracksToQueue(
@@ -317,8 +317,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
 
     /**
      * Toggle bass boost mode.
-     * @param enabled - Whether or not the feature is enabled.
-     * @returns Whether or not the feature was enabled.
+     * @param enabled - Whether the feature is enabled.
+     * @returns Whether the feature was enabled.
      */
     async setBassboost(enabled: boolean): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
@@ -339,7 +339,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Bind the player to a text channel.
      * @param channel - The channel to bind to.
-     * @returns Whether or not the player was bound.
+     * @returns Whether the player was bound.
      */
     async bindTextChannel(channel: QuaverChannels): Promise<PlayerResponse> {
         if (
@@ -365,7 +365,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
 
     /**
      * Clear the queue.
-     * @returns Whether or not the queue was cleared.
+     * @returns Whether the queue was cleared.
      */
     async clearQueue(): Promise<PlayerResponse> {
         if (this.queue.tracks.length === 0) {
@@ -382,7 +382,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Disconnects and cleans up the player.
      * @param channelId - The channel to disconnect from.
-     * @returns Whether or not the player was disconnected.
+     * @returns Whether the player was disconnected.
      */
     async disconnect(channelId?: Snowflake): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
@@ -441,7 +441,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Change the looping mode.
      * @param type - The type of looping to use.
-     * @returns Whether or not the looping mode was changed.
+     * @returns Whether the looping mode was changed.
      */
     async setLoopMode(type: LoopType): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
@@ -454,7 +454,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * Move a track in the queue.
      * @param oldPosition - The old position of the track.
      * @param newPosition - The new position of the track.
-     * @returns Whether or not the track was moved.
+     * @returns Whether the track was moved.
      */
     async moveQueuedTrack(
         oldPosition: number,
@@ -484,8 +484,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
 
     /**
      * Toggle nightcore mode.
-     * @param enabled - Whether or not the feature is enabled.
-     * @returns Whether or not the feature was enabled.
+     * @param enabled - Whether the feature is enabled.
+     * @returns Whether the feature was enabled.
      */
     async setNightcore(enabled: boolean): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
@@ -505,8 +505,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
 
     /**
      * Pause the player.
-     * @param paused - Whether or not to pause the player.
-     * @returns Whether or not the player was paused.
+     * @param paused - Whether to pause the player.
+     * @returns Whether the player was paused.
      */
     async setPause(paused: boolean): Promise<PlayerResponse> {
         // we only prevent pausing / resuming when we triggered the pause
@@ -532,7 +532,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Remove a track from the queue.
      * @param position - The position of the track.
-     * @returns Whether or not the track was removed.
+     * @returns Whether the track was removed.
      */
     async removeQueuedTrack(position: number): Promise<PlayerResponse> {
         if (this.queue.tracks.length === 0)
@@ -566,7 +566,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Seek to a position in the current track.
      * @param position - The position of the track to seek to.
-     * @returns Whether or not the seeking was successful.
+     * @returns Whether the seeking was successful.
      */
     async seekTo(position: number): Promise<PlayerResponse> {
         if (this.restartReady) return PlayerResponse.RestartInProgress;
@@ -674,8 +674,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
 
     /**
      * Toggle shuffle.
-     * @param enabled - Whether or not to enable shuffle.
-     * @returns Whether or not shuffle was enabled.
+     * @param enabled - Whether to enable shuffle.
+     * @returns Whether shuffle was enabled.
      */
     async setShuffle(enabled: boolean): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
@@ -703,8 +703,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
 
     /**
      * Toggle alternating (smart queue).
-     * @param enabled - Whether or not to enable alternating.
-     * @returns Whether or not alternating was enabled.
+     * @param enabled - Whether to enable alternating.
+     * @returns Whether alternating was enabled.
      */
     async setAlternate(enabled: boolean): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
@@ -745,7 +745,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
 
     /**
      * Skip the current track.
-     * @returns Whether or not the track was skipped.
+     * @returns Whether the track was skipped.
      */
     async skipCurrentTrack(): Promise<PlayerResponse> {
         if (this.restartReady) return PlayerResponse.RestartInProgress;
@@ -760,7 +760,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Skip to a specific position in the queue.
      * @param position - The position to skip to.
-     * @returns Whether or not the player was skipped to the position.
+     * @returns Whether the player was skipped to the position.
      */
     async skipToQueuedTrack(position: number): Promise<PlayerResponse> {
         if (this.restartReady) return PlayerResponse.RestartInProgress;
@@ -779,7 +779,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
 
     /**
      * Stop (and reset) the player.
-     * @returns Whether or not the player was stopped.
+     * @returns Whether the player was stopped.
      */
     async reset(): Promise<PlayerResponse> {
         if (!this.queue.current || (!this.playing && !this.paused)) {
@@ -798,7 +798,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Set the volume of the player.
      * @param volume - The volume to set the player to.
-     * @returns Whether or not the volume was set.
+     * @returns Whether the volume was set.
      */
     async setVolumeTo(volume: number): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);

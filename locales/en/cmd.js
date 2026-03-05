@@ -2,7 +2,7 @@ export default {
     '247': {
         DESCRIPTION: '24/7 mode prevents Quaver from leaving.',
         OPTION: {
-            ENABLED: 'Whether or not 24/7 mode is enabled. If not specified, it will be toggled.',
+            ENABLED: 'Whether 24/7 mode is enabled. If not specified, it will be toggled.',
         },
         RESPONSE: {
             DISABLED: '24/7 mode has been **disabled**',
@@ -16,7 +16,7 @@ export default {
     BASSBOOST: {
         DESCRIPTION: 'Bass boost mode amplifies the bass levels.',
         OPTION: {
-            ENABLED: 'Whether or not bass boost mode is enabled. If not specified, it will be toggled.',
+            ENABLED: 'Whether bass boost mode is enabled. If not specified, it will be toggled.',
         },
         RESPONSE: {
             DISABLED: 'Bass boost mode has been **disabled**',
@@ -113,7 +113,7 @@ export default {
     NIGHTCORE: {
         DESCRIPTION: 'Nightcore mode speeds up your music.',
         OPTION: {
-            ENABLED: 'Whether or not nightcore mode is enabled. If not specified, it will be toggled.',
+            ENABLED: 'Whether nightcore mode is enabled. If not specified, it will be toggled.',
         },
         RESPONSE: {
             DISABLED: 'Nightcore mode has been **disabled**',
@@ -139,7 +139,7 @@ export default {
     PLAY: {
         DESCRIPTION: 'Add a track to the queue.',
         OPTION: {
-            INSERT: 'Whether or not to play the track next.',
+            INSERT: 'Whether to play the track next.',
             QUERY: 'Your search query or a link.',
         },
         RESPONSE: {
@@ -244,7 +244,7 @@ export default {
                 NAME: 'Language',
             },
             NOTIFYIN247: {
-                DESCRIPTION: 'Whether or not to send "Now playing" messages in 24/7 mode.',
+                DESCRIPTION: 'Whether to send "Now playing" messages in 24/7 mode.',
                 NAME: 'Notify in 24/7 mode',
             },
             PREMIUM: {
@@ -279,7 +279,7 @@ export default {
     SHUFFLE: {
         DESCRIPTION: 'Shuffle the queue.',
         OPTION: {
-            ENABLED: 'Whether or not shuffle is enabled. If not specified, it will be toggled.',
+            ENABLED: 'Whether shuffle is enabled. If not specified, it will be toggled.',
         },
         RESPONSE: {
             DISABLED: 'Shuffle has been **disabled**',
