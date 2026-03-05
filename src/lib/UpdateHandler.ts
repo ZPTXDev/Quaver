@@ -245,7 +245,9 @@ export class UpdateHandler {
             if (startup.started) {
                 const players = this.client.music.players;
                 if (players.cache.size < 1) return;
-                const states: Record<string, QuaverPlayerJSON> = {};
+                const states: Record<string, QuaverPlayerJSON> & {
+                    savedAt?: number;
+                } = {};
                 logger.info('Disconnecting from all guilds...');
                 for (const pair of players.cache) {
                     const player = pair[1];
@@ -269,7 +271,9 @@ export class UpdateHandler {
                                 )}`,
                             ),
                             guild.builders.textDisplayLocale(
-                                'MUSIC.PLAYER.RESTARTING.SESSION_RECOVERY_EXPLANATION',
+                                settings.sessionRecovery?.enabled
+                                    ? 'MUSIC.PLAYER.RESTARTING.SESSION_RECOVERY_EXPLANATION'
+                                    : 'MUSIC.PLAYER.RESTARTING.SESSION_RECOVERY_DISABLED',
                             ),
                             guild.builders.textDisplayLocale(
                                 'MUSIC.PLAYER.RESTARTING.APOLOGY',
@@ -278,7 +282,13 @@ export class UpdateHandler {
                         { type: MessageOptionsBuilderType.Warning },
                     );
                 }
-                await writeFile('states.json', JSON.stringify(states, null, 4));
+                if (settings.sessionRecovery?.enabled) {
+                    states.savedAt = Date.now();
+                    await writeFile(
+                        'states.json',
+                        JSON.stringify(states, null, 4),
+                    );
+                }
             }
         } catch (error) {
             if (error instanceof Error) {

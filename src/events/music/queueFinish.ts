@@ -3,6 +3,7 @@ import { QuaverGuild } from '#src/lib/guild';
 import { logger } from '#src/lib/logger';
 import { updateHandler } from '#src/lib/state';
 import type { QuaverQueue } from '#src/lib/util';
+import { settings } from '#src/lib/util';
 import { ContainerBuilder } from 'discord.js';
 
 export default {
@@ -17,7 +18,9 @@ export default {
                         'MUSIC.PLAYER.RESTARTING.PENDING',
                     ),
                     guild.builders.textDisplayLocale(
-                        'MUSIC.PLAYER.RESTARTING.SESSION_RECOVERY_EXPLANATION',
+                        settings.sessionRecovery?.enabled
+                            ? 'MUSIC.PLAYER.RESTARTING.SESSION_RECOVERY_EXPLANATION'
+                            : 'MUSIC.PLAYER.RESTARTING.SESSION_RECOVERY_DISABLED',
                     ),
                     guild.builders.textDisplayLocale(
                         'MUSIC.PLAYER.RESTARTING.APOLOGY',

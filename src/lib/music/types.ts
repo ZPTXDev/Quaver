@@ -1,3 +1,5 @@
+import type { QuaverPlayerJSON } from '#src/lib/music/QuaverPlayer';
+
 export enum PlayerResponse {
     RestartInProgress,
     FeatureDisabled,
@@ -13,3 +15,8 @@ export enum PlayerResponse {
     PlayerIsStream,
     Success,
 }
+
+export type PlayerStatesRecord = Record<string, QuaverPlayerJSON> & {
+    savedAt?: number;
+    attempts?: number;
+};

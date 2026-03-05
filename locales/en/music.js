@@ -44,6 +44,7 @@ export default {
             CRASHED: 'Quaver has crashed and will disconnect briefly.',
             DEFAULT: 'Quaver is restarting and will disconnect briefly.',
             PENDING: 'Pardon the interruption! Quaver is restarting shortly.',
+            SESSION_RECOVERY_DISABLED: 'You will need to start a new session after Quaver is back online as session recovery is disabled.',
             SESSION_RECOVERY_EXPLANATION: 'Your session will be restored when Quaver is back online.'
         },
         RESTORING: 'Quaver is back online! Restoring your session...',

@@ -83,5 +83,10 @@
     "channel": "stable",
     "install": true,
     "restartStrategy": "none"
+  },
+  "sessionRecovery": {
+    "enabled": true,
+    "maxAge": 86400,
+    "maxAttempts": 1
   }
 }

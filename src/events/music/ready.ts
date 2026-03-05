@@ -1,22 +1,42 @@
 import { MessageOptionsBuilderType } from '#src/lib';
 import { data } from '#src/lib/data';
+import type { Initialized } from '#src/lib/guild';
 import { QuaverGuild } from '#src/lib/guild';
 import { logger } from '#src/lib/logger';
-import type { QuaverPlayerJSON } from '#src/lib/music';
+import type { PlayerStatesRecord, QuaverPlayerJSON } from '#src/lib/music';
+import { PlayerStateManager } from '#src/lib/music';
 import type { QuaverChannels } from '#src/lib/util';
+import { settings } from '#src/lib/util';
+import type { Guild } from 'discord.js';
 import { get } from 'lodash-es';
-import { readFile, unlink } from 'node:fs/promises';
 
-async function readPlayerStates(): Promise<Record<string, QuaverPlayerJSON>> {
+async function restorePlayer(
+    guild: QuaverGuild<Initialized> & Guild,
+    snapshot: QuaverPlayerJSON,
+): Promise<boolean> {
     try {
-        const raw = await readFile('states.json', 'utf8');
-        await unlink('states.json');
-        return JSON.parse(raw);
-    } catch (error) {
-        if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
-            logger.error(error);
+        if (!snapshot.voiceChannelId) return false;
+        const player = await guild.client.music.players.createFromJSON(
+            guild,
+            snapshot,
+        );
+        await player.sendMessage(guild.locale('MUSIC.PLAYER.RESTORING'), {
+            type: MessageOptionsBuilderType.Success,
+        });
+        player.voice.connect(snapshot.voiceChannelId, {
+            deafened: true,
+        });
+        if (snapshot.queue.current && (snapshot.paused || snapshot.playing)) {
+            await player.play(snapshot.queue.current);
         }
-        return {};
+        if (snapshot.position > 0) {
+            await player.seekTo(snapshot.position);
+        }
+        logger.info(`[G ${guild.id}] Player restored from saved state`);
+        return true;
+    } catch (error) {
+        logger.error(`[G ${guild.id}] Failed to restore player`, error);
+        return false;
     }
 }
 
@@ -35,7 +55,18 @@ export default {
             }, 1_000);
             return;
         }
-        const states = await readPlayerStates();
+        const stateManager = new PlayerStateManager();
+        let states: PlayerStatesRecord = {};
+        if (settings.sessionRecovery?.enabled) {
+            states = await stateManager.read();
+            if (!stateManager.shouldRestore(states)) {
+                await stateManager.delete();
+                states = {};
+            } else {
+                states.attempts = (states.attempts ?? 0) + 1;
+                await stateManager.save(states);
+            }
+        }
         for await (const [
             guildId,
             guildData,
@@ -45,38 +76,8 @@ export default {
             const guild = await QuaverGuild.wrap(discordGuild);
             const snapshot = states[guildId];
             if (snapshot) {
-                try {
-                    if (!snapshot.voiceChannelId) return;
-                    const player = await client.music.players.createFromJSON(
-                        guild,
-                        snapshot,
-                    );
-                    await player.sendMessage(
-                        guild.locale('MUSIC.PLAYER.RESTORING'),
-                        { type: MessageOptionsBuilderType.Success },
-                    );
-                    player.voice.connect(snapshot.voiceChannelId, {
-                        deafened: true,
-                    });
-                    if (
-                        snapshot.queue.current &&
-                        (snapshot.paused || snapshot.playing)
-                    ) {
-                        await player.play(snapshot.queue.current);
-                    }
-                    if (snapshot.position > 0) {
-                        await player.seekTo(snapshot.position);
-                    }
-                    logger.info(
-                        `[G ${guildId}] Player restored from saved state`,
-                    );
-                } catch (error) {
-                    logger.error(
-                        `[G ${guildId}] Failed to restore player`,
-                        error,
-                    );
-                }
-                continue;
+                const restored = await restorePlayer(guild, snapshot);
+                if (restored) continue;
             }
             if (get(guildData, 'settings.stay.enabled')) {
                 const player = client.music.players.create(guild);
@@ -88,5 +89,6 @@ export default {
                 });
             }
         }
+        await stateManager.delete();
     },
 };
