@@ -38,7 +38,6 @@ async function deletePlayerStates(): Promise<void> {
 async function savePlayerStates(
     states: Record<string, QuaverPlayerJSON>,
 ): Promise<void> {
-    await deletePlayerStates();
     try {
         await writeFile('states.json', JSON.stringify(states, null, 4));
     } catch (error) {
