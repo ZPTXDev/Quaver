@@ -60,31 +60,36 @@ export default {
             }, 1_000);
             return;
         }
-        if (!settings.sessionRecovery?.enabled) return;
-        const states = await readPlayerStates();
-        if (
-            states.savedAt &&
-            Date.now() - states.savedAt >
-                (settings.sessionRecovery.maxAge ?? 86400) * 1000
-        ) {
-            logger.warn(
-                'Saved player states are too old and will not be restored.',
-            );
-            await deletePlayerStates();
-            return;
+        let states: Record<string, QuaverPlayerJSON> & {
+            savedAt?: number;
+            attempts?: number;
+        } = {};
+        if (settings.sessionRecovery?.enabled) {
+            states = await readPlayerStates();
+            if (
+                states.savedAt &&
+                Date.now() - states.savedAt >
+                    (settings.sessionRecovery.maxAge ?? 86400) * 1000
+            ) {
+                logger.warn(
+                    'Saved player states are too old and will not be restored.',
+                );
+                await deletePlayerStates();
+                states = {};
+            } else if (
+                states.attempts &&
+                states.attempts >= (settings.sessionRecovery.maxAttempts ?? 1)
+            ) {
+                logger.warn(
+                    'Maximum session recovery attempts reached. Saved player states will not be restored.',
+                );
+                await deletePlayerStates();
+                states = {};
+            } else {
+                states.attempts = (states.attempts ?? 0) + 1;
+                await savePlayerStates(states);
+            }
         }
-        if (
-            states.attempts &&
-            states.attempts >= (settings.sessionRecovery.maxAttempts ?? 1)
-        ) {
-            logger.warn(
-                'Maximum session recovery attempts reached. Saved player states will not be restored.',
-            );
-            await deletePlayerStates();
-            return;
-        }
-        states.attempts = (states.attempts ?? 0) + 1;
-        await savePlayerStates(states);
         for await (const [
             guildId,
             guildData,
