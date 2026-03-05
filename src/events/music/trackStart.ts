@@ -89,7 +89,9 @@ export default {
                         'MUSIC.PLAYER.RESTARTING.PENDING',
                     ),
                     guild.builders.textDisplayLocale(
-                        'MUSIC.PLAYER.RESTARTING.SESSION_RECOVERY_EXPLANATION',
+                        settings.sessionRecovery?.enabled
+                            ? 'MUSIC.PLAYER.RESTARTING.SESSION_RECOVERY_EXPLANATION'
+                            : 'MUSIC.PLAYER.RESTARTING.SESSION_RECOVERY_DISABLED',
                     ),
                     guild.builders.textDisplayLocale(
                         'MUSIC.PLAYER.RESTARTING.APOLOGY',

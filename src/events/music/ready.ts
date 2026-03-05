@@ -4,19 +4,45 @@ import { QuaverGuild } from '#src/lib/guild';
 import { logger } from '#src/lib/logger';
 import type { QuaverPlayerJSON } from '#src/lib/music';
 import type { QuaverChannels } from '#src/lib/util';
+import { settings } from '#src/lib/util';
 import { get } from 'lodash-es';
-import { readFile, unlink } from 'node:fs/promises';
+import { readFile, unlink, writeFile } from 'node:fs/promises';
 
-async function readPlayerStates(): Promise<Record<string, QuaverPlayerJSON>> {
+async function readPlayerStates(): Promise<
+    Record<string, QuaverPlayerJSON> & {
+        savedAt?: number;
+        attempts?: number;
+    }
+> {
     try {
         const raw = await readFile('states.json', 'utf8');
-        await unlink('states.json');
         return JSON.parse(raw);
     } catch (error) {
         if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
             logger.error(error);
         }
         return {};
+    }
+}
+
+async function deletePlayerStates(): Promise<void> {
+    try {
+        await unlink('states.json');
+    } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+            logger.error(error);
+        }
+    }
+}
+
+async function savePlayerStates(
+    states: Record<string, QuaverPlayerJSON>,
+): Promise<void> {
+    await deletePlayerStates();
+    try {
+        await writeFile('states.json', JSON.stringify(states, null, 4));
+    } catch (error) {
+        logger.error(error);
     }
 }
 
@@ -35,7 +61,31 @@ export default {
             }, 1_000);
             return;
         }
+        if (!settings.sessionRecovery?.enabled) return;
         const states = await readPlayerStates();
+        if (
+            states.savedAt &&
+            Date.now() - states.savedAt >
+                (settings.sessionRecovery.maxAge ?? 86400) * 1000
+        ) {
+            logger.warn(
+                'Saved player states are too old and will not be restored.',
+            );
+            await deletePlayerStates();
+            return;
+        }
+        if (
+            states.attempts &&
+            states.attempts >= (settings.sessionRecovery.maxAttempts ?? 1)
+        ) {
+            logger.warn(
+                'Maximum session recovery attempts reached. Saved player states will not be restored.',
+            );
+            await deletePlayerStates();
+            return;
+        }
+        states.attempts = (states.attempts ?? 0) + 1;
+        await savePlayerStates(states);
         for await (const [
             guildId,
             guildData,
@@ -88,5 +138,6 @@ export default {
                 });
             }
         }
+        await deletePlayerStates();
     },
 };

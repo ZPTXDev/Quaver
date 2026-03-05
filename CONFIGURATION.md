@@ -1,4 +1,4 @@
-# Configuration
+~~# Configuration
 
 ```json
 {
@@ -86,6 +86,11 @@
     "channel": "stable",
     "install": true,
     "restartStrategy": "none"
+  },
+  "sessionRecovery": {
+    "enabled": true,
+    "maxAge": 86400,
+    "maxAttempts": 1
   }
 }
 ```
@@ -140,3 +145,6 @@
 | `updater.channel`               | The channel to use for update checks. Valid values are `none`, `stable`, `staging`, `next`.                                                                                                                                                                                                                                                                       | ❌ (defaults to `none`)                                    | `8.0.0`       |
 | `updater.install`               | Whether to automatically download and install updates when found. Only used if `updater.channel` is not `none`.                                                                                                                                                                                                                                                   | ❌ (defaults to `false`)                                   | `8.0.0`       |
 | `updater.restartStrategy`       | The strategy to use when restarting Quaver after an update is installed. Only used if `updater.install` is set to `true` and `updater.channel` is not `none`. Valid values are `none` (no restart), `immediate`, `track` (after all players finish their current track, or up to 5 minutes), `queue` (after all players finish their queue, or up to 30 minutes). | ❌ (defaults to `none`)                                    | `8.0.0`       |
+| `sessionRecovery.enabled`       | Whether to enable resuming sessions after Quaver restarts. Enabling this will create a `states.json` file whenever Quaver shuts down.                                                                                                                                                                                                                             | ❌ (defaults to `false`)                                   | `8.0.0`       |
+| `sessionRecovery.maxAge`        | The maximum age of a session in seconds. Only used if `sessionRecovery.enabled` is `true`.                                                                                                                                                                                                                                                                        | ❌ (defaults to `86400` (24 hours))                        | `8.0.0`       |
+| `sessionRecovery.maxAttempts`   | The maximum number of attempts to resume a session. Only used if `sessionRecovery.enabled` is `true`.                                                                                                                                                                                                                                                             | ❌ (defaults to `1`)                                       | `8.0.0`       |~~

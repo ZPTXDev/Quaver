@@ -21,6 +21,7 @@ type SettingsObject = {
     lavalink?: LavalinkSettingsObject;
     features?: FeaturesSettingsObject;
     updater?: UpdaterSettingsObject;
+    sessionRecovery?: SessionRecoverySettingsObject;
 };
 
 type ColorsSettingsObject = {
@@ -109,6 +110,12 @@ type UpdaterSettingsObject = {
     channel?: 'none' | 'stable' | 'staging' | 'next';
     install?: boolean;
     restartStrategy?: 'none' | 'immediate' | 'track' | 'queue';
+};
+
+type SessionRecoverySettingsObject = {
+    enabled?: boolean;
+    maxAge?: number;
+    maxAttempts?: number;
 };
 
 export let settings: SettingsObject = {};

@@ -262,8 +262,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
 
     /**
      * Toggle 24/7 mode.
-     * @param enabled - Whether or not the feature is enabled.
-     * @returns Whether or not the feature was enabled.
+     * @param enabled - Whether the feature is enabled.
+     * @returns Whether the feature was enabled.
      */
     async setStay(enabled: boolean): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
