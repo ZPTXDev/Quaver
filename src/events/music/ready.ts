@@ -13,9 +13,9 @@ import { get } from 'lodash-es';
 async function restorePlayer(
     guild: QuaverGuild<Initialized> & Guild,
     snapshot: QuaverPlayerJSON,
-): Promise<void> {
+): Promise<boolean> {
     try {
-        if (!snapshot.voiceChannelId) return;
+        if (!snapshot.voiceChannelId) return false;
         const player = await guild.client.music.players.createFromJSON(
             guild,
             snapshot,
@@ -33,8 +33,10 @@ async function restorePlayer(
             await player.seekTo(snapshot.position);
         }
         logger.info(`[G ${guild.id}] Player restored from saved state`);
+        return true;
     } catch (error) {
         logger.error(`[G ${guild.id}] Failed to restore player`, error);
+        return false;
     }
 }
 
@@ -74,8 +76,8 @@ export default {
             const guild = await QuaverGuild.wrap(discordGuild);
             const snapshot = states[guildId];
             if (snapshot) {
-                await restorePlayer(guild, snapshot);
-                continue;
+                const restored = await restorePlayer(guild, snapshot);
+                if (restored) continue;
             }
             if (get(guildData, 'settings.stay.enabled')) {
                 const player = client.music.players.create(guild);
