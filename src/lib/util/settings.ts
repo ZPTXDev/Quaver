@@ -6,6 +6,7 @@ import { z } from 'zod';
 interface TreeifiedError {
     errors: string[];
     properties?: Record<string, TreeifiedError>;
+    items?: Array<TreeifiedError | undefined>;
 }
 
 const path = getAbsoluteFileURL(import.meta.url, [
@@ -34,6 +35,11 @@ if (!result.success) {
             for (const [key, value] of Object.entries(obj.properties)) {
                 logErrors(value, prefix ? `${prefix}.${key}` : key);
             }
+        }
+        if (obj.items) {
+            obj.items.forEach((item, index): void => {
+                if (item) logErrors(item, `${prefix}[${index}]`);
+            });
         }
     };
     console.error(`\nConfiguration Error\n${'-'.repeat(19)}`);
