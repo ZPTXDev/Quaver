@@ -38,7 +38,7 @@ if (!result.success) {
     const logErrors = (obj: TreeifiedError, prefix = ''): void => {
         if (obj.errors && Array.isArray(obj.errors)) {
             obj.errors.forEach((err: string): void => {
-                console.error(`- ${prefix}: ${err}`);
+                console.error(`- ${prefix || '<root>'}: ${err}`);
             });
         }
         if (obj.properties) {
