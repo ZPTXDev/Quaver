@@ -17,11 +17,21 @@ const path = getAbsoluteFileURL(import.meta.url, [
 ]);
 
 if (!existsSync(path)) {
-    console.error('No settings.json file found. Please create one to proceed.');
+    console.error(`\nConfiguration Error\n${'-'.repeat(19)}`);
+    console.error('- settings.json: File missing\n');
     process.exit(1);
 }
 
-const rawData = JSON.parse(readFileSync(path).toString());
+let rawData: unknown;
+try {
+    rawData = JSON.parse(readFileSync(path, 'utf8'));
+} catch (error) {
+    console.error(`\nConfiguration Error\n${'-'.repeat(19)}`);
+    console.error(
+        `- settings.json: Invalid JSON (${error instanceof Error ? error.message : String(error)})\n`,
+    );
+    process.exit(1);
+}
 const result = SettingsSchema.safeParse(rawData);
 if (!result.success) {
     const formattedErrors = z.treeifyError(result.error);
