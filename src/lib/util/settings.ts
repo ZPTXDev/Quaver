@@ -1,131 +1,45 @@
+import { type Settings, SettingsSchema } from '#src/schemas';
 import { getAbsoluteFileURL } from '@zptxdev/zptx-lib';
-import type { ColorResolvable, Snowflake } from 'discord.js';
 import { existsSync, readFileSync } from 'node:fs';
+import { z } from 'zod';
 
-type SettingsObject = {
-    token?: string;
-    applicationId?: Snowflake;
-    clientSecret?: string;
-    colors?: ColorsSettingsObject;
-    emojis?: EmojisSettingsObject;
-    status?: StatusSettingsObject;
-    defaultLocaleCode?: string;
-    developerMode?: boolean;
-    disableAd?: boolean;
-    supportServer?: string;
-    premiumURL?: string;
-    geniusToken?: string;
-    managers?: Snowflake[];
-    grafanaLogging?: GrafanaLoggingSettingsObject;
-    database?: DatabaseSettingsObject;
-    lavalink?: LavalinkSettingsObject;
-    features?: FeaturesSettingsObject;
-    updater?: UpdaterSettingsObject;
-    sessionRecovery?: SessionRecoverySettingsObject;
-};
+interface TreeifiedError {
+    errors: string[];
+    properties?: Record<string, TreeifiedError>;
+}
 
-type ColorsSettingsObject = {
-    success?: ColorResolvable;
-    neutral?: ColorResolvable;
-    warning?: ColorResolvable;
-    error?: ColorResolvable;
-};
-
-type EmojisSettingsObject = {
-    youtube?: string;
-    deezer?: string;
-    spotify?: string;
-    soundcloud?: string;
-    applemusic?: string;
-    http?: string;
-    yandexmusic?: string;
-    'flowery-tts'?: string;
-    vkmusic?: string;
-    tidal?: string;
-};
-
-type StatusSettingsObject = {
-    presence?: string;
-    activityType?: string;
-    name?: string;
-    url?: string;
-    showVersion?: boolean;
-};
-
-type DatabaseSettingsObject = {
-    protocol?: string;
-    path?: string;
-};
-
-type LavalinkReconnectSettingsObject = {
-    delay?: number;
-    tries?: number;
-};
-
-type LavalinkSettingsObject = {
-    host?: string;
-    port?: number;
-    password?: string;
-    secure?: boolean;
-    reconnect?: LavalinkReconnectSettingsObject;
-};
-
-type GrafanaLoggingSettingsObject = {
-    host?: string;
-    appName?: string;
-    basicAuth?: string;
-};
-
-type FeaturesSettingsObject = {
-    autolyrics?: GenericPremiumFeatureSettingsObject;
-    stay?: GenericPremiumFeatureSettingsObject;
-    smartqueue?: GenericPremiumFeatureSettingsObject;
-    web?: WebFeatureSettingsObject;
-};
-
-type GenericFeatureSettingsObject = {
-    enabled?: boolean;
-};
-
-type GenericPremiumFeatureSettingsObject = GenericFeatureSettingsObject & {
-    whitelist?: boolean;
-    premium?: boolean;
-};
-
-type WebFeatureSettingsObject = GenericFeatureSettingsObject & {
-    port?: number;
-    allowedOrigins?: string[];
-    encryptionKey?: string;
-    https?: WebFeatureHttpsSettingsObject;
-    dashboardURL?: string;
-};
-
-type WebFeatureHttpsSettingsObject = {
-    enabled?: boolean;
-    key?: string;
-    cert?: string;
-};
-
-type UpdaterSettingsObject = {
-    channel?: 'none' | 'stable' | 'staging' | 'next';
-    install?: boolean;
-    restartStrategy?: 'none' | 'immediate' | 'track' | 'queue';
-};
-
-type SessionRecoverySettingsObject = {
-    enabled?: boolean;
-    maxAge?: number;
-    maxAttempts?: number;
-};
-
-export let settings: SettingsObject = {};
 const path = getAbsoluteFileURL(import.meta.url, [
     '..',
     '..',
     '..',
     'settings.json',
 ]);
+
 if (!existsSync(path)) {
+    console.error('No settings.json file found. Please create one to proceed.');
     process.exit(1);
 }
-settings = JSON.parse(readFileSync(path).toString());
+
+const rawData = JSON.parse(readFileSync(path).toString());
+const result = SettingsSchema.safeParse(rawData);
+if (!result.success) {
+    const formattedErrors = z.treeifyError(result.error);
+    const logErrors = (obj: TreeifiedError, prefix = ''): void => {
+        if (obj.errors && Array.isArray(obj.errors)) {
+            obj.errors.forEach((err: string): void => {
+                console.error(`- ${prefix}: ${err}`);
+            });
+        }
+        if (obj.properties) {
+            for (const [key, value] of Object.entries(obj.properties)) {
+                logErrors(value, prefix ? `${prefix}.${key}` : key);
+            }
+        }
+    };
+    console.error(`\nConfiguration Error\n${'-'.repeat(19)}`);
+    logErrors(formattedErrors);
+    console.error();
+    process.exit(1);
+}
+
+export const settings: Settings = result.data;
