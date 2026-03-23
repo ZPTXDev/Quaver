@@ -3,6 +3,11 @@ import { z } from 'zod';
 
 const placeholderCheck = (val: string): boolean =>
     !val.toLowerCase().includes('paste');
+
+const snowflakeSchema = z
+    .string()
+    .regex(/^\d{17,20}$/, 'Must be a valid Discord snowflake ID');
+
 const genericPremiumFeatureSchema = z.object({
     enabled: z.boolean().default(false),
     whitelist: z.boolean().default(false),
@@ -16,12 +21,9 @@ export const SettingsSchema = z.object({
         .refine(placeholderCheck, {
             message: 'You must replace the default token placeholder',
         }),
-    applicationId: z
-        .string()
-        .min(1, 'Application ID is required')
-        .refine(placeholderCheck, {
-            message: 'You must replace the default applicationId placeholder',
-        }) as z.ZodType<Snowflake>,
+    applicationId: snowflakeSchema.refine(placeholderCheck, {
+        message: 'You must replace the default applicationId placeholder',
+    }) as z.ZodType<Snowflake>,
     clientSecret: z
         .string()
         .min(1, 'Client secret is required')
@@ -67,7 +69,7 @@ export const SettingsSchema = z.object({
     supportServer: z.url().optional(),
     premiumURL: z.url().optional(),
     managers: z
-        .array(z.string() as z.ZodType<Snowflake>)
+        .array(snowflakeSchema as z.ZodType<Snowflake>)
         .nonempty('At least one manager ID is required'),
     grafanaLogging: z
         .object({
