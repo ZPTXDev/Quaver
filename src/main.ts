@@ -83,12 +83,14 @@ if (settings.features.web.enabled) {
     logger.info(
         `Web integration is ${colors.green('enabled')}. For more information, visit ${colors.underline(colors.cyan('https://github.com/ZPTXDev/Quaver-Web'))}.`,
     );
-    spinner.start(`Starting ${colors.cyan('web server')}`);
-    app = express();
     if (settings.grafanaLogging) {
         logger.info(
             `Grafana logging is ${colors.green('enabled')}. Statistics will be accessible through the /stats endpoint.`,
         );
+    }
+    spinner.start(`Starting ${colors.cyan('web server')}`);
+    app = express();
+    if (settings.grafanaLogging) {
         app.get('/stats', async (req, res): Promise<void> => {
             const totalSessions = client.music?.players?.cache.size;
             const activeSessions = Array.from(
