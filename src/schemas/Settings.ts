@@ -1,4 +1,5 @@
 import type { ColorResolvable, Snowflake } from 'discord.js';
+import { resolveColor } from 'discord.js';
 import { z } from 'zod';
 
 const placeholderCheck = (val: string): boolean =>
@@ -7,6 +8,18 @@ const placeholderCheck = (val: string): boolean =>
 const snowflakeSchema = z
     .string()
     .regex(/^\d{17,20}$/, 'Must be a valid Discord snowflake ID');
+
+const colorResolvableSchema = z.string().refine(
+    (value): boolean => {
+        try {
+            resolveColor(value as ColorResolvable);
+            return true;
+        } catch {
+            return false;
+        }
+    },
+    { message: 'Invalid Discord color value' },
+);
 
 const genericPremiumFeatureSchema = z.object({
     enabled: z.boolean().default(false),
@@ -31,10 +44,10 @@ export const SettingsSchema = z.object({
             message: 'You must replace the default clientSecret placeholder',
         }),
     colors: z.object({
-        success: z.string() as z.ZodType<ColorResolvable>,
-        neutral: z.string() as z.ZodType<ColorResolvable>,
-        warning: z.string() as z.ZodType<ColorResolvable>,
-        error: z.string() as z.ZodType<ColorResolvable>,
+        success: colorResolvableSchema as z.ZodType<ColorResolvable>,
+        neutral: colorResolvableSchema as z.ZodType<ColorResolvable>,
+        warning: colorResolvableSchema as z.ZodType<ColorResolvable>,
+        error: colorResolvableSchema as z.ZodType<ColorResolvable>,
     }),
     emojis: z
         .object({
