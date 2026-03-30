@@ -85,7 +85,7 @@ export class SettingsRenderer {
                 new ActionRowBuilder<ButtonBuilder>().addComponents(
                     new ButtonBuilder()
                         .setCustomId('settings')
-                        .setLabel('Back')
+                        .setLabel(guild.locale('MISC.BACK'))
                         .setStyle(ButtonStyle.Secondary),
                 ),
             );

@@ -3,6 +3,7 @@ export default {
     ACTIVE: 'Active',
     ADD: 'Add',
     ADDED_BY: 'Added by <@%1>',
+    BACK: 'Back',
     CANCEL: 'Cancel',
     CONFIRM: 'Confirm',
     CURRENT: 'Current',
