@@ -162,6 +162,8 @@ export class ReplyHandler {
 
         if (
             force === ForceType.Update &&
+            !this.interaction.replied &&
+            !this.interaction.deferred &&
             !this.interaction.isCommand() &&
             (!this.interaction.isModalSubmit() ||
                 this.interaction.isFromMessage())
