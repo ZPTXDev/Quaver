@@ -1,0 +1,32 @@
+import { ModalSubmitHandler } from '#src/lib/builders';
+import { QuaverGuild } from '#src/lib/guild';
+import {
+    GeneralLogicHandler,
+    PlaybackLogicHandler,
+    SettingsCategory,
+} from '#src/lib/settings';
+
+export default new ModalSubmitHandler().setExecute(
+    async function (interaction): Promise<void> {
+        const guild = await QuaverGuild.wrap(interaction.guild);
+        const params = interaction.customId.split(':');
+        const category = params[1];
+        const item = params[2];
+        switch (category) {
+            case SettingsCategory.General:
+                await GeneralLogicHandler.handleModalSubmit(
+                    guild,
+                    interaction,
+                    item,
+                );
+                return;
+            case SettingsCategory.Playback:
+                await PlaybackLogicHandler.handleModalSubmit(
+                    guild,
+                    interaction,
+                    item,
+                );
+                return;
+        }
+    },
+);

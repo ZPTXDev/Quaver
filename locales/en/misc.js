@@ -1,5 +1,6 @@
 export default {
     ACTION_IRREVERSIBLE: '-# This action is irreversible.',
+    ACTIVE: 'Active',
     ADD: 'Add',
     ADDED_BY: 'Added by <@%1>',
     CANCEL: 'Cancel',
@@ -19,6 +20,7 @@ export default {
     PAGE: '-# Page %1 of %2',
     POSITION: 'Position',
     QUEUE: 'Queue',
+    SET: 'Set',
     SOURCES: {
         APPLEMUSIC: 'Apple Music',
         DEEZER: 'Deezer',

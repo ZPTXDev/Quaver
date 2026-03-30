@@ -346,12 +346,21 @@ rl.on('line', async (input): Promise<void> => {
                 console.log('Guild not found.');
                 break;
             }
-            if (!['stay', 'autolyrics', 'smartqueue'].includes(feature)) {
-                console.log('Available features: stay, autolyrics, smartqueue');
+            if (
+                !['premium', 'stay', 'autolyrics', 'smartqueue'].includes(
+                    feature,
+                )
+            ) {
+                console.log(
+                    'Available features: premium, stay, autolyrics, smartqueue',
+                );
                 break;
             }
             let featureName = '';
             switch (feature) {
+                case 'premium':
+                    featureName = 'Premium';
+                    break;
                 case 'stay':
                     featureName = '24/7';
                     break;
@@ -361,7 +370,12 @@ rl.on('line', async (input): Promise<void> => {
                 case 'smartqueue':
                     featureName = 'Smart Queue';
             }
-            if (!settings.features[feature as WhitelistedFeatures].whitelist) {
+            if (
+                (feature === 'premium' && !settings.premiumURL) ||
+                (feature !== 'premium' &&
+                    !settings.features[feature as WhitelistedFeatures]
+                        .whitelist)
+            ) {
                 console.log(`The ${featureName} whitelist is not enabled.`);
                 break;
             }
@@ -375,15 +389,16 @@ rl.on('line', async (input): Promise<void> => {
             const whitelisted = await guild.features.checkWhitelisted(
                 feature as WhitelistedFeatures,
             );
+            const featureStore = `${feature}${feature !== 'premium' ? '.whitelisted' : ''}`;
             if (whitelisted && !duration) {
-                await guild.features.unset(`${feature}.whitelisted`);
+                await guild.features.unset(featureStore);
                 console.log(
                     `Removed ${guild.name} from the ${featureName} whitelist.`,
                 );
                 break;
             }
             await guild.features.set(
-                `${feature}.whitelisted`,
+                featureStore,
                 durationMs === -1 ? durationMs : Date.now() + durationMs,
             );
             console.log(

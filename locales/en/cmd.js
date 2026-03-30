@@ -215,64 +215,73 @@ export default {
     },
     SETTINGS: {
         DESCRIPTION: 'Change Quaver\'s settings in this server.',
-        RESPONSE: {
-            HEADER: 'Settings for **%1**',
-        },
         MISC: {
-            AUTOLYRICS: {
-                DESCRIPTION: 'Automatically send lyrics for every track.',
-                NAME: 'Auto Lyrics',
-            },
-            DJ: {
-                DESCRIPTION: 'A role allowing requester check bypass.',
-                NAME: 'DJ Role',
-            },
-            FORMAT: {
-                DESCRIPTION: 'The "Now playing" format to use for this server.',
-                EXAMPLE: {
-                    DETAILED: 'Detailed Format Display',
-                    SIMPLE: 'Simple Format Display',
-                },
-                NAME: 'Format',
-                OPTIONS: {
-                    DETAILED: 'Detailed',
-                    SIMPLE: 'Simple',
-                },
-            },
-            LANGUAGE: {
-                DESCRIPTION: 'The language to use for this server.',
-                NAME: 'Language',
-            },
-            NOTIFYIN247: {
-                DESCRIPTION: 'Whether to send "Now playing" messages in 24/7 mode.',
-                NAME: 'Notify in 24/7 mode',
-            },
-            PREMIUM: {
-                DESCRIPTION: 'Premium features for this server.',
-                DISPLAY: {
-                    LOCKED: {
-                        DEFAULT: 'Requires Premium',
-                        EXPIRED: 'Expired at **<t:%1:f>**',
+            CONTENT: {
+                DESCRIPTION: 'Manage the core identity and permission levels for Quaver on this server.',
+                NAME: 'Content & Display',
+                SETTINGS: {
+                    AUTOLYRICS: {
+                        DESCRIPTION: 'Automatically send lyrics for every track.',
+                        NAME: 'Auto Lyrics',
                     },
-                    UNLOCKED: {
-                        PERMANENT: 'Available **forever**',
-                        TEMPORARY: 'Available until **<t:%1:f>**',
+                    FORMAT: {
+                        DESCRIPTION: 'The "Now playing" format to use for this server.',
+                        EXAMPLE: {
+                            DETAILED: 'Detailed Format Display',
+                            SIMPLE: 'Simple Format Display',
+                        },
+                        NAME: 'Format',
+                        OPTIONS: {
+                            DETAILED: 'Detailed',
+                            SIMPLE: 'Simple',
+                        },
                     },
                 },
-                FEATURES: {
-                    AUTOLYRICS: 'Auto Lyrics',
-                    SMARTQUEUE: 'Smart Queue',
-                    STAY: '24/7 Mode',
+            },
+            GENERAL: {
+                DESCRIPTION: 'Customize how information and lyrics are presented in your text channels.',
+                NAME: 'General & Access',
+                SETTINGS: {
+                    DJ: {
+                        DESCRIPTION: 'A role allowing requester check bypass.',
+                        NAME: 'DJ Role',
+                    },
+                    LANGUAGE: {
+                        DESCRIPTION: 'The language to use for this server.',
+                        NAME: 'Language',
+                    },
+                    PREMIUM: {
+                        DESCRIPTION: 'Premium unlocks **Ad-Free Listening**, **Auto Lyrics**, **Smart Queue**, and **24/7 Mode**.',
+                        NAME: 'Premium',
+                        STATE: {
+                            ACTIVE_MESSAGE: 'This server has Premium until **<t:%1:f>**.\nThank you for your support!',
+                            ACTIVE_LIFETIME_MESSAGE: 'This server has Premium until **Forever**, courtesy of Quaver\'s manager.'
+                        },
+                    },
                 },
-                NAME: 'Premium',
             },
-            SMARTQUEUE: {
-                DESCRIPTION: 'Sorts the queue to alternate between requesters.',
-                NAME: 'Smart Queue',
+            MAIN_MENU: {
+                DESCRIPTION: 'Select a category below to view or modify server-specific configurations.',
+                HEADER: '## Settings for %1',
+                TITLE: 'Settings',
             },
-            SOURCE: {
-                DESCRIPTION: 'The default source to use. Affects the /play and /search commands.',
-                NAME: 'Source',
+            PLAYBACK: {
+                DESCRIPTION: 'Configure how Quaver handles music sources and queueing behavior.',
+                NAME: 'Playback & Logic',
+                SETTINGS: {
+                    NOTIFYIN247: {
+                        DESCRIPTION: 'Whether to send "Now playing" messages in 24/7 mode.',
+                        NAME: 'Notify in 24/7 mode',
+                    },
+                    SMARTQUEUE: {
+                        DESCRIPTION: 'Sorts the queue to alternate between requesters.',
+                        NAME: 'Smart Queue',
+                    },
+                    SOURCE: {
+                        DESCRIPTION: 'The default source to use. Affects the /play and /search commands.',
+                        NAME: 'Source',
+                    },
+                },
             },
         },
     },

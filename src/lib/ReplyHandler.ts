@@ -176,6 +176,22 @@ export class ReplyHandler {
                 return undefined;
             }
         }
+        if (force === ForceType.FollowUp) {
+            if (ephemeral) {
+                replyMsgOpts.flags = [
+                    MessageFlags.IsComponentsV2,
+                    MessageFlags.Ephemeral,
+                ];
+            }
+            try {
+                return await this.interaction.followUp(replyMsgOpts);
+            } catch (error) {
+                if (error instanceof Error) {
+                    logger.error(`${error.message}\n${error.stack}`);
+                }
+                return undefined;
+            }
+        }
         try {
             return await this.interaction.editReply(
                 replyMsgOpts as InteractionEditReplyOptions,
@@ -193,4 +209,5 @@ export enum ForceType {
     Reply,
     Edit,
     Update,
+    FollowUp,
 }
