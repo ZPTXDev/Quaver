@@ -389,7 +389,14 @@ rl.on('line', async (input): Promise<void> => {
             const whitelisted = await guild.features.checkWhitelisted(
                 feature as WhitelistedFeatures,
             );
-            const featureStore = `${feature}${feature !== 'premium' ? '.whitelisted' : ''}`;
+            const usesPremiumStore =
+                feature === 'premium' ||
+                (feature !== 'premium' &&
+                    settings.premiumURL &&
+                    settings.features[feature as WhitelistedFeatures].premium);
+            const featureStore = usesPremiumStore
+                ? 'premium'
+                : `${feature}.whitelisted`;
             if (whitelisted && !duration) {
                 await guild.features.unset(featureStore);
                 console.log(
