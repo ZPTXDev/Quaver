@@ -97,7 +97,7 @@ export class ReplyHandler {
             this.interaction.channel &&
             !this.interaction.channel
                 .permissionsFor(this.interaction.client.user.id)
-                .has(
+                ?.has(
                     new PermissionsBitField([
                         PermissionsBitField.Flags.ViewChannel,
                         PermissionsBitField.Flags.SendMessages,
