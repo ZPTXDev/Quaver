@@ -93,16 +93,18 @@ export class ReplyHandler {
     }
 
     private lacksChannelPermissions(): boolean {
-        return !!(
-            this.interaction.channel &&
-            !this.interaction.channel
-                .permissionsFor(this.interaction.client.user.id)
-                ?.has(
-                    new PermissionsBitField([
-                        PermissionsBitField.Flags.ViewChannel,
-                        PermissionsBitField.Flags.SendMessages,
-                    ]),
-                )
+        const channel = this.interaction.channel;
+        const permissions = channel?.permissionsFor(
+            this.interaction.client.user.id,
+        );
+        if (!permissions) return !!channel;
+        return !permissions.has(
+            new PermissionsBitField([
+                PermissionsBitField.Flags.ViewChannel,
+                channel.isThread()
+                    ? PermissionsBitField.Flags.SendMessagesInThreads
+                    : PermissionsBitField.Flags.SendMessages,
+            ]),
         );
     }
 
