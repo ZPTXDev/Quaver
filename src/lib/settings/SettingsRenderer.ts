@@ -46,7 +46,7 @@ export class SettingsRenderer {
             container.addSectionComponents(
                 this.createItemSection(guild, setting),
             );
-            if (categories.length - 1 < i) {
+            if (i < categories.length - 1) {
                 container.addSeparatorComponents(
                     new SeparatorBuilder().setDivider(false),
                 );
