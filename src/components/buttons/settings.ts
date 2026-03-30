@@ -9,6 +9,7 @@ import {
     SettingsRenderer,
 } from '#src/lib/settings';
 import { Check } from '#src/lib/util';
+import { PermissionsBitField } from 'discord.js';
 
 export default new ButtonHandler()
     .setChecks([Check.InteractionStarter])
@@ -17,6 +18,24 @@ export default new ButtonHandler()
         const params = interaction.customId.split(':');
         const category = params[1];
         const item = params[2];
+        const missingPermissions = interaction.memberPermissions.missing(
+            PermissionsBitField.Flags.ManageGuild,
+        );
+        if (missingPermissions.length > 0) {
+            await interaction.replyHandler.reply(
+                guild.locale(
+                    'DISCORD.INSUFFICIENT_PERMISSIONS.USER',
+                    missingPermissions
+                        .map((perm): string => `\`${perm}\``)
+                        .join(' '),
+                ),
+                {
+                    type: MessageOptionsBuilderType.Error,
+                    force: ForceType.Update,
+                },
+            );
+            return;
+        }
         if (!category) {
             await interaction.replyHandler.reply(
                 SettingsRenderer.renderMainMenu(guild),
