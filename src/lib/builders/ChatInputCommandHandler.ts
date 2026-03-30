@@ -78,13 +78,11 @@ export class ChatInputCommandHandler extends BaseHandler {
                 user: interaction.channel
                     .permissionsFor(interaction.member)
                     .missing(this.permissions.user),
-                bot: interaction.channel
-                    .permissionsFor(interaction.client.user.id)
-                    .missing([
-                        PermissionsBitField.Flags.ViewChannel,
-                        PermissionsBitField.Flags.SendMessages,
-                        ...this.permissions.bot,
-                    ]),
+                bot: interaction.appPermissions.missing([
+                    PermissionsBitField.Flags.ViewChannel,
+                    PermissionsBitField.Flags.SendMessages,
+                    ...this.permissions.bot,
+                ]),
             };
         }
         return {

@@ -23,12 +23,15 @@ export class GuildFeatures {
     }
 
     async checkWhitelisted(
-        feature: WhitelistedFeatures,
+        feature: WhitelistedFeatures | 'premium',
     ): Promise<WhitelistStatus> {
-        if (!settings.features[feature].whitelist) {
+        if (feature !== 'premium' && !settings.features[feature].whitelist) {
             return WhitelistStatus.Permanent;
         }
-        const whitelisted = await this.get<number>(`${feature}.whitelisted`);
+        const whitelisted = await (feature === 'premium' ||
+        (settings.premiumURL && settings.features[feature].premium)
+            ? this.get<number>('premium')
+            : this.get<number>(`${feature}.whitelisted`));
         if (!whitelisted) return WhitelistStatus.NotWhitelisted;
         if (whitelisted !== -1 && Date.now() > whitelisted) {
             return WhitelistStatus.Expired;
