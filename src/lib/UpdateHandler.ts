@@ -7,7 +7,7 @@ import { startup } from '#src/lib/state';
 import { settings, version } from '#src/lib/util';
 import AdmZip from 'adm-zip';
 import { ContainerBuilder, TextDisplayBuilder } from 'discord.js';
-import { writeFile } from 'node:fs/promises';
+import { rm, writeFile } from 'node:fs/promises';
 import semver from 'semver';
 
 type APIReleaseAuthor = {
@@ -175,8 +175,22 @@ export class UpdateHandler {
             return;
         }
         const buffer = await res.arrayBuffer();
-        logger.info('Extracting update...');
         const zip = new AdmZip(Buffer.from(buffer));
+        logger.info('Cleaning up old build files...');
+        const foldersToClean = [
+            './dist',
+            './locales',
+            './scripts',
+            './patches',
+        ];
+        for (const folder of foldersToClean) {
+            try {
+                await rm(folder, { recursive: true, force: true });
+            } catch (err) {
+                logger.warn(`Failed to clean ${folder}: ${err.message}`);
+            }
+        }
+        logger.info('Extracting update...');
         zip.extractAllTo('.', true);
         logger.info('Update installed successfully.');
         clearInterval(this.updateInterval);
