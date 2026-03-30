@@ -94,9 +94,7 @@ export class ReplyHandler {
 
     private lacksChannelPermissions(): boolean {
         const channel = this.interaction.channel;
-        const permissions = channel?.permissionsFor(
-            this.interaction.client.user.id,
-        );
+        const permissions = this.interaction.appPermissions;
         if (!permissions) return !!channel;
         return !permissions.has(
             new PermissionsBitField([
