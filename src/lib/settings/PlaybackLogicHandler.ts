@@ -113,13 +113,13 @@ export class PlaybackLogicHandler {
                     }
                 }
                 await guild.settings.set('smartqueue', !smartQueue);
-                guild.sendWebUpdate('smartQueueFeatureUpdate', {
-                    enabled: !smartQueue,
-                });
                 const player = await guild.getPlayer();
                 if (player && player.memory.alternate === smartQueue) {
                     await player.setAlternate(!smartQueue);
-                    guild.sendWebUpdate('queueUpdate', player.decorateQueue());
+                } else {
+                    guild.sendWebUpdate('smartQueueFeatureUpdate', {
+                        enabled: !smartQueue,
+                    });
                 }
                 await interaction.replyHandler.reply(
                     await SettingsRenderer.renderSubMenu(
