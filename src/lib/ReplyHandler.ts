@@ -118,16 +118,12 @@ export class ReplyHandler {
         inputData: MessageOptionsBuilderInputs,
         options?: MessageOptionsBuilderOptions &
             AdditionalBuilderOptions & { withResponse?: false },
-    ): Promise<InteractionResponse>;
+    ): Promise<InteractionResponse | Message | undefined>;
     async reply(
         inputData: MessageOptionsBuilderInputs,
-        options?: MessageOptionsBuilderOptions &
+        options: MessageOptionsBuilderOptions &
             AdditionalBuilderOptions & { withResponse: true },
-    ): Promise<InteractionCallbackResponse | Message>;
-    async reply(
-        inputData: MessageOptionsBuilderInputs,
-        options?: MessageOptionsBuilderOptions & AdditionalBuilderOptions,
-    ): Promise<InteractionResponse>;
+    ): Promise<InteractionCallbackResponse | Message | undefined>;
     async reply(
         inputData: MessageOptionsBuilderInputs,
         {
