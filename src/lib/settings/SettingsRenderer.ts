@@ -62,7 +62,7 @@ export class SettingsRenderer {
         const subMenuName = guild.locale(
             `CMD.SETTINGS.MISC.${category.toUpperCase()}.NAME` as LocaleKey,
         );
-        return new ContainerBuilder()
+        const container = new ContainerBuilder()
             .addTextDisplayComponents(
                 new TextDisplayBuilder().setContent(
                     `-# ${guild.locale('CMD.SETTINGS.MISC.MAIN_MENU.TITLE')} > ${subMenuName}`,
@@ -74,10 +74,17 @@ export class SettingsRenderer {
             )
             .addSeparatorComponents(
                 new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Large),
-            )
-            .addSectionComponents(
-                ...(await this.renderSettings(category, guild)),
-            )
+            );
+        const sections = await this.renderSettings(category, guild);
+        sections.forEach((section, i): void => {
+            container.addSectionComponents(section);
+            if (i < sections.length - 1) {
+                container.addSeparatorComponents(
+                    new SeparatorBuilder().setDivider(false),
+                );
+            }
+        });
+        return container
             .addSeparatorComponents(
                 new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Large),
             )
