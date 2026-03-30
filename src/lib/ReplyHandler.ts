@@ -182,7 +182,9 @@ export class ReplyHandler {
         }
 
         if (force === ForceType.FollowUp) {
-            if (ephemeral) replyMsgOpts.flags = EPHEMERAL_FLAGS;
+            if (ephemeral || type === MessageOptionsBuilderType.Error) {
+                replyMsgOpts.flags = EPHEMERAL_FLAGS;
+            }
             return this.tryAction(
                 (): Promise<Message<true>> =>
                     this.interaction.followUp(replyMsgOpts),
