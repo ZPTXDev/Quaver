@@ -1,11 +1,6 @@
 import { load as effectsLoad } from '@lavaclient/plugin-effects';
 import { load as queueLoad } from '@lavaclient/plugin-queue';
-import {
-    getAbsoluteFileURL,
-    msToTime,
-    msToTimeString,
-    parseTimeString,
-} from '@zptxdev/zptx-lib';
+import { getAbsoluteFileURL, msToTime, msToTimeString, parseTimeString, } from '@zptxdev/zptx-lib';
 import { createCache } from 'cache-manager';
 import { KeyvCacheableMemory } from 'cacheable';
 import { Collection, GatewayIntentBits } from 'discord.js';
@@ -387,7 +382,7 @@ rl.on('line', async (input): Promise<void> => {
                 durationMs = parseTimeString(duration);
             }
             const whitelisted = await guild.features.checkWhitelisted(
-                feature as WhitelistedFeatures,
+                feature as WhitelistedFeatures | 'premium',
             );
             const usesPremiumStore =
                 feature === 'premium' ||
