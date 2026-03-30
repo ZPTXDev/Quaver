@@ -1,3 +1,4 @@
+import { MessageOptionsBuilderType } from '#src/lib';
 import { ModalSubmitHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import {
@@ -25,6 +26,12 @@ export default new ModalSubmitHandler().setExecute(
                     guild,
                     interaction,
                     item,
+                );
+                return;
+            default:
+                await interaction.replyHandler.reply(
+                    guild.locale('DISCORD.GENERIC_ERROR'),
+                    { type: MessageOptionsBuilderType.Error },
                 );
                 return;
         }

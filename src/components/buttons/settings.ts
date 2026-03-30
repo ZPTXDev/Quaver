@@ -1,4 +1,4 @@
-import { ForceType } from '#src/lib';
+import { ForceType, MessageOptionsBuilderType } from '#src/lib';
 import { ButtonHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import {
@@ -54,6 +54,12 @@ export default new ButtonHandler()
                     guild,
                     interaction,
                     item,
+                );
+                return;
+            default:
+                await interaction.replyHandler.reply(
+                    guild.locale('DISCORD.GENERIC_ERROR'),
+                    { type: MessageOptionsBuilderType.Error },
                 );
                 return;
         }
