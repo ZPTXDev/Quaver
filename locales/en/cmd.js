@@ -255,7 +255,7 @@ export default {
                         NAME: 'Premium',
                         STATE: {
                             ACTIVE_MESSAGE: 'This server has Premium until **<t:%1:f>**.\nThank you for your support!',
-                            ACTIVE_LIFETIME_MESSAGE: 'This server has Premium until **Forever**, courtesy of Quaver\'s manager.'
+                            ACTIVE_LIFETIME_MESSAGE: 'This server has Premium **forever**, courtesy of Quaver\'s manager.'
                         },
                     },
                 },
