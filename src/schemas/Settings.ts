@@ -128,6 +128,9 @@ export const SettingsSchema = z.object({
     }),
     updater: z
         .object({
+            user: z.string().default('ZPTXDev'),
+            repo: z.string().default('Quaver'),
+            token: z.string().optional(),
             channel: z
                 .enum(['none', 'stable', 'staging', 'next'])
                 .default('none'),

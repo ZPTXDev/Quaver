@@ -73,6 +73,12 @@ type APIRelease = {
 };
 
 export class UpdateHandler {
+    // GitHub repo user
+    user = settings.updater?.user ?? 'ZPTXDev';
+    // GitHub repo name
+    repo = settings.updater?.repo ?? 'Quaver';
+    // GitHub PAT
+    token = settings.updater?.token;
     // Channel to update from - none means update checker is disabled
     channel = settings.updater?.channel ?? 'none';
     // Whether to download and replace files when an update is found
@@ -116,7 +122,10 @@ export class UpdateHandler {
         if (this.channel === 'none') return;
         if (!version.official) return;
         const res = await fetch(
-            'https://api.github.com/repos/ZPTXDev/Quaver/releases',
+            `https://api.github.com/repos/${this.user}/${this.repo}/releases`,
+            this.token
+                ? { headers: { Authorization: `Bearer ${this.token}` } }
+                : {},
         );
         if (!res.ok) {
             logger.warn(
