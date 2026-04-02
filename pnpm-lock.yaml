@@ -29,8 +29,8 @@ dependencies:
     specifier: ^1.1.0
     version: 1.1.0
   adm-zip:
-    specifier: ^0.5.16
-    version: 0.5.16
+    specifier: ^0.5.17
+    version: 0.5.17
   cache-manager:
     specifier: ^7.2.8
     version: 7.2.8
@@ -1344,8 +1344,8 @@ packages:
     hasBin: true
     dev: true
 
-  /adm-zip@0.5.16:
-    resolution: {integrity: sha512-TGw5yVi4saajsSEgz25grObGHEUaDrniwvA2qwSC060KfqGPdglhvPMA2lPIoxs3PQIItj2iag35fONcQqgUaQ==}
+  /adm-zip@0.5.17:
+    resolution: {integrity: sha512-+Ut8d9LLqwEvHHJl1+PIHqoyDxFgVN847JTVM3Izi3xHDWPE4UtzzXysMZQs64DMcrJfBeS/uoEP4AD3HQHnQQ==}
     engines: {node: '>=12.0'}
     dev: false
 
