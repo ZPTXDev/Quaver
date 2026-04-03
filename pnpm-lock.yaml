@@ -83,8 +83,8 @@ dependencies:
     specifier: ^6.0.1
     version: 6.0.1
   undici:
-    specifier: ^7.24.7
-    version: 7.24.7
+    specifier: ^8.0.1
+    version: 8.0.1
   wanakana:
     specifier: ^5.3.1
     version: 5.3.1
@@ -4395,9 +4395,9 @@ packages:
     engines: {node: '>=18.17'}
     dev: false
 
-  /undici@7.24.7:
-    resolution: {integrity: sha512-H/nlJ/h0ggGC+uRL3ovD+G0i4bqhvsDOpbDv7At5eFLlj2b41L8QliGbnl2H7SnDiYhENphh1tQFJZf+MyfLsQ==}
-    engines: {node: '>=20.18.1'}
+  /undici@8.0.1:
+    resolution: {integrity: sha512-6qdTUr+jabXmYKeYkv/+pIvO7d0bs1k9uy+5PFnXr4segNVwILH1KExhwRh3/iGa6gSLmySK3hTnSs3k7ZPnjQ==}
+    engines: {node: '>=22.19.0'}
     dev: false
 
   /unique-filename@1.1.1:
