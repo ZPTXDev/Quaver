@@ -101,8 +101,8 @@ dependencies:
     specifier: ^2.1.2
     version: 2.1.2
   zod:
-    specifier: ^4.3.6
-    version: 4.3.6
+    specifier: ^4.4.1
+    version: 4.4.1
 
 devDependencies:
   '@eslint/eslintrc':
@@ -4438,6 +4438,6 @@ packages:
     engines: {node: '>=18'}
     dev: false
 
-  /zod@4.3.6:
-    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
+  /zod@4.4.1:
+    resolution: {integrity: sha512-a6ENMBBGZBsnlSebQ/eKCguSBeGKSf4O7BPnqVPmYGtpBYI7VSqoVqw+QcB7kPRjbqPwhYTpFbVj/RqNz/CT0Q==}
     dev: false
