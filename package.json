@@ -15,7 +15,7 @@
     "cache-manager": "^7.2.8",
     "cacheable": "^2.3.4",
     "crypto-js": "^4.2.0",
-    "discord.js": "^14.26.3",
+    "discord.js": "^14.26.4",
     "effect": "^3.21.0",
     "express": "^5.2.1",
     "hangul-romanization": "^1.0.1",
