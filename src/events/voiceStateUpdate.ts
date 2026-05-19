@@ -77,6 +77,7 @@ async function resumeChannelSession(
     await player.resume();
     clearTimeout(player.timeout.pause);
     player.timeout.pause = null;
+    player.timeout.pausedAlone = false;
     guild.sendWebUpdate('pauseUpdate', player.paused);
     guild.sendWebUpdate('pauseTimeoutUpdate', !!player.timeout.pause);
     await player.sendMessage(guild.locale('MUSIC.DISCONNECT.ALONE.RESUMING'), {
@@ -99,6 +100,9 @@ async function onChannelEmpty(
         await guild.settings.set('stay.enabled', false);
     }
     if (isPlayerIdle && player.voice.channelId) {
+        if (isGuildStayEnabled) {
+            return;
+        }
         logger.info(`[G ${guild.id}] Disconnecting (alone)`);
         await player.sendMessage(
             guild.locale(
@@ -115,8 +119,29 @@ async function onChannelEmpty(
     if (
         player.timeout.standard ||
         player.timeout.pause ||
+        player.timeout.pausedAlone ||
         !player.voice.channelId
     ) {
+        return;
+    }
+    if (isGuildStayEnabled) {
+        if (player.paused) {
+            return;
+        }
+        await player.pause();
+        guild.sendWebUpdate('pauseUpdate', player.paused);
+        player.timeout.pausedAlone = true;
+        await player.sendMessage(
+            new ContainerBuilder().addTextDisplayComponents(
+                guild.builders.textDisplayLocale(
+                    'MUSIC.DISCONNECT.ALONE.WARNING',
+                ),
+                guild.builders.textDisplayLocale(
+                    'MUSIC.DISCONNECT.ALONE.REJOIN_TO_RESUME',
+                ),
+            ),
+            { type: MessageOptionsBuilderType.Warning },
+        );
         return;
     }
     await pauseChannelSession(io, player);
@@ -136,11 +161,13 @@ async function onChannelJoinOrMove(
     }
     // In this context newState#channel is always defined for join/move states, so optional chaining is unnecessary
     const hasNewChannelUsers = newState.channel.members.filter(isUser).size > 0;
-    if (hasNewChannelUsers && player.timeout.pause) {
+    if (hasNewChannelUsers && (player.timeout.pause || player.timeout.pausedAlone)) {
         await resumeChannelSession(io, player);
     }
     // To prevent Quaver from handling a channel that still has users or the guild's stay feature is enabled, do not handle the channel
-    if (hasNewChannelUsers || isGuildStayEnabled) {
+    const pauseAlone =
+        (await guild.settings.get<boolean>('pausealone247')) ?? false;
+    if (hasNewChannelUsers || (isGuildStayEnabled && !pauseAlone)) {
         return;
     }
     await onChannelEmpty(
@@ -316,18 +343,20 @@ export default new EventHandler()
         if (
             !isOldQuaverStateUpdate &&
             newChannelId === player.voice.channelId &&
-            player.timeout.pause
+            (player.timeout.pause || player.timeout.pausedAlone)
         ) {
             await resumeChannelSession(guild.client.io, player);
             return;
         }
         const isUserLeaveOrMoveState =
             !isOldQuaverStateUpdate && oldChannelId === player.voice.channelId;
-        // Since the last user left or moved out from Quaver's channel and the guild's stay feature is disabled, handle the empty channel
+        const pauseAlone =
+            (await guild.settings.get<boolean>('pausealone247')) ?? false;
+        // Since the last user left or moved out from Quaver's channel, handle the empty channel
         if (
             isUserLeaveOrMoveState &&
             oldState.channel?.members.filter(isUser).size < 1 &&
-            !isGuildStayEnabled
+            (!isGuildStayEnabled || pauseAlone)
         ) {
             await onChannelEmpty(
                 guild.client.io,

@@ -273,6 +273,10 @@ export default {
                         DESCRIPTION: 'Whether to send "Now playing" messages in 24/7 mode.',
                         NAME: 'Notify in 24/7 mode',
                     },
+                    PAUSEALONE247: {
+                        DESCRIPTION: 'Whether to pause playback when alone in voice channel in 24/7 mode.',
+                        NAME: 'Pause alone in 24/7 mode',
+                    },
                     SMARTQUEUE: {
                         DESCRIPTION: 'Sorts the queue to alternate between requesters.',
                         NAME: 'Smart Queue',
