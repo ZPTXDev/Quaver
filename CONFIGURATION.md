@@ -12,6 +12,7 @@
     "error": "DarkRed"
   },
   "emojis": {
+    "quavermusic": "",
     "youtube": "",
     "deezer": "",
     "spotify": "",

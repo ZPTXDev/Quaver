@@ -11,6 +11,7 @@ import {
     Check,
     getTrackMarkdownLocaleString,
     queryOverrides,
+    searchTracks,
     settings,
 } from '#src/lib/util';
 import type { Song } from '@lavaclient/plugin-queue';
@@ -91,17 +92,11 @@ export default new ChatInputCommandHandler()
         await interaction.deferReply();
         const query = interaction.options.getString('query');
         let tracks: QuaverSong[] = [];
-        let searchQuery;
-        if (queryOverrides.some((q): boolean => query.startsWith(q))) {
-            searchQuery = query;
-        } else {
-            const source =
-                (await guild.settings.get<string>('source')) ??
-                Object.keys(acceptableSources)[0];
-            searchQuery = `${acceptableSources[source]}${query}`;
-        }
-        const result =
-            await interaction.client.music.api.loadTracks(searchQuery);
+        const result = await searchTracks(
+            interaction.client,
+            guild,
+            query,
+        );
         switch (result.loadType) {
             case 'playlist':
             case 'track': {

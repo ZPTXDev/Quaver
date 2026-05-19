@@ -246,6 +246,7 @@ export function buildMessageOptions(
  */
 export function updateQueryOverrides(sourceManagers: readonly string[]): void {
     queryOverrides.push(
+        ...(sourceManagers.includes('quavermusic') ? ['qmsearch:'] : []),
         ...(sourceManagers.includes('http') ? ['https://', 'http://'] : []),
         ...(sourceManagers.includes('spotify') ? ['spsearch:', 'sprec:'] : []),
         ...(sourceManagers.includes('applemusic') ? ['amsearch:'] : []),
@@ -305,4 +306,54 @@ export function getTrackMarkdownLocaleString(track: Song): string {
     return track.info.title === track.info.uri
         ? track.info.uri
         : `[${track.info.title}](${track.info.uri})`;
+}
+
+/**
+ * Searches for tracks using the configured source, falling back to other sources if no tracks are found.
+ * @param client - The QuaverClient instance.
+ * @param guild - The QuaverGuild instance.
+ * @param query - The search query.
+ */
+export async function searchTracks(
+    client: QuaverClient,
+    guild: any,
+    query: string,
+): Promise<any> {
+    if (queryOverrides.some((q): boolean => query.startsWith(q))) {
+        return await client.music.api.loadTracks(query);
+    }
+
+    const startingSource =
+        ((await guild.settings.get('source')) as string) ??
+        Object.keys(acceptableSources)[0];
+
+    const sources = Object.keys(acceptableSources);
+    const orderedSources = [
+        startingSource,
+        ...sources.filter((s): boolean => s !== startingSource),
+    ].filter((s): boolean => !!acceptableSources[s]);
+
+    let result: any = null;
+    for (const source of orderedSources) {
+        const searchQuery = `${acceptableSources[source]}${query}`;
+        try {
+            result = await client.music.api.loadTracks(searchQuery);
+            if (result) {
+                const hasTracks =
+                    (result.loadType === 'playlist' &&
+                        Array.isArray(result.data?.tracks) &&
+                        result.data.tracks.length > 0) ||
+                    (result.loadType === 'track' && result.data) ||
+                    (result.loadType === 'search' &&
+                        Array.isArray(result.data) &&
+                        result.data.length > 0);
+                if (hasTracks) {
+                    return result;
+                }
+            }
+        } catch (error) {
+            // Ignore error and try the next source
+        }
+    }
+    return result;
 }

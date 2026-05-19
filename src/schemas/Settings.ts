@@ -51,6 +51,7 @@ export const SettingsSchema = z.object({
     }),
     emojis: z
         .object({
+            quavermusic: z.string().default(''),
             youtube: z.string().default(''),
             deezer: z.string().default(''),
             spotify: z.string().default(''),

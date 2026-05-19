@@ -109,7 +109,7 @@ export default {
         if (!notify) format = 'off';
         const emoji =
             settings.emojis?.[
-                track.info.sourceName as keyof typeof settings.emojis
+            track.info.sourceName as keyof typeof settings.emojis
             ] ?? '';
         switch (format) {
             case 'simple':
@@ -129,26 +129,26 @@ export default {
                         )
                         .addSeparatorComponents(
                             ...(settings.features.web.enabled &&
-                            settings.features.web.dashboardURL
+                                settings.features.web.dashboardURL
                                 ? [new SeparatorBuilder()]
                                 : []),
                         )
                         .addActionRowComponents(
                             ...(settings.features.web.enabled &&
-                            settings.features.web.dashboardURL
+                                settings.features.web.dashboardURL
                                 ? [
-                                      new ActionRowBuilder<ButtonBuilder>().addComponents(
-                                          guild.builders
-                                              .buttonLocale('MISC.DASHBOARD')
-                                              .setStyle(ButtonStyle.Link)
-                                              .setURL(
-                                                  `${settings.features.web.dashboardURL.replace(
-                                                      /\/+$/,
-                                                      '',
-                                                  )}/guild/${guild.id}`,
-                                              ),
-                                      ),
-                                  ]
+                                    new ActionRowBuilder<ButtonBuilder>().addComponents(
+                                        guild.builders
+                                            .buttonLocale('MISC.DASHBOARD')
+                                            .setStyle(ButtonStyle.Link)
+                                            .setURL(
+                                                `${settings.features.web.dashboardURL.replace(
+                                                    /\/+$/,
+                                                    '',
+                                                )}/guild/${guild.id}`,
+                                            ),
+                                    ),
+                                ]
                                 : []),
                         ),
                 );
@@ -180,7 +180,7 @@ export default {
                                 .setThumbnailAccessory(
                                     new ThumbnailBuilder().setURL(
                                         track.info.artworkUrl ??
-                                            `https://i.ytimg.com/vi/${track.info.identifier}/hqdefault.jpg`,
+                                        `https://i.ytimg.com/vi/${track.info.identifier}/hqdefault.jpg`,
                                     ),
                                 ),
                         )
@@ -265,17 +265,17 @@ export default {
                     .addActionRowComponents(
                         ...(romanizeFrom
                             ? [
-                                  new ActionRowBuilder<ButtonBuilder>().addComponents(
-                                      guild.builders
-                                          .buttonLocale(
-                                              `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}` as LocaleKey,
-                                          )
-                                          .setStyle(ButtonStyle.Secondary)
-                                          .setCustomId(
-                                              `lyrics:${romanizeFrom}`,
-                                          ),
-                                  ),
-                              ]
+                                new ActionRowBuilder<ButtonBuilder>().addComponents(
+                                    guild.builders
+                                        .buttonLocale(
+                                            `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}` as LocaleKey,
+                                        )
+                                        .setStyle(ButtonStyle.Secondary)
+                                        .setCustomId(
+                                            `lyrics:${romanizeFrom}`,
+                                        ),
+                                ),
+                            ]
                             : []),
                     ),
             );

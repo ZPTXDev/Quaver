@@ -9,6 +9,7 @@ import {
     type QuaverSong,
     queryOverrides,
     RequesterStatus,
+    searchTracks,
     settings,
 } from '#src/lib/util';
 import { type APIGuild, type APIUser, GuildMember, PermissionsBitField, type Snowflake, } from 'discord.js';
@@ -57,16 +58,7 @@ export default {
                     return callback({ status: compatible });
                 const query = item.value;
                 let tracks = [];
-                let searchQuery;
-                if (queryOverrides.some((q): boolean => query.startsWith(q))) {
-                    searchQuery = query;
-                } else {
-                    const source =
-                        (await guild.settings.get<string>('source')) ??
-                        Object.keys(acceptableSources)[0];
-                    searchQuery = `${acceptableSources[source]}${query}`;
-                }
-                const result = await client.music.api.loadTracks(searchQuery);
+                const result = await searchTracks(client, guild, query);
                 switch (result.loadType) {
                     case 'playlist':
                         tracks = [
