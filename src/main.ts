@@ -229,9 +229,9 @@ const requiredPlugins = [
 const info = await client.music.api.info();
 if (
     info.plugins.length === 0 ||
-    !info.plugins
-        .map((plugin): string => plugin.name)
-        .every((plugin): boolean => requiredPlugins.includes(plugin))
+    !requiredPlugins.every(
+        (plugin): boolean => info.plugins.map((p): string => p.name).includes(plugin)
+    )
 ) {
     logger.warn({
         message: 'Required plugins are not loaded. Some features may not work.',
