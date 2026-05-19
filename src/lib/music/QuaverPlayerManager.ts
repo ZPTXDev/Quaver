@@ -29,6 +29,7 @@ export class QuaverPlayerManager<
     async createFromJSON(
         guild: Guild,
         data: QuaverPlayerJSON,
+        resumed = false,
     ): Promise<QuaverPlayer<TNode>> {
         if (data.version !== 1) {
             throw new Error(
@@ -56,15 +57,21 @@ export class QuaverPlayerManager<
                   users: [...data.memory.skip.users],
               }
             : undefined;
-        if (data.effects.bassboost !== player.memory.bassboost) {
-            await player.setBassboost(data.effects.bassboost);
-        }
-        if (data.effects.nightcore !== player.memory.nightcore) {
-            await player.setNightcore(data.effects.nightcore);
-        }
-        await player.setVolumeTo(data.volume);
-        if (data.paused && !player.paused) {
-            await player.setPause(true);
+        if (resumed) {
+            await player.fetch();
+            player.memory.bassboost = data.effects.bassboost;
+            player.memory.nightcore = data.effects.nightcore;
+        } else {
+            if (data.effects.bassboost !== player.memory.bassboost) {
+                await player.setBassboost(data.effects.bassboost);
+            }
+            if (data.effects.nightcore !== player.memory.nightcore) {
+                await player.setNightcore(data.effects.nightcore);
+            }
+            await player.setVolumeTo(data.volume);
+            if (data.paused && !player.paused) {
+                await player.setPause(true);
+            }
         }
         if (player.memory.shuffle || player.memory.alternate) {
             player.recomputeQueue();

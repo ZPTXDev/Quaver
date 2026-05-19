@@ -19,4 +19,5 @@ export enum PlayerResponse {
 export type PlayerStatesRecord = Record<string, QuaverPlayerJSON> & {
     savedAt?: number;
     attempts?: number;
+    lavalinkSessionId?: string;
 };

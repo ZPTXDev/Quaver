@@ -270,14 +270,17 @@ export class UpdateHandler {
                 if (players.cache.size < 1) return;
                 const states: Record<string, QuaverPlayerJSON> & {
                     savedAt?: number;
+                    lavalinkSessionId?: string;
                 } = {};
                 logger.info('Disconnecting from all guilds...');
                 for (const pair of players.cache) {
                     const player = pair[1];
                     states[player.guild.id] = player.toJSON();
                     const guild = await QuaverGuild.wrap(player.guild);
-                    logger.info(`[G ${guild.id}] Disconnecting (restarting)`);
-                    await player.disconnect();
+                    if (!settings.sessionRecovery?.enabled) {
+                        logger.info(`[G ${guild.id}] Disconnecting (restarting)`);
+                        await player.disconnect();
+                    }
                     await player.sendMessage(
                         new ContainerBuilder().addTextDisplayComponents(
                             new TextDisplayBuilder().setContent(
@@ -307,6 +310,7 @@ export class UpdateHandler {
                 }
                 if (settings.sessionRecovery?.enabled) {
                     states.savedAt = Date.now();
+                    states.lavalinkSessionId = this.client.music.ws.session?.id;
                     await writeFile(
                         'states.json',
                         JSON.stringify(states, null, 4),
