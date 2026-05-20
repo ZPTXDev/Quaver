@@ -263,12 +263,12 @@ export default new ChatInputCommandHandler()
                     new ActionRowBuilder<ButtonBuilder>().addComponents(
                         new ButtonBuilder()
                             .setCustomId('search:0')
-                            .setEmoji('⬅️')
+                            .setEmoji(settings.emojis.left)
                             .setDisabled(true)
                             .setStyle(ButtonStyle.Primary),
                         new ButtonBuilder()
                             .setCustomId('search:2')
-                            .setEmoji('➡️')
+                            .setEmoji(settings.emojis.right)
                             .setDisabled(pages.length === 1)
                             .setStyle(ButtonStyle.Primary),
                         guild.builders

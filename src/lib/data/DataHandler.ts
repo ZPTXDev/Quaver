@@ -11,6 +11,7 @@ type DatabaseObject = {
 type GuildSettingsObject = {
     stay?: StaySettingObject;
     locale?: string;
+    controls?: boolean;
 };
 
 type StaySettingObject = {

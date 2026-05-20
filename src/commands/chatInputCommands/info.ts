@@ -42,27 +42,27 @@ export default new ChatInputCommandHandler()
                         ],
                     }),
                 )
-                .setEmoji('🔗'),
+                .setEmoji(settings.emojis.link),
             supportServer: guild.builders
                 .buttonLocale('CMD.INFO.MISC.SUPPORT_SERVER')
                 .setStyle(ButtonStyle.Link)
                 .setURL(settings.supportServer ?? 'https://example.com')
-                .setEmoji('💬'),
+                .setEmoji(settings.emojis.support),
             sourceCode: guild.builders
                 .buttonLocale('CMD.INFO.MISC.SOURCE_CODE')
                 .setStyle(ButtonStyle.Link)
                 .setURL('https://go.zptx.dev/Quaver')
-                .setEmoji('📖'),
+                .setEmoji(settings.emojis.documentation),
             sponsorUs: guild.builders
                 .buttonLocale('CMD.INFO.MISC.SPONSOR_US')
                 .setStyle(ButtonStyle.Link)
                 .setURL('https://github.com/sponsors/ZPTXDev')
-                .setEmoji('💖'),
+                .setEmoji(settings.emojis.sponsor),
             translateForUs: guild.builders
                 .buttonLocale('CMD.INFO.MISC.TRANSLATE_FOR_US')
                 .setStyle(ButtonStyle.Link)
                 .setURL('https://translate.zptx.dev/')
-                .setEmoji('🌐'),
+                .setEmoji(settings.emojis.website),
         };
         await interaction.replyHandler.reply(
             new ContainerBuilder()
