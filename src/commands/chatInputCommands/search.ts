@@ -6,11 +6,9 @@ import { logger } from '#src/lib/logger';
 import { searchState, updateHandler } from '#src/lib/state';
 import type { QuaverChannels, QuaverSong } from '#src/lib/util';
 import {
-    acceptableSources,
     buildMessageOptions,
     Check,
     getTrackMarkdownLocaleString,
-    queryOverrides,
     searchTracks,
     settings,
 } from '#src/lib/util';

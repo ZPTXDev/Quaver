@@ -5,6 +5,8 @@ import {
     type QuaverClient,
     type TopLevelComponentBuilders,
 } from '#src/lib';
+import type { Initialized, QuaverGuild } from '#src/lib/guild';
+import type { LoadResult } from 'lavalink-protocol';
 import { data } from '#src/lib/data';
 import type { ComponentInteractions } from '#src/lib/interactions';
 import type { QuaverPlayer } from '#src/lib/music';
@@ -316,9 +318,9 @@ export function getTrackMarkdownLocaleString(track: Song): string {
  */
 export async function searchTracks(
     client: QuaverClient,
-    guild: any,
+    guild: QuaverGuild<Initialized>,
     query: string,
-): Promise<any> {
+): Promise<LoadResult> {
     if (queryOverrides.some((q): boolean => query.startsWith(q))) {
         return await client.music.api.loadTracks(query);
     }
@@ -333,7 +335,7 @@ export async function searchTracks(
         ...sources.filter((s): boolean => s !== startingSource),
     ].filter((s): boolean => !!acceptableSources[s]);
 
-    let result: any = null;
+    let result: LoadResult | null = null;
     for (const source of orderedSources) {
         const searchQuery = `${acceptableSources[source]}${query}`;
         try {
@@ -351,7 +353,7 @@ export async function searchTracks(
                     return result;
                 }
             }
-        } catch (error) {
+        } catch {
             // Ignore error and try the next source
         }
     }
