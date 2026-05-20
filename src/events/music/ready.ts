@@ -91,7 +91,7 @@ export default {
                 );
                 if (restored) continue;
             }
-            if (get(guildData, 'settings.stay.enabled')) {
+            if (get(guildData, 'settings.stay.enabled') && await guild.features.isFeatureActive('stay')) {
                 const player = client.music.players.create(guild);
                 player.queue.channel = guild.channels.cache.get(
                     get(guildData, 'settings.stay.text'),

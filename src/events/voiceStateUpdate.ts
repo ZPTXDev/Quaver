@@ -196,7 +196,8 @@ export default new EventHandler()
             return;
         }
         const isGuildStayEnabled =
-            await guild.settings.get<boolean>('stay.enabled');
+            (await guild.settings.get<boolean>('stay.enabled')) &&
+            (await guild.features.isFeatureActive('stay'));
         const hasQuaverDisconnected = isOldQuaverStateUpdate && !newChannelId;
         // To ensure Quaver does not persist in an inactive session, disable stay feature for this guild
         if (hasQuaverDisconnected && isGuildStayEnabled) {

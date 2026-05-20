@@ -72,6 +72,7 @@
         "http://localhost"
       ],
       "encryptionKey": "Type an encryption key here",
+      "apiSecret": "Type a secure random string here",
       "https": {
         "enabled": false,
         "key": "key.pem",

@@ -117,6 +117,7 @@ export const SettingsSchema = z.object({
             port: z.number().int().default(3000),
             allowedOrigins: z.array(z.string()).default(['http://localhost']),
             encryptionKey: z.string().optional(),
+            apiSecret: z.string().optional(),
             https: z
                 .object({
                     enabled: z.boolean().default(false),

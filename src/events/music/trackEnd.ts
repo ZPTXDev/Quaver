@@ -90,7 +90,7 @@ export default {
             .members as Collection<Snowflake, GuildMember>;
         if (
             members?.filter((m): boolean => !m.user.bot).size < 1 &&
-            !(await guild.settings.get<boolean>('stay.enabled'))
+            !(await guild.settings.get<boolean>('stay.enabled') && await guild.features.isFeatureActive('stay'))
         ) {
             logger.info(`[G ${guild.id} Disconnecting (alone)`);
             await queue.player.sendMessage(

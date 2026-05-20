@@ -386,7 +386,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      */
     async disconnect(channelId?: Snowflake): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
-        if (await guild.settings.get('stay.enabled')) {
+        if (await guild.settings.get('stay.enabled') && await guild.features.isFeatureActive('stay')) {
             return PlayerResponse.FeatureConflict;
         }
         clearTimeout(this.timeout.standard);

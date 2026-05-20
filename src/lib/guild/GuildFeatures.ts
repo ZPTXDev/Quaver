@@ -39,4 +39,20 @@ export class GuildFeatures {
         if (whitelisted === -1) return WhitelistStatus.Permanent;
         return WhitelistStatus.Temporary;
     }
+
+    async isFeatureActive(
+        feature: WhitelistedFeatures,
+    ): Promise<boolean> {
+        if (!settings.features[feature].enabled) return false;
+        if (settings.features[feature].whitelist) {
+            const status = await this.checkWhitelisted(feature);
+            if (
+                status === WhitelistStatus.NotWhitelisted ||
+                status === WhitelistStatus.Expired
+            ) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

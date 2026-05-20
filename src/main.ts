@@ -85,6 +85,57 @@ if (settings.features.web.enabled) {
     }
     spinner.start(`Starting ${colors.cyan('web server')}`);
     app = express();
+    app.use(express.json());
+    if (settings.features.web.apiSecret) {
+        app.post('/api/premium/whitelist', async (req, res): Promise<void> => {
+            const authHeader = req.headers.authorization;
+            if (!authHeader || authHeader !== `Bearer ${settings.features.web.apiSecret}`) {
+                res.status(401).send({ error: 'Unauthorized' });
+                return;
+            }
+            const { guildId, feature, durationMs } = req.body;
+            if (!guildId || !feature) {
+                res.status(400).send({ error: 'Missing guildId or feature' });
+                return;
+            }
+            if (!['premium', 'stay', 'autolyrics', 'smartqueue'].includes(feature)) {
+                res.status(400).send({ error: 'Invalid feature name' });
+                return;
+            }
+            let discordGuild;
+            try {
+                discordGuild = await client.guilds.fetch(guildId);
+            } catch {
+                res.status(404).send({ error: 'Guild not found or bot not in guild' });
+                return;
+            }
+            const guild = await QuaverGuild.wrap(discordGuild);
+            if (!guild) {
+                res.status(404).send({ error: 'Guild wrapping failed' });
+                return;
+            }
+            const usesPremiumStore =
+                feature === 'premium' ||
+                (feature !== 'premium' &&
+                    settings.premiumURL &&
+                    settings.features[feature as WhitelistedFeatures].premium);
+            const featureStore = usesPremiumStore
+                ? 'premium'
+                : `${feature}.whitelisted`;
+
+            const parsedDuration = typeof durationMs === 'number' ? durationMs : -1;
+            await guild.features.set(
+                featureStore,
+                parsedDuration === -1 ? parsedDuration : Date.now() + parsedDuration,
+            );
+            res.send({
+                success: true,
+                guildName: guild.name,
+                feature,
+                expires: parsedDuration === -1 ? -1 : Date.now() + parsedDuration,
+            });
+        });
+    }
     if (settings.grafanaLogging) {
         app.get('/stats', async (req, res): Promise<void> => {
             const totalSessions = client.music?.players?.cache.size;

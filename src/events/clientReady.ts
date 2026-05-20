@@ -1,4 +1,4 @@
-import type { QuaverClient } from '#src/lib';
+import { PremiumSweepService, type QuaverClient } from '#src/lib';
 import { UpdateHandler } from '#src/lib';
 import { EventHandler } from '#src/lib/builders';
 import { logger } from '#src/lib/logger';
@@ -108,4 +108,6 @@ export default new EventHandler()
         }
         (client as QuaverClient).music.connect({ userId: client.user.id });
         await client.application.commands.fetch();
+        const sweepService = new PremiumSweepService();
+        sweepService.start();
     });

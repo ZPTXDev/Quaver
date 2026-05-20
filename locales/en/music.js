@@ -67,6 +67,8 @@ export default {
         FORCED: {
             DISCONNECTED: 'Session ended as Quaver was disconnected.',
             STAGE_NOT_MODERATOR: 'Session ended as Quaver was moved to a stage channel that Quaver isn\'t a stage moderator of.',
+            PREMIUM_EXPIRED: 'Session ended as this server\'s Premium status has expired.',
+            PREMIUM_EXPIRED_FEATURES: 'Deactivated premium features as this server\'s Premium status has expired.',
         },
     },
 };

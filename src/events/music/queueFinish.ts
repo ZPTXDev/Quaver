@@ -30,7 +30,7 @@ export default {
             );
             return;
         }
-        if (await guild.settings.get<boolean>('stay.enabled')) {
+        if (await guild.settings.get<boolean>('stay.enabled') && await guild.features.isFeatureActive('stay')) {
             await queue.player.sendMessage(guild.locale('MUSIC.QUEUE.EMPTY'));
             return;
         }
