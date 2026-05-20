@@ -388,7 +388,7 @@ export default new EventHandler()
         const isGuildStayEnabled =
             await guild.settings.get<boolean>('stay.enabled');
         const hasQuaverDisconnected = isOldQuaverStateUpdate && !newChannelId;
-        
+
         if (hasQuaverDisconnected) {
             await handleQuaverDisconnection(
                 guild,
@@ -421,4 +421,3 @@ export default new EventHandler()
             isOldQuaverStateUpdate,
         );
     });
-
