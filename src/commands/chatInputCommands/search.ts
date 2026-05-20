@@ -148,7 +148,14 @@ async function handleImmediateAdd(
 ): Promise<void> {
     const tracks =
         result.loadType === 'track'
-            ? [result.data]
+            ? [
+                  ((): QuaverSong => {
+                      const track = result.data as QuaverSong;
+                      track.requesterId = interaction.user.id;
+                      track.id = crypto.randomUUID();
+                      return track;
+                  })(),
+              ]
             : result.data.tracks.map(
                   (t: QuaverSong): QuaverSong => {
                       t.requesterId = interaction.user.id;
@@ -263,9 +270,16 @@ async function renderSearchResults(
                                             99,
                                         )}…`;
                                     }
+                                    let description = track.info.author;
+                                    if (description.length >= 100) {
+                                        description = `${description.substring(
+                                            0,
+                                            99,
+                                        )}…`;
+                                    }
                                     return {
                                         label: label,
-                                        description: track.info.author,
+                                        description: description,
                                         value: track.id,
                                     };
                                 },

@@ -40,7 +40,7 @@ export default new ButtonHandler().setExecute(
             );
         }
         const page = parseInt(target);
-        if (!player || pages.length === 0 || page < 1 || page > pages.length) {
+        if (!player || pages.length === 0 || isNaN(page) || page < 1 || page > pages.length) {
             await interaction.replyHandler.reply(
                 guild.locale('CMD.SESSIONLOGS.RESPONSE.NO_LOGS'),
                 {

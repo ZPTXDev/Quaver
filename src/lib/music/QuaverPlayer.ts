@@ -320,7 +320,6 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      */
     async setStay(enabled: boolean, author?: { id: string; tag: string } | string | null): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
-        this.logSessionEvent('STAY', author, enabled ? 'ENABLED' : 'DISABLED');
         if (!settings.features.stay.enabled) {
             return PlayerResponse.FeatureDisabled;
         }
@@ -336,6 +335,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         if (!this.queue.channel?.id) {
             return PlayerResponse.QueueChannelMissing;
         }
+        this.logSessionEvent('STAY', author, enabled ? 'ENABLED' : 'DISABLED');
         await guild.settings.set('stay.enabled', enabled);
         if (enabled) {
             await guild.settings.set('stay.channel', this.voice.channelId);
