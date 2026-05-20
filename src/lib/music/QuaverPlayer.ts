@@ -9,6 +9,7 @@ import { logger } from '#src/lib/logger';
 import { updateHandler } from '#src/lib/state';
 import { buildMessageOptions, type QuaverChannels, type QuaverQueue, type QuaverSong, settings, } from '#src/lib/util';
 import type { PlayerEffect } from '@lavaclient/plugin-effects';
+import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import { type LoopType, Queue } from '@lavaclient/plugin-queue';
 import {
     ChannelType,

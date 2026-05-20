@@ -4,12 +4,10 @@ import { QuaverGuild } from '#src/lib/guild';
 import { getLocaleString, type LocaleKey } from '#src/lib/locales';
 import { updateHandler } from '#src/lib/state';
 import {
-    acceptableSources,
     Check,
     getTrackMarkdownLocaleString,
     type QuaverChannels,
     type QuaverSong,
-    queryOverrides,
     searchTracks,
     settings,
 } from '#src/lib/util';

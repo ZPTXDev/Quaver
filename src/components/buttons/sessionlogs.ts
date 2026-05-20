@@ -1,7 +1,8 @@
 import { ForceType, MessageOptionsBuilderType } from '#src/lib';
 import { ButtonHandler } from '#src/lib/builders';
+import { formatSessionLog } from '#src/lib/util';
+import type { LocaleKey } from '#src/lib/locales';
 import { QuaverGuild } from '#src/lib/guild';
-import { Check, formatSessionLog } from '#src/lib/util';
 import { paginate } from '@zptxdev/zptx-lib';
 import {
     ActionRowBuilder,
@@ -64,7 +65,7 @@ export default new ButtonHandler().setExecute(
                 .addTextDisplayComponents(
                     new TextDisplayBuilder().setContent(
                         pages[page - 1]
-                            .map((log): string => formatSessionLog(log, (key, ...args) => guild.locale(key, ...args)))
+                            .map((log): string => formatSessionLog(log, (key: LocaleKey, ...args: string[]): string => guild.locale(key, ...args)))
                             .join('\n'),
                     ),
                     guild.builders.textDisplayLocale(

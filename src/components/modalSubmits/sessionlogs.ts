@@ -2,6 +2,7 @@ import { ForceType, MessageOptionsBuilderType } from '#src/lib';
 import { ModalSubmitHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import { formatSessionLog } from '#src/lib/util';
+import type { LocaleKey } from '#src/lib/locales';
 import { paginate } from '@zptxdev/zptx-lib';
 import {
     ActionRowBuilder,
@@ -51,7 +52,7 @@ export default new ModalSubmitHandler().setExecute(
                 .addTextDisplayComponents(
                     new TextDisplayBuilder().setContent(
                         pages[page - 1]
-                            .map((log): string => formatSessionLog(log, (key, ...args) => guild.locale(key, ...args)))
+                            .map((log): string => formatSessionLog(log, (key: LocaleKey, ...args: string[]): string => guild.locale(key, ...args)))
                             .join('\n'),
                     ),
                     guild.builders.textDisplayLocale(

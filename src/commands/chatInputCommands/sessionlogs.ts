@@ -1,7 +1,7 @@
 import { MessageOptionsBuilderType } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
-import { getLocaleString } from '#src/lib/locales';
+import { getLocaleString, type LocaleKey } from '#src/lib/locales';
 import { Check, formatSessionLog, settings } from '#src/lib/util';
 import { paginate } from '@zptxdev/zptx-lib';
 import {
@@ -47,7 +47,7 @@ export default new ChatInputCommandHandler()
                 .addTextDisplayComponents(
                     new TextDisplayBuilder().setContent(
                         pages[0]
-                            .map((log): string => formatSessionLog(log, (key, ...args) => guild.locale(key, ...args)))
+                            .map((log): string => formatSessionLog(log, (key: LocaleKey, ...args: string[]): string => guild.locale(key, ...args)))
                             .join('\n'),
                     ),
                     guild.builders.textDisplayLocale(

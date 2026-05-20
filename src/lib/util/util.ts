@@ -5,6 +5,9 @@ import {
     type QuaverClient,
     type TopLevelComponentBuilders,
 } from '#src/lib';
+import type { LavalinkAPI } from 'lavalink-api-client';
+import type { QuaverGuild, Initialized, Uninitialized } from '#src/lib/guild';
+import type { LocaleKey } from '#src/lib/locales';
 import { data } from '#src/lib/data';
 import type { ComponentInteractions } from '#src/lib/interactions';
 import type { QuaverPlayer } from '#src/lib/music';
@@ -316,9 +319,9 @@ export function getTrackMarkdownLocaleString(track: Song): string {
  */
 export async function searchTracks(
     client: QuaverClient,
-    guild: any,
+    guild: QuaverGuild<Initialized | Uninitialized>,
     query: string,
-): Promise<any> {
+): Promise<Awaited<ReturnType<LavalinkAPI['loadTracks']>>> {
     if (queryOverrides.some((q): boolean => query.startsWith(q))) {
         return await client.music.api.loadTracks(query);
     }
@@ -333,7 +336,7 @@ export async function searchTracks(
         ...sources.filter((s): boolean => s !== startingSource),
     ].filter((s): boolean => !!acceptableSources[s]);
 
-    let result: any = null;
+    let result: Awaited<ReturnType<LavalinkAPI['loadTracks']>> | null = null;
     for (const source of orderedSources) {
         const searchQuery = `${acceptableSources[source]}${query}`;
         try {
@@ -351,7 +354,7 @@ export async function searchTracks(
                     return result;
                 }
             }
-        } catch (error) {
+        } catch {
             // Ignore error and try the next source
         }
     }
@@ -372,7 +375,7 @@ export function formatSessionLog(
         userTag: string | null;
         details: string | null;
     },
-    locale: (key: any, ...args: string[]) => string,
+    locale: (key: LocaleKey, ...args: string[]) => string,
 ): string {
     const timeStr = `<t:${Math.floor(log.timestamp / 1000)}:T>`;
     let authorDisplay = 'System';
@@ -390,7 +393,7 @@ export function formatSessionLog(
         detailVal = locale('CMD.SESSIONLOGS.MISC.DISABLED');
     } else if (log.action === 'LOOP' && detailVal) {
         try {
-            detailVal = locale(`CMD.LOOP.OPTION.TYPE.OPTION.${detailVal.toUpperCase()}` as any);
+            detailVal = locale(`CMD.LOOP.OPTION.TYPE.OPTION.${detailVal.toUpperCase()}` as LocaleKey);
         } catch {
             // fallback
         }
@@ -398,7 +401,7 @@ export function formatSessionLog(
 
     let actionText = '';
     try {
-        actionText = locale(localeKey as any, authorDisplay, detailVal ?? '');
+        actionText = locale(localeKey as LocaleKey, authorDisplay, detailVal ?? '');
     } catch {
         actionText = `${authorDisplay} executed ${log.action} ${log.details ?? ''}`;
     }
