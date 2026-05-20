@@ -28,6 +28,7 @@ export default {
     once: false,
     async execute(queue: QuaverQueue, track: QuaverSong): Promise<void> {
         const guild = await QuaverGuild.wrap(queue.player.guild);
+        queue.player.logSessionEvent('PLAY', null, `[${track.info.title}](${track.info.uri})`);
         delete queue.player.memory.skip;
         logger.info(`[G ${guild.id}] Starting track`);
         if (queue.player.memory.alternate) {

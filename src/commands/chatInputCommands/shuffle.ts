@@ -40,6 +40,7 @@ export default new ChatInputCommandHandler()
         const player = await guild.getPlayer();
         const response = await player.setShuffle(
             enabled !== null ? enabled : !player.memory.shuffle,
+            interaction.user,
         );
         if (response !== PlayerResponse.Success) return;
         await interaction.replyHandler.reply(

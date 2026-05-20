@@ -80,7 +80,7 @@ export default new ChatInputCommandHandler()
                 break;
         }
         typeLocale = typeLocale.toLowerCase();
-        const response = await player.setLoopMode(loop);
+        const response = await player.setLoopMode(loop, interaction.user);
         if (response !== PlayerResponse.Success) return;
         await interaction.replyHandler.reply(
             guild.locale('CMD.LOOP.RESPONSE.SUCCESS', typeLocale),

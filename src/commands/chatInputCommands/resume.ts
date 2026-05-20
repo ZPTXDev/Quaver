@@ -26,7 +26,7 @@ export default new ChatInputCommandHandler()
     .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
-        const response = await player.setPause(false);
+        const response = await player.setPause(false, interaction.user);
         switch (response) {
             case PlayerResponse.RestartInProgress:
                 await interaction.replyHandler.reply(

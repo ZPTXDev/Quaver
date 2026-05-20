@@ -17,7 +17,7 @@ export default new ButtonHandler()
         const player = await guild.getPlayer();
         clearTimeout(confirmationTimeout[interaction.message.id]);
         delete confirmationTimeout[interaction.message.id];
-        const response = await player.clearQueue();
+        const response = await player.clearQueue(interaction.user);
         switch (response) {
             case PlayerResponse.QueueInsufficientTracks:
                 await interaction.replyHandler.reply(

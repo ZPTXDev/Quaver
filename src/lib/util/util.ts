@@ -357,3 +357,52 @@ export async function searchTracks(
     }
     return result;
 }
+
+/**
+ * Formats a session log event into a markdown string.
+ * @param log - The session log item.
+ * @param locale - The locale function of the guild.
+ * @returns The formatted string.
+ */
+export function formatSessionLog(
+    log: {
+        timestamp: number;
+        action: string;
+        userId: string | null;
+        userTag: string | null;
+        details: string | null;
+    },
+    locale: (key: any, ...args: string[]) => string,
+): string {
+    const timeStr = `<t:${Math.floor(log.timestamp / 1000)}:T>`;
+    let authorDisplay = 'System';
+    if (log.userId) {
+        authorDisplay = `<@${log.userId}>`;
+    } else if (log.userTag) {
+        authorDisplay = `**${log.userTag}**`;
+    }
+
+    const localeKey = `CMD.SESSIONLOGS.MISC.EVENT.${log.action}`;
+    let detailVal = log.details;
+    if (detailVal === 'true') {
+        detailVal = locale('CMD.SESSIONLOGS.MISC.ENABLED');
+    } else if (detailVal === 'false') {
+        detailVal = locale('CMD.SESSIONLOGS.MISC.DISABLED');
+    } else if (log.action === 'LOOP' && detailVal) {
+        try {
+            detailVal = locale(`CMD.LOOP.OPTION.TYPE.OPTION.${detailVal.toUpperCase()}` as any);
+        } catch {
+            // fallback
+        }
+    }
+
+    let actionText = '';
+    try {
+        actionText = locale(localeKey as any, authorDisplay, detailVal ?? '');
+    } catch {
+        actionText = `${authorDisplay} executed ${log.action} ${log.details ?? ''}`;
+    }
+
+    return `**${timeStr}** ${actionText}`;
+}
+

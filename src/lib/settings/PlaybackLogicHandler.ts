@@ -115,7 +115,7 @@ export class PlaybackLogicHandler {
                 await guild.settings.set('smartqueue', !smartQueue);
                 const player = await guild.getPlayer();
                 if (player && player.memory.alternate === smartQueue) {
-                    await player.setAlternate(!smartQueue);
+                    await player.setAlternate(!smartQueue, interaction.user);
                 } else {
                     guild.sendWebUpdate('smartQueueFeatureUpdate', {
                         enabled: !smartQueue,

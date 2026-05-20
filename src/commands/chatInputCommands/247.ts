@@ -53,7 +53,7 @@ export default new ChatInputCommandHandler()
             enabled !== null
                 ? enabled
                 : !(await guild.settings.get('stay.enabled'));
-        const response = await player.setStay(isGuildStayEnabled);
+        const response = await player.setStay(isGuildStayEnabled, interaction.user);
         switch (response) {
             case PlayerResponse.FeatureDisabled:
                 await interaction.replyHandler.reply(

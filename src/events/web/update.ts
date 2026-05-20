@@ -46,6 +46,10 @@ export default {
         ) {
             return callback({ status: Response.ChannelMismatchError });
         }
+        const author = {
+            id: socket.user.id,
+            tag: socket.user.username,
+        };
         switch (item.type) {
             case UpdateItemType.Add: {
                 const member = await guild.members.fetch(socket.user.id);
@@ -111,7 +115,7 @@ export default {
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
-                await player.setLoopMode(item.value);
+                await player.setLoopMode(item.value, author);
                 break;
             }
             case UpdateItemType.Volume: {
@@ -119,7 +123,7 @@ export default {
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
-                const response = await player.setVolumeTo(item.value);
+                const response = await player.setVolumeTo(item.value, author);
                 if (response !== PlayerResponse.Success) {
                     return callback({ status: Response.GenericError });
                 }
@@ -130,7 +134,7 @@ export default {
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
-                const response = await player.setPause(item.value);
+                const response = await player.setPause(item.value, author);
                 if (response !== PlayerResponse.Success) {
                     return callback({ status: Response.GenericError });
                 }
@@ -147,7 +151,7 @@ export default {
                     player.queue.channel,
                 );
                 if (requesterStatus !== RequesterStatus.NotRequester) {
-                    const response = await player.skipCurrentTrack();
+                    const response = await player.skipCurrentTrack(author);
                     if (response !== PlayerResponse.Success) {
                         return callback({ status: Response.GenericError });
                     }
@@ -168,7 +172,7 @@ export default {
                 }
                 skip.users.push(socket.user.id);
                 if (skip.users.length >= skip.required) {
-                    const response = await player.skipCurrentTrack();
+                    const response = await player.skipCurrentTrack(author);
                     if (response !== PlayerResponse.Success) {
                         return callback({ status: Response.GenericError });
                     }
@@ -182,7 +186,7 @@ export default {
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
-                await player.setBassboost(item.value);
+                await player.setBassboost(item.value, author);
                 break;
             }
             case UpdateItemType.Nightcore: {
@@ -190,7 +194,7 @@ export default {
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
-                await player.setNightcore(item.value);
+                await player.setNightcore(item.value, author);
                 break;
             }
             case UpdateItemType.Seek: {
@@ -208,7 +212,7 @@ export default {
                 if (requesterStatus === RequesterStatus.NotRequester) {
                     return callback({ status: Response.AuthenticationError });
                 }
-                const response = await player.seekTo(item.value);
+                const response = await player.seekTo(item.value, author);
                 if (response !== PlayerResponse.Success) {
                     return callback({ status: Response.GenericError });
                 }
@@ -231,7 +235,7 @@ export default {
                 if (requesterStatus === RequesterStatus.NotRequester) {
                     return callback({ status: Response.AuthenticationError });
                 }
-                const response = await player.removeQueuedTrack(item.value + 1);
+                const response = await player.removeQueuedTrack(item.value + 1, author);
                 if (response !== PlayerResponse.Success) {
                     return callback({ status: Response.GenericError });
                 }
@@ -242,7 +246,7 @@ export default {
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
-                await player.setShuffle(item.value);
+                await player.setShuffle(item.value, author);
                 break;
             }
             case UpdateItemType.StayFeature: {
@@ -262,7 +266,7 @@ export default {
                 if (failedChecks.length > 0) {
                     return callback({ status: Response.UserNotInChannelError });
                 }
-                const response = await player.setStay(item.value);
+                const response = await player.setStay(item.value, author);
                 switch (response) {
                     case PlayerResponse.FeatureDisabled:
                         return callback({
