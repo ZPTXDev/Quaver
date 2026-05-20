@@ -3,7 +3,7 @@ import { load as queueLoad } from '@lavaclient/plugin-queue';
 import { getAbsoluteFileURL, msToTime, msToTimeString, parseTimeString, } from '@zptxdev/zptx-lib';
 import { createCache } from 'cache-manager';
 import { KeyvCacheableMemory } from 'cacheable';
-import { Collection, GatewayIntentBits } from 'discord.js';
+import { Collection, GatewayIntentBits, PermissionsBitField } from 'discord.js';
 import { default as express, type Express } from 'express';
 import Keyv from 'keyv';
 import type { ClientEvents, NodeEvents } from 'lavaclient';
@@ -19,7 +19,7 @@ import yoctoSpinner from 'yocto-spinner';
 import colors from 'yoctocolors';
 import { QuaverClient } from './lib';
 import { data, DataHandler } from './lib/data';
-import { QuaverGuild, type WhitelistedFeatures } from './lib/guild';
+import { QuaverGuild, type WhitelistedFeatures, WhitelistStatus, type Initialized } from './lib/guild';
 import type { InteractionHandlerMapsFlat } from './lib/interactions';
 import { setLocales } from './lib/locales';
 import { logger } from './lib/logger';
@@ -87,6 +87,46 @@ if (settings.features.web.enabled) {
     app = express();
     app.use(express.json());
     if (settings.features.web.apiSecret) {
+        const getGuildPremiumStatus = async (
+            guild: QuaverGuild<Initialized>,
+        ): Promise<Record<string, { status: string; expires: number | null }>> => {
+            const featuresList = ['premium', 'stay', 'autolyrics', 'smartqueue'] as const;
+            const featuresStatus: Record<string, { status: string; expires: number | null }> = {};
+
+            for (const feature of featuresList) {
+                const status = await guild.features.checkWhitelisted(feature);
+                let usesPremiumStore = false;
+                if (feature === 'premium') {
+                    usesPremiumStore = true;
+                } else {
+                    usesPremiumStore = !!(
+                        settings.premiumURL &&
+                        settings.features[feature].premium
+                    );
+                }
+                const featureStore = usesPremiumStore
+                    ? 'premium'
+                    : `${feature}.whitelisted`;
+                
+                const expires = await guild.features.get<number>(featureStore);
+
+                let statusString = 'NotWhitelisted';
+                if (status === WhitelistStatus.Permanent) {
+                    statusString = 'Permanent';
+                } else if (status === WhitelistStatus.Temporary) {
+                    statusString = 'Temporary';
+                } else if (status === WhitelistStatus.Expired) {
+                    statusString = 'Expired';
+                }
+
+                featuresStatus[feature] = {
+                    status: statusString,
+                    expires: expires !== undefined ? expires : null,
+                };
+            }
+            return featuresStatus;
+        };
+
         app.post('/api/premium/whitelist', async (req, res): Promise<void> => {
             if (!startup.started) {
                 res.status(503).send({ error: 'Service is starting up, please try again later' });
@@ -146,6 +186,201 @@ if (settings.features.web.enabled) {
                 guildName: guild.name,
                 feature,
                 expires: durationMs === -1 ? -1 : Date.now() + durationMs,
+            });
+        });
+
+        app.get('/api/premium/status/:guildId', async (req, res): Promise<void> => {
+            if (!startup.started) {
+                res.status(503).send({ error: 'Service is starting up, please try again later' });
+                return;
+            }
+            const authHeader = req.headers.authorization;
+            if (!authHeader || authHeader !== `Bearer ${settings.features.web.apiSecret}`) {
+                res.status(401).send({ error: 'Unauthorized' });
+                return;
+            }
+            const { guildId } = req.params;
+            if (!guildId) {
+                res.status(400).send({ error: 'Missing guildId parameter' });
+                return;
+            }
+            let discordGuild;
+            try {
+                discordGuild = await client.guilds.fetch(guildId);
+            } catch {
+                res.status(404).send({ error: 'Guild not found or bot not in guild' });
+                return;
+            }
+            const guild = await QuaverGuild.wrap(discordGuild);
+            if (!guild) {
+                res.status(404).send({ error: 'Guild wrapping failed' });
+                return;
+            }
+            const features = await getGuildPremiumStatus(guild);
+            res.send({
+                guildId: guild.id,
+                name: guild.name,
+                icon: discordGuild.iconURL(),
+                features,
+            });
+        });
+
+        app.get('/api/premium/users/:userId/guilds', async (req, res): Promise<void> => {
+            if (!startup.started) {
+                res.status(503).send({ error: 'Service is starting up, please try again later' });
+                return;
+            }
+            const authHeader = req.headers.authorization;
+            if (!authHeader || authHeader !== `Bearer ${settings.features.web.apiSecret}`) {
+                res.status(401).send({ error: 'Unauthorized' });
+                return;
+            }
+            const { userId } = req.params;
+            if (!userId) {
+                res.status(400).send({ error: 'Missing userId parameter' });
+                return;
+            }
+
+            const ownedGuilds = client.guilds.cache.filter((g): boolean => g.ownerId === userId);
+            const guildsData = [];
+            for (const discordGuild of ownedGuilds.values()) {
+                const guild = await QuaverGuild.wrap(discordGuild);
+                if (!guild) continue;
+                const features = await getGuildPremiumStatus(guild);
+                guildsData.push({
+                    guildId: guild.id,
+                    name: guild.name,
+                    icon: discordGuild.iconURL(),
+                    owner: true,
+                    features,
+                });
+            }
+            res.send(guildsData);
+        });
+
+        app.post('/api/premium/users/:userId/guilds', async (req, res): Promise<void> => {
+            if (!startup.started) {
+                res.status(503).send({ error: 'Service is starting up, please try again later' });
+                return;
+            }
+            const authHeader = req.headers.authorization;
+            if (!authHeader || authHeader !== `Bearer ${settings.features.web.apiSecret}`) {
+                res.status(401).send({ error: 'Unauthorized' });
+                return;
+            }
+            const { userId } = req.params;
+            if (!userId) {
+                res.status(400).send({ error: 'Missing userId parameter' });
+                return;
+            }
+            if (!req.body || !Array.isArray(req.body.guildIds)) {
+                res.status(400).send({ error: 'Invalid or missing guildIds list in request body' });
+                return;
+            }
+            const guildIds: string[] = req.body.guildIds;
+            const guildsData = [];
+            
+            const limitedGuildIds = guildIds.slice(0, 100);
+
+            for (const guildId of limitedGuildIds) {
+                const discordGuild = client.guilds.cache.get(guildId);
+                if (!discordGuild) {
+                    guildsData.push({
+                        guildId,
+                        botInGuild: false,
+                    });
+                    continue;
+                }
+
+                const isOwner = discordGuild.ownerId === userId;
+                let isAdmin = isOwner;
+
+                if (!isOwner) {
+                    try {
+                        const member = await discordGuild.members.fetch(userId);
+                        if (member) {
+                            isAdmin = member.permissions.has(PermissionsBitField.Flags.Administrator) ||
+                                      member.permissions.has(PermissionsBitField.Flags.ManageGuild);
+                        }
+                    } catch {
+                        // Member not found or couldn't fetch
+                    }
+                }
+
+                const guild = await QuaverGuild.wrap(discordGuild);
+                if (!guild) {
+                    guildsData.push({
+                        guildId,
+                        botInGuild: false,
+                    });
+                    continue;
+                }
+
+                const features = await getGuildPremiumStatus(guild);
+                guildsData.push({
+                    guildId,
+                    name: guild.name,
+                    icon: discordGuild.iconURL(),
+                    botInGuild: true,
+                    owner: isOwner,
+                    isAdmin,
+                    features,
+                });
+            }
+            res.send(guildsData);
+        });
+
+        app.delete('/api/premium/whitelist', async (req, res): Promise<void> => {
+            if (!startup.started) {
+                res.status(503).send({ error: 'Service is starting up, please try again later' });
+                return;
+            }
+            const authHeader = req.headers.authorization;
+            if (!authHeader || authHeader !== `Bearer ${settings.features.web.apiSecret}`) {
+                res.status(401).send({ error: 'Unauthorized' });
+                return;
+            }
+            if (!req.body || typeof req.body !== 'object') {
+                res.status(400).send({ error: 'Invalid or missing request body' });
+                return;
+            }
+            const { guildId, feature } = req.body;
+            if (typeof guildId !== 'string' || typeof feature !== 'string') {
+                res.status(400).send({
+                    error: 'guildId and feature must be strings',
+                });
+                return;
+            }
+            if (!['premium', 'stay', 'autolyrics', 'smartqueue'].includes(feature)) {
+                res.status(400).send({ error: 'Invalid feature name' });
+                return;
+            }
+            let discordGuild;
+            try {
+                discordGuild = await client.guilds.fetch(guildId);
+            } catch {
+                res.status(404).send({ error: 'Guild not found or bot not in guild' });
+                return;
+            }
+            const guild = await QuaverGuild.wrap(discordGuild);
+            if (!guild) {
+                res.status(404).send({ error: 'Guild wrapping failed' });
+                return;
+            }
+            const usesPremiumStore =
+                feature === 'premium' ||
+                (feature !== 'premium' &&
+                    settings.premiumURL &&
+                    settings.features[feature as WhitelistedFeatures].premium);
+            const featureStore = usesPremiumStore
+                ? 'premium'
+                : `${feature}.whitelisted`;
+
+            await guild.features.unset(featureStore);
+            res.send({
+                success: true,
+                guildName: guild.name,
+                feature,
             });
         });
     }
