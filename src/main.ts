@@ -88,14 +88,28 @@ if (settings.features.web.enabled) {
     app.use(express.json());
     if (settings.features.web.apiSecret) {
         app.post('/api/premium/whitelist', async (req, res): Promise<void> => {
+            if (!startup.started) {
+                res.status(503).send({ error: 'Service is starting up, please try again later' });
+                return;
+            }
             const authHeader = req.headers.authorization;
             if (!authHeader || authHeader !== `Bearer ${settings.features.web.apiSecret}`) {
                 res.status(401).send({ error: 'Unauthorized' });
                 return;
             }
+            if (!req.body || typeof req.body !== 'object') {
+                res.status(400).send({ error: 'Invalid or missing request body' });
+                return;
+            }
             const { guildId, feature, durationMs } = req.body;
-            if (!guildId || !feature) {
-                res.status(400).send({ error: 'Missing guildId or feature' });
+            if (typeof guildId !== 'string' || typeof feature !== 'string' || typeof durationMs !== 'number') {
+                res.status(400).send({
+                    error: 'guildId and feature must be strings, and durationMs must be a number',
+                });
+                return;
+            }
+            if (durationMs < -1) {
+                res.status(400).send({ error: 'durationMs must be -1 or greater' });
                 return;
             }
             if (!['premium', 'stay', 'autolyrics', 'smartqueue'].includes(feature)) {
@@ -123,16 +137,15 @@ if (settings.features.web.enabled) {
                 ? 'premium'
                 : `${feature}.whitelisted`;
 
-            const parsedDuration = typeof durationMs === 'number' ? durationMs : -1;
             await guild.features.set(
                 featureStore,
-                parsedDuration === -1 ? parsedDuration : Date.now() + parsedDuration,
+                durationMs === -1 ? durationMs : Date.now() + durationMs,
             );
             res.send({
                 success: true,
                 guildName: guild.name,
                 feature,
-                expires: parsedDuration === -1 ? -1 : Date.now() + parsedDuration,
+                expires: durationMs === -1 ? -1 : Date.now() + durationMs,
             });
         });
     }

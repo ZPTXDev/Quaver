@@ -711,7 +711,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         if (!settings.features.smartqueue.enabled) {
             return PlayerResponse.FeatureDisabled;
         }
-        if (settings.features.smartqueue.whitelist) {
+        if (enabled && settings.features.smartqueue.whitelist) {
             const whitelisted =
                 await guild.features.checkWhitelisted('smartqueue');
             if (

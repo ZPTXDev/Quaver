@@ -25,33 +25,37 @@ export class PremiumSweepService {
             const { client } = await import('#src/main');
             if (!client.music?.players?.cache) return;
             for (const player of client.music.players.cache.values()) {
-                const guild = await QuaverGuild.wrap(player.guild);
+                try {
+                    const guild = await QuaverGuild.wrap(player.guild);
 
-                // 1. Check stay (24/7) feature
-                const staySetting = await guild.settings.get<boolean>('stay.enabled');
-                const isStayActive = await guild.features.isFeatureActive('stay');
+                    // 1. Check stay (24/7) feature
+                    const staySetting = await guild.settings.get<boolean>('stay.enabled');
+                    const isStayActive = await guild.features.isFeatureActive('stay');
 
-                if (staySetting && !isStayActive) {
-                    logger.info(`[G ${guild.id}] Stay premium/whitelist expired. Disconnecting immediately.`);
-                    await player.sendMessage(
-                        guild.locale('MUSIC.SESSION_ENDED.FORCED.PREMIUM_EXPIRED'),
-                        { type: MessageOptionsBuilderType.Warning }
-                    );
-                    await player.disconnect();
-                    continue;
-                }
-
-                // 2. Check smart queue (alternating) feature
-                if (player.memory.alternate) {
-                    const isSmartQueueActive = await guild.features.isFeatureActive('smartqueue');
-                    if (!isSmartQueueActive) {
-                        logger.info(`[G ${guild.id}] Smart Queue premium/whitelist expired. Deactivating feature.`);
-                        await player.setAlternate(false);
+                    if (staySetting && !isStayActive) {
+                        logger.info(`[G ${guild.id}] Stay premium/whitelist expired. Disconnecting immediately.`);
                         await player.sendMessage(
-                            guild.locale('MUSIC.SESSION_ENDED.FORCED.PREMIUM_EXPIRED_FEATURES'),
+                            guild.locale('MUSIC.SESSION_ENDED.FORCED.PREMIUM_EXPIRED'),
                             { type: MessageOptionsBuilderType.Warning }
                         );
+                        await player.disconnect();
+                        continue;
                     }
+
+                    // 2. Check smart queue (alternating) feature
+                    if (player.memory.alternate) {
+                        const isSmartQueueActive = await guild.features.isFeatureActive('smartqueue');
+                        if (!isSmartQueueActive) {
+                            logger.info(`[G ${guild.id}] Smart Queue premium/whitelist expired. Deactivating feature.`);
+                            await player.setAlternate(false);
+                            await player.sendMessage(
+                                guild.locale('MUSIC.SESSION_ENDED.FORCED.PREMIUM_EXPIRED_FEATURES'),
+                                { type: MessageOptionsBuilderType.Warning }
+                            );
+                        }
+                    }
+                } catch (playerError) {
+                    logger.error(`Error processing premium sweep for player of guild ${player.guild.id}:`, playerError);
                 }
             }
         } catch (error) {
