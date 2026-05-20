@@ -326,6 +326,159 @@ updateSourceManagers(info.sourceManagers);
 updateAcceptableSources(acceptableSources);
 spinner.success();
 
+const consoleCommands: Record<
+    string,
+    (input: string, command: string) => void | Promise<void>
+> = {
+    exit: async (input): Promise<void> => {
+        const strategy = input.split(' ')[1] ?? 'immediate';
+        if (
+            strategy !== 'immediate' &&
+            strategy !== 'track' &&
+            strategy !== 'queue'
+        ) {
+            console.log('Usage: exit [immediate|track|queue]');
+            return;
+        }
+        await updateHandler.restart(strategy, 'exit');
+    },
+    update: async (): Promise<void> => {
+        if (updateHandler.channel === 'none') {
+            console.log('Automatic updates are disabled.');
+            return;
+        }
+        if (updateHandler.restartInProgress) {
+            console.log('An update or restart is already in progress.');
+            return;
+        }
+        if (!version.official) {
+            console.log(
+                'Automatic updates are disabled for unofficial builds.',
+            );
+            return;
+        }
+        console.log('Triggering an update check...');
+        await updateHandler.checkForUpdates();
+    },
+    sessions: (): void => {
+        console.log(
+            `There are currently ${client.music.players.cache.size} active session(s).`,
+        );
+    },
+    stats: (): void => {
+        const uptime = msToTime(client.uptime);
+        const uptimeString = msToTimeString(uptime);
+        console.log(
+            `Statistics:\nGuilds: ${client.guilds.cache.size}\nUptime: ${uptimeString}`,
+        );
+    },
+    whitelist: async (input): Promise<void> => {
+        const guildId = input.split(' ')[1];
+        const feature = input.split(' ')[2];
+        const duration = input.split(' ')[3];
+        let durationMs = -1;
+        if (!guildId || !feature) {
+            console.log('Usage: whitelist <guildId> <feature> [duration]');
+            return;
+        }
+        const discordGuild = await client.guilds.fetch(guildId);
+        const guild = await QuaverGuild.wrap(discordGuild);
+        if (!guild) {
+            console.log('Guild not found.');
+            return;
+        }
+        if (
+            !['premium', 'stay', 'autolyrics', 'smartqueue'].includes(
+                feature,
+            )
+        ) {
+            console.log(
+                'Available features: premium, stay, autolyrics, smartqueue',
+            );
+            return;
+        }
+        let featureName = '';
+        switch (feature) {
+            case 'premium':
+                featureName = 'Premium';
+                break;
+            case 'stay':
+                featureName = '24/7';
+                break;
+            case 'autolyrics':
+                featureName = 'Auto Lyrics';
+                break;
+            case 'smartqueue':
+                featureName = 'Smart Queue';
+        }
+        if (
+            (feature === 'premium' && !settings.premiumURL) ||
+            (feature !== 'premium' &&
+                !settings.features[feature as WhitelistedFeatures]
+                    .whitelist)
+        ) {
+            console.log(`The ${featureName} whitelist is not enabled.`);
+            return;
+        }
+        if (duration) {
+            if (!parseTimeString(duration)) {
+                console.log('Duration example: 5d1h, 1h30m, 10s');
+                return;
+            }
+            durationMs = parseTimeString(duration);
+        }
+        const whitelisted = await guild.features.checkWhitelisted(
+            feature as WhitelistedFeatures | 'premium',
+        );
+        const usesPremiumStore =
+            feature === 'premium' ||
+            (feature !== 'premium' &&
+                settings.premiumURL &&
+                settings.features[feature as WhitelistedFeatures].premium);
+        const featureStore = usesPremiumStore
+            ? 'premium'
+            : `${feature}.whitelisted`;
+        if (whitelisted && !duration) {
+            await guild.features.unset(featureStore);
+            console.log(
+                `Removed ${guild.name} from the ${featureName} whitelist.`,
+            );
+            return;
+        }
+        await guild.features.set(
+            featureStore,
+            durationMs === -1 ? durationMs : Date.now() + durationMs,
+        );
+        console.log(
+            `Added ${guild.name} to the ${featureName} whitelist ${durationMs === -1
+                ? 'permanently'
+                : `for ${msToTimeString(msToTime(durationMs))}`
+            }.`,
+        );
+    },
+    eval: async (input, command): Promise<void> => {
+        if (!settings.developerMode) {
+            console.log('Developer mode is not enabled.');
+            return;
+        }
+        if (!input.substring(command.length + 1)) {
+            console.log('No input provided.');
+            return;
+        }
+        let output: string;
+        try {
+            output = await eval(input.substring(command.length + 1));
+            if (typeof output !== 'string') {
+                output = inspect(output, { depth: 1 });
+            }
+        } catch (error) {
+            output = error;
+        }
+        if (!output) output = '[no output]';
+        console.log(output);
+    },
+};
+
 const rl = createInterface({ input: process.stdin, output: process.stdout });
 rl.on('line', async (input): Promise<void> => {
     const command = input.split(' ')[0].toLowerCase();
@@ -333,163 +486,13 @@ rl.on('line', async (input): Promise<void> => {
         console.log('Quaver is not initialized yet.');
         return;
     }
-    switch (command) {
-        case 'exit': {
-            const strategy = input.split(' ')[1] ?? 'immediate';
-            if (
-                strategy !== 'immediate' &&
-                strategy !== 'track' &&
-                strategy !== 'queue'
-            ) {
-                console.log('Usage: exit [immediate|track|queue]');
-                break;
-            }
-            await updateHandler.restart(strategy, 'exit');
-            break;
-        }
-        case 'update':
-            if (updateHandler.channel === 'none') {
-                console.log('Automatic updates are disabled.');
-                break;
-            }
-            if (updateHandler.restartInProgress) {
-                console.log('An update or restart is already in progress.');
-                break;
-            }
-            if (!version.official) {
-                console.log(
-                    'Automatic updates are disabled for unofficial builds.',
-                );
-                break;
-            }
-            console.log('Triggering an update check...');
-            await updateHandler.checkForUpdates();
-            break;
-        case 'sessions':
-            console.log(
-                `There are currently ${client.music.players.cache.size} active session(s).`,
-            );
-            break;
-        case 'stats': {
-            const uptime = msToTime(client.uptime);
-            const uptimeString = msToTimeString(uptime);
-            console.log(
-                `Statistics:\nGuilds: ${client.guilds.cache.size}\nUptime: ${uptimeString}`,
-            );
-            break;
-        }
-        case 'whitelist': {
-            const guildId = input.split(' ')[1];
-            const feature = input.split(' ')[2];
-            const duration = input.split(' ')[3];
-            let durationMs = -1;
-            if (!guildId || !feature) {
-                console.log('Usage: whitelist <guildId> <feature> [duration]');
-                break;
-            }
-            const discordGuild = await client.guilds.fetch(guildId);
-            const guild = await QuaverGuild.wrap(discordGuild);
-            if (!guild) {
-                console.log('Guild not found.');
-                break;
-            }
-            if (
-                !['premium', 'stay', 'autolyrics', 'smartqueue'].includes(
-                    feature,
-                )
-            ) {
-                console.log(
-                    'Available features: premium, stay, autolyrics, smartqueue',
-                );
-                break;
-            }
-            let featureName = '';
-            switch (feature) {
-                case 'premium':
-                    featureName = 'Premium';
-                    break;
-                case 'stay':
-                    featureName = '24/7';
-                    break;
-                case 'autolyrics':
-                    featureName = 'Auto Lyrics';
-                    break;
-                case 'smartqueue':
-                    featureName = 'Smart Queue';
-            }
-            if (
-                (feature === 'premium' && !settings.premiumURL) ||
-                (feature !== 'premium' &&
-                    !settings.features[feature as WhitelistedFeatures]
-                        .whitelist)
-            ) {
-                console.log(`The ${featureName} whitelist is not enabled.`);
-                break;
-            }
-            if (duration) {
-                if (!parseTimeString(duration)) {
-                    console.log('Duration example: 5d1h, 1h30m, 10s');
-                    break;
-                }
-                durationMs = parseTimeString(duration);
-            }
-            const whitelisted = await guild.features.checkWhitelisted(
-                feature as WhitelistedFeatures | 'premium',
-            );
-            const usesPremiumStore =
-                feature === 'premium' ||
-                (feature !== 'premium' &&
-                    settings.premiumURL &&
-                    settings.features[feature as WhitelistedFeatures].premium);
-            const featureStore = usesPremiumStore
-                ? 'premium'
-                : `${feature}.whitelisted`;
-            if (whitelisted && !duration) {
-                await guild.features.unset(featureStore);
-                console.log(
-                    `Removed ${guild.name} from the ${featureName} whitelist.`,
-                );
-                break;
-            }
-            await guild.features.set(
-                featureStore,
-                durationMs === -1 ? durationMs : Date.now() + durationMs,
-            );
-            console.log(
-                `Added ${guild.name} to the ${featureName} whitelist ${durationMs === -1
-                    ? 'permanently'
-                    : `for ${msToTimeString(msToTime(durationMs))}`
-                }.`,
-            );
-            break;
-        }
-        case 'eval': {
-            if (!settings.developerMode) {
-                console.log('Developer mode is not enabled.');
-                break;
-            }
-            if (!input.substring(command.length + 1)) {
-                console.log('No input provided.');
-                break;
-            }
-            let output: string;
-            try {
-                output = await eval(input.substring(command.length + 1));
-                if (typeof output !== 'string') {
-                    output = inspect(output, { depth: 1 });
-                }
-            } catch (error) {
-                output = error;
-            }
-            if (!output) output = '[no output]';
-            console.log(output);
-            break;
-        }
-        default:
-            console.log(
-                'Available commands: exit, update, sessions, whitelist, stats',
-            );
-            break;
+    const handler = consoleCommands[command];
+    if (handler) {
+        await handler(input, command);
+    } else {
+        console.log(
+            'Available commands: exit, update, sessions, whitelist, stats',
+        );
     }
 });
 // 'close' event catches ctrl+c, therefore we pass it to shuttingDown as a ctrl+c event
