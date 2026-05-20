@@ -27,7 +27,9 @@ const genericPremiumFeatureSchema = z.object({
     premium: z.boolean().default(false),
 });
 
-const emojiSchema = (fallback: string) =>
+const emojiSchema = (
+    fallback: string,
+): z.ZodDefault<z.ZodPipe<z.ZodString, z.ZodTransform<string, string>>> =>
     z.string().transform((val): string => val || fallback).default(fallback);
 
 export const SettingsSchema = z.object({
