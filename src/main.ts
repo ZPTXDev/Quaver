@@ -87,6 +87,25 @@ if (settings.features.web.enabled) {
     app = express();
     app.use(express.json());
     if (settings.features.web.apiSecret) {
+        app.use('/api/premium', (req, res, next): void => {
+            const origin = req.headers.origin;
+            if (origin) {
+                if (settings.features.web.allowedOrigins.includes(origin)) {
+                    res.setHeader('Access-Control-Allow-Origin', origin);
+                    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+                    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+                } else {
+                    res.status(403).send({ error: 'Forbidden by CORS policy' });
+                    return;
+                }
+            }
+            if (req.method === 'OPTIONS') {
+                res.sendStatus(204);
+                return;
+            }
+            next();
+        });
+
         const getGuildPremiumStatus = async (
             guild: QuaverGuild<Initialized>,
         ): Promise<Record<string, { status: string; expires: number | null }>> => {
@@ -177,15 +196,25 @@ if (settings.features.web.enabled) {
                 ? 'premium'
                 : `${feature}.whitelisted`;
 
-            await guild.features.set(
-                featureStore,
-                durationMs === -1 ? durationMs : Date.now() + durationMs,
-            );
+            const currentExpiry = await guild.features.get<number>(featureStore);
+
+            let newExpiry: number;
+            if (durationMs === -1) {
+                newExpiry = -1;
+            } else if (currentExpiry === -1) {
+                newExpiry = -1;
+            } else if (currentExpiry && currentExpiry > Date.now()) {
+                newExpiry = currentExpiry + durationMs;
+            } else {
+                newExpiry = Date.now() + durationMs;
+            }
+
+            await guild.features.set(featureStore, newExpiry);
             res.send({
                 success: true,
                 guildName: guild.name,
                 feature,
-                expires: durationMs === -1 ? -1 : Date.now() + durationMs,
+                expires: newExpiry,
             });
         });
 
