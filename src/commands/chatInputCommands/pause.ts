@@ -4,7 +4,7 @@ import { QuaverGuild } from '#src/lib/guild';
 import { getLocaleString } from '#src/lib/locales';
 import { PlayerResponse } from '#src/lib/music';
 import { Check, getPremiumURL, settings } from '#src/lib/util';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ContainerBuilder, SlashCommandBuilder } from 'discord.js';
+import { ActionRowBuilder, type ButtonBuilder, ButtonStyle, ContainerBuilder, SlashCommandBuilder } from 'discord.js';
 
 export default new ChatInputCommandHandler()
     .setData(
@@ -39,8 +39,8 @@ export default new ChatInputCommandHandler()
             if (premiumURL) {
                 container.addActionRowComponents(
                     new ActionRowBuilder<ButtonBuilder>().setComponents(
-                        new ButtonBuilder()
-                            .setLabel('Get Premium')
+                        guild.builders
+                            .buttonLocale('MISC.GET_PREMIUM')
                             .setStyle(ButtonStyle.Link)
                             .setURL(premiumURL),
                     ),

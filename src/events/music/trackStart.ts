@@ -47,12 +47,11 @@ export default {
                 ),
                 guild.builders.textDisplayLocale(
                     'MUSIC.PLAYER.PLAYING.AD.MESSAGE',
-                    premiumURL || '',
                 ),
             );
 
-            // Add Get Premium button if premium is enabled and URL is available
-            if (settings.premiumEnabled && premiumURL) {
+            // Add Get Premium button if URL is available
+            if (premiumURL) {
                 container.addActionRowComponents(
                     new ActionRowBuilder<ButtonBuilder>().setComponents(
                         guild.builders

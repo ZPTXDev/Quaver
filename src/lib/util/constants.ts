@@ -9,7 +9,8 @@ export function getPremiumURL(guildId: string): string | undefined {
     if (!settings.premiumEnabled || !settings.features.web.dashboardURL) {
         return undefined;
     }
-    return `${settings.features.web.dashboardURL}/guild/${guildId}?premium=true`;
+    const baseURL = settings.features.web.dashboardURL.replace(/\/+$/, '');
+    return `${baseURL}/guild/${guildId}?premium=true`;
 }
 
 export enum Check {

@@ -11,7 +11,7 @@ import {
     RequesterStatus,
     settings,
 } from '#src/lib/util';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ContainerBuilder, type GuildMember, SlashCommandBuilder } from 'discord.js';
+import { ActionRowBuilder, type ButtonBuilder, ButtonStyle, ContainerBuilder, type GuildMember, SlashCommandBuilder } from 'discord.js';
 
 
 export default new ChatInputCommandHandler()
@@ -47,8 +47,8 @@ export default new ChatInputCommandHandler()
             if (premiumURL) {
                 container.addActionRowComponents(
                     new ActionRowBuilder<ButtonBuilder>().setComponents(
-                        new ButtonBuilder()
-                            .setLabel('Get Premium')
+                        guild.builders
+                            .buttonLocale('MISC.GET_PREMIUM')
                             .setStyle(ButtonStyle.Link)
                             .setURL(premiumURL),
                     ),

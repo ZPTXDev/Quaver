@@ -153,9 +153,12 @@ if (settings.features.web.enabled) {
         const withWhitelistLock = async <T>(guildId: string, feature: string, fn: () => Promise<T>): Promise<T> => {
             const lockKey = `${guildId}:${feature}`;
 
-            // Wait for any existing lock on this guild/feature
-            while (whitelistLocks.has(lockKey)) {
-                await whitelistLocks.get(lockKey);
+            // If lock exists, wait for it and retry
+            const existingLock = whitelistLocks.get(lockKey);
+            if (existingLock) {
+                await existingLock;
+                // Retry after lock is released
+                return withWhitelistLock(guildId, feature, fn);
             }
 
             // Create new lock
@@ -850,7 +853,15 @@ const consoleCommands: Record<
             console.log('Usage: whitelist <guildId> <feature> [duration]');
             return;
         }
-        const discordGuild = await client.guilds.fetch(guildId);
+        
+        let discordGuild;
+        try {
+            discordGuild = await client.guilds.fetch(guildId);
+        } catch {
+            console.log('Guild not found or bot is not in that guild.');
+            return;
+        }
+        
         const guild = await QuaverGuild.wrap(discordGuild);
         if (!guild) {
             console.log('Guild not found.');

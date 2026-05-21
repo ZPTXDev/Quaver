@@ -158,13 +158,14 @@ export class SettingsRenderer {
                     return f.enabled && f.whitelist && f.premium;
                 },
             );
+        const premiumURL = getPremiumURL(guild.id);
         const isPremium =
             premiumEnabled &&
             [WhitelistStatus.Permanent, WhitelistStatus.Temporary].includes(
                 await guild.features.checkWhitelisted('premium'),
             );
         return [
-            ...(premiumEnabled
+            ...(premiumEnabled && (isPremium || premiumURL)
                 ? [
                       this.createItemSection(
                           guild,
@@ -174,7 +175,7 @@ export class SettingsRenderer {
                               ? guild.locale('MISC.ACTIVE')
                               : guild.locale('MISC.GET_PREMIUM'),
                           isPremium ? ButtonStyle.Success : ButtonStyle.Link,
-                          isPremium ? '' : getPremiumURL(guild.id) ?? '',
+                          isPremium ? '' : premiumURL!,
                       ),
                   ]
                 : []),

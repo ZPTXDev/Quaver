@@ -86,26 +86,26 @@ export class PlaybackLogicHandler {
                         ) {
                             const premiumURL = getPremiumURL(guild.id);
                             if (premiumURL) {
-                            await interaction.replyHandler.reply(
-                                new ContainerBuilder()
-                                    .addTextDisplayComponents(
-                                        guild.builders.textDisplayLocale(
-                                            'FEATURE.NO_PERMISSION.PREMIUM',
+                                await interaction.replyHandler.reply(
+                                    new ContainerBuilder()
+                                        .addTextDisplayComponents(
+                                            guild.builders.textDisplayLocale(
+                                                'FEATURE.NO_PERMISSION.PREMIUM',
+                                            ),
+                                        )
+                                        .addActionRowComponents(
+                                            new ActionRowBuilder<ButtonBuilder>().setComponents(
+                                                guild.builders
+                                                    .buttonLocale(
+                                                        'MISC.GET_PREMIUM',
+                                                    )
+                                                    .setStyle(ButtonStyle.Link)
+                                                    .setURL(premiumURL),
+                                            ),
                                         ),
-                                    )
-                                    .addActionRowComponents(
-                                        new ActionRowBuilder<ButtonBuilder>().setComponents(
-                                            guild.builders
-                                                .buttonLocale(
-                                                    'MISC.GET_PREMIUM',
-                                                )
-                                                .setStyle(ButtonStyle.Link)
-                                                .setURL(premiumURL),
-                                        ),
-                                    ),
-                                { type: MessageOptionsBuilderType.Error },
-                            );
-                            return;
+                                    { type: MessageOptionsBuilderType.Error },
+                                );
+                                return;
                             }
                         }
                         await interaction.replyHandler.reply(
