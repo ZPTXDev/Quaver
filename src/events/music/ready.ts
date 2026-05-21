@@ -25,21 +25,32 @@ async function restorePlayer(
         await player.sendMessage(guild.locale('MUSIC.PLAYER.RESTORING'), {
             type: MessageOptionsBuilderType.Success,
         });
-        if (!resumed) {
-            player.voice.connect(snapshot.voiceChannelId, {
-                deafened: true,
-            });
+        
+        // Connect to voice channel first
+        player.voice.connect(snapshot.voiceChannelId, {
+            deafened: true,
+        });
+        
+        // Check if the current track is an ad and skip it
+        const isAdTrack = snapshot.queue.current?.isAd === true;
+        if (isAdTrack) {
+            // If resumed, stop the current track (Lavalink already started it)
+            if (resumed && player.playing) {
+                await player.stop();
+            }
+            // Advance to the next track
+            await player.queue.start();
+        } else if (!resumed) {
+            // Normal restoration for non-ad tracks (not resumed)
             if (snapshot.queue.current && (snapshot.paused || snapshot.playing)) {
                 await player.play(snapshot.queue.current);
             }
             if (snapshot.position > 0) {
                 await player.seekTo(snapshot.position);
             }
-        } else {
-            player.voice.connect(snapshot.voiceChannelId, {
-                deafened: true,
-            });
         }
+        // When resumed=true, Lavalink has already positioned the track correctly, no need to seek
+        
         logger.info(`[G ${guild.id}] Player restored from saved state (resumed = ${resumed})`);
         return true;
     } catch (error) {

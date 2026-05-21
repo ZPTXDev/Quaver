@@ -23,7 +23,7 @@ import { QuaverGuild, type WhitelistedFeatures, WhitelistStatus, type Initialize
 import type { InteractionHandlerMapsFlat } from './lib/interactions';
 import { setLocales } from './lib/locales';
 import { logger } from './lib/logger';
-import type { QuaverPlayer } from './lib/music';
+import type { QuaverNode, QuaverPlayer } from './lib/music';
 import { startup, updateHandler } from './lib/state';
 import {
     loadVersion,
@@ -119,7 +119,7 @@ if (settings.features.web.enabled) {
                     usesPremiumStore = true;
                 } else {
                     usesPremiumStore = !!(
-                        settings.premiumURL &&
+                        settings.premiumEnabled &&
                         settings.features[feature].premium
                     );
                 }
@@ -215,7 +215,7 @@ if (settings.features.web.enabled) {
             const usesPremiumStore =
                 feature === 'premium' ||
                 (feature !== 'premium' &&
-                    settings.premiumURL &&
+                    settings.premiumEnabled &&
                     settings.features[feature as WhitelistedFeatures].premium);
             return usesPremiumStore ? 'premium' : `${feature}.whitelisted`;
         };
@@ -501,7 +501,7 @@ if (settings.features.web.enabled) {
             const usesPremiumStore =
                 feature === 'premium' ||
                 (feature !== 'premium' &&
-                    settings.premiumURL &&
+                    settings.premiumEnabled &&
                     settings.features[feature as WhitelistedFeatures].premium);
             const featureStore = usesPremiumStore
                 ? 'premium'
@@ -522,24 +522,24 @@ if (settings.features.web.enabled) {
     if (settings.grafanaLogging) {
         app.get('/stats', async (req, res): Promise<void> => {
             const totalSessions = client.music?.players?.cache.size;
-            const activeSessions = Array.from(
+            const totalActive = Array.from(
                 client.music?.players?.cache.values(),
             ).filter(
-                (player: QuaverPlayer): boolean =>
+                (player: QuaverPlayer<QuaverNode>): boolean =>
                     !player.timeout.standard && !player.timeout.pause,
             ).length;
             const totalQueued = Array.from(
                 client.music?.players?.cache.values(),
             ).reduce(
-                (total: number, player: QuaverPlayer): number =>
-                    total + player.queue?.tracks.length,
+                (total: number, player: QuaverPlayer<QuaverNode>): number =>
+                    total + (player.queue?.tracks.length ?? 0),
                 0,
             );
             res.send({
                 sessions: {
                     total: totalSessions,
-                    active: activeSessions,
-                    idle: totalSessions - activeSessions,
+                    active: totalActive,
+                    idle: totalSessions - totalActive,
                 },
                 tracks: {
                     totalQueued: totalQueued,
@@ -775,7 +775,7 @@ const consoleCommands: Record<
             return;
         }
 
-        if (!settings.premiumURL) {
+        if (!settings.premiumEnabled) {
             console.log('Premium is not enabled in settings.');
             return;
         }
@@ -881,7 +881,7 @@ const consoleCommands: Record<
                 featureName = 'Smart Queue';
         }
         if (
-            (feature === 'premium' && !settings.premiumURL) ||
+            (feature === 'premium' && !settings.premiumEnabled) ||
             (feature !== 'premium' &&
                 !settings.features[feature as WhitelistedFeatures]
                     .whitelist)
@@ -902,7 +902,7 @@ const consoleCommands: Record<
         const usesPremiumStore =
             feature === 'premium' ||
             (feature !== 'premium' &&
-                settings.premiumURL &&
+                settings.premiumEnabled &&
                 settings.features[feature as WhitelistedFeatures].premium);
         const featureStore = usesPremiumStore
             ? 'premium'

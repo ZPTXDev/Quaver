@@ -3,7 +3,7 @@ import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import { getLocaleString } from '#src/lib/locales';
 import { PlayerResponse } from '#src/lib/music';
-import { Check, settings } from '#src/lib/util';
+import { Check, getPremiumURL, settings } from '#src/lib/util';
 import {
     ActionRowBuilder,
     type ApplicationCommandManager,
@@ -62,25 +62,28 @@ export default new ChatInputCommandHandler()
                 );
                 return;
             case PlayerResponse.FeatureNotWhitelisted:
-                if (settings.features.stay.premium && settings.premiumURL) {
-                    await interaction.replyHandler.reply(
-                        new ContainerBuilder()
-                            .addTextDisplayComponents(
-                                guild.builders.textDisplayLocale(
-                                    'FEATURE.NO_PERMISSION.PREMIUM',
+                if (settings.features.stay.premium && settings.premiumEnabled) {
+                    const premiumURL = getPremiumURL(interaction.guild.id);
+                    if (premiumURL) {
+                        await interaction.replyHandler.reply(
+                            new ContainerBuilder()
+                                .addTextDisplayComponents(
+                                    guild.builders.textDisplayLocale(
+                                        'FEATURE.NO_PERMISSION.PREMIUM',
+                                    ),
+                                )
+                                .addActionRowComponents(
+                                    new ActionRowBuilder<ButtonBuilder>().setComponents(
+                                        guild.builders
+                                            .buttonLocale('MISC.GET_PREMIUM')
+                                            .setStyle(ButtonStyle.Link)
+                                            .setURL(premiumURL),
+                                    ),
                                 ),
-                            )
-                            .addActionRowComponents(
-                                new ActionRowBuilder<ButtonBuilder>().setComponents(
-                                    guild.builders
-                                        .buttonLocale('MISC.GET_PREMIUM')
-                                        .setStyle(ButtonStyle.Link)
-                                        .setURL(settings.premiumURL),
-                                ),
-                            ),
-                        { type: MessageOptionsBuilderType.Error },
-                    );
-                    return;
+                            { type: MessageOptionsBuilderType.Error },
+                        );
+                        return;
+                    }
                 }
                 await interaction.replyHandler.reply(
                     guild.locale('FEATURE.NO_PERMISSION.DEFAULT'),
