@@ -250,6 +250,38 @@ if (settings.features.web.enabled) {
             return { isOwner: false, isAdmin: false };
         };
 
+        // Process guild data for a specific user, including permission checks and premium status
+        const processUserGuildData = async (guildId: string, userId: string): Promise<Record<string, unknown>> => {
+            const discordGuild = client.guilds.cache.get(guildId);
+            if (!discordGuild) {
+                return {
+                    guildId,
+                    botInGuild: false,
+                };
+            }
+
+            const { isOwner, isAdmin } = await checkUserAdminPermissions(discordGuild, userId);
+
+            const guild = await QuaverGuild.wrap(discordGuild);
+            if (!guild) {
+                return {
+                    guildId,
+                    botInGuild: false,
+                };
+            }
+
+            const features = await getGuildPremiumStatus(guild);
+            return {
+                guildId,
+                name: guild.name,
+                icon: discordGuild.iconURL(),
+                botInGuild: true,
+                owner: isOwner,
+                isAdmin,
+                features,
+            };
+        };
+
         app.post('/api/premium/whitelist', async (req, res): Promise<void> => {
             const validation = validateWhitelistRequest(req, res);
             if (!validation.valid) return;
@@ -399,44 +431,24 @@ if (settings.features.web.enabled) {
                 res.status(400).send({ error: 'Invalid or missing guildIds list in request body' });
                 return;
             }
-            const guildIds: string[] = req.body.guildIds;
+            const guildIds = req.body.guildIds;
+            if (guildIds.length === 0) {
+                res.status(400).send({ error: 'guildIds array cannot be empty' });
+                return;
+            }
+            if (guildIds.length > 100) {
+                res.status(400).send({ error: 'guildIds array cannot exceed 100 items' });
+                return;
+            }
+            if (!guildIds.every((id): boolean => typeof id === 'string')) {
+                res.status(400).send({ error: 'All guildIds must be strings' });
+                return;
+            }
+
             const guildsData = [];
-            
-            const limitedGuildIds = guildIds.slice(0, 100);
-
-            for (const guildId of limitedGuildIds) {
-                const discordGuild = client.guilds.cache.get(guildId);
-                if (!discordGuild) {
-                    guildsData.push({
-                        guildId,
-                        botInGuild: false,
-                    });
-                    continue;
-                }
-
-
-                const { isOwner, isAdmin } = await checkUserAdminPermissions(discordGuild, userId);
-
-
-                const guild = await QuaverGuild.wrap(discordGuild);
-                if (!guild) {
-                    guildsData.push({
-                        guildId,
-                        botInGuild: false,
-                    });
-                    continue;
-                }
-
-                const features = await getGuildPremiumStatus(guild);
-                guildsData.push({
-                    guildId,
-                    name: guild.name,
-                    icon: discordGuild.iconURL(),
-                    botInGuild: true,
-                    owner: isOwner,
-                    isAdmin,
-                    features,
-                });
+            for (const guildId of guildIds) {
+                const guildData = await processUserGuildData(guildId, userId);
+                guildsData.push(guildData);
             }
             res.send(guildsData);
         });
