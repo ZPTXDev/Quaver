@@ -52,6 +52,10 @@ export default {
                     TEXT: 'Now playing **%1** `[%2]`',
                 },
             },
+            AD: {
+                TITLE: '### Ad Break',
+                MESSAGE: 'This is a brief ad break.\nFor ad-free listening, get Premium for this server.',
+            },
         },
         QUEUE_CLEARED_ERROR: 'Cleared queue as an error occurred multiple times consecutively.',
         RESTARTING: {

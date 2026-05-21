@@ -7,9 +7,9 @@ import {
 import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
 import { logger } from '#src/lib/logger';
 import { updateHandler } from '#src/lib/state';
-import { buildMessageOptions, type QuaverChannels, type QuaverQueue, type QuaverSong, settings, } from '#src/lib/util';
+import { buildMessageOptions, type QuaverChannels, type QuaverSong, settings, } from '#src/lib/util';
 import type { PlayerEffect } from '@lavaclient/plugin-effects';
-import { type LoopType, Queue } from '@lavaclient/plugin-queue';
+import { QuaverQueue, type LoopType } from './QuaverQueue';
 import {
     ChannelType,
     type Guild,
@@ -50,6 +50,9 @@ export interface QuaverPlayerJSON {
             required: number;
             users: Snowflake[];
         };
+        adPlaytimeMs?: number;
+        isAdPlaying?: boolean;
+        isAdQueued?: boolean;
     };
 }
 
@@ -108,7 +111,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         end?: number;
     } = {};
     // overriding native queue type
-    queue: QuaverQueue;
+    queue!: QuaverQueue;
     memory: {
         bassboost: boolean;
         nightcore: boolean;
@@ -121,23 +124,29 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         originalQueue?: QuaverSong[];
         shuffledQueue?: string[];
         failureCount?: number;
+        adPlaytimeMs: number;
+        isAdPlaying: boolean;
+        isAdQueued?: boolean;
+        savedFilters?: {
+            bassboost: boolean;
+            nightcore: boolean;
+        };
     } = {
         bassboost: false,
         nightcore: false,
         shuffle: false,
         alternate: false,
+        adPlaytimeMs: 0,
+        isAdPlaying: false,
+        isAdQueued: false,
     };
 
     constructor(node: TNode, guild: Guild) {
         super(node, guild.id);
         this.client = guild.client as QuaverClient;
         this.guild = guild;
-        this.queue = new Queue(this, {
-            play: async (_, track): Promise<void> =>
-                void (await this.play(track)),
-        }) as QuaverQueue;
+        this.queue = new QuaverQueue(this);
         this.queue.channel = null;
-        this.queue.tracks = [];
     }
 
     /**
@@ -212,7 +221,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         const wasEmptyBeforeAdd =
             (!this.queue.current || (!this.playing && !this.paused)) &&
             this.queue.tracks.length === 0;
-        this.queue.add(added, { requester: requesterId, next });
+        this.queue.add(added, { requester: { id: requesterId }, next });
         const transformsActive = this.memory.shuffle || this.memory.alternate;
         if (transformsActive) {
             if (!this.memory.originalQueue) {
@@ -749,9 +758,13 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      */
     async skipCurrentTrack(): Promise<PlayerResponse> {
         if (this.restartReady) return PlayerResponse.RestartInProgress;
+        if (this.memory.isAdPlaying) return PlayerResponse.AdPlaying;
         if (!this.queue.current || (!this.playing && !this.paused)) {
             return PlayerResponse.PlayerIdle;
         }
+        // Skip current track and start next
+        // Note: player.stop() emits trackEnd with reason='stopped', but mayStartNext['stopped'] = false
+        // so the trackEnd event is NOT emitted to the handler. We must manually advance the queue.
         await this.queue.skip();
         await this.queue.start();
         return PlayerResponse.Success;
@@ -764,6 +777,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      */
     async skipToQueuedTrack(position: number): Promise<PlayerResponse> {
         if (this.restartReady) return PlayerResponse.RestartInProgress;
+        if (this.memory.isAdPlaying) return PlayerResponse.AdPlaying;
         if (this.queue.tracks.length > 1) {
             const moveResponse = await this.moveQueuedTrack(position, 1);
             if (moveResponse !== PlayerResponse.Success) {
@@ -789,8 +803,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         this.queue.clear();
         delete this.memory.originalQueue;
         delete this.memory.shuffledQueue;
+        // Skip current track - trackEnd handler will see the queue is empty
         await this.queue.skip();
-        await this.queue.start();
         guild.sendWebUpdate('queueUpdate', []);
         return PlayerResponse.Success;
     }
@@ -825,6 +839,15 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         });
     }
 
+    /**
+     * Check if a track is an advertisement.
+     * @param track - The track to check.
+     * @returns Whether the track is an ad.
+     */
+    isAdTrack(track: QuaverSong): boolean {
+        return track.isAd === true;
+    }
+
     toJSON(): QuaverPlayerJSON {
         return {
             version: 1,
@@ -837,8 +860,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             position: this.position ?? 0,
             loop: this.queue.loop.type,
             queue: {
-                current: this.queue.current ?? null,
-                tracks: [...this.queue.tracks],
+                current: this.queue.current && !this.isAdTrack(this.queue.current) 
+                    ? this.queue.current 
+                    : null,
+                tracks: this.queue.tracks.filter((track): boolean => !this.isAdTrack(track)),
             },
             effects: {
                 bassboost: this.memory.bassboost,
@@ -860,6 +885,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
                           users: [...this.memory.skip.users],
                       }
                     : undefined,
+                adPlaytimeMs: this.memory.adPlaytimeMs,
+                isAdPlaying: this.memory.isAdPlaying,
             },
         };
     }

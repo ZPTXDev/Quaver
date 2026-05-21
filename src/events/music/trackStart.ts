@@ -5,6 +5,7 @@ import { logger } from '#src/lib/logger';
 import { updateHandler } from '#src/lib/state';
 import {
     formatLavaLyricsResponse,
+    getPremiumURL,
     getTrackMarkdownLocaleString,
     type LavaLyricsResponse,
     type QuaverQueue,
@@ -30,6 +31,50 @@ export default {
         const guild = await QuaverGuild.wrap(queue.player.guild);
         delete queue.player.memory.skip;
         logger.info(`[G ${guild.id}] Starting track`);
+
+        // Check if this is an ad track
+        const isAdTrack = queue.player.isAdTrack(track);
+
+        if (isAdTrack) {
+            // Mark that an ad is currently playing
+            queue.player.memory.isAdPlaying = true;
+
+            // Display custom ad message with Get Premium button
+            const premiumURL = getPremiumURL(queue.player.guild.id);
+            const container = new ContainerBuilder().addTextDisplayComponents(
+                guild.builders.textDisplayLocale(
+                    'MUSIC.PLAYER.PLAYING.AD.TITLE',
+                ),
+                guild.builders.textDisplayLocale(
+                    'MUSIC.PLAYER.PLAYING.AD.MESSAGE',
+                    premiumURL || '',
+                ),
+            );
+
+            // Add Get Premium button if premium is enabled and URL is available
+            if (settings.premiumEnabled && premiumURL) {
+                container.addActionRowComponents(
+                    new ActionRowBuilder<ButtonBuilder>().setComponents(
+                        guild.builders
+                            .buttonLocale('MISC.GET_PREMIUM')
+                            .setStyle(ButtonStyle.Link)
+                            .setURL(premiumURL),
+                    ),
+                );
+            }
+
+            await queue.player.sendMessage(
+                container,
+                { type: MessageOptionsBuilderType.Neutral },
+            );
+
+            // Skip the rest of the normal track start logic for ads
+            return;
+        }
+
+        // Regular track (not an ad)
+        queue.player.memory.isAdPlaying = false;
+
         if (queue.player.memory.alternate) {
             const whitelisted =
                 await guild.features.checkWhitelisted('smartqueue');

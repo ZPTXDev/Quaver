@@ -1,12 +1,14 @@
 import { MessageOptionsBuilderType } from '#src/lib';
-import { QuaverGuild } from '#src/lib/guild';
+import { data } from '#src/lib/data';
+import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
 import { logger } from '#src/lib/logger';
+import { LoopType, type QuaverQueue } from '#src/lib/music';
 import {
+    getPremiumURL,
     getTrackMarkdownLocaleString,
-    type QuaverQueue,
     type QuaverSong,
+    settings,
 } from '#src/lib/util';
-import { LoopType } from '@lavaclient/plugin-queue';
 import type { Collection, GuildMember, Snowflake } from 'discord.js';
 
 export default {
@@ -19,7 +21,30 @@ export default {
     ): Promise<void> {
         const guild = await QuaverGuild.wrap(queue.player.guild);
         delete queue.player.memory.skip;
+
+        const isAdTrack = queue.player.isAdTrack(track);
+
+        // Handle load failures
         if (reason === 'loadFailed') {
+            // If ad failed to load, skip silently
+            if (isAdTrack) {
+                queue.player.memory.isAdPlaying = false;
+                queue.player.memory.adPlaytimeMs = 0;
+                await data.guild.set(guild.id, 'ads.playtimeMs', 0);
+
+                // Restore saved filters
+                if (queue.player.memory.savedFilters) {
+                    await queue.player.setBassboost(queue.player.memory.savedFilters.bassboost);
+                    await queue.player.setNightcore(queue.player.memory.savedFilters.nightcore);
+                    delete queue.player.memory.savedFilters;
+                }
+
+                // Advance to next track silently
+                await queue.next();
+                return;
+            }
+
+            // Regular track load failure - show error to user
             logger.warn(`[G ${guild.id}] Track skipped as it failed to load`);
             await queue.player.sendMessage(
                 guild.locale(
@@ -28,76 +53,211 @@ export default {
                 ),
                 { type: MessageOptionsBuilderType.Warning },
             );
-            if (!queue.player.memory.failureCount) {
-                queue.player.memory.failureCount = 0;
-            }
-            queue.player.memory.failureCount++;
+
+            queue.player.memory.failureCount =
+                (queue.player.memory.failureCount || 0) + 1;
+
             if (queue.player.memory.failureCount >= 3) {
                 await queue.player.clearQueue();
-                await queue.skip();
-                await queue.start();
                 await queue.player.sendMessage(
                     guild.locale('MUSIC.PLAYER.QUEUE_CLEARED_ERROR'),
                     { type: MessageOptionsBuilderType.Warning },
                 );
             }
+
+            // Advance to next track
+            const hasNext = await queue.next();
+            if (!hasNext) {
+                logger.info(`[G ${guild.id}] Queue finished after load failures`);
+            }
             return;
         }
-        switch (queue.loop.type) {
-            case LoopType.Song:
-                if (track.info.length <= 15 * 1000) {
-                    queue.setLoop(LoopType.None);
-                    await queue.player.sendMessage(
-                        guild.locale('MUSIC.PLAYER.LOOP_TRACK_DISABLED'),
-                        { type: MessageOptionsBuilderType.Warning },
+
+        // If ad just finished, advance to next track
+        if (isAdTrack) {
+            queue.player.memory.isAdPlaying = false;
+            queue.player.memory.adPlaytimeMs = 0;
+            await data.guild.set(guild.id, 'ads.playtimeMs', 0);
+
+            // Restore saved filters
+            if (queue.player.memory.savedFilters) {
+                await queue.player.setBassboost(queue.player.memory.savedFilters.bassboost);
+                await queue.player.setNightcore(queue.player.memory.savedFilters.nightcore);
+                delete queue.player.memory.savedFilters;
+            }
+
+            // Advance to next track (the real track that was queued)
+            await queue.next();
+            return;
+        }
+
+        // Regular track finished
+        if (reason === 'finished') {
+            // Accumulate playtime
+            if (queue.player.memory.adPlaytimeMs === undefined) {
+                const dbPlaytime = await data.guild.get<number>(
+                    guild.id,
+                    'ads.playtimeMs',
+                );
+                queue.player.memory.adPlaytimeMs = dbPlaytime || 0;
+            }
+            queue.player.memory.adPlaytimeMs += track.info.length;
+            await data.guild.set(
+                guild.id,
+                'ads.playtimeMs',
+                queue.player.memory.adPlaytimeMs,
+            );
+
+            // Check if we should play an ad
+            const adsConfig = settings.ads;
+            const isPremium = await guild.features.checkWhitelisted('premium');
+
+            const shouldPlayAd =
+                adsConfig?.enabled &&
+                adsConfig.urls.length > 0 &&
+                isPremium === WhitelistStatus.NotWhitelisted &&
+                queue.player.memory.adPlaytimeMs >=
+                    adsConfig.intervalMinutes * 60 * 1000;
+
+            if (shouldPlayAd) {
+                try {
+                    // Select random ad URL
+                    const randomIndex = Math.floor(
+                        Math.random() * adsConfig.urls.length,
                     );
-                    await queue.skip();
-                    await queue.start();
-                }
-                break;
-            case LoopType.Queue: {
-                if (
-                    queue.tracks.reduce(
-                        (a: number, b: QuaverSong): number => a + b.info.length,
-                        track.info.length,
-                    ) <=
-                    15 * 1000
-                ) {
-                    queue.setLoop(LoopType.None);
-                    await queue.player.sendMessage(
-                        guild.locale('MUSIC.PLAYER.LOOP_QUEUE_DISABLED'),
-                        { type: MessageOptionsBuilderType.Warning },
-                    );
-                    break;
-                }
-                const transformsActive =
-                    queue.player.memory.shuffle ||
-                    queue.player.memory.alternate;
-                if (transformsActive) {
-                    if (queue.player.memory.originalQueue) {
-                        queue.player.memory.originalQueue.push(track);
+                    const adUrl = adsConfig.urls[randomIndex];
+
+                    // Load the ad track
+                    const result =
+                        await queue.player.client.music.api.loadTracks(adUrl);
+
+                    if (result.loadType === 'track' && result.data) {
+                        const premiumURL = getPremiumURL(guild.id) || 'https://quaver.gg/premium';
+                        const adTrack = {
+                            ...result.data,
+                            isAd: true,
+                            info: {
+                                ...result.data.info,
+                                title: 'Ad Break',
+                                author: 'Quaver',
+                                uri: premiumURL,
+                                artworkUrl: queue.player.client.user.displayAvatarURL(),
+                            },
+                            requesterId: queue.player.client.user.id,
+                        } as QuaverSong;
+
+                        // Save current filters and disable them for the ad
+                        queue.player.memory.savedFilters = {
+                            bassboost: queue.player.memory.bassboost,
+                            nightcore: queue.player.memory.nightcore,
+                        };
+                        
+                        // Disable all filters for the ad
+                        if (queue.player.memory.bassboost) {
+                            await queue.player.setBassboost(false);
+                        }
+                        if (queue.player.memory.nightcore) {
+                            await queue.player.setNightcore(false);
+                        }
+
+                        // Mark that an ad is playing
+                        queue.player.memory.isAdPlaying = true;
+                        queue.player.memory.adPlaytimeMs = 0;
+                        await data.guild.set(guild.id, 'ads.playtimeMs', 0);
+
+                        // Set queue.current to the ad track so trackStart displays it correctly
+                        queue.current = adTrack;
+
+                        // Play ad directly (NOT through queue)
+                        await queue.player.play(adTrack);
+                        // Don't advance queue yet - wait for ad to finish
+                        return;
+                    } else {
+                        // Failed to load ad, reset counter
+                        queue.player.memory.adPlaytimeMs = 0;
+                        await data.guild.set(guild.id, 'ads.playtimeMs', 0);
                     }
-                    if (queue.player.memory.shuffledQueue) {
-                        queue.player.memory.shuffledQueue.push(track.id);
-                    }
+                } catch {
+                    // Error loading ad, reset counter
+                    queue.player.memory.adPlaytimeMs = 0;
+                    await data.guild.set(guild.id, 'ads.playtimeMs', 0);
                 }
             }
         }
+
+        // Handle loop edge cases
+        if (queue.loop.type === LoopType.Song) {
+            if (track.info.length <= 15 * 1000) {
+                queue.setLoop(LoopType.None);
+                await queue.player.sendMessage(
+                    guild.locale('MUSIC.PLAYER.LOOP_TRACK_DISABLED'),
+                    { type: MessageOptionsBuilderType.Warning },
+                );
+            }
+        }
+
+        if (queue.loop.type === LoopType.Queue) {
+            // Check if queue is too short for looping
+            const totalDuration = queue.tracks.reduce(
+                (a: number, b: QuaverSong): number => a + b.info.length,
+                track.info.length,
+            );
+
+            if (totalDuration <= 15 * 1000) {
+                queue.setLoop(LoopType.None);
+                await queue.player.sendMessage(
+                    guild.locale('MUSIC.PLAYER.LOOP_QUEUE_DISABLED'),
+                    { type: MessageOptionsBuilderType.Warning },
+                );
+            }
+
+            // Handle shuffle/alternate with queue loop
+            const transformsActive =
+                queue.player.memory.shuffle || queue.player.memory.alternate;
+            if (transformsActive) {
+                if (queue.player.memory.originalQueue) {
+                    queue.player.memory.originalQueue.push(track);
+                }
+                if (queue.player.memory.shuffledQueue) {
+                    queue.player.memory.shuffledQueue.push(track.id);
+                }
+            }
+        }
+
+        // Clear failure count on successful track
         if (queue.player.memory.failureCount) {
             delete queue.player.memory.failureCount;
         }
-        const members = guild.channels.cache.get(queue.player.voice.channelId)
-            .members as Collection<Snowflake, GuildMember>;
+
+        // Check if alone in voice channel
+        const voiceChannel = guild.channels.cache.get(
+            queue.player.voice.channelId,
+        );
+        const members = voiceChannel?.members as Collection<
+            Snowflake,
+            GuildMember
+        >;
+
         if (
             members?.filter((m): boolean => !m.user.bot).size < 1 &&
-            !(await guild.settings.get<boolean>('stay.enabled') && await guild.features.isFeatureActive('stay'))
+            !(
+                (await guild.settings.get<boolean>('stay.enabled')) &&
+                (await guild.features.isFeatureActive('stay'))
+            )
         ) {
-            logger.info(`[G ${guild.id} Disconnecting (alone)`);
+            logger.info(`[G ${guild.id}] Disconnecting (alone)`);
             await queue.player.sendMessage(
                 guild.locale('MUSIC.DISCONNECT.ALONE.DISCONNECTED.DEFAULT'),
                 { type: MessageOptionsBuilderType.Warning },
             );
             await queue.player.disconnect();
+            return;
+        }
+
+        // Advance to next track
+        const hasNext = await queue.next();
+        if (!hasNext) {
+            logger.info(`[G ${guild.id}] Queue finished`);
         }
     },
 };
