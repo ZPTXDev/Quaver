@@ -160,7 +160,7 @@ if (settings.features.web.enabled) {
                 res.status(400).send({ error: 'Invalid or missing request body' });
                 return;
             }
-            const { guildId, feature, durationMs } = req.body;
+            const { guildId, feature, durationMs, sessionId } = req.body;
             if (typeof guildId !== 'string' || typeof feature !== 'string' || typeof durationMs !== 'number') {
                 res.status(400).send({
                     error: 'guildId and feature must be strings, and durationMs must be a number',
@@ -198,6 +198,24 @@ if (settings.features.web.enabled) {
 
             const currentExpiry = await guild.features.get<number>(featureStore);
 
+            if (sessionId) {
+                if (typeof sessionId !== 'string') {
+                    res.status(400).send({ error: 'sessionId must be a string' });
+                    return;
+                }
+                const alreadyProcessed = await guild.features.get<boolean>(`processedTransactions.${sessionId}`);
+                if (alreadyProcessed) {
+                    res.send({
+                        success: true,
+                        guildName: guild.name,
+                        feature,
+                        expires: currentExpiry !== undefined ? currentExpiry : null,
+                        alreadyProcessed: true,
+                    });
+                    return;
+                }
+            }
+
             let newExpiry: number;
             if (durationMs === -1) {
                 newExpiry = -1;
@@ -210,6 +228,11 @@ if (settings.features.web.enabled) {
             }
 
             await guild.features.set(featureStore, newExpiry);
+
+            if (sessionId) {
+                await guild.features.set(`processedTransactions.${sessionId}`, true);
+            }
+
             res.send({
                 success: true,
                 guildName: guild.name,
