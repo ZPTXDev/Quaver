@@ -39,12 +39,6 @@ export default new ChatInputCommandHandler()
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
         
-        // If disconnecting during an ad, restore accumulated playtime to prevent ad-skipping
-        if (player.memory.isAdPlaying && player.memory.preAdPlaytimeMs !== undefined) {
-            player.memory.adPlaytimeMs = player.memory.preAdPlaytimeMs;
-            await data.guild.set(guild.id, 'ads.playtimeMs', player.memory.preAdPlaytimeMs);
-        }
-        
         if (player.queue.tracks.length === 0) {
             const response = await player.disconnect();
             switch (response) {
@@ -57,6 +51,12 @@ export default new ChatInputCommandHandler()
                     );
                     return;
                 case PlayerResponse.Success:
+                    // Restore accumulated playtime after successful disconnect
+                    if (player.memory.isAdPlaying && player.memory.preAdPlaytimeMs !== undefined) {
+                        player.memory.adPlaytimeMs = player.memory.preAdPlaytimeMs;
+                        await data.guild.set(guild.id, 'ads.playtimeMs', player.memory.preAdPlaytimeMs);
+                    }
+                    
                     await interaction.replyHandler.reply(
                         guild.locale('CMD.DISCONNECT.RESPONSE.SUCCESS'),
                         { type: MessageOptionsBuilderType.Success },
