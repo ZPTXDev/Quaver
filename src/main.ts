@@ -3,8 +3,8 @@ import { load as queueLoad } from '@lavaclient/plugin-queue';
 import { getAbsoluteFileURL, msToTime, msToTimeString, parseTimeString, } from '@zptxdev/zptx-lib';
 import { createCache } from 'cache-manager';
 import { KeyvCacheableMemory } from 'cacheable';
-import { Collection, GatewayIntentBits, PermissionsBitField } from 'discord.js';
-import { default as express, type Express } from 'express';
+import { Collection, GatewayIntentBits, type Guild, PermissionsBitField } from 'discord.js';
+import { default as express, type Express, type Request, type Response } from 'express';
 import Keyv from 'keyv';
 import type { ClientEvents, NodeEvents } from 'lavaclient';
 import { readdirSync, readFileSync } from 'node:fs';
@@ -146,35 +146,83 @@ if (settings.features.web.enabled) {
             return featuresStatus;
         };
 
-        app.post('/api/premium/whitelist', async (req, res): Promise<void> => {
+        // Helper to validate whitelist request and send appropriate responses
+        const validateWhitelistRequest = (req: Request, res: Response): { valid: boolean, guildId?: string, feature?: string, durationMs?: number, sessionId?: string } => {
             if (!startup.started) {
                 res.status(503).send({ error: 'Service is starting up, please try again later' });
-                return;
+                return { valid: false };
             }
             const authHeader = req.headers.authorization;
             if (!authHeader || authHeader !== `Bearer ${settings.features.web.apiSecret}`) {
                 res.status(401).send({ error: 'Unauthorized' });
-                return;
+                return { valid: false };
             }
             if (!req.body || typeof req.body !== 'object') {
                 res.status(400).send({ error: 'Invalid or missing request body' });
-                return;
+                return { valid: false };
             }
             const { guildId, feature, durationMs, sessionId } = req.body;
             if (typeof guildId !== 'string' || typeof feature !== 'string' || typeof durationMs !== 'number') {
-                res.status(400).send({
-                    error: 'guildId and feature must be strings, and durationMs must be a number',
-                });
-                return;
+                res.status(400).send({ error: 'guildId and feature must be strings, and durationMs must be a number' });
+                return { valid: false };
             }
             if (durationMs < -1) {
                 res.status(400).send({ error: 'durationMs must be -1 or greater' });
-                return;
+                return { valid: false };
             }
             if (!['premium', 'stay', 'autolyrics', 'smartqueue'].includes(feature)) {
                 res.status(400).send({ error: 'Invalid feature name' });
-                return;
+                return { valid: false };
             }
+            return { valid: true, guildId, feature, durationMs, sessionId };
+        };
+
+        // Determine which feature store to use based on feature and premium config
+        const resolveFeatureStore = (feature: string): string => {
+            const usesPremiumStore =
+                feature === 'premium' ||
+                (feature !== 'premium' &&
+                    settings.premiumURL &&
+                    settings.features[feature as WhitelistedFeatures].premium);
+            return usesPremiumStore ? 'premium' : `${feature}.whitelisted`;
+        };
+
+        // Compute new expiry timestamp based on current expiry and requested duration
+        const computeNewExpiry = (currentExpiry: number | undefined, durationMs: number): number => {
+            if (durationMs === -1) return -1;
+            if (currentExpiry === -1) return -1;
+            if (currentExpiry && currentExpiry > Date.now()) {
+                return currentExpiry + durationMs;
+            }
+            return Date.now() + durationMs;
+        };
+
+        // Check if a user has admin permissions (owner, Administrator, or ManageGuild) in a guild
+        const checkUserAdminPermissions = async (discordGuild: Guild, userId: string): Promise<{ isOwner: boolean; isAdmin: boolean }> => {
+            const isOwner = discordGuild.ownerId === userId;
+            if (isOwner) {
+                return { isOwner: true, isAdmin: true };
+            }
+
+            try {
+                const member = await discordGuild.members.fetch(userId);
+                if (member) {
+                    const isAdmin = member.permissions.has(PermissionsBitField.Flags.Administrator) ||
+                                  member.permissions.has(PermissionsBitField.Flags.ManageGuild);
+                    return { isOwner: false, isAdmin };
+                }
+            } catch {
+                // Member not found or couldn't fetch
+            }
+            return { isOwner: false, isAdmin: false };
+        };
+
+        app.post('/api/premium/whitelist', async (req, res): Promise<void> => {
+            const validation = validateWhitelistRequest(req, res);
+            if (!validation.valid) return;
+            const { guildId, feature, durationMs, sessionId } = validation;
+
+            // Fetch guild
             let discordGuild;
             try {
                 discordGuild = await client.guilds.fetch(guildId);
@@ -187,22 +235,12 @@ if (settings.features.web.enabled) {
                 res.status(404).send({ error: 'Guild wrapping failed' });
                 return;
             }
-            const usesPremiumStore =
-                feature === 'premium' ||
-                (feature !== 'premium' &&
-                    settings.premiumURL &&
-                    settings.features[feature as WhitelistedFeatures].premium);
-            const featureStore = usesPremiumStore
-                ? 'premium'
-                : `${feature}.whitelisted`;
 
+            const featureStore = resolveFeatureStore(feature);
             const currentExpiry = await guild.features.get<number>(featureStore);
 
+            // Idempotent session handling
             if (sessionId) {
-                if (typeof sessionId !== 'string') {
-                    res.status(400).send({ error: 'sessionId must be a string' });
-                    return;
-                }
                 const alreadyProcessed = await guild.features.get<boolean>(`processedTransactions.${sessionId}`);
                 if (alreadyProcessed) {
                     res.send({
@@ -214,25 +252,11 @@ if (settings.features.web.enabled) {
                     });
                     return;
                 }
-            }
-
-            let newExpiry: number;
-            if (durationMs === -1) {
-                newExpiry = -1;
-            } else if (currentExpiry === -1) {
-                newExpiry = -1;
-            } else if (currentExpiry && currentExpiry > Date.now()) {
-                newExpiry = currentExpiry + durationMs;
-            } else {
-                newExpiry = Date.now() + durationMs;
-            }
-
-            await guild.features.set(featureStore, newExpiry);
-
-            if (sessionId) {
                 await guild.features.set(`processedTransactions.${sessionId}`, true);
             }
 
+            const newExpiry = computeNewExpiry(currentExpiry, durationMs);
+            await guild.features.set(featureStore, newExpiry);
             // Fire-and-forget: re-enable features for active players after premium renewal
             void PremiumSweepService.restoreFeatures(guildId);
 
@@ -242,6 +266,8 @@ if (settings.features.web.enabled) {
                 feature,
                 expires: newExpiry,
             });
+
+
         });
 
         app.get('/api/premium/status/:guildId', async (req, res): Promise<void> => {
@@ -347,20 +373,9 @@ if (settings.features.web.enabled) {
                     continue;
                 }
 
-                const isOwner = discordGuild.ownerId === userId;
-                let isAdmin = isOwner;
 
-                if (!isOwner) {
-                    try {
-                        const member = await discordGuild.members.fetch(userId);
-                        if (member) {
-                            isAdmin = member.permissions.has(PermissionsBitField.Flags.Administrator) ||
-                                      member.permissions.has(PermissionsBitField.Flags.ManageGuild);
-                        }
-                    } catch {
-                        // Member not found or couldn't fetch
-                    }
-                }
+                const { isOwner, isAdmin } = await checkUserAdminPermissions(discordGuild, userId);
+
 
                 const guild = await QuaverGuild.wrap(discordGuild);
                 if (!guild) {
