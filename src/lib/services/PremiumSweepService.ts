@@ -10,6 +10,7 @@ import type { Guild } from 'discord.js';
 
 export class PremiumSweepService {
     private interval: ReturnType<typeof setInterval> | null = null;
+    private bootSweepTimeout: ReturnType<typeof setTimeout> | null = null;
 
     start(): void {
         if (this.interval) return;
@@ -17,8 +18,9 @@ export class PremiumSweepService {
         logger.info('Starting Premium/Whitelist expiration sweep service at 15m interval');
 
         // Run initial sweep on boot after a short delay (e.g. 10 seconds) to let guilds load
-        setTimeout((): void => {
+        this.bootSweepTimeout = setTimeout((): void => {
             void this.sweep();
+            this.bootSweepTimeout = null;
         }, 10 * 1000);
 
         this.interval = setInterval((): void => {
@@ -167,6 +169,10 @@ export class PremiumSweepService {
         if (this.interval) {
             clearInterval(this.interval);
             this.interval = null;
+        }
+        if (this.bootSweepTimeout) {
+            clearTimeout(this.bootSweepTimeout);
+            this.bootSweepTimeout = null;
         }
     }
 }

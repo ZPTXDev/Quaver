@@ -191,6 +191,10 @@ if (settings.features.web.enabled) {
                 res.status(400).send({ error: 'guildId and feature must be strings, and durationMs must be a number' });
                 return { valid: false };
             }
+            if (sessionId !== undefined && typeof sessionId !== 'string') {
+                res.status(400).send({ error: 'sessionId must be a string if provided' });
+                return { valid: false };
+            }
             if (!Number.isFinite(durationMs)) {
                 res.status(400).send({ error: 'durationMs must be a finite number' });
                 return { valid: false };
