@@ -216,6 +216,7 @@ export default {
             ) {
                 return;
             }
+            // Wait 1 second to ensure that the track actually plays and doesn't fail to load
             await new Promise<void>((resolve): void => {
                 setTimeout(resolve, 1000);
             });
