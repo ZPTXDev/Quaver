@@ -764,6 +764,83 @@ const consoleCommands: Record<
         await startup.sweepService.sweep();
         console.log('Sweep completed.');
     },
+    retry: async (input): Promise<void> => {
+        const sessionId = input.split(' ')[1];
+        const guildId = input.split(' ')[2];
+        const months = parseInt(input.split(' ')[3], 10);
+
+        if (!sessionId || !guildId || !months || isNaN(months)) {
+            console.log('Usage: retry <sessionId> <guildId> <months>');
+            console.log('Example: retry cs_test_abc123 1234567890 3');
+            return;
+        }
+
+        if (!settings.premiumURL) {
+            console.log('Premium is not enabled in settings.');
+            return;
+        }
+
+        try {
+            const discordGuild = await client.guilds.fetch(guildId);
+            const guild = await QuaverGuild.wrap(discordGuild);
+            if (!guild) {
+                console.log('Guild not found.');
+                return;
+            }
+
+            console.log(`Retrying payment for guild ${guild.name} (${guildId})...`);
+            console.log(`Session ID: ${sessionId}`);
+            console.log(`Duration: ${months} month(s)`);
+
+            // Convert months to milliseconds
+            const durationMs = months * 30 * 24 * 60 * 60 * 1000;
+
+            // Determine feature store (premium always uses 'premium' store)
+            const featureStore = 'premium';
+
+            // Get current expiry
+            const currentExpiry = await guild.features.get<number>(featureStore);
+            const wasActive = currentExpiry !== undefined && (currentExpiry === -1 || currentExpiry > Date.now());
+
+            // Check if already processed (idempotency)
+            const alreadyProcessed = await guild.features.get<boolean>(`processedTransactions.${sessionId}`);
+            if (alreadyProcessed) {
+                console.log('⚠️  This payment has already been processed.');
+                console.log(`Current expiry: ${currentExpiry === -1 ? 'Lifetime' : currentExpiry ? new Date(currentExpiry).toISOString() : 'None'}`);
+                return;
+            }
+
+            // Compute new expiry
+            let newExpiry: number;
+            if (durationMs === -1) {
+                newExpiry = -1;
+            } else if (currentExpiry === -1) {
+                newExpiry = -1;
+            } else if (currentExpiry && currentExpiry > Date.now()) {
+                newExpiry = currentExpiry + durationMs;
+            } else {
+                newExpiry = Date.now() + durationMs;
+            }
+
+            // Set the new expiry
+            await guild.features.set(featureStore, newExpiry);
+
+            // Mark as processed after successful write
+            await guild.features.set(`processedTransactions.${sessionId}`, true);
+
+            console.log('✓ Payment processed successfully!');
+            console.log(`New expiry: ${newExpiry === -1 ? 'Lifetime' : new Date(newExpiry).toISOString()}`);
+
+            // Trigger feature restoration if premium was not active before
+            if (!wasActive) {
+                console.log('Restoring premium features...');
+                await PremiumSweepService.restoreFeatures(guildId);
+                console.log('Features restored.');
+            }
+        } catch (error) {
+            console.error('Error retrying payment:', error);
+        }
+    },
     whitelist: async (input): Promise<void> => {
         const guildId = input.split(' ')[1];
         const feature = input.split(' ')[2];
@@ -883,7 +960,7 @@ rl.on('line', async (input): Promise<void> => {
         await handler(input, command);
     } else {
         console.log(
-            'Available commands: exit, update, sessions, whitelist, stats, sweep',
+            'Available commands: exit, update, sessions, whitelist, stats, sweep, retry',
         );
     }
 });
