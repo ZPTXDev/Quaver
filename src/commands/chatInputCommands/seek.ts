@@ -78,6 +78,16 @@ export default new ChatInputCommandHandler()
             seconds = interaction.options.getInteger('seconds') ?? 0;
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
+        
+        // Check if an ad is playing
+        if (player.memory.isAdPlaying) {
+            await interaction.replyHandler.reply(
+                guild.locale('CMD.SEEK.RESPONSE.ERROR.AD_PLAYING'),
+                { type: MessageOptionsBuilderType.Error },
+            );
+            return;
+        }
+        
         if (
             interaction.options.getInteger('hours') === null &&
             interaction.options.getInteger('minutes') === null &&

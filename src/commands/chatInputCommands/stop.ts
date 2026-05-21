@@ -36,6 +36,16 @@ export default new ChatInputCommandHandler()
     .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
+        
+        // Check if an ad is playing
+        if (player.memory.isAdPlaying) {
+            await interaction.replyHandler.reply(
+                guild.locale('CMD.STOP.RESPONSE.ERROR.AD_PLAYING'),
+                { type: MessageOptionsBuilderType.Error },
+            );
+            return;
+        }
+        
         if (!player.queue.current || (!player.playing && !player.paused)) {
             await interaction.replyHandler.reply(
                 guild.locale('MUSIC.PLAYER.PLAYING.NOTHING'),
