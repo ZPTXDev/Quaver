@@ -22,6 +22,16 @@ export default {
                 WHITELIST: "**Smart Queue** was disabled as this server no longer has access to the feature."
             },
         },
+        FEATURE_RESTORED: {
+            STAY: {
+                PREMIUM: "**24/7 Mode** has been re-enabled as this server's Premium status has been renewed.",
+                WHITELIST: "**24/7 Mode** has been re-enabled as this server now has access to the feature."
+            },
+            SMARTQUEUE: {
+                PREMIUM: "**Smart Queue** has been re-enabled as this server's Premium status has been renewed.",
+                WHITELIST: "**Smart Queue** has been re-enabled as this server now has access to the feature."
+            },
+        },
         FILTER_NOTE: '-# This may take a few seconds to apply',
         LOOP_QUEUE_DISABLED: 'Disabled looping as the queue is less than 15 seconds long.',
         LOOP_TRACK_DISABLED: 'Disabled looping as the track is less than 15 seconds long.',

@@ -17,7 +17,7 @@ import { inspect } from 'node:util';
 import { Server, type Socket } from 'socket.io';
 import yoctoSpinner from 'yocto-spinner';
 import colors from 'yoctocolors';
-import { QuaverClient } from './lib';
+import { PremiumSweepService, QuaverClient } from './lib';
 import { data, DataHandler } from './lib/data';
 import { QuaverGuild, type WhitelistedFeatures, WhitelistStatus, type Initialized } from './lib/guild';
 import type { InteractionHandlerMapsFlat } from './lib/interactions';
@@ -232,6 +232,9 @@ if (settings.features.web.enabled) {
             if (sessionId) {
                 await guild.features.set(`processedTransactions.${sessionId}`, true);
             }
+
+            // Fire-and-forget: re-enable features for active players after premium renewal
+            void PremiumSweepService.restoreFeatures(guildId);
 
             res.send({
                 success: true,
