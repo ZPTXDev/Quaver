@@ -31,7 +31,7 @@
   "defaultLocaleCode": "en",
   "disableAd": false,
   "supportServer": "https://discord.gg/",
-  "premiumURL": "https://example.com/premium",
+  "premiumEnabled": false,
   "managers": [
     "Paste your user ID here"
   ],
@@ -90,5 +90,10 @@
     "enabled": true,
     "maxAge": 86400,
     "maxAttempts": 1
+  },
+  "ads": {
+    "enabled": false,
+    "urls": [],
+    "intervalMinutes": 60
   }
 }

@@ -60,6 +60,7 @@ export type QuaverSong = Song & {
     requesterTag?: string;
     requesterAvatar?: string;
     id?: string;
+    isAd?: boolean;
 };
 
 export type QuaverQueue = Queue & {

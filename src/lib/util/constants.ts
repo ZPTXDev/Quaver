@@ -1,5 +1,17 @@
 import { settings } from './settings';
 
+/**
+ * Generate the premium upsell URL for a specific guild
+ * @param guildId - The Discord guild ID
+ * @returns The premium URL or undefined if premium is not enabled or dashboard URL is not configured
+ */
+export function getPremiumURL(guildId: string): string | undefined {
+    if (!settings.premiumEnabled || !settings.features.web.dashboardURL) {
+        return undefined;
+    }
+    return `${settings.features.web.dashboardURL}/guild/${guildId}?premium=true`;
+}
+
 export enum Check {
     /**
      * Only allowed in guild
@@ -24,7 +36,7 @@ export enum Check {
 }
 
 export const settingsOptions = [
-    ...(settings.premiumURL &&
+    ...(settings.premiumEnabled &&
         ['autolyrics', 'stay', 'smartqueue'].some((feature: string): boolean => {
             const f =
                 settings.features[feature as 'autolyrics' | 'stay' | 'smartqueue'];

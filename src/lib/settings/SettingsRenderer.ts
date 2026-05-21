@@ -4,7 +4,7 @@ import {
     WhitelistStatus,
 } from '#src/lib/guild';
 import { Language, type LocaleKey } from '#src/lib/locales';
-import { acceptableSources, settings } from '#src/lib/util';
+import { acceptableSources, getPremiumURL, settings } from '#src/lib/util';
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -148,7 +148,7 @@ export class SettingsRenderer {
         guild: QuaverGuild<Initialized> & Guild,
     ): Promise<SectionBuilder[]> {
         const premiumEnabled =
-            settings.premiumURL &&
+            settings.premiumEnabled &&
             ['autolyrics', 'stay', 'smartqueue'].some(
                 (feature: string): boolean => {
                     const f =
@@ -174,7 +174,7 @@ export class SettingsRenderer {
                               ? guild.locale('MISC.ACTIVE')
                               : guild.locale('MISC.GET_PREMIUM'),
                           isPremium ? ButtonStyle.Success : ButtonStyle.Link,
-                          isPremium ? '' : settings.premiumURL,
+                          isPremium ? '' : getPremiumURL(guild.id) ?? '',
                       ),
                   ]
                 : []),

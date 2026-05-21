@@ -53,7 +53,7 @@ export class PremiumSweepService {
                         if (!hasUsers) {
                             // No users in channel - disconnect immediately
                             logger.info(`[G ${guild.id}] Premium or 24/7 Mode whitelist expired. Disconnecting immediately.`);
-                            const isStayPremium = !!(settings.premiumURL && settings.features.stay.premium);
+                            const isStayPremium = !!(settings.premiumEnabled && settings.features.stay.premium);
                             await player.sendMessage(
                                 guild.locale(isStayPremium ? 'MUSIC.SESSION_ENDED.FORCED.PREMIUM_EXPIRED' : 'MUSIC.SESSION_ENDED.FORCED.WHITELIST_EXPIRED' as LocaleKey),
                                 { type: MessageOptionsBuilderType.Warning }
@@ -74,7 +74,7 @@ export class PremiumSweepService {
                         if (!isSmartQueueActive) {
                             logger.info(`[G ${guild.id}] Premium or Smart Queue whitelist expired. Deactivating feature.`);
                             await player.setAlternate(false);
-                            const isSmartQueuePremium = !!(settings.premiumURL && settings.features.smartqueue.premium);
+                            const isSmartQueuePremium = !!(settings.premiumEnabled && settings.features.smartqueue.premium);
                             await player.sendMessage(
                                 guild.locale(`MUSIC.PLAYER.FEATURE_DISABLED.SMARTQUEUE.${isSmartQueuePremium ? 'PREMIUM' : 'WHITELIST'}` as LocaleKey),
                                 { type: MessageOptionsBuilderType.Warning }
@@ -123,8 +123,13 @@ export class PremiumSweepService {
         guild: QuaverGuild<Initialized> & Guild,
         guildId: string
     ): Promise<void> {
-        const isStayPremium = !!(settings.premiumURL && settings.features.stay.premium);
-        const isSmartQueuePremium = !!(settings.premiumURL && settings.features.smartqueue.premium);
+        const isStayPremium = !!(settings.premiumEnabled && settings.features.stay.premium);
+        const isSmartQueuePremium = !!(settings.premiumEnabled && settings.features.smartqueue.premium);
+
+        // Reset ad playtime counter when premium is restored
+        if (player.memory.adPlaytimeMs) {
+            player.memory.adPlaytimeMs = 0;
+        }
 
         // 1. Re-enable 24/7 (stay) if it was previously enabled but got cut off
         const staySetting = await guild.settings.get<boolean>('stay.enabled');
@@ -178,7 +183,7 @@ export class PremiumSweepService {
         if (!stayChannel || !stayText) return;
 
         logger.info(`[G ${guildId}] Premium restored. Reconnecting to stay channel.`);
-        const isStayPremium = !!(settings.premiumURL && settings.features.stay.premium);
+        const isStayPremium = !!(settings.premiumEnabled && settings.features.stay.premium);
         const newPlayer = client.music.players.create(guild);
         newPlayer.queue.channel = guild.channels.cache.get(stayText) as QuaverChannels;
         newPlayer.voice.connect(stayChannel, { deafened: true });

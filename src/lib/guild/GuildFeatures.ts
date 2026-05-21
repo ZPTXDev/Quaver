@@ -29,7 +29,7 @@ export class GuildFeatures {
             return WhitelistStatus.Permanent;
         }
         const whitelisted = await (feature === 'premium' ||
-        (settings.premiumURL && settings.features[feature].premium)
+        (settings.premiumEnabled && settings.features[feature].premium)
             ? this.get<number>('premium')
             : this.get<number>(`${feature}.whitelisted`));
         if (!whitelisted) return WhitelistStatus.NotWhitelisted;
