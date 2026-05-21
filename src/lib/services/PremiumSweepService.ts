@@ -163,6 +163,12 @@ export class PremiumSweepService {
         guild: QuaverGuild<Initialized> & Guild,
         guildId: string
     ): Promise<void> {
+        // Guard: ensure music subsystem is ready
+        if (!client.music?.players) {
+            logger.warn(`[G ${guildId}] Cannot reconnect to stay channel: music subsystem not ready yet.`);
+            return;
+        }
+
         const staySetting = await guild.settings.get<boolean>('stay.enabled');
         const isStayNowActive = await guild.features.isFeatureActive('stay');
         if (!staySetting || !isStayNowActive) return;

@@ -317,11 +317,15 @@ if (settings.features.web.enabled) {
                             wasActive,
                         };
                     }
-                    await guild.features.set(`processedTransactions.${sessionId}`, true);
                 }
 
                 const newExpiry = computeNewExpiry(currentExpiry, durationMs);
                 await guild.features.set(featureStore, newExpiry);
+
+                // Mark as processed only after successful entitlement write
+                if (sessionId) {
+                    await guild.features.set(`processedTransactions.${sessionId}`, true);
+                }
 
                 return {
                     alreadyProcessed: false,
@@ -503,7 +507,11 @@ if (settings.features.web.enabled) {
                 ? 'premium'
                 : `${feature}.whitelisted`;
 
-            await guild.features.unset(featureStore);
+            // Serialize delete with the same lock as POST to prevent race conditions
+            await withWhitelistLock(guildId, feature, async (): Promise<void> => {
+                await guild.features.unset(featureStore);
+            });
+
             res.send({
                 success: true,
                 guildName: guild.name,
