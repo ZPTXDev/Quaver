@@ -35,6 +35,16 @@ export default new ChatInputCommandHandler()
             );
             return;
         }
+        
+        // Check if current track is an ad
+        if (player.isAdTrack(player.queue.current)) {
+            await interaction.replyHandler.reply(
+                guild.locale('MUSIC.PLAYER.PLAYING.AD.MESSAGE'),
+                { ephemeral: true },
+            );
+            return;
+        }
+        
         const bar = getBar(
             (player.position / player.queue.current.info.length) * 100,
         );

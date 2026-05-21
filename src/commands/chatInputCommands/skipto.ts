@@ -3,8 +3,9 @@ import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import { getLocaleString } from '#src/lib/locales';
 import { PlayerResponse } from '#src/lib/music';
-import { Check, getRequesterStatus, getTrackMarkdownLocaleString, RequesterStatus, settings, } from '#src/lib/util';
-import { type GuildMember, SlashCommandBuilder, type SlashCommandIntegerOption, } from 'discord.js';
+import { Check, getPremiumURL, getRequesterStatus, getTrackMarkdownLocaleString, RequesterStatus, settings, } from '#src/lib/util';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ContainerBuilder, type GuildMember, SlashCommandBuilder, type SlashCommandIntegerOption, } from 'discord.js';
+
 
 export default new ChatInputCommandHandler()
     .setData(
@@ -63,6 +64,30 @@ export default new ChatInputCommandHandler()
         }
         const response = await player.skipToQueuedTrack(position);
         switch (response) {
+            case PlayerResponse.AdPlaying: {
+                const premiumURL = getPremiumURL(interaction.guild.id);
+                
+                const container = new ContainerBuilder()
+                    .addTextDisplayComponents(
+                        guild.builders.textDisplayLocale('CMD.SKIPTO.RESPONSE.ERROR.AD_PLAYING'),
+                    );
+                
+                if (premiumURL) {
+                    container.addActionRowComponents(
+                        new ActionRowBuilder<ButtonBuilder>().setComponents(
+                            new ButtonBuilder()
+                                .setLabel('Get Premium')
+                                .setStyle(ButtonStyle.Link)
+                                .setURL(premiumURL),
+                        ),
+                    );
+                }
+                
+                await interaction.replyHandler.reply(container, {
+                    type: MessageOptionsBuilderType.Error,
+                });
+                return;
+            }
             case PlayerResponse.RestartInProgress:
                 await interaction.replyHandler.reply(
                     guild.locale('MUSIC.PLAYER.RESTARTING.ACTION_BLOCKED'),

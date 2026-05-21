@@ -37,6 +37,12 @@ export default new ChatInputCommandHandler()
     .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
+        
+        // If disconnecting during an ad, reset accumulated playtime since the ad was interrupted
+        if (player.memory.isAdPlaying) {
+            player.memory.adPlaytimeMs = 0;
+        }
+        
         if (player.queue.tracks.length === 0) {
             const response = await player.disconnect();
             switch (response) {

@@ -5,12 +5,14 @@ import { getLocaleString } from '#src/lib/locales';
 import { PlayerResponse } from '#src/lib/music';
 import {
     Check,
+    getPremiumURL,
     getRequesterStatus,
     getTrackMarkdownLocaleString,
     RequesterStatus,
     settings,
 } from '#src/lib/util';
-import { type GuildMember, SlashCommandBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ContainerBuilder, type GuildMember, SlashCommandBuilder } from 'discord.js';
+
 
 export default new ChatInputCommandHandler()
     .setData(
@@ -32,6 +34,33 @@ export default new ChatInputCommandHandler()
     .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
+        
+        // Check if an ad is playing
+        if (player.memory.isAdPlaying) {
+            const premiumURL = getPremiumURL(interaction.guild.id);
+            
+            const container = new ContainerBuilder()
+                .addTextDisplayComponents(
+                    guild.builders.textDisplayLocale('CMD.SKIP.RESPONSE.ERROR.AD_PLAYING'),
+                );
+            
+            if (premiumURL) {
+                container.addActionRowComponents(
+                    new ActionRowBuilder<ButtonBuilder>().setComponents(
+                        new ButtonBuilder()
+                            .setLabel('Get Premium')
+                            .setStyle(ButtonStyle.Link)
+                            .setURL(premiumURL),
+                    ),
+                );
+            }
+            
+            await interaction.replyHandler.reply(container, {
+                type: MessageOptionsBuilderType.Error,
+            });
+            return;
+        }
+        
         // this check already occurs in the PlayerHandler#skip() method, but we do it first as we need to check before running voteskip addition etc
         if (!player.queue.current || (!player.playing && !player.paused)) {
             await interaction.replyHandler.reply(
