@@ -1,7 +1,8 @@
 import { QuaverGuild } from '#src/lib/guild';
 import { MessageOptionsBuilderType } from '#src/lib';
 import { logger } from '#src/lib/logger';
-import { LocaleKey } from '../locales';
+import { settings } from '#src/lib/util';
+import type { LocaleKey } from '../locales';
 
 export class PremiumSweepService {
     private interval: ReturnType<typeof setInterval> | null = null;
@@ -35,8 +36,9 @@ export class PremiumSweepService {
 
                     if (staySetting && !isStayActive) {
                         logger.info(`[G ${guild.id}] Premium or 24/7 Mode whitelist expired. Disconnecting immediately.`);
+                        const isStayPremium = !!(settings.premiumURL && settings.features.stay.premium);
                         await player.sendMessage(
-                            guild.locale('MUSIC.SESSION_ENDED.FORCED.PREMIUM_EXPIRED'),
+                            guild.locale(isStayPremium ? 'MUSIC.SESSION_ENDED.FORCED.PREMIUM_EXPIRED' : 'MUSIC.SESSION_ENDED.FORCED.WHITELIST_EXPIRED' as LocaleKey),
                             { type: MessageOptionsBuilderType.Warning }
                         );
                         await player.disconnect();
@@ -49,8 +51,9 @@ export class PremiumSweepService {
                         if (!isSmartQueueActive) {
                             logger.info(`[G ${guild.id}] Premium or Smart Queue whitelist expired. Deactivating feature.`);
                             await player.setAlternate(false);
+                            const isSmartQueuePremium = !!(settings.premiumURL && settings.features.smartqueue.premium);
                             await player.sendMessage(
-                                guild.locale(`MUSIC.PLAYER.FEATURE_DISABLED.SMARTQUEUE.${isPremium ? 'PREMIUM' : 'WHITELIST'}` as LocaleKey),
+                                guild.locale(`MUSIC.PLAYER.FEATURE_DISABLED.SMARTQUEUE.${isSmartQueuePremium ? 'PREMIUM' : 'WHITELIST'}` as LocaleKey),
                                 { type: MessageOptionsBuilderType.Warning }
                             );
                         }
