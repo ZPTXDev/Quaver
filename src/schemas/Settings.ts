@@ -118,27 +118,28 @@ export const SettingsSchema = z.object({
             allowedOrigins: z.array(z.string()).default(['http://localhost']),
             encryptionKey: z
                 .string()
-                .optional()
+                .min(32, 'Encryption key must be at least 32 characters')
                 .refine(
                     (val): boolean =>
-                        val === undefined || val !== 'Type an encryption key here',
+                        val !== 'Type an encryption key here',
                     {
                         message:
                             'You must replace the default encryptionKey placeholder with a secure random key.',
                     },
-                ),
+                )
+                .optional(),
             apiSecret: z
                 .string()
-                .optional()
+                .min(32, 'API secret must be at least 32 characters')
                 .refine(
                     (val): boolean =>
-                        val === undefined ||
                         val !== 'Type a secure random string here',
                     {
                         message:
                             'You must replace the default apiSecret placeholder with a secure random string.',
                     },
-                ),
+                )
+                .optional(),
             https: z
                 .object({
                     enabled: z.boolean().default(false),
