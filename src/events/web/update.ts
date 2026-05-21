@@ -1,13 +1,11 @@
 import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
 import { PlayerResponse } from '#src/lib/music';
 import {
-    acceptableSources,
     Check,
     getFailedChecks,
     getRequesterStatus,
     type QuaverChannels,
     type QuaverSong,
-    queryOverrides,
     RequesterStatus,
     searchTracks,
     settings,
