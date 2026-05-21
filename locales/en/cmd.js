@@ -1,12 +1,12 @@
 export default {
     '247': {
-        DESCRIPTION: '24/7 mode prevents Quaver from leaving.',
+        DESCRIPTION: '24/7 Mode prevents Quaver from leaving.',
         OPTION: {
-            ENABLED: 'Whether 24/7 mode is enabled. If not specified, it will be toggled.',
+            ENABLED: 'Whether 24/7 Mode is enabled. If not specified, it will be toggled.',
         },
         RESPONSE: {
-            DISABLED: '24/7 mode has been **disabled**',
-            ENABLED: '24/7 mode has been **enabled**',
+            DISABLED: '24/7 Mode has been **disabled**',
+            ENABLED: '24/7 Mode has been **enabled**',
             QUEUE_CHANNEL_MISSING: 'The queue channel is missing. Try using </bind:%1>.',
         },
         MISC: {
@@ -45,7 +45,7 @@ export default {
         DESCRIPTION: 'Disconnect Quaver.',
         RESPONSE: {
             CONFIRMATION: 'Are you sure you want Quaver to disconnect? You will also lose your current queue.',
-            FEATURE_247_ENABLED: 'Quaver is unable to disconnect as 24/7 mode is enabled.',
+            FEATURE_247_ENABLED: 'Quaver is unable to disconnect as 24/7 Mode is enabled.',
             SUCCESS: 'Disconnected from the voice channel.',
         },
     },
@@ -270,7 +270,7 @@ export default {
                 NAME: 'Playback & Logic',
                 SETTINGS: {
                     NOTIFYIN247: {
-                        DESCRIPTION: 'Whether to send "Now playing" messages in 24/7 mode.',
+                        DESCRIPTION: 'Whether to send "Now playing" messages in 24/7 Mode.',
                         NAME: 'Notify in 24/7 mode',
                     },
                     SMARTQUEUE: {

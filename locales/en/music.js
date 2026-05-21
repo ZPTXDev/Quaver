@@ -16,6 +16,12 @@ export default {
     },
     NOT_READY: 'One moment please! Quaver is still starting up.',
     PLAYER: {
+        FEATURE_DISABLED: {
+            SMARTQUEUE: {
+                PREMIUM: "**Smart Queue** was disabled as this server's Premium status has expired.",
+                WHITELIST: "**Smart Queue** was disabled as this server no longer has access to the feature."
+            },
+        },
         FILTER_NOTE: '-# This may take a few seconds to apply',
         LOOP_QUEUE_DISABLED: 'Disabled looping as the queue is less than 15 seconds long.',
         LOOP_TRACK_DISABLED: 'Disabled looping as the track is less than 15 seconds long.',
@@ -66,9 +72,9 @@ export default {
     SESSION_ENDED: {
         FORCED: {
             DISCONNECTED: 'Session ended as Quaver was disconnected.',
-            STAGE_NOT_MODERATOR: 'Session ended as Quaver was moved to a stage channel that Quaver isn\'t a stage moderator of.',
             PREMIUM_EXPIRED: 'Session ended as this server\'s Premium status has expired.',
-            PREMIUM_EXPIRED_FEATURES: 'Deactivated premium features as this server\'s Premium status has expired.',
+            STAGE_NOT_MODERATOR: 'Session ended as Quaver was moved to a stage channel that Quaver isn\'t a stage moderator of.',
+            WHITELIST_EXPIRED: 'Session ended as this server no longer has access to **24/7 Mode**.',
         },
     },
 };

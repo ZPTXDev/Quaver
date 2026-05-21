@@ -1,6 +1,7 @@
 import { QuaverGuild } from '#src/lib/guild';
 import { MessageOptionsBuilderType } from '#src/lib';
 import { logger } from '#src/lib/logger';
+import { LocaleKey } from '../locales';
 
 export class PremiumSweepService {
     private interval: ReturnType<typeof setInterval> | null = null;
@@ -8,7 +9,7 @@ export class PremiumSweepService {
     start(): void {
         if (this.interval) return;
 
-        logger.info('Starting Premium/Whitelist Expiration Sweep Service (15m interval)...');
+        logger.info('Starting Premium/Whitelist expiration sweep service at 15m interval');
 
         // Run initial sweep on boot after a short delay (e.g. 10 seconds) to let guilds load
         setTimeout((): void => {
@@ -33,7 +34,7 @@ export class PremiumSweepService {
                     const isStayActive = await guild.features.isFeatureActive('stay');
 
                     if (staySetting && !isStayActive) {
-                        logger.info(`[G ${guild.id}] Stay premium/whitelist expired. Disconnecting immediately.`);
+                        logger.info(`[G ${guild.id}] Premium or 24/7 Mode whitelist expired. Disconnecting immediately.`);
                         await player.sendMessage(
                             guild.locale('MUSIC.SESSION_ENDED.FORCED.PREMIUM_EXPIRED'),
                             { type: MessageOptionsBuilderType.Warning }
@@ -46,10 +47,10 @@ export class PremiumSweepService {
                     if (player.memory.alternate) {
                         const isSmartQueueActive = await guild.features.isFeatureActive('smartqueue');
                         if (!isSmartQueueActive) {
-                            logger.info(`[G ${guild.id}] Smart Queue premium/whitelist expired. Deactivating feature.`);
+                            logger.info(`[G ${guild.id}] Premium or Smart Queue whitelist expired. Deactivating feature.`);
                             await player.setAlternate(false);
                             await player.sendMessage(
-                                guild.locale('MUSIC.SESSION_ENDED.FORCED.PREMIUM_EXPIRED_FEATURES'),
+                                guild.locale(`MUSIC.PLAYER.FEATURE_DISABLED.SMARTQUEUE.${isPremium ? 'PREMIUM' : 'WHITELIST'}` as LocaleKey),
                                 { type: MessageOptionsBuilderType.Warning }
                             );
                         }
