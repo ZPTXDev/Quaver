@@ -146,6 +146,31 @@ if (settings.features.web.enabled) {
             return featuresStatus;
         };
 
+        // Lock map to serialize whitelist writes per guild/feature combination
+        const whitelistLocks = new Map<string, Promise<void>>();
+
+        // Execute a function with an exclusive lock on a guild/feature pair
+        const withWhitelistLock = async <T>(guildId: string, feature: string, fn: () => Promise<T>): Promise<T> => {
+            const lockKey = `${guildId}:${feature}`;
+            
+            // Wait for any existing lock on this guild/feature
+            while (whitelistLocks.has(lockKey)) {
+                await whitelistLocks.get(lockKey);
+            }
+            
+            // Create new lock
+            let releaseLock: () => void;
+            const lockPromise = new Promise<void>((resolve: () => void): void => { releaseLock = resolve; });
+            whitelistLocks.set(lockKey, lockPromise);
+            
+            try {
+                return await fn();
+            } finally {
+                whitelistLocks.delete(lockKey);
+                releaseLock!();
+            }
+        };
+
         // Helper to validate whitelist request and send appropriate responses
         const validateWhitelistRequest = (req: Request, res: Response): { valid: boolean, guildId?: string, feature?: string, durationMs?: number, sessionId?: string } => {
             if (!startup.started) {
@@ -164,6 +189,10 @@ if (settings.features.web.enabled) {
             const { guildId, feature, durationMs, sessionId } = req.body;
             if (typeof guildId !== 'string' || typeof feature !== 'string' || typeof durationMs !== 'number') {
                 res.status(400).send({ error: 'guildId and feature must be strings, and durationMs must be a number' });
+                return { valid: false };
+            }
+            if (!Number.isFinite(durationMs)) {
+                res.status(400).send({ error: 'durationMs must be a finite number' });
                 return { valid: false };
             }
             if (durationMs < -1) {
@@ -236,35 +265,43 @@ if (settings.features.web.enabled) {
                 return;
             }
 
-            const featureStore = resolveFeatureStore(feature);
-            const currentExpiry = await guild.features.get<number>(featureStore);
+            // Serialize all reads and writes for this guild/feature under a lock
+            const result = await withWhitelistLock(guildId, feature, async (): Promise<{ alreadyProcessed: boolean; expires: number | null }> => {
+                const featureStore = resolveFeatureStore(feature);
+                const currentExpiry = await guild.features.get<number>(featureStore);
 
-            // Idempotent session handling
-            if (sessionId) {
-                const alreadyProcessed = await guild.features.get<boolean>(`processedTransactions.${sessionId}`);
-                if (alreadyProcessed) {
-                    res.send({
-                        success: true,
-                        guildName: guild.name,
-                        feature,
-                        expires: currentExpiry !== undefined ? currentExpiry : null,
-                        alreadyProcessed: true,
-                    });
-                    return;
+                // Idempotent session handling
+                if (sessionId) {
+                    const alreadyProcessed = await guild.features.get<boolean>(`processedTransactions.${sessionId}`);
+                    if (alreadyProcessed) {
+                        return {
+                            alreadyProcessed: true,
+                            expires: currentExpiry !== undefined ? currentExpiry : null,
+                        };
+                    }
+                    await guild.features.set(`processedTransactions.${sessionId}`, true);
                 }
-                await guild.features.set(`processedTransactions.${sessionId}`, true);
-            }
 
-            const newExpiry = computeNewExpiry(currentExpiry, durationMs);
-            await guild.features.set(featureStore, newExpiry);
+                const newExpiry = computeNewExpiry(currentExpiry, durationMs);
+                await guild.features.set(featureStore, newExpiry);
+                
+                return {
+                    alreadyProcessed: false,
+                    expires: newExpiry,
+                };
+            });
+
             // Fire-and-forget: re-enable features for active players after premium renewal
-            void PremiumSweepService.restoreFeatures(guildId);
+            if (!result.alreadyProcessed) {
+                void PremiumSweepService.restoreFeatures(guildId);
+            }
 
             res.send({
                 success: true,
                 guildName: guild.name,
                 feature,
-                expires: newExpiry,
+                expires: result.expires,
+                ...(result.alreadyProcessed && { alreadyProcessed: true }),
             });
 
 
