@@ -41,14 +41,31 @@ export class PremiumSweepService {
                     const isStayActive = await guild.features.isFeatureActive('stay');
 
                     if (staySetting && !isStayActive) {
-                        logger.info(`[G ${guild.id}] Premium or 24/7 Mode whitelist expired. Disconnecting immediately.`);
-                        const isStayPremium = !!(settings.premiumURL && settings.features.stay.premium);
-                        await player.sendMessage(
-                            guild.locale(isStayPremium ? 'MUSIC.SESSION_ENDED.FORCED.PREMIUM_EXPIRED' : 'MUSIC.SESSION_ENDED.FORCED.WHITELIST_EXPIRED' as LocaleKey),
-                            { type: MessageOptionsBuilderType.Warning }
-                        );
-                        await player.disconnect();
-                        continue;
+                        // Check if there are any users in the voice channel (excluding bots)
+                        const voiceChannelId = player.voice.channelId;
+                        const voiceChannel = voiceChannelId ? guild.channels.cache.get(voiceChannelId) : null;
+                        
+                        let hasUsers = false;
+                        if (voiceChannel && 'members' in voiceChannel && voiceChannel.members instanceof Map) {
+                            hasUsers = Array.from(voiceChannel.members.values()).some((member): boolean => !member.user.bot);
+                        }
+
+                        if (!hasUsers) {
+                            // No users in channel - disconnect immediately
+                            logger.info(`[G ${guild.id}] Premium or 24/7 Mode whitelist expired. Disconnecting immediately.`);
+                            const isStayPremium = !!(settings.premiumURL && settings.features.stay.premium);
+                            await player.sendMessage(
+                                guild.locale(isStayPremium ? 'MUSIC.SESSION_ENDED.FORCED.PREMIUM_EXPIRED' : 'MUSIC.SESSION_ENDED.FORCED.WHITELIST_EXPIRED' as LocaleKey),
+                                { type: MessageOptionsBuilderType.Warning }
+                            );
+                            await player.disconnect();
+                            continue;
+                        } else {
+                            // Users are present - disable stay setting but keep session active
+                            await guild.settings.set('stay.enabled', false);
+                            logger.info(`[G ${guild.id}] Premium or 24/7 Mode whitelist expired. Disabled 24/7 mode but keeping session active due to users in channel.`);
+                            // Let normal timeout logic handle disconnection when users leave
+                        }
                     }
 
                     // 2. Check smart queue (alternating) feature

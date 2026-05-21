@@ -108,6 +108,6 @@ export default new EventHandler()
         }
         (client as QuaverClient).music.connect({ userId: client.user.id });
         await client.application.commands.fetch();
-        const sweepService = new PremiumSweepService();
-        sweepService.start();
+        startup.sweepService = new PremiumSweepService();
+        startup.sweepService.start();
     });

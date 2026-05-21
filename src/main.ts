@@ -126,7 +126,7 @@ if (settings.features.web.enabled) {
                 const featureStore = usesPremiumStore
                     ? 'premium'
                     : `${feature}.whitelisted`;
-                
+
                 const expires = await guild.features.get<number>(featureStore);
 
                 let statusString = 'NotWhitelisted';
@@ -152,17 +152,17 @@ if (settings.features.web.enabled) {
         // Execute a function with an exclusive lock on a guild/feature pair
         const withWhitelistLock = async <T>(guildId: string, feature: string, fn: () => Promise<T>): Promise<T> => {
             const lockKey = `${guildId}:${feature}`;
-            
+
             // Wait for any existing lock on this guild/feature
             while (whitelistLocks.has(lockKey)) {
                 await whitelistLocks.get(lockKey);
             }
-            
+
             // Create new lock
             let releaseLock: () => void;
             const lockPromise = new Promise<void>((resolve: () => void): void => { releaseLock = resolve; });
             whitelistLocks.set(lockKey, lockPromise);
-            
+
             try {
                 return await fn();
             } finally {
@@ -241,7 +241,7 @@ if (settings.features.web.enabled) {
                 const member = await discordGuild.members.fetch(userId);
                 if (member) {
                     const isAdmin = member.permissions.has(PermissionsBitField.Flags.Administrator) ||
-                                  member.permissions.has(PermissionsBitField.Flags.ManageGuild);
+                        member.permissions.has(PermissionsBitField.Flags.ManageGuild);
                     return { isOwner: false, isAdmin };
                 }
             } catch {
@@ -302,9 +302,10 @@ if (settings.features.web.enabled) {
             }
 
             // Serialize all reads and writes for this guild/feature under a lock
-            const result = await withWhitelistLock(guildId, feature, async (): Promise<{ alreadyProcessed: boolean; expires: number | null }> => {
+            const result = await withWhitelistLock(guildId, feature, async (): Promise<{ alreadyProcessed: boolean; expires: number | null; wasActive: boolean }> => {
                 const featureStore = resolveFeatureStore(feature);
                 const currentExpiry = await guild.features.get<number>(featureStore);
+                const wasActive = currentExpiry !== undefined && (currentExpiry === -1 || currentExpiry > Date.now());
 
                 // Idempotent session handling
                 if (sessionId) {
@@ -313,6 +314,7 @@ if (settings.features.web.enabled) {
                         return {
                             alreadyProcessed: true,
                             expires: currentExpiry !== undefined ? currentExpiry : null,
+                            wasActive,
                         };
                     }
                     await guild.features.set(`processedTransactions.${sessionId}`, true);
@@ -320,15 +322,17 @@ if (settings.features.web.enabled) {
 
                 const newExpiry = computeNewExpiry(currentExpiry, durationMs);
                 await guild.features.set(featureStore, newExpiry);
-                
+
                 return {
                     alreadyProcessed: false,
                     expires: newExpiry,
+                    wasActive,
                 };
             });
 
             // Fire-and-forget: re-enable features for active players after premium renewal
-            if (!result.alreadyProcessed) {
+            // Only restore features if premium was not already active (i.e., transitioning from inactive to active)
+            if (!result.alreadyProcessed && !result.wasActive) {
                 void PremiumSweepService.restoreFeatures(guildId);
             }
 
@@ -440,7 +444,7 @@ if (settings.features.web.enabled) {
                 res.status(400).send({ error: 'guildIds array cannot exceed 100 items' });
                 return;
             }
-            if (!guildIds.every((id): boolean => typeof id === 'string')) {
+            if (!guildIds.every((id: unknown): boolean => typeof id === 'string')) {
                 res.status(400).send({ error: 'All guildIds must be strings' });
                 return;
             }
@@ -743,6 +747,15 @@ const consoleCommands: Record<
             `Statistics:\nGuilds: ${client.guilds.cache.size}\nUptime: ${uptimeString}`,
         );
     },
+    sweep: async (): Promise<void> => {
+        if (!startup.sweepService) {
+            console.log('Premium sweep service is not initialized.');
+            return;
+        }
+        console.log('Manually triggering premium/whitelist sweep...');
+        await startup.sweepService.sweep();
+        console.log('Sweep completed.');
+    },
     whitelist: async (input): Promise<void> => {
         const guildId = input.split(' ')[1];
         const feature = input.split(' ')[2];
@@ -862,7 +875,7 @@ rl.on('line', async (input): Promise<void> => {
         await handler(input, command);
     } else {
         console.log(
-            'Available commands: exit, update, sessions, whitelist, stats',
+            'Available commands: exit, update, sessions, whitelist, stats, sweep',
         );
     }
 });
