@@ -1,5 +1,6 @@
 import { MessageOptionsBuilderType } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
+import { data } from '#src/lib/data';
 import { QuaverGuild } from '#src/lib/guild';
 import { getLocaleString } from '#src/lib/locales';
 import { logger } from '#src/lib/logger';
@@ -38,9 +39,10 @@ export default new ChatInputCommandHandler()
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
         
-        // If disconnecting during an ad, reset accumulated playtime since the ad was interrupted
-        if (player.memory.isAdPlaying) {
-            player.memory.adPlaytimeMs = 0;
+        // If disconnecting during an ad, restore accumulated playtime to prevent ad-skipping
+        if (player.memory.isAdPlaying && player.memory.preAdPlaytimeMs !== undefined) {
+            player.memory.adPlaytimeMs = player.memory.preAdPlaytimeMs;
+            await data.guild.set(guild.id, 'ads.playtimeMs', player.memory.preAdPlaytimeMs);
         }
         
         if (player.queue.tracks.length === 0) {

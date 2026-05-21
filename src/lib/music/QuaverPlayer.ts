@@ -51,6 +51,7 @@ export interface QuaverPlayerJSON {
             users: Snowflake[];
         };
         adPlaytimeMs?: number;
+        preAdPlaytimeMs?: number;
         isAdPlaying?: boolean;
         isAdQueued?: boolean;
     };
@@ -125,6 +126,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         shuffledQueue?: string[];
         failureCount?: number;
         adPlaytimeMs: number;
+        preAdPlaytimeMs?: number;
         isAdPlaying: boolean;
         isAdQueued?: boolean;
         savedFilters?: {

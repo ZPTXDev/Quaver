@@ -162,6 +162,8 @@ export default {
 
                         // Mark that an ad is playing
                         queue.player.memory.isAdPlaying = true;
+                        // Save current playtime before resetting (for disconnect handling)
+                        queue.player.memory.preAdPlaytimeMs = queue.player.memory.adPlaytimeMs;
                         queue.player.memory.adPlaytimeMs = 0;
                         await data.guild.set(guild.id, 'ads.playtimeMs', 0);
 
