@@ -35,9 +35,16 @@ export default {
 
                 // Restore saved filters
                 if (queue.player.memory.savedFilters) {
-                    await queue.player.setBassboost(queue.player.memory.savedFilters.bassboost);
-                    await queue.player.setNightcore(queue.player.memory.savedFilters.nightcore);
+                    // Batch filter updates to prevent UI flickering
+                    await queue.player.setBassboost(queue.player.memory.savedFilters.bassboost, true);
+                    await queue.player.setNightcore(queue.player.memory.savedFilters.nightcore, true);
                     delete queue.player.memory.savedFilters;
+                    
+                    // Send single batched web update
+                    guild.sendWebUpdate('filterUpdate', {
+                        bassboost: queue.player.memory.bassboost,
+                        nightcore: queue.player.memory.nightcore,
+                    });
                 }
 
                 // Advance to next track silently
@@ -82,9 +89,16 @@ export default {
 
             // Restore saved filters
             if (queue.player.memory.savedFilters) {
-                await queue.player.setBassboost(queue.player.memory.savedFilters.bassboost);
-                await queue.player.setNightcore(queue.player.memory.savedFilters.nightcore);
+                // Batch filter updates to prevent UI flickering
+                await queue.player.setBassboost(queue.player.memory.savedFilters.bassboost, true);
+                await queue.player.setNightcore(queue.player.memory.savedFilters.nightcore, true);
                 delete queue.player.memory.savedFilters;
+                
+                // Send single batched web update
+                guild.sendWebUpdate('filterUpdate', {
+                    bassboost: queue.player.memory.bassboost,
+                    nightcore: queue.player.memory.nightcore,
+                });
             }
 
             // Only advance to next track if the reason warrants it
@@ -164,12 +178,20 @@ export default {
                             nightcore: queue.player.memory.nightcore,
                         };
                         
-                        // Disable all filters for the ad
+                        // Batch filter updates to prevent UI flickering
                         if (queue.player.memory.bassboost) {
-                            await queue.player.setBassboost(false);
+                            await queue.player.setBassboost(false, true);
                         }
                         if (queue.player.memory.nightcore) {
-                            await queue.player.setNightcore(false);
+                            await queue.player.setNightcore(false, true);
+                        }
+                        
+                        // Send single batched web update only if filters were changed
+                        if (queue.player.memory.savedFilters.bassboost || queue.player.memory.savedFilters.nightcore) {
+                            guild.sendWebUpdate('filterUpdate', {
+                                bassboost: queue.player.memory.bassboost,
+                                nightcore: queue.player.memory.nightcore,
+                            });
                         }
 
                         // Mark that an ad is playing

@@ -326,9 +326,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Toggle bass boost mode.
      * @param enabled - Whether the feature is enabled.
+     * @param suppressWebUpdate - If true, skip sending web update (useful for batching multiple filter changes).
      * @returns Whether the feature was enabled.
      */
-    async setBassboost(enabled: boolean): Promise<PlayerResponse> {
+    async setBassboost(enabled: boolean, suppressWebUpdate = false): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
         if (
             enabled !==
@@ -337,10 +338,12 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             await this.effects.toggle(effects.bassboost);
         }
         this.memory.bassboost = enabled;
-        guild.sendWebUpdate('filterUpdate', {
-            bassboost: this.memory.bassboost,
-            nightcore: this.memory.nightcore,
-        });
+        if (!suppressWebUpdate) {
+            guild.sendWebUpdate('filterUpdate', {
+                bassboost: this.memory.bassboost,
+                nightcore: this.memory.nightcore,
+            });
+        }
         return PlayerResponse.Success;
     }
 
@@ -493,9 +496,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Toggle nightcore mode.
      * @param enabled - Whether the feature is enabled.
+     * @param suppressWebUpdate - If true, skip sending web update (useful for batching multiple filter changes).
      * @returns Whether the feature was enabled.
      */
-    async setNightcore(enabled: boolean): Promise<PlayerResponse> {
+    async setNightcore(enabled: boolean, suppressWebUpdate = false): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
         if (
             enabled !==
@@ -504,10 +508,12 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             await this.effects.toggle(effects.nightcore);
         }
         this.memory.nightcore = enabled;
-        guild.sendWebUpdate('filterUpdate', {
-            bassboost: this.memory.bassboost,
-            nightcore: this.memory.nightcore,
-        });
+        if (!suppressWebUpdate) {
+            guild.sendWebUpdate('filterUpdate', {
+                bassboost: this.memory.bassboost,
+                nightcore: this.memory.nightcore,
+            });
+        }
         return PlayerResponse.Success;
     }
 
