@@ -129,6 +129,9 @@ export default {
                     return callback({ status: Response.InactiveSessionError });
                 }
                 const response = await player.setPause(item.value);
+                if (response === PlayerResponse.AdPlaying) {
+                    return callback({ status: Response.AdPlayingError });
+                }
                 if (response !== PlayerResponse.Success) {
                     return callback({ status: Response.GenericError });
                 }
@@ -207,6 +210,9 @@ export default {
                     return callback({ status: Response.AuthenticationError });
                 }
                 const response = await player.seekTo(item.value);
+                if (response === PlayerResponse.AdPlaying) {
+                    return callback({ status: Response.AdPlayingError });
+                }
                 if (response !== PlayerResponse.Success) {
                     return callback({ status: Response.GenericError });
                 }
@@ -373,4 +379,5 @@ export enum Response {
     NoResultsError = 'error-no-results',
     UserNotInChannelError = 'error-user-not-in-channel',
     NotReadyError = 'error-not-ready',
+    AdPlayingError = 'error-ad-playing',
 }

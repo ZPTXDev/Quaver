@@ -521,6 +521,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         // after pausing, we'll set restartReady to true, indicating end of a track
         // (only for restartStrategy: track)
         if (this.restartReady) return PlayerResponse.RestartInProgress;
+        if (this.memory.isAdPlaying) return PlayerResponse.AdPlaying;
         const guild = await QuaverGuild.wrap(this.guild);
         if (this.paused === paused) {
             return PlayerResponse.PlayerStateUnchanged;
@@ -578,6 +579,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      */
     async seekTo(position: number): Promise<PlayerResponse> {
         if (this.restartReady) return PlayerResponse.RestartInProgress;
+        if (this.memory.isAdPlaying) return PlayerResponse.AdPlaying;
         if (!this.queue.current || (!this.playing && !this.paused)) {
             return PlayerResponse.PlayerIdle;
         }
@@ -795,6 +797,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @returns Whether the player was stopped.
      */
     async reset(): Promise<PlayerResponse> {
+        if (this.memory.isAdPlaying) return PlayerResponse.AdPlaying;
         if (!this.queue.current || (!this.playing && !this.paused)) {
             return PlayerResponse.PlayerIdle;
         }
