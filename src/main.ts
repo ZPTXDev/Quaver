@@ -164,7 +164,8 @@ if (settings.features.web.enabled) {
             });
 
             // Chain: wait for previous, then hold the lock until we resolve
-            whitelistLocks.set(lockKey, previousLock.then((): Promise<void> => currentLock));
+            const chainedLock = previousLock.then((): Promise<void> => currentLock);
+            whitelistLocks.set(lockKey, chainedLock);
 
             try {
                 // Wait for previous operation to complete
@@ -174,6 +175,10 @@ if (settings.features.web.enabled) {
             } finally {
                 // Release the lock
                 resolveCurrent!();
+                // Clean up the map entry if no new operations were added
+                if (whitelistLocks.get(lockKey) === chainedLock) {
+                    whitelistLocks.delete(lockKey);
+                }
             }
         };
 
@@ -258,8 +263,10 @@ if (settings.features.web.enabled) {
 
         // Process guild data for a specific user, including permission checks and premium status
         const processUserGuildData = async (guildId: string, userId: string): Promise<Record<string, unknown>> => {
-            const discordGuild = client.guilds.cache.get(guildId);
-            if (!discordGuild) {
+            let discordGuild;
+            try {
+                discordGuild = await client.guilds.fetch(guildId);
+            } catch {
                 return {
                     guildId,
                     botInGuild: false,

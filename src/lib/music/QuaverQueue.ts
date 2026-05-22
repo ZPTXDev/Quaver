@@ -32,6 +32,7 @@ export interface QueueOptions {
     play: (queue: Queue, song: Song) => Promise<void>;
 }
 
+
 export interface QueueEvents {
     trackStart: (song: QuaverSong) => void;
     trackEnd: (song: QuaverSong, reason: TrackEndReason) => void;
@@ -48,6 +49,7 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
 
     /** Queue options */
     readonly options: QueueOptions;
+
 
 
     /** Queued tracks */
