@@ -12,7 +12,7 @@ import {
 import type { Collection, GuildMember, Snowflake } from 'discord.js';
 
 export default {
-    name: 'trackEnd',
+    name: 'queueTrackEnd',
     once: false,
     async execute(
         queue: QuaverQueue,

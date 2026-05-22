@@ -47,7 +47,7 @@ export class PremiumSweepService {
                         
                         let hasUsers = false;
                         if (voiceChannel && 'members' in voiceChannel && voiceChannel.members instanceof Map) {
-                            hasUsers = Array.from(voiceChannel.members.values()).some((member): boolean => !member.user.bot);
+                            hasUsers = voiceChannel.members.some((member): boolean => !member.user.bot);
                         }
 
                         if (!hasUsers) {

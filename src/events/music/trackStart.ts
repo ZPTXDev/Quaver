@@ -25,7 +25,7 @@ import {
 } from 'discord.js';
 
 export default {
-    name: 'trackStart',
+    name: 'queueTrackStart',
     once: false,
     async execute(queue: QuaverQueue, track: QuaverSong): Promise<void> {
         const guild = await QuaverGuild.wrap(queue.player.guild);

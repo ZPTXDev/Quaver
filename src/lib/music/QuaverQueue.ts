@@ -1,7 +1,7 @@
 import type { QuaverPlayer } from './QuaverPlayer';
 import type { QuaverChannels, QuaverSong } from '#src/lib/util';
 import { TypedEmitter } from 'tiny-typed-emitter';
-import type { TrackEndReason } from 'lavalink-protocol';
+import { mayStartNext, type TrackEndReason } from 'lavalink-protocol';
 import type { Queue, Song } from '@lavaclient/plugin-queue';
 import { LoopType } from '@lavaclient/plugin-queue';
 
@@ -95,8 +95,6 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
         player.on('trackEnd', async (track, reason): Promise<void> => {
             // Only emit trackEnd for reasons that should advance the queue
             // This matches the behavior of @lavaclient/plugin-queue
-            const { mayStartNext } = await import('lavalink-protocol');
-            
             if (!mayStartNext[reason]) {
                 return;
             }
@@ -116,8 +114,14 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
         event: K,
         ...args: Parameters<QueueEvents[K]>
     ): boolean {
-        // Map 'finish' to 'queueFinish' for Node events
-        const nodeEvent = event === 'finish' ? 'queueFinish' : event;
+        // Map queue events to unique names to avoid conflicts with lavaclient's native events
+        const eventMap: Record<string, string> = {
+            'trackStart': 'queueTrackStart',
+            'trackEnd': 'queueTrackEnd',
+            'finish': 'queueFinish',
+        };
+        
+        const nodeEvent = eventMap[event] || event;
         
         // Emit on the Node with the queue as the first argument
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Cross-type event emission requires type assertion

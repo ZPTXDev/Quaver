@@ -153,12 +153,9 @@ if (settings.features.web.enabled) {
         const withWhitelistLock = async <T>(guildId: string, feature: string, fn: () => Promise<T>): Promise<T> => {
             const lockKey = `${guildId}:${feature}`;
 
-            // If lock exists, wait for it and retry
-            const existingLock = whitelistLocks.get(lockKey);
-            if (existingLock) {
-                await existingLock;
-                // Retry after lock is released
-                return withWhitelistLock(guildId, feature, fn);
+            // Wait for any existing lock to be released
+            while (whitelistLocks.has(lockKey)) {
+                await whitelistLocks.get(lockKey);
             }
 
             // Create new lock
