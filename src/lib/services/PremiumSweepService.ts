@@ -7,6 +7,7 @@ import { type QuaverChannels, settings } from '#src/lib/util';
 import type { LocaleKey } from '../locales';
 import type { QuaverPlayer } from '../music';
 import type { Guild } from 'discord.js';
+import { data } from '#src/lib/data';
 
 export class PremiumSweepService {
     private interval: ReturnType<typeof setInterval> | null = null;
@@ -129,6 +130,7 @@ export class PremiumSweepService {
         // Reset ad playtime counter when premium is restored
         if (player.memory.adPlaytimeMs) {
             player.memory.adPlaytimeMs = 0;
+            await data.guild.set(guild.id, 'ads.playtimeMs', 0);
         }
 
         // 1. Re-enable 24/7 (stay) if it was previously enabled but got cut off

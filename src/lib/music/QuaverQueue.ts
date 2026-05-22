@@ -28,9 +28,6 @@ export interface AddOptions {
     requester?: { id: string };
 }
 
-export interface QueueOptions {
-    play: (queue: Queue, song: Song) => Promise<void>;
-}
 
 export interface QueueEvents {
     trackStart: (song: QuaverSong) => void;
@@ -93,12 +90,6 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
         });
 
         player.on('trackEnd', async (track, reason): Promise<void> => {
-            // Only emit trackEnd for reasons that should advance the queue
-            // This matches the behavior of @lavaclient/plugin-queue
-            if (!mayStartNext[reason]) {
-                return;
-            }
-            
             if (!track) {
                 return;
             }
@@ -175,6 +166,7 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
             switch (this.loop.type) {
                 case LoopType.Song:
                     // Track loop: replay the same track
+                    this.last = this.current;
                     await this.player.play(this.current);
                     return true;
 
@@ -198,7 +190,8 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
         // Get next track
         const next = this.tracks.shift();
         if (!next) {
-            // Queue is empty - emit finish event
+            // Queue is empty - reset current and emit finish event
+            this.current = null;
             this.emit('finish');
             return false;
         }

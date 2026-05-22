@@ -32,6 +32,7 @@ import {
     updateQueryOverrides,
     updateSourceManagers,
     version,
+    WHITELISTABLE_FEATURES,
 } from './lib/util';
 
 type QuaverMusicEvent = {
@@ -109,7 +110,7 @@ if (settings.features.web.enabled) {
         const getGuildPremiumStatus = async (
             guild: QuaverGuild<Initialized>,
         ): Promise<Record<string, { status: string; expires: number | null }>> => {
-            const featuresList = ['premium', 'stay', 'autolyrics', 'smartqueue'] as const;
+            const featuresList = WHITELISTABLE_FEATURES;
             const featuresStatus: Record<string, { status: string; expires: number | null }> = {};
 
             for (const feature of featuresList) {
@@ -203,7 +204,7 @@ if (settings.features.web.enabled) {
                 res.status(400).send({ error: 'durationMs must be -1 or greater' });
                 return { valid: false };
             }
-            if (!['premium', 'stay', 'autolyrics', 'smartqueue'].includes(feature)) {
+            if (!WHITELISTABLE_FEATURES.includes(feature)) {
                 res.status(400).send({ error: 'Invalid feature name' });
                 return { valid: false };
             }
@@ -482,7 +483,7 @@ if (settings.features.web.enabled) {
                 });
                 return;
             }
-            if (!['premium', 'stay', 'autolyrics', 'smartqueue'].includes(feature)) {
+            if (!WHITELISTABLE_FEATURES.includes(feature)) {
                 res.status(400).send({ error: 'Invalid feature name' });
                 return;
             }
@@ -865,12 +866,12 @@ const consoleCommands: Record<
             return;
         }
         if (
-            !['premium', 'stay', 'autolyrics', 'smartqueue'].includes(
+            !WHITELISTABLE_FEATURES.includes(
                 feature,
             )
         ) {
             console.log(
-                'Available features: premium, stay, autolyrics, smartqueue',
+                `Available features: ${WHITELISTABLE_FEATURES.join(', ')}`,
             );
             return;
         }

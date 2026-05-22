@@ -13,6 +13,11 @@ export function getPremiumURL(guildId: string): string | undefined {
     return `${baseURL}/guild/${guildId}?premium=true`;
 }
 
+/**
+ * List of features that can be whitelisted
+ */
+export const WHITELISTABLE_FEATURES = ['premium', 'stay', 'autolyrics', 'smartqueue'] as const;
+
 export enum Check {
     /**
      * Only allowed in guild
