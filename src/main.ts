@@ -204,7 +204,7 @@ if (settings.features.web.enabled) {
                 res.status(400).send({ error: 'durationMs must be -1 or greater' });
                 return { valid: false };
             }
-            if (!WHITELISTABLE_FEATURES.includes(feature)) {
+            if (!(WHITELISTABLE_FEATURES as readonly string[]).includes(feature)) {
                 res.status(400).send({ error: 'Invalid feature name' });
                 return { valid: false };
             }
@@ -483,7 +483,7 @@ if (settings.features.web.enabled) {
                 });
                 return;
             }
-            if (!WHITELISTABLE_FEATURES.includes(feature)) {
+            if (!(WHITELISTABLE_FEATURES as readonly string[]).includes(feature)) {
                 res.status(400).send({ error: 'Invalid feature name' });
                 return;
             }
@@ -866,7 +866,7 @@ const consoleCommands: Record<
             return;
         }
         if (
-            !WHITELISTABLE_FEATURES.includes(
+            !(WHITELISTABLE_FEATURES as readonly string[]).includes(
                 feature,
             )
         ) {

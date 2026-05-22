@@ -1,7 +1,7 @@
 import type { QuaverPlayer } from './QuaverPlayer';
 import type { QuaverChannels, QuaverSong } from '#src/lib/util';
 import { TypedEmitter } from 'tiny-typed-emitter';
-import { mayStartNext, type TrackEndReason } from 'lavalink-protocol';
+import type { TrackEndReason } from 'lavalink-protocol';
 import type { Queue, Song } from '@lavaclient/plugin-queue';
 import { LoopType } from '@lavaclient/plugin-queue';
 
@@ -28,6 +28,9 @@ export interface AddOptions {
     requester?: { id: string };
 }
 
+export interface QueueOptions {
+    play: (queue: Queue, song: Song) => Promise<void>;
+}
 
 export interface QueueEvents {
     trackStart: (song: QuaverSong) => void;
@@ -45,6 +48,7 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
 
     /** Queue options */
     readonly options: QueueOptions;
+
 
     /** Queued tracks */
     tracks: QuaverSong[] = [];
