@@ -118,7 +118,8 @@ export default {
             const shouldPlayAd =
                 adsConfig?.enabled &&
                 adsConfig.urls.length > 0 &&
-                isPremium === WhitelistStatus.NotWhitelisted &&
+                isPremium !== WhitelistStatus.Permanent &&
+                isPremium !== WhitelistStatus.Temporary &&
                 queue.player.memory.adPlaytimeMs >=
                     adsConfig.intervalMinutes * 60 * 1000;
 
@@ -190,7 +191,9 @@ export default {
                         } else if (queue.loop.type === LoopType.Song) {
                             // For song loop, unshift the track back to the queue
                             // so it will be replayed after the ad finishes
+                            // Preserve the loop counter by updating queue.last
                             queue.tracks.unshift(track);
+                            queue.last = track;
                         }
 
                         // Set queue.current to the ad track so trackStart displays it correctly

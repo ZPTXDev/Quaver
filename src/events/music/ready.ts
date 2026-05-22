@@ -35,6 +35,18 @@ async function restorePlayer(
         // Also check memory.isAdPlaying since toJSON sets queue.current to null for ads
         const isAdTrack = snapshot.queue.current?.isAd === true || snapshot.memory.isAdPlaying;
         if (isAdTrack) {
+            // Clean up ad state before advancing (mirror trackEnd ad cleanup path)
+            player.memory.isAdPlaying = false;
+            player.memory.adPlaytimeMs = 0;
+            await data.guild.set(guild.id, 'ads.playtimeMs', 0);
+            
+            // Restore saved filters
+            if (player.memory.savedFilters) {
+                await player.setBassboost(player.memory.savedFilters.bassboost);
+                await player.setNightcore(player.memory.savedFilters.nightcore);
+                delete player.memory.savedFilters;
+            }
+            
             // If resumed, stop the current track (Lavalink already started it)
             if (resumed && player.playing) {
                 await player.stop();

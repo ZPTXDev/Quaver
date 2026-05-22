@@ -49,11 +49,6 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
     /** The player this queue belongs to */
     readonly player: QuaverPlayer;
 
-    /** Queue options */
-    readonly options: QueueOptions;
-
-
-
     /** Queued tracks */
     tracks: QuaverSong[] = [];
 
@@ -75,14 +70,9 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
     /** Custom data storage */
     data: Record<string, unknown> = {};
 
-    constructor(player: QuaverPlayer, options?: QueueOptions) {
+    constructor(player: QuaverPlayer) {
         super();
         this.player = player;
-        this.options = options ?? {
-            play: async (queue, song): Promise<void> => {
-                await queue.player.play(song);
-            }
-        };
 
         // Listen to Player events and re-emit them as Queue events
         // This ensures Node events are fired with the queue as the first argument

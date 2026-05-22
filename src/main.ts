@@ -172,8 +172,8 @@ if (settings.features.web.enabled) {
             whitelistLocks.set(lockKey, chainedLock);
 
             try {
-                // Wait for previous operation to complete
-                await previousLock;
+                // Wait for previous operation to complete (ignore its result/error)
+                await previousLock.catch(() => {});
                 // Execute our operation
                 return await fn();
             } finally {
