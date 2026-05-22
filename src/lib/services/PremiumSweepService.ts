@@ -44,9 +44,20 @@ export class PremiumSweepService {
                     if (staySetting && !isStayActive) {
                         // Check if there are any users in the voice channel (excluding bots)
                         const voiceChannelId = player.voice.channelId;
-                        const voiceChannel = voiceChannelId ? guild.channels.cache.get(voiceChannelId) : null;
+                        let voiceChannel = voiceChannelId ? guild.channels.cache.get(voiceChannelId) : null;
                         
-                        let hasUsers = false;
+                        // If channel is not cached, try to fetch it
+                        if (!voiceChannel && voiceChannelId) {
+                            try {
+                                voiceChannel = await guild.channels.fetch(voiceChannelId);
+                            } catch {
+                                // If we can't fetch the channel, assume users are present to avoid incorrect disconnection
+                                logger.warn(`[G ${guild.id}] Could not fetch voice channel ${voiceChannelId}. Assuming users are present.`);
+                            }
+                        }
+                        
+                        // Default to true (assume users present) if we can't verify the channel state
+                        let hasUsers = true;
                         if (voiceChannel && voiceChannel.isVoiceBased() && 'members' in voiceChannel) {
                             hasUsers = voiceChannel.members.some((member: { user: { bot: boolean } }): boolean => !member.user.bot);
                         }

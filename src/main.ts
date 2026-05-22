@@ -186,12 +186,31 @@ if (settings.features.web.enabled) {
             whitelistLocks.set(lockKey, chainedLock);
 
             try {
-                // Wait for previous operation to complete (ignore its result/error)
-                await previousLock.catch((): void => {
-                    // Intentionally empty - we only care that the previous operation completed
+                // Wait for previous operation to complete with a timeout to prevent deadlocks
+                // Timeout set to 30 seconds
+                const LOCK_TIMEOUT_MS = 30000;
+                const timeoutPromise = new Promise<never>((_, reject): void => {
+                    setTimeout((): void => {
+                        reject(new Error(`Lock acquisition timeout for ${lockKey}`));
+                    }, LOCK_TIMEOUT_MS);
                 });
-                // Execute our operation
-                return await fn();
+
+                await Promise.race([
+                    previousLock.catch((): void => {
+                        // Intentionally empty - we only care that the previous operation completed
+                    }),
+                    timeoutPromise
+                ]);
+
+                // Execute our operation with timeout
+                return await Promise.race([
+                    fn(),
+                    new Promise<never>((_, reject): void => {
+                        setTimeout((): void => {
+                            reject(new Error(`Operation timeout for ${lockKey}`));
+                        }, LOCK_TIMEOUT_MS);
+                    })
+                ]);
             } finally {
                 // Release the lock
                 resolveCurrent!();
@@ -458,10 +477,14 @@ if (settings.features.web.enabled) {
                 return;
             }
 
-            // Count how many guilds are not in cache to prevent rate limit abuse
-            const uncachedCount = guildIds.filter((guildId: string): boolean => 
+            // Deduplicate guildIds to prevent redundant API calls and accurate rate limiting
+            const uniqueGuildIds = Array.from(new Set(guildIds));
+
+            // Count how many unique guilds are not in cache to prevent rate limit abuse
+            const uncachedGuildIds = uniqueGuildIds.filter((guildId: string): boolean => 
                 !client.guilds.cache.has(guildId)
-            ).length;
+            );
+            const uncachedCount = uncachedGuildIds.length;
             
             // Limit the number of API calls per request to prevent abuse
             const MAX_UNCACHED_GUILDS = 10;
@@ -475,7 +498,7 @@ if (settings.features.web.enabled) {
             }
 
             const guildsData = await Promise.all(
-                guildIds.map((guildId: string) => processUserGuildData(guildId, userId))
+                uniqueGuildIds.map((guildId: string): Promise<Record<string, unknown>> => processUserGuildData(guildId, userId))
             );
             res.send(guildsData);
         });
