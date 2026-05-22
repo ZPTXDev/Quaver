@@ -170,6 +170,25 @@ export default {
                         queue.player.memory.adPlaytimeMs = 0;
                         await data.guild.set(guild.id, 'ads.playtimeMs', 0);
 
+                        // Handle loop logic for the finished track before playing ad
+                        // This ensures the track isn't lost from the loop cycle
+                        if (queue.loop.type === LoopType.Queue) {
+                            // Add finished track to previous array for queue loop
+                            queue.previous.push(track);
+                            
+                            // Handle shuffle/alternate with queue loop
+                            const transformsActive =
+                                queue.player.memory.shuffle || queue.player.memory.alternate;
+                            if (transformsActive) {
+                                if (queue.player.memory.originalQueue) {
+                                    queue.player.memory.originalQueue.push(track);
+                                }
+                                if (queue.player.memory.shuffledQueue) {
+                                    queue.player.memory.shuffledQueue.push(track.id);
+                                }
+                            }
+                        }
+
                         // Set queue.current to the ad track so trackStart displays it correctly
                         queue.current = adTrack;
 

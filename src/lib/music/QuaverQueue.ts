@@ -168,8 +168,10 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
      * @returns True if a track was started, false if queue is empty
      */
     async next(): Promise<boolean> {
-        // Handle loop logic
-        if (this.current) {
+        // Handle loop logic (skip for ad tracks)
+        const isCurrentAd = this.current && this.player.isAdTrack(this.current);
+        
+        if (this.current && !isCurrentAd) {
             switch (this.loop.type) {
                 case LoopType.Song:
                     // Track loop: replay the same track
@@ -211,7 +213,10 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
         }
 
         // Update current and play
-        this.last = this.current;
+        // Don't update this.last if current is an ad track
+        if (!isCurrentAd) {
+            this.last = this.current;
+        }
         this.current = next;
         await this.player.play(next);
         return true;

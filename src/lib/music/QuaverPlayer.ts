@@ -53,7 +53,6 @@ export interface QuaverPlayerJSON {
         adPlaytimeMs?: number;
         preAdPlaytimeMs?: number;
         isAdPlaying?: boolean;
-        isAdQueued?: boolean;
     };
 }
 
@@ -128,7 +127,6 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         adPlaytimeMs: number;
         preAdPlaytimeMs?: number;
         isAdPlaying: boolean;
-        isAdQueued?: boolean;
         savedFilters?: {
             bassboost: boolean;
             nightcore: boolean;
@@ -140,7 +138,6 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         alternate: false,
         adPlaytimeMs: 0,
         isAdPlaying: false,
-        isAdQueued: false,
     };
 
     constructor(node: TNode, guild: Guild) {
