@@ -105,11 +105,15 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
                 return;
             }
             // Find the matching QuaverSong to preserve metadata
-            // If this.current matches the ended track, use it; otherwise use this.last
-            // This handles the race condition when next() is called before trackEnd fires
-            const endedTrack = this.current?.encoded === track.encoded 
-                ? this.current 
-                : this.last;
+            // For 'finished' and 'replaced' reasons, prefer this.last because it represents
+            // the track that actually just ended (this.current may already be the next track)
+            // This is especially important for loop mode where the same track is replayed
+            let endedTrack: QuaverSong | null = null;
+            if (reason === 'finished' || reason === 'replaced') {
+                endedTrack = this.last?.encoded === track.encoded ? this.last : this.current;
+            } else {
+                endedTrack = this.current?.encoded === track.encoded ? this.current : this.last;
+            }
             
             if (endedTrack) {
                 this.emit('trackEnd', endedTrack, reason);

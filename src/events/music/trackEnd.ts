@@ -94,9 +94,11 @@ export default {
             return;
         }
 
-        // Regular track finished
-        if (reason === 'finished') {
-            // Accumulate playtime
+        // Accumulate playtime for regular tracks (not ads)
+        // Use player position to track actual listened duration, regardless of end reason
+        // This prevents users from skipping tracks to avoid ads
+        if (reason === 'finished' || reason === 'stopped' || reason === 'replaced') {
+            // Initialize playtime from database if not in memory
             if (queue.player.memory.adPlaytimeMs === undefined) {
                 const dbPlaytime = await data.guild.get<number>(
                     guild.id,
@@ -104,14 +106,20 @@ export default {
                 );
                 queue.player.memory.adPlaytimeMs = dbPlaytime || 0;
             }
-            queue.player.memory.adPlaytimeMs += track.info.length;
+            
+            // Accumulate actual listened duration using player position
+            const listenedDuration = queue.player.position || 0;
+            queue.player.memory.adPlaytimeMs += listenedDuration;
             await data.guild.set(
                 guild.id,
                 'ads.playtimeMs',
                 queue.player.memory.adPlaytimeMs,
             );
+        }
 
-            // Check if we should play an ad
+        // Only check for ad insertion when a track finishes naturally
+        // (not when user skips, as we don't want to interrupt their action with an ad)
+        if (reason === 'finished') {
             const adsConfig = settings.ads;
             const isPremium = await guild.features.checkWhitelisted('premium');
 

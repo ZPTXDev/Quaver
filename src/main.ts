@@ -150,9 +150,12 @@ if (settings.features.web.enabled) {
         // Lock map to serialize whitelist writes per guild/feature combination
         const whitelistLocks = new Map<string, Promise<void>>();
 
-        // Execute a function with an exclusive lock on a guild/feature pair
+        // Execute a function with an exclusive lock on a guild/store pair
         const withWhitelistLock = async <T>(guildId: string, feature: string, fn: () => Promise<T>): Promise<T> => {
-            const lockKey = `${guildId}:${feature}`;
+            // Use the resolved store name as the lock key to prevent race conditions
+            // when multiple features share the same underlying data store
+            const storeName = resolveFeatureStore(feature);
+            const lockKey = `${guildId}:${storeName}`;
 
             // Get the current lock promise or create a resolved one
             const previousLock = whitelistLocks.get(lockKey) ?? Promise.resolve();
@@ -477,6 +480,22 @@ if (settings.features.web.enabled) {
             }
             if (!guildIds.every((id: unknown): boolean => typeof id === 'string')) {
                 res.status(400).send({ error: 'All guildIds must be strings' });
+                return;
+            }
+
+            // Count how many guilds are not in cache to prevent rate limit abuse
+            const uncachedCount = guildIds.filter((guildId: string): boolean => 
+                !client.guilds.cache.has(guildId)
+            ).length;
+            
+            // Limit the number of API calls per request to prevent abuse
+            const MAX_UNCACHED_GUILDS = 10;
+            if (uncachedCount > MAX_UNCACHED_GUILDS) {
+                res.status(429).send({ 
+                    error: `Too many uncached guilds. Maximum ${MAX_UNCACHED_GUILDS} uncached guilds allowed per request. Found ${uncachedCount} uncached guilds.`,
+                    uncachedCount,
+                    maxAllowed: MAX_UNCACHED_GUILDS
+                });
                 return;
             }
 
