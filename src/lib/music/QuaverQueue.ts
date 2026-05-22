@@ -162,21 +162,23 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
 
     /**
      * Start playing the queue
+     * @param force If true, bypass loop logic (used for manual skips)
      * @returns True if a track was started, false if queue is empty
      */
-    async start(): Promise<boolean> {
-        return this.next();
+    async start(force = false): Promise<boolean> {
+        return this.next(force);
     }
 
     /**
      * Advance to the next track in the queue
+     * @param force If true, bypass loop logic (used for manual skips)
      * @returns True if a track was started, false if queue is empty
      */
-    async next(): Promise<boolean> {
-        // Handle loop logic (skip for ad tracks)
+    async next(force = false): Promise<boolean> {
+        // Handle loop logic (skip for ad tracks and when not forced)
         const isCurrentAd = this.current && this.player.isAdTrack(this.current);
         
-        if (this.current && !isCurrentAd) {
+        if (this.current && !isCurrentAd && !force) {
             switch (this.loop.type) {
                 case LoopType.Song:
                     // Track loop: replay the same track

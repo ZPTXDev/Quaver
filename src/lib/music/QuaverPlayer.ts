@@ -772,8 +772,9 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         // Skip current track and start next
         // Note: player.stop() emits trackEnd with reason='stopped', but mayStartNext['stopped'] = false
         // so the trackEnd event is NOT emitted to the handler. We must manually advance the queue.
+        // Pass force=true to bypass loop logic (e.g., song loop)
         await this.queue.skip();
-        await this.queue.start();
+        await this.queue.start(true);
         return PlayerResponse.Success;
     }
 
@@ -813,6 +814,9 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         delete this.memory.shuffledQueue;
         // Skip current track - trackEnd handler will see the queue is empty
         await this.queue.skip();
+        // Manually advance queue to nullify current and emit finish event
+        // (trackEnd is not called when reason='stopped')
+        await this.queue.next();
         guild.sendWebUpdate('queueUpdate', []);
         return PlayerResponse.Success;
     }

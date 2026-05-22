@@ -291,16 +291,36 @@ export default {
         }
 
         // Check if alone in voice channel
-        const voiceChannel = guild.channels.cache.get(
+        let voiceChannel = guild.channels.cache.get(
             queue.player.voice.channelId,
         );
+        
+        // If channel is not in cache, try to fetch it
+        if (!voiceChannel) {
+            try {
+                voiceChannel = await guild.channels.fetch(
+                    queue.player.voice.channelId,
+                );
+            } catch (error) {
+                // Channel might have been deleted or we lack permissions
+                // Default to not disconnecting to avoid accidental disconnections
+                logger.warn(
+                    `[G ${guild.id}] Could not fetch voice channel ${queue.player.voice.channelId}, assuming users are present:`,
+                    error,
+                );
+            }
+        }
+        
         const members = voiceChannel?.members as Collection<
             Snowflake,
             GuildMember
         >;
 
+        // Only disconnect if we can confirm there are no non-bot members
+        // If members is undefined (channel not found), don't disconnect
         if (
-            !members?.some((m): boolean => !m.user.bot) &&
+            members &&
+            !members.some((m): boolean => !m.user.bot) &&
             !(
                 (await guild.settings.get<boolean>('stay.enabled')) &&
                 (await guild.features.isFeatureActive('stay'))
