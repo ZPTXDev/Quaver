@@ -47,7 +47,7 @@ export class PremiumSweepService {
                         const voiceChannel = voiceChannelId ? guild.channels.cache.get(voiceChannelId) : null;
                         
                         let hasUsers = false;
-                        if (voiceChannel && 'members' in voiceChannel && voiceChannel.members instanceof Map) {
+                        if (voiceChannel && 'members' in voiceChannel && typeof voiceChannel.members?.some === 'function') {
                             hasUsers = voiceChannel.members.some((member): boolean => !member.user.bot);
                         }
 

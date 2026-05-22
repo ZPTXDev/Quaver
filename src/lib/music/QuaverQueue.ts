@@ -2,7 +2,6 @@ import type { QuaverPlayer } from './QuaverPlayer';
 import type { QuaverChannels, QuaverSong } from '#src/lib/util';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import type { TrackEndReason } from 'lavalink-protocol';
-import type { Queue, Song } from '@lavaclient/plugin-queue';
 import { LoopType } from '@lavaclient/plugin-queue';
 
 // Re-export LoopType for use in other modules
@@ -26,10 +25,6 @@ export interface AddOptions {
     next?: boolean;
     /** Requester information */
     requester?: { id: string };
-}
-
-export interface QueueOptions {
-    play: (queue: Queue, song: Song) => Promise<void>;
 }
 
 
@@ -106,8 +101,16 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
             if (!track) {
                 return;
             }
-            // Emit this.current instead of track to preserve QuaverSong metadata
-            this.emit('trackEnd', this.current!, reason);
+            // Find the matching QuaverSong to preserve metadata
+            // If this.current matches the ended track, use it; otherwise use this.last
+            // This handles the race condition when next() is called before trackEnd fires
+            const endedTrack = this.current?.encoded === track.encoded 
+                ? this.current 
+                : this.last;
+            
+            if (endedTrack) {
+                this.emit('trackEnd', endedTrack, reason);
+            }
         });
     }
 
