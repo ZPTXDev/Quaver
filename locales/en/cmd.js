@@ -260,11 +260,11 @@ export default {
                         NAME: 'Language',
                     },
                     PREMIUM: {
-                        DESCRIPTION: 'Premium unlocks **Ad-Free Listening**, **Auto Lyrics**, **Smart Queue**, and **24/7 Mode**.',
-                        NAME: 'Premium',
+                        DESCRIPTION: '**Quaver Premium** unlocks **Ad-Free Listening**, **Auto Lyrics**, **Smart Queue**, and **24/7 Mode**.',
+                        NAME: 'Quaver Premium',
                         STATE: {
-                            ACTIVE_MESSAGE: 'This server has Premium until **<t:%1:f>**.\nThank you for your support!',
-                            ACTIVE_LIFETIME_MESSAGE: 'This server has Premium **forever**, courtesy of Quaver\'s manager.'
+                            ACTIVE_MESSAGE: 'This server has **Quaver Premium** until **<t:%1:f>**.\nThank you for your support!',
+                            ACTIVE_LIFETIME_MESSAGE: 'This server has lifetime **Quaver Premium**.\nThank you for your support!'
                         },
                     },
                 },

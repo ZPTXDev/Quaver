@@ -18,18 +18,18 @@ export default {
     PLAYER: {
         FEATURE_DISABLED: {
             SMARTQUEUE: {
-                PREMIUM: "**Smart Queue** was disabled as this server's Premium status has expired.",
+                PREMIUM: "**Smart Queue** was disabled as **Quaver Premium** has expired.",
                 WHITELIST: "**Smart Queue** was disabled as this server no longer has access to the feature."
             },
         },
         FEATURE_RESTORED: {
             STAY: {
-                PREMIUM: "**24/7 Mode** has been re-enabled as this server's Premium status has been renewed.",
-                WHITELIST: "**24/7 Mode** has been re-enabled as this server now has access to the feature."
+                PREMIUM: "**24/7 Mode** has been re-enabled as **Quaver Premium** has been renewed.",
+                WHITELIST: "**24/7 Mode** has been re-enabled as this server has regained access to the feature."
             },
             SMARTQUEUE: {
-                PREMIUM: "**Smart Queue** has been re-enabled as this server's Premium status has been renewed.",
-                WHITELIST: "**Smart Queue** has been re-enabled as this server now has access to the feature."
+                PREMIUM: "**Smart Queue** has been re-enabled as **Quaver Premium** has been renewed.",
+                WHITELIST: "**Smart Queue** has been re-enabled as this server has regained access to the feature."
             },
         },
         FILTER_NOTE: '-# This may take a few seconds to apply',
@@ -54,7 +54,7 @@ export default {
             },
             AD: {
                 TITLE: '### Ad Break',
-                MESSAGE: 'This is a brief ad break.\nFor ad-free listening, get Premium for this server.',
+                MESSAGE: 'This is a brief ad break.\nFor ad-free listening, get **Quaver Premium**.',
             },
         },
         QUEUE_CLEARED_ERROR: 'Cleared queue as an error occurred multiple times consecutively.',
@@ -86,7 +86,7 @@ export default {
     SESSION_ENDED: {
         FORCED: {
             DISCONNECTED: 'Session ended as Quaver was disconnected.',
-            PREMIUM_EXPIRED: 'Session ended as this server\'s Premium status has expired.',
+            PREMIUM_EXPIRED: 'Session ended as **Quaver Premium** has expired.',
             STAGE_NOT_MODERATOR: 'Session ended as Quaver was moved to a stage channel that Quaver isn\'t a stage moderator of.',
             WHITELIST_EXPIRED: 'Session ended as this server no longer has access to **24/7 Mode**.',
         },

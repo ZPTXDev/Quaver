@@ -5,6 +5,6 @@ export default {
 	},
 	NO_PERMISSION: {
 		DEFAULT: 'This server is not whitelisted to use this feature.',
-		PREMIUM: 'This feature is only available to Premium servers.'
+		PREMIUM: 'This feature is only available with **Quaver Premium**.'
 	},
 };
