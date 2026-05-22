@@ -74,6 +74,102 @@ data.cache = createCache({
 });
 spinner.success();
 
+// Helper function to resolve the actual data store name for a feature
+// This ensures that features sharing the same store (e.g., via premium) use the same lock
+const resolveFeatureStore = (feature: string): string => {
+    if (feature === 'premium') {
+        return 'premium';
+    }
+    // Check if this feature uses the premium store
+    const usesPremiumStore = !!(
+        settings.premiumEnabled &&
+        settings.features[feature as WhitelistedFeatures]?.premium
+    );
+    return usesPremiumStore ? 'premium' : `${feature}.whitelisted`;
+};
+
+// Lock map to serialize whitelist writes per guild/feature combination
+const whitelistLocks = new Map<string, Promise<void>>();
+
+// Execute a function with an exclusive lock on a guild/store pair
+const withWhitelistLock = async <T>(guildId: string, feature: string, fn: () => Promise<T>): Promise<T> => {
+    // Use the resolved store name as the lock key to prevent race conditions
+    // when multiple features share the same underlying data store
+    const storeName = resolveFeatureStore(feature);
+    const lockKey = `${guildId}:${storeName}`;
+
+    // Get the current lock promise or create a resolved one
+    const previousLock = whitelistLocks.get(lockKey) ?? Promise.resolve();
+
+    // Create a promise for our operation
+    let resolveCurrent: () => void;
+    const currentLock = new Promise<void>((resolve): void => {
+        resolveCurrent = resolve;
+    });
+
+    // Chain: wait for previous, then hold the lock until we resolve
+    // Use catch to ensure the chain continues even if previous operation failed
+    const chainedLock = previousLock.then(
+        (): Promise<void> => currentLock,
+        (): Promise<void> => currentLock
+    );
+    whitelistLocks.set(lockKey, chainedLock);
+
+    try {
+        // Wait for previous operation to complete with a timeout to prevent deadlocks
+        // Timeout set to 30 seconds
+        const LOCK_TIMEOUT_MS = 30000;
+        const timeoutPromise = new Promise<never>((_, reject): void => {
+            setTimeout((): void => {
+                reject(new Error(`Lock acquisition timeout for ${lockKey}`));
+            }, LOCK_TIMEOUT_MS);
+        });
+
+        await Promise.race([
+            previousLock.catch((): void => {
+                // Intentionally empty - we only care that the previous operation completed
+            }),
+            timeoutPromise
+        ]);
+
+        // Execute our operation with timeout
+        // Track the operation promise so we can wait for it in finally
+        let operationPromise: Promise<T>;
+        let timedOut = false;
+        
+        try {
+            operationPromise = fn();
+            const result = await Promise.race([
+                operationPromise,
+                new Promise<never>((_, reject): void => {
+                    setTimeout((): void => {
+                        timedOut = true;
+                        reject(new Error(`Operation timeout for ${lockKey}`));
+                    }, LOCK_TIMEOUT_MS);
+                })
+            ]);
+            return result;
+        } catch (error) {
+            // If we timed out, wait for the operation to complete before releasing the lock
+            // This prevents race conditions where a new operation starts while the old one is still writing
+            if (timedOut && operationPromise) {
+                logger.warn(`Operation timed out for ${lockKey}, waiting for completion before releasing lock...`);
+                await operationPromise.catch((err): void => {
+                    logger.error(`Timed-out operation for ${lockKey} failed:`, err);
+                });
+            }
+            throw error;
+        }
+    } finally {
+        // Release the lock
+        resolveCurrent!();
+        // Clean up the map entry if no new operations were added
+        if (whitelistLocks.get(lockKey) === chainedLock) {
+            whitelistLocks.delete(lockKey);
+        }
+    }
+};
+
 let app: Express, server;
 if (settings.features.web.enabled) {
     logger.info(
@@ -158,69 +254,6 @@ if (settings.features.web.enabled) {
             return featuresStatus;
         };
 
-        // Lock map to serialize whitelist writes per guild/feature combination
-        const whitelistLocks = new Map<string, Promise<void>>();
-
-        // Execute a function with an exclusive lock on a guild/store pair
-        const withWhitelistLock = async <T>(guildId: string, feature: string, fn: () => Promise<T>): Promise<T> => {
-            // Use the resolved store name as the lock key to prevent race conditions
-            // when multiple features share the same underlying data store
-            const storeName = resolveFeatureStore(feature);
-            const lockKey = `${guildId}:${storeName}`;
-
-            // Get the current lock promise or create a resolved one
-            const previousLock = whitelistLocks.get(lockKey) ?? Promise.resolve();
-
-            // Create a promise for our operation
-            let resolveCurrent: () => void;
-            const currentLock = new Promise<void>((resolve): void => {
-                resolveCurrent = resolve;
-            });
-
-            // Chain: wait for previous, then hold the lock until we resolve
-            // Use catch to ensure the chain continues even if previous operation failed
-            const chainedLock = previousLock.then(
-                (): Promise<void> => currentLock,
-                (): Promise<void> => currentLock
-            );
-            whitelistLocks.set(lockKey, chainedLock);
-
-            try {
-                // Wait for previous operation to complete with a timeout to prevent deadlocks
-                // Timeout set to 30 seconds
-                const LOCK_TIMEOUT_MS = 30000;
-                const timeoutPromise = new Promise<never>((_, reject): void => {
-                    setTimeout((): void => {
-                        reject(new Error(`Lock acquisition timeout for ${lockKey}`));
-                    }, LOCK_TIMEOUT_MS);
-                });
-
-                await Promise.race([
-                    previousLock.catch((): void => {
-                        // Intentionally empty - we only care that the previous operation completed
-                    }),
-                    timeoutPromise
-                ]);
-
-                // Execute our operation with timeout
-                return await Promise.race([
-                    fn(),
-                    new Promise<never>((_, reject): void => {
-                        setTimeout((): void => {
-                            reject(new Error(`Operation timeout for ${lockKey}`));
-                        }, LOCK_TIMEOUT_MS);
-                    })
-                ]);
-            } finally {
-                // Release the lock
-                resolveCurrent!();
-                // Clean up the map entry if no new operations were added
-                if (whitelistLocks.get(lockKey) === chainedLock) {
-                    whitelistLocks.delete(lockKey);
-                }
-            }
-        };
-
         // Helper to validate whitelist request and send appropriate responses
         const validateWhitelistRequest = (req: Request, res: Response): { valid: boolean, guildId?: string, feature?: string, durationMs?: number, sessionId?: string } => {
             if (!req.body || typeof req.body !== 'object') {
@@ -251,15 +284,6 @@ if (settings.features.web.enabled) {
             return { valid: true, guildId, feature, durationMs, sessionId };
         };
 
-        // Determine which feature store to use based on feature and premium config
-        const resolveFeatureStore = (feature: string): string => {
-            const usesPremiumStore =
-                feature === 'premium' ||
-                (feature !== 'premium' &&
-                    settings.premiumEnabled &&
-                    settings.features[feature as WhitelistedFeatures].premium);
-            return usesPremiumStore ? 'premium' : `${feature}.whitelisted`;
-        };
 
         // Compute new expiry timestamp based on current expiry and requested duration
         const computeNewExpiry = (currentExpiry: number | undefined, durationMs: number): number => {
@@ -888,11 +912,14 @@ const consoleCommands: Record<
                 newExpiry = Date.now() + durationMs;
             }
 
-            // Set the new expiry
-            await guild.features.set(featureStore, newExpiry);
+            // Wrap database writes in lock to prevent race conditions
+            await withWhitelistLock(guildId, featureStore, async (): Promise<void> => {
+                // Set the new expiry
+                await guild.features.set(featureStore, newExpiry);
 
-            // Mark as processed after successful write
-            await guild.features.set(`processedTransactions.${sessionId}`, true);
+                // Mark as processed after successful write
+                await guild.features.set(`processedTransactions.${sessionId}`, true);
+            });
 
             console.log('✓ Payment processed successfully!');
             console.log(`New expiry: ${newExpiry === -1 ? 'Lifetime' : new Date(newExpiry).toISOString()}`);
@@ -981,17 +1008,24 @@ const consoleCommands: Record<
         const featureStore = usesPremiumStore
             ? 'premium'
             : `${feature}.whitelisted`;
+        
+        // Wrap database writes in lock to prevent race conditions
         if (whitelisted && !duration) {
-            await guild.features.unset(featureStore);
+            await withWhitelistLock(guildId, featureStore, async (): Promise<void> => {
+                await guild.features.unset(featureStore);
+            });
             console.log(
                 `Removed ${guild.name} from the ${featureName} whitelist.`,
             );
             return;
         }
-        await guild.features.set(
-            featureStore,
-            durationMs === -1 ? durationMs : Date.now() + durationMs,
-        );
+        
+        await withWhitelistLock(guildId, featureStore, async (): Promise<void> => {
+            await guild.features.set(
+                featureStore,
+                durationMs === -1 ? durationMs : Date.now() + durationMs,
+            );
+        });
         console.log(
             `Added ${guild.name} to the ${featureName} whitelist ${durationMs === -1
                 ? 'permanently'

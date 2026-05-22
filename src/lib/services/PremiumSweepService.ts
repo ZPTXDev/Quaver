@@ -197,7 +197,21 @@ export class PremiumSweepService {
         logger.info(`[G ${guildId}] Premium restored. Reconnecting to stay channel.`);
         const isStayPremium = !!(settings.premiumEnabled && settings.features.stay.premium);
         const newPlayer = client.music.players.create(guild);
-        newPlayer.queue.channel = guild.channels.cache.get(stayText) as QuaverChannels;
+        
+        // Fetch text channel if not in cache
+        let textChannel = guild.channels.cache.get(stayText) as QuaverChannels;
+        if (!textChannel) {
+            try {
+                textChannel = await guild.channels.fetch(stayText) as QuaverChannels;
+            } catch (error) {
+                logger.error(`[G ${guildId}] Could not fetch text channel ${stayText} for stay reconnection:`, error);
+                // If we can't get the text channel, we can't send messages, so disconnect
+                newPlayer.disconnect();
+                return;
+            }
+        }
+        
+        newPlayer.queue.channel = textChannel;
         newPlayer.voice.connect(stayChannel, { deafened: true });
         await newPlayer.sendMessage(
             guild.locale(`MUSIC.PLAYER.FEATURE_RESTORED.STAY.${isStayPremium ? 'PREMIUM' : 'WHITELIST'}` as LocaleKey),
