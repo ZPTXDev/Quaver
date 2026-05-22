@@ -118,9 +118,10 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
         
         const nodeEvent = eventMap[event] || event;
         
-        // Emit on the Node with the queue as the first argument
+        // Emit on the Manager with the queue as the first argument
+        // This ensures handlers registered on client.music receive the events
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Cross-type event emission requires type assertion
-        this.player.node.emit(nodeEvent as any, this, ...args);
+        this.player.client.music.emit(nodeEvent as any, this, ...args);
         
         // Also emit on the queue itself
         return super.emit(event, ...args);

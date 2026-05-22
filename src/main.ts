@@ -154,21 +154,26 @@ if (settings.features.web.enabled) {
         const withWhitelistLock = async <T>(guildId: string, feature: string, fn: () => Promise<T>): Promise<T> => {
             const lockKey = `${guildId}:${feature}`;
 
-            // Wait for any existing lock to be released
-            while (whitelistLocks.has(lockKey)) {
-                await whitelistLocks.get(lockKey);
-            }
+            // Get the current lock promise or create a resolved one
+            const previousLock = whitelistLocks.get(lockKey) ?? Promise.resolve();
 
-            // Create new lock
-            let releaseLock: () => void;
-            const lockPromise = new Promise<void>((resolve: () => void): void => { releaseLock = resolve; });
-            whitelistLocks.set(lockKey, lockPromise);
+            // Create a promise for our operation
+            let resolveCurrent: () => void;
+            const currentLock = new Promise<void>((resolve): void => {
+                resolveCurrent = resolve;
+            });
+
+            // Chain: wait for previous, then hold the lock until we resolve
+            whitelistLocks.set(lockKey, previousLock.then((): Promise<void> => currentLock));
 
             try {
+                // Wait for previous operation to complete
+                await previousLock;
+                // Execute our operation
                 return await fn();
             } finally {
-                whitelistLocks.delete(lockKey);
-                releaseLock!();
+                // Release the lock
+                resolveCurrent!();
             }
         };
 
