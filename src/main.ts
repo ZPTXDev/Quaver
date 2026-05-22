@@ -104,6 +104,17 @@ if (settings.features.web.enabled) {
                 res.sendStatus(204);
                 return;
             }
+            // Check if service is ready
+            if (!startup.started) {
+                res.status(503).send({ error: 'Service is starting up, please try again later' });
+                return;
+            }
+            // Check authorization
+            const authHeader = req.headers.authorization;
+            if (!authHeader || authHeader !== `Bearer ${settings.features.web.apiSecret}`) {
+                res.status(401).send({ error: 'Unauthorized' });
+                return;
+            }
             next();
         });
 
@@ -193,15 +204,6 @@ if (settings.features.web.enabled) {
 
         // Helper to validate whitelist request and send appropriate responses
         const validateWhitelistRequest = (req: Request, res: Response): { valid: boolean, guildId?: string, feature?: string, durationMs?: number, sessionId?: string } => {
-            if (!startup.started) {
-                res.status(503).send({ error: 'Service is starting up, please try again later' });
-                return { valid: false };
-            }
-            const authHeader = req.headers.authorization;
-            if (!authHeader || authHeader !== `Bearer ${settings.features.web.apiSecret}`) {
-                res.status(401).send({ error: 'Unauthorized' });
-                return { valid: false };
-            }
             if (!req.body || typeof req.body !== 'object') {
                 res.status(400).send({ error: 'Invalid or missing request body' });
                 return { valid: false };
@@ -382,15 +384,6 @@ if (settings.features.web.enabled) {
         });
 
         app.get('/api/premium/status/:guildId', async (req, res): Promise<void> => {
-            if (!startup.started) {
-                res.status(503).send({ error: 'Service is starting up, please try again later' });
-                return;
-            }
-            const authHeader = req.headers.authorization;
-            if (!authHeader || authHeader !== `Bearer ${settings.features.web.apiSecret}`) {
-                res.status(401).send({ error: 'Unauthorized' });
-                return;
-            }
             const { guildId } = req.params;
             if (!guildId) {
                 res.status(400).send({ error: 'Missing guildId parameter' });
@@ -418,15 +411,6 @@ if (settings.features.web.enabled) {
         });
 
         app.get('/api/premium/users/:userId/guilds', async (req, res): Promise<void> => {
-            if (!startup.started) {
-                res.status(503).send({ error: 'Service is starting up, please try again later' });
-                return;
-            }
-            const authHeader = req.headers.authorization;
-            if (!authHeader || authHeader !== `Bearer ${settings.features.web.apiSecret}`) {
-                res.status(401).send({ error: 'Unauthorized' });
-                return;
-            }
             const { userId } = req.params;
             if (!userId) {
                 res.status(400).send({ error: 'Missing userId parameter' });
@@ -451,15 +435,6 @@ if (settings.features.web.enabled) {
         });
 
         app.post('/api/premium/users/:userId/guilds', async (req, res): Promise<void> => {
-            if (!startup.started) {
-                res.status(503).send({ error: 'Service is starting up, please try again later' });
-                return;
-            }
-            const authHeader = req.headers.authorization;
-            if (!authHeader || authHeader !== `Bearer ${settings.features.web.apiSecret}`) {
-                res.status(401).send({ error: 'Unauthorized' });
-                return;
-            }
             const { userId } = req.params;
             if (!userId) {
                 res.status(400).send({ error: 'Missing userId parameter' });
@@ -499,24 +474,13 @@ if (settings.features.web.enabled) {
                 return;
             }
 
-            const guildsData = [];
-            for (const guildId of guildIds) {
-                const guildData = await processUserGuildData(guildId, userId);
-                guildsData.push(guildData);
-            }
+            const guildsData = await Promise.all(
+                guildIds.map((guildId: string) => processUserGuildData(guildId, userId))
+            );
             res.send(guildsData);
         });
 
         app.delete('/api/premium/whitelist', async (req, res): Promise<void> => {
-            if (!startup.started) {
-                res.status(503).send({ error: 'Service is starting up, please try again later' });
-                return;
-            }
-            const authHeader = req.headers.authorization;
-            if (!authHeader || authHeader !== `Bearer ${settings.features.web.apiSecret}`) {
-                res.status(401).send({ error: 'Unauthorized' });
-                return;
-            }
             if (!req.body || typeof req.body !== 'object') {
                 res.status(400).send({ error: 'Invalid or missing request body' });
                 return;
@@ -815,9 +779,10 @@ const consoleCommands: Record<
         const guildId = input.split(' ')[2];
         const months = parseInt(input.split(' ')[3], 10);
 
-        if (!sessionId || !guildId || !months || isNaN(months)) {
+        if (!sessionId || !guildId || isNaN(months)) {
             console.log('Usage: retry <sessionId> <guildId> <months>');
             console.log('Example: retry cs_test_abc123 1234567890 3');
+            console.log('Use -1 for lifetime premium');
             return;
         }
 
@@ -836,10 +801,10 @@ const consoleCommands: Record<
 
             console.log(`Retrying payment for guild ${guild.name} (${guildId})...`);
             console.log(`Session ID: ${sessionId}`);
-            console.log(`Duration: ${months} month(s)`);
+            console.log(`Duration: ${months === -1 ? 'Lifetime' : `${months} month(s)`}`);
 
-            // Convert months to milliseconds
-            const durationMs = months * 30 * 24 * 60 * 60 * 1000;
+            // Check for lifetime premium before calculating duration
+            const durationMs = months === -1 ? -1 : months * 30 * 24 * 60 * 60 * 1000;
 
             // Determine feature store (premium always uses 'premium' store)
             const featureStore = 'premium';
@@ -858,9 +823,8 @@ const consoleCommands: Record<
 
             // Compute new expiry
             let newExpiry: number;
-            if (durationMs === -1) {
-                newExpiry = -1;
-            } else if (currentExpiry === -1) {
+            if (durationMs === -1 || currentExpiry === -1) {
+                // Lifetime premium takes precedence
                 newExpiry = -1;
             } else if (currentExpiry && currentExpiry > Date.now()) {
                 newExpiry = currentExpiry + durationMs;
