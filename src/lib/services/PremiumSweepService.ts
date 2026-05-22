@@ -145,9 +145,18 @@ export class PremiumSweepService {
 
         // 1. Re-enable 24/7 (stay) if it was previously enabled but got cut off
         const staySetting = await guild.settings.get<boolean>('stay.enabled');
+        const stayText = await guild.settings.get<string>('stay.text');
         const isStayNowActive = await guild.features.isFeatureActive('stay');
-        if (staySetting && isStayNowActive) {
+        
+        // Restore if either stay.enabled is true OR stay.text exists (indicates user had 24/7 configured before expiry)
+        if ((staySetting || stayText) && isStayNowActive) {
             logger.info(`[G ${guildId}] Premium restored. Re-activating 24/7 Mode.`);
+            
+            // Re-enable stay.enabled if it was disabled during expiration
+            if (!staySetting) {
+                await guild.settings.set('stay.enabled', true);
+            }
+            
             if (player.timeout.standard) {
                 clearTimeout(player.timeout.standard);
                 delete player.timeout.standard;
@@ -158,6 +167,7 @@ export class PremiumSweepService {
                 { type: MessageOptionsBuilderType.Success }
             );
         }
+
 
         // 2. Re-enable Smart Queue if it was previously enabled but got deactivated
         const smartQueueSetting = await guild.settings.get<boolean>('smartqueue');
