@@ -135,7 +135,7 @@ export default {
                         await queue.player.client.music.api.loadTracks(adUrl);
 
                     if (result.loadType === 'track' && result.data) {
-                        const premiumURL = getPremiumURL(guild.id) || 'https://example.com';
+                        const premiumURL = getPremiumURL(guild.id);
                         const adTrack = {
                             ...result.data,
                             isAd: true,
@@ -143,7 +143,7 @@ export default {
                                 ...result.data.info,
                                 title: 'Ad Break',
                                 author: 'Quaver',
-                                uri: premiumURL,
+                                uri: premiumURL || undefined,
                                 artworkUrl: queue.player.client.user.displayAvatarURL(),
                             },
                             requesterId: queue.player.client.user.id,

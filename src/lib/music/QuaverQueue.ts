@@ -39,6 +39,13 @@ export interface QueueEvents {
     finish: () => void;
 }
 
+// Event name mapping to avoid conflicts with lavaclient's native events
+const QUEUE_EVENT_MAP: Record<string, string> = {
+    'trackStart': 'queueTrackStart',
+    'trackEnd': 'queueTrackEnd',
+    'finish': 'queueFinish',
+};
+
 /**
  * Custom queue implementation with manual advancement control.
  * Based on @lavaclient/plugin-queue but adapted for Quaver's needs.
@@ -111,14 +118,7 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
         event: K,
         ...args: Parameters<QueueEvents[K]>
     ): boolean {
-        // Map queue events to unique names to avoid conflicts with lavaclient's native events
-        const eventMap: Record<string, string> = {
-            'trackStart': 'queueTrackStart',
-            'trackEnd': 'queueTrackEnd',
-            'finish': 'queueFinish',
-        };
-        
-        const nodeEvent = eventMap[event] || event;
+        const nodeEvent = QUEUE_EVENT_MAP[event] || event;
         
         // Emit on the Manager with the queue as the first argument
         // This ensures handlers registered on client.music receive the events
@@ -173,6 +173,13 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
             switch (this.loop.type) {
                 case LoopType.Song:
                     // Track loop: replay the same track
+                    // Honor max loop count if set
+                    if (this.loop.max > 0 && this.loop.current >= this.loop.max) {
+                        // Max loops reached, stop looping
+                        this.loop.type = LoopType.None;
+                        this.loop.current = 0;
+                        break;
+                    }
                     this.last = this.current;
                     await this.player.play(this.current);
                     return true;

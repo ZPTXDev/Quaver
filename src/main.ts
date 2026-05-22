@@ -248,29 +248,37 @@ if (settings.features.web.enabled) {
                 return { isOwner: true, isAdmin: true };
             }
 
-            try {
-                const member = await discordGuild.members.fetch(userId);
-                if (member) {
-                    const isAdmin = member.permissions.has(PermissionsBitField.Flags.Administrator) ||
-                        member.permissions.has(PermissionsBitField.Flags.ManageGuild);
-                    return { isOwner: false, isAdmin };
+            // Check cache first to avoid unnecessary API calls
+            let member = discordGuild.members.cache.get(userId);
+            if (!member) {
+                try {
+                    member = await discordGuild.members.fetch(userId);
+                } catch {
+                    // Member not found or couldn't fetch
+                    return { isOwner: false, isAdmin: false };
                 }
-            } catch {
-                // Member not found or couldn't fetch
+            }
+            if (member) {
+                const isAdmin = member.permissions.has(PermissionsBitField.Flags.Administrator) ||
+                    member.permissions.has(PermissionsBitField.Flags.ManageGuild);
+                return { isOwner: false, isAdmin };
             }
             return { isOwner: false, isAdmin: false };
         };
 
         // Process guild data for a specific user, including permission checks and premium status
         const processUserGuildData = async (guildId: string, userId: string): Promise<Record<string, unknown>> => {
-            let discordGuild;
-            try {
-                discordGuild = await client.guilds.fetch(guildId);
-            } catch {
-                return {
-                    guildId,
-                    botInGuild: false,
-                };
+            // Check cache first to avoid unnecessary API calls
+            let discordGuild = client.guilds.cache.get(guildId);
+            if (!discordGuild) {
+                try {
+                    discordGuild = await client.guilds.fetch(guildId);
+                } catch {
+                    return {
+                        guildId,
+                        botInGuild: false,
+                    };
+                }
             }
 
             const { isOwner, isAdmin } = await checkUserAdminPermissions(discordGuild, userId);

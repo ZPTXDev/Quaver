@@ -127,11 +127,10 @@ export class PremiumSweepService {
         const isStayPremium = !!(settings.premiumEnabled && settings.features.stay.premium);
         const isSmartQueuePremium = !!(settings.premiumEnabled && settings.features.smartqueue.premium);
 
-        // Reset ad playtime counter when premium is restored
-        if (player.memory.adPlaytimeMs) {
-            player.memory.adPlaytimeMs = 0;
-            await data.guild.set(guild.id, 'ads.playtimeMs', 0);
-        }
+        // Reset ad playtime counter when premium is restored (unconditionally)
+        // This ensures stale data doesn't survive premium restoration after restart
+        player.memory.adPlaytimeMs = 0;
+        await data.guild.set(guild.id, 'ads.playtimeMs', 0);
 
         // 1. Re-enable 24/7 (stay) if it was previously enabled but got cut off
         const staySetting = await guild.settings.get<boolean>('stay.enabled');
