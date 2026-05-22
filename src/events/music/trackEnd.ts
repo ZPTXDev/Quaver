@@ -10,6 +10,7 @@ import {
     settings,
 } from '#src/lib/util';
 import type { Collection, GuildMember, Snowflake } from 'discord.js';
+import { mayStartNext } from 'lavalink-protocol';
 
 export default {
     name: 'queueTrackEnd',
@@ -73,7 +74,7 @@ export default {
             return;
         }
 
-        // If ad just finished, advance to next track
+        // If ad just finished, clean up ad state
         if (isAdTrack) {
             queue.player.memory.isAdPlaying = false;
             queue.player.memory.adPlaytimeMs = 0;
@@ -86,8 +87,10 @@ export default {
                 delete queue.player.memory.savedFilters;
             }
 
-            // Advance to next track (the real track that was queued)
-            await queue.next();
+            // Only advance to next track if the reason warrants it
+            if (mayStartNext[reason]) {
+                await queue.next();
+            }
             return;
         }
 
@@ -132,7 +135,7 @@ export default {
                         await queue.player.client.music.api.loadTracks(adUrl);
 
                     if (result.loadType === 'track' && result.data) {
-                        const premiumURL = getPremiumURL(guild.id) || 'https://quaver.gg/premium';
+                        const premiumURL = getPremiumURL(guild.id) || 'https://example.com';
                         const adTrack = {
                             ...result.data,
                             isAd: true,
@@ -241,7 +244,7 @@ export default {
         >;
 
         if (
-            members?.filter((m): boolean => !m.user.bot).size < 1 &&
+            !members?.some((m): boolean => !m.user.bot) &&
             !(
                 (await guild.settings.get<boolean>('stay.enabled')) &&
                 (await guild.features.isFeatureActive('stay'))
@@ -256,10 +259,12 @@ export default {
             return;
         }
 
-        // Advance to next track
-        const hasNext = await queue.next();
-        if (!hasNext) {
-            logger.info(`[G ${guild.id}] Queue finished`);
+        // Advance to next track only if the reason warrants it
+        if (mayStartNext[reason]) {
+            const hasNext = await queue.next();
+            if (!hasNext) {
+                logger.info(`[G ${guild.id}] Queue finished`);
+            }
         }
     },
 };

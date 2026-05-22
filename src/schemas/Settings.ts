@@ -153,7 +153,7 @@ export const SettingsSchema = z.object({
                     cert: z.string().default('cert.pem'),
                 })
                 .optional(),
-            dashboardURL: z.url().optional(),
+            dashboardURL: z.url().default('https://example.com'),
         }),
     }),
     updater: z
