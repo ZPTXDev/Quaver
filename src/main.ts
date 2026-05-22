@@ -173,7 +173,9 @@ if (settings.features.web.enabled) {
 
             try {
                 // Wait for previous operation to complete (ignore its result/error)
-                await previousLock.catch(() => {});
+                await previousLock.catch((): void => {
+                    // Intentionally empty - we only care that the previous operation completed
+                });
                 // Execute our operation
                 return await fn();
             } finally {

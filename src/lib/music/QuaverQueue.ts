@@ -2,6 +2,7 @@ import type { QuaverPlayer } from './QuaverPlayer';
 import type { QuaverChannels, QuaverSong } from '#src/lib/util';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import type { TrackEndReason } from 'lavalink-protocol';
+import type { Queue, Song } from '@lavaclient/plugin-queue';
 import { LoopType } from '@lavaclient/plugin-queue';
 
 // Re-export LoopType for use in other modules
@@ -27,6 +28,9 @@ export interface AddOptions {
     requester?: { id: string };
 }
 
+export interface QueueOptions {
+    play: (queue: Queue, song: Song) => Promise<void>;
+}
 
 export interface QueueEvents {
     trackStart: (song: QuaverSong) => void;
@@ -48,6 +52,9 @@ const QUEUE_EVENT_MAP: Record<string, string> = {
 export class QuaverQueue extends TypedEmitter<QueueEvents> {
     /** The player this queue belongs to */
     readonly player: QuaverPlayer;
+
+    /** Queue options (unused but required for type compatibility) */
+    readonly options: QueueOptions;
 
     /** Queued tracks */
     tracks: QuaverSong[] = [];
@@ -73,6 +80,12 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
     constructor(player: QuaverPlayer) {
         super();
         this.player = player;
+        // Initialize options for type compatibility (not actually used)
+        this.options = {
+            play: async (queue, song): Promise<void> => {
+                await queue.player.play(song);
+            }
+        };
 
         // Listen to Player events and re-emit them as Queue events
         // This ensures Node events are fired with the queue as the first argument
