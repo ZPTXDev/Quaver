@@ -164,7 +164,11 @@ if (settings.features.web.enabled) {
             });
 
             // Chain: wait for previous, then hold the lock until we resolve
-            const chainedLock = previousLock.then((): Promise<void> => currentLock);
+            // Use catch to ensure the chain continues even if previous operation failed
+            const chainedLock = previousLock.then(
+                (): Promise<void> => currentLock,
+                (): Promise<void> => currentLock
+            );
             whitelistLocks.set(lockKey, chainedLock);
 
             try {

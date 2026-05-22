@@ -106,7 +106,8 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
             if (!track) {
                 return;
             }
-            this.emit('trackEnd', track, reason);
+            // Emit this.current instead of track to preserve QuaverSong metadata
+            this.emit('trackEnd', this.current!, reason);
         });
     }
 
@@ -198,7 +199,8 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
         }
 
         // If queue is empty but we have previous tracks (queue loop), restore them
-        if (!this.tracks.length && this.previous.length) {
+        // Only restore if queue loop is still active
+        if (!this.tracks.length && this.previous.length && this.loop.type === LoopType.Queue) {
             this.tracks = this.previous;
             this.previous = [];
         }
@@ -301,6 +303,10 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
         this.loop.type = type;
         this.loop.max = max;
         this.loop.current = 0;
+        // Clear previous tracks if not using queue loop to prevent stale data
+        if (type !== LoopType.Queue) {
+            this.previous = [];
+        }
         return this;
     }
 

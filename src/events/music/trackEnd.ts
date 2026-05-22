@@ -187,6 +187,10 @@ export default {
                                     queue.player.memory.shuffledQueue.push(track.id);
                                 }
                             }
+                        } else if (queue.loop.type === LoopType.Song) {
+                            // For song loop, unshift the track back to the queue
+                            // so it will be replayed after the ad finishes
+                            queue.tracks.unshift(track);
                         }
 
                         // Set queue.current to the ad track so trackStart displays it correctly

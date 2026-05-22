@@ -32,7 +32,8 @@ async function restorePlayer(
         });
         
         // Check if the current track is an ad and skip it
-        const isAdTrack = snapshot.queue.current?.isAd === true;
+        // Also check memory.isAdPlaying since toJSON sets queue.current to null for ads
+        const isAdTrack = snapshot.queue.current?.isAd === true || snapshot.memory.isAdPlaying;
         if (isAdTrack) {
             // If resumed, stop the current track (Lavalink already started it)
             if (resumed && player.playing) {
