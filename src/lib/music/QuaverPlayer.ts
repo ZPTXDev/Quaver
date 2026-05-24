@@ -106,6 +106,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         standard?: ReturnType<typeof setTimeout>;
         pause?: ReturnType<typeof setTimeout>;
         end?: number;
+        pausedAlone?: boolean;
     } = {};
     // overriding native queue type
     queue: QuaverQueue;
@@ -391,6 +392,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         }
         clearTimeout(this.timeout.standard);
         clearTimeout(this.timeout.pause);
+        this.timeout.pausedAlone = false;
         this.voice.disconnect();
         await this.client.music.players.destroy(guild.id);
         guild.sendWebUpdate('playerDisconnect');
@@ -521,6 +523,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             await this.pause();
         } else {
             await this.resume();
+            this.timeout.pausedAlone = false;
             if (!this.playing && this.queue.tracks.length > 0) {
                 await this.queue.start();
             }

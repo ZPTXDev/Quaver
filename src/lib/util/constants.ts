@@ -33,7 +33,7 @@ export const settingsOptions = [
         ? ['premium']
         : []),
     'language',
-    ...(settings.features.stay.enabled ? ['notifyin247'] : []),
+    ...(settings.features.stay.enabled ? ['notifyin247', 'pausealone247'] : []),
     'format',
     'dj',
     'source',

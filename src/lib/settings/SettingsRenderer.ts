@@ -205,6 +205,8 @@ export class SettingsRenderer {
     ): Promise<SectionBuilder[]> {
         const notify =
             (await guild.settings.get<boolean>('notifyin247')) ?? true;
+        const pauseAlone =
+            (await guild.settings.get<boolean>('pausealone247')) ?? false;
         const source =
             (await guild.settings.get<string>('source')) ??
             Object.keys(acceptableSources)[0];
@@ -221,6 +223,15 @@ export class SettingsRenderer {
                               notify ? 'MISC.ENABLED' : 'MISC.DISABLED',
                           ),
                           notify ? ButtonStyle.Success : ButtonStyle.Danger,
+                      ),
+                      this.createItemSection(
+                          guild,
+                          SettingsCategory.Playback,
+                          'pausealone247',
+                          guild.locale(
+                              pauseAlone ? 'MISC.ENABLED' : 'MISC.DISABLED',
+                          ),
+                          pauseAlone ? ButtonStyle.Success : ButtonStyle.Danger,
                       ),
                   ]
                 : []),
