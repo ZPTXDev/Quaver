@@ -40,6 +40,7 @@ export type SettingsPageOptions =
     | 'premium'
     | 'language'
     | 'notifyin247'
+    | 'pausealone247'
     | 'format'
     | 'dj'
     | 'source'
