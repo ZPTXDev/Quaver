@@ -9,8 +9,8 @@ import { logger } from '#src/lib/logger';
 import { updateHandler } from '#src/lib/state';
 import { buildMessageOptions, type QuaverChannels, type QuaverQueue, type QuaverSong, settings, } from '#src/lib/util';
 import type { PlayerEffect } from '@lavaclient/plugin-effects';
-import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import { type LoopType, Queue } from '@lavaclient/plugin-queue';
+import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import {
     ChannelType,
     type Guild,
@@ -227,9 +227,15 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             userTag,
             details,
         });
+        if (this.sessionLogs.length > 100) {
+            this.sessionLogs.shift();
+        }
         QuaverGuild.wrap(this.guild)
             .then((wrappedGuild): void => {
-                wrappedGuild.sendWebUpdate('sessionLogUpdate', this.sessionLogs);
+                wrappedGuild.sendWebUpdate(
+                    'sessionLogUpdate',
+                    this.sessionLogs,
+                );
             })
             .catch((err): void => {
                 logger.error(`Error sending web update: ${err.message}`);
@@ -263,9 +269,17 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             this.queue.tracks.length === 0;
         this.queue.add(added, { requester: requesterId, next });
         if (added.length === 1) {
-            this.logSessionEvent('QUEUE_ADD', requesterId, `[${added[0].info.title}](${added[0].info.uri})`);
+            this.logSessionEvent(
+                'QUEUE_ADD',
+                requesterId,
+                `[${added[0].info.title}](${added[0].info.uri})`,
+            );
         } else {
-            this.logSessionEvent('QUEUE_ADD', requesterId, `${added.length} tracks`);
+            this.logSessionEvent(
+                'QUEUE_ADD',
+                requesterId,
+                `${added.length} tracks`,
+            );
         }
         const transformsActive = this.memory.shuffle || this.memory.alternate;
         if (transformsActive) {
@@ -317,9 +331,13 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Toggle 24/7 mode.
      * @param enabled - Whether the feature is enabled.
+     * @
      * @returns Whether the feature was enabled.
      */
-    async setStay(enabled: boolean, author?: { id: string; tag: string } | string | null): Promise<PlayerResponse> {
+    async setStay(
+        enabled: boolean,
+        author?: { id: string; tag: string } | string | null,
+    ): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
         if (!settings.features.stay.enabled) {
             return PlayerResponse.FeatureDisabled;
@@ -375,9 +393,16 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @param enabled - Whether the feature is enabled.
      * @returns Whether the feature was enabled.
      */
-    async setBassboost(enabled: boolean, author?: { id: string; tag: string } | string | null): Promise<PlayerResponse> {
+    async setBassboost(
+        enabled: boolean,
+        author?: { id: string; tag: string } | string | null,
+    ): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
-        this.logSessionEvent('BASSBOOST', author, enabled ? 'ENABLED' : 'DISABLED');
+        this.logSessionEvent(
+            'BASSBOOST',
+            author,
+            enabled ? 'ENABLED' : 'DISABLED',
+        );
         if (
             enabled !==
             !!this.effects.toJSON().find((e): boolean => e.id === 'bassboost')
@@ -397,7 +422,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @param channel - The channel to bind to.
      * @returns Whether the player was bound.
      */
-    async bindTextChannel(channel: QuaverChannels, author?: { id: string; tag: string } | string | null): Promise<PlayerResponse> {
+    async bindTextChannel(
+        channel: QuaverChannels,
+        author?: { id: string; tag: string } | string | null,
+    ): Promise<PlayerResponse> {
         if (
             !channel
                 .permissionsFor(this.client.user.id)
@@ -424,7 +452,9 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * Clear the queue.
      * @returns Whether the queue was cleared.
      */
-    async clearQueue(author?: { id: string; tag: string } | string | null): Promise<PlayerResponse> {
+    async clearQueue(
+        author?: { id: string; tag: string } | string | null,
+    ): Promise<PlayerResponse> {
         if (this.queue.tracks.length === 0) {
             return PlayerResponse.QueueInsufficientTracks;
         }
@@ -442,7 +472,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @param channelId - The channel to disconnect from.
      * @returns Whether the player was disconnected.
      */
-    async disconnect(channelId?: Snowflake, author?: { id: string; tag: string } | string | null): Promise<PlayerResponse> {
+    async disconnect(
+        channelId?: Snowflake,
+        author?: { id: string; tag: string } | string | null,
+    ): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
         if (await guild.settings.get('stay.enabled')) {
             return PlayerResponse.FeatureConflict;
@@ -503,12 +536,24 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @param type - The type of looping to use.
      * @returns Whether the looping mode was changed.
      */
-    async setLoopMode(type: LoopType, author?: { id: string; tag: string } | string | null): Promise<PlayerResponse> {
+    async setLoopMode(
+        type: LoopType,
+        author?: { id: string; tag: string } | string | null,
+    ): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
         this.queue.setLoop(type);
         let loopStr = 'DISABLED';
-        if (type.toString() === '1' || type.toString().toLowerCase() === 'song' || type.toString().toLowerCase() === 'track') loopStr = 'TRACK';
-        else if (type.toString() === '2' || type.toString().toLowerCase() === 'queue') loopStr = 'QUEUE';
+        if (
+            type.toString() === '1' ||
+            type.toString().toLowerCase() === 'song' ||
+            type.toString().toLowerCase() === 'track'
+        )
+            loopStr = 'TRACK';
+        else if (
+            type.toString() === '2' ||
+            type.toString().toLowerCase() === 'queue'
+        )
+            loopStr = 'QUEUE';
         this.logSessionEvent('LOOP', author, loopStr);
         guild.sendWebUpdate('loopUpdate', type);
         return PlayerResponse.Success;
@@ -548,7 +593,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             author,
             moved
                 ? `[${moved.info.title}](${moved.info.uri}) (\`${oldPosition}\` ➜ \`${newPosition}\`)`
-                : `(\`${oldPosition}\` ➜ \`${newPosition}\`)`
+                : `(\`${oldPosition}\` ➜ \`${newPosition}\`)`,
         );
         guild.sendWebUpdate('queueUpdate', this.decorateQueue());
         return PlayerResponse.Success;
@@ -559,9 +604,16 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @param enabled - Whether the feature is enabled.
      * @returns Whether the feature was enabled.
      */
-    async setNightcore(enabled: boolean, author?: { id: string; tag: string } | string | null): Promise<PlayerResponse> {
+    async setNightcore(
+        enabled: boolean,
+        author?: { id: string; tag: string } | string | null,
+    ): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
-        this.logSessionEvent('NIGHTCORE', author, enabled ? 'ENABLED' : 'DISABLED');
+        this.logSessionEvent(
+            'NIGHTCORE',
+            author,
+            enabled ? 'ENABLED' : 'DISABLED',
+        );
         if (
             enabled !==
             !!this.effects.toJSON().find((e): boolean => e.id === 'nightcore')
@@ -581,7 +633,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @param paused - Whether to pause the player.
      * @returns Whether the player was paused.
      */
-    async setPause(paused: boolean, author?: { id: string; tag: string } | string | null): Promise<PlayerResponse> {
+    async setPause(
+        paused: boolean,
+        author?: { id: string; tag: string } | string | null,
+    ): Promise<PlayerResponse> {
         // we only prevent pausing / resuming when we triggered the pause
         // after pausing, we'll set restartReady to true, indicating end of a track
         // (only for restartStrategy: track)
@@ -609,7 +664,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @param position - The position of the track.
      * @returns Whether the track was removed.
      */
-    async removeQueuedTrack(position: number, author?: { id: string; tag: string } | string | null): Promise<PlayerResponse> {
+    async removeQueuedTrack(
+        position: number,
+        author?: { id: string; tag: string } | string | null,
+    ): Promise<PlayerResponse> {
         if (this.queue.tracks.length === 0)
             return PlayerResponse.QueueInsufficientTracks;
         if (position < 1 || position > this.queue.tracks.length)
@@ -621,7 +679,9 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         this.logSessionEvent(
             'QUEUE_REMOVE',
             author,
-            removedSong ? `[${removedSong.info.title}](${removedSong.info.uri})` : null,
+            removedSong
+                ? `[${removedSong.info.title}](${removedSong.info.uri})`
+                : null,
         );
         this.queue.remove(position - 1);
         if (transformsActive && this.memory.originalQueue) {
@@ -648,7 +708,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @param position - The position of the track to seek to.
      * @returns Whether the seeking was successful.
      */
-    async seekTo(position: number, author?: { id: string; tag: string } | string | null): Promise<PlayerResponse> {
+    async seekTo(
+        position: number,
+        author?: { id: string; tag: string } | string | null,
+    ): Promise<PlayerResponse> {
         if (this.restartReady) return PlayerResponse.RestartInProgress;
         if (!this.queue.current || (!this.playing && !this.paused)) {
             return PlayerResponse.PlayerIdle;
@@ -760,11 +823,18 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @param enabled - Whether to enable shuffle.
      * @returns Whether shuffle was enabled.
      */
-    async setShuffle(enabled: boolean, author?: { id: string; tag: string } | string | null): Promise<PlayerResponse> {
+    async setShuffle(
+        enabled: boolean,
+        author?: { id: string; tag: string } | string | null,
+    ): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
         const wasActive = this.memory.shuffle || this.memory.alternate;
         this.memory.shuffle = enabled;
-        this.logSessionEvent('SHUFFLE', author, enabled ? 'ENABLED' : 'DISABLED');
+        this.logSessionEvent(
+            'SHUFFLE',
+            author,
+            enabled ? 'ENABLED' : 'DISABLED',
+        );
         const isActive = this.memory.shuffle || this.memory.alternate;
         if (!wasActive && isActive) {
             // First time any transform is turned on → snapshot.
@@ -790,7 +860,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @param enabled - Whether to enable alternating.
      * @returns Whether alternating was enabled.
      */
-    async setAlternate(enabled: boolean, author?: { id: string; tag: string } | string | null): Promise<PlayerResponse> {
+    async setAlternate(
+        enabled: boolean,
+        author?: { id: string; tag: string } | string | null,
+    ): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
         if (!settings.features.smartqueue.enabled) {
             return PlayerResponse.FeatureDisabled;
@@ -807,7 +880,11 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         }
         const wasActive = this.memory.shuffle || this.memory.alternate;
         this.memory.alternate = enabled;
-        this.logSessionEvent('SMARTQUEUE', author, enabled ? 'ENABLED' : 'DISABLED');
+        this.logSessionEvent(
+            'SMARTQUEUE',
+            author,
+            enabled ? 'ENABLED' : 'DISABLED',
+        );
         const isActive = this.memory.shuffle || this.memory.alternate;
         if (!wasActive && isActive) {
             // First time any transform is turned on → snapshot.
@@ -832,7 +909,9 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * Skip the current track.
      * @returns Whether the track was skipped.
      */
-    async skipCurrentTrack(author?: { id: string; tag: string } | string | null): Promise<PlayerResponse> {
+    async skipCurrentTrack(
+        author?: { id: string; tag: string } | string | null,
+    ): Promise<PlayerResponse> {
         if (this.restartReady) return PlayerResponse.RestartInProgress;
         if (!this.queue.current || (!this.playing && !this.paused)) {
             return PlayerResponse.PlayerIdle;
@@ -840,7 +919,9 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         this.logSessionEvent(
             'SKIP',
             author,
-            this.queue.current ? `[${this.queue.current.info.title}](${this.queue.current.info.uri})` : null,
+            this.queue.current
+                ? `[${this.queue.current.info.title}](${this.queue.current.info.uri})`
+                : null,
         );
         await this.queue.skip();
         await this.queue.start();
@@ -852,11 +933,18 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @param position - The position to skip to.
      * @returns Whether the player was skipped to the position.
      */
-    async skipToQueuedTrack(position: number, author?: { id: string; tag: string } | string | null): Promise<PlayerResponse> {
+    async skipToQueuedTrack(
+        position: number,
+        author?: { id: string; tag: string } | string | null,
+    ): Promise<PlayerResponse> {
         if (this.restartReady) return PlayerResponse.RestartInProgress;
         const targetTrack = this.queue.tracks[position - 1];
         if (this.queue.tracks.length > 1) {
-            const moveResponse = await this.moveQueuedTrack(position, 1, author);
+            const moveResponse = await this.moveQueuedTrack(
+                position,
+                1,
+                author,
+            );
             if (moveResponse !== PlayerResponse.Success) {
                 return moveResponse;
             }
@@ -864,7 +952,9 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         this.logSessionEvent(
             'SKIPTO',
             author,
-            targetTrack ? `[${targetTrack.info.title}](${targetTrack.info.uri})` : null,
+            targetTrack
+                ? `[${targetTrack.info.title}](${targetTrack.info.uri})`
+                : null,
         );
         const skipResponse = await this.skipCurrentTrack(author);
         if (skipResponse !== PlayerResponse.Success) {
@@ -877,7 +967,9 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * Stop (and reset) the player.
      * @returns Whether the player was stopped.
      */
-    async reset(author?: { id: string; tag: string } | string | null): Promise<PlayerResponse> {
+    async reset(
+        author?: { id: string; tag: string } | string | null,
+    ): Promise<PlayerResponse> {
         if (!this.queue.current || (!this.playing && !this.paused)) {
             return PlayerResponse.PlayerIdle;
         }
@@ -897,7 +989,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @param volume - The volume to set the player to.
      * @returns Whether the volume was set.
      */
-    async setVolumeTo(volume: number, author?: { id: string; tag: string } | string | null): Promise<PlayerResponse> {
+    async setVolumeTo(
+        volume: number,
+        author?: { id: string; tag: string } | string | null,
+    ): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
         if (volume < 0 || volume > 200) {
             return PlayerResponse.InputOutOfRange;

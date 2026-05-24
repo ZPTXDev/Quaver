@@ -1,8 +1,8 @@
 import { ForceType, MessageOptionsBuilderType } from '#src/lib';
 import { ModalSubmitHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
-import { formatSessionLog } from '#src/lib/util';
 import type { LocaleKey } from '#src/lib/locales';
+import { formatSessionLog, settings } from '#src/lib/util';
 import { paginate } from '@zptxdev/zptx-lib';
 import {
     ActionRowBuilder,
@@ -52,7 +52,15 @@ export default new ModalSubmitHandler().setExecute(
                 .addTextDisplayComponents(
                     new TextDisplayBuilder().setContent(
                         pages[page - 1]
-                            .map((log): string => formatSessionLog(log, (key: LocaleKey, ...args: string[]): string => guild.locale(key, ...args)))
+                            .map((log): string =>
+                                formatSessionLog(
+                                    log,
+                                    (
+                                        key: LocaleKey,
+                                        ...args: string[]
+                                    ): string => guild.locale(key, ...args),
+                                ),
+                            )
                             .join('\n'),
                     ),
                     guild.builders.textDisplayLocale(
@@ -66,7 +74,7 @@ export default new ModalSubmitHandler().setExecute(
                     new ActionRowBuilder<ButtonBuilder>().setComponents(
                         new ButtonBuilder()
                             .setCustomId(`sessionlogs:${page - 1}`)
-                            .setEmoji('⬅️')
+                            .setEmoji(settings.emojis.left)
                             .setDisabled(page - 1 < 1)
                             .setStyle(ButtonStyle.Primary),
                         guild.builders
@@ -75,7 +83,7 @@ export default new ModalSubmitHandler().setExecute(
                             .setCustomId('sessionlogs:goto'),
                         new ButtonBuilder()
                             .setCustomId(`sessionlogs:${page + 1}`)
-                            .setEmoji('➡️')
+                            .setEmoji(settings.emojis.right)
                             .setDisabled(page + 1 > pages.length)
                             .setStyle(ButtonStyle.Primary),
                     ),

@@ -6,7 +6,13 @@ import { getLocaleString, type LocaleKey } from '#src/lib/locales';
 import { logger } from '#src/lib/logger';
 import { searchState, updateHandler } from '#src/lib/state';
 import type { QuaverChannels, QuaverSong } from '#src/lib/util';
-import { buildMessageOptions, Check, getTrackMarkdownLocaleString, searchTracks, settings, } from '#src/lib/util';
+import {
+    buildMessageOptions,
+    Check,
+    getTrackMarkdownLocaleString,
+    searchTracks,
+    settings,
+} from '#src/lib/util';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
 import {
@@ -275,12 +281,12 @@ async function renderSearchResults(
                 new ActionRowBuilder<ButtonBuilder>().addComponents(
                     new ButtonBuilder()
                         .setCustomId('search:0')
-                        .setEmoji('⬅️')
+                        .setEmoji(settings.emojis.left)
                         .setDisabled(true)
                         .setStyle(ButtonStyle.Primary),
                     new ButtonBuilder()
                         .setCustomId('search:2')
-                        .setEmoji('➡️')
+                        .setEmoji(settings.emojis.right)
                         .setDisabled(pages.length === 1)
                         .setStyle(ButtonStyle.Primary),
                     guild.builders

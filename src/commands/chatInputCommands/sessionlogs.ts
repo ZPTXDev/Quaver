@@ -47,7 +47,15 @@ export default new ChatInputCommandHandler()
                 .addTextDisplayComponents(
                     new TextDisplayBuilder().setContent(
                         pages[0]
-                            .map((log): string => formatSessionLog(log, (key: LocaleKey, ...args: string[]): string => guild.locale(key, ...args)))
+                            .map((log): string =>
+                                formatSessionLog(
+                                    log,
+                                    (
+                                        key: LocaleKey,
+                                        ...args: string[]
+                                    ): string => guild.locale(key, ...args),
+                                ),
+                            )
                             .join('\n'),
                     ),
                     guild.builders.textDisplayLocale(
@@ -61,7 +69,7 @@ export default new ChatInputCommandHandler()
                     new ActionRowBuilder<ButtonBuilder>().setComponents(
                         new ButtonBuilder()
                             .setCustomId('sessionlogs:0')
-                            .setEmoji('⬅️')
+                            .setEmoji(settings.emojis.left)
                             .setDisabled(true)
                             .setStyle(ButtonStyle.Primary),
                         guild.builders
@@ -70,7 +78,7 @@ export default new ChatInputCommandHandler()
                             .setCustomId('sessionlogs:goto'),
                         new ButtonBuilder()
                             .setCustomId('sessionlogs:2')
-                            .setEmoji('➡️')
+                            .setEmoji(settings.emojis.right)
                             .setDisabled(pages.length === 1)
                             .setStyle(ButtonStyle.Primary),
                     ),

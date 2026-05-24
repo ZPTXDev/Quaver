@@ -1,8 +1,8 @@
 import { ForceType, MessageOptionsBuilderType } from '#src/lib';
 import { ButtonHandler } from '#src/lib/builders';
-import { formatSessionLog } from '#src/lib/util';
-import type { LocaleKey } from '#src/lib/locales';
 import { QuaverGuild } from '#src/lib/guild';
+import type { LocaleKey } from '#src/lib/locales';
+import { formatSessionLog, settings } from '#src/lib/util';
 import { paginate } from '@zptxdev/zptx-lib';
 import {
     ActionRowBuilder,
@@ -40,7 +40,13 @@ export default new ButtonHandler().setExecute(
             );
         }
         const page = parseInt(target);
-        if (!player || pages.length === 0 || isNaN(page) || page < 1 || page > pages.length) {
+        if (
+            !player ||
+            pages.length === 0 ||
+            isNaN(page) ||
+            page < 1 ||
+            page > pages.length
+        ) {
             await interaction.replyHandler.reply(
                 guild.locale('CMD.SESSIONLOGS.RESPONSE.NO_LOGS'),
                 {
@@ -65,7 +71,15 @@ export default new ButtonHandler().setExecute(
                 .addTextDisplayComponents(
                     new TextDisplayBuilder().setContent(
                         pages[page - 1]
-                            .map((log): string => formatSessionLog(log, (key: LocaleKey, ...args: string[]): string => guild.locale(key, ...args)))
+                            .map((log): string =>
+                                formatSessionLog(
+                                    log,
+                                    (
+                                        key: LocaleKey,
+                                        ...args: string[]
+                                    ): string => guild.locale(key, ...args),
+                                ),
+                            )
                             .join('\n'),
                     ),
                     guild.builders.textDisplayLocale(
@@ -79,7 +93,7 @@ export default new ButtonHandler().setExecute(
                     new ActionRowBuilder<ButtonBuilder>().addComponents(
                         new ButtonBuilder()
                             .setCustomId(`sessionlogs:${page - 1}`)
-                            .setEmoji('⬅️')
+                            .setEmoji(settings.emojis.left)
                             .setDisabled(page - 1 < 1)
                             .setStyle(ButtonStyle.Primary),
                         guild.builders
@@ -88,7 +102,7 @@ export default new ButtonHandler().setExecute(
                             .setCustomId('sessionlogs:goto'),
                         new ButtonBuilder()
                             .setCustomId(`sessionlogs:${page + 1}`)
-                            .setEmoji('➡️')
+                            .setEmoji(settings.emojis.right)
                             .setDisabled(page + 1 > pages.length)
                             .setStyle(ButtonStyle.Primary),
                     ),
