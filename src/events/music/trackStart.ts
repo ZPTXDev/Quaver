@@ -216,6 +216,14 @@ export default {
             ) {
                 return;
             }
+            // Wait 1 second to ensure that the track actually plays and doesn't fail to load
+            await new Promise<void>((resolve): void => {
+                setTimeout(resolve, 1000);
+            });
+            // Verify if the track is still the current track in the queue
+            if (queue.current?.id !== track.id) {
+                return;
+            }
             let json;
             let lyrics: string | Error;
             try {
