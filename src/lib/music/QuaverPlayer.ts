@@ -331,7 +331,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Toggle 24/7 mode.
      * @param enabled - Whether the feature is enabled.
-     * @
+     * @param author - The user who triggered the change.
      * @returns Whether the feature was enabled.
      */
     async setStay(
@@ -391,6 +391,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Toggle bass boost mode.
      * @param enabled - Whether the feature is enabled.
+     * @param author - The user who triggered the change.
      * @returns Whether the feature was enabled.
      */
     async setBassboost(
@@ -420,6 +421,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Bind the player to a text channel.
      * @param channel - The channel to bind to.
+     * @param author - The user who triggered the change.
      * @returns Whether the player was bound.
      */
     async bindTextChannel(
@@ -470,6 +472,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Disconnects and cleans up the player.
      * @param channelId - The channel to disconnect from.
+     * @param author - The user who triggered the change.
      * @returns Whether the player was disconnected.
      */
     async disconnect(
@@ -534,6 +537,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Change the looping mode.
      * @param type - The type of looping to use.
+     * @param author - The user who triggered the change.
      * @returns Whether the looping mode was changed.
      */
     async setLoopMode(
@@ -563,6 +567,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * Move a track in the queue.
      * @param oldPosition - The old position of the track.
      * @param newPosition - The new position of the track.
+     * @param author - The user who triggered the change.
      * @returns Whether the track was moved.
      */
     async moveQueuedTrack(
@@ -602,6 +607,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Toggle nightcore mode.
      * @param enabled - Whether the feature is enabled.
+     * @param author - The user who triggered the change.
      * @returns Whether the feature was enabled.
      */
     async setNightcore(
@@ -631,6 +637,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Pause the player.
      * @param paused - Whether to pause the player.
+     * @param author - The user who triggered the change.
      * @returns Whether the player was paused.
      */
     async setPause(
@@ -662,6 +669,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Remove a track from the queue.
      * @param position - The position of the track.
+     * @param author - The user who triggered the change.
      * @returns Whether the track was removed.
      */
     async removeQueuedTrack(
@@ -706,6 +714,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Seek to a position in the current track.
      * @param position - The position of the track to seek to.
+     * @param author - The user who triggered the change.
      * @returns Whether the seeking was successful.
      */
     async seekTo(
@@ -821,6 +830,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Toggle shuffle.
      * @param enabled - Whether to enable shuffle.
+     * @param author - The user who triggered the change.
      * @returns Whether shuffle was enabled.
      */
     async setShuffle(
@@ -858,6 +868,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Toggle alternating (smart queue).
      * @param enabled - Whether to enable alternating.
+     * @param author - The user who triggered the change.
      * @returns Whether alternating was enabled.
      */
     async setAlternate(
@@ -931,6 +942,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Skip to a specific position in the queue.
      * @param position - The position to skip to.
+     * @param author - The user who triggered the change.
      * @returns Whether the player was skipped to the position.
      */
     async skipToQueuedTrack(
@@ -987,6 +999,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Set the volume of the player.
      * @param volume - The volume to set the player to.
+     * @param author - The user who triggered the change.
      * @returns Whether the volume was set.
      */
     async setVolumeTo(
