@@ -1,6 +1,6 @@
 import { MessageOptionsBuilderType, type QuaverClient } from '#src/lib';
 import { EventHandler } from '#src/lib/builders';
-import { QuaverGuild, type Initialized } from '#src/lib/guild';
+import { type Initialized, QuaverGuild } from '#src/lib/guild';
 import { logger } from '#src/lib/logger';
 import type { QuaverPlayer } from '#src/lib/music';
 import {
@@ -91,7 +91,7 @@ async function onChannelEmpty(
     io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>,
     player: QuaverPlayer,
     isOldQuaverStateUpdate: boolean,
-    isGuildStayEnabled: boolean | unknown,
+    isGuildStayEnabled: boolean | undefined,
 ): Promise<void> {
     const guild = await QuaverGuild.wrap(player.guild);
     const isPlayerIdle =
@@ -152,7 +152,7 @@ async function onChannelJoinOrMove(
     io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>,
     player: QuaverPlayer,
     newState: VoiceState,
-    isGuildStayEnabled: boolean | unknown,
+    isGuildStayEnabled: boolean | undefined,
     isOldQuaverStateUpdate: boolean,
 ): Promise<void> {
     const guild = await QuaverGuild.wrap(player.guild);
@@ -162,7 +162,10 @@ async function onChannelJoinOrMove(
     }
     // In this context newState#channel is always defined for join/move states, so optional chaining is unnecessary
     const hasNewChannelUsers = newState.channel.members.filter(isUser).size > 0;
-    if (hasNewChannelUsers && (player.timeout.pause || player.timeout.pausedAlone)) {
+    if (
+        hasNewChannelUsers &&
+        (player.timeout.pause || player.timeout.pausedAlone)
+    ) {
         await resumeChannelSession(io, player);
     }
     // To prevent Quaver from handling a channel that still has users or the guild's stay feature is enabled, do not handle the channel
@@ -183,7 +186,7 @@ async function handleQuaverDisconnection(
     guild: QuaverGuild<Initialized> & Guild,
     player: QuaverPlayer,
     oldChannelId: string | null,
-    isGuildStayEnabled: boolean | unknown,
+    isGuildStayEnabled: boolean | undefined,
 ): Promise<void> {
     // To ensure Quaver does not persist in an inactive session, disable stay feature for this guild
     if (isGuildStayEnabled) {
@@ -204,7 +207,7 @@ async function handleQuaverJoinOrMove(
     guild: QuaverGuild<Initialized> & Guild,
     player: QuaverPlayer,
     newState: VoiceState,
-    isGuildStayEnabled: boolean | unknown,
+    isGuildStayEnabled: boolean | undefined,
     isOldQuaverStateUpdate: boolean,
     oldClientUserId: string,
 ): Promise<void> {
@@ -214,14 +217,17 @@ async function handleQuaverJoinOrMove(
     const newChannelType = newChannel?.type;
 
     // To keep the dashboard updated with the latest session details, emit channel events for this guild
-    guild.sendWebUpdate('textChannelUpdate', player.queue.channel.name);
+    guild.sendWebUpdate('textChannelUpdate', player.queue.channel?.name);
     guild.sendWebUpdate('channelUpdate', newChannel?.name);
 
     // For type consistency, create an empty map for unhandled states
     const channelPermissions = guild.channels.cache
         .get(newChannelId)
         ?.permissionsFor(oldClientUserId);
-    if (!channelPermissions) return;
+    if (!channelPermissions) {
+        await player.disconnect();
+        return;
+    }
 
     const hasBasicChannelPermissions = channelPermissions.has(
         new PermissionsBitField([
@@ -251,10 +257,7 @@ async function handleQuaverJoinOrMove(
         return;
     }
 
-    if (
-        newChannelType === ChannelType.GuildStageVoice &&
-        newState.suppress
-    ) {
+    if (newChannelType === ChannelType.GuildStageVoice) {
         // To prevent permission errors, properly disconnect Quaver
         if (!hasBasicChannelPermissions) {
             await player.sendMessage(
@@ -272,30 +275,30 @@ async function handleQuaverJoinOrMove(
         }
         if (!hasStageModerator) {
             await player.sendMessage(
-                guild.locale(
-                    'MUSIC.SESSION_ENDED.FORCED.STAGE_NOT_MODERATOR',
-                ),
+                guild.locale('MUSIC.SESSION_ENDED.FORCED.STAGE_NOT_MODERATOR'),
                 { type: MessageOptionsBuilderType.Warning },
             );
             await player.disconnect();
             return;
         }
-        // To avoid errors from recreating a stage instance, only create one if it doesn't already exist
-        if (newChannel && !newChannel.stageInstance) {
-            try {
-                await newChannel.createStageInstance({
-                    topic: guild.locale('MISC.STAGE_TOPIC'),
-                    privacyLevel: StageInstancePrivacyLevel.GuildOnly,
-                });
-            } catch (error) {
-                if (error instanceof Error) {
-                    logger.error(`${error.message}\n${error.stack}`);
+        if (newState.suppress) {
+            // To avoid errors from recreating a stage instance, only create one if it doesn't already exist
+            if (newChannel && !newChannel.stageInstance) {
+                try {
+                    await newChannel.createStageInstance({
+                        topic: guild.locale('MISC.STAGE_TOPIC'),
+                        privacyLevel: StageInstancePrivacyLevel.GuildOnly,
+                    });
+                } catch (error) {
+                    if (error instanceof Error) {
+                        logger.error(`${error.message}\n${error.stack}`);
+                    }
                 }
             }
+            // To prevent a regression bug in which Quaver remains silent in stage channels, unsuppress Quaver after stage instance creation
+            // Also handles unsuppressing Quaver mid-track as suppress state updates were intentionally written not to be ignored by Quaver
+            await newState.setSuppressed(false);
         }
-        // To prevent a regression bug in which Quaver remains silent in stage channels, unsuppress Quaver after stage instance creation
-        // Also handles unsuppressing Quaver mid-track as suppress state updates were intentionally written not to be ignored by Quaver
-        await newState.setSuppressed(false);
         await onChannelJoinOrMove(
             guild.client.io,
             player,
@@ -311,7 +314,7 @@ async function handleUserVoiceStateUpdate(
     newState: VoiceState,
     guild: QuaverGuild<Initialized> & Guild,
     player: QuaverPlayer,
-    isGuildStayEnabled: boolean | unknown,
+    isGuildStayEnabled: boolean | undefined,
     isOldQuaverStateUpdate: boolean,
 ): Promise<void> {
     const newChannelId = newState.channelId;
@@ -327,20 +330,21 @@ async function handleUserVoiceStateUpdate(
     }
 
     const isUserLeaveOrMoveState = oldChannelId === player.voice.channelId;
-    const pauseAlone =
-        (await guild.settings.get<boolean>('pausealone247')) ?? false;
     // Since the last user left or moved out from Quaver's channel, handle the empty channel
     if (
         isUserLeaveOrMoveState &&
-        oldState.channel?.members.filter(isUser).size < 1 &&
-        (!isGuildStayEnabled || pauseAlone)
+        oldState.channel?.members.filter(isUser).size < 1
     ) {
-        await onChannelEmpty(
-            guild.client.io,
-            player,
-            isOldQuaverStateUpdate,
-            isGuildStayEnabled,
-        );
+        const pauseAlone =
+            (await guild.settings.get<boolean>('pausealone247')) ?? false;
+        if (!isGuildStayEnabled || pauseAlone) {
+            await onChannelEmpty(
+                guild.client.io,
+                player,
+                isOldQuaverStateUpdate,
+                isGuildStayEnabled,
+            );
+        }
     }
 }
 
