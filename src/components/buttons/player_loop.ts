@@ -1,17 +1,13 @@
+import { buildNowPlayingMessage } from '#src/events/music/trackStart';
 import { ForceType, MessageOptionsBuilderType } from '#src/lib';
 import { ButtonHandler } from '#src/lib/builders';
-import { buildNowPlayingMessage } from '#src/events/music/trackStart';
 import { QuaverGuild } from '#src/lib/guild';
 import { PlayerResponse } from '#src/lib/music';
 import { Check } from '#src/lib/util';
 import { LoopType } from '@lavaclient/plugin-queue';
 
 export default new ButtonHandler()
-    .setChecks([
-        Check.ActiveSession,
-        Check.InVoice,
-        Check.InSessionVoice,
-    ])
+    .setChecks([Check.ActiveSession, Check.InVoice, Check.InSessionVoice])
     .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
@@ -28,12 +24,22 @@ export default new ButtonHandler()
         }
         typeLocale = typeLocale.toLowerCase();
         const response = await player.setLoopMode(loop);
+        if (response === PlayerResponse.RestartInProgress) {
+            await interaction.replyHandler.reply(
+                guild.locale('MUSIC.PLAYER.RESTARTING.ACTION_BLOCKED'),
+                { type: MessageOptionsBuilderType.Error, ephemeral: true },
+            );
+            return;
+        }
         if (response !== PlayerResponse.Success) return;
         if (player.queue.current) {
-            const { container, actionRows } = await buildNowPlayingMessage(guild, player.queue.current);
+            const { container, actionRows } = await buildNowPlayingMessage(
+                guild,
+                player.queue.current,
+            );
             await interaction.replyHandler.reply(
                 container.addActionRowComponents(...actionRows),
-                { force: ForceType.Update }
+                { force: ForceType.Update },
             );
         } else {
             await interaction.replyHandler.reply(

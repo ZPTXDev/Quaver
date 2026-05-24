@@ -2,20 +2,11 @@ import { ForceType, MessageOptionsBuilderType } from '#src/lib';
 import { ButtonHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import { PlayerResponse } from '#src/lib/music';
-import {
-    Check,
-    getRequesterStatus,
-    getTrackMarkdownLocaleString,
-    RequesterStatus,
-} from '#src/lib/util';
+import { Check, getRequesterStatus, getTrackMarkdownLocaleString, RequesterStatus, } from '#src/lib/util';
 import { type GuildMember } from 'discord.js';
 
 export default new ButtonHandler()
-    .setChecks([
-        Check.ActiveSession,
-        Check.InVoice,
-        Check.InSessionVoice,
-    ])
+    .setChecks([Check.ActiveSession, Check.InVoice, Check.InSessionVoice])
     .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
@@ -53,10 +44,24 @@ export default new ButtonHandler()
             if (skip.users.length >= skip.required) {
                 const response = await player.skipCurrentTrack();
                 switch (response) {
+                    case PlayerResponse.RestartInProgress:
+                        await interaction.replyHandler.reply(
+                            guild.locale(
+                                'MUSIC.PLAYER.RESTARTING.ACTION_BLOCKED',
+                            ),
+                            {
+                                type: MessageOptionsBuilderType.Error,
+                                ephemeral: true,
+                            },
+                        );
+                        return;
                     case PlayerResponse.PlayerIdle:
                         await interaction.replyHandler.reply(
                             guild.locale('MUSIC.PLAYER.PLAYING.NOTHING'),
-                            { type: MessageOptionsBuilderType.Error, ephemeral: true },
+                            {
+                                type: MessageOptionsBuilderType.Error,
+                                ephemeral: true,
+                            },
                         );
                         return;
                     case PlayerResponse.Success: {
@@ -68,7 +73,7 @@ export default new ButtonHandler()
                             )}\n${guild.locale(
                                 'MISC.ADDED_BY',
                                 track.requesterId,
-                              )}`,
+                            )}`,
                             {
                                 force: ForceType.FollowUp,
                             },
