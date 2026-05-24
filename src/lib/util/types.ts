@@ -45,7 +45,8 @@ export type SettingsPageOptions =
     | 'dj'
     | 'source'
     | 'autolyrics'
-    | 'smartqueue';
+    | 'smartqueue'
+    | 'controls';
 
 export type SettingsPage = {
     current: string;

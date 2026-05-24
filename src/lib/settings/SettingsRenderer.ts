@@ -105,12 +105,16 @@ export class SettingsRenderer {
         label = '➔',
         style: ButtonStyle = ButtonStyle.Secondary,
         url?: string,
+        disabled = false,
     ): SectionBuilder {
         const button = new ButtonBuilder().setLabel(label).setStyle(style);
         if (url) {
             button.setURL(url);
         } else {
             button.setCustomId(`settings:${category}${item ? `:${item}` : ''}`);
+        }
+        if (disabled) {
+            button.setDisabled(true);
         }
         return new SectionBuilder()
             .addTextDisplayComponents(
@@ -261,6 +265,8 @@ export class SettingsRenderer {
         const format = (await guild.settings.get<string>('format')) ?? 'simple';
         const autoLyrics =
             (await guild.settings.get<boolean>('autolyrics')) ?? false;
+        const controls =
+            (await guild.settings.get<boolean>('controls')) ?? true;
         return [
             this.createItemSection(
                 guild,
@@ -287,6 +293,25 @@ export class SettingsRenderer {
                       ),
                   ]
                 : []),
+            this.createItemSection(
+                guild,
+                SettingsCategory.Content,
+                'controls',
+                guild.locale(
+                    format === 'simple'
+                        ? 'MISC.DISABLED'
+                        : controls
+                          ? 'MISC.ENABLED'
+                          : 'MISC.DISABLED',
+                ),
+                format === 'simple'
+                    ? ButtonStyle.Danger
+                    : controls
+                      ? ButtonStyle.Success
+                      : ButtonStyle.Danger,
+                undefined,
+                format === 'simple',
+            ),
         ];
     }
 

@@ -12,6 +12,7 @@ type GuildSettingsObject = {
     stay?: StaySettingObject;
     locale?: string;
     pausealone247?: boolean;
+    controls?: boolean;
 };
 
 type StaySettingObject = {

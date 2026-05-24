@@ -142,7 +142,7 @@ export class PlaybackLogicHandler {
                     { force: ForceType.Update },
                 );
                 return;
-            }
+        }
         }
     }
 

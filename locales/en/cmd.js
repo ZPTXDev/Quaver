@@ -224,6 +224,10 @@ export default {
                         DESCRIPTION: 'Automatically send lyrics for every track.',
                         NAME: 'Auto Lyrics',
                     },
+                    CONTROLS: {
+                        DESCRIPTION: 'Whether to show player control buttons on "Now playing" messages.',
+                        NAME: 'Player Controls',
+                    },
                     FORMAT: {
                         DESCRIPTION: 'The "Now playing" format to use for this server.',
                         EXAMPLE: {
