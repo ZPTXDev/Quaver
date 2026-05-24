@@ -58,17 +58,17 @@ export default new ChatInputCommandHandler()
                     player.queue.current.info.uri
                         ? `**${player.queue.current.info.uri}**`
                         : `[**${escapeMarkdown(cleanURIForMarkdown(player.queue.current.info.title))}**](${player.queue.current.info.uri})`
-                }\n🔴 **${guild.locale(
+                }\n${settings.emojis.live} **${guild.locale(
                     'MISC.LIVE',
-                )}** ${'▬'.repeat(10)}${player.paused ? ' ⏸️' : ''}${
+                )}** ${'▬'.repeat(10)}${player.paused ? ` ${settings.emojis.pause}` : ''}${
                     player.queue.loop.type !== LoopType.None
                         ? ` ${
                               player.queue.loop.type === LoopType.Queue
-                                  ? '🔁'
-                                  : '🔂'
+                                  ? settings.emojis.loop
+                                  : settings.emojis.loop_song
                           }`
                         : ''
-                }${player.memory.shuffle ? ' 🔀' : ''}${player.memory.bassboost ? ' 🅱️' : ''}\n\`[${guild.locale(
+                }${player.memory.shuffle ? ` ${settings.emojis.shuffle}` : ''}${player.memory.bassboost ? ` ${settings.emojis.bassboost}` : ''}\n\`[${guild.locale(
                     'MISC.STREAMING',
                 )}]\` | ${guild.locale(
                     'MISC.ADDED_BY',
@@ -81,16 +81,16 @@ export default new ChatInputCommandHandler()
         await interaction.replyHandler.reply(
             `**[${escapeMarkdown(player.queue.current.info.title)}](${
                 player.queue.current.info.uri
-            })**\n${bar}${player.paused ? ' ⏸️' : ''}${
+            })**\n${bar}${player.paused ? ` ${settings.emojis.pause}` : ''}${
                 player.queue.loop.type !== LoopType.None
                     ? ` ${
                           player.queue.loop.type === LoopType.Queue
-                              ? '🔁'
-                              : '🔂'
+                              ? settings.emojis.loop
+                              : settings.emojis.loop_song
                       }`
                     : ''
-            }${player.memory.shuffle ? ' 🔀' : ''}${player.memory.bassboost ? ' 🅱️' : ''}${
-                player.memory.nightcore ? ' 🇳' : ''
+            }${player.memory.shuffle ? ` ${settings.emojis.shuffle}` : ''}${player.memory.bassboost ? ` ${settings.emojis.bassboost}` : ''}${
+                player.memory.nightcore ? ` ${settings.emojis.nightcore}` : ''
             }\n\`[${elapsedString} / ${durationString}]\` | ${guild.locale(
                 'MISC.ADDED_BY',
                 player.queue.current.requesterId,
