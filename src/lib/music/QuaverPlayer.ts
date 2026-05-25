@@ -7,7 +7,13 @@ import {
 import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
 import { logger } from '#src/lib/logger';
 import { updateHandler } from '#src/lib/state';
-import { buildMessageOptions, type QuaverChannels, type QuaverQueue, type QuaverSong, settings, } from '#src/lib/util';
+import {
+    buildMessageOptions,
+    type QuaverChannels,
+    type QuaverQueue,
+    type QuaverSong,
+    settings,
+} from '#src/lib/util';
 import type { PlayerEffect } from '@lavaclient/plugin-effects';
 import { type LoopType, Queue } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
