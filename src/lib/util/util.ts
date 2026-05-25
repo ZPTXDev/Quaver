@@ -378,11 +378,11 @@ export function formatSessionLog(
     locale: (key: LocaleKey, ...args: string[]) => string,
 ): string {
     const timeStr = `<t:${Math.floor(log.timestamp / 1000)}:T>`;
-    let authorDisplay = 'System';
+    let actorDisplay = 'System';
     if (log.userId) {
-        authorDisplay = `<@${log.userId}>`;
+        actorDisplay = `<@${log.userId}>`;
     } else if (log.userTag) {
-        authorDisplay = `**${log.userTag}**`;
+        actorDisplay = `**${log.userTag}**`;
     }
 
     const localeKey = `CMD.SESSIONLOGS.MISC.EVENT.${log.action}`;
@@ -403,11 +403,11 @@ export function formatSessionLog(
     try {
         actionText = locale(
             localeKey as LocaleKey,
-            authorDisplay,
+            actorDisplay,
             detailVal ?? '',
         );
     } catch {
-        actionText = `${authorDisplay} executed ${log.action} ${log.details ?? ''}`;
+        actionText = `${actorDisplay} executed ${log.action} ${log.details ?? ''}`;
     }
 
     return `**${timeStr}** ${actionText}`;
