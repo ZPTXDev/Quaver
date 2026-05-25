@@ -5,15 +5,11 @@ import { PlayerResponse } from '#src/lib/music';
 import { Check } from '#src/lib/util';
 
 export default new ButtonHandler()
-    .setChecks([
-        Check.ActiveSession,
-        Check.InVoice,
-        Check.InSessionVoice,
-    ])
+    .setChecks([Check.ActiveSession, Check.InVoice, Check.InSessionVoice])
     .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
-        const response = await player.reset();
+        const response = await player.reset(interaction.user);
         switch (response) {
             case PlayerResponse.PlayerIdle:
                 await interaction.replyHandler.reply(

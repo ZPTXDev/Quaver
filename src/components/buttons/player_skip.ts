@@ -2,7 +2,12 @@ import { ForceType, MessageOptionsBuilderType } from '#src/lib';
 import { ButtonHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import { PlayerResponse } from '#src/lib/music';
-import { Check, getRequesterStatus, getTrackMarkdownLocaleString, RequesterStatus, } from '#src/lib/util';
+import {
+    Check,
+    getRequesterStatus,
+    getTrackMarkdownLocaleString,
+    RequesterStatus,
+} from '#src/lib/util';
 import { type GuildMember } from 'discord.js';
 
 export default new ButtonHandler()
@@ -42,7 +47,9 @@ export default new ButtonHandler()
             }
             skip.users.push(interaction.user.id);
             if (skip.users.length >= skip.required) {
-                const response = await player.skipCurrentTrack();
+                const response = await player.skipCurrentTrack(
+                    interaction.user,
+                );
                 switch (response) {
                     case PlayerResponse.RestartInProgress:
                         await interaction.replyHandler.reply(
@@ -94,7 +101,7 @@ export default new ButtonHandler()
             );
             return;
         }
-        const response = await player.skipCurrentTrack();
+        const response = await player.skipCurrentTrack(interaction.user);
         switch (response) {
             case PlayerResponse.RestartInProgress:
                 await interaction.replyHandler.reply(

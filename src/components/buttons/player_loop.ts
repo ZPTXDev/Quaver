@@ -23,7 +23,7 @@ export default new ButtonHandler()
             typeLocale = guild.locale('CMD.LOOP.OPTION.TYPE.OPTION.DISABLED');
         }
         typeLocale = typeLocale.toLowerCase();
-        const response = await player.setLoopMode(loop);
+        const response = await player.setLoopMode(loop, interaction.user);
         if (response === PlayerResponse.RestartInProgress) {
             await interaction.replyHandler.reply(
                 guild.locale('MUSIC.PLAYER.RESTARTING.ACTION_BLOCKED'),

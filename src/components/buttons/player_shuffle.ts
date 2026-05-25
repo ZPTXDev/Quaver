@@ -11,7 +11,7 @@ export default new ButtonHandler()
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
         const shuffle = !player.memory.shuffle;
-        const response = await player.setShuffle(shuffle);
+        const response = await player.setShuffle(shuffle, interaction.user);
         if (response === PlayerResponse.RestartInProgress) {
             await interaction.replyHandler.reply(
                 guild.locale('MUSIC.PLAYER.RESTARTING.ACTION_BLOCKED'),
