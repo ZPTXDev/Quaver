@@ -5,11 +5,10 @@ import {
     type QuaverClient,
     type TopLevelComponentBuilders,
 } from '#src/lib';
-import type { QuaverGuild, Initialized } from '#src/lib/guild';
-import type { LocaleKey } from '#src/lib/locales';
-import type { LoadResult } from 'lavalink-protocol';
 import { data } from '#src/lib/data';
+import type { Initialized, QuaverGuild } from '#src/lib/guild';
 import type { ComponentInteractions } from '#src/lib/interactions';
+import type { LocaleKey } from '#src/lib/locales';
 import type { QuaverPlayer } from '#src/lib/music';
 import {
     acceptableSources,
@@ -30,6 +29,7 @@ import {
     type Snowflake,
     TextDisplayBuilder,
 } from 'discord.js';
+import type { LoadResult } from 'lavalink-protocol';
 import type { LavaLyricsResponse } from '.';
 
 type ColorTypes = 'success' | 'neutral' | 'warning' | 'error';
@@ -387,13 +387,13 @@ export function formatSessionLog(
 
     const localeKey = `CMD.SESSIONLOGS.MISC.EVENT.${log.action}`;
     let detailVal = log.details;
-    if (detailVal === 'true') {
-        detailVal = locale('CMD.SESSIONLOGS.MISC.ENABLED');
-    } else if (detailVal === 'false') {
-        detailVal = locale('CMD.SESSIONLOGS.MISC.DISABLED');
+    if (detailVal === 'ENABLED' || detailVal === 'DISABLED') {
+        detailVal = locale(`CMD.SESSIONLOGS.MISC.${detailVal}` as LocaleKey);
     } else if (log.action === 'LOOP' && detailVal) {
         try {
-            detailVal = locale(`CMD.LOOP.OPTION.TYPE.OPTION.${detailVal.toUpperCase()}` as LocaleKey);
+            detailVal = locale(
+                `CMD.LOOP.OPTION.TYPE.OPTION.${detailVal.toUpperCase()}` as LocaleKey,
+            );
         } catch {
             // fallback
         }
@@ -401,11 +401,14 @@ export function formatSessionLog(
 
     let actionText = '';
     try {
-        actionText = locale(localeKey as LocaleKey, authorDisplay, detailVal ?? '');
+        actionText = locale(
+            localeKey as LocaleKey,
+            authorDisplay,
+            detailVal ?? '',
+        );
     } catch {
         actionText = `${authorDisplay} executed ${log.action} ${log.details ?? ''}`;
     }
 
     return `**${timeStr}** ${actionText}`;
 }
-
