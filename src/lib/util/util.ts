@@ -358,7 +358,17 @@ export async function searchTracks(
             // Ignore error and try the next source
         }
     }
-    return result;
+    return (
+        result ??
+        ({
+            loadType: 'error',
+            data: {
+                message: 'All search sources failed.',
+                severity: 'common',
+                cause: 'No source returned a result',
+            },
+        } as LoadResult)
+    );
 }
 
 /**
