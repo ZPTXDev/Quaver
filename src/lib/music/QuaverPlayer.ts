@@ -548,17 +548,12 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         const guild = await QuaverGuild.wrap(this.guild);
         this.queue.setLoop(type);
         let loopStr = 'DISABLED';
-        if (
-            type.toString() === '1' ||
-            type.toString().toLowerCase() === 'song' ||
-            type.toString().toLowerCase() === 'track'
-        )
+        const typeStr = type?.toString().toLowerCase() ?? '';
+        if (typeStr === '1' || typeStr === 'song' || typeStr === 'track') {
             loopStr = 'TRACK';
-        else if (
-            type.toString() === '2' ||
-            type.toString().toLowerCase() === 'queue'
-        )
+        } else if (typeStr === '2' || typeStr === 'queue') {
             loopStr = 'QUEUE';
+        }
         this.logSessionEvent('LOOP', actor, loopStr);
         guild.sendWebUpdate('loopUpdate', type);
         return PlayerResponse.Success;
