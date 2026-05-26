@@ -6,13 +6,7 @@ import { getLocaleString, type LocaleKey } from '#src/lib/locales';
 import { logger } from '#src/lib/logger';
 import { searchState, updateHandler } from '#src/lib/state';
 import type { QuaverChannels, QuaverSong } from '#src/lib/util';
-import {
-    buildMessageOptions,
-    Check,
-    getTrackMarkdownLocaleString,
-    searchTracks,
-    settings,
-} from '#src/lib/util';
+import { buildMessageOptions, Check, getTrackMarkdownLocaleString, searchTracks, settings, } from '#src/lib/util';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
 import {
@@ -148,18 +142,19 @@ async function handleImmediateAdd(
     const tracks =
         result.loadType === 'track'
             ? [
-                  ((): QuaverSong => {
-                      const track = result.data as QuaverSong;
-                      track.requesterId = interaction.user.id;
-                      track.id = crypto.randomUUID();
-                      return track;
-                  })(),
+                  {
+                      ...(result.data as QuaverSong),
+                      requesterId: interaction.user.id,
+                      id: crypto.randomUUID(),
+                  },
               ]
-            : result.data.tracks.map((t: QuaverSong): QuaverSong => {
-                  t.requesterId = interaction.user.id;
-                  t.id = crypto.randomUUID();
-                  return t;
-              });
+            : result.data.tracks.map(
+                  (t: QuaverSong): QuaverSong => ({
+                      ...t,
+                      requesterId: interaction.user.id,
+                      id: crypto.randomUUID(),
+                  }),
+              );
     const msg =
         result.loadType === 'track'
             ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT'
