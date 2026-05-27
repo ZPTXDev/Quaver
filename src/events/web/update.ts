@@ -193,7 +193,7 @@ export default {
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
-                await player.setBassboost(item.value, actor);
+                await player.setBassboost(item.value, false, actor);
                 break;
             }
             case UpdateItemType.Nightcore: {
@@ -201,7 +201,7 @@ export default {
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
-                await player.setNightcore(item.value, actor);
+                await player.setNightcore(item.value, false, actor);
                 break;
             }
             case UpdateItemType.Seek: {

@@ -33,6 +33,8 @@ export default {
         const guild = await QuaverGuild.wrap(queue.player.guild);
         queue.player.logSessionEvent('PLAY', null, `[${track.info.title}](${track.info.uri})`);
         delete queue.player.memory.skip;
+        // Record track start time for accurate playtime tracking
+        queue.player.memory.trackStartTime = Date.now();
         logger.info(`[G ${guild.id}] Starting track`);
 
         // Check if this is an ad track

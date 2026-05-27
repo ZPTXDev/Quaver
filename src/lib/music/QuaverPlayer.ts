@@ -54,6 +54,11 @@ export interface QuaverPlayerJSON {
         adPlaytimeMs?: number;
         preAdPlaytimeMs?: number;
         isAdPlaying?: boolean;
+        savedFilters?: {
+            bassboost: boolean;
+            nightcore: boolean;
+        };
+        trackStartTime?: number;
     };
     sessionLogs: {
         timestamp: number;
@@ -140,6 +145,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             bassboost: boolean;
             nightcore: boolean;
         };
+        trackStartTime?: number;
     } = {
         bassboost: false,
         nightcore: false,
@@ -1092,6 +1098,12 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
                     : undefined,
                 adPlaytimeMs: this.memory.adPlaytimeMs,
                 isAdPlaying: this.memory.isAdPlaying,
+                savedFilters: this.memory.savedFilters
+                    ? {
+                          bassboost: this.memory.savedFilters.bassboost,
+                          nightcore: this.memory.savedFilters.nightcore,
+                      }
+                    : undefined,
             },
             sessionLogs: [...this.sessionLogs],
         };

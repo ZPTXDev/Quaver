@@ -213,6 +213,12 @@ export class PremiumSweepService {
         if (!textChannel) {
             try {
                 textChannel = await guild.channels.fetch(stayText) as QuaverChannels;
+                if (!textChannel) {
+                    logger.error(`[G ${guildId}] Text channel ${stayText} not found for stay reconnection`);
+                    // If we can't get the text channel, we can't send messages, so disconnect
+                    newPlayer.disconnect();
+                    return;
+                }
             } catch (error) {
                 logger.error(`[G ${guildId}] Could not fetch text channel ${stayText} for stay reconnection:`, error);
                 // If we can't get the text channel, we can't send messages, so disconnect

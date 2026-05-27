@@ -109,8 +109,8 @@ export default {
         }
 
         // Accumulate playtime for regular tracks (not ads)
-        // Use player position to track actual listened duration, regardless of end reason
-        // This prevents users from skipping tracks to avoid ads
+        // Use elapsed time from trackStartTime to track actual listened duration
+        // This prevents issues where player.position is reset to 0 or represents the new track
         if (reason === 'finished' || reason === 'stopped' || reason === 'replaced') {
             // Initialize playtime from database if not in memory
             if (queue.player.memory.adPlaytimeMs === undefined) {
@@ -121,14 +121,22 @@ export default {
                 queue.player.memory.adPlaytimeMs = dbPlaytime || 0;
             }
             
-            // Accumulate actual listened duration using player position
-            const listenedDuration = queue.player.position || 0;
+            // Calculate actual listened duration using elapsed time from track start
+            // Cap at track length to prevent accumulating more than the track's duration
+            const trackStartTime = queue.player.memory.trackStartTime || Date.now();
+            const elapsedTime = Date.now() - trackStartTime;
+            const trackLength = track.info.length || 0;
+            const listenedDuration = Math.min(elapsedTime, trackLength);
+            
             queue.player.memory.adPlaytimeMs += listenedDuration;
             await data.guild.set(
                 guild.id,
                 'ads.playtimeMs',
                 queue.player.memory.adPlaytimeMs,
             );
+            
+            // Clean up the trackStartTime
+            delete queue.player.memory.trackStartTime;
         }
 
         // Only check for ad insertion when a track finishes naturally
