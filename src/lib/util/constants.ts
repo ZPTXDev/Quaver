@@ -51,12 +51,13 @@ export const settingsOptions = [
         ? ['premium']
         : []),
     'language',
-    ...(settings.features.stay.enabled ? ['notifyin247'] : []),
+    ...(settings.features.stay.enabled ? ['notifyin247', 'pausealone247'] : []),
     'format',
     'dj',
     'source',
     ...(settings.features.autolyrics.enabled ? ['autolyrics'] : []),
     ...(settings.features.smartqueue.enabled ? ['smartqueue'] : []),
+    'controls',
 ];
 
 export const queryOverrides: string[] = [];

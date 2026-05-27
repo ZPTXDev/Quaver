@@ -105,12 +105,16 @@ export class SettingsRenderer {
         label = '➔',
         style: ButtonStyle = ButtonStyle.Secondary,
         url?: string,
+        disabled = false,
     ): SectionBuilder {
         const button = new ButtonBuilder().setLabel(label).setStyle(style);
         if (url) {
             button.setURL(url);
         } else {
             button.setCustomId(`settings:${category}${item ? `:${item}` : ''}`);
+        }
+        if (disabled) {
+            button.setDisabled(true);
         }
         return new SectionBuilder()
             .addTextDisplayComponents(
@@ -202,6 +206,8 @@ export class SettingsRenderer {
     ): Promise<SectionBuilder[]> {
         const notify =
             (await guild.settings.get<boolean>('notifyin247')) ?? true;
+        const pauseAlone =
+            (await guild.settings.get<boolean>('pausealone247')) ?? false;
         const source =
             (await guild.settings.get<string>('source')) ??
             Object.keys(acceptableSources)[0];
@@ -218,6 +224,15 @@ export class SettingsRenderer {
                               notify ? 'MISC.ENABLED' : 'MISC.DISABLED',
                           ),
                           notify ? ButtonStyle.Success : ButtonStyle.Danger,
+                      ),
+                      this.createItemSection(
+                          guild,
+                          SettingsCategory.Playback,
+                          'pausealone247',
+                          guild.locale(
+                              pauseAlone ? 'MISC.ENABLED' : 'MISC.DISABLED',
+                          ),
+                          pauseAlone ? ButtonStyle.Success : ButtonStyle.Danger,
                       ),
                   ]
                 : []),
@@ -251,6 +266,8 @@ export class SettingsRenderer {
         const format = (await guild.settings.get<string>('format')) ?? 'simple';
         const autoLyrics =
             (await guild.settings.get<boolean>('autolyrics')) ?? false;
+        const controls =
+            (await guild.settings.get<boolean>('controls')) ?? true;
         return [
             this.createItemSection(
                 guild,
@@ -277,6 +294,25 @@ export class SettingsRenderer {
                       ),
                   ]
                 : []),
+            this.createItemSection(
+                guild,
+                SettingsCategory.Content,
+                'controls',
+                guild.locale(
+                    format === 'simple'
+                        ? 'MISC.DISABLED'
+                        : controls
+                          ? 'MISC.ENABLED'
+                          : 'MISC.DISABLED',
+                ),
+                format === 'simple'
+                    ? ButtonStyle.Danger
+                    : controls
+                      ? ButtonStyle.Success
+                      : ButtonStyle.Danger,
+                undefined,
+                format === 'simple',
+            ),
         ];
     }
 

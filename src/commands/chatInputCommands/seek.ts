@@ -124,7 +124,7 @@ export default new ChatInputCommandHandler()
         if (targetString === 'MORE_THAN_A_DAY') {
             targetString = guild.locale('MISC.MORE_THAN_A_DAY');
         }
-        const response = await player.seekTo(position);
+        const response = await player.seekTo(position, interaction.user);
         switch (response) {
             case PlayerResponse.RestartInProgress:
                 await interaction.replyHandler.reply(

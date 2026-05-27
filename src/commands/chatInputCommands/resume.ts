@@ -26,16 +26,16 @@ export default new ChatInputCommandHandler()
     .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
-        
+
         // Check if an ad is playing
         if (player.memory.isAdPlaying) {
             const premiumURL = getPremiumURL(interaction.guild.id);
-            
+
             const container = new ContainerBuilder()
                 .addTextDisplayComponents(
                     guild.builders.textDisplayLocale('CMD.RESUME.RESPONSE.ERROR.AD_PLAYING'),
                 );
-            
+
             if (premiumURL) {
                 container.addActionRowComponents(
                     new ActionRowBuilder<ButtonBuilder>().setComponents(
@@ -46,14 +46,14 @@ export default new ChatInputCommandHandler()
                     ),
                 );
             }
-            
+
             await interaction.replyHandler.reply(container, {
                 type: MessageOptionsBuilderType.Error,
             });
             return;
         }
-        
-        const response = await player.setPause(false);
+
+        const response = await player.setPause(false, interaction.user);
         switch (response) {
             case PlayerResponse.RestartInProgress:
                 await interaction.replyHandler.reply(

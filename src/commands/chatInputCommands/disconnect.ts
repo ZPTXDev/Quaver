@@ -40,7 +40,7 @@ export default new ChatInputCommandHandler()
         const player = await guild.getPlayer();
         
         if (player.queue.tracks.length === 0) {
-            const response = await player.disconnect();
+            const response = await player.disconnect(undefined, interaction.user);
             switch (response) {
                 case PlayerResponse.FeatureConflict:
                     await interaction.replyHandler.reply(

@@ -18,7 +18,7 @@ export default new ButtonHandler()
         const player = await guild.getPlayer();
         clearTimeout(confirmationTimeout[interaction.message.id]);
         delete confirmationTimeout[interaction.message.id];
-        const response = await player.disconnect();
+        const response = await player.disconnect(undefined, interaction.user);
         switch (response) {
             case PlayerResponse.FeatureConflict:
                 await interaction.replyHandler.reply(

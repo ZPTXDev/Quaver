@@ -40,11 +40,13 @@ export type SettingsPageOptions =
     | 'premium'
     | 'language'
     | 'notifyin247'
+    | 'pausealone247'
     | 'format'
     | 'dj'
     | 'source'
     | 'autolyrics'
-    | 'smartqueue';
+    | 'smartqueue'
+    | 'controls';
 
 export type SettingsPage = {
     current: string;

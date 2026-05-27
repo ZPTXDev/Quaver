@@ -49,7 +49,7 @@ export default new ChatInputCommandHandler()
         ) as QuaverChannels;
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
-        const response = await player.bindTextChannel(channel);
+        const response = await player.bindTextChannel(channel, interaction.user);
         switch (response) {
             case PlayerResponse.InsufficientPermissions:
                 await interaction.replyHandler.reply(

@@ -100,6 +100,22 @@ export class ContentLogicHandler {
                 );
                 return;
             }
+            case 'controls': {
+                const format =
+                    (await guild.settings.get<string>('format')) ?? 'simple';
+                if (format === 'simple') return;
+                const controls =
+                    (await guild.settings.get<boolean>('controls')) ?? true;
+                await guild.settings.set('controls', !controls);
+                await interaction.replyHandler.reply(
+                    await SettingsRenderer.renderSubMenu(
+                        await QuaverGuild.wrap(interaction.guild),
+                        SettingsCategory.Content,
+                    ),
+                    { force: ForceType.Update },
+                );
+                return;
+            }
         }
     }
 }
