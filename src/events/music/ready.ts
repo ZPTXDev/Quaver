@@ -64,7 +64,33 @@ async function restorePlayer(
         }
         // When resumed=true, Lavalink has already positioned the track correctly, no need to seek
         
-        logger.info(`[G ${guild.id}] Player restored from saved state (resumed = ${resumed})`);
+        // Auto-unpause if the pause was initiated by the bot (e.g., due to inactivity)
+        try {
+            if (snapshot.paused && Array.isArray(snapshot.sessionLogs)) {
+                const lastPause = [...snapshot.sessionLogs]
+                    .reverse()
+                    .find((l): boolean => l.action === 'PAUSE');
+                // detect if the pause was by the bot (no user present)
+                if (
+                    lastPause &&
+                    !lastPause.userId &&
+                    !lastPause.userTag &&
+                    Date.now() - lastPause.timestamp < 15_000
+                ) {
+                    await player.setPause(false);
+                    logger.info(`[G ${guild.id}] Unpaused restored player`);
+                }
+            }
+        } catch (err) {
+            // don't fail the whole restore if unpause fails; log and continue
+            logger.warn(
+                `[G ${guild.id}] Failed to auto-unpause restored player: ${err instanceof Error ? err.message : String(err)}`,
+            );
+        }
+        
+        logger.info(
+            `[G ${guild.id}] Player restored from saved state (resumed = ${resumed})`,
+        );
         return true;
     } catch (error) {
         logger.error(`[G ${guild.id}] Failed to restore player`, error);

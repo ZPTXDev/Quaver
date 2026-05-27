@@ -387,7 +387,7 @@ export function formatSessionLog(
     locale: (key: LocaleKey, ...args: string[]) => string,
 ): string {
     const timeStr = `<t:${Math.floor(log.timestamp / 1000)}:T>`;
-    let actorDisplay = 'System';
+    let actorDisplay = `<@${settings.applicationId}>`;
     if (log.userId) {
         actorDisplay = `<@${log.userId}>`;
     } else if (log.userTag) {

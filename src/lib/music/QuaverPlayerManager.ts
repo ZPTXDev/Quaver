@@ -57,6 +57,7 @@ export class QuaverPlayerManager<
                   users: [...data.memory.skip.users],
               }
             : undefined;
+        player.sessionLogs = data.sessionLogs ? [...data.sessionLogs] : [];
         if (resumed) {
             await player.fetch();
             player.memory.bassboost = data.effects.bassboost;
