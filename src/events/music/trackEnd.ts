@@ -339,7 +339,7 @@ export default {
                 (await guild.features.isFeatureActive('stay'))
             )
         ) {
-            logger.info(`[G ${guild.id}] Disconnecting (alone) - early return from trackEnd`);
+            logger.info(`[G ${guild.id}] Disconnecting (alone)`);
             await queue.player.sendMessage(
                 guild.locale('MUSIC.DISCONNECT.ALONE.DISCONNECTED.DEFAULT'),
                 { type: MessageOptionsBuilderType.Warning },
@@ -347,8 +347,6 @@ export default {
             await queue.player.disconnect();
             return;
         }
-
-
 
         // Advance to next track only if the reason warrants it
         if (mayStartNext[reason]) {
@@ -361,7 +359,6 @@ export default {
             // Only do this if there's a current track (to avoid double-emitting)
             queue.current = null;
             queue.emit('finish');
-
         }
     },
 };
