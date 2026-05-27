@@ -83,8 +83,8 @@ dependencies:
     specifier: ^6.0.1
     version: 6.0.1
   undici:
-    specifier: ^7.24.7
-    version: 7.24.7
+    specifier: ^8.3.0
+    version: 8.3.0
   wanakana:
     specifier: ^5.3.1
     version: 5.3.1
@@ -3119,7 +3119,7 @@ packages:
       semver: 7.8.1
       tar: 7.5.12
       tinyglobby: 0.2.16
-      undici: 6.25.0
+      undici: 6.26.0
       which: 6.0.1
     dev: false
     optional: true
@@ -4240,16 +4240,16 @@ packages:
     engines: {node: '>=18.17'}
     dev: false
 
-  /undici@6.25.0:
-    resolution: {integrity: sha512-ZgpWDC5gmNiuY9CnLVXEH8rl50xhRCuLNA97fAUnKi8RRuV4E6KG31pDTsLVUKnohJE0I3XDrTeEydAXRw47xg==}
+  /undici@6.26.0:
+    resolution: {integrity: sha512-4yqz8a3n5HmGTlsbADNtr/dJlhkh/55Rq798G6ibiULcXbDtaLpTl1pvdqcbFfeoj3iSi52lePFM7h9H21cw/A==}
     engines: {node: '>=18.17'}
     requiresBuild: true
     dev: false
     optional: true
 
-  /undici@7.24.7:
-    resolution: {integrity: sha512-H/nlJ/h0ggGC+uRL3ovD+G0i4bqhvsDOpbDv7At5eFLlj2b41L8QliGbnl2H7SnDiYhENphh1tQFJZf+MyfLsQ==}
-    engines: {node: '>=20.18.1'}
+  /undici@8.3.0:
+    resolution: {integrity: sha512-TkUDgb6tl7KOGZ+7e8E3d2FYgUQgF6z5YypqjWmixVQSQERFcVrVg0ySADm2LVLRh5ljAaHTCR5Fmz3Q34rB7Q==}
+    engines: {node: '>=22.19.0'}
     dev: false
 
   /unique-filename@1.1.1:
