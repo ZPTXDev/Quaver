@@ -74,6 +74,7 @@ export default {
                           channel:
                               client.guilds.cache.get(guildId).members.me.voice
                                   .channel?.name,
+                          sessionLogs: player.sessionLogs,
                       }
                     : null;
                 break;

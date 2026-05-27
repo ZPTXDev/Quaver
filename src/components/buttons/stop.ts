@@ -17,7 +17,7 @@ export default new ButtonHandler()
         const player = await guild.getPlayer();
         clearTimeout(confirmationTimeout[interaction.message.id]);
         delete confirmationTimeout[interaction.message.id];
-        const response = await player.reset();
+        const response = await player.reset(interaction.user);
         switch (response) {
             case PlayerResponse.PlayerIdle:
                 await interaction.replyHandler.reply(

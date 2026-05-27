@@ -61,7 +61,7 @@ export default new ChatInputCommandHandler()
             );
             return;
         }
-        const response = await player.skipToQueuedTrack(position);
+        const response = await player.skipToQueuedTrack(position, interaction.user);
         switch (response) {
             case PlayerResponse.RestartInProgress:
                 await interaction.replyHandler.reply(

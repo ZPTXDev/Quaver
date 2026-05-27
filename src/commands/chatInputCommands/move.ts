@@ -57,7 +57,7 @@ export default new ChatInputCommandHandler()
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
         const track = player.queue.tracks[oldPosition - 1];
-        const response = await player.moveQueuedTrack(oldPosition, newPosition);
+        const response = await player.moveQueuedTrack(oldPosition, newPosition, interaction.user);
         switch (response) {
             case PlayerResponse.QueueInsufficientTracks:
                 await interaction.replyHandler.reply(
