@@ -48,8 +48,11 @@ async function restorePlayer(
                 const lastPause = [...snapshot.sessionLogs]
                     .reverse()
                     .find((l): boolean => l.action === 'PAUSE');
+                // detect if the pause was by the bot (no user present)
                 if (
-                    lastPause?.userId === guild.client.user.id &&
+                    lastPause &&
+                    !lastPause.userId &&
+                    !lastPause.userTag &&
                     Date.now() - lastPause.timestamp < 15_000
                 ) {
                     await player.setPause(false);
