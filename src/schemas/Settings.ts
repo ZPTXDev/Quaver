@@ -202,16 +202,16 @@ export const SettingsSchema = z.object({
     connectionHealth: z
         .object({
             gateway: z.object({
-                unstablePingThresholdMs: z.number().default(500),
-                unstableReconnectThreshold: z.number().default(5),
-                sampleIntervalSeconds: z.number().default(10),
-                sampleWindowSize: z.number().default(20),
+                unstablePingThresholdMs: z.number().int().positive().default(500),
+                unstableReconnectThreshold: z.number().int().nonnegative().default(5),
+                sampleIntervalSeconds: z.number().int().positive().default(10),
+                sampleWindowSize: z.number().int().positive().default(20),
             }),
             media: z.object({
-                checkIntervalSeconds: z.number().default(60),
-                unstableLatencyMs: z.number().default(2000),
-                consecutiveFailureThreshold: z.number().default(3),
-                checkTimeoutMs: z.number().default(2000),
+                checkIntervalSeconds: z.number().int().positive().default(60),
+                unstableLatencyMs: z.number().int().positive().default(2000),
+                consecutiveFailureThreshold: z.number().int().positive().default(3),
+                checkTimeoutMs: z.number().int().positive().default(2000),
             }),
         })
         .optional(),

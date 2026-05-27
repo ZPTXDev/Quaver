@@ -201,6 +201,16 @@ export class ConnectionHealthMonitor {
     }
 
     public updateMediaEndpoint(endpoint: string | null): void {
+        if (endpoint === null && this.mediaEndpoint !== null) {
+            logger.info('Media server endpoint cleared, stopping health checks');
+            this.mediaEndpoint = null;
+            this.mediaConsecutiveFailures = 0;
+            this.mediaLatencySamples = [];
+            this.lastMediaCheckTimestamp = Date.now();
+            this.emitMediaHealthUpdate();
+            return;
+        }
+
         if (endpoint && endpoint !== this.mediaEndpoint) {
             logger.info(`Media server endpoint updated: ${endpoint}`);
             this.mediaEndpoint = endpoint;

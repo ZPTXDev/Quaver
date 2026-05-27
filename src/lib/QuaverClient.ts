@@ -55,9 +55,7 @@ export class QuaverClient extends Client {
             GatewayDispatchEvents.VoiceServerUpdate,
             async (payload): Promise<boolean> => {
                 // Capture media server endpoint for health monitoring
-                if (payload.endpoint) {
-                    this.connectionHealth.updateMediaEndpoint(payload.endpoint);
-                }
+                this.connectionHealth.updateMediaEndpoint(payload.endpoint ?? null);
                 return this.music.players.handleVoiceUpdate(payload);
             },
         );
