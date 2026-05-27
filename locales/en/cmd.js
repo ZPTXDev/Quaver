@@ -228,11 +228,11 @@ export default {
             DISABLED: 'disabled',
             ENABLED: 'enabled',
             EVENT: {
-                BASSBOOST: '**%1** **%2** bass boost',
+                BASSBOOST: '**%1** **%2** bass boost mode',
                 BIND: '**%1** bound the text channel to <#%2>',
                 DISCONNECT: '**%1** disconnected the player',
                 LOOP: '**%1** set loop mode to **%2**',
-                NIGHTCORE: '**%1** **%2** nightcore',
+                NIGHTCORE: '**%1** **%2** nightcore mode',
                 PAUSE: '**%1** paused the player',
                 PLAY: 'Started playing **%2**',
                 QUEUE_ADD: '**%1** added **%2**',
@@ -245,8 +245,8 @@ export default {
                 SHUFFLE: '**%1** **%2** shuffle',
                 SKIP: '**%1** skipped **%2**',
                 SKIPTO: '**%1** skipped to **%2**',
-                SMARTQUEUE: '**%1** **%2** smart queue',
-                STAY: '**%1** **%2** 24/7 mode',
+                SMARTQUEUE: '**%1** **%2** Smart Queue',
+                STAY: '**%1** **%2** 24/7 Mode',
                 STOP: '**%1** stopped the player',
                 VOLUME: '**%1** set the volume to **%2%**',
             },
@@ -317,11 +317,11 @@ export default {
                 SETTINGS: {
                     NOTIFYIN247: {
                         DESCRIPTION: 'Whether to send "Now playing" messages in 24/7 Mode.',
-                        NAME: 'Notify in 24/7 mode',
+                        NAME: 'Notify in 24/7 Mode',
                     },
                     PAUSEALONE247: {
-                        DESCRIPTION: 'Whether to pause playback when alone in voice channel in 24/7 mode.',
-                        NAME: 'Pause alone in 24/7 mode',
+                        DESCRIPTION: 'Whether to pause playback when alone in voice channel in 24/7 Mode.',
+                        NAME: 'Pause alone in 24/7 Mode',
                     },
                     SMARTQUEUE: {
                         DESCRIPTION: 'Sorts the queue to alternate between requesters.',
