@@ -1,3 +1,4 @@
+export * from './ConnectionHealthMonitor';
 export * from './PlayerStateManager';
 export * from './QuaverNode';
 export * from './QuaverPlayer';

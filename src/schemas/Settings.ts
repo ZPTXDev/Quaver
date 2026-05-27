@@ -199,6 +199,22 @@ export const SettingsSchema = z.object({
             maxAttempts: z.number().default(1),
         })
         .optional(),
+    connectionHealth: z
+        .object({
+            gateway: z.object({
+                unstablePingThresholdMs: z.number().default(500),
+                unstableReconnectThreshold: z.number().default(5),
+                sampleIntervalSeconds: z.number().default(10),
+                sampleWindowSize: z.number().default(20),
+            }),
+            media: z.object({
+                checkIntervalSeconds: z.number().default(60),
+                unstableLatencyMs: z.number().default(2000),
+                consecutiveFailureThreshold: z.number().default(3),
+                checkTimeoutMs: z.number().default(2000),
+            }),
+        })
+        .optional(),
 });
 
 export type Settings = z.infer<typeof SettingsSchema>;

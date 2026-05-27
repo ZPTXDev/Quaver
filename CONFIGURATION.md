@@ -109,6 +109,20 @@
     "enabled": true,
     "maxAge": 86400,
     "maxAttempts": 1
+  },
+  "connectionHealth": {
+    "gateway": {
+      "unstablePingThresholdMs": 500,
+      "unstableReconnectThreshold": 5,
+      "sampleIntervalSeconds": 10,
+      "sampleWindowSize": 20
+    },
+    "media": {
+      "checkIntervalSeconds": 60,
+      "unstableLatencyMs": 2000,
+      "consecutiveFailureThreshold": 3,
+      "checkTimeoutMs": 2000
+    }
   }
 }
 ```
@@ -169,3 +183,12 @@
 | `sessionRecovery.enabled`       | Whether to enable resuming sessions after Quaver restarts. Enabling this will create a `states.json` file whenever Quaver shuts down.                                                                                                                                                                                                                             | ❌ (defaults to `false`)                                   | `8.0.0`       |
 | `sessionRecovery.maxAge`        | The maximum age of a session in seconds. Only used if `sessionRecovery.enabled` is `true`.                                                                                                                                                                                                                                                                        | ❌ (defaults to `86400` (24 hours))                        | `8.0.0`       |
 | `sessionRecovery.maxAttempts`   | The maximum number of attempts to resume a session. Only used if `sessionRecovery.enabled` is `true`.                                                                                                                                                                                                                                                             | ❌ (defaults to `1`)                                       | `8.0.0`       |
+| `connectionHealth`              | Connection health monitoring configuration. Monitors Discord gateway and media server connectivity to detect and alert users about connection issues.                                                                                                                                                                                                           | ❌                                                         | `8.0.0`       |
+| `connectionHealth.gateway.unstablePingThresholdMs` | The ping threshold in milliseconds above which the gateway connection is considered unstable.                                                                                                                                                                                                     | ❌ (defaults to `500`)                                     | `8.0.0`       |
+| `connectionHealth.gateway.unstableReconnectThreshold` | The number of reconnects within the sample window that indicates an unstable gateway connection.                                                                                                                                                                                                  | ❌ (defaults to `5`)                                       | `8.0.0`       |
+| `connectionHealth.gateway.sampleIntervalSeconds` | How often (in seconds) to sample gateway health metrics.                                                                                                                                                                                                                                          | ❌ (defaults to `10`)                                      | `8.0.0`       |
+| `connectionHealth.gateway.sampleWindowSize` | The number of samples to keep in the rolling window for gateway health analysis.                                                                                                                                                                                                                  | ❌ (defaults to `20`)                                      | `8.0.0`       |
+| `connectionHealth.media.checkIntervalSeconds` | How often (in seconds) to check Discord media server connectivity.                                                                                                                                                                                                                                | ❌ (defaults to `60`)                                      | `8.0.0`       |
+| `connectionHealth.media.unstableLatencyMs` | The latency threshold in milliseconds above which the media server connection is considered unstable.                                                                                                                                                                                             | ❌ (defaults to `2000`)                                    | `8.0.0`       |
+| `connectionHealth.media.consecutiveFailureThreshold` | The number of consecutive failed media server checks that triggers an unstable status alert.                                                                                                                                                                                                      | ❌ (defaults to `3`)                                       | `8.0.0`       |
+| `connectionHealth.media.checkTimeoutMs` | The timeout in milliseconds for media server health checks.                                                                                                                                                                                                                                       | ❌ (defaults to `2000`)                                    | `8.0.0`       |

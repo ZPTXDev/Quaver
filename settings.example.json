@@ -106,5 +106,19 @@
     "enabled": true,
     "maxAge": 86400,
     "maxAttempts": 1
+  },
+  "connectionHealth": {
+    "gateway": {
+      "unstablePingThresholdMs": 500,
+      "unstableReconnectThreshold": 5,
+      "sampleIntervalSeconds": 10,
+      "sampleWindowSize": 20
+    },
+    "media": {
+      "checkIntervalSeconds": 60,
+      "unstableLatencyMs": 2000,
+      "consecutiveFailureThreshold": 3,
+      "checkTimeoutMs": 2000
+    }
   }
 }
