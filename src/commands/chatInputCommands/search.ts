@@ -278,12 +278,12 @@ async function renderSearchResults(
                         .setCustomId('search:0')
                         .setEmoji(settings.emojis.left)
                         .setDisabled(true)
-                        .setStyle(ButtonStyle.Primary),
+                        .setStyle(ButtonStyle.Secondary),
                     new ButtonBuilder()
                         .setCustomId('search:2')
                         .setEmoji(settings.emojis.right)
                         .setDisabled(pages.length === 1)
-                        .setStyle(ButtonStyle.Primary),
+                        .setStyle(ButtonStyle.Secondary),
                     guild.builders
                         .buttonLocale('MISC.ADD')
                         .setStyle(ButtonStyle.Success)
@@ -291,7 +291,7 @@ async function renderSearchResults(
                         .setDisabled(true),
                     guild.builders
                         .buttonLocale('MISC.CANCEL')
-                        .setStyle(ButtonStyle.Secondary)
+                        .setStyle(ButtonStyle.Danger)
                         .setCustomId('cancel'),
                 ),
             ),
