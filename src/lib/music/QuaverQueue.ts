@@ -104,10 +104,11 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
             if (!track) {
                 return;
             }
+            
             // Find the matching QuaverSong to preserve metadata
-            // At the moment the trackEnd event is received, this.current should still point
-            // to the track that just ended (before next() is called), so we check it first
-            const endedTrack = this.current?.encoded === track.encoded ? this.current : this.last;
+            // At the moment trackEnd is received, this.current should be the track that just ended
+            // Use it if it exists, regardless of encoded value matching (encoded can change during playback)
+            const endedTrack = this.current || this.last;
             
             if (endedTrack) {
                 this.emit('trackEnd', endedTrack, reason);

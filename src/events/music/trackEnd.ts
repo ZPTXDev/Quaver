@@ -39,7 +39,7 @@ export default {
                     await queue.player.setBassboost(queue.player.memory.savedFilters.bassboost, true);
                     await queue.player.setNightcore(queue.player.memory.savedFilters.nightcore, true);
                     delete queue.player.memory.savedFilters;
-                    
+
                     // Send single batched web update
                     guild.sendWebUpdate('filterUpdate', {
                         bassboost: queue.player.memory.bassboost,
@@ -93,7 +93,7 @@ export default {
                 await queue.player.setBassboost(queue.player.memory.savedFilters.bassboost, true);
                 await queue.player.setNightcore(queue.player.memory.savedFilters.nightcore, true);
                 delete queue.player.memory.savedFilters;
-                
+
                 // Send single batched web update
                 guild.sendWebUpdate('filterUpdate', {
                     bassboost: queue.player.memory.bassboost,
@@ -104,6 +104,11 @@ export default {
             // Only advance to next track if the reason warrants it
             if (mayStartNext[reason]) {
                 await queue.next();
+            } else if (queue.isEmpty && queue.current) {
+                // Even if we don't advance, check if queue is empty and emit finish event
+                // Only do this if there's a current track (to avoid double-emitting)
+                queue.current = null;
+                queue.emit('finish');
             }
             return;
         }
@@ -120,21 +125,21 @@ export default {
                 );
                 queue.player.memory.adPlaytimeMs = dbPlaytime || 0;
             }
-            
+
             // Calculate actual listened duration using elapsed time from track start
             // Cap at track length to prevent accumulating more than the track's duration
             const trackStartTime = queue.player.memory.trackStartTime || Date.now();
             const elapsedTime = Date.now() - trackStartTime;
             const trackLength = track.info.length || 0;
             const listenedDuration = Math.min(elapsedTime, trackLength);
-            
+
             queue.player.memory.adPlaytimeMs += listenedDuration;
             await data.guild.set(
                 guild.id,
                 'ads.playtimeMs',
                 queue.player.memory.adPlaytimeMs,
             );
-            
+
             // Clean up the trackStartTime
             delete queue.player.memory.trackStartTime;
         }
@@ -151,7 +156,7 @@ export default {
                 isPremium !== WhitelistStatus.Permanent &&
                 isPremium !== WhitelistStatus.Temporary &&
                 queue.player.memory.adPlaytimeMs >=
-                    adsConfig.intervalMinutes * 60 * 1000;
+                adsConfig.intervalMinutes * 60 * 1000;
 
             if (shouldPlayAd) {
                 try {
@@ -185,7 +190,7 @@ export default {
                             bassboost: queue.player.memory.bassboost,
                             nightcore: queue.player.memory.nightcore,
                         };
-                        
+
                         // Batch filter updates to prevent UI flickering
                         if (queue.player.memory.bassboost) {
                             await queue.player.setBassboost(false, true);
@@ -193,7 +198,7 @@ export default {
                         if (queue.player.memory.nightcore) {
                             await queue.player.setNightcore(false, true);
                         }
-                        
+
                         // Send single batched web update only if filters were changed
                         if (queue.player.memory.savedFilters.bassboost || queue.player.memory.savedFilters.nightcore) {
                             guild.sendWebUpdate('filterUpdate', {
@@ -214,7 +219,7 @@ export default {
                         if (queue.loop.type === LoopType.Queue) {
                             // Add finished track to previous array for queue loop
                             queue.previous.push(track);
-                            
+
                             // Handle shuffle/alternate with queue loop
                             const transformsActive =
                                 queue.player.memory.shuffle || queue.player.memory.alternate;
@@ -302,7 +307,7 @@ export default {
         let voiceChannel = guild.channels.cache.get(
             queue.player.voice.channelId,
         );
-        
+
         // If channel is not in cache, try to fetch it
         if (!voiceChannel) {
             try {
@@ -318,7 +323,7 @@ export default {
                 );
             }
         }
-        
+
         const members = voiceChannel?.members as Collection<
             Snowflake,
             GuildMember
@@ -334,7 +339,7 @@ export default {
                 (await guild.features.isFeatureActive('stay'))
             )
         ) {
-            logger.info(`[G ${guild.id}] Disconnecting (alone)`);
+            logger.info(`[G ${guild.id}] Disconnecting (alone) - early return from trackEnd`);
             await queue.player.sendMessage(
                 guild.locale('MUSIC.DISCONNECT.ALONE.DISCONNECTED.DEFAULT'),
                 { type: MessageOptionsBuilderType.Warning },
@@ -343,12 +348,20 @@ export default {
             return;
         }
 
+
+
         // Advance to next track only if the reason warrants it
         if (mayStartNext[reason]) {
             const hasNext = await queue.next();
             if (!hasNext) {
                 logger.info(`[G ${guild.id}] Queue finished`);
             }
+        } else if (queue.isEmpty && queue.current) {
+            // Even if we don't advance, check if queue is empty and emit finish event
+            // Only do this if there's a current track (to avoid double-emitting)
+            queue.current = null;
+            queue.emit('finish');
+
         }
     },
 };
