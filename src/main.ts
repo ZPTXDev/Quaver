@@ -58,10 +58,10 @@ spinner.start(`Setting up ${colors.cyan('data handler')}`);
 data.guild = new DataHandler({
     cache: settings.database
         ? `${settings.database.protocol}://${resolve(
-              __dirname,
-              '..',
-              settings.database.path,
-          )}`
+            __dirname,
+            '..',
+            settings.database.path,
+        )}`
         : `sqlite://${resolve(__dirname, '..', 'database.sqlite')}`,
     namespace: 'guild',
 });
@@ -152,8 +152,8 @@ if (settings.features.web.enabled) {
 }
 const io = settings.features.web.enabled
     ? new Server(server, {
-          cors: { origin: settings.features.web.allowedOrigins },
-      })
+        cors: { origin: settings.features.web.allowedOrigins },
+    })
     : undefined;
 if (io) {
     spinner.success();
@@ -229,9 +229,9 @@ const requiredPlugins = [
 const info = await client.music.api.info();
 if (
     info.plugins.length === 0 ||
-    !info.plugins
-        .map((plugin): string => plugin.name)
-        .every((plugin): boolean => requiredPlugins.includes(plugin))
+    !requiredPlugins.every(
+        (plugin): boolean => info.plugins.map((p): string => p.name).includes(plugin)
+    )
 ) {
     logger.warn({
         message: 'Required plugins are not loaded. Some features may not work.',
@@ -243,9 +243,10 @@ spinner.success();
 
 spinner.start(`Configuring ${colors.cyan('Lavalink sources')}`);
 const acceptableSources = {
+    quavermusic: 'qmsearch:',
+    deezer: 'dzsearch:',
     youtubemusic: 'ytmsearch:',
     youtube: 'ytsearch:',
-    deezer: 'dzsearch:',
     soundcloud: 'scsearch:',
     yandexmusic: 'ymsearch:',
     vkmusic: 'vksearch:',
@@ -404,10 +405,9 @@ rl.on('line', async (input): Promise<void> => {
                 durationMs === -1 ? durationMs : Date.now() + durationMs,
             );
             console.log(
-                `Added ${guild.name} to the ${featureName} whitelist ${
-                    durationMs === -1
-                        ? 'permanently'
-                        : `for ${msToTimeString(msToTime(durationMs))}`
+                `Added ${guild.name} to the ${featureName} whitelist ${durationMs === -1
+                    ? 'permanently'
+                    : `for ${msToTimeString(msToTime(durationMs))}`
                 }.`,
             );
             break;

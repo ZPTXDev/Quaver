@@ -4,6 +4,7 @@ import { EventHandler } from '#src/lib/builders';
 import { logger } from '#src/lib/logger';
 import { setUpdateHandler, startup } from '#src/lib/state';
 import { settings, version } from '#src/lib/util';
+import { PlayerStateManager } from '#src/lib/music';
 import { ActivityType, type PresenceStatusData } from 'discord.js';
 
 export default new EventHandler()
@@ -92,6 +93,19 @@ export default new EventHandler()
                 },
             ],
         });
+        if (settings.sessionRecovery?.enabled) {
+            const stateManager = new PlayerStateManager();
+            const states = await stateManager.read();
+            if (states.lavalinkSessionId && stateManager.shouldRestore(states)) {
+                (client as QuaverClient).music.ws.session = (
+                    client as QuaverClient
+                ).music.ws.api.session(states.lavalinkSessionId);
+                logger.info({
+                    message: `Attempting to resume Lavalink session: ${states.lavalinkSessionId}`,
+                    label: 'Lavalink',
+                });
+            }
+        }
         (client as QuaverClient).music.connect({ userId: client.user.id });
         await client.application.commands.fetch();
     });

@@ -27,6 +27,7 @@ export default {
         DEEZER: 'Deezer',
         'FLOWERY-TTS': 'Flowery TTS',
         HTTP: 'Web',
+        QUAVERMUSIC: 'Quaver Music',
         SOUNDCLOUD: 'SoundCloud',
         SPOTIFY: 'Spotify',
         TIDAL: 'Tidal',

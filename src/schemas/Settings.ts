@@ -27,6 +27,11 @@ const genericPremiumFeatureSchema = z.object({
     premium: z.boolean().default(false),
 });
 
+const emojiSchema = (
+    fallback: string,
+): z.ZodDefault<z.ZodPipe<z.ZodString, z.ZodTransform<string, string>>> =>
+    z.string().transform((val): string => val || fallback).default(fallback);
+
 export const SettingsSchema = z.object({
     token: z
         .string()
@@ -51,6 +56,7 @@ export const SettingsSchema = z.object({
     }),
     emojis: z
         .object({
+            quavermusic: z.string().default(''),
             youtube: z.string().default(''),
             deezer: z.string().default(''),
             spotify: z.string().default(''),
@@ -61,8 +67,54 @@ export const SettingsSchema = z.object({
             'flowery-tts': z.string().default(''),
             vkmusic: z.string().default(''),
             tidal: z.string().default(''),
+            pause: emojiSchema('⏸️'),
+            resume: emojiSchema('▶️'),
+            skip: emojiSchema('⏭️'),
+            stop: emojiSchema('⏹️'),
+            loop: emojiSchema('🔁'),
+            loop_song: emojiSchema('🔂'),
+            shuffle: emojiSchema('🔀'),
+            left: emojiSchema('⬅️'),
+            right: emojiSchema('➡️'),
+            link: emojiSchema('🔗'),
+            support: emojiSchema('💬'),
+            documentation: emojiSchema('📖'),
+            sponsor: emojiSchema('💖'),
+            website: emojiSchema('🌐'),
+            live: emojiSchema('🔴'),
+            bassboost: emojiSchema('🅱️'),
+            nightcore: emojiSchema('🇳'),
         })
-        .optional(),
+        .default({
+            quavermusic: '',
+            youtube: '',
+            deezer: '',
+            spotify: '',
+            soundcloud: '',
+            applemusic: '',
+            http: '',
+            yandexmusic: '',
+            'flowery-tts': '',
+            vkmusic: '',
+            tidal: '',
+            pause: '⏸️',
+            resume: '▶️',
+            skip: '⏭️',
+            stop: '⏹️',
+            loop: '🔁',
+            loop_song: '🔂',
+            shuffle: '🔀',
+            left: '⬅️',
+            right: '➡️',
+            link: '🔗',
+            support: '💬',
+            documentation: '📖',
+            sponsor: '💖',
+            website: '🌐',
+            live: '🔴',
+            bassboost: '🅱️',
+            nightcore: '🇳',
+        }),
     status: z.object({
         presence: z.enum(['online', 'idle', 'dnd', 'invisible']),
         activityType: z.enum([

@@ -1,4 +1,5 @@
 import KeyvSqlite from '@keyv/sqlite';
+import { Cacheable } from 'cacheable';
 import type { Snowflake } from 'discord.js';
 import Keyv from 'keyv';
 import { get as _get, set as _set, unset as _unset } from 'lodash-es';
@@ -10,6 +11,8 @@ type DatabaseObject = {
 type GuildSettingsObject = {
     stay?: StaySettingObject;
     locale?: string;
+    pausealone247?: boolean;
+    controls?: boolean;
 };
 
 type StaySettingObject = {
@@ -20,16 +23,19 @@ type StaySettingObject = {
 
 /** Class for handling data through Keyv. */
 export class DataHandler {
-    cache: Keyv;
+    cache: Cacheable;
 
     /**
      * Create an instance of DataHandler, also creating a database connection.
      * @param opts - The options to pass to Keyv.
      */
     constructor(opts: { cache: string; namespace: string }) {
-        this.cache = new Keyv({
-            store: new KeyvSqlite({
-                uri: opts.cache,
+        this.cache = new Cacheable({
+            secondary: new Keyv({
+                store: new KeyvSqlite({
+                    uri: opts.cache,
+                }),
+                namespace: opts.namespace,
             }),
             namespace: opts.namespace,
         });
@@ -42,7 +48,7 @@ export class DataHandler {
      * @returns The requested item.
      */
     async get<T>(key: string, item: string): Promise<T | undefined> {
-        const data: DatabaseObject = await this.cache.get(key);
+        const data = await this.cache.get<DatabaseObject>(key);
         if (!data) return undefined;
         return _get(data, item);
     }
@@ -59,9 +65,10 @@ export class DataHandler {
         item: string,
         value: string | number | boolean,
     ): Promise<boolean> {
-        let data: DatabaseObject = await this.cache.get(key);
+        let data = await this.cache.get<DatabaseObject>(key);
         if (!data) data = {};
-        return this.cache.set(key, _set(data, item, value));
+        _set(data, item, value);
+        return this.cache.set(key, data);
     }
 
     /**
@@ -71,7 +78,7 @@ export class DataHandler {
      * @returns The updated item.
      */
     async unset(key: string, item: string): Promise<boolean> {
-        const data: DatabaseObject = await this.cache.get(key);
+        const data = await this.cache.get<DatabaseObject>(key);
         if (!data) return false;
         _unset(data, item);
         return this.cache.set(key, data);
@@ -82,6 +89,6 @@ export class DataHandler {
      * @returns The Keyv instance.
      */
     get instance(): Keyv {
-        return this.cache;
+        return this.cache.secondary!;
     }
 }

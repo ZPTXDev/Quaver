@@ -4,12 +4,11 @@ import { QuaverGuild } from '#src/lib/guild';
 import { getLocaleString, type LocaleKey } from '#src/lib/locales';
 import { updateHandler } from '#src/lib/state';
 import {
-    acceptableSources,
     Check,
     getTrackMarkdownLocaleString,
     type QuaverChannels,
     type QuaverSong,
-    queryOverrides,
+    searchTracks,
     settings,
 } from '#src/lib/util';
 import {
@@ -78,17 +77,11 @@ export default new ChatInputCommandHandler()
         let tracks: QuaverSong[] = [],
             msg = '',
             extras = [];
-        let searchQuery;
-        if (queryOverrides.some((q): boolean => query.startsWith(q))) {
-            searchQuery = query;
-        } else {
-            const source =
-                (await guild.settings.get<string>('source')) ??
-                Object.keys(acceptableSources)[0];
-            searchQuery = `${acceptableSources[source]}${query}`;
-        }
-        const result =
-            await interaction.client.music.api.loadTracks(searchQuery);
+        const result = await searchTracks(
+            interaction.client,
+            guild,
+            query,
+        );
         switch (result.loadType) {
             case 'playlist':
                 tracks = [

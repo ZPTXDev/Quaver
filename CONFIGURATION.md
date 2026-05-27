@@ -12,6 +12,7 @@
     "error": "DarkRed"
   },
   "emojis": {
+    "quavermusic": "",
     "youtube": "",
     "deezer": "",
     "spotify": "",
@@ -21,7 +22,24 @@
     "yandexmusic": "",
     "flowery-tts": "",
     "vkmusic": "",
-    "tidal": ""
+    "tidal": "",
+    "pause": "",
+    "resume": "",
+    "skip": "",
+    "stop": "",
+    "loop": "",
+    "loop_song": "",
+    "shuffle": "",
+    "left": "",
+    "right": "",
+    "link": "",
+    "support": "",
+    "documentation": "",
+    "sponsor": "",
+    "website": "",
+    "live": "",
+    "bassboost": "",
+    "nightcore": ""
   },
   "status": {
     "presence": "online",

@@ -1,42 +1,24 @@
-import { MessageOptionsBuilderType } from '#src/lib';
-import { ChatInputCommandHandler } from '#src/lib/builders';
+import { ForceType, MessageOptionsBuilderType } from '#src/lib';
+import { ButtonHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
-import { getLocaleString } from '#src/lib/locales';
 import { PlayerResponse } from '#src/lib/music';
 import {
     Check,
     getRequesterStatus,
     getTrackMarkdownLocaleString,
     RequesterStatus,
-    settings,
 } from '#src/lib/util';
-import { type GuildMember, SlashCommandBuilder } from 'discord.js';
+import { type GuildMember } from 'discord.js';
 
-export default new ChatInputCommandHandler()
-    .setData(
-        new SlashCommandBuilder()
-            .setName('skip')
-            .setDescription(
-                getLocaleString(
-                    settings.defaultLocaleCode,
-                    'CMD.SKIP.DESCRIPTION',
-                ),
-            ),
-    )
-    .setChecks([
-        Check.GuildOnly,
-        Check.ActiveSession,
-        Check.InVoice,
-        Check.InSessionVoice,
-    ])
+export default new ButtonHandler()
+    .setChecks([Check.ActiveSession, Check.InVoice, Check.InSessionVoice])
     .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
-        // this check already occurs in the PlayerHandler#skip() method, but we do it first as we need to check before running voteskip addition etc
         if (!player.queue.current || (!player.playing && !player.paused)) {
             await interaction.replyHandler.reply(
                 guild.locale('MUSIC.PLAYER.PLAYING.NOTHING'),
-                { type: MessageOptionsBuilderType.Error },
+                { type: MessageOptionsBuilderType.Error, ephemeral: true },
             );
             return;
         }
@@ -59,21 +41,38 @@ export default new ChatInputCommandHandler()
             if (skip.users.includes(interaction.user.id)) {
                 await interaction.replyHandler.reply(
                     guild.locale('CMD.SKIP.RESPONSE.VOTED.STATE_UNCHANGED'),
-                    { type: MessageOptionsBuilderType.Error },
+                    { type: MessageOptionsBuilderType.Error, ephemeral: true },
                 );
                 return;
             }
             skip.users.push(interaction.user.id);
             if (skip.users.length >= skip.required) {
-                const response = await player.skipCurrentTrack(interaction.user);
+                const response = await player.skipCurrentTrack(
+                    interaction.user,
+                );
                 switch (response) {
+                    case PlayerResponse.RestartInProgress:
+                        await interaction.replyHandler.reply(
+                            guild.locale(
+                                'MUSIC.PLAYER.RESTARTING.ACTION_BLOCKED',
+                            ),
+                            {
+                                type: MessageOptionsBuilderType.Error,
+                                ephemeral: true,
+                            },
+                        );
+                        return;
                     case PlayerResponse.PlayerIdle:
                         await interaction.replyHandler.reply(
                             guild.locale('MUSIC.PLAYER.PLAYING.NOTHING'),
-                            { type: MessageOptionsBuilderType.Error },
+                            {
+                                type: MessageOptionsBuilderType.Error,
+                                ephemeral: true,
+                            },
                         );
                         return;
                     case PlayerResponse.Success: {
+                        await interaction.deferUpdate();
                         await interaction.replyHandler.reply(
                             `${guild.locale(
                                 'CMD.SKIP.RESPONSE.SUCCESS.VOTED',
@@ -82,6 +81,9 @@ export default new ChatInputCommandHandler()
                                 'MISC.ADDED_BY',
                                 track.requesterId,
                             )}`,
+                            {
+                                force: ForceType.FollowUp,
+                            },
                         );
                     }
                 }
@@ -95,7 +97,7 @@ export default new ChatInputCommandHandler()
                     skip.users.length.toString(),
                     skip.required.toString(),
                 ),
-                { type: MessageOptionsBuilderType.Success },
+                { type: MessageOptionsBuilderType.Success, ephemeral: true },
             );
             return;
         }
@@ -104,16 +106,17 @@ export default new ChatInputCommandHandler()
             case PlayerResponse.RestartInProgress:
                 await interaction.replyHandler.reply(
                     guild.locale('MUSIC.PLAYER.RESTARTING.ACTION_BLOCKED'),
-                    { type: MessageOptionsBuilderType.Error },
+                    { type: MessageOptionsBuilderType.Error, ephemeral: true },
                 );
                 return;
             case PlayerResponse.PlayerIdle:
                 await interaction.replyHandler.reply(
                     guild.locale('MUSIC.PLAYER.PLAYING.NOTHING'),
-                    { type: MessageOptionsBuilderType.Error },
+                    { type: MessageOptionsBuilderType.Error, ephemeral: true },
                 );
                 return;
             case PlayerResponse.Success: {
+                await interaction.deferUpdate();
                 await interaction.replyHandler.reply(
                     `${guild.locale(
                         requesterStatus === RequesterStatus.Requester
@@ -130,6 +133,9 @@ export default new ChatInputCommandHandler()
                               )}`
                             : ''
                     }`,
+                    {
+                        force: ForceType.FollowUp,
+                    },
                 );
             }
         }

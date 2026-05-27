@@ -1,16 +1,14 @@
 import { MessageOptionsBuilderType } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
-import { getLocaleString } from '#src/lib/locales';
-import { Check, cleanURIForMarkdown, settings } from '#src/lib/util';
-import type { Song } from '@lavaclient/plugin-queue';
-import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
+import { getLocaleString, type LocaleKey } from '#src/lib/locales';
+import { Check, formatSessionLog, settings } from '#src/lib/util';
+import { paginate } from '@zptxdev/zptx-lib';
 import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
     ContainerBuilder,
-    escapeMarkdown,
     SeparatorBuilder,
     SlashCommandBuilder,
     TextDisplayBuilder,
@@ -19,11 +17,11 @@ import {
 export default new ChatInputCommandHandler()
     .setData(
         new SlashCommandBuilder()
-            .setName('queue')
+            .setName('sessionlogs')
             .setDescription(
                 getLocaleString(
                     settings.defaultLocaleCode,
-                    'CMD.QUEUE.DESCRIPTION',
+                    'CMD.SESSIONLOGS.DESCRIPTION',
                 ),
             ),
     )
@@ -36,35 +34,28 @@ export default new ChatInputCommandHandler()
     .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
-        if (player.queue.tracks.length === 0) {
+        if (player.sessionLogs.length === 0) {
             await interaction.replyHandler.reply(
-                guild.locale('CMD.QUEUE.RESPONSE.QUEUE_EMPTY'),
+                guild.locale('CMD.SESSIONLOGS.RESPONSE.NO_LOGS'),
                 { type: MessageOptionsBuilderType.Error },
             );
             return;
         }
-        const pages = paginate(player.queue.tracks, 5);
+        const pages = paginate(player.sessionLogs, 10);
         await interaction.replyHandler.reply(
             new ContainerBuilder()
                 .addTextDisplayComponents(
                     new TextDisplayBuilder().setContent(
                         pages[0]
-                            .map((track: Song, index): string => {
-                                const duration = msToTime(track.info.length);
-                                let durationString = track.info.isStream
-                                    ? '∞'
-                                    : msToTimeString(duration, true);
-                                if (durationString === 'MORE_THAN_A_DAY') {
-                                    durationString = guild.locale(
-                                        'MISC.MORE_THAN_A_DAY',
-                                    );
-                                }
-                                return `\`${index + 1}.\` ${
-                                    track.info.title === track.info.uri
-                                        ? `**${track.info.uri}**`
-                                        : `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`
-                                } \`[${durationString}]\` <@${track.requesterId}>`;
-                            })
+                            .map((log): string =>
+                                formatSessionLog(
+                                    log,
+                                    (
+                                        key: LocaleKey,
+                                        ...args: string[]
+                                    ): string => guild.locale(key, ...args),
+                                ),
+                            )
                             .join('\n'),
                     ),
                     guild.builders.textDisplayLocale(
@@ -77,16 +68,16 @@ export default new ChatInputCommandHandler()
                 .addActionRowComponents(
                     new ActionRowBuilder<ButtonBuilder>().setComponents(
                         new ButtonBuilder()
-                            .setCustomId('queue:0')
+                            .setCustomId('sessionlogs:0')
                             .setEmoji(settings.emojis.left)
                             .setDisabled(true)
                             .setStyle(ButtonStyle.Secondary),
                         guild.builders
                             .buttonLocale('MISC.GO_TO')
                             .setStyle(ButtonStyle.Secondary)
-                            .setCustomId('queue:goto'),
+                            .setCustomId('sessionlogs:goto'),
                         new ButtonBuilder()
-                            .setCustomId('queue:2')
+                            .setCustomId('sessionlogs:2')
                             .setEmoji(settings.emojis.right)
                             .setDisabled(pages.length === 1)
                             .setStyle(ButtonStyle.Secondary),

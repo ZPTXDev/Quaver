@@ -25,26 +25,28 @@ export enum Check {
 
 export const settingsOptions = [
     ...(settings.premiumURL &&
-    ['autolyrics', 'stay', 'smartqueue'].some((feature: string): boolean => {
-        const f =
-            settings.features[feature as 'autolyrics' | 'stay' | 'smartqueue'];
-        return f.enabled && f.whitelist && f.premium;
-    })
+        ['autolyrics', 'stay', 'smartqueue'].some((feature: string): boolean => {
+            const f =
+                settings.features[feature as 'autolyrics' | 'stay' | 'smartqueue'];
+            return f.enabled && f.whitelist && f.premium;
+        })
         ? ['premium']
         : []),
     'language',
-    ...(settings.features.stay.enabled ? ['notifyin247'] : []),
+    ...(settings.features.stay.enabled ? ['notifyin247', 'pausealone247'] : []),
     'format',
     'dj',
     'source',
     ...(settings.features.autolyrics.enabled ? ['autolyrics'] : []),
     ...(settings.features.smartqueue.enabled ? ['smartqueue'] : []),
+    'controls',
 ];
 
 export const queryOverrides: string[] = [];
 export const sourceManagers: string[] = [];
 export const acceptableSources: Record<string, string> = {};
 export const sourceList: Record<string, string> = {
+    'qmsearch:': 'quavermusic',
     'https://': 'http',
     'http://': 'http',
     'spsearch:': 'spotify',

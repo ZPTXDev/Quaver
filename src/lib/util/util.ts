@@ -6,7 +6,9 @@ import {
     type TopLevelComponentBuilders,
 } from '#src/lib';
 import { data } from '#src/lib/data';
+import type { Initialized, QuaverGuild } from '#src/lib/guild';
 import type { ComponentInteractions } from '#src/lib/interactions';
+import type { LocaleKey } from '#src/lib/locales';
 import type { QuaverPlayer } from '#src/lib/music';
 import {
     acceptableSources,
@@ -27,6 +29,7 @@ import {
     type Snowflake,
     TextDisplayBuilder,
 } from 'discord.js';
+import type { LoadResult } from 'lavalink-protocol';
 import type { LavaLyricsResponse } from '.';
 
 type ColorTypes = 'success' | 'neutral' | 'warning' | 'error';
@@ -246,6 +249,7 @@ export function buildMessageOptions(
  */
 export function updateQueryOverrides(sourceManagers: readonly string[]): void {
     queryOverrides.push(
+        ...(sourceManagers.includes('quavermusic') ? ['qmsearch:'] : []),
         ...(sourceManagers.includes('http') ? ['https://', 'http://'] : []),
         ...(sourceManagers.includes('spotify') ? ['spsearch:', 'sprec:'] : []),
         ...(sourceManagers.includes('applemusic') ? ['amsearch:'] : []),
@@ -305,4 +309,115 @@ export function getTrackMarkdownLocaleString(track: Song): string {
     return track.info.title === track.info.uri
         ? track.info.uri
         : `[${track.info.title}](${track.info.uri})`;
+}
+
+/**
+ * Searches for tracks using the configured source, falling back to other sources if no tracks are found.
+ * @param client - The QuaverClient instance.
+ * @param guild - The QuaverGuild instance.
+ * @param query - The search query.
+ */
+export async function searchTracks(
+    client: QuaverClient,
+    guild: QuaverGuild<Initialized>,
+    query: string,
+): Promise<LoadResult> {
+    if (queryOverrides.some((q): boolean => query.startsWith(q))) {
+        return await client.music.api.loadTracks(query);
+    }
+
+    const startingSource =
+        ((await guild.settings.get('source')) as string) ??
+        Object.keys(acceptableSources)[0];
+
+    const sources = Object.keys(acceptableSources);
+    const orderedSources = [
+        startingSource,
+        ...sources.filter((s): boolean => s !== startingSource),
+    ].filter((s): boolean => !!acceptableSources[s]);
+
+    let result: LoadResult | null = null;
+    for (const source of orderedSources) {
+        const searchQuery = `${acceptableSources[source]}${query}`;
+        try {
+            result = await client.music.api.loadTracks(searchQuery);
+            if (result) {
+                const hasTracks =
+                    (result.loadType === 'playlist' &&
+                        Array.isArray(result.data?.tracks) &&
+                        result.data.tracks.length > 0) ||
+                    (result.loadType === 'track' && result.data) ||
+                    (result.loadType === 'search' &&
+                        Array.isArray(result.data) &&
+                        result.data.length > 0);
+                if (hasTracks) {
+                    return result;
+                }
+            }
+        } catch {
+            // Ignore error and try the next source
+        }
+    }
+    return (
+        result ?? {
+            loadType: 'error',
+            data: {
+                message: 'All search sources failed.',
+                severity: 'common',
+                cause: 'No source returned a result',
+            },
+        }
+    );
+}
+
+/**
+ * Formats a session log event into a markdown string.
+ * @param log - The session log item.
+ * @param locale - The locale function of the guild.
+ * @returns The formatted string.
+ */
+export function formatSessionLog(
+    log: {
+        timestamp: number;
+        action: string;
+        userId: string | null;
+        userTag: string | null;
+        details: string | null;
+    },
+    locale: (key: LocaleKey, ...args: string[]) => string,
+): string {
+    const timeStr = `<t:${Math.floor(log.timestamp / 1000)}:T>`;
+    let actorDisplay = 'System';
+    if (log.userId) {
+        actorDisplay = `<@${log.userId}>`;
+    } else if (log.userTag) {
+        actorDisplay = `**${log.userTag}**`;
+    }
+
+    const localeKey = `CMD.SESSIONLOGS.MISC.EVENT.${log.action}`;
+    let detailVal = log.details;
+    if (detailVal === 'ENABLED' || detailVal === 'DISABLED') {
+        detailVal = locale(`CMD.SESSIONLOGS.MISC.${detailVal}` as LocaleKey);
+    } else if (log.action === 'LOOP' && detailVal) {
+        try {
+            detailVal = locale(
+                `CMD.LOOP.OPTION.TYPE.OPTION.${detailVal.toUpperCase()}` as LocaleKey,
+            );
+        } catch {
+            // fallback
+        }
+    }
+
+    let actionText = '';
+    try {
+        actionText = locale(
+            localeKey as LocaleKey,
+            actorDisplay,
+            detailVal ?? '',
+        );
+    } catch {
+        actionText = `${actorDisplay} executed ${log.action} ${log.details ?? ''}`;
+    }
+
+    return `**${timeStr}** ${actionText}`;
 }

@@ -37,6 +37,19 @@ export class PlaybackLogicHandler {
                 );
                 return;
             }
+            case 'pausealone247': {
+                const pauseAlone =
+                    (await guild.settings.get<boolean>('pausealone247')) ?? false;
+                await guild.settings.set('pausealone247', !pauseAlone);
+                await interaction.replyHandler.reply(
+                    await SettingsRenderer.renderSubMenu(
+                        await QuaverGuild.wrap(interaction.guild),
+                        SettingsCategory.Playback,
+                    ),
+                    { force: ForceType.Update },
+                );
+                return;
+            }
             case 'source': {
                 const source =
                     (await guild.settings.get<string>('source')) ??
@@ -115,7 +128,7 @@ export class PlaybackLogicHandler {
                 await guild.settings.set('smartqueue', !smartQueue);
                 const player = await guild.getPlayer();
                 if (player && player.memory.alternate === smartQueue) {
-                    await player.setAlternate(!smartQueue);
+                    await player.setAlternate(!smartQueue, interaction.user);
                 } else {
                     guild.sendWebUpdate('smartQueueFeatureUpdate', {
                         enabled: !smartQueue,
@@ -129,7 +142,7 @@ export class PlaybackLogicHandler {
                     { force: ForceType.Update },
                 );
                 return;
-            }
+        }
         }
     }
 

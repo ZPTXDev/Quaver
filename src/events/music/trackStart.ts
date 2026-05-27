@@ -1,5 +1,5 @@
 import { MessageOptionsBuilderType } from '#src/lib';
-import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
+import { type Initialized, QuaverGuild, WhitelistStatus } from '#src/lib/guild';
 import type { LocaleKey } from '#src/lib/locales';
 import { logger } from '#src/lib/logger';
 import { updateHandler } from '#src/lib/state';
@@ -11,12 +11,14 @@ import {
     type QuaverSong,
     settings,
 } from '#src/lib/util';
+import { LoopType } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import {
     ActionRowBuilder,
-    type ButtonBuilder,
+    ButtonBuilder,
     ButtonStyle,
     ContainerBuilder,
+    type Guild,
     SectionBuilder,
     SeparatorBuilder,
     TextDisplayBuilder,
@@ -28,6 +30,7 @@ export default {
     once: false,
     async execute(queue: QuaverQueue, track: QuaverSong): Promise<void> {
         const guild = await QuaverGuild.wrap(queue.player.guild);
+        queue.player.logSessionEvent('PLAY', null, `[${track.info.title}](${track.info.uri})`);
         delete queue.player.memory.skip;
         logger.info(`[G ${guild.id}] Starting track`);
         if (queue.player.memory.alternate) {
@@ -109,7 +112,7 @@ export default {
         if (!notify) format = 'off';
         const emoji =
             settings.emojis?.[
-                track.info.sourceName as keyof typeof settings.emojis
+            track.info.sourceName as keyof typeof settings.emojis
             ] ?? '';
         switch (format) {
             case 'simple':
@@ -129,80 +132,37 @@ export default {
                         )
                         .addSeparatorComponents(
                             ...(settings.features.web.enabled &&
-                            settings.features.web.dashboardURL
+                                settings.features.web.dashboardURL
                                 ? [new SeparatorBuilder()]
                                 : []),
                         )
                         .addActionRowComponents(
                             ...(settings.features.web.enabled &&
-                            settings.features.web.dashboardURL
+                                settings.features.web.dashboardURL
                                 ? [
-                                      new ActionRowBuilder<ButtonBuilder>().addComponents(
-                                          guild.builders
-                                              .buttonLocale('MISC.DASHBOARD')
-                                              .setStyle(ButtonStyle.Link)
-                                              .setURL(
-                                                  `${settings.features.web.dashboardURL.replace(
-                                                      /\/+$/,
-                                                      '',
-                                                  )}/guild/${guild.id}`,
-                                              ),
-                                      ),
-                                  ]
+                                    new ActionRowBuilder<ButtonBuilder>().addComponents(
+                                        guild.builders
+                                            .buttonLocale('MISC.DASHBOARD')
+                                            .setStyle(ButtonStyle.Link)
+                                            .setURL(
+                                                `${settings.features.web.dashboardURL.replace(
+                                                    /\/+$/,
+                                                    '',
+                                                )}/guild/${guild.id}`,
+                                            ),
+                                    ),
+                                ]
                                 : []),
                         ),
                 );
                 break;
-            case 'detailed':
+            case 'detailed': {
+                const { container, actionRows } = await buildNowPlayingMessage(guild, track);
                 await queue.player.sendMessage(
-                    new ContainerBuilder()
-                        .addSectionComponents(
-                            new SectionBuilder()
-                                .addTextDisplayComponents(
-                                    guild.builders.textDisplayLocale(
-                                        'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE',
-                                    ),
-                                    new TextDisplayBuilder().setContent(
-                                        `${guild.locale(
-                                            'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TEXT',
-                                            `[${track.info.author} - ${track.info.title}](${track.info.uri})`,
-                                            durationString,
-                                        )}\n${guild.locale('MUSIC.PLAYER.PLAYING.NOW.DETAILED.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${guild.locale(`MISC.SOURCES.${track.info.sourceName.toUpperCase()}` as LocaleKey)}** ─ ${guild.locale(
-                                            'MISC.ADDED_BY',
-                                            track.requesterId,
-                                        )}`,
-                                    ),
-                                    guild.builders.textDisplayLocale(
-                                        'MUSIC.PLAYER.PLAYING.NOW.DETAILED.REMAINING',
-                                        queue.tracks.length.toString(),
-                                    ),
-                                )
-                                .setThumbnailAccessory(
-                                    new ThumbnailBuilder().setURL(
-                                        track.info.artworkUrl ??
-                                            `https://i.ytimg.com/vi/${track.info.identifier}/hqdefault.jpg`,
-                                    ),
-                                ),
-                        )
-                        .addSeparatorComponents(
-                            ...(settings.features.web.dashboardURL
-                                ? [new SeparatorBuilder()]
-                                : []),
-                        )
-                        .addActionRowComponents(
-                            new ActionRowBuilder<ButtonBuilder>().addComponents(
-                                guild.builders
-                                    .buttonLocale('MISC.DASHBOARD')
-                                    .setStyle(ButtonStyle.Link)
-                                    .setURL(
-                                        `${settings.features.web.dashboardURL.replace(
-                                            /\/+$/,
-                                            '',
-                                        )}/guild/${guild.id}`,
-                                    ),
-                            ),
-                        ),
+                    container.addActionRowComponents(...actionRows)
                 );
+                break;
+            }
         }
         if (settings.features.autolyrics.enabled) {
             if (!(await guild.settings.get<boolean>('autolyrics'))) {
@@ -214,6 +174,14 @@ export default {
                 whitelisted === WhitelistStatus.NotWhitelisted ||
                 whitelisted === WhitelistStatus.Expired
             ) {
+                return;
+            }
+            // Wait 1 second to ensure that the track actually plays and doesn't fail to load
+            await new Promise<void>((resolve): void => {
+                setTimeout(resolve, 1000);
+            });
+            // Verify if the track is still the current track in the queue
+            if (queue.current?.id !== track.id) {
                 return;
             }
             let json;
@@ -265,20 +233,131 @@ export default {
                     .addActionRowComponents(
                         ...(romanizeFrom
                             ? [
-                                  new ActionRowBuilder<ButtonBuilder>().addComponents(
-                                      guild.builders
-                                          .buttonLocale(
-                                              `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}` as LocaleKey,
-                                          )
-                                          .setStyle(ButtonStyle.Secondary)
-                                          .setCustomId(
-                                              `lyrics:${romanizeFrom}`,
-                                          ),
-                                  ),
-                              ]
+                                new ActionRowBuilder<ButtonBuilder>().addComponents(
+                                    guild.builders
+                                        .buttonLocale(
+                                            `CMD.LYRICS.MISC.ROMANIZE_FROM_${romanizeFrom.toUpperCase()}` as LocaleKey,
+                                        )
+                                        .setStyle(ButtonStyle.Secondary)
+                                        .setCustomId(
+                                            `lyrics:${romanizeFrom}`,
+                                        ),
+                                ),
+                            ]
                             : []),
                     ),
             );
         }
     },
 };
+
+export async function buildNowPlayingMessage(
+    guild: QuaverGuild<Initialized> & Guild,
+    track: QuaverSong,
+): Promise<{ container: ContainerBuilder; actionRows: ActionRowBuilder<ButtonBuilder>[] }> {
+    const player = await guild.getPlayer();
+    const duration = msToTime(track.info.length);
+    let durationString = track.info.isStream
+        ? '∞'
+        : msToTimeString(duration, true);
+    if (durationString === 'MORE_THAN_A_DAY') {
+        durationString = guild.locale('MISC.MORE_THAN_A_DAY');
+    }
+    const emoji =
+        settings.emojis[
+            track.info.sourceName as keyof typeof settings.emojis
+        ] ?? '';
+
+    const controls = (await guild.settings.get<boolean>('controls')) ?? true;
+    const actionRows: ActionRowBuilder<ButtonBuilder>[] = [];
+    if (controls) {
+        const pauseEmoji = player.paused
+            ? settings.emojis.resume
+            : settings.emojis.pause;
+        const skipEmoji = settings.emojis.skip;
+        const stopEmoji = settings.emojis.stop;
+        const loopEmoji = player.queue.loop.type === LoopType.Song
+            ? settings.emojis.loop_song
+            : settings.emojis.loop;
+        const shuffleEmoji = settings.emojis.shuffle;
+
+        actionRows.push(
+            new ActionRowBuilder<ButtonBuilder>().addComponents(
+                new ButtonBuilder()
+                    .setCustomId('player_pause')
+                    .setEmoji(pauseEmoji)
+                    .setStyle(ButtonStyle.Secondary),
+                new ButtonBuilder()
+                    .setCustomId('player_skip')
+                    .setEmoji(skipEmoji)
+                    .setStyle(ButtonStyle.Secondary),
+                new ButtonBuilder()
+                    .setCustomId('player_stop')
+                    .setEmoji(stopEmoji)
+                    .setStyle(ButtonStyle.Secondary),
+                new ButtonBuilder()
+                    .setCustomId('player_loop')
+                    .setEmoji(loopEmoji)
+                    .setStyle(
+                        player.queue.loop.type !== LoopType.None
+                            ? ButtonStyle.Success
+                            : ButtonStyle.Secondary,
+                    ),
+                new ButtonBuilder()
+                    .setCustomId('player_shuffle')
+                    .setEmoji(shuffleEmoji)
+                    .setStyle(player.memory.shuffle ? ButtonStyle.Success : ButtonStyle.Secondary),
+            ),
+        );
+    }
+    if (settings.features.web.dashboardURL) {
+        actionRows.push(
+            new ActionRowBuilder<ButtonBuilder>().addComponents(
+                guild.builders
+                    .buttonLocale('MISC.DASHBOARD')
+                    .setStyle(ButtonStyle.Link)
+                    .setURL(
+                        `${settings.features.web.dashboardURL.replace(
+                            /\/+$/,
+                            '',
+                        )}/guild/${guild.id}`,
+                    ),
+            ),
+        );
+    }
+
+    const container = new ContainerBuilder()
+        .addSectionComponents(
+            new SectionBuilder()
+                .addTextDisplayComponents(
+                    guild.builders.textDisplayLocale(
+                        'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE',
+                    ),
+                    new TextDisplayBuilder().setContent(
+                        `${guild.locale(
+                            'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TEXT',
+                            `[${track.info.author} - ${track.info.title}](${track.info.uri})`,
+                            durationString,
+                        )}\n${guild.locale('MUSIC.PLAYER.PLAYING.NOW.DETAILED.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${guild.locale(`MISC.SOURCES.${track.info.sourceName.toUpperCase()}` as LocaleKey)}** ─ ${guild.locale(
+                            'MISC.ADDED_BY',
+                            track.requesterId,
+                        )}`,
+                    ),
+                    guild.builders.textDisplayLocale(
+                        'MUSIC.PLAYER.PLAYING.NOW.DETAILED.REMAINING',
+                        player.queue.tracks.length.toString(),
+                    ),
+                )
+                .setThumbnailAccessory(
+                    new ThumbnailBuilder().setURL(
+                        track.info.artworkUrl ??
+                        `https://i.ytimg.com/vi/${track.info.identifier}/hqdefault.jpg`,
+                    ),
+                ),
+        )
+        .addSeparatorComponents(
+            ...(actionRows.length > 0 ? [new SeparatorBuilder()] : []),
+        );
+
+    return { container, actionRows };
+}
