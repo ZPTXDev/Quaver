@@ -1,12 +1,12 @@
 export default {
     '247': {
-        DESCRIPTION: '24/7 mode prevents Quaver from leaving.',
+        DESCRIPTION: '24/7 Mode prevents Quaver from leaving.',
         OPTION: {
-            ENABLED: 'Whether 24/7 mode is enabled. If not specified, it will be toggled.',
+            ENABLED: 'Whether 24/7 Mode is enabled. If not specified, it will be toggled.',
         },
         RESPONSE: {
-            DISABLED: '24/7 mode has been **disabled**',
-            ENABLED: '24/7 mode has been **enabled**',
+            DISABLED: '24/7 Mode has been **disabled**',
+            ENABLED: '24/7 Mode has been **enabled**',
             QUEUE_CHANNEL_MISSING: 'The queue channel is missing. Try using </bind:%1>.',
         },
         MISC: {
@@ -45,7 +45,7 @@ export default {
         DESCRIPTION: 'Disconnect Quaver.',
         RESPONSE: {
             CONFIRMATION: 'Are you sure you want Quaver to disconnect? You will also lose your current queue.',
-            FEATURE_247_ENABLED: 'Quaver is unable to disconnect as 24/7 mode is enabled.',
+            FEATURE_247_ENABLED: 'Quaver is unable to disconnect as 24/7 Mode is enabled.',
             SUCCESS: 'Disconnected from the voice channel.',
         },
     },
@@ -123,6 +123,9 @@ export default {
     PAUSE: {
         DESCRIPTION: 'Pause Quaver.',
         RESPONSE: {
+            ERROR: {
+                AD_PLAYING: 'You cannot pause during ad breaks.',
+            },
             STATE_UNCHANGED: 'The player is already paused.',
             SUCCESS: 'The player has been paused.',
         },
@@ -178,6 +181,9 @@ export default {
     RESUME: {
         DESCRIPTION: 'Resume Quaver.',
         RESPONSE: {
+            ERROR: {
+                AD_PLAYING: 'You cannot resume during ad breaks.',
+            },
             STATE_UNCHANGED: 'The player is already playing.',
             SUCCESS: 'The player has been resumed.',
         },
@@ -203,6 +209,9 @@ export default {
             SECONDS: 'The seconds position for the target timestamp.',
         },
         RESPONSE: {
+            ERROR: {
+                AD_PLAYING: 'You cannot seek during ad breaks.',
+            },
             STREAM_CANNOT_SEEK: 'Seek cannot be used for streams.',
             SUCCESS: {
                 DEFAULT: 'Seeking to `[%1 / %2]`',
@@ -219,11 +228,11 @@ export default {
             DISABLED: 'disabled',
             ENABLED: 'enabled',
             EVENT: {
-                BASSBOOST: '**%1** **%2** bass boost',
+                BASSBOOST: '**%1** **%2** bass boost mode',
                 BIND: '**%1** bound the text channel to <#%2>',
                 DISCONNECT: '**%1** disconnected the player',
                 LOOP: '**%1** set loop mode to **%2**',
-                NIGHTCORE: '**%1** **%2** nightcore',
+                NIGHTCORE: '**%1** **%2** nightcore mode',
                 PAUSE: '**%1** paused the player',
                 PLAY: 'Started playing **%2**',
                 QUEUE_ADD: '**%1** added **%2**',
@@ -236,8 +245,8 @@ export default {
                 SHUFFLE: '**%1** **%2** shuffle',
                 SKIP: '**%1** skipped **%2**',
                 SKIPTO: '**%1** skipped to **%2**',
-                SMARTQUEUE: '**%1** **%2** smart queue',
-                STAY: '**%1** **%2** 24/7 mode',
+                SMARTQUEUE: '**%1** **%2** Smart Queue',
+                STAY: '**%1** **%2** 24/7 Mode',
                 STOP: '**%1** stopped the player',
                 VOLUME: '**%1** set the volume to **%2%**',
             },
@@ -288,11 +297,11 @@ export default {
                         NAME: 'Language',
                     },
                     PREMIUM: {
-                        DESCRIPTION: 'Premium unlocks **Ad-Free Listening**, **Auto Lyrics**, **Smart Queue**, and **24/7 Mode**.',
-                        NAME: 'Premium',
+                        DESCRIPTION: '**Quaver Premium** unlocks **Ad-Free Listening**, **Auto Lyrics**, **Smart Queue**, and **24/7 Mode**.',
+                        NAME: 'Quaver Premium',
                         STATE: {
-                            ACTIVE_MESSAGE: 'This server has Premium until **<t:%1:f>**.\nThank you for your support!',
-                            ACTIVE_LIFETIME_MESSAGE: 'This server has Premium **forever**, courtesy of Quaver\'s manager.'
+                            ACTIVE_MESSAGE: 'This server has **Quaver Premium** until **<t:%1:f>**.\nThank you for your support!',
+                            ACTIVE_LIFETIME_MESSAGE: 'This server has lifetime **Quaver Premium**.\nThank you for your support!'
                         },
                     },
                 },
@@ -307,12 +316,12 @@ export default {
                 NAME: 'Playback & Logic',
                 SETTINGS: {
                     NOTIFYIN247: {
-                        DESCRIPTION: 'Whether to send "Now playing" messages in 24/7 mode.',
-                        NAME: 'Notify in 24/7 mode',
+                        DESCRIPTION: 'Whether to send "Now playing" messages in 24/7 Mode.',
+                        NAME: 'Notify in 24/7 Mode',
                     },
                     PAUSEALONE247: {
-                        DESCRIPTION: 'Whether to pause playback when alone in voice channel in 24/7 mode.',
-                        NAME: 'Pause alone in 24/7 mode',
+                        DESCRIPTION: 'Whether to pause playback when alone in voice channel in 24/7 Mode.',
+                        NAME: 'Pause alone in 24/7 Mode',
                     },
                     SMARTQUEUE: {
                         DESCRIPTION: 'Sorts the queue to alternate between requesters.',
@@ -339,6 +348,9 @@ export default {
     SKIP: {
         DESCRIPTION: 'Skip the current track.',
         RESPONSE: {
+            ERROR: {
+                AD_PLAYING: 'You cannot skip ad breaks.',
+            },
             VOTED: {
                 STATE_UNCHANGED: 'You have already voted to skip this track.',
                 SUCCESS: 'Voted to skip %1 `[%2 / %3]`',
@@ -357,6 +369,9 @@ export default {
             POSITION: 'The position of the track to skip to.',
         },
         RESPONSE: {
+            ERROR: {
+                AD_PLAYING: 'You cannot skip ad breaks.',
+            },
             FEATURE_CONFLICT: 'Skipping to a specific track is disabled while **Shuffle** or **Smart Queue** is enabled.',
             NOT_REQUESTER: 'You are not the requester of the current track and do not have sufficient permissions to skip it.',
             OUT_OF_RANGE: 'Your input was out of range.',
@@ -370,6 +385,9 @@ export default {
     STOP: {
         DESCRIPTION: 'Stop the current track and clear the queue.',
         RESPONSE: {
+            ERROR: {
+                AD_PLAYING: 'You cannot stop during ad breaks.',
+            },
             CONFIRMATION: 'Are you sure you want to stop the current track and clear the queue?',
             SUCCESS: 'Stopped the current track and cleared the queue.',
         },

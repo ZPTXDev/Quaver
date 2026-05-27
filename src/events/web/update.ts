@@ -139,6 +139,9 @@ export default {
                     return callback({ status: Response.InactiveSessionError });
                 }
                 const response = await player.setPause(item.value, actor);
+                if (response === PlayerResponse.AdPlaying) {
+                    return callback({ status: Response.AdPlayingError });
+                }
                 if (response !== PlayerResponse.Success) {
                     return callback({ status: Response.GenericError });
                 }
@@ -190,7 +193,7 @@ export default {
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
-                await player.setBassboost(item.value, actor);
+                await player.setBassboost(item.value, false, actor);
                 break;
             }
             case UpdateItemType.Nightcore: {
@@ -198,7 +201,7 @@ export default {
                 if (!player) {
                     return callback({ status: Response.InactiveSessionError });
                 }
-                await player.setNightcore(item.value, actor);
+                await player.setNightcore(item.value, false, actor);
                 break;
             }
             case UpdateItemType.Seek: {
@@ -217,6 +220,9 @@ export default {
                     return callback({ status: Response.AuthenticationError });
                 }
                 const response = await player.seekTo(item.value, actor);
+                if (response === PlayerResponse.AdPlaying) {
+                    return callback({ status: Response.AdPlayingError });
+                }
                 if (response !== PlayerResponse.Success) {
                     return callback({ status: Response.GenericError });
                 }
@@ -386,4 +392,5 @@ export enum Response {
     NoResultsError = 'error-no-results',
     UserNotInChannelError = 'error-user-not-in-channel',
     NotReadyError = 'error-not-ready',
+    AdPlayingError = 'error-ad-playing',
 }

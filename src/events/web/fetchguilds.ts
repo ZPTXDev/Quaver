@@ -81,7 +81,7 @@ export default {
                     : '';
             return guild;
         });
-        if (settings.premiumURL) {
+        if (settings.premiumEnabled) {
             for (const webGuild of webGuilds) {
                 if (!webGuild.botInGuild) continue;
                 const guild = await QuaverGuild.wrap(

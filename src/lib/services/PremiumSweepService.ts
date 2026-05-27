@@ -1,0 +1,248 @@
+import type { Initialized } from '#src/lib/guild';
+import { QuaverGuild } from '#src/lib/guild';
+import type { QuaverClient } from '#src/lib';
+import { MessageOptionsBuilderType } from '#src/lib';
+import { logger } from '#src/lib/logger';
+import { type QuaverChannels, settings } from '#src/lib/util';
+import type { LocaleKey } from '../locales';
+import type { QuaverPlayer } from '../music';
+import type { Guild } from 'discord.js';
+import { data } from '#src/lib/data';
+
+export class PremiumSweepService {
+    private interval: ReturnType<typeof setInterval> | null = null;
+    private bootSweepTimeout: ReturnType<typeof setTimeout> | null = null;
+
+    start(): void {
+        if (this.interval) return;
+
+        logger.info('Starting Premium/Whitelist expiration sweep service at 15m interval');
+
+        // Run initial sweep on boot after a short delay (e.g. 10 seconds) to let guilds load
+        this.bootSweepTimeout = setTimeout((): void => {
+            void this.sweep();
+            this.bootSweepTimeout = null;
+        }, 10 * 1000);
+
+        this.interval = setInterval((): void => {
+            void this.sweep();
+        }, 15 * 60 * 1000);
+    }
+
+    async sweep(): Promise<void> {
+        try {
+            const { client } = await import('#src/main');
+            if (!client.music?.players?.cache) return;
+            for (const player of client.music.players.cache.values()) {
+                try {
+                    const guild = await QuaverGuild.wrap(player.guild);
+
+                    // 1. Check stay (24/7) feature
+                    const staySetting = await guild.settings.get<boolean>('stay.enabled');
+                    const isStayActive = await guild.features.isFeatureActive('stay');
+
+                    if (staySetting && !isStayActive) {
+                        // Check if there are any users in the voice channel (excluding bots)
+                        const voiceChannelId = player.voice.channelId;
+                        let voiceChannel = voiceChannelId ? guild.channels.cache.get(voiceChannelId) : null;
+                        
+                        // If channel is not cached, try to fetch it
+                        if (!voiceChannel && voiceChannelId) {
+                            try {
+                                voiceChannel = await guild.channels.fetch(voiceChannelId);
+                            } catch {
+                                // If we can't fetch the channel, assume users are present to avoid incorrect disconnection
+                                logger.warn(`[G ${guild.id}] Could not fetch voice channel ${voiceChannelId}. Assuming users are present.`);
+                            }
+                        }
+                        
+                        // Default to true (assume users present) if we can't verify the channel state
+                        let hasUsers = true;
+                        if (voiceChannel && voiceChannel.isVoiceBased() && 'members' in voiceChannel) {
+                            hasUsers = voiceChannel.members.some((member: { user: { bot: boolean } }): boolean => !member.user.bot);
+                        }
+
+                        if (!hasUsers) {
+                            // No users in channel - disconnect immediately
+                            logger.info(`[G ${guild.id}] Premium or 24/7 Mode whitelist expired. Disconnecting immediately.`);
+                            const isStayPremium = !!(settings.premiumEnabled && settings.features.stay.premium);
+                            await player.sendMessage(
+                                guild.locale(isStayPremium ? 'MUSIC.SESSION_ENDED.FORCED.PREMIUM_EXPIRED' : 'MUSIC.SESSION_ENDED.FORCED.WHITELIST_EXPIRED' as LocaleKey),
+                                { type: MessageOptionsBuilderType.Warning }
+                            );
+                            await player.disconnect();
+                            continue;
+                        } else {
+                            // Users are present - disable stay setting but keep session active
+                            await guild.settings.set('stay.enabled', false);
+                            logger.info(`[G ${guild.id}] Premium or 24/7 Mode whitelist expired. Disabled 24/7 mode but keeping session active due to users in channel.`);
+                            // Let normal timeout logic handle disconnection when users leave
+                        }
+                    }
+
+                    // 2. Check smart queue (alternating) feature
+                    if (player.memory.alternate) {
+                        const isSmartQueueActive = await guild.features.isFeatureActive('smartqueue');
+                        if (!isSmartQueueActive) {
+                            logger.info(`[G ${guild.id}] Premium or Smart Queue whitelist expired. Deactivating feature.`);
+                            await player.setAlternate(false);
+                            const isSmartQueuePremium = !!(settings.premiumEnabled && settings.features.smartqueue.premium);
+                            await player.sendMessage(
+                                guild.locale(`MUSIC.PLAYER.FEATURE_DISABLED.SMARTQUEUE.${isSmartQueuePremium ? 'PREMIUM' : 'WHITELIST'}` as LocaleKey),
+                                { type: MessageOptionsBuilderType.Warning }
+                            );
+                        }
+                    }
+                } catch (playerError) {
+                    logger.error(`Error processing premium sweep for player of guild ${player.guild.id}:`, playerError);
+                }
+            }
+        } catch (error) {
+            logger.error('Error in PremiumSweepService sweep execution:', error);
+        }
+    }
+
+    /**
+     * Re-enables premium-gated features for a guild after premium has been added or renewed.
+     * If an active player session exists, restores features in-session.
+     * If no session exists but 24/7 Mode was enabled, reconnects to the saved voice channel.
+     * @param guildId - The ID of the guild to restore features for.
+     */
+    static async restoreFeatures(guildId: string): Promise<void> {
+        try {
+            const { client } = await import('#src/main');
+            const discordGuild = client.guilds.cache.get(guildId);
+            if (!discordGuild) return;
+
+            const guild = await QuaverGuild.wrap(discordGuild);
+            const player = client.music?.players?.cache.get(guildId);
+
+            if (player) {
+                await this.restoreActiveSessionFeatures(player, guild, guildId);
+            } else {
+                await this.reconnectStayChannel(client, guild, guildId);
+            }
+        } catch (error) {
+            logger.error(`Error restoring features for guild ${guildId} after premium renewal:`, error);
+        }
+    }
+
+    /**
+     * Restores premium features for an active player session.
+     */
+    private static async restoreActiveSessionFeatures(
+        player: QuaverPlayer,
+        guild: QuaverGuild<Initialized> & Guild,
+        guildId: string
+    ): Promise<void> {
+        const isStayPremium = !!(settings.premiumEnabled && settings.features.stay.premium);
+        const isSmartQueuePremium = !!(settings.premiumEnabled && settings.features.smartqueue.premium);
+
+        // Reset ad playtime counter when premium is restored (unconditionally)
+        // This ensures stale data doesn't survive premium restoration after restart
+        player.memory.adPlaytimeMs = 0;
+        await data.guild.set(guild.id, 'ads.playtimeMs', 0);
+
+        // 1. Re-enable 24/7 (stay) if it was previously enabled but got cut off
+        const staySetting = await guild.settings.get<boolean>('stay.enabled');
+        const stayText = await guild.settings.get<string>('stay.text');
+        const isStayNowActive = await guild.features.isFeatureActive('stay');
+        
+        // Restore if either stay.enabled is true OR stay.text exists (indicates user had 24/7 configured before expiry)
+        if ((staySetting || stayText) && isStayNowActive) {
+            logger.info(`[G ${guildId}] Premium restored. Re-activating 24/7 Mode.`);
+            
+            // Re-enable stay.enabled if it was disabled during expiration
+            if (!staySetting) {
+                await guild.settings.set('stay.enabled', true);
+            }
+            
+            if (player.timeout.standard) {
+                clearTimeout(player.timeout.standard);
+                delete player.timeout.standard;
+                guild.sendWebUpdate('timeoutUpdate', false);
+            }
+            await player.sendMessage(
+                guild.locale(`MUSIC.PLAYER.FEATURE_RESTORED.STAY.${isStayPremium ? 'PREMIUM' : 'WHITELIST'}` as LocaleKey),
+                { type: MessageOptionsBuilderType.Success }
+            );
+        }
+
+
+        // 2. Re-enable Smart Queue if it was previously enabled but got deactivated
+        const smartQueueSetting = await guild.settings.get<boolean>('smartqueue');
+        const isSmartQueueNowActive = await guild.features.isFeatureActive('smartqueue');
+        if (smartQueueSetting && isSmartQueueNowActive && !player.memory.alternate) {
+            logger.info(`[G ${guildId}] Premium restored. Re-activating Smart Queue.`);
+            await player.setAlternate(true);
+            await player.sendMessage(
+                guild.locale(`MUSIC.PLAYER.FEATURE_RESTORED.SMARTQUEUE.${isSmartQueuePremium ? 'PREMIUM' : 'WHITELIST'}` as LocaleKey),
+                { type: MessageOptionsBuilderType.Success }
+            );
+        }
+    }
+
+    /**
+     * Reconnects to the stay channel if 24/7 Mode was enabled but no active session exists.
+     */
+    private static async reconnectStayChannel(
+        client: QuaverClient,
+        guild: QuaverGuild<Initialized> & Guild,
+        guildId: string
+    ): Promise<void> {
+        // Guard: ensure music subsystem is ready
+        if (!client.music?.players) {
+            logger.warn(`[G ${guildId}] Cannot reconnect to stay channel: music subsystem not ready yet.`);
+            return;
+        }
+
+        const staySetting = await guild.settings.get<boolean>('stay.enabled');
+        const isStayNowActive = await guild.features.isFeatureActive('stay');
+        if (!staySetting || !isStayNowActive) return;
+
+        const stayChannel = await guild.settings.get<string>('stay.channel');
+        const stayText = await guild.settings.get<string>('stay.text');
+        if (!stayChannel || !stayText) return;
+
+        logger.info(`[G ${guildId}] Premium restored. Reconnecting to stay channel.`);
+        const isStayPremium = !!(settings.premiumEnabled && settings.features.stay.premium);
+        const newPlayer = client.music.players.create(guild);
+        
+        // Fetch text channel if not in cache
+        let textChannel = guild.channels.cache.get(stayText) as QuaverChannels;
+        if (!textChannel) {
+            try {
+                textChannel = await guild.channels.fetch(stayText) as QuaverChannels;
+                if (!textChannel) {
+                    logger.error(`[G ${guildId}] Text channel ${stayText} not found for stay reconnection`);
+                    // If we can't get the text channel, we can't send messages, so disconnect
+                    newPlayer.disconnect();
+                    return;
+                }
+            } catch (error) {
+                logger.error(`[G ${guildId}] Could not fetch text channel ${stayText} for stay reconnection:`, error);
+                // If we can't get the text channel, we can't send messages, so disconnect
+                newPlayer.disconnect();
+                return;
+            }
+        }
+        
+        newPlayer.queue.channel = textChannel;
+        newPlayer.voice.connect(stayChannel, { deafened: true });
+        await newPlayer.sendMessage(
+            guild.locale(`MUSIC.PLAYER.FEATURE_RESTORED.STAY.${isStayPremium ? 'PREMIUM' : 'WHITELIST'}` as LocaleKey),
+            { type: MessageOptionsBuilderType.Success }
+        );
+    }
+
+    stop(): void {
+        if (this.interval) {
+            clearInterval(this.interval);
+            this.interval = null;
+        }
+        if (this.bootSweepTimeout) {
+            clearTimeout(this.bootSweepTimeout);
+            this.bootSweepTimeout = null;
+        }
+    }
+}

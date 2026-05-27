@@ -43,6 +43,7 @@ export default new ChatInputCommandHandler()
         const player = await guild.getPlayer();
         const response = await player.setNightcore(
             enabled !== null ? enabled : !player.memory.nightcore,
+            false,
             interaction.user,
         );
         if (response !== PlayerResponse.Success) return;

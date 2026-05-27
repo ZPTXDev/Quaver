@@ -16,6 +16,22 @@ export default {
     },
     NOT_READY: 'One moment please! Quaver is still starting up.',
     PLAYER: {
+        FEATURE_DISABLED: {
+            SMARTQUEUE: {
+                PREMIUM: "**Smart Queue** was disabled as **Quaver Premium** has expired.",
+                WHITELIST: "**Smart Queue** was disabled as this server no longer has access to the feature."
+            },
+        },
+        FEATURE_RESTORED: {
+            STAY: {
+                PREMIUM: "**24/7 Mode** has been re-enabled as **Quaver Premium** has been renewed.",
+                WHITELIST: "**24/7 Mode** has been re-enabled as this server has regained access to the feature."
+            },
+            SMARTQUEUE: {
+                PREMIUM: "**Smart Queue** has been re-enabled as **Quaver Premium** has been renewed.",
+                WHITELIST: "**Smart Queue** has been re-enabled as this server has regained access to the feature."
+            },
+        },
         FILTER_NOTE: '-# This may take a few seconds to apply',
         LOOP_QUEUE_DISABLED: 'Disabled looping as the queue is less than 15 seconds long.',
         LOOP_TRACK_DISABLED: 'Disabled looping as the track is less than 15 seconds long.',
@@ -35,6 +51,10 @@ export default {
                     SOURCE: 'Source',
                     TEXT: 'Now playing **%1** `[%2]`',
                 },
+            },
+            AD: {
+                TITLE: '### Ad Break',
+                MESSAGE: 'This is a brief ad break.\nFor ad-free listening, get **Quaver Premium**.',
             },
         },
         QUEUE_CLEARED_ERROR: 'Cleared queue as an error occurred multiple times consecutively.',
@@ -66,7 +86,9 @@ export default {
     SESSION_ENDED: {
         FORCED: {
             DISCONNECTED: 'Session ended as Quaver was disconnected.',
+            PREMIUM_EXPIRED: 'Session ended as **Quaver Premium** has expired.',
             STAGE_NOT_MODERATOR: 'Session ended as Quaver was moved to a stage channel that Quaver isn\'t a stage moderator of.',
+            WHITELIST_EXPIRED: 'Session ended as this server no longer has access to **24/7 Mode**.',
         },
     },
 };

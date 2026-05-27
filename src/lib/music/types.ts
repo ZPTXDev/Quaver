@@ -13,6 +13,7 @@ export enum PlayerResponse {
     PlayerStateUnchanged,
     PlayerIdle,
     PlayerIsStream,
+    AdPlaying,
     Success,
 }
 
@@ -21,3 +22,7 @@ export type PlayerStatesRecord = Record<string, QuaverPlayerJSON> & {
     attempts?: number;
     lavalinkSessionId?: string;
 };
+
+// Re-export queue types
+export { LoopType, QuaverQueue } from './QuaverQueue';
+export type { QueueLoop, QuaverQueueJSON, AddOptions } from './QuaverQueue';
