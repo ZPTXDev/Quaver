@@ -78,18 +78,18 @@ export default new ChatInputCommandHandler()
                     new ActionRowBuilder<ButtonBuilder>().setComponents(
                         new ButtonBuilder()
                             .setCustomId('queue:0')
-                            .setEmoji('⬅️')
+                            .setEmoji(settings.emojis.left)
                             .setDisabled(true)
-                            .setStyle(ButtonStyle.Primary),
+                            .setStyle(ButtonStyle.Secondary),
                         guild.builders
                             .buttonLocale('MISC.GO_TO')
                             .setStyle(ButtonStyle.Secondary)
                             .setCustomId('queue:goto'),
                         new ButtonBuilder()
                             .setCustomId('queue:2')
-                            .setEmoji('➡️')
+                            .setEmoji(settings.emojis.right)
                             .setDisabled(pages.length === 1)
-                            .setStyle(ButtonStyle.Primary),
+                            .setStyle(ButtonStyle.Secondary),
                     ),
                 ),
             { ephemeral: true },

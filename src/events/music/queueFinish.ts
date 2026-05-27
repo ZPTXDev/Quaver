@@ -11,6 +11,7 @@ export default {
     once: false,
     async execute(queue: QuaverQueue): Promise<void> {
         const guild = await QuaverGuild.wrap(queue.player.guild);
+        queue.player.logSessionEvent('QUEUE_FINISH');
         if (updateHandler.restartInProgress) {
             await queue.player.sendMessage(
                 new ContainerBuilder().addTextDisplayComponents(

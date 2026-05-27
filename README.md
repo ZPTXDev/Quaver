@@ -106,6 +106,12 @@ installed, and ensure `plugins.lavasrc.lyrics-sources` is defined in your
 [Lavalink configuration](https://github.com/topi314/LavaSrc?tab=readme-ov-file#configuration). Quaver uses a combination
 of both plugins to fetch and display lyrics.
 
+## What's "Quaver Music"? I see it as a source but I'm not sure how to configure it in my own instance.
+
+Quaver Music refers to a Lavalink plugin utilising a Navidrome library for music streaming.
+
+At this time, the plugin is not publicly available and the source is only available on public instances of Quaver.
+
 # 💬 Translating
 
 Take a look at our [Crowdin project](https://translate.zptx.dev).

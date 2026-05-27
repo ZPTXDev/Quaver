@@ -7,7 +7,7 @@ import { startup } from '#src/lib/state';
 import { settings, version } from '#src/lib/util';
 import AdmZip from 'adm-zip';
 import { ContainerBuilder, TextDisplayBuilder } from 'discord.js';
-import { writeFile } from 'node:fs/promises';
+import { rm, writeFile } from 'node:fs/promises';
 import semver from 'semver';
 
 type APIReleaseAuthor = {
@@ -73,6 +73,12 @@ type APIRelease = {
 };
 
 export class UpdateHandler {
+    // GitHub repo user
+    user = settings.updater?.user ?? 'ZPTXDev';
+    // GitHub repo name
+    repo = settings.updater?.repo ?? 'Quaver';
+    // GitHub PAT
+    token = settings.updater?.token;
     // Channel to update from - none means update checker is disabled
     channel = settings.updater?.channel ?? 'none';
     // Whether to download and replace files when an update is found
@@ -116,7 +122,10 @@ export class UpdateHandler {
         if (this.channel === 'none') return;
         if (!version.official) return;
         const res = await fetch(
-            'https://api.github.com/repos/ZPTXDev/Quaver/releases',
+            `https://api.github.com/repos/${this.user}/${this.repo}/releases`,
+            this.token
+                ? { headers: { Authorization: `Bearer ${this.token}` } }
+                : {},
         );
         if (!res.ok) {
             logger.warn(
@@ -175,8 +184,22 @@ export class UpdateHandler {
             return;
         }
         const buffer = await res.arrayBuffer();
-        logger.info('Extracting update...');
         const zip = new AdmZip(Buffer.from(buffer));
+        logger.info('Cleaning up old build files...');
+        const foldersToClean = [
+            './dist',
+            './locales',
+            './scripts',
+            './patches',
+        ];
+        for (const folder of foldersToClean) {
+            try {
+                await rm(folder, { recursive: true, force: true });
+            } catch (err) {
+                logger.warn(`Failed to clean ${folder}: ${err.message}`);
+            }
+        }
+        logger.info('Extracting update...');
         zip.extractAllTo('.', true);
         logger.info('Update installed successfully.');
         clearInterval(this.updateInterval);
@@ -247,14 +270,17 @@ export class UpdateHandler {
                 if (players.cache.size < 1) return;
                 const states: Record<string, QuaverPlayerJSON> & {
                     savedAt?: number;
+                    lavalinkSessionId?: string;
                 } = {};
                 logger.info('Disconnecting from all guilds...');
                 for (const pair of players.cache) {
                     const player = pair[1];
                     states[player.guild.id] = player.toJSON();
                     const guild = await QuaverGuild.wrap(player.guild);
-                    logger.info(`[G ${guild.id}] Disconnecting (restarting)`);
-                    await player.disconnect();
+                    if (!settings.sessionRecovery?.enabled) {
+                        logger.info(`[G ${guild.id}] Disconnecting (restarting)`);
+                        await player.disconnect();
+                    }
                     await player.sendMessage(
                         new ContainerBuilder().addTextDisplayComponents(
                             new TextDisplayBuilder().setContent(
@@ -284,6 +310,7 @@ export class UpdateHandler {
                 }
                 if (settings.sessionRecovery?.enabled) {
                     states.savedAt = Date.now();
+                    states.lavalinkSessionId = this.client.music.ws.session?.id;
                     await writeFile(
                         'states.json',
                         JSON.stringify(states, null, 4),

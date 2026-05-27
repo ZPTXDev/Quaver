@@ -54,6 +54,19 @@ export enum MessageOptionsBuilderType {
     Error,
 }
 
+export enum ForceType {
+    Reply,
+    Edit,
+    Update,
+    FollowUp,
+}
+
+const BASE_FLAGS = [MessageFlags.IsComponentsV2] as const;
+const EPHEMERAL_FLAGS = [
+    MessageFlags.IsComponentsV2,
+    MessageFlags.Ephemeral,
+] as const;
+
 /** Class for handling replies to interactions. */
 export class ReplyHandler {
     interaction: NonSpecialInteractions;
@@ -66,6 +79,33 @@ export class ReplyHandler {
         this.interaction = interaction;
     }
 
+    private async tryAction<T>(
+        action: () => Promise<T>,
+    ): Promise<T | undefined> {
+        try {
+            return await action();
+        } catch (error) {
+            if (error instanceof Error) {
+                logger.error(`${error.message}\n${error.stack}`);
+            }
+            return undefined;
+        }
+    }
+
+    private lacksChannelPermissions(): boolean {
+        const channel = this.interaction.channel;
+        const permissions = this.interaction.appPermissions;
+        if (!permissions) return !!channel;
+        return !permissions.has(
+            new PermissionsBitField([
+                PermissionsBitField.Flags.ViewChannel,
+                channel.isThread()
+                    ? PermissionsBitField.Flags.SendMessagesInThreads
+                    : PermissionsBitField.Flags.SendMessages,
+            ]),
+        );
+    }
+
     /**
      * Replies with a message.
      * @param inputData - The data to be used. Can be a string, ContainerBuilder, or an array of either.
@@ -74,39 +114,14 @@ export class ReplyHandler {
      */
     async reply(
         inputData: MessageOptionsBuilderInputs,
-        {
-            type,
-            components,
-            files,
-            ephemeral,
-            force,
-            withResponse,
-        }?: MessageOptionsBuilderOptions &
+        options?: MessageOptionsBuilderOptions &
             AdditionalBuilderOptions & { withResponse?: false },
-    ): Promise<InteractionResponse>;
+    ): Promise<InteractionResponse | Message | undefined>;
     async reply(
         inputData: MessageOptionsBuilderInputs,
-        {
-            type,
-            components,
-            files,
-            ephemeral,
-            force,
-            withResponse,
-        }?: MessageOptionsBuilderOptions &
+        options: MessageOptionsBuilderOptions &
             AdditionalBuilderOptions & { withResponse: true },
-    ): Promise<InteractionCallbackResponse | Message>;
-    async reply(
-        inputData: MessageOptionsBuilderInputs,
-        {
-            type,
-            components,
-            files,
-            ephemeral,
-            force,
-            withResponse,
-        }?: MessageOptionsBuilderOptions & AdditionalBuilderOptions,
-    ): Promise<InteractionResponse>;
+    ): Promise<InteractionCallbackResponse | Message | undefined>;
     async reply(
         inputData: MessageOptionsBuilderInputs,
         {
@@ -126,71 +141,59 @@ export class ReplyHandler {
             files,
         }) as InteractionReplyOptions;
         replyMsgOpts.withResponse = withResponse;
-        replyMsgOpts.flags = [MessageFlags.IsComponentsV2];
+        replyMsgOpts.flags = BASE_FLAGS;
         replyMsgOpts.allowedMentions = { parse: [] };
-        if (
+
+        const isInitialReply =
             force === ForceType.Reply ||
-            (!this.interaction.replied && !this.interaction.deferred && !force)
-        ) {
-            if (
-                type === MessageOptionsBuilderType.Error ||
+            (!force && !this.interaction.replied && !this.interaction.deferred);
+
+        if (isInitialReply) {
+            const isEphemeral =
                 ephemeral ||
-                (this.interaction.channel &&
-                    !this.interaction.channel
-                        .permissionsFor(this.interaction.client.user.id)
-                        .has(
-                            new PermissionsBitField([
-                                PermissionsBitField.Flags.ViewChannel,
-                                PermissionsBitField.Flags.SendMessages,
-                            ]),
-                        ))
-            ) {
-                replyMsgOpts.flags = [
-                    MessageFlags.IsComponentsV2,
-                    MessageFlags.Ephemeral,
-                ];
-            }
-            try {
-                return await this.interaction.reply(replyMsgOpts);
-            } catch (error) {
-                if (error instanceof Error) {
-                    logger.error(`${error.message}\n${error.stack}`);
-                }
-                return undefined;
-            }
+                type === MessageOptionsBuilderType.Error ||
+                this.lacksChannelPermissions();
+            if (isEphemeral) replyMsgOpts.flags = EPHEMERAL_FLAGS;
+            return this.tryAction(
+                (): Promise<InteractionResponse<true>> =>
+                    this.interaction.reply(replyMsgOpts),
+            );
         }
+
         if (
             force === ForceType.Update &&
+            !this.interaction.replied &&
+            !this.interaction.deferred &&
             !this.interaction.isCommand() &&
             (!this.interaction.isModalSubmit() ||
                 this.interaction.isFromMessage())
         ) {
-            try {
-                return await this.interaction.update(
-                    replyMsgOpts as InteractionUpdateOptions,
-                );
-            } catch (error) {
-                if (error instanceof Error) {
-                    logger.error(`${error.message}\n${error.stack}`);
-                }
-                return undefined;
-            }
-        }
-        try {
-            return await this.interaction.editReply(
-                replyMsgOpts as InteractionEditReplyOptions,
+            return this.tryAction(
+                (): Promise<InteractionResponse<true>> =>
+                    (
+                        this.interaction as Extract<
+                            NonSpecialInteractions,
+                            { update: unknown }
+                        >
+                    ).update(replyMsgOpts as InteractionUpdateOptions),
             );
-        } catch (error) {
-            if (error instanceof Error) {
-                logger.error(`${error.message}\n${error.stack}`);
-            }
-            return undefined;
         }
-    }
-}
 
-export enum ForceType {
-    Reply,
-    Edit,
-    Update,
+        if (force === ForceType.FollowUp) {
+            if (ephemeral || type === MessageOptionsBuilderType.Error) {
+                replyMsgOpts.flags = EPHEMERAL_FLAGS;
+            }
+            return this.tryAction(
+                (): Promise<Message<true>> =>
+                    this.interaction.followUp(replyMsgOpts),
+            );
+        }
+
+        return this.tryAction(
+            (): Promise<Message<true>> =>
+                this.interaction.editReply(
+                    replyMsgOpts as InteractionEditReplyOptions,
+                ),
+        );
+    }
 }

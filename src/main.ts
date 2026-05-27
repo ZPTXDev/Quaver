@@ -1,11 +1,6 @@
 import { load as effectsLoad } from '@lavaclient/plugin-effects';
 import { load as queueLoad } from '@lavaclient/plugin-queue';
-import {
-    getAbsoluteFileURL,
-    msToTime,
-    msToTimeString,
-    parseTimeString,
-} from '@zptxdev/zptx-lib';
+import { getAbsoluteFileURL, msToTime, msToTimeString, parseTimeString, } from '@zptxdev/zptx-lib';
 import { createCache } from 'cache-manager';
 import { KeyvCacheableMemory } from 'cacheable';
 import { Collection, GatewayIntentBits } from 'discord.js';
@@ -63,10 +58,10 @@ spinner.start(`Setting up ${colors.cyan('data handler')}`);
 data.guild = new DataHandler({
     cache: settings.database
         ? `${settings.database.protocol}://${resolve(
-              __dirname,
-              '..',
-              settings.database.path,
-          )}`
+            __dirname,
+            '..',
+            settings.database.path,
+        )}`
         : `sqlite://${resolve(__dirname, '..', 'database.sqlite')}`,
     namespace: 'guild',
 });
@@ -157,8 +152,8 @@ if (settings.features.web.enabled) {
 }
 const io = settings.features.web.enabled
     ? new Server(server, {
-          cors: { origin: settings.features.web.allowedOrigins },
-      })
+        cors: { origin: settings.features.web.allowedOrigins },
+    })
     : undefined;
 if (io) {
     spinner.success();
@@ -234,9 +229,9 @@ const requiredPlugins = [
 const info = await client.music.api.info();
 if (
     info.plugins.length === 0 ||
-    !info.plugins
-        .map((plugin): string => plugin.name)
-        .every((plugin): boolean => requiredPlugins.includes(plugin))
+    !requiredPlugins.every(
+        (plugin): boolean => info.plugins.map((p): string => p.name).includes(plugin)
+    )
 ) {
     logger.warn({
         message: 'Required plugins are not loaded. Some features may not work.',
@@ -248,9 +243,10 @@ spinner.success();
 
 spinner.start(`Configuring ${colors.cyan('Lavalink sources')}`);
 const acceptableSources = {
+    quavermusic: 'qmsearch:',
+    deezer: 'dzsearch:',
     youtubemusic: 'ytmsearch:',
     youtube: 'ytsearch:',
-    deezer: 'dzsearch:',
     soundcloud: 'scsearch:',
     yandexmusic: 'ymsearch:',
     vkmusic: 'vksearch:',
@@ -346,12 +342,21 @@ rl.on('line', async (input): Promise<void> => {
                 console.log('Guild not found.');
                 break;
             }
-            if (!['stay', 'autolyrics', 'smartqueue'].includes(feature)) {
-                console.log('Available features: stay, autolyrics, smartqueue');
+            if (
+                !['premium', 'stay', 'autolyrics', 'smartqueue'].includes(
+                    feature,
+                )
+            ) {
+                console.log(
+                    'Available features: premium, stay, autolyrics, smartqueue',
+                );
                 break;
             }
             let featureName = '';
             switch (feature) {
+                case 'premium':
+                    featureName = 'Premium';
+                    break;
                 case 'stay':
                     featureName = '24/7';
                     break;
@@ -361,7 +366,12 @@ rl.on('line', async (input): Promise<void> => {
                 case 'smartqueue':
                     featureName = 'Smart Queue';
             }
-            if (!settings.features[feature as WhitelistedFeatures].whitelist) {
+            if (
+                (feature === 'premium' && !settings.premiumURL) ||
+                (feature !== 'premium' &&
+                    !settings.features[feature as WhitelistedFeatures]
+                        .whitelist)
+            ) {
                 console.log(`The ${featureName} whitelist is not enabled.`);
                 break;
             }
@@ -373,24 +383,31 @@ rl.on('line', async (input): Promise<void> => {
                 durationMs = parseTimeString(duration);
             }
             const whitelisted = await guild.features.checkWhitelisted(
-                feature as WhitelistedFeatures,
+                feature as WhitelistedFeatures | 'premium',
             );
+            const usesPremiumStore =
+                feature === 'premium' ||
+                (feature !== 'premium' &&
+                    settings.premiumURL &&
+                    settings.features[feature as WhitelistedFeatures].premium);
+            const featureStore = usesPremiumStore
+                ? 'premium'
+                : `${feature}.whitelisted`;
             if (whitelisted && !duration) {
-                await guild.features.unset(`${feature}.whitelisted`);
+                await guild.features.unset(featureStore);
                 console.log(
                     `Removed ${guild.name} from the ${featureName} whitelist.`,
                 );
                 break;
             }
             await guild.features.set(
-                `${feature}.whitelisted`,
+                featureStore,
                 durationMs === -1 ? durationMs : Date.now() + durationMs,
             );
             console.log(
-                `Added ${guild.name} to the ${featureName} whitelist ${
-                    durationMs === -1
-                        ? 'permanently'
-                        : `for ${msToTimeString(msToTime(durationMs))}`
+                `Added ${guild.name} to the ${featureName} whitelist ${durationMs === -1
+                    ? 'permanently'
+                    : `for ${msToTimeString(msToTime(durationMs))}`
                 }.`,
             );
             break;

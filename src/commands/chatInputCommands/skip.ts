@@ -65,7 +65,7 @@ export default new ChatInputCommandHandler()
             }
             skip.users.push(interaction.user.id);
             if (skip.users.length >= skip.required) {
-                const response = await player.skipCurrentTrack();
+                const response = await player.skipCurrentTrack(interaction.user);
                 switch (response) {
                     case PlayerResponse.PlayerIdle:
                         await interaction.replyHandler.reply(
@@ -99,7 +99,7 @@ export default new ChatInputCommandHandler()
             );
             return;
         }
-        const response = await player.skipCurrentTrack();
+        const response = await player.skipCurrentTrack(interaction.user);
         switch (response) {
             case PlayerResponse.RestartInProgress:
                 await interaction.replyHandler.reply(

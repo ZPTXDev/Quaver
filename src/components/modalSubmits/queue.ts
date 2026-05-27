@@ -1,7 +1,7 @@
 import { ForceType, MessageOptionsBuilderType } from '#src/lib';
 import { ModalSubmitHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
-import { cleanURIForMarkdown } from '#src/lib/util';
+import { cleanURIForMarkdown, settings } from '#src/lib/util';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
 import {
@@ -87,18 +87,18 @@ export default new ModalSubmitHandler().setExecute(
                     new ActionRowBuilder<ButtonBuilder>().setComponents(
                         new ButtonBuilder()
                             .setCustomId(`queue:${page - 1}`)
-                            .setEmoji('⬅️')
+                            .setEmoji(settings.emojis.left)
                             .setDisabled(page - 1 < 1)
-                            .setStyle(ButtonStyle.Primary),
+                            .setStyle(ButtonStyle.Secondary),
                         guild.builders
                             .buttonLocale('MISC.GO_TO')
                             .setStyle(ButtonStyle.Secondary)
                             .setCustomId('queue:goto'),
                         new ButtonBuilder()
                             .setCustomId(`queue:${page + 1}`)
-                            .setEmoji('➡️')
+                            .setEmoji(settings.emojis.right)
                             .setDisabled(page + 1 > pages.length)
-                            .setStyle(ButtonStyle.Primary),
+                            .setStyle(ButtonStyle.Secondary),
                     ),
                 ),
             { force: ForceType.Update },

@@ -52,7 +52,7 @@ export default new ChatInputCommandHandler()
             );
             return;
         }
-        const response = await player.setVolumeTo(volume);
+        const response = await player.setVolumeTo(volume, interaction.user);
         if (response !== PlayerResponse.Success) return;
         await interaction.replyHandler.reply(
             new ContainerBuilder().addTextDisplayComponents(

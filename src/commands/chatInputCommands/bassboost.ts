@@ -43,6 +43,7 @@ export default new ChatInputCommandHandler()
         const player = await guild.getPlayer();
         const response = await player.setBassboost(
             enabled !== null ? enabled : !player.memory.bassboost,
+            interaction.user,
         );
         if (response !== PlayerResponse.Success) return;
         await interaction.replyHandler.reply(

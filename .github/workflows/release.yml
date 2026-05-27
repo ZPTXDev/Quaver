@@ -31,6 +31,7 @@ jobs:
           extra_plugins: |
             @semantic-release/git
             @semantic-release/exec
+            conventional-changelog-conventionalcommits
         env:
           GITHUB_TOKEN: ${{ secrets.PUSH_TO_PROTECTED_BRANCH }}
           GIT_AUTHOR_NAME: ${{ secrets.ZPTX_BOT_NAME }}
