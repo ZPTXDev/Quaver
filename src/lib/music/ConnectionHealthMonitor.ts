@@ -53,6 +53,33 @@ export class ConnectionHealthMonitor {
     private mediaCheckInterval?: ReturnType<typeof setInterval>;
     private lastMediaCheckTimestamp = 0;
 
+    // Bound event listeners for cleanup
+    private onReady = (): void => {
+        logger.debug('Gateway ready event received');
+    };
+
+    private onShardDisconnect = (): void => {
+        const now = Date.now();
+        this.reconnectTimestamps.push(now);
+        this.reconnectTimestamps = this.reconnectTimestamps.filter(
+            (ts): boolean => now - ts < 5 * 60 * 1000,
+        );
+        this.reconnectCount = this.reconnectTimestamps.length;
+        logger.info(
+            `Gateway disconnected. Reconnect count (last 5 min): ${this.reconnectCount}`,
+        );
+        this.emitGatewayHealthUpdate();
+    };
+
+    private onShardReconnecting = (): void => {
+        logger.info('Gateway reconnecting...');
+    };
+
+    private onShardResume = (): void => {
+        logger.info('Gateway resumed');
+        this.emitGatewayHealthUpdate();
+    };
+
     constructor(client: QuaverClient) {
         this.client = client;
         this.config = this.loadConfig();
@@ -61,56 +88,32 @@ export class ConnectionHealthMonitor {
     }
 
     private loadConfig(): ConnectionHealthConfig {
-        // Zod schema provides defaults, so we only need a fallback if connectionHealth is completely missing
         const userConfig = (settings as Record<string, unknown>)
             .connectionHealth as ConnectionHealthConfig | undefined;
 
-        return (
-            userConfig ?? {
-                gateway: {
-                    unstablePingThresholdMs: 500,
-                    unstableReconnectThreshold: 5,
-                    sampleIntervalSeconds: 10,
-                    sampleWindowSize: 20,
-                },
-                media: {
-                    checkIntervalSeconds: 60,
-                    unstableLatencyMs: 2000,
-                    consecutiveFailureThreshold: 3,
-                    checkTimeoutMs: 2000,
-                },
-            }
-        );
+        // Defensively merge config to handle partial user configuration
+        return {
+            gateway: {
+                unstablePingThresholdMs: userConfig?.gateway?.unstablePingThresholdMs ?? 500,
+                unstableReconnectThreshold: userConfig?.gateway?.unstableReconnectThreshold ?? 5,
+                sampleIntervalSeconds: userConfig?.gateway?.sampleIntervalSeconds ?? 10,
+                sampleWindowSize: userConfig?.gateway?.sampleWindowSize ?? 20,
+            },
+            media: {
+                checkIntervalSeconds: userConfig?.media?.checkIntervalSeconds ?? 60,
+                unstableLatencyMs: userConfig?.media?.unstableLatencyMs ?? 2000,
+                consecutiveFailureThreshold: userConfig?.media?.consecutiveFailureThreshold ?? 3,
+                checkTimeoutMs: userConfig?.media?.checkTimeoutMs ?? 2000,
+            },
+        };
     }
 
     private initializeGatewayMonitoring(): void {
-        // Track reconnection events
-        this.client.ws.on('ready' as never, (): void => {
-            logger.debug('Gateway ready event received');
-        });
-
-        this.client.on('shardDisconnect', (): void => {
-            const now = Date.now();
-            this.reconnectTimestamps.push(now);
-            // Keep only reconnects from the last 5 minutes
-            this.reconnectTimestamps = this.reconnectTimestamps.filter(
-                (ts): boolean => now - ts < 5 * 60 * 1000,
-            );
-            this.reconnectCount = this.reconnectTimestamps.length;
-            logger.info(
-                `Gateway disconnected. Reconnect count (last 5 min): ${this.reconnectCount}`,
-            );
-            this.emitGatewayHealthUpdate();
-        });
-
-        this.client.on('shardReconnecting', (): void => {
-            logger.info('Gateway reconnecting...');
-        });
-
-        this.client.on('shardResume', (): void => {
-            logger.info('Gateway resumed');
-            this.emitGatewayHealthUpdate();
-        });
+        // Register bound event listeners so they can be removed during cleanup
+        this.client.ws.on('ready' as never, this.onReady);
+        this.client.on('shardDisconnect', this.onShardDisconnect);
+        this.client.on('shardReconnecting', this.onShardReconnecting);
+        this.client.on('shardResume', this.onShardResume);
 
         // Periodically sample ping
         this.gatewayPingInterval = setInterval((): void => {
@@ -143,11 +146,12 @@ export class ConnectionHealthMonitor {
 
         const startTime = Date.now();
         this.lastMediaCheckTimestamp = startTime;
+        let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
         try {
             // Attempt a simple HTTP HEAD request to check if the endpoint is reachable
             const controller = new AbortController();
-            const timeoutId = setTimeout(
+            timeoutId = setTimeout(
                 (): void => controller.abort(),
                 this.config.media.checkTimeoutMs,
             );
@@ -156,8 +160,6 @@ export class ConnectionHealthMonitor {
                 method: 'HEAD',
                 signal: controller.signal,
             });
-
-            clearTimeout(timeoutId);
 
             const latency = Date.now() - startTime;
             this.mediaLatencySamples.push(latency);
@@ -188,6 +190,11 @@ export class ConnectionHealthMonitor {
             logger.warn(
                 `Media server health check error: ${this.mediaEndpoint} - ${error instanceof Error ? error.message : String(error)}`,
             );
+        } finally {
+            // Always clear timeout to prevent memory leaks
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
         }
 
         this.emitMediaHealthUpdate();
@@ -215,6 +222,13 @@ export class ConnectionHealthMonitor {
     }
 
     public getGatewayHealth(): GatewayHealthData {
+        // Dynamically filter timestamps to ensure reconnectCount decays over time
+        const now = Date.now();
+        this.reconnectTimestamps = this.reconnectTimestamps.filter(
+            (ts): boolean => now - ts < 5 * 60 * 1000,
+        );
+        this.reconnectCount = this.reconnectTimestamps.length;
+
         const validSamples = this.pingSamples.filter(
             (p): boolean => p > 0 && p < 10000,
         );
@@ -243,7 +257,7 @@ export class ConnectionHealthMonitor {
             unstable,
             reconnectCount: this.reconnectCount,
             lastEndpoint: this.lastGatewayEndpoint,
-            timestamp: Date.now(),
+            timestamp: now,
         };
     }
 
@@ -276,12 +290,18 @@ export class ConnectionHealthMonitor {
     }
 
     public destroy(): void {
+        // Clear intervals
         if (this.gatewayPingInterval) {
             clearInterval(this.gatewayPingInterval);
         }
         if (this.mediaCheckInterval) {
             clearInterval(this.mediaCheckInterval);
         }
+        // Remove event listeners to prevent memory leaks
+        this.client.ws.off('ready' as never, this.onReady);
+        this.client.off('shardDisconnect', this.onShardDisconnect);
+        this.client.off('shardReconnecting', this.onShardReconnecting);
+        this.client.off('shardResume', this.onShardResume);
         logger.info('ConnectionHealthMonitor destroyed');
     }
 }

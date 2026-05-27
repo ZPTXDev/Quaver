@@ -107,7 +107,10 @@ export class QuaverClient extends Client {
     private setupHealthEventForwarding(): void {
         // Forward gateway health updates to all guilds with active sessions
         this.on('gatewayHealthUpdate', (data): void => {
+            if (!this.io || this.io.engine.clientsCount === 0) return;
             this.guilds.cache.forEach((guild): void => {
+                const hasActiveWebSession = (this.io?.sockets.adapter.rooms.get(guild.id)?.size ?? 0) > 0;
+                if (!hasActiveWebSession) return;
                 QuaverGuild.wrap(guild)
                     .then((g): void => {
                         g.sendWebUpdate('gatewayHealthUpdate', data);
@@ -129,8 +132,11 @@ export class QuaverClient extends Client {
                 this.guilds.cache.forEach((guild): void => {
                     QuaverGuild.wrap(guild)
                         .then(async (g): Promise<void> => {
-                            // Forward to dashboard
-                            g.sendWebUpdate('mediaHealthUpdate', data);
+                            // Forward to dashboard if active
+                            const hasActiveWebSession = (this.io?.sockets.adapter.rooms.get(guild.id)?.size ?? 0) > 0;
+                            if (hasActiveWebSession) {
+                                g.sendWebUpdate('mediaHealthUpdate', data);
+                            }
 
                             // Check if guild has an active player
                             const player = await this.music?.players.fetch(guild.id);
@@ -147,8 +153,11 @@ export class QuaverClient extends Client {
                         });
                 });
             } else {
-                // Just forward to dashboard if not transitioning to unstable
+                if (!this.io || this.io.engine.clientsCount === 0) return;
+                // Just forward to dashboard if not transitioning to unstable and active
                 this.guilds.cache.forEach((guild): void => {
+                    const hasActiveWebSession = (this.io?.sockets.adapter.rooms.get(guild.id)?.size ?? 0) > 0;
+                    if (!hasActiveWebSession) return;
                     QuaverGuild.wrap(guild)
                         .then((g): void => {
                             g.sendWebUpdate('mediaHealthUpdate', data);
