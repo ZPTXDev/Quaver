@@ -80,7 +80,7 @@ export default new ChatInputCommandHandler()
                             .setCustomId('queue:0')
                             .setEmoji(settings.emojis.left)
                             .setDisabled(true)
-                            .setStyle(ButtonStyle.Primary),
+                            .setStyle(ButtonStyle.Secondary),
                         guild.builders
                             .buttonLocale('MISC.GO_TO')
                             .setStyle(ButtonStyle.Secondary)
@@ -89,7 +89,7 @@ export default new ChatInputCommandHandler()
                             .setCustomId('queue:2')
                             .setEmoji(settings.emojis.right)
                             .setDisabled(pages.length === 1)
-                            .setStyle(ButtonStyle.Primary),
+                            .setStyle(ButtonStyle.Secondary),
                     ),
                 ),
             { ephemeral: true },

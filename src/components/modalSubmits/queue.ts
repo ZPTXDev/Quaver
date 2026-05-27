@@ -89,7 +89,7 @@ export default new ModalSubmitHandler().setExecute(
                             .setCustomId(`queue:${page - 1}`)
                             .setEmoji(settings.emojis.left)
                             .setDisabled(page - 1 < 1)
-                            .setStyle(ButtonStyle.Primary),
+                            .setStyle(ButtonStyle.Secondary),
                         guild.builders
                             .buttonLocale('MISC.GO_TO')
                             .setStyle(ButtonStyle.Secondary)
@@ -98,7 +98,7 @@ export default new ModalSubmitHandler().setExecute(
                             .setCustomId(`queue:${page + 1}`)
                             .setEmoji(settings.emojis.right)
                             .setDisabled(page + 1 > pages.length)
-                            .setStyle(ButtonStyle.Primary),
+                            .setStyle(ButtonStyle.Secondary),
                     ),
                 ),
             { force: ForceType.Update },
