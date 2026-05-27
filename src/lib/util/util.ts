@@ -359,15 +359,14 @@ export async function searchTracks(
         }
     }
     return (
-        result ??
-        ({
+        result ?? {
             loadType: 'error',
             data: {
                 message: 'All search sources failed.',
                 severity: 'common',
                 cause: 'No source returned a result',
             },
-        } as LoadResult)
+        }
     );
 }
 
