@@ -1,7 +1,6 @@
 import type { QuaverClient } from '#src/lib';
 import { logger } from '#src/lib/logger';
 import { settings } from '../util';
-import { GatewayDispatchEvents } from 'discord.js';
 
 export type GatewayHealthData = {
     averagePing: number;

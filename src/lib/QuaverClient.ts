@@ -161,8 +161,8 @@ export class QuaverClient extends Client {
         });
     }
 
-    destroy(): void {
+    async destroy(): Promise<void> {
         this.connectionHealth.destroy();
-        super.destroy();
+        await super.destroy();
     }
 }
