@@ -29,7 +29,10 @@ async function restorePlayer(
             player.voice.connect(snapshot.voiceChannelId, {
                 deafened: true,
             });
-            if (snapshot.queue.current && (snapshot.paused || snapshot.playing)) {
+            if (
+                snapshot.queue.current &&
+                (snapshot.paused || snapshot.playing)
+            ) {
                 await player.play(snapshot.queue.current);
             }
             if (snapshot.position > 0) {
@@ -40,7 +43,28 @@ async function restorePlayer(
                 deafened: true,
             });
         }
-        logger.info(`[G ${guild.id}] Player restored from saved state (resumed = ${resumed})`);
+        try {
+            if (snapshot.paused && Array.isArray(snapshot.sessionLogs)) {
+                const lastPause = [...snapshot.sessionLogs]
+                    .reverse()
+                    .find((l): boolean => l.action === 'PAUSE');
+                if (
+                    lastPause?.userId === guild.client.user.id &&
+                    Date.now() - lastPause.timestamp < 15_000
+                ) {
+                    await player.setPause(false);
+                    logger.info(`[G ${guild.id}] Unpaused restored player`);
+                }
+            }
+        } catch (err) {
+            // don't fail the whole restore if unpause fails; log and continue
+            logger.warn(
+                `[G ${guild.id}] Failed to auto-unpause restored player: ${err instanceof Error ? err.message : String(err)}`,
+            );
+        }
+        logger.info(
+            `[G ${guild.id}] Player restored from saved state (resumed = ${resumed})`,
+        );
         return true;
     } catch (error) {
         logger.error(`[G ${guild.id}] Failed to restore player`, error);
