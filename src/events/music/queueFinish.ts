@@ -58,6 +58,7 @@ export default {
         );
         queue.player.timeout.end = Date.now() + 30 * 60 * 1000;
         guild.sendWebUpdate('timeoutUpdate', queue.player.timeout.end);
+        guild.sendWebUpdate('queueUpdate', queue.player.decorateQueue());
         await queue.player.sendMessage(
             `${guild.locale('MUSIC.QUEUE.EMPTY')} ${guild.locale(
                 'MUSIC.DISCONNECT.INACTIVITY.WARNING',

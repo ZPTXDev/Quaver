@@ -49,6 +49,7 @@ export default {
 
                 // Advance to next track silently
                 await queue.next();
+                guild.sendWebUpdate('queueUpdate', queue.player.decorateQueue());
                 return;
             }
 
@@ -75,6 +76,7 @@ export default {
 
             // Advance to next track
             const hasNext = await queue.next();
+            guild.sendWebUpdate('queueUpdate', queue.player.decorateQueue());
             if (!hasNext) {
                 logger.info(`[G ${guild.id}] Queue finished after load failures`);
             }
@@ -104,11 +106,13 @@ export default {
             // Only advance to next track if the reason warrants it
             if (mayStartNext[reason]) {
                 await queue.next();
+                guild.sendWebUpdate('queueUpdate', queue.player.decorateQueue());
             } else if (queue.isEmpty && queue.current) {
                 // Even if we don't advance, check if queue is empty and emit finish event
                 // Only do this if there's a current track (to avoid double-emitting)
                 queue.current = null;
                 queue.emit('finish');
+                guild.sendWebUpdate('queueUpdate', queue.player.decorateQueue());
             }
             return;
         }
@@ -351,6 +355,7 @@ export default {
         // Advance to next track only if the reason warrants it
         if (mayStartNext[reason]) {
             const hasNext = await queue.next();
+            guild.sendWebUpdate('queueUpdate', queue.player.decorateQueue());
             if (!hasNext) {
                 logger.info(`[G ${guild.id}] Queue finished`);
             }
@@ -359,6 +364,7 @@ export default {
             // Only do this if there's a current track (to avoid double-emitting)
             queue.current = null;
             queue.emit('finish');
+            guild.sendWebUpdate('queueUpdate', queue.player.decorateQueue());
         }
     },
 };
