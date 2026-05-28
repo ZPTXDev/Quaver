@@ -107,9 +107,11 @@ export default {
             if (mayStartNext[reason]) {
                 await queue.next();
                 guild.sendWebUpdate('queueUpdate', queue.player.decorateQueue());
-            } else if (queue.isEmpty && queue.current) {
+            } else if (reason !== 'stopped' && queue.isEmpty && queue.current) {
                 // Even if we don't advance, check if queue is empty and emit finish event
                 // Only do this if there's a current track (to avoid double-emitting)
+                // Don't emit finish for 'stopped' reason as that's used during skip operations
+                // where the queue is manually advanced afterward (race condition prevention)
                 queue.current = null;
                 queue.emit('finish');
                 guild.sendWebUpdate('queueUpdate', queue.player.decorateQueue());
@@ -359,9 +361,11 @@ export default {
             if (!hasNext) {
                 logger.info(`[G ${guild.id}] Queue finished`);
             }
-        } else if (queue.isEmpty && queue.current) {
+        } else if (reason !== 'stopped' && queue.isEmpty && queue.current) {
             // Even if we don't advance, check if queue is empty and emit finish event
             // Only do this if there's a current track (to avoid double-emitting)
+            // Don't emit finish for 'stopped' reason as that's used during skip operations
+            // where the queue is manually advanced afterward (race condition prevention)
             queue.current = null;
             queue.emit('finish');
             guild.sendWebUpdate('queueUpdate', queue.player.decorateQueue());
