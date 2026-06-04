@@ -2,6 +2,7 @@ import { getAbsoluteFileURL } from '@zptxdev/zptx-lib';
 import { Client, GatewayDispatchEvents } from 'discord.js';
 import { readdirSync } from 'node:fs';
 import type { Server } from 'socket.io';
+import { MessageOptionsBuilderType } from '.';
 import type { EventHandler } from './builders';
 import { QuaverGuild } from './guild';
 import {
@@ -140,9 +141,8 @@ export class QuaverClient extends Client {
                             const player = await this.music?.players.fetch(guild.id);
                             if (player?.voice.connected && player.queue.channel) {
                                 // Send warning message to the player's bound text channel
-                                const message = g.locale('MUSIC.PLAYER.CONNECTION_UNSTABLE');
-                                await player.queue.channel.send(message).catch((): void => {
-                                    // Silently ignore if message send fails
+                                await player.sendMessage(guild.locale('MUSIC.PLAYER.CONNECTION_UNSTABLE'), {
+                                    type: MessageOptionsBuilderType.Warning,
                                 });
                             }
                         })
