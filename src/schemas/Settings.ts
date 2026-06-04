@@ -30,7 +30,10 @@ const genericPremiumFeatureSchema = z.object({
 const emojiSchema = (
     fallback: string,
 ): z.ZodDefault<z.ZodPipe<z.ZodString, z.ZodTransform<string, string>>> =>
-    z.string().transform((val): string => val || fallback).default(fallback);
+    z
+        .string()
+        .transform((val): string => val || fallback)
+        .default(fallback);
 
 export const SettingsSchema = z.object({
     token: z
@@ -228,10 +231,28 @@ export const SettingsSchema = z.object({
             maxAttempts: z.number().default(1),
         })
         .optional(),
+    connectionHealth: z.object({
+        gateway: z.object({
+            unstablePingThresholdMs: z.number().int().positive().default(500),
+            unstableReconnectThreshold: z
+                .number()
+                .int()
+                .nonnegative()
+                .default(5),
+            sampleIntervalSeconds: z.number().int().positive().default(10),
+            sampleWindowSize: z.number().int().positive().default(20),
+        }),
+        media: z.object({
+            checkIntervalSeconds: z.number().int().positive().default(60),
+            unstableLatencyMs: z.number().int().positive().default(2000),
+            consecutiveFailureThreshold: z.number().int().positive().default(3),
+            checkTimeoutMs: z.number().int().positive().default(2000),
+        }),
+    }),
     ads: z
         .object({
             enabled: z.boolean().default(false),
-            urls: z.array(z.string().url()).default([]),
+            urls: z.array(z.url()).default([]),
             intervalMinutes: z.number().int().min(1).default(60),
         })
         .optional(),

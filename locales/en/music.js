@@ -16,6 +16,7 @@ export default {
     },
     NOT_READY: 'One moment please! Quaver is still starting up.',
     PLAYER: {
+        CONNECTION_UNSTABLE: 'Quaver has detected an unstable connection to Discord\'s media server. If you are hearing stuttering / robotic audio or nothing at all, please try changing your [Voice Region](https://support.discord.com/hc/en-us/articles/1500007645701-Voice-Regions-on-Discord-FAQ).',
         FEATURE_DISABLED: {
             SMARTQUEUE: {
                 PREMIUM: "**Smart Queue** was disabled as **Quaver Premium** has expired.",
