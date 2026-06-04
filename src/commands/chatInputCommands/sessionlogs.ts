@@ -41,7 +41,7 @@ export default new ChatInputCommandHandler()
             );
             return;
         }
-        const pages = paginate(player.sessionLogs, 10);
+        const pages = paginate([...player.sessionLogs].reverse(), 10);
         await interaction.replyHandler.reply(
             new ContainerBuilder()
                 .addTextDisplayComponents(

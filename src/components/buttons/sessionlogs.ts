@@ -21,7 +21,7 @@ export default new ButtonHandler().setExecute(
     async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
-        const pages = player ? paginate(player.sessionLogs, 10) : [];
+        const pages = player ? paginate([...player.sessionLogs].reverse(), 10) : [];
         const target = interaction.customId.split(':')[1];
         if (player && target === 'goto' && pages.length !== 0) {
             return interaction.showModal(

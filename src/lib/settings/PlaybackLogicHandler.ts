@@ -2,7 +2,7 @@ import { ForceType, MessageOptionsBuilderType } from '#src/lib';
 import { type Initialized, QuaverGuild, WhitelistStatus } from '#src/lib/guild';
 import type { QuaverInteraction } from '#src/lib/interactions';
 import type { LocaleKey } from '#src/lib/locales';
-import { acceptableSources, settings } from '#src/lib/util';
+import { acceptableSources, getPremiumURL, settings } from '#src/lib/util';
 import {
     ActionRowBuilder,
     type APISelectMenuOption,
@@ -95,28 +95,31 @@ export class PlaybackLogicHandler {
                     ) {
                         if (
                             settings.features.smartqueue.premium &&
-                            settings.premiumURL
+                            settings.premiumEnabled
                         ) {
-                            await interaction.replyHandler.reply(
-                                new ContainerBuilder()
-                                    .addTextDisplayComponents(
-                                        guild.builders.textDisplayLocale(
-                                            'FEATURE.NO_PERMISSION.PREMIUM',
+                            const premiumURL = getPremiumURL(guild.id);
+                            if (premiumURL) {
+                                await interaction.replyHandler.reply(
+                                    new ContainerBuilder()
+                                        .addTextDisplayComponents(
+                                            guild.builders.textDisplayLocale(
+                                                'FEATURE.NO_PERMISSION.PREMIUM',
+                                            ),
+                                        )
+                                        .addActionRowComponents(
+                                            new ActionRowBuilder<ButtonBuilder>().setComponents(
+                                                guild.builders
+                                                    .buttonLocale(
+                                                        'MISC.GET_PREMIUM',
+                                                    )
+                                                    .setStyle(ButtonStyle.Link)
+                                                    .setURL(premiumURL),
+                                            ),
                                         ),
-                                    )
-                                    .addActionRowComponents(
-                                        new ActionRowBuilder<ButtonBuilder>().setComponents(
-                                            guild.builders
-                                                .buttonLocale(
-                                                    'MISC.GET_PREMIUM',
-                                                )
-                                                .setStyle(ButtonStyle.Link)
-                                                .setURL(settings.premiumURL),
-                                        ),
-                                    ),
-                                { type: MessageOptionsBuilderType.Error },
-                            );
-                            return;
+                                    { type: MessageOptionsBuilderType.Error },
+                                );
+                                return;
+                            }
                         }
                         await interaction.replyHandler.reply(
                             guild.locale('FEATURE.NO_PERMISSION.DEFAULT'),

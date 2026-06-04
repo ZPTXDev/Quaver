@@ -132,7 +132,7 @@ export const SettingsSchema = z.object({
     developerMode: z.boolean().default(false),
     disableAd: z.boolean().default(false),
     supportServer: z.url().optional(),
-    premiumURL: z.url().optional(),
+    premiumEnabled: z.boolean().default(false),
     managers: z
         .array(snowflakeSchema as z.ZodType<Snowflake>)
         .nonempty('At least one manager ID is required'),
@@ -167,7 +167,36 @@ export const SettingsSchema = z.object({
             enabled: z.boolean().default(false),
             port: z.number().int().default(3000),
             allowedOrigins: z.array(z.string()).default(['http://localhost']),
-            encryptionKey: z.string().optional(),
+            encryptionKey: z
+                .string()
+                .refine(
+                    (val): boolean => val.trim().length >= 32,
+                    'Encryption key must be at least 32 characters',
+                )
+                .refine(
+                    (val): boolean =>
+                        val.trim() !== 'Type an encryption key here',
+                    {
+                        message:
+                            'You must replace the default encryptionKey placeholder with a secure random key.',
+                    },
+                )
+                .optional(),
+            apiSecret: z
+                .string()
+                .refine(
+                    (val): boolean => val.trim().length >= 32,
+                    'API secret must be at least 32 characters',
+                )
+                .refine(
+                    (val): boolean =>
+                        val.trim() !== 'Type a secure random string here',
+                    {
+                        message:
+                            'You must replace the default apiSecret placeholder with a secure random string.',
+                    },
+                )
+                .optional(),
             https: z
                 .object({
                     enabled: z.boolean().default(false),
@@ -213,6 +242,11 @@ export const SettingsSchema = z.object({
                 consecutiveFailureThreshold: z.number().int().positive().default(3),
                 checkTimeoutMs: z.number().int().positive().default(2000),
             }),
+    ads: z
+        .object({
+            enabled: z.boolean().default(false),
+            urls: z.array(z.string().url()).default([]),
+            intervalMinutes: z.number().int().min(1).default(60),
         })
         .optional(),
 });

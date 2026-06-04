@@ -390,7 +390,8 @@ export default new EventHandler()
             return;
         }
         const isGuildStayEnabled =
-            await guild.settings.get<boolean>('stay.enabled');
+            (await guild.settings.get<boolean>('stay.enabled')) &&
+            (await guild.features.isFeatureActive('stay'));
         const hasQuaverDisconnected = isOldQuaverStateUpdate && !newChannelId;
 
         if (hasQuaverDisconnected) {

@@ -7,9 +7,9 @@ import {
 import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
 import { logger } from '#src/lib/logger';
 import { updateHandler } from '#src/lib/state';
-import { buildMessageOptions, type QuaverChannels, type QuaverQueue, type QuaverSong, settings, } from '#src/lib/util';
+import { buildMessageOptions, type QuaverChannels, type QuaverSong, settings, } from '#src/lib/util';
 import type { PlayerEffect } from '@lavaclient/plugin-effects';
-import { type LoopType, Queue } from '@lavaclient/plugin-queue';
+import { QuaverQueue, type LoopType } from './QuaverQueue';
 import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import {
     ChannelType,
@@ -51,6 +51,14 @@ export interface QuaverPlayerJSON {
             required: number;
             users: Snowflake[];
         };
+        adPlaytimeMs?: number;
+        preAdPlaytimeMs?: number;
+        isAdPlaying?: boolean;
+        savedFilters?: {
+            bassboost: boolean;
+            nightcore: boolean;
+        };
+        trackStartTime?: number;
     };
     sessionLogs: {
         timestamp: number;
@@ -117,7 +125,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         pausedAlone?: boolean;
     } = {};
     // overriding native queue type
-    queue: QuaverQueue;
+    queue!: QuaverQueue;
     memory: {
         bassboost: boolean;
         nightcore: boolean;
@@ -130,11 +138,21 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         originalQueue?: QuaverSong[];
         shuffledQueue?: string[];
         failureCount?: number;
+        adPlaytimeMs: number;
+        preAdPlaytimeMs?: number;
+        isAdPlaying: boolean;
+        savedFilters?: {
+            bassboost: boolean;
+            nightcore: boolean;
+        };
+        trackStartTime?: number;
     } = {
         bassboost: false,
         nightcore: false,
         shuffle: false,
         alternate: false,
+        adPlaytimeMs: 0,
+        isAdPlaying: false,
     };
     sessionLogs: {
         timestamp: number;
@@ -148,12 +166,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         super(node, guild.id);
         this.client = guild.client as QuaverClient;
         this.guild = guild;
-        this.queue = new Queue(this, {
-            play: async (_, track): Promise<void> =>
-                void (await this.play(track)),
-        }) as QuaverQueue;
+        this.queue = new QuaverQueue(this);
         this.queue.channel = null;
-        this.queue.tracks = [];
     }
 
     /**
@@ -267,7 +281,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         const wasEmptyBeforeAdd =
             (!this.queue.current || (!this.playing && !this.paused)) &&
             this.queue.tracks.length === 0;
-        this.queue.add(added, { requester: requesterId, next });
+        this.queue.add(added, { requester: { id: requesterId }, next });
         if (added.length === 1) {
             this.logSessionEvent(
                 'QUEUE_ADD',
@@ -391,13 +405,11 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Toggle bass boost mode.
      * @param enabled - Whether the feature is enabled.
+     * @param suppressWebUpdate - If true, skip sending web update (useful for batching multiple filter changes).
      * @param actor - The user who triggered the change.
      * @returns Whether the feature was enabled.
      */
-    async setBassboost(
-        enabled: boolean,
-        actor?: { id: string; tag: string } | string | null,
-    ): Promise<PlayerResponse> {
+    async setBassboost(enabled: boolean, suppressWebUpdate = false, actor?: { id: string; tag: string } | string | null): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
         this.logSessionEvent(
             'BASSBOOST',
@@ -411,10 +423,12 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             await this.effects.toggle(effects.bassboost);
         }
         this.memory.bassboost = enabled;
-        guild.sendWebUpdate('filterUpdate', {
-            bassboost: this.memory.bassboost,
-            nightcore: this.memory.nightcore,
-        });
+        if (!suppressWebUpdate) {
+            guild.sendWebUpdate('filterUpdate', {
+                bassboost: this.memory.bassboost,
+                nightcore: this.memory.nightcore,
+            });
+        }
         return PlayerResponse.Success;
     }
 
@@ -481,7 +495,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         actor?: { id: string; tag: string } | string | null,
     ): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
-        if (await guild.settings.get('stay.enabled')) {
+        if (await guild.settings.get('stay.enabled') && await guild.features.isFeatureActive('stay')) {
             return PlayerResponse.FeatureConflict;
         }
         this.logSessionEvent('DISCONNECT', actor);
@@ -603,13 +617,11 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Toggle nightcore mode.
      * @param enabled - Whether the feature is enabled.
+     * @param suppressWebUpdate - If true, skip sending web update (useful for batching multiple filter changes).
      * @param actor - The user who triggered the change.
      * @returns Whether the feature was enabled.
      */
-    async setNightcore(
-        enabled: boolean,
-        actor?: { id: string; tag: string } | string | null,
-    ): Promise<PlayerResponse> {
+    async setNightcore(enabled: boolean, suppressWebUpdate = false, actor?: { id: string; tag: string } | string | null): Promise<PlayerResponse> {
         const guild = await QuaverGuild.wrap(this.guild);
         this.logSessionEvent(
             'NIGHTCORE',
@@ -623,10 +635,12 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             await this.effects.toggle(effects.nightcore);
         }
         this.memory.nightcore = enabled;
-        guild.sendWebUpdate('filterUpdate', {
-            bassboost: this.memory.bassboost,
-            nightcore: this.memory.nightcore,
-        });
+        if (!suppressWebUpdate) {
+            guild.sendWebUpdate('filterUpdate', {
+                bassboost: this.memory.bassboost,
+                nightcore: this.memory.nightcore,
+            });
+        }
         return PlayerResponse.Success;
     }
 
@@ -644,6 +658,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         // after pausing, we'll set restartReady to true, indicating end of a track
         // (only for restartStrategy: track)
         if (this.restartReady) return PlayerResponse.RestartInProgress;
+        if (this.memory.isAdPlaying) return PlayerResponse.AdPlaying;
         const guild = await QuaverGuild.wrap(this.guild);
         if (this.paused === paused) {
             return PlayerResponse.PlayerStateUnchanged;
@@ -718,6 +733,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         actor?: { id: string; tag: string } | string | null,
     ): Promise<PlayerResponse> {
         if (this.restartReady) return PlayerResponse.RestartInProgress;
+        if (this.memory.isAdPlaying) return PlayerResponse.AdPlaying;
         if (!this.queue.current || (!this.playing && !this.paused)) {
             return PlayerResponse.PlayerIdle;
         }
@@ -875,7 +891,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         if (!settings.features.smartqueue.enabled) {
             return PlayerResponse.FeatureDisabled;
         }
-        if (settings.features.smartqueue.whitelist) {
+        if (enabled && settings.features.smartqueue.whitelist) {
             const whitelisted =
                 await guild.features.checkWhitelisted('smartqueue');
             if (
@@ -921,9 +937,14 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         actor?: { id: string; tag: string } | string | null,
     ): Promise<PlayerResponse> {
         if (this.restartReady) return PlayerResponse.RestartInProgress;
+        if (this.memory.isAdPlaying) return PlayerResponse.AdPlaying;
         if (!this.queue.current || (!this.playing && !this.paused)) {
             return PlayerResponse.PlayerIdle;
         }
+        // Skip current track and start next
+        // Note: player.stop() emits trackEnd with reason='stopped', but mayStartNext['stopped'] = false
+        // so the trackEnd event is NOT emitted to the handler. We must manually advance the queue.
+        // Pass force=true to bypass loop logic (e.g., song loop)
         this.logSessionEvent(
             'SKIP',
             actor,
@@ -932,7 +953,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
                 : null,
         );
         await this.queue.skip();
-        await this.queue.start();
+        await this.queue.start(true);
         return PlayerResponse.Success;
     }
 
@@ -947,6 +968,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         actor?: { id: string; tag: string } | string | null,
     ): Promise<PlayerResponse> {
         if (this.restartReady) return PlayerResponse.RestartInProgress;
+        if (this.memory.isAdPlaying) return PlayerResponse.AdPlaying;
         const targetTrack = this.queue.tracks[position - 1];
         if (this.queue.tracks.length > 1) {
             const moveResponse = await this.moveQueuedTrack(position, 1, actor);
@@ -975,6 +997,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     async reset(
         actor?: { id: string; tag: string } | string | null,
     ): Promise<PlayerResponse> {
+        if (this.memory.isAdPlaying) return PlayerResponse.AdPlaying;
         if (!this.queue.current || (!this.playing && !this.paused)) {
             return PlayerResponse.PlayerIdle;
         }
@@ -983,8 +1006,11 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         this.queue.clear();
         delete this.memory.originalQueue;
         delete this.memory.shuffledQueue;
+        // Skip current track - trackEnd handler will see the queue is empty
         await this.queue.skip();
-        await this.queue.start();
+        // Manually advance queue to nullify current and emit finish event
+        // (trackEnd is not called when reason='stopped')
+        await this.queue.next();
         guild.sendWebUpdate('queueUpdate', []);
         return PlayerResponse.Success;
     }
@@ -1024,6 +1050,15 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         });
     }
 
+    /**
+     * Check if a track is an advertisement.
+     * @param track - The track to check.
+     * @returns Whether the track is an ad.
+     */
+    isAdTrack(track: QuaverSong): boolean {
+        return track.isAd === true;
+    }
+
     toJSON(): QuaverPlayerJSON {
         return {
             version: 1,
@@ -1036,8 +1071,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             position: this.position ?? 0,
             loop: this.queue.loop.type,
             queue: {
-                current: this.queue.current ?? null,
-                tracks: [...this.queue.tracks],
+                current: this.queue.current && !this.isAdTrack(this.queue.current)
+                    ? this.queue.current
+                    : null,
+                tracks: this.queue.tracks.filter((track): boolean => !this.isAdTrack(track)),
             },
             effects: {
                 bassboost: this.memory.bassboost,
@@ -1057,6 +1094,14 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
                     ? {
                           required: this.memory.skip.required,
                           users: [...this.memory.skip.users],
+                      }
+                    : undefined,
+                adPlaytimeMs: this.memory.adPlaytimeMs,
+                isAdPlaying: this.memory.isAdPlaying,
+                savedFilters: this.memory.savedFilters
+                    ? {
+                          bassboost: this.memory.savedFilters.bassboost,
+                          nightcore: this.memory.savedFilters.nightcore,
                       }
                     : undefined,
             },

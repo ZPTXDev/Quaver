@@ -3,8 +3,8 @@ import { load as queueLoad } from '@lavaclient/plugin-queue';
 import { getAbsoluteFileURL, msToTime, msToTimeString, parseTimeString, } from '@zptxdev/zptx-lib';
 import { createCache } from 'cache-manager';
 import { KeyvCacheableMemory } from 'cacheable';
-import { Collection, GatewayIntentBits } from 'discord.js';
-import { default as express, type Express } from 'express';
+import { Collection, GatewayIntentBits, type Guild, PermissionsBitField } from 'discord.js';
+import { default as express, type Express, type Request, type Response } from 'express';
 import Keyv from 'keyv';
 import type { ClientEvents, NodeEvents } from 'lavaclient';
 import { readdirSync, readFileSync } from 'node:fs';
@@ -17,13 +17,13 @@ import { inspect } from 'node:util';
 import { Server, type Socket } from 'socket.io';
 import yoctoSpinner from 'yocto-spinner';
 import colors from 'yoctocolors';
-import { QuaverClient } from './lib';
+import { PremiumSweepService, QuaverClient } from './lib';
 import { data, DataHandler } from './lib/data';
-import { QuaverGuild, type WhitelistedFeatures } from './lib/guild';
+import { QuaverGuild, type WhitelistedFeatures, WhitelistStatus, type Initialized } from './lib/guild';
 import type { InteractionHandlerMapsFlat } from './lib/interactions';
 import { setLocales } from './lib/locales';
 import { logger } from './lib/logger';
-import type { QuaverPlayer } from './lib/music';
+import type { QuaverNode, QuaverPlayer } from './lib/music';
 import { startup, updateHandler } from './lib/state';
 import {
     loadVersion,
@@ -32,6 +32,7 @@ import {
     updateQueryOverrides,
     updateSourceManagers,
     version,
+    WHITELISTABLE_FEATURES,
 } from './lib/util';
 
 type QuaverMusicEvent = {
@@ -73,6 +74,102 @@ data.cache = createCache({
 });
 spinner.success();
 
+// Helper function to resolve the actual data store name for a feature
+// This ensures that features sharing the same store (e.g., via premium) use the same lock
+const resolveFeatureStore = (feature: string): string => {
+    if (feature === 'premium') {
+        return 'premium';
+    }
+    // Check if this feature uses the premium store
+    const usesPremiumStore = !!(
+        settings.premiumEnabled &&
+        settings.features[feature as WhitelistedFeatures]?.premium
+    );
+    return usesPremiumStore ? 'premium' : `${feature}.whitelisted`;
+};
+
+// Lock map to serialize whitelist writes per guild/feature combination
+const whitelistLocks = new Map<string, Promise<void>>();
+
+// Execute a function with an exclusive lock on a guild/store pair
+const withWhitelistLock = async <T>(guildId: string, feature: string, fn: () => Promise<T>): Promise<T> => {
+    // Use the resolved store name as the lock key to prevent race conditions
+    // when multiple features share the same underlying data store
+    const storeName = resolveFeatureStore(feature);
+    const lockKey = `${guildId}:${storeName}`;
+
+    // Get the current lock promise or create a resolved one
+    const previousLock = whitelistLocks.get(lockKey) ?? Promise.resolve();
+
+    // Create a promise for our operation
+    let resolveCurrent: () => void;
+    const currentLock = new Promise<void>((resolve): void => {
+        resolveCurrent = resolve;
+    });
+
+    // Chain: wait for previous, then hold the lock until we resolve
+    // Use catch to ensure the chain continues even if previous operation failed
+    const chainedLock = previousLock.then(
+        (): Promise<void> => currentLock,
+        (): Promise<void> => currentLock
+    );
+    whitelistLocks.set(lockKey, chainedLock);
+
+    try {
+        // Wait for previous operation to complete with a timeout to prevent deadlocks
+        // Timeout set to 30 seconds
+        const LOCK_TIMEOUT_MS = 30000;
+        const timeoutPromise = new Promise<never>((_, reject): void => {
+            setTimeout((): void => {
+                reject(new Error(`Lock acquisition timeout for ${lockKey}`));
+            }, LOCK_TIMEOUT_MS);
+        });
+
+        await Promise.race([
+            previousLock.catch((): void => {
+                // Intentionally empty - we only care that the previous operation completed
+            }),
+            timeoutPromise
+        ]);
+
+        // Execute our operation with timeout
+        // Track the operation promise so we can wait for it in finally
+        let operationPromise: Promise<T>;
+        let timedOut = false;
+        
+        try {
+            operationPromise = fn();
+            const result = await Promise.race([
+                operationPromise,
+                new Promise<never>((_, reject): void => {
+                    setTimeout((): void => {
+                        timedOut = true;
+                        reject(new Error(`Operation timeout for ${lockKey}`));
+                    }, LOCK_TIMEOUT_MS);
+                })
+            ]);
+            return result;
+        } catch (error) {
+            // If we timed out, wait for the operation to complete before releasing the lock
+            // This prevents race conditions where a new operation starts while the old one is still writing
+            if (timedOut && operationPromise) {
+                logger.warn(`Operation timed out for ${lockKey}, waiting for completion before releasing lock...`);
+                await operationPromise.catch((err): void => {
+                    logger.error(`Timed-out operation for ${lockKey} failed:`, err);
+                });
+            }
+            throw error;
+        }
+    } finally {
+        // Release the lock
+        resolveCurrent!();
+        // Clean up the map entry if no new operations were added
+        if (whitelistLocks.get(lockKey) === chainedLock) {
+            whitelistLocks.delete(lockKey);
+        }
+    }
+};
+
 let app: Express, server;
 if (settings.features.web.enabled) {
     logger.info(
@@ -85,27 +182,454 @@ if (settings.features.web.enabled) {
     }
     spinner.start(`Starting ${colors.cyan('web server')}`);
     app = express();
+    app.use(express.json());
+    if (settings.features.web.apiSecret) {
+        app.use('/api/premium', (req, res, next): void => {
+            const origin = req.headers.origin;
+            if (origin) {
+                if (settings.features.web.allowedOrigins.includes(origin)) {
+                    res.setHeader('Access-Control-Allow-Origin', origin);
+                    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+                    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+                } else {
+                    res.status(403).send({ error: 'Forbidden by CORS policy' });
+                    return;
+                }
+            }
+            if (req.method === 'OPTIONS') {
+                res.sendStatus(204);
+                return;
+            }
+            // Check if service is ready
+            if (!startup.started) {
+                res.status(503).send({ error: 'Service is starting up, please try again later' });
+                return;
+            }
+            // Check authorization
+            const authHeader = req.headers.authorization;
+            if (!authHeader || authHeader !== `Bearer ${settings.features.web.apiSecret}`) {
+                res.status(401).send({ error: 'Unauthorized' });
+                return;
+            }
+            next();
+        });
+
+        const getGuildPremiumStatus = async (
+            guild: QuaverGuild<Initialized>,
+        ): Promise<Record<string, { status: string; expires: number | null }>> => {
+            const featuresList = WHITELISTABLE_FEATURES;
+            const featuresStatus: Record<string, { status: string; expires: number | null }> = {};
+
+            for (const feature of featuresList) {
+                const status = await guild.features.checkWhitelisted(feature);
+                let usesPremiumStore = false;
+                if (feature === 'premium') {
+                    usesPremiumStore = true;
+                } else {
+                    usesPremiumStore = !!(
+                        settings.premiumEnabled &&
+                        settings.features[feature].premium
+                    );
+                }
+                const featureStore = usesPremiumStore
+                    ? 'premium'
+                    : `${feature}.whitelisted`;
+
+                const expires = await guild.features.get<number>(featureStore);
+
+                let statusString = 'NotWhitelisted';
+                if (status === WhitelistStatus.Permanent) {
+                    statusString = 'Permanent';
+                } else if (status === WhitelistStatus.Temporary) {
+                    statusString = 'Temporary';
+                } else if (status === WhitelistStatus.Expired) {
+                    statusString = 'Expired';
+                }
+
+                featuresStatus[feature] = {
+                    status: statusString,
+                    expires: expires !== undefined ? expires : null,
+                };
+            }
+            return featuresStatus;
+        };
+
+        // Helper to validate whitelist request and send appropriate responses
+        const validateWhitelistRequest = (req: Request, res: Response): { valid: boolean, guildId?: string, feature?: string, durationMs?: number, sessionId?: string } => {
+            if (!req.body || typeof req.body !== 'object') {
+                res.status(400).send({ error: 'Invalid or missing request body' });
+                return { valid: false };
+            }
+            const { guildId, feature, durationMs, sessionId } = req.body;
+            if (typeof guildId !== 'string' || typeof feature !== 'string' || typeof durationMs !== 'number') {
+                res.status(400).send({ error: 'guildId and feature must be strings, and durationMs must be a number' });
+                return { valid: false };
+            }
+            if (sessionId !== undefined && typeof sessionId !== 'string') {
+                res.status(400).send({ error: 'sessionId must be a string if provided' });
+                return { valid: false };
+            }
+            if (!Number.isFinite(durationMs)) {
+                res.status(400).send({ error: 'durationMs must be a finite number' });
+                return { valid: false };
+            }
+            if (durationMs < -1) {
+                res.status(400).send({ error: 'durationMs must be -1 or greater' });
+                return { valid: false };
+            }
+            if (!(WHITELISTABLE_FEATURES as readonly string[]).includes(feature)) {
+                res.status(400).send({ error: 'Invalid feature name' });
+                return { valid: false };
+            }
+            return { valid: true, guildId, feature, durationMs, sessionId };
+        };
+
+
+        // Compute new expiry timestamp based on current expiry and requested duration
+        const computeNewExpiry = (currentExpiry: number | undefined, durationMs: number): number => {
+            if (durationMs === -1) return -1;
+            if (currentExpiry === -1) return -1;
+            if (currentExpiry && currentExpiry > Date.now()) {
+                return currentExpiry + durationMs;
+            }
+            return Date.now() + durationMs;
+        };
+
+        // Check if a user has admin permissions (owner, Administrator, or ManageGuild) in a guild
+        const checkUserAdminPermissions = async (discordGuild: Guild, userId: string): Promise<{ isOwner: boolean; isAdmin: boolean }> => {
+            const isOwner = discordGuild.ownerId === userId;
+            if (isOwner) {
+                return { isOwner: true, isAdmin: true };
+            }
+
+            // Check cache first to avoid unnecessary API calls
+            let member = discordGuild.members.cache.get(userId);
+            if (!member) {
+                try {
+                    member = await discordGuild.members.fetch(userId);
+                } catch {
+                    // Member not found or couldn't fetch
+                    return { isOwner: false, isAdmin: false };
+                }
+            }
+            if (member) {
+                const isAdmin = member.permissions.has(PermissionsBitField.Flags.Administrator) ||
+                    member.permissions.has(PermissionsBitField.Flags.ManageGuild);
+                return { isOwner: false, isAdmin };
+            }
+            return { isOwner: false, isAdmin: false };
+        };
+
+        // Process guild data for a specific user, including permission checks and premium status
+        const processUserGuildData = async (guildId: string, userId: string): Promise<Record<string, unknown>> => {
+            // Check cache first to avoid unnecessary API calls
+            let discordGuild = client.guilds.cache.get(guildId);
+            if (!discordGuild) {
+                try {
+                    discordGuild = await client.guilds.fetch(guildId);
+                } catch {
+                    return {
+                        guildId,
+                        botInGuild: false,
+                    };
+                }
+            }
+
+            const { isOwner, isAdmin } = await checkUserAdminPermissions(discordGuild, userId);
+
+            const guild = await QuaverGuild.wrap(discordGuild);
+            if (!guild) {
+                return {
+                    guildId,
+                    botInGuild: false,
+                };
+            }
+
+            const features = await getGuildPremiumStatus(guild);
+            return {
+                guildId,
+                name: guild.name,
+                icon: discordGuild.iconURL(),
+                botInGuild: true,
+                owner: isOwner,
+                isAdmin,
+                features,
+            };
+        };
+
+        app.post('/api/premium/whitelist', async (req, res): Promise<void> => {
+            try {
+                const validation = validateWhitelistRequest(req, res);
+                if (!validation.valid) return;
+                const { guildId, feature, durationMs, sessionId } = validation;
+
+                // Fetch guild
+                let discordGuild;
+                try {
+                    discordGuild = await client.guilds.fetch(guildId);
+                } catch {
+                    res.status(404).send({ error: 'Guild not found or bot not in guild' });
+                    return;
+                }
+                const guild = await QuaverGuild.wrap(discordGuild);
+                if (!guild) {
+                    res.status(404).send({ error: 'Guild wrapping failed' });
+                    return;
+                }
+
+                // Serialize all reads and writes for this guild/feature under a lock
+                const result = await withWhitelistLock(guildId, feature, async (): Promise<{ alreadyProcessed: boolean; expires: number | null; wasActive: boolean }> => {
+                    const featureStore = resolveFeatureStore(feature);
+                    const currentExpiry = await guild.features.get<number>(featureStore);
+                    const wasActive = currentExpiry !== undefined && (currentExpiry === -1 || currentExpiry > Date.now());
+
+                    // Idempotent session handling
+                    if (sessionId) {
+                        const alreadyProcessed = await guild.features.get<boolean>(`processedTransactions.${sessionId}`);
+                        if (alreadyProcessed) {
+                            return {
+                                alreadyProcessed: true,
+                                expires: currentExpiry !== undefined ? currentExpiry : null,
+                                wasActive,
+                            };
+                        }
+                    }
+
+                    const newExpiry = computeNewExpiry(currentExpiry, durationMs);
+                    await guild.features.set(featureStore, newExpiry);
+
+                    // Mark as processed only after successful entitlement write
+                    if (sessionId) {
+                        await guild.features.set(`processedTransactions.${sessionId}`, true);
+                    }
+
+                    return {
+                        alreadyProcessed: false,
+                        expires: newExpiry,
+                        wasActive,
+                    };
+                });
+
+                // Fire-and-forget: re-enable features for active players after premium renewal
+                // Only restore features if premium was not already active (i.e., transitioning from inactive to active)
+                if (!result.alreadyProcessed && !result.wasActive) {
+                    void PremiumSweepService.restoreFeatures(guildId);
+                }
+
+                res.send({
+                    success: true,
+                    guildName: guild.name,
+                    feature,
+                    expires: result.expires,
+                    ...(result.alreadyProcessed && { alreadyProcessed: true }),
+                });
+            } catch (error) {
+                logger.error({ message: 'Error in POST /api/premium/whitelist', label: 'API', error });
+                if (!res.headersSent) {
+                    res.status(500).send({ error: 'Internal server error' });
+                }
+            }
+        });
+
+        app.get('/api/premium/status/:guildId', async (req, res): Promise<void> => {
+            try {
+                const { guildId } = req.params;
+                if (!guildId) {
+                    res.status(400).send({ error: 'Missing guildId parameter' });
+                    return;
+                }
+                let discordGuild;
+                try {
+                    discordGuild = await client.guilds.fetch(guildId);
+                } catch {
+                    res.status(404).send({ error: 'Guild not found or bot not in guild' });
+                    return;
+                }
+                const guild = await QuaverGuild.wrap(discordGuild);
+                if (!guild) {
+                    res.status(404).send({ error: 'Guild wrapping failed' });
+                    return;
+                }
+                const features = await getGuildPremiumStatus(guild);
+                res.send({
+                    guildId: guild.id,
+                    name: guild.name,
+                    icon: discordGuild.iconURL(),
+                    features,
+                });
+            } catch (error) {
+                logger.error({ message: 'Error in GET /api/premium/status/:guildId', label: 'API', error });
+                if (!res.headersSent) {
+                    res.status(500).send({ error: 'Internal server error' });
+                }
+            }
+        });
+
+        app.get('/api/premium/users/:userId/guilds', async (req, res): Promise<void> => {
+            try {
+                const { userId } = req.params;
+                if (!userId) {
+                    res.status(400).send({ error: 'Missing userId parameter' });
+                    return;
+                }
+
+                const ownedGuilds = client.guilds.cache.filter((g): boolean => g.ownerId === userId);
+                const guildsData = [];
+                for (const discordGuild of ownedGuilds.values()) {
+                    const guild = await QuaverGuild.wrap(discordGuild);
+                    if (!guild) continue;
+                    const features = await getGuildPremiumStatus(guild);
+                    guildsData.push({
+                        guildId: guild.id,
+                        name: guild.name,
+                        icon: discordGuild.iconURL(),
+                        owner: true,
+                        features,
+                    });
+                }
+                res.send(guildsData);
+            } catch (error) {
+                logger.error({ message: 'Error in GET /api/premium/users/:userId/guilds', label: 'API', error });
+                if (!res.headersSent) {
+                    res.status(500).send({ error: 'Internal server error' });
+                }
+            }
+        });
+
+        app.post('/api/premium/users/:userId/guilds', async (req, res): Promise<void> => {
+            try {
+                const { userId } = req.params;
+                if (!userId) {
+                    res.status(400).send({ error: 'Missing userId parameter' });
+                    return;
+                }
+                if (!req.body || !Array.isArray(req.body.guildIds)) {
+                    res.status(400).send({ error: 'Invalid or missing guildIds list in request body' });
+                    return;
+                }
+                const guildIds = req.body.guildIds;
+                if (guildIds.length === 0) {
+                    res.status(400).send({ error: 'guildIds array cannot be empty' });
+                    return;
+                }
+                if (guildIds.length > 100) {
+                    res.status(400).send({ error: 'guildIds array cannot exceed 100 items' });
+                    return;
+                }
+                if (!guildIds.every((id: unknown): boolean => typeof id === 'string')) {
+                    res.status(400).send({ error: 'All guildIds must be strings' });
+                    return;
+                }
+
+                // Deduplicate guildIds to prevent redundant API calls and accurate rate limiting
+                const uniqueGuildIds = Array.from(new Set(guildIds));
+
+                // Count how many unique guilds are not in cache to prevent rate limit abuse
+                const uncachedGuildIds = uniqueGuildIds.filter((guildId: string): boolean => 
+                    !client.guilds.cache.has(guildId)
+                );
+                const uncachedCount = uncachedGuildIds.length;
+                
+                // Limit the number of API calls per request to prevent abuse
+                const MAX_UNCACHED_GUILDS = 10;
+                if (uncachedCount > MAX_UNCACHED_GUILDS) {
+                    res.status(429).send({ 
+                        error: `Too many uncached guilds. Maximum ${MAX_UNCACHED_GUILDS} uncached guilds allowed per request. Found ${uncachedCount} uncached guilds.`,
+                        uncachedCount,
+                        maxAllowed: MAX_UNCACHED_GUILDS
+                    });
+                    return;
+                }
+
+                const guildsData = await Promise.all(
+                    uniqueGuildIds.map((guildId: string): Promise<Record<string, unknown>> => processUserGuildData(guildId, userId))
+                );
+                res.send(guildsData);
+            } catch (error) {
+                logger.error({ message: 'Error in POST /api/premium/users/:userId/guilds', label: 'API', error });
+                if (!res.headersSent) {
+                    res.status(500).send({ error: 'Internal server error' });
+                }
+            }
+        });
+
+        app.delete('/api/premium/whitelist', async (req, res): Promise<void> => {
+            try {
+                if (!req.body || typeof req.body !== 'object') {
+                    res.status(400).send({ error: 'Invalid or missing request body' });
+                    return;
+                }
+                const { guildId, feature } = req.body;
+                if (typeof guildId !== 'string' || typeof feature !== 'string') {
+                    res.status(400).send({
+                        error: 'guildId and feature must be strings',
+                    });
+                    return;
+                }
+                if (!(WHITELISTABLE_FEATURES as readonly string[]).includes(feature)) {
+                    res.status(400).send({ error: 'Invalid feature name' });
+                    return;
+                }
+                let discordGuild;
+                try {
+                    discordGuild = await client.guilds.fetch(guildId);
+                } catch {
+                    res.status(404).send({ error: 'Guild not found or bot not in guild' });
+                    return;
+                }
+                const guild = await QuaverGuild.wrap(discordGuild);
+                if (!guild) {
+                    res.status(404).send({ error: 'Guild wrapping failed' });
+                    return;
+                }
+                const usesPremiumStore =
+                    feature === 'premium' ||
+                    (feature !== 'premium' &&
+                        settings.premiumEnabled &&
+                        settings.features[feature as WhitelistedFeatures].premium);
+                const featureStore = usesPremiumStore
+                    ? 'premium'
+                    : `${feature}.whitelisted`;
+
+                // Serialize delete with the same lock as POST to prevent race conditions
+                await withWhitelistLock(guildId, feature, async (): Promise<void> => {
+                    await guild.features.unset(featureStore);
+                });
+
+                res.send({
+                    success: true,
+                    guildName: guild.name,
+                    feature,
+                });
+            } catch (error) {
+                logger.error({ message: 'Error in DELETE /api/premium/whitelist', label: 'API', error });
+                if (!res.headersSent) {
+                    res.status(500).send({ error: 'Internal server error' });
+                }
+            }
+        });
+    }
     if (settings.grafanaLogging) {
         app.get('/stats', async (req, res): Promise<void> => {
             const totalSessions = client.music?.players?.cache.size;
-            const activeSessions = Array.from(
+            const totalActive = Array.from(
                 client.music?.players?.cache.values(),
             ).filter(
-                (player: QuaverPlayer): boolean =>
+                (player: QuaverPlayer<QuaverNode>): boolean =>
                     !player.timeout.standard && !player.timeout.pause,
             ).length;
             const totalQueued = Array.from(
                 client.music?.players?.cache.values(),
             ).reduce(
-                (total: number, player: QuaverPlayer): number =>
-                    total + player.queue?.tracks.length,
+                (total: number, player: QuaverPlayer<QuaverNode>): number =>
+                    total + (player.queue?.tracks.length ?? 0),
                 0,
             );
             res.send({
                 sessions: {
                     total: totalSessions,
-                    active: activeSessions,
-                    idle: totalSessions - activeSessions,
+                    active: totalActive,
+                    idle: totalSessions - totalActive,
                 },
                 tracks: {
                     totalQueued: totalQueued,
@@ -275,6 +799,263 @@ updateSourceManagers(info.sourceManagers);
 updateAcceptableSources(acceptableSources);
 spinner.success();
 
+const consoleCommands: Record<
+    string,
+    (input: string, command: string) => void | Promise<void>
+> = {
+    exit: async (input): Promise<void> => {
+        const strategy = input.split(' ')[1] ?? 'immediate';
+        if (
+            strategy !== 'immediate' &&
+            strategy !== 'track' &&
+            strategy !== 'queue'
+        ) {
+            console.log('Usage: exit [immediate|track|queue]');
+            return;
+        }
+        await updateHandler.restart(strategy, 'exit');
+    },
+    update: async (): Promise<void> => {
+        if (updateHandler.channel === 'none') {
+            console.log('Automatic updates are disabled.');
+            return;
+        }
+        if (updateHandler.restartInProgress) {
+            console.log('An update or restart is already in progress.');
+            return;
+        }
+        if (!version.official) {
+            console.log(
+                'Automatic updates are disabled for unofficial builds.',
+            );
+            return;
+        }
+        console.log('Triggering an update check...');
+        await updateHandler.checkForUpdates();
+    },
+    sessions: (): void => {
+        console.log(
+            `There are currently ${client.music.players.cache.size} active session(s).`,
+        );
+    },
+    stats: (): void => {
+        const uptime = msToTime(client.uptime);
+        const uptimeString = msToTimeString(uptime);
+        console.log(
+            `Statistics:\nGuilds: ${client.guilds.cache.size}\nUptime: ${uptimeString}`,
+        );
+    },
+    sweep: async (): Promise<void> => {
+        if (!startup.sweepService) {
+            console.log('Premium sweep service is not initialized.');
+            return;
+        }
+        console.log('Manually triggering premium/whitelist sweep...');
+        await startup.sweepService.sweep();
+        console.log('Sweep completed.');
+    },
+    retry: async (input): Promise<void> => {
+        const sessionId = input.split(' ')[1];
+        const guildId = input.split(' ')[2];
+        const months = parseInt(input.split(' ')[3], 10);
+
+        if (!sessionId || !guildId || isNaN(months)) {
+            console.log('Usage: retry <sessionId> <guildId> <months>');
+            console.log('Example: retry cs_test_abc123 1234567890 3');
+            console.log('Use -1 for lifetime premium');
+            return;
+        }
+
+        if (!settings.premiumEnabled) {
+            console.log('Premium is not enabled in settings.');
+            return;
+        }
+
+        try {
+            const discordGuild = await client.guilds.fetch(guildId);
+            const guild = await QuaverGuild.wrap(discordGuild);
+            if (!guild) {
+                console.log('Guild not found.');
+                return;
+            }
+
+            console.log(`Retrying payment for guild ${guild.name} (${guildId})...`);
+            console.log(`Session ID: ${sessionId}`);
+            console.log(`Duration: ${months === -1 ? 'Lifetime' : `${months} month(s)`}`);
+
+            // Check for lifetime premium before calculating duration
+            const durationMs = months === -1 ? -1 : months * 30 * 24 * 60 * 60 * 1000;
+
+            // Determine feature store (premium always uses 'premium' store)
+            const featureStore = 'premium';
+
+            // Get current expiry
+            const currentExpiry = await guild.features.get<number>(featureStore);
+            const wasActive = currentExpiry !== undefined && (currentExpiry === -1 || currentExpiry > Date.now());
+
+            // Check if already processed (idempotency)
+            const alreadyProcessed = await guild.features.get<boolean>(`processedTransactions.${sessionId}`);
+            if (alreadyProcessed) {
+                console.log('⚠️  This payment has already been processed.');
+                console.log(`Current expiry: ${currentExpiry === -1 ? 'Lifetime' : currentExpiry ? new Date(currentExpiry).toISOString() : 'None'}`);
+                return;
+            }
+
+            // Compute new expiry
+            let newExpiry: number;
+            if (durationMs === -1 || currentExpiry === -1) {
+                // Lifetime premium takes precedence
+                newExpiry = -1;
+            } else if (currentExpiry && currentExpiry > Date.now()) {
+                newExpiry = currentExpiry + durationMs;
+            } else {
+                newExpiry = Date.now() + durationMs;
+            }
+
+            // Wrap database writes in lock to prevent race conditions
+            await withWhitelistLock(guildId, featureStore, async (): Promise<void> => {
+                // Set the new expiry
+                await guild.features.set(featureStore, newExpiry);
+
+                // Mark as processed after successful write
+                await guild.features.set(`processedTransactions.${sessionId}`, true);
+            });
+
+            console.log('✓ Payment processed successfully!');
+            console.log(`New expiry: ${newExpiry === -1 ? 'Lifetime' : new Date(newExpiry).toISOString()}`);
+
+            // Trigger feature restoration if premium was not active before
+            if (!wasActive) {
+                console.log('Restoring premium features...');
+                await PremiumSweepService.restoreFeatures(guildId);
+                console.log('Features restored.');
+            }
+        } catch (error) {
+            console.error('Error retrying payment:', error);
+        }
+    },
+    whitelist: async (input): Promise<void> => {
+        const guildId = input.split(' ')[1];
+        const feature = input.split(' ')[2];
+        const duration = input.split(' ')[3];
+        let durationMs = -1;
+        if (!guildId || !feature) {
+            console.log('Usage: whitelist <guildId> <feature> [duration]');
+            return;
+        }
+        
+        let discordGuild;
+        try {
+            discordGuild = await client.guilds.fetch(guildId);
+        } catch {
+            console.log('Guild not found or bot is not in that guild.');
+            return;
+        }
+        
+        const guild = await QuaverGuild.wrap(discordGuild);
+        if (!guild) {
+            console.log('Guild not found.');
+            return;
+        }
+        if (
+            !(WHITELISTABLE_FEATURES as readonly string[]).includes(
+                feature,
+            )
+        ) {
+            console.log(
+                `Available features: ${WHITELISTABLE_FEATURES.join(', ')}`,
+            );
+            return;
+        }
+        let featureName = '';
+        switch (feature) {
+            case 'premium':
+                featureName = 'Premium';
+                break;
+            case 'stay':
+                featureName = '24/7';
+                break;
+            case 'autolyrics':
+                featureName = 'Auto Lyrics';
+                break;
+            case 'smartqueue':
+                featureName = 'Smart Queue';
+        }
+        if (
+            (feature === 'premium' && !settings.premiumEnabled) ||
+            (feature !== 'premium' &&
+                !settings.features[feature as WhitelistedFeatures]
+                    .whitelist)
+        ) {
+            console.log(`The ${featureName} whitelist is not enabled.`);
+            return;
+        }
+        if (duration) {
+            if (!parseTimeString(duration)) {
+                console.log('Duration example: 5d1h, 1h30m, 10s');
+                return;
+            }
+            durationMs = parseTimeString(duration);
+        }
+        const whitelisted = await guild.features.checkWhitelisted(
+            feature as WhitelistedFeatures | 'premium',
+        );
+        const usesPremiumStore =
+            feature === 'premium' ||
+            (feature !== 'premium' &&
+                settings.premiumEnabled &&
+                settings.features[feature as WhitelistedFeatures].premium);
+        const featureStore = usesPremiumStore
+            ? 'premium'
+            : `${feature}.whitelisted`;
+        
+        // Wrap database writes in lock to prevent race conditions
+        if (whitelisted && !duration) {
+            await withWhitelistLock(guildId, featureStore, async (): Promise<void> => {
+                await guild.features.unset(featureStore);
+            });
+            console.log(
+                `Removed ${guild.name} from the ${featureName} whitelist.`,
+            );
+            return;
+        }
+        
+        await withWhitelistLock(guildId, featureStore, async (): Promise<void> => {
+            await guild.features.set(
+                featureStore,
+                durationMs === -1 ? durationMs : Date.now() + durationMs,
+            );
+        });
+        console.log(
+            `Added ${guild.name} to the ${featureName} whitelist ${durationMs === -1
+                ? 'permanently'
+                : `for ${msToTimeString(msToTime(durationMs))}`
+            }.`,
+        );
+    },
+    eval: async (input, command): Promise<void> => {
+        if (!settings.developerMode) {
+            console.log('Developer mode is not enabled.');
+            return;
+        }
+        if (!input.substring(command.length + 1)) {
+            console.log('No input provided.');
+            return;
+        }
+        let output: string;
+        try {
+            output = await eval(input.substring(command.length + 1));
+            if (typeof output !== 'string') {
+                output = inspect(output, { depth: 1 });
+            }
+        } catch (error) {
+            output = error;
+        }
+        if (!output) output = '[no output]';
+        console.log(output);
+    },
+};
+
 const rl = createInterface({ input: process.stdin, output: process.stdout });
 rl.on('line', async (input): Promise<void> => {
     const command = input.split(' ')[0].toLowerCase();
@@ -282,163 +1063,13 @@ rl.on('line', async (input): Promise<void> => {
         console.log('Quaver is not initialized yet.');
         return;
     }
-    switch (command) {
-        case 'exit': {
-            const strategy = input.split(' ')[1] ?? 'immediate';
-            if (
-                strategy !== 'immediate' &&
-                strategy !== 'track' &&
-                strategy !== 'queue'
-            ) {
-                console.log('Usage: exit [immediate|track|queue]');
-                break;
-            }
-            await updateHandler.restart(strategy, 'exit');
-            break;
-        }
-        case 'update':
-            if (updateHandler.channel === 'none') {
-                console.log('Automatic updates are disabled.');
-                break;
-            }
-            if (updateHandler.restartInProgress) {
-                console.log('An update or restart is already in progress.');
-                break;
-            }
-            if (!version.official) {
-                console.log(
-                    'Automatic updates are disabled for unofficial builds.',
-                );
-                break;
-            }
-            console.log('Triggering an update check...');
-            await updateHandler.checkForUpdates();
-            break;
-        case 'sessions':
-            console.log(
-                `There are currently ${client.music.players.cache.size} active session(s).`,
-            );
-            break;
-        case 'stats': {
-            const uptime = msToTime(client.uptime);
-            const uptimeString = msToTimeString(uptime);
-            console.log(
-                `Statistics:\nGuilds: ${client.guilds.cache.size}\nUptime: ${uptimeString}`,
-            );
-            break;
-        }
-        case 'whitelist': {
-            const guildId = input.split(' ')[1];
-            const feature = input.split(' ')[2];
-            const duration = input.split(' ')[3];
-            let durationMs = -1;
-            if (!guildId || !feature) {
-                console.log('Usage: whitelist <guildId> <feature> [duration]');
-                break;
-            }
-            const discordGuild = await client.guilds.fetch(guildId);
-            const guild = await QuaverGuild.wrap(discordGuild);
-            if (!guild) {
-                console.log('Guild not found.');
-                break;
-            }
-            if (
-                !['premium', 'stay', 'autolyrics', 'smartqueue'].includes(
-                    feature,
-                )
-            ) {
-                console.log(
-                    'Available features: premium, stay, autolyrics, smartqueue',
-                );
-                break;
-            }
-            let featureName = '';
-            switch (feature) {
-                case 'premium':
-                    featureName = 'Premium';
-                    break;
-                case 'stay':
-                    featureName = '24/7';
-                    break;
-                case 'autolyrics':
-                    featureName = 'Auto Lyrics';
-                    break;
-                case 'smartqueue':
-                    featureName = 'Smart Queue';
-            }
-            if (
-                (feature === 'premium' && !settings.premiumURL) ||
-                (feature !== 'premium' &&
-                    !settings.features[feature as WhitelistedFeatures]
-                        .whitelist)
-            ) {
-                console.log(`The ${featureName} whitelist is not enabled.`);
-                break;
-            }
-            if (duration) {
-                if (!parseTimeString(duration)) {
-                    console.log('Duration example: 5d1h, 1h30m, 10s');
-                    break;
-                }
-                durationMs = parseTimeString(duration);
-            }
-            const whitelisted = await guild.features.checkWhitelisted(
-                feature as WhitelistedFeatures | 'premium',
-            );
-            const usesPremiumStore =
-                feature === 'premium' ||
-                (feature !== 'premium' &&
-                    settings.premiumURL &&
-                    settings.features[feature as WhitelistedFeatures].premium);
-            const featureStore = usesPremiumStore
-                ? 'premium'
-                : `${feature}.whitelisted`;
-            if (whitelisted && !duration) {
-                await guild.features.unset(featureStore);
-                console.log(
-                    `Removed ${guild.name} from the ${featureName} whitelist.`,
-                );
-                break;
-            }
-            await guild.features.set(
-                featureStore,
-                durationMs === -1 ? durationMs : Date.now() + durationMs,
-            );
-            console.log(
-                `Added ${guild.name} to the ${featureName} whitelist ${durationMs === -1
-                    ? 'permanently'
-                    : `for ${msToTimeString(msToTime(durationMs))}`
-                }.`,
-            );
-            break;
-        }
-        case 'eval': {
-            if (!settings.developerMode) {
-                console.log('Developer mode is not enabled.');
-                break;
-            }
-            if (!input.substring(command.length + 1)) {
-                console.log('No input provided.');
-                break;
-            }
-            let output: string;
-            try {
-                output = await eval(input.substring(command.length + 1));
-                if (typeof output !== 'string') {
-                    output = inspect(output, { depth: 1 });
-                }
-            } catch (error) {
-                output = error;
-            }
-            if (!output) output = '[no output]';
-            console.log(output);
-            break;
-        }
-        default:
-            console.log(
-                'Available commands: exit, update, sessions, whitelist, stats',
-            );
-            break;
+    const handler = consoleCommands[command];
+    if (handler) {
+        await handler(input, command);
+    } else {
+        console.log(
+            'Available commands: exit, update, sessions, whitelist, stats, sweep, retry',
+        );
     }
 });
 // 'close' event catches ctrl+c, therefore we pass it to shuttingDown as a ctrl+c event

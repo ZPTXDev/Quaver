@@ -48,7 +48,7 @@
   "defaultLocaleCode": "en",
   "disableAd": false,
   "supportServer": "https://discord.gg/",
-  "premiumURL": "https://example.com/premium",
+  "premiumEnabled": false,
   "managers": [
     "Paste your user ID here"
   ],
@@ -89,6 +89,7 @@
         "http://localhost"
       ],
       "encryptionKey": "Type an encryption key here",
+      "apiSecret": "Type a secure random string here",
       "https": {
         "enabled": false,
         "key": "key.pem",
@@ -120,5 +121,10 @@
       "consecutiveFailureThreshold": 3,
       "checkTimeoutMs": 2000
     }
+  },
+  "ads": {
+    "enabled": false,
+    "urls": [],
+    "intervalMinutes": 60
   }
 }

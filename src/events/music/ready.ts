@@ -25,24 +25,46 @@ async function restorePlayer(
         await player.sendMessage(guild.locale('MUSIC.PLAYER.RESTORING'), {
             type: MessageOptionsBuilderType.Success,
         });
-        if (!resumed) {
-            player.voice.connect(snapshot.voiceChannelId, {
-                deafened: true,
-            });
-            if (
-                snapshot.queue.current &&
-                (snapshot.paused || snapshot.playing)
-            ) {
+        
+        // Connect to voice channel first
+        player.voice.connect(snapshot.voiceChannelId, {
+            deafened: true,
+        });
+        
+        // Check if the current track is an ad and skip it
+        // Also check memory.isAdPlaying since toJSON sets queue.current to null for ads
+        const isAdTrack = snapshot.queue.current?.isAd === true || snapshot.memory.isAdPlaying;
+        if (isAdTrack) {
+            // Clean up ad state before advancing (mirror trackEnd ad cleanup path)
+            player.memory.isAdPlaying = false;
+            player.memory.adPlaytimeMs = 0;
+            await data.guild.set(guild.id, 'ads.playtimeMs', 0);
+            
+            // Restore saved filters
+            if (player.memory.savedFilters) {
+                await player.setBassboost(player.memory.savedFilters.bassboost);
+                await player.setNightcore(player.memory.savedFilters.nightcore);
+                delete player.memory.savedFilters;
+            }
+            
+            // If resumed, stop the current track (Lavalink already started it)
+            if (resumed && player.playing) {
+                await player.stop();
+            }
+            // Advance to the next track
+            await player.queue.start();
+        } else if (!resumed) {
+            // Normal restoration for non-ad tracks (not resumed)
+            if (snapshot.queue.current && (snapshot.paused || snapshot.playing)) {
                 await player.play(snapshot.queue.current);
             }
             if (snapshot.position > 0) {
                 await player.seekTo(snapshot.position);
             }
-        } else {
-            player.voice.connect(snapshot.voiceChannelId, {
-                deafened: true,
-            });
         }
+        // When resumed=true, Lavalink has already positioned the track correctly, no need to seek
+        
+        // Auto-unpause if the pause was initiated by the bot (e.g., due to inactivity)
         try {
             if (snapshot.paused && Array.isArray(snapshot.sessionLogs)) {
                 const lastPause = [...snapshot.sessionLogs]
@@ -65,6 +87,7 @@ async function restorePlayer(
                 `[G ${guild.id}] Failed to auto-unpause restored player: ${err instanceof Error ? err.message : String(err)}`,
             );
         }
+        
         logger.info(
             `[G ${guild.id}] Player restored from saved state (resumed = ${resumed})`,
         );
@@ -118,7 +141,7 @@ export default {
                 );
                 if (restored) continue;
             }
-            if (get(guildData, 'settings.stay.enabled')) {
+            if (get(guildData, 'settings.stay.enabled') && await guild.features.isFeatureActive('stay')) {
                 const player = client.music.players.create(guild);
                 player.queue.channel = guild.channels.cache.get(
                     get(guildData, 'settings.stay.text'),

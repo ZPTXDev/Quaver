@@ -34,8 +34,9 @@ export default new AutocompleteHandler().setExecute(
         if (existingResults) {
             const searchSuggestionsResponse =
                 existingResults as ApplicationCommandOptionChoiceData[];
+            const firstChoiceName = `${sourceName}: ${query}`;
             searchSuggestionsResponse.unshift({
-                name: `${sourceName}: ${query}`,
+                name: firstChoiceName.length > 100 ? `${firstChoiceName.slice(0, 99)}…` : firstChoiceName,
                 value: focused,
             });
             return interaction.respond(searchSuggestionsResponse);
@@ -83,8 +84,9 @@ export default new AutocompleteHandler().setExecute(
                 query.toLowerCase(),
                 searchSuggestionsResponse,
             );
+            const firstChoiceName = `${sourceName}: ${query}`;
             searchSuggestionsResponse.unshift({
-                name: `${sourceName}: ${query}`,
+                name: firstChoiceName.length > 100 ? `${firstChoiceName.slice(0, 99)}…` : firstChoiceName,
                 value: focused,
             });
             return await interaction.respond(searchSuggestionsResponse);

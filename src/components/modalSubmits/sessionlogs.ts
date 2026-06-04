@@ -28,7 +28,7 @@ export default new ModalSubmitHandler().setExecute(
             );
             return;
         }
-        if (player) pages = paginate(player.sessionLogs, 10);
+        if (player) pages = paginate([...player.sessionLogs].reverse(), 10);
         if (!player || pages?.length === 0) {
             await interaction.replyHandler.reply(
                 guild.locale('CMD.SESSIONLOGS.RESPONSE.NO_LOGS'),
