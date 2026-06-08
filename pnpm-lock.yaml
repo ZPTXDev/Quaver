@@ -83,8 +83,8 @@ dependencies:
     specifier: ^6.0.1
     version: 6.0.1
   undici:
-    specifier: ^8.3.0
-    version: 8.3.0
+    specifier: ^8.4.1
+    version: 8.4.1
   wanakana:
     specifier: ^5.3.1
     version: 5.3.1
@@ -93,7 +93,7 @@ dependencies:
     version: 3.19.0
   winston-loki:
     specifier: ^6.1.4
-    version: 6.1.4(patch_hash=32snqi5dy3rdioixvoeeabdayq)(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+    version: 6.1.4(patch_hash=32snqi5dy3rdioixvoeeabdayq)(@emnapi/core@1.11.0)(@emnapi/runtime@1.11.0)
   yocto-spinner:
     specifier: ^1.2.0
     version: 1.2.0
@@ -316,15 +316,34 @@ packages:
 
   /@emnapi/core@1.10.0:
     resolution: {integrity: sha512-yq6OkJ4p82CAfPl0u9mQebQHKPJkY7WrIuk205cTYnYe+k2Z8YBh11FrbRG/H6ihirqcacOgl2BIO8oyMQLeXw==}
+    requiresBuild: true
     dependencies:
       '@emnapi/wasi-threads': 1.2.1
       tslib: 2.8.1
+    dev: true
+    optional: true
+
+  /@emnapi/core@1.11.0:
+    resolution: {integrity: sha512-l9Oo58x0HOP5znGzVhYW9U3e5wVuA4LAZU2AGezTmkhO1CgQRFDhDg4nneHsu/t3WniXg9QrG2nIXL/ZS8ln8Q==}
+    dependencies:
+      '@emnapi/wasi-threads': 1.2.2
+      tslib: 2.8.1
+    dev: false
     optional: true
 
   /@emnapi/runtime@1.10.0:
     resolution: {integrity: sha512-ewvYlk86xUoGI0zQRNq/mC+16R1QeDlKQy21Ki3oSYXNgLb45GV1P6A0M+/s6nyCuNDqe5VpaY84BzXGwVbwFA==}
+    requiresBuild: true
     dependencies:
       tslib: 2.8.1
+    dev: true
+    optional: true
+
+  /@emnapi/runtime@1.11.0:
+    resolution: {integrity: sha512-55coeOFKHv1ywEcUXJtWU5f+Jr/W5tZDvZig8DLKSwUN1JpROQ4rk/SNOQiFWmaR/VKF4zuFyW1B8JduOSv6Pg==}
+    dependencies:
+      tslib: 2.8.1
+    dev: false
     optional: true
 
   /@emnapi/wasi-threads@1.2.1:
@@ -332,6 +351,14 @@ packages:
     requiresBuild: true
     dependencies:
       tslib: 2.8.1
+    dev: true
+    optional: true
+
+  /@emnapi/wasi-threads@1.2.2:
+    resolution: {integrity: sha512-c95qOXkHdydNKhscBTebqEC1CVAZpyqOfVfBzQ1qgzyl3gfeldUjIggDbIZgDKsHLgnsM+igH7TJ/eAasaVuMA==}
+    dependencies:
+      tslib: 2.8.1
+    dev: false
     optional: true
 
   /@eslint-community/eslint-utils@4.9.1(eslint@10.4.1):
@@ -655,13 +682,13 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-wasm32-wasi@7.3.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0):
+  /@napi-rs/snappy-wasm32-wasi@7.3.3(@emnapi/core@1.11.0)(@emnapi/runtime@1.11.0):
     resolution: {integrity: sha512-+EroeygVYo9RksOchjF206frhMkfD2PaIun3yH4Zp5j/Y0oIEgs/+VhAYx/f+zHRylQYUIdLzDRclcoepvlR8Q==}
     engines: {node: '>=14.0.0'}
     cpu: [wasm32]
     requiresBuild: true
     dependencies:
-      '@napi-rs/wasm-runtime': 1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+      '@napi-rs/wasm-runtime': 1.1.4(@emnapi/core@1.11.0)(@emnapi/runtime@1.11.0)
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
@@ -705,6 +732,20 @@ packages:
       '@emnapi/core': 1.10.0
       '@emnapi/runtime': 1.10.0
       '@tybys/wasm-util': 0.10.2
+    dev: true
+    optional: true
+
+  /@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.11.0)(@emnapi/runtime@1.11.0):
+    resolution: {integrity: sha512-3NQNNgA1YSlJb/kMH1ildASP9HW7/7kYnRI2szWJaofaS1hWmbGI4H+d3+22aGzXXN9IJ+n+GiFVcGipJP18ow==}
+    requiresBuild: true
+    peerDependencies:
+      '@emnapi/core': ^1.7.1
+      '@emnapi/runtime': ^1.7.1
+    dependencies:
+      '@emnapi/core': 1.11.0
+      '@emnapi/runtime': 1.11.0
+      '@tybys/wasm-util': 0.10.2
+    dev: false
     optional: true
 
   /@nodelib/fs.scandir@2.1.5:
@@ -3074,8 +3115,8 @@ packages:
     engines: {node: ^18 || ^20 || >= 21}
     dev: false
 
-  /node-gyp@12.3.0:
-    resolution: {integrity: sha512-QNcUWM+HgJplcPzBvFBZ9VXacyGZ4+VTOb80PwWR+TlVzoHbRKULNEzpRsnaoxG3Wzr7Qh7BYxGDU3CbKib2Yg==}
+  /node-gyp@12.4.0:
+    resolution: {integrity: sha512-OMcPNvqTCFUnNaBlmdgq+lfNqY7gTiSmNRDjY3uAXRyudeKZEZxu3CLtjMQrx4zZxCX2b/mpNqTtwuCJgXhHkw==}
     engines: {node: ^20.17.0 || >=22.9.0}
     hasBin: true
     requiresBuild: true
@@ -3765,7 +3806,7 @@ packages:
     dev: false
     optional: true
 
-  /snappy@7.3.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0):
+  /snappy@7.3.3(@emnapi/core@1.11.0)(@emnapi/runtime@1.11.0):
     resolution: {integrity: sha512-UDJVCunvgblRpfTOjo/uT7pQzfrTsSICJ4yVS4aq7SsGBaUSpJwaVP15nF//jqinSLpN7boe/BqbUmtWMTQ5MQ==}
     engines: {node: '>= 10'}
     requiresBuild: true
@@ -3784,7 +3825,7 @@ packages:
       '@napi-rs/snappy-linux-x64-gnu': 7.3.3
       '@napi-rs/snappy-linux-x64-musl': 7.3.3
       '@napi-rs/snappy-openharmony-arm64': 7.3.3
-      '@napi-rs/snappy-wasm32-wasi': 7.3.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+      '@napi-rs/snappy-wasm32-wasi': 7.3.3(@emnapi/core@1.11.0)(@emnapi/runtime@1.11.0)
       '@napi-rs/snappy-win32-arm64-msvc': 7.3.3
       '@napi-rs/snappy-win32-ia32-msvc': 7.3.3
       '@napi-rs/snappy-win32-x64-msvc': 7.3.3
@@ -3902,7 +3943,7 @@ packages:
       prebuild-install: 7.1.3
       tar: 7.5.12
     optionalDependencies:
-      node-gyp: 12.3.0
+      node-gyp: 12.4.0
     dev: false
 
   /ssri@8.0.1:
@@ -4210,8 +4251,8 @@ packages:
     dev: false
     optional: true
 
-  /undici@8.3.0:
-    resolution: {integrity: sha512-TkUDgb6tl7KOGZ+7e8E3d2FYgUQgF6z5YypqjWmixVQSQERFcVrVg0ySADm2LVLRh5ljAaHTCR5Fmz3Q34rB7Q==}
+  /undici@8.4.1:
+    resolution: {integrity: sha512-RNHlB4fxZK0IrkhBsxhlbx7s8kFWwr7rzzOqj5nvZugw3ig3RsB7KW3zVlV0eu8POl+rx5d1hmL7rRg0z1owow==}
     engines: {node: '>=22.19.0'}
     dev: false
 
@@ -4292,7 +4333,7 @@ packages:
     dev: false
     optional: true
 
-  /winston-loki@6.1.4(patch_hash=32snqi5dy3rdioixvoeeabdayq)(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0):
+  /winston-loki@6.1.4(patch_hash=32snqi5dy3rdioixvoeeabdayq)(@emnapi/core@1.11.0)(@emnapi/runtime@1.11.0):
     resolution: {integrity: sha512-/j/Zf7TGLjgSBck29BkPnpJlEnGQr5xqlx8A0N6LZnXYYYvyK7lFk6FPpWiD+VMO8xjaxOu1KNF9SzWaRDsigA==}
     dependencies:
       async-exit-hook: 2.0.1
@@ -4301,7 +4342,7 @@ packages:
       url-polyfill: 1.1.14
       winston-transport: 4.9.0
     optionalDependencies:
-      snappy: 7.3.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+      snappy: 7.3.3(@emnapi/core@1.11.0)(@emnapi/runtime@1.11.0)
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
