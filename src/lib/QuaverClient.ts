@@ -70,8 +70,8 @@ export class QuaverClient extends Client {
                     '..',
                     '..',
                     settings.database.path,
-                )}`
-                : `sqlite://${resolve(__dirname, '..', '..', 'database.sqlite')}`;
+                ).replace(/\\/g, '/')}`
+                : `sqlite://${resolve(__dirname, '..', '..', 'database.sqlite').replace(/\\/g, '/')}`;
             const regionAffinity = new RegionAffinity(databaseUri);
 
             // Update ConnectionHealthMonitor with RegionAffinity

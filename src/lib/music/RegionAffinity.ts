@@ -108,11 +108,11 @@ export class RegionAffinity {
         
         const keysToDelete: string[] = [];
         
-        for await (const [nodeId, data] of iterator) {
+        for await (const [key, data] of iterator) {
             const affinityData = data as AffinityData;
             
             if (now - affinityData.lastUpdated > staleAfterMs) {
-                keysToDelete.push(nodeId as string);
+                keysToDelete.push(key as string);
             }
         }
 

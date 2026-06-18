@@ -116,7 +116,9 @@ export const Penalties = {
         if (nodes.length === 0) return undefined;
         if (nodes.length === 1) return nodes[0];
 
-        let bestNode: QuaverNode | undefined;
+        // Initialize to first node to ensure we always return a node
+        // even if all nodes have equal (maximum) penalty during startup
+        let bestNode: QuaverNode = nodes[0];
         let lowestPenalty = Number.MAX_SAFE_INTEGER;
 
         for (const node of nodes) {

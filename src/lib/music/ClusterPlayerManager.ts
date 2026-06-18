@@ -53,17 +53,27 @@ export class ClusterPlayerManager implements PlayerManager<QuaverNode> {
      */
     getNodeIdForGuild(guildId: string): string | null {
         const nodeId = this.guildNodeMap.get(guildId);
-        if (!nodeId) return null;
-
-        // Verify the player actually exists on the node
-        const node = this.cluster.nodes.get(nodeId);
-        if (!node || !node.players.has(guildId)) {
+        if (nodeId) {
+            // Verify player still exists
+            const node = this.cluster.nodes.get(nodeId);
+            if (node && node.players.has(guildId)) {
+                return nodeId;
+            }
             // Clean up stale entry
             this.guildNodeMap.delete(guildId);
-            return null;
         }
 
-        return nodeId;
+        // Fallback: search all nodes directly
+        // This handles cases like restart or direct player creation
+        for (const [id, node] of this.cluster.nodes.entries()) {
+            if (node.players.has(guildId)) {
+                // Update our tracking
+                this.guildNodeMap.set(guildId, id);
+                return id;
+            }
+        }
+
+        return null;
     }
 
     /**

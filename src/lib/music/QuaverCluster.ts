@@ -100,19 +100,22 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
             const staleAfterMs = settings.regionAffinity?.staleAfterMs ?? 300000;
             const allNodes = await this.regionAffinity.getAllNodes(staleAfterMs);
             
-            // Clear old cache
-            this.affinityCache.clear();
+            // Build new cache (don't clear in-place to avoid race conditions)
+            const newCache = new Map<string, { nodeId: string; regionPrefix: string; avgPing: number; lastUpdated: number }>();
             
-            // Populate cache with compound keys: nodeId:regionPrefix
+            // Populate new cache with compound keys: nodeId:regionPrefix
             for (const { nodeId, regionPrefix, data } of allNodes) {
                 const key = `${nodeId}:${regionPrefix}`;
-                this.affinityCache.set(key, {
+                newCache.set(key, {
                     nodeId,
                     regionPrefix,
                     avgPing: data.avgPing,
                     lastUpdated: data.lastUpdated,
                 });
             }
+            
+            // Atomically replace the cache reference
+            this.affinityCache = newCache;
             
             logger.debug(`Affinity cache refreshed with ${allNodes.length} entries`);
         } catch (error) {
@@ -188,8 +191,8 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
         if (!targetNodeIds || targetNodeIds.length === 0) return null;
 
         // Collect ready nodes with affinity data for the target region
-        // Group by nodeId to calculate average ping across all region prefixes
-        const nodeAffinityMap = new Map<string, { node: QuaverNode; totalPing: number; count: number }>();
+        // Track minimum ping for each node (not average) to avoid skewing from fallback usage
+        const nodeAffinityMap = new Map<string, { node: QuaverNode; minPing: number }>();
 
         for (const affinityData of this.affinityCache.values()) {
             const { nodeId, avgPing } = affinityData;
@@ -200,30 +203,29 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
             const node = this.nodes.get(nodeId);
             if (!node || !this.isNodeReady(node)) continue;
 
-            // Accumulate ping data for this node
+            // Track minimum ping for this node across all region prefixes
             const existing = nodeAffinityMap.get(nodeId);
             if (existing) {
-                existing.totalPing += avgPing;
-                existing.count += 1;
+                existing.minPing = Math.min(existing.minPing, avgPing);
             } else {
-                nodeAffinityMap.set(nodeId, { node, totalPing: avgPing, count: 1 });
+                nodeAffinityMap.set(nodeId, { node, minPing: avgPing });
             }
         }
 
         if (nodeAffinityMap.size === 0) return null;
 
-        // Calculate average ping for each node and collect candidates
-        const candidateNodes: Array<{ node: QuaverNode; nodeId: string; avgPing: number }> = [];
-        for (const [nodeId, { node, totalPing, count }] of nodeAffinityMap.entries()) {
+        // Collect candidates with their minimum ping
+        const candidateNodes: Array<{ node: QuaverNode; nodeId: string; minPing: number }> = [];
+        for (const [nodeId, { node, minPing }] of nodeAffinityMap.entries()) {
             candidateNodes.push({
                 node,
                 nodeId,
-                avgPing: totalPing / count,
+                minPing,
             });
         }
 
         // Try to find nodes that meet the threshold
-        const suitableNodes = candidateNodes.filter(({ avgPing }): boolean => avgPing <= maxPingMs);
+        const suitableNodes = candidateNodes.filter(({ minPing }): boolean => minPing <= maxPingMs);
         
         let selectedNodes: typeof candidateNodes;
         if (suitableNodes.length > 0) {
@@ -235,10 +237,10 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
         }
 
         // Find the lowest ping
-        const lowestPing = Math.min(...selectedNodes.map(({ avgPing }): number => avgPing));
+        const lowestPing = Math.min(...selectedNodes.map(({ minPing }): number => minPing));
         
         // Get all nodes with the lowest ping
-        const bestNodes = selectedNodes.filter(({ avgPing }): boolean => avgPing === lowestPing);
+        const bestNodes = selectedNodes.filter(({ minPing }): boolean => minPing === lowestPing);
 
         // If multiple nodes have the same ping, use penalty-based selection as tiebreaker
         if (bestNodes.length > 1) {
@@ -253,9 +255,9 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
      * Check if a node is ready (WebSocket connected)
      */
     private isNodeReady(node: QuaverNode): boolean {
-        // Access the ws.state from the node
+        // Access the ws.state from the node with optional chaining
         // LavalinkWSClientState.Ready = 2
-        return node.ws.state === 2;
+        return node.ws?.state === 2;
     }
 
     /**
