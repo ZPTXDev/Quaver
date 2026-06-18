@@ -503,6 +503,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         clearTimeout(this.timeout.pause);
         this.timeout.pausedAlone = false;
         this.voice.disconnect();
+        this.client.connectionHealth.updateMediaEndpoint(null);
         await this.client.music.players.destroy(guild.id);
         guild.sendWebUpdate('playerDisconnect');
         const voiceChannel = this.client.guilds.cache
