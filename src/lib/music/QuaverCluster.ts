@@ -31,7 +31,7 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
     readonly players: ClusterPlayerManager;
     private regionAffinity: RegionAffinity | null;
     private pruneInterval?: ReturnType<typeof setInterval>;
-    private affinityCache: Map<string, { regionPrefix: string; avgPing: number; lastUpdated: number }> = new Map();
+    private affinityCache: Map<string, { nodeId: string; regionPrefix: string; avgPing: number; lastUpdated: number }> = new Map();
 
     constructor(options: QuaverClusterOptions, client: QuaverClient, regionAffinity: RegionAffinity | null = null) {
         super();
@@ -73,13 +73,17 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
             void this.refreshAffinityCache();
 
             this.pruneInterval = setInterval((): void => {
-                // Prune stale entries
-                this.regionAffinity?.pruneStaleEntries(staleAfterMs).catch((err): void => {
-                    logger.error({ message: 'Failed to prune stale affinity entries', label: 'QuaverCluster', error: err });
-                });
-                
-                // Refresh cache
-                void this.refreshAffinityCache();
+                // Run operations sequentially to avoid race conditions
+                void (async (): Promise<void> => {
+                    try {
+                        // Prune stale entries first
+                        await this.regionAffinity?.pruneStaleEntries(staleAfterMs);
+                        // Then refresh cache
+                        await this.refreshAffinityCache();
+                    } catch (err) {
+                        logger.error({ message: 'Failed to refresh affinity data', label: 'QuaverCluster', error: err });
+                    }
+                })();
             }, refreshSeconds * 1000);
 
             logger.info('Region affinity pruning and caching scheduled');
@@ -99,9 +103,15 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
             // Clear old cache
             this.affinityCache.clear();
             
-            // Populate cache
-            for (const { nodeId, data } of allNodes) {
-                this.affinityCache.set(nodeId, data);
+            // Populate cache with compound keys: nodeId:regionPrefix
+            for (const { nodeId, regionPrefix, data } of allNodes) {
+                const key = `${nodeId}:${regionPrefix}`;
+                this.affinityCache.set(key, {
+                    nodeId,
+                    regionPrefix,
+                    avgPing: data.avgPing,
+                    lastUpdated: data.lastUpdated,
+                });
             }
             
             logger.debug(`Affinity cache refreshed with ${allNodes.length} entries`);
@@ -118,14 +128,19 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
      * 3. Global penalty-based load balancing
      */
     getNodeForRegion(region?: string | null): QuaverNode | undefined {
-        // Try affinity-based selection first if enabled
-        if (this.regionAffinity && settings.regionAffinity?.enabled) {
-            const affinityNode = this.selectNodeByAffinity();
+        // Try affinity-based selection first if enabled and region is specified
+        if (region && this.regionAffinity && settings.regionAffinity?.enabled) {
+            const affinityNode = this.selectNodeByAffinity(region);
             if (affinityNode) {
                 // Find the node ID for logging
-                const nodeId = Array.from(this.nodes.entries())
-                    .find(([, n]: [string, QuaverNode]): boolean => n === affinityNode)?.[0] ?? 'unknown';
-                logger.debug(`Selected node by affinity: ${nodeId}`);
+                let nodeId = 'unknown';
+                for (const [id, node] of this.nodes.entries()) {
+                    if (node === affinityNode) {
+                        nodeId = id;
+                        break;
+                    }
+                }
+                logger.debug(`Selected node by affinity: ${nodeId} for region: ${region}`);
                 return affinityNode;
             }
         }
@@ -159,28 +174,53 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
 
     /**
      * Selects a node based on region affinity data (ping measurements) using cached data.
-     * Returns null if affinity data is unavailable or all nodes are not ready.
+     * Only considers nodes that serve the specified target region.
+     * @param targetRegion - The Lavalink configured region to filter nodes by (e.g., "singapore")
+     * @returns The best node for the target region, or null if no affinity data available
      */
-    private selectNodeByAffinity(): QuaverNode | null {
-        if (!this.regionAffinity || this.affinityCache.size === 0) return null;
+    private selectNodeByAffinity(targetRegion: string | null): QuaverNode | null {
+        if (!this.regionAffinity || this.affinityCache.size === 0 || !targetRegion) return null;
 
         const maxPingMs = settings.regionAffinity?.maxPingMs ?? 50;
 
-        // Collect ready nodes with affinity data
-        const candidateNodes: Array<{ node: QuaverNode; nodeId: string; avgPing: number }> = [];
-        
-        for (const [nodeId, affinityData] of this.affinityCache.entries()) {
+        // Get list of node IDs that serve the target region
+        const targetNodeIds = this.regionMap.get(targetRegion);
+        if (!targetNodeIds || targetNodeIds.length === 0) return null;
+
+        // Collect ready nodes with affinity data for the target region
+        // Group by nodeId to calculate average ping across all region prefixes
+        const nodeAffinityMap = new Map<string, { node: QuaverNode; totalPing: number; count: number }>();
+
+        for (const affinityData of this.affinityCache.values()) {
+            const { nodeId, avgPing } = affinityData;
+            
+            // Only consider nodes that serve the target region
+            if (!targetNodeIds.includes(nodeId)) continue;
+
             const node = this.nodes.get(nodeId);
-            if (node && this.isNodeReady(node)) {
-                candidateNodes.push({
-                    node,
-                    nodeId,
-                    avgPing: affinityData.avgPing,
-                });
+            if (!node || !this.isNodeReady(node)) continue;
+
+            // Accumulate ping data for this node
+            const existing = nodeAffinityMap.get(nodeId);
+            if (existing) {
+                existing.totalPing += avgPing;
+                existing.count += 1;
+            } else {
+                nodeAffinityMap.set(nodeId, { node, totalPing: avgPing, count: 1 });
             }
         }
 
-        if (candidateNodes.length === 0) return null;
+        if (nodeAffinityMap.size === 0) return null;
+
+        // Calculate average ping for each node and collect candidates
+        const candidateNodes: Array<{ node: QuaverNode; nodeId: string; avgPing: number }> = [];
+        for (const [nodeId, { node, totalPing, count }] of nodeAffinityMap.entries()) {
+            candidateNodes.push({
+                node,
+                nodeId,
+                avgPing: totalPing / count,
+            });
+        }
 
         // Try to find nodes that meet the threshold
         const suitableNodes = candidateNodes.filter(({ avgPing }): boolean => avgPing <= maxPingMs);

@@ -34,7 +34,9 @@ export class RegionAffinity {
      * @param ping - The current ping measurement in milliseconds
      */
     async upsertAffinity(nodeId: string, regionPrefix: string, ping: number): Promise<void> {
-        const existing = await this.keyv.get<AffinityData>(nodeId);
+        // Use compound key: nodeId:regionPrefix to track affinity per node per region
+        const key = `${nodeId}:${regionPrefix}`;
+        const existing = await this.keyv.get<AffinityData>(key);
         
         let avgPing: number;
         if (existing) {
@@ -51,72 +53,23 @@ export class RegionAffinity {
             lastUpdated: Date.now(),
         };
 
-        await this.keyv.set(nodeId, data);
-    }
-
-    /**
-     * Gets the best node with ping less than or equal to the threshold.
-     * @param maxPingMs - Maximum acceptable ping in milliseconds
-     * @param staleAfterMs - Time in milliseconds after which data is considered stale
-     * @returns The node ID and average ping, or null if no suitable node found
-     */
-    async getBestNode(maxPingMs: number, staleAfterMs: number): Promise<{nodeId: string, avgPing: number} | null> {
-        const allNodes = await this.getAllNodes(staleAfterMs);
-        
-        // Filter nodes that meet the threshold
-        const suitableNodes = allNodes.filter(({ data }): boolean => data.avgPing <= maxPingMs);
-        
-        if (suitableNodes.length === 0) {
-            return null;
-        }
-
-        // Find the one with the lowest ping
-        const best = suitableNodes.reduce((prev, curr): {nodeId: string, data: AffinityData} => 
-            curr.data.avgPing < prev.data.avgPing ? curr : prev
-        );
-
-        return {
-            nodeId: best.nodeId,
-            avgPing: best.data.avgPing,
-        };
-    }
-
-    /**
-     * Gets the node with the absolute lowest ping, regardless of threshold.
-     * @param staleAfterMs - Time in milliseconds after which data is considered stale
-     * @returns The node ID and average ping, or null if no data available
-     */
-    async getLowestPingNode(staleAfterMs: number): Promise<{nodeId: string, avgPing: number} | null> {
-        const allNodes = await this.getAllNodes(staleAfterMs);
-        
-        if (allNodes.length === 0) {
-            return null;
-        }
-
-        const best = allNodes.reduce((prev, curr): {nodeId: string, data: AffinityData} => 
-            curr.data.avgPing < prev.data.avgPing ? curr : prev
-        );
-
-        return {
-            nodeId: best.nodeId,
-            avgPing: best.data.avgPing,
-        };
+        await this.keyv.set(key, data);
     }
 
     /**
      * Gets all non-stale affinity data entries.
      * @param staleAfterMs - Time in milliseconds after which data is considered stale
-     * @returns Array of node IDs with their affinity data
+     * @returns Array of entries with nodeId, regionPrefix, and affinity data
      */
-    async getAllNodes(staleAfterMs: number): Promise<Array<{nodeId: string, data: AffinityData}>> {
+    async getAllNodes(staleAfterMs: number): Promise<Array<{nodeId: string, regionPrefix: string, data: AffinityData}>> {
         const now = Date.now();
-        const result: Array<{nodeId: string, data: AffinityData}> = [];
+        const result: Array<{nodeId: string, regionPrefix: string, data: AffinityData}> = [];
 
         // Keyv doesn't have a native "get all keys" method, so we need to iterate
         // This is a limitation, but acceptable for a small number of nodes
         const iterator = this.keyv.iterator!();
         
-        for await (const [nodeId, data] of iterator) {
+        for await (const [key, data] of iterator) {
             const affinityData = data as AffinityData;
             
             // Skip stale entries
@@ -124,8 +77,20 @@ export class RegionAffinity {
                 continue;
             }
 
+            // Parse compound key: nodeId:regionPrefix
+            const keyStr = key as string;
+            const separatorIndex = keyStr.indexOf(':');
+            if (separatorIndex === -1) {
+                // Skip malformed keys
+                continue;
+            }
+
+            const nodeId = keyStr.substring(0, separatorIndex);
+            const regionPrefix = keyStr.substring(separatorIndex + 1);
+
             result.push({
-                nodeId: nodeId as string,
+                nodeId,
+                regionPrefix,
                 data: affinityData,
             });
         }
