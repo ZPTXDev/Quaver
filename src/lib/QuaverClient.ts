@@ -4,6 +4,7 @@ import { readdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Server } from 'socket.io';
+import { MessageOptionsBuilderType } from '.';
 import type { EventHandler } from './builders';
 import { QuaverGuild } from './guild';
 import {
@@ -73,7 +74,7 @@ export class QuaverClient extends Client {
                 )}`
                 : `sqlite://${resolve(__dirname, '..', '..', 'database.sqlite')}`;
             const regionAffinity = new RegionAffinity(databaseUri);
-            
+
             // Update ConnectionHealthMonitor with RegionAffinity
             this.connectionHealth.setRegionAffinity(regionAffinity);
 
@@ -205,9 +206,8 @@ export class QuaverClient extends Client {
                             const player = await this.music?.players.fetch(guild.id);
                             if (player?.voice.connected && player.queue.channel) {
                                 // Send warning message to the player's bound text channel
-                                const message = g.locale('MUSIC.PLAYER.CONNECTION_UNSTABLE' as LocaleKey);
-                                await player.queue.channel.send(message).catch((): void => {
-                                    // Silently ignore if message send fails
+                                await player.sendMessage(g.locale('MUSIC.PLAYER.CONNECTION_UNSTABLE'), {
+                                    type: MessageOptionsBuilderType.Warning,
                                 });
                             }
                         })
