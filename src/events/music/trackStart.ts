@@ -236,9 +236,6 @@ export default {
                 const response = await queue.player.client.music.rest.execute({
                     path: `/v4/sessions/${queue.player.api.session.id}/players/${guild.id}/track/lyrics`,
                     method: 'GET',
-                    headers: {
-                        Authorization: `Bearer ${settings.lavalink.password}`,
-                    },
                 });
                 json = (await response.json()) as LavaLyricsResponse;
                 lyrics = formatLavaLyricsResponse(json, queue.player);

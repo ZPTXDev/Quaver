@@ -16,6 +16,14 @@ export class QuaverPlayerManager<
         return super.resolve(guild) as QuaverPlayer<TNode> | undefined;
     }
 
+    /**
+     * Get the node ID for a guild (returns null for single-node setup)
+     */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    getNodeIdForGuild(_guildId: string): string | null {
+        return null;
+    }
+
     create(guild: Guild): QuaverPlayer<TNode> {
         if (this.has(guild.id)) {
             return this.resolve(guild.id)!;

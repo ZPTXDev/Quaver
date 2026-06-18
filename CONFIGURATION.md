@@ -133,6 +133,62 @@
 }
 ```
 
+## Multi-Node Lavalink Configuration
+
+Quaver supports connecting to multiple Lavalink nodes for improved reliability, load distribution, and region-based routing. To enable multi-node mode, replace the `lavalink` object with a `nodes` array:
+
+```json
+{
+  "lavalink": {
+    "nodes": [
+      {
+        "host": "sg-lavalink.example.com",
+        "port": 2333,
+        "password": "youshallnotpass",
+        "secure": true,
+        "region": "singapore",
+        "reconnect": {
+          "delay": 3000,
+          "tries": 5
+        }
+      },
+      {
+        "host": "us-lavalink.example.com",
+        "port": 2333,
+        "password": "youshallnotpass",
+        "secure": true,
+        "region": "us-central",
+        "reconnect": {
+          "delay": 3000,
+          "tries": 5
+        }
+      },
+      {
+        "host": "eu-lavalink.example.com",
+        "port": 2333,
+        "password": "youshallnotpass",
+        "secure": true,
+        "region": "rotterdam",
+        "reconnect": {
+          "delay": 3000,
+          "tries": 5
+        }
+      }
+    ]
+  }
+}
+```
+
+### Multi-Node Features
+
+- **Ping-Based Region Affinity**: Quaver learns which Lavalink nodes provide the best latency for different Discord media regions over time, automatically routing new connections to the optimal node
+- **Intelligent Load Balancing**: Uses penalty-based selection considering CPU load, active players, and frame statistics
+- **Automatic Failover**: If a node becomes unavailable, new players route to healthy nodes
+- **Session Recovery**: Players can be restored after restarts, maintaining node affinity when possible
+
+> **Note**: The `region` field in each node configuration is an internal identifier for affinity tracking. You can set it to any value you prefer (e.g., `"sg1"`, `"us-east"`, `"europe"`). It's not matched against Discord's voice regions.
+
+
 | Config Item Path                                      | Description                                                                                                                                                                                                                                                                                                                                                       | Required                                                  | Version Added |
 |-------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|---------------|
 | `token`                                               | Your bot token. You can get it from the [Discord Developer Portal](https://discord.com/developers/applications).                                                                                                                                                                                                                                                  | ✅                                                         |               |
@@ -152,12 +208,20 @@
 | `managers`                                            | The [user IDs](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-) that are given manager-level permissions on Quaver.                                                                                                                                                                                           | ✅                                                         |               |
 | `database.protocol`                                   | The database protocol. At this time, only `sqlite` is supported.                                                                                                                                                                                                                                                                                                  | ✅                                                         |               |
 | `database.path`                                       | The database path. For `sqlite`, this is relative to your Quaver directory containing `dist`, `locales`, etc.                                                                                                                                                                                                                                                     | ✅                                                         |               |
-| `lavalink.host`                                       | The Lavalink instance host address.                                                                                                                                                                                                                                                                                                                               | ✅                                                         |               |
-| `lavalink.port`                                       | The Lavalink instance port.                                                                                                                                                                                                                                                                                                                                       | ✅                                                         |               |
-| `lavalink.password`                                   | The Lavalink instance password.                                                                                                                                                                                                                                                                                                                                   | ✅                                                         |               |
-| `lavalink.secure`                                     | Whether the Lavalink instance uses a secure connection.                                                                                                                                                                                                                                                                                                           | ❌                                                         |               |
-| `lavalink.reconnect.delay`                            | The delay in milliseconds between Lavalink reconnect attempts.                                                                                                                                                                                                                                                                                                    | ❌                                                         |               |
-| `lavalink.reconnect.tries`                            | The number of times to attempt to reconnect to Lavalink.                                                                                                                                                                                                                                                                                                          | ❌                                                         |               |
+| `lavalink.host`                                       | The Lavalink instance host address. **Single-node mode only.** Use `lavalink.nodes` for multi-node configuration.                                                                                                                                                                                                                                                | ✅ (single-node)<br />❌ (multi-node)                      |               |
+| `lavalink.port`                                       | The Lavalink instance port. **Single-node mode only.**                                                                                                                                                                                                                                                                                                            | ✅ (single-node)<br />❌ (multi-node)                      |               |
+| `lavalink.password`                                   | The Lavalink instance password. **Single-node mode only.**                                                                                                                                                                                                                                                                                                        | ✅ (single-node)<br />❌ (multi-node)                      |               |
+| `lavalink.secure`                                     | Whether the Lavalink instance uses a secure connection. **Single-node mode only.**                                                                                                                                                                                                                                                                                | ❌                                                         |               |
+| `lavalink.reconnect.delay`                            | The delay in milliseconds between Lavalink reconnect attempts. **Single-node mode only.**                                                                                                                                                                                                                                                                         | ❌                                                         |               |
+| `lavalink.reconnect.tries`                            | The number of times to attempt to reconnect to Lavalink. **Single-node mode only.**                                                                                                                                                                                                                                                                               | ❌                                                         |               |
+| `lavalink.nodes`                                      | Array of Lavalink node configurations for multi-node mode. When specified, enables intelligent load balancing and region-based routing across multiple Lavalink servers. **Multi-node mode only.** Mutually exclusive with single-node fields (`host`, `port`, `password`, etc.).                                                                                | ✅ (multi-node)<br />❌ (single-node)                      | `8.0.0`       |
+| `lavalink.nodes[].host`                               | The Lavalink node host address.                                                                                                                                                                                                                                                                                                                                   | ✅ (multi-node)                                            | `8.0.0`       |
+| `lavalink.nodes[].port`                               | The Lavalink node port.                                                                                                                                                                                                                                                                                                                                           | ✅ (multi-node)                                            | `8.0.0`       |
+| `lavalink.nodes[].password`                           | The Lavalink node password.                                                                                                                                                                                                                                                                                                                                       | ✅ (multi-node)                                            | `8.0.0`       |
+| `lavalink.nodes[].secure`                             | Whether the Lavalink node uses a secure connection.                                                                                                                                                                                                                                                                                                               | ❌                                                         | `8.0.0`       |
+| `lavalink.nodes[].region`                             | Discord voice region this node serves (e.g., `singapore`, `us-central`, `rotterdam`). Players in voice channels with matching `rtcRegion` will route to nodes configured for that region. If multiple nodes serve the same region, load balancing determines which node is used. Must match region IDs from Discord's `/voice/regions` API.                       | ❌                                                         | `8.0.0`       |
+| `lavalink.nodes[].reconnect.delay`                    | The delay in milliseconds between reconnect attempts for this node.                                                                                                                                                                                                                                                                                               | ❌                                                         | `8.0.0`       |
+| `lavalink.nodes[].reconnect.tries`                    | The number of times to attempt to reconnect to this node.                                                                                                                                                                                                                                                                                                         | ❌                                                         | `8.0.0`       |
 | `features.autolyrics`                                 | Auto Lyrics feature: Allows users to toggle Quaver automatically sending lyrics for the current song.                                                                                                                                                                                                                                                             | ✅                                                         | `6.7.0`       |
 | `features.autolyrics.enabled`                         | Whether the feature is enabled.                                                                                                                                                                                                                                                                                                                                   | ✅                                                         | `6.7.0`       |
 | `features.autolyrics.whitelist`                       | Whether the feature requires guilds to be whitelisted. You will be able to whitelist guilds through the terminal.                                                                                                                                                                                                                                                 | ✅ (if feature is enabled)<br />❌ (if feature is disabled) | `6.7.0`       |
