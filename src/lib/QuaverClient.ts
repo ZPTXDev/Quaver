@@ -12,7 +12,6 @@ import {
     type InteractionHandlerMapsFlat,
 } from './interactions';
 import { ConnectionHealthMonitor, QuaverNode, QuaverCluster, RegionAffinity } from './music';
-import type { LocaleKey } from './locales';
 import { settings } from './util';
 
 export class QuaverClient extends Client {
