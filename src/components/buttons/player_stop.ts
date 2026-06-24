@@ -21,8 +21,8 @@ export default new ButtonHandler()
                 await interaction.replyHandler.reply(
                     guild.locale('CMD.STOP.RESPONSE.SUCCESS'),
                     {
-                        force: ForceType.Update,
-                        components: [],
+                        type: MessageOptionsBuilderType.Success,
+                        force: ForceType.FollowUp,
                     },
                 );
         }
