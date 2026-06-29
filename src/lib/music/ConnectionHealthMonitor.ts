@@ -168,7 +168,7 @@ export class ConnectionHealthMonitor {
                 this.mediaLatencySamples.shift();
             }
 
-            if (response.ok) {
+            if (response.ok || response.status === 403) {
                 this.mediaConsecutiveFailures = 0;
                 logger.debug(
                     `Media server health check OK: ${this.mediaEndpoint} (${latency}ms)`,
@@ -250,7 +250,7 @@ export class ConnectionHealthMonitor {
         if (validSamples.length > 0) {
             averagePing = Math.round(
                 validSamples.reduce((a, b): number => a + b, 0) /
-                    validSamples.length,
+                validSamples.length,
             );
             minPing = Math.min(...validSamples);
             maxPing = Math.max(...validSamples);
@@ -280,13 +280,13 @@ export class ConnectionHealthMonitor {
         if (validLatencies.length > 0) {
             latencyMs = Math.round(
                 validLatencies.reduce((a, b): number => a + b, 0) /
-                    validLatencies.length,
+                validLatencies.length,
             );
         }
 
         const unstable =
             this.mediaConsecutiveFailures >=
-                this.config.media.consecutiveFailureThreshold ||
+            this.config.media.consecutiveFailureThreshold ||
             (latencyMs !== null &&
                 latencyMs > this.config.media.unstableLatencyMs);
 
