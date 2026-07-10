@@ -11,7 +11,7 @@
     "@lavaclient/plugin-effects": "^1.0.3",
     "@lavaclient/plugin-queue": "^0.1.0",
     "@zptxdev/zptx-lib": "^1.1.0",
-    "adm-zip": "^0.5.18",
+    "adm-zip": "^0.6.0",
     "cache-manager": "^7.2.9",
     "cacheable": "^2.5.0",
     "crypto-js": "^4.2.0",
