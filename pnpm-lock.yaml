@@ -95,8 +95,8 @@ dependencies:
     specifier: ^6.1.4
     version: 6.1.4(patch_hash=32snqi5dy3rdioixvoeeabdayq)(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)
   yocto-spinner:
-    specifier: ^1.2.1
-    version: 1.2.1
+    specifier: ^1.2.2
+    version: 1.2.2
   yoctocolors:
     specifier: ^2.1.2
     version: 2.1.2
@@ -4495,8 +4495,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  /yocto-spinner@1.2.1:
-    resolution: {integrity: sha512-9cbFWLhbiZp+820O4pkHGNncI7+MrUGzBOjw8NMG+ewsY+aG0DdEXnr19Smxao32YOjLZRMdn1UtaxcrXOYOIg==}
+  /yocto-spinner@1.2.2:
+    resolution: {integrity: sha512-DODGl1wJjA/s5pnJFKau9lIYHT81lnhob1i3e1TjxZRxEhWRKl74nTbWE6H5KlkViQQTo/Z29YFdxzTZAMY3ng==}
     engines: {node: '>=18.19'}
     dependencies:
       yoctocolors: 2.1.2
