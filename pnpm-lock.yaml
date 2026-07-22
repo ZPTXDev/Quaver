@@ -71,8 +71,8 @@ dependencies:
     specifier: ^2.0.0
     version: 2.0.0
   pinyin-pro:
-    specifier: ^3.28.1
-    version: 3.28.1
+    specifier: ^3.28.2
+    version: 3.28.2
   semver:
     specifier: ^7.8.5
     version: 7.8.5
@@ -3364,8 +3364,8 @@ packages:
     resolution: {integrity: sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==}
     engines: {node: '>=12'}
 
-  /pinyin-pro@3.28.1:
-    resolution: {integrity: sha512-oqz8ulwRgtUXRi0vbqEfGNly19zpyCxYrjhkk5TibGcgSW6eNwS5woajCXRwqURi8Ehc2yOFTiB4uNoZ+NJOnA==}
+  /pinyin-pro@3.28.2:
+    resolution: {integrity: sha512-jV38yxXHLfidirMC4hrXasLDozLCSq/4DfX88GnHcSEJ2+GpSedG6I9VOiEXJu6iQ5dbJC/RjmzyMuS5h/wH5A==}
     dev: false
 
   /prebuild-install@7.1.3:
