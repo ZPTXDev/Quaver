@@ -34,7 +34,7 @@
     "winston": "^3.19.0",
     "winston-loki": "^6.1.4",
     "yocto-spinner": "^1.2.2",
-    "yoctocolors": "^2.1.2",
+    "yoctocolors": "^2.2.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
