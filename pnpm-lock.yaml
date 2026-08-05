@@ -124,8 +124,8 @@ devDependencies:
     specifier: ^4.17.12
     version: 4.17.12
   '@types/semver':
-    specifier: ^7.7.1
-    version: 7.7.1
+    specifier: ^7.8.0
+    version: 7.8.0
   eslint:
     specifier: ^10.8.0
     version: 10.8.0
@@ -1080,8 +1080,8 @@ packages:
     resolution: {integrity: sha512-hKormJbkJqzQGhziax5PItDUTMAM9uE2XXQmM37dyd4hVM+5aVl7oVxMVUiVQn2oCQFN/LKCZdvSM0pFRqbSmQ==}
     dev: true
 
-  /@types/semver@7.7.1:
-    resolution: {integrity: sha512-FmgJfu+MOcQ370SD0ev7EI8TlCAfKYU+B4m5T3yXc1CiRN94g/SZPtsCkk506aUDtlMnFZvasDwHHUcZUEaYuA==}
+  /@types/semver@7.8.0:
+    resolution: {integrity: sha512-1mAINjtQCXXeLkJ9ehXkwOcBpqtLxiVtKhpUf83DdRNdQKV0iXZpaHYqRr7nj+wvxuJzoAmAwXI+sCNMv1CzLQ==}
     dev: true
 
   /@types/send@1.2.1:
