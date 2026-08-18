@@ -24,7 +24,7 @@
         "lavalink-ws-client": "^1.1.2",
         "lodash-es": "^4.18.1",
         "path-exists-cli": "^2.0.0",
-        "pinyin-pro": "^3.29.1",
+        "pinyin-pro": "^3.29.2",
         "semver": "^7.8.5",
         "socket.io": "^4.8.3",
         "sqlite3": "^6.0.1",
