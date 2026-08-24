@@ -71,8 +71,8 @@ dependencies:
     specifier: ^2.0.0
     version: 2.0.0
   pinyin-pro:
-    specifier: ^3.29.2
-    version: 3.29.2
+    specifier: ^3.29.3
+    version: 3.29.3
   semver:
     specifier: ^7.8.5
     version: 7.8.5
@@ -466,8 +466,8 @@ packages:
       tslib: 2.8.1
     dev: false
 
-  /@napi-rs/snappy-android-arm-eabi@7.4.1:
-    resolution: {integrity: sha512-7siGMYnpi4pjI07XXoIgXlBkIbI/XsmXYMi+dSPEZz/7V/f/4MvK9OGGKT4cgHLiszgxkTSTZzL+AjCF7OACtQ==}
+  /@napi-rs/snappy-android-arm-eabi@7.4.2:
+    resolution: {integrity: sha512-5Z74BfBXperrqJKG4hmw/nN1LA7UZs5OdUTyZ2cZseZrfcPu4zTQblIzR014pEfhjd2mxm4BzOdQ9TBNCUSJlw==}
     engines: {node: '>= 10'}
     cpu: [arm]
     os: [android]
@@ -475,8 +475,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-android-arm64@7.4.1:
-    resolution: {integrity: sha512-8tcrG2V3LSzCS3OdppuvalNbsgsvyr8hIkUliPBaFzjOiAjRpCOyS05s7KZe7YdkJyAht/OCTjIV1XqKdAUJXw==}
+  /@napi-rs/snappy-android-arm64@7.4.2:
+    resolution: {integrity: sha512-0mDR06aGsAmzxpHubRCLJomWXYc6A0Mn//1huZMg3MrVFhd23xVv0upLYTAtAVSEC3/M3SlqUQLNpZydl9NsiQ==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [android]
@@ -484,8 +484,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-darwin-arm64@7.4.1:
-    resolution: {integrity: sha512-imzAEKEySv3dmzMFCnVj0SeaVbaZptlVGjQXLuIQ1n157/DpqJYuG4Yj1pPIRh3S/VzniC3ewPmYQWfxWepRsA==}
+  /@napi-rs/snappy-darwin-arm64@7.4.2:
+    resolution: {integrity: sha512-QNfdjRsGT1YIQ7t+IzIOdGSXrZNNsoovKiFJL4cOD9+2AYWPJQgt8xYMUGihz9nWtWUB4d3nRaYXGSMrSjzguQ==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
@@ -493,8 +493,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-darwin-x64@7.4.1:
-    resolution: {integrity: sha512-Q9LDalgq5uqpd1JwpWxKb34rmheOmk7BhlwUMadaECAZU/v5HwArAZjsWomRXiYm4tfXFnQeL3ItFGW0Irv6+A==}
+  /@napi-rs/snappy-darwin-x64@7.4.2:
+    resolution: {integrity: sha512-TOrxHMfAYkmUOCy6mv0I5NT7h6TRh5aorp8b8RUG9eGlh74RnbU+1IpjhI59L4fq5m+uX8Q9ViCfEM14SO5OPw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
@@ -502,8 +502,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-freebsd-x64@7.4.1:
-    resolution: {integrity: sha512-O1B/ynTjOOlnr6dnVHdj/xrYcPcWLjZPC3dNWyOy7xGbkjQHHYiTt0EXDxmfANALt9YEa1rSfzICMmKcyFCtnQ==}
+  /@napi-rs/snappy-freebsd-x64@7.4.2:
+    resolution: {integrity: sha512-tZ6Nw5P/+ELsamWioFhATLgSlzKBEh/jxSVCxOVR/Q1PylD5GwT1InSVftJ/8G91okvVOmeof1zjc9xTBfgXZg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [freebsd]
@@ -511,8 +511,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-linux-arm-gnueabihf@7.4.1:
-    resolution: {integrity: sha512-8vY+IGu1qm2EEuqEvanMh73edIFlRD19HeXMSEZZLOzJeIhlOcMGCAqKApPJSgdwMf7nxNmnBYyXnH+QM1ryQA==}
+  /@napi-rs/snappy-linux-arm-gnueabihf@7.4.2:
+    resolution: {integrity: sha512-TNc+bw2rH0YT0me9D7VYRyvQr6E0fZlUa/MCZG4KPd0k+DjQjZucoxRIg7Kss/7ILaVYUfhN1DT+c1znK0ZFZQ==}
     engines: {node: '>= 10'}
     cpu: [arm]
     os: [linux]
@@ -520,8 +520,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-linux-arm64-gnu@7.4.1:
-    resolution: {integrity: sha512-FRjLCPfbtmr4B4OwR0gIEAKnnaczyLKL7QtG3iAn5+n4g284Fur1RoIGTCloq7zGKAuPbKBRhrARCOrXr7nx3A==}
+  /@napi-rs/snappy-linux-arm64-gnu@7.4.2:
+    resolution: {integrity: sha512-+3CJI7f43w09nkjt2+kJI5LAi+p7Qw63t5/RaRyEqRku5MChwBTUs2RMN5OsKdFrHkGdMPkHJWq5AvlvADiysA==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
@@ -529,8 +529,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-linux-arm64-musl@7.4.1:
-    resolution: {integrity: sha512-seZSp/mCSOMZ/ve29s3bAhnLTPpwUZmf9N7+HCCndVckbS6lzRfasstn4RDWP2fVn0MoGbCDFAHADrGP55dzPQ==}
+  /@napi-rs/snappy-linux-arm64-musl@7.4.2:
+    resolution: {integrity: sha512-GdNIKqTepX3ZO20DgTb5sN1TlDPHBcfPe9pE8uORKfggTO07tzkxyzbisp6EGQqS3FUtkf+UJdI2ac2kCC9SEQ==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
@@ -538,8 +538,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-linux-ppc64-gnu@7.4.1:
-    resolution: {integrity: sha512-vBguLu+Dc3J7pwn6QXYDK1iPgGSoqfSig7O1FQMg7v9iUxexR7IAna7vKMTprMHP8FDM9szxcYOzEMrNGmcdaA==}
+  /@napi-rs/snappy-linux-ppc64-gnu@7.4.2:
+    resolution: {integrity: sha512-vF0sv6nNSeWd3Vl0KPR9BYl7ByI/JoheYEb8ymEO4vkkB5wY8XUrIrt9+jJ++Ic4U5QBnIrKoqATWYUU5PNwog==}
     engines: {node: '>= 10'}
     cpu: [ppc64]
     os: [linux]
@@ -547,8 +547,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-linux-riscv64-gnu@7.4.1:
-    resolution: {integrity: sha512-UmgLvreYF6NWV/cBOwZp25dOm5uxiOTC8Rj+vFdOAx8whi/jiwui/pbxjjdUfwBQutzxFk3nMOSC5Jq6TgAZTA==}
+  /@napi-rs/snappy-linux-riscv64-gnu@7.4.2:
+    resolution: {integrity: sha512-LIWbSAfYhhkLG2sypR2boISfH598Gt/ctyH6SiJqxCvHxQgtLXqgMOTuyixPA4wa7uNFXcpG6AU05pQuGsQUvw==}
     engines: {node: '>= 10'}
     cpu: [riscv64]
     os: [linux]
@@ -556,8 +556,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-linux-s390x-gnu@7.4.1:
-    resolution: {integrity: sha512-mXTqUnLUMZeYiSMT6wRiDEmqLDm9VJXJhhtKExqK2sYiTPRGQfn1NR/qzv192LlOsXikIRvY6jWMq4Ron0LA1Q==}
+  /@napi-rs/snappy-linux-s390x-gnu@7.4.2:
+    resolution: {integrity: sha512-nljpLVhSeNDvgO+3tOGZtTv/W2+XHfpZ0t/d8nfpoC9NalRh2e5Fsmi7ukMjqU/yMSbUqDgCHC5nYZ0ivkaBVw==}
     engines: {node: '>= 10'}
     cpu: [s390x]
     os: [linux]
@@ -565,8 +565,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-linux-x64-gnu@7.4.1:
-    resolution: {integrity: sha512-D+2LJTgAAv10SRZcX9rdmdx/rgqU+Lp1oJvZAMkiL7fhkFeHmKRHND8DOkMyAdcVi2ES7EpZnUJBXdcYqxWxjQ==}
+  /@napi-rs/snappy-linux-x64-gnu@7.4.2:
+    resolution: {integrity: sha512-MTv4Uv0Fpr5p4yih39NjsjE3Oy1Dzp3q17NbyqQpSX9tQcD/PNA5yb9ADqmoXpmINM9jpIFuLszzfs7254U6Yg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
@@ -574,8 +574,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-linux-x64-musl@7.4.1:
-    resolution: {integrity: sha512-2DgFW7mQ9cy0EtiddIOuEk9rPUCnt8xv875AYtEjjPrQArXbgVmB/Lt6ngbTlckv5Xgb0Cx4lt7R7ahWXcTbxw==}
+  /@napi-rs/snappy-linux-x64-musl@7.4.2:
+    resolution: {integrity: sha512-BMRBwRpHOwaPw1OzaDERWG4VnOGFHwdxd/8KiANaZx64dISONIaYAFtPKBYVGXikqYcvyp5WgLcp90d+Lu7/Xw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
@@ -583,8 +583,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-openharmony-arm64@7.4.1:
-    resolution: {integrity: sha512-sF1LJRTvZn2A3AyrZUEr6zpNEQW5mm9GO09clzd0nQJlNKoPbWaLusv+nhZYTBxEVLFApISp1ggL8yPNkIpjvA==}
+  /@napi-rs/snappy-openharmony-arm64@7.4.2:
+    resolution: {integrity: sha512-quGOiGkQAJN1+oIMVliCK2u4j62ob88K1P7/tL6ffAeypmy4DQFrGEkzQ9kbnZtxkGhIk7MR8+6kIjtUcJQkcg==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [openharmony]
@@ -592,8 +592,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-win32-arm64-msvc@7.4.1:
-    resolution: {integrity: sha512-sqZbbT1yKlKp1LPO4Yqkja6He0txXOvWKANKZJM98vvHqQikLayq4X6ogovzVXOFYzmpkHFdT10NfGwh4hZbog==}
+  /@napi-rs/snappy-win32-arm64-msvc@7.4.2:
+    resolution: {integrity: sha512-W+VHhwyWeeht8hVwa8eB49tgALsJLj3S+R51BCdNMmofJNJnWOet9j786RQoZ+NfZk4jGP6sxiVMb9jLnnkPlQ==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
@@ -601,8 +601,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-win32-ia32-msvc@7.4.1:
-    resolution: {integrity: sha512-RrgbOcrH52k+dFfuey2wm98OxNmNayI4qyGZ1J36pGWMEOemft+g10zsVzHkN86J5D1RWcD6z25SzB87eW3SEQ==}
+  /@napi-rs/snappy-win32-ia32-msvc@7.4.2:
+    resolution: {integrity: sha512-KalsOkZEurI5ti/20xWt84aLnBUqFBDuuvvkATw5G/D9FaqmOqpLGcvLROL55bdL49/wRCh1OZpVpqKS7x+g/Q==}
     engines: {node: '>= 10'}
     cpu: [ia32]
     os: [win32]
@@ -610,8 +610,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-win32-x64-msvc@7.4.1:
-    resolution: {integrity: sha512-n8OpxSCvNr1QPmXquDkMatYQaG80pjXrmgPuwvbXbGTr8BbZay6wZWlAE0OW32mEBrGWGqLUs4uheIJdF1cLVA==}
+  /@napi-rs/snappy-win32-x64-msvc@7.4.2:
+    resolution: {integrity: sha512-D2BZ0utRz/Nqxa01mZHe9EhVJoCG77w4sqRzdzBCXDgAwszcCmnGIw0wKc+iHmdA9wfIryok9KNArtP8ZJZO9g==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
@@ -3380,8 +3380,8 @@ packages:
     resolution: {integrity: sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==}
     engines: {node: '>=12'}
 
-  /pinyin-pro@3.29.2:
-    resolution: {integrity: sha512-L2AemHDHVFIgr207HFdjiU+4i8Hu15kcHX0Ab5iZCWH0NDmX404tyCQ06kglotGpqOLXNst2NK/A2K8qdC301Q==}
+  /pinyin-pro@3.29.3:
+    resolution: {integrity: sha512-+UU9bx6vfDw8amOJGHm0TE0rdQl8VPylsDWviQ5OOQ3e+on1xRP4OqDbiDuMT5OISgvfl/Y6ez1BBRaIP80GLQ==}
     dev: false
 
   /prebuild-install@7.1.3:
@@ -3833,28 +3833,28 @@ packages:
     dev: false
     optional: true
 
-  /snappy@7.4.1:
-    resolution: {integrity: sha512-Em7vzkTe3d2K4BHhEoKqU3Xz6cZnVuAmx66/iMlly7KZDBIviIRcNRejsvWCQg+/snpalbh1mWZfIKzCfFyiHg==}
+  /snappy@7.4.2:
+    resolution: {integrity: sha512-ApyCoX5QnrGpMJ/MVaZOo3GRDLTFpEDC6SnFJkwSaMvF6sTAuj3fTLq9o9tLgcz1/ealV7sMI2SgW3bZvZD1pA==}
     engines: {node: '>= 10'}
     requiresBuild: true
     optionalDependencies:
-      '@napi-rs/snappy-android-arm-eabi': 7.4.1
-      '@napi-rs/snappy-android-arm64': 7.4.1
-      '@napi-rs/snappy-darwin-arm64': 7.4.1
-      '@napi-rs/snappy-darwin-x64': 7.4.1
-      '@napi-rs/snappy-freebsd-x64': 7.4.1
-      '@napi-rs/snappy-linux-arm-gnueabihf': 7.4.1
-      '@napi-rs/snappy-linux-arm64-gnu': 7.4.1
-      '@napi-rs/snappy-linux-arm64-musl': 7.4.1
-      '@napi-rs/snappy-linux-ppc64-gnu': 7.4.1
-      '@napi-rs/snappy-linux-riscv64-gnu': 7.4.1
-      '@napi-rs/snappy-linux-s390x-gnu': 7.4.1
-      '@napi-rs/snappy-linux-x64-gnu': 7.4.1
-      '@napi-rs/snappy-linux-x64-musl': 7.4.1
-      '@napi-rs/snappy-openharmony-arm64': 7.4.1
-      '@napi-rs/snappy-win32-arm64-msvc': 7.4.1
-      '@napi-rs/snappy-win32-ia32-msvc': 7.4.1
-      '@napi-rs/snappy-win32-x64-msvc': 7.4.1
+      '@napi-rs/snappy-android-arm-eabi': 7.4.2
+      '@napi-rs/snappy-android-arm64': 7.4.2
+      '@napi-rs/snappy-darwin-arm64': 7.4.2
+      '@napi-rs/snappy-darwin-x64': 7.4.2
+      '@napi-rs/snappy-freebsd-x64': 7.4.2
+      '@napi-rs/snappy-linux-arm-gnueabihf': 7.4.2
+      '@napi-rs/snappy-linux-arm64-gnu': 7.4.2
+      '@napi-rs/snappy-linux-arm64-musl': 7.4.2
+      '@napi-rs/snappy-linux-ppc64-gnu': 7.4.2
+      '@napi-rs/snappy-linux-riscv64-gnu': 7.4.2
+      '@napi-rs/snappy-linux-s390x-gnu': 7.4.2
+      '@napi-rs/snappy-linux-x64-gnu': 7.4.2
+      '@napi-rs/snappy-linux-x64-musl': 7.4.2
+      '@napi-rs/snappy-openharmony-arm64': 7.4.2
+      '@napi-rs/snappy-win32-arm64-msvc': 7.4.2
+      '@napi-rs/snappy-win32-ia32-msvc': 7.4.2
+      '@napi-rs/snappy-win32-x64-msvc': 7.4.2
     dev: false
     optional: true
 
@@ -4364,7 +4364,7 @@ packages:
       url-polyfill: 1.1.14
       winston-transport: 4.9.0
     optionalDependencies:
-      snappy: 7.4.1
+      snappy: 7.4.2
     dev: false
     patched: true
 
