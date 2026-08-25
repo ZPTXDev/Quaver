@@ -183,8 +183,8 @@ export default new ButtonHandler()
             ActionRowBuilder.from<StringSelectMenuBuilder>(
                 container.components[3].toJSON() as APIActionRowComponent<APIStringSelectComponent>,
             );
-        const selectMenuOptions = pages[page - 1]
-            .map((track, index: number): APISelectMenuOption => {
+        const pageOptions = pages[page - 1].map(
+            (track, index: number): APISelectMenuOption => {
                 let label = `${firstIndex + index}. ${track.info.title}`;
                 if (label.length >= 100) {
                     label = `${label.substring(0, 97)}...`;
@@ -197,40 +197,44 @@ export default new ButtonHandler()
                         (id: string): boolean => id === track.id,
                     ),
                 };
+            },
+        );
+        // Cart items (selected from other pages) fill only remaining slots,
+        // ensuring page items are always shown first when the 25-option cap is hit.
+        const cartOptions = state.selected
+            .map((id: string): APISelectMenuOption => {
+                const refPg = pages.indexOf(
+                    pages.find(
+                        (pg): Song =>
+                            pg.find((t): boolean => t.id === id),
+                    ),
+                );
+                const firstIdx = 10 * refPg + 1;
+                const refTrack = pages[refPg].find(
+                    (t): boolean => t.id === id,
+                );
+                let label = `${
+                    firstIdx + pages[refPg].indexOf(refTrack)
+                }. ${refTrack.info.title}`;
+                if (label.length >= 100) {
+                    label = `${label.substring(0, 97)}...`;
+                }
+                return {
+                    label: label,
+                    description: refTrack.info.author,
+                    value: id,
+                    default: true,
+                };
             })
-            .concat(
-                state.selected
-                    .map((id: string): APISelectMenuOption => {
-                        const refPg = pages.indexOf(
-                            pages.find(
-                                (pg): Song =>
-                                    pg.find((t): boolean => t.id === id),
-                            ),
-                        );
-                        const firstIdx = 10 * refPg + 1;
-                        const refTrack = pages[refPg].find(
-                            (t): boolean => t.id === id,
-                        );
-                        let label = `${
-                            firstIdx + pages[refPg].indexOf(refTrack)
-                        }. ${refTrack.info.title}`;
-                        if (label.length >= 100) {
-                            label = `${label.substring(0, 97)}...`;
-                        }
-                        return {
-                            label: label,
-                            description: refTrack.info.author,
-                            value: id,
-                            default: true,
-                        };
-                    })
-                    .filter(
-                        (options): boolean =>
-                            !pages[page - 1].find(
-                                (track): boolean => track.id === options.value,
-                            ),
+            .filter(
+                (options): boolean =>
+                    !pages[page - 1].find(
+                        (track): boolean => track.id === options.value,
                     ),
             )
+            .slice(0, 25 - pageOptions.length);
+        const selectMenuOptions = pageOptions
+            .concat(cartOptions)
             .sort(
                 (a, b): number =>
                     parseInt(a.label.split('.')[0]) -

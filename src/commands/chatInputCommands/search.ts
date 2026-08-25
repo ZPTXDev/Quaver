@@ -275,7 +275,7 @@ async function renderSearchResults(
                             ),
                         )
                         .setMinValues(0)
-                        .setMaxValues(pages[0].length),
+                        .setMaxValues(Math.min(pages[0].length, 25)),
                 ),
             )
             .addActionRowComponents(
