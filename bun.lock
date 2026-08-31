@@ -34,7 +34,7 @@
         "winston-loki": "^6.1.4",
         "yocto-spinner": "^1.2.2",
         "yoctocolors": "^2.2.0",
-        "zod": "^4.4.3",
+        "zod": "^4.5.1",
       },
       "devDependencies": {
         "@eslint/eslintrc": "^3.3.6",
@@ -1115,7 +1115,7 @@
 
     "yuku-parser": ["yuku-parser@0.8.0", "", { "dependencies": { "@yuku-toolchain/types": "^0.8.0", "yuku-ast": "^0.8.0" }, "optionalDependencies": { "@yuku-parser/binding-darwin-arm64": "0.8.0", "@yuku-parser/binding-darwin-x64": "0.8.0", "@yuku-parser/binding-freebsd-x64": "0.8.0", "@yuku-parser/binding-linux-arm-gnu": "0.8.0", "@yuku-parser/binding-linux-arm-musl": "0.8.0", "@yuku-parser/binding-linux-arm64-gnu": "0.8.0", "@yuku-parser/binding-linux-arm64-musl": "0.8.0", "@yuku-parser/binding-linux-x64-gnu": "0.8.0", "@yuku-parser/binding-linux-x64-musl": "0.8.0", "@yuku-parser/binding-win32-arm64": "0.8.0", "@yuku-parser/binding-win32-x64": "0.8.0" } }, "sha512-obrazyE8Cyh79xTQS9wv44khnhvkXG1CDSSy0bg+Pjjla+iXkKXK2b6+LTYXSN3qvVfQxc0MN5qhNKYr9sl3Zw=="],
 
-    "zod": ["zod@4.4.3", "", {}, "sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ=="],
+    "zod": ["zod@4.5.4", "", {}, "sha512-sC95tT5iHHH9gtpj6A81kh+NEaRAUFN+qlUPDUbRfOMvNf5QCBqsb3WgvnpVtK5Y+4UfA6KqufotuTvMGiTlsA=="],
 
     "@discordjs/builders/discord-api-types": ["discord-api-types@0.38.40", "", {}, "sha512-P/His8cotqZgQqrt+hzrocp9L8RhQQz1GkrCnC9TMJ8Uw2q0tg8YyqJyGULxhXn/8kxHETN4IppmOv+P2m82lQ=="],
 
