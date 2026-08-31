@@ -101,8 +101,8 @@ dependencies:
     specifier: ^2.2.0
     version: 2.2.0
   zod:
-    specifier: ^4.4.3
-    version: 4.4.3
+    specifier: ^4.5.1
+    version: 4.5.1
 
 devDependencies:
   '@eslint/eslintrc':
@@ -4515,6 +4515,6 @@ packages:
       '@yuku-parser/binding-win32-x64': 0.8.0
     dev: true
 
-  /zod@4.4.3:
-    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
+  /zod@4.5.1:
+    resolution: {integrity: sha512-P3GqeAEOEDqKvafVGLezbg+39YW/ze4xrD4qdS0adOY8eoI3zfjv1PQM4UwQzgT8mZKXEbqtVt8K+ZKGqkMFKg==}
     dev: false
