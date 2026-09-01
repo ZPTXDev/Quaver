@@ -1011,8 +1011,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         // Skip current track - trackEnd handler will see the queue is empty
         await this.queue.skip();
         // Manually advance queue to nullify current and emit finish event
-        // (trackEnd is not called when reason='stopped')
-        await this.queue.next();
+        // Force=true bypasses loop logic to prevent re-queuing during stop
+        await this.queue.next(true);
         guild.sendWebUpdate('queueUpdate', []);
         return PlayerResponse.Success;
     }
