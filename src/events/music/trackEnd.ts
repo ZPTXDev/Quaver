@@ -21,6 +21,7 @@ export default {
         reason: 'cleanup' | 'finished' | 'loadFailed' | 'replaced' | 'stopped',
     ): Promise<void> {
         const guild = await QuaverGuild.wrap(queue.player.guild);
+        const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
         delete queue.player.memory.skip;
 
         const isAdTrack = queue.player.isAdTrack(track);
@@ -58,7 +59,7 @@ export default {
             await queue.player.sendMessage(
                 guild.locale(
                     'MUSIC.PLAYER.TRACK_SKIPPED_ERROR',
-                    getTrackMarkdownLocaleString(track),
+                    getTrackMarkdownLocaleString(track, showArtist),
                 ),
                 { type: MessageOptionsBuilderType.Warning },
             );

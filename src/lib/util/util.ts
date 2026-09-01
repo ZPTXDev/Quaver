@@ -303,12 +303,17 @@ export function cleanURIForMarkdown(uri: string): string {
 /**
  * Returns the markdown-formatted locale string for a track.
  * @param track - The track to format.
+ * @param showArtist - Whether to include the artist name.
  * @returns The markdown-formatted string.
  */
-export function getTrackMarkdownLocaleString(track: Song): string {
-    return track.info.title === track.info.uri
-        ? track.info.uri
-        : `[${track.info.title}](${track.info.uri})`;
+export function getTrackMarkdownLocaleString(track: Song, showArtist = false): string {
+    if (track.info.title === track.info.uri) {
+        return track.info.uri;
+    }
+    if (showArtist && track.info.author) {
+        return `[${track.info.author} - ${track.info.title}](${track.info.uri})`;
+    }
+    return `[${track.info.title}](${track.info.uri})`;
 }
 
 /**

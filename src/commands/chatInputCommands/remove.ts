@@ -51,6 +51,7 @@ export default new ChatInputCommandHandler()
         const position = interaction.options.getInteger('position');
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
+        const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
         const track = player.queue.tracks[position - 1];
         // workaround: if track doesn't exist, temporarily mark it as "requested by user" and we'll let the switch case deal with it
         // FIXME: should turn QuaverSong into a proper class so this method can be called directly on it
@@ -90,7 +91,7 @@ export default new ChatInputCommandHandler()
                             : requesterStatus === RequesterStatus.ManagerBypass
                               ? 'CMD.REMOVE.RESPONSE.SUCCESS.MANAGER'
                               : 'CMD.REMOVE.RESPONSE.SUCCESS.FORCED',
-                        getTrackMarkdownLocaleString(track),
+                        getTrackMarkdownLocaleString(track, showArtist),
                     ),
                     { type: MessageOptionsBuilderType.Success },
                 );

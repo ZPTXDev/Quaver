@@ -118,7 +118,8 @@ export default new ChatInputCommandHandler()
                 msg = insert
                     ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.INSERTED'
                     : 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
-                extras = [getTrackMarkdownLocaleString(track)];
+                const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+                extras = [getTrackMarkdownLocaleString(track, showArtist)];
                 break;
             }
             case 'empty':

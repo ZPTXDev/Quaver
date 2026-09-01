@@ -35,6 +35,19 @@ export class ContentLogicHandler {
                 );
                 return;
             }
+            case 'showartist': {
+                const showArtist =
+                    (await guild.settings.get<boolean>('showartist')) ?? true;
+                await guild.settings.set('showartist', !showArtist);
+                await interaction.replyHandler.reply(
+                    await SettingsRenderer.renderSubMenu(
+                        await QuaverGuild.wrap(interaction.guild),
+                        SettingsCategory.Content,
+                    ),
+                    { force: ForceType.Update },
+                );
+                return;
+            }
             case 'autolyrics': {
                 const autoLyrics =
                     (await guild.settings.get<boolean>('autolyrics')) ?? false;

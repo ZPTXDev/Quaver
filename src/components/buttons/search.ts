@@ -25,6 +25,7 @@ export default new ButtonHandler()
     .setChecks([Check.InteractionStarter])
     .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
+        const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
         const state = searchState[interaction.message.id];
         if (!state) {
             await interaction.replyHandler.reply(
@@ -73,7 +74,7 @@ export default new ButtonHandler()
                 extras = [];
             if (resolvedTracks.length === 1) {
                 msg = 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
-                extras = [getTrackMarkdownLocaleString(resolvedTracks[0])];
+                extras = [getTrackMarkdownLocaleString(resolvedTracks[0], showArtist)];
             } else {
                 msg = 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
                 extras = [
@@ -169,6 +170,7 @@ export default new ButtonHandler()
                             ' ',
                         )}.\` **${getTrackMarkdownLocaleString(
                         track,
+                        showArtist,
                     )}** \`[${durationString}]\``;
                 })
                 .join('\n'),

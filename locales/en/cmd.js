@@ -282,6 +282,10 @@ export default {
                             SIMPLE: 'Simple',
                         },
                     },
+                    SHOWARTIST: {
+                        DESCRIPTION: 'Whether to show the artist name on all messages.',
+                        NAME: 'Show Artist Name',
+                    },
                 },
             },
             GENERAL: {

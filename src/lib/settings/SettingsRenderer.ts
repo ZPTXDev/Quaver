@@ -264,6 +264,8 @@ export class SettingsRenderer {
         guild: QuaverGuild<Initialized> & Guild,
     ): Promise<SectionBuilder[]> {
         const format = (await guild.settings.get<string>('format')) ?? 'simple';
+        const showArtist =
+            (await guild.settings.get<boolean>('showartist')) ?? true;
         const autoLyrics =
             (await guild.settings.get<boolean>('autolyrics')) ?? false;
         const controls =
@@ -280,6 +282,15 @@ export class SettingsRenderer {
                     : guild.locale(
                           'CMD.SETTINGS.MISC.CONTENT.SETTINGS.FORMAT.OPTIONS.DETAILED',
                       ),
+            ),
+            this.createItemSection(
+                guild,
+                SettingsCategory.Content,
+                'showartist',
+                guild.locale(
+                    showArtist ? 'MISC.ENABLED' : 'MISC.DISABLED',
+                ),
+                showArtist ? ButtonStyle.Success : ButtonStyle.Danger,
             ),
             ...(settings.features.autolyrics.enabled
                 ? [

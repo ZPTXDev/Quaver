@@ -42,6 +42,7 @@ export default new ChatInputCommandHandler()
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
         const position = interaction.options.getInteger('position');
+        const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
         if (!player.queue.current || (!player.playing && !player.paused)) {
             await interaction.replyHandler.reply(
                 guild.locale('MUSIC.PLAYER.PLAYING.NOTHING'),
@@ -66,12 +67,12 @@ export default new ChatInputCommandHandler()
         switch (response) {
             case PlayerResponse.AdPlaying: {
                 const premiumURL = getPremiumURL(interaction.guild.id);
-                
+
                 const container = new ContainerBuilder()
                     .addTextDisplayComponents(
                         guild.builders.textDisplayLocale('CMD.SKIPTO.RESPONSE.ERROR.AD_PLAYING'),
                     );
-                
+
                 if (premiumURL) {
                     container.addActionRowComponents(
                         new ActionRowBuilder<ButtonBuilder>().setComponents(
@@ -82,7 +83,7 @@ export default new ChatInputCommandHandler()
                         ),
                     );
                 }
-                
+
                 await interaction.replyHandler.reply(container, {
                     type: MessageOptionsBuilderType.Error,
                 });
@@ -121,8 +122,8 @@ export default new ChatInputCommandHandler()
                             : requesterStatus === RequesterStatus.ManagerBypass
                               ? 'CMD.SKIPTO.RESPONSE.SUCCESS.MANAGER'
                               : 'CMD.SKIPTO.RESPONSE.SUCCESS.FORCED',
-                        getTrackMarkdownLocaleString(track),
-                        getTrackMarkdownLocaleString(movedTrack),
+                        getTrackMarkdownLocaleString(track, showArtist),
+                        getTrackMarkdownLocaleString(movedTrack, showArtist),
                     ),
                 );
             }

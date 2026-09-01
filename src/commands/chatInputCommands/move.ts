@@ -56,6 +56,7 @@ export default new ChatInputCommandHandler()
         const newPosition = interaction.options.getInteger('new_position');
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
+        const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
         const track = player.queue.tracks[oldPosition - 1];
         const response = await player.moveQueuedTrack(oldPosition, newPosition, interaction.user);
         switch (response) {
@@ -91,7 +92,7 @@ export default new ChatInputCommandHandler()
                 await interaction.replyHandler.reply(
                     guild.locale(
                         'CMD.MOVE.RESPONSE.SUCCESS',
-                        getTrackMarkdownLocaleString(track),
+                        getTrackMarkdownLocaleString(track, showArtist),
                         oldPosition.toString(),
                         updatedPosition.toString(),
                     ),

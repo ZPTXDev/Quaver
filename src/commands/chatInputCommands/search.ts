@@ -145,6 +145,7 @@ async function handleImmediateAdd(
     >,
     query: string,
 ): Promise<void> {
+    const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
     const tracks =
         result.loadType === 'track'
             ? [
@@ -167,7 +168,7 @@ async function handleImmediateAdd(
             : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
     const extras =
         result.loadType === 'track'
-            ? [getTrackMarkdownLocaleString(tracks[0])]
+            ? [getTrackMarkdownLocaleString(tracks[0], showArtist)]
             : [
                   tracks.length.toString(),
                   result.data.info.name === query
@@ -208,6 +209,7 @@ async function renderSearchResults(
     guild: QuaverGuild<Initialized>,
     tracks: QuaverSong[],
 ): Promise<void> {
+    const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
     const pages = paginate(tracks, 10);
     const response = await interaction.replyHandler.reply(
         new ContainerBuilder()
@@ -231,6 +233,7 @@ async function renderSearchResults(
                                     ' ',
                                 )}.\` **${getTrackMarkdownLocaleString(
                                 track,
+                                showArtist,
                             )}** \`[${durationString}]\``;
                         })
                         .join('\n'),

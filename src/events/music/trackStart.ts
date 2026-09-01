@@ -156,6 +156,7 @@ export default {
         );
         let format = (await guild.settings.get<string>('format')) ?? 'simple';
         if (!notify) format = 'off';
+        const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
         const emoji =
             settings.emojis?.[
             track.info.sourceName as keyof typeof settings.emojis
@@ -168,7 +169,7 @@ export default {
                             new TextDisplayBuilder().setContent(
                                 `${guild.locale(
                                     'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
-                                    getTrackMarkdownLocaleString(track),
+                                    getTrackMarkdownLocaleString(track, showArtist),
                                     durationString,
                                 )}\n${guild.locale('MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${guild.locale(`MISC.SOURCES.${track.info.sourceName.toUpperCase()}` as LocaleKey)}** ─ ${guild.locale(
                                     'MISC.ADDED_BY',
@@ -203,7 +204,7 @@ export default {
                 );
                 break;
             case 'detailed': {
-                const { container, actionRows } = await buildNowPlayingMessage(guild, track);
+                const { container, actionRows } = await buildNowPlayingMessage(guild, track, showArtist);
                 await queue.player.sendMessage(
                     container.addActionRowComponents(...actionRows)
                 );
@@ -300,6 +301,7 @@ export default {
 export async function buildNowPlayingMessage(
     guild: QuaverGuild<Initialized> & Guild,
     track: QuaverSong,
+    showArtist = true,
 ): Promise<{ container: ContainerBuilder; actionRows: ActionRowBuilder<ButtonBuilder>[] }> {
     const player = await guild.getPlayer();
     const duration = msToTime(track.info.length);
@@ -372,6 +374,10 @@ export async function buildNowPlayingMessage(
         );
     }
 
+    const trackDisplay = showArtist && track.info.author
+        ? `[${track.info.author} - ${track.info.title}](${track.info.uri})`
+        : `[${track.info.title}](${track.info.uri})`;
+
     const container = new ContainerBuilder()
         .addSectionComponents(
             new SectionBuilder()
@@ -382,7 +388,7 @@ export async function buildNowPlayingMessage(
                     new TextDisplayBuilder().setContent(
                         `${guild.locale(
                             'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TEXT',
-                            `[${track.info.author} - ${track.info.title}](${track.info.uri})`,
+                            trackDisplay,
                             durationString,
                         )}\n${guild.locale('MUSIC.PLAYER.PLAYING.NOW.DETAILED.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${guild.locale(`MISC.SOURCES.${track.info.sourceName.toUpperCase()}` as LocaleKey)}** ─ ${guild.locale(
                             'MISC.ADDED_BY',
