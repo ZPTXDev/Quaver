@@ -34,7 +34,7 @@
         "winston-loki": "^6.1.4",
         "yocto-spinner": "^1.2.2",
         "yoctocolors": "^2.2.0",
-        "zod": "^4.5.1",
+        "zod": "^4.5.4",
       },
       "devDependencies": {
         "@eslint/eslintrc": "^3.3.6",
