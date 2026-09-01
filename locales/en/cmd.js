@@ -259,7 +259,7 @@ export default {
         DESCRIPTION: 'Change Quaver\'s settings in this server.',
         MISC: {
             CONTENT: {
-                DESCRIPTION: 'Manage the core identity and permission levels for Quaver on this server.',
+                DESCRIPTION: 'Customize how information and lyrics are presented in your text channels.',
                 NAME: 'Content & Display',
                 SETTINGS: {
                     AUTOLYRICS: {
@@ -289,7 +289,7 @@ export default {
                 },
             },
             GENERAL: {
-                DESCRIPTION: 'Customize how information and lyrics are presented in your text channels.',
+                DESCRIPTION: 'Manage the core identity and permission levels for Quaver on this server.',
                 NAME: 'General & Access',
                 SETTINGS: {
                     DJ: {
