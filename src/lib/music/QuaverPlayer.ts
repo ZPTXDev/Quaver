@@ -1005,6 +1005,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         const guild = await QuaverGuild.wrap(this.guild);
         this.logSessionEvent('STOP', actor);
         this.queue.clear();
+        this.queue.previous = [];
         delete this.memory.originalQueue;
         delete this.memory.shuffledQueue;
         // Skip current track - trackEnd handler will see the queue is empty
