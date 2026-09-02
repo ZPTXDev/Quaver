@@ -108,6 +108,7 @@ export default new ButtonHandler().setExecute(
                                     if (track.info.title === track.info.uri) {
                                         trackDisplay = `${sourcePrefix}**${track.info.uri.substring(0, maxTrackDisplayLength - sourcePrefix.length - 3 - ellipsis.length)}${ellipsis}**`;
                                     } else {
+                                        // [**]() markup
                                         const urlLength = track.info.uri.length + 4;
                                         const maxTitleLength = maxTrackDisplayLength - sourcePrefix.length - urlLength - ellipsis.length;
                                         if (showArtist && track.info.author) {
