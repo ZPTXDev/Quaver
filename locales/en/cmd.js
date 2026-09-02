@@ -325,11 +325,11 @@ export default {
                 SETTINGS: {
                     NOTIFYIN247: {
                         DESCRIPTION: 'Whether to send "Now playing" messages in 24/7 Mode.',
-                        NAME: 'Notify in 24/7 Mode',
+                        NAME: '24/7 Mode - "Now playing" messages',
                     },
                     PAUSEALONE247: {
                         DESCRIPTION: 'Whether to pause playback when alone in voice channel in 24/7 Mode.',
-                        NAME: 'Pause alone in 24/7 Mode',
+                        NAME: '24/7 Mode - Pause when alone',
                     },
                     SMARTQUEUE: {
                         DESCRIPTION: 'Sorts the queue to alternate between requesters.',
