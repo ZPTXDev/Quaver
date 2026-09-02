@@ -211,9 +211,12 @@ export default {
                 break;
             case 'detailed': {
                 const { container, actionRows } = await buildNowPlayingMessage(guild, track, showArtist);
-                await queue.player.sendMessage(
+                const message = await queue.player.sendMessage(
                     container.addActionRowComponents(...actionRows)
                 );
+                if (message) {
+                    queue.player.memory.currentNowPlayingMessageId = message.id;
+                }
                 break;
             }
         }

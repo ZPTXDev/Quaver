@@ -59,6 +59,7 @@ export interface QuaverPlayerJSON {
             nightcore: boolean;
         };
         trackStartTime?: number;
+        currentNowPlayingMessageId?: Snowflake;
     };
     sessionLogs: {
         timestamp: number;
@@ -146,6 +147,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             nightcore: boolean;
         };
         trackStartTime?: number;
+        currentNowPlayingMessageId?: Snowflake;
     } = {
         bassboost: false,
         nightcore: false,
@@ -1105,6 +1107,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
                       }
                     : undefined,
                 adPlaytimeMs: this.memory.adPlaytimeMs,
+                preAdPlaytimeMs: this.memory.preAdPlaytimeMs,
                 isAdPlaying: this.memory.isAdPlaying,
                 savedFilters: this.memory.savedFilters
                     ? {
@@ -1112,6 +1115,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
                           nightcore: this.memory.savedFilters.nightcore,
                       }
                     : undefined,
+                trackStartTime: this.memory.trackStartTime,
+                currentNowPlayingMessageId: this.memory.currentNowPlayingMessageId,
             },
             sessionLogs: [...this.sessionLogs],
         };

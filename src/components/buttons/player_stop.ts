@@ -20,6 +20,16 @@ export default new ButtonHandler()
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
 
+        // Check if this is an old player control message
+        if (player.memory.currentNowPlayingMessageId &&
+            interaction.message.id !== player.memory.currentNowPlayingMessageId) {
+            await interaction.replyHandler.reply(
+                guild.locale('DISCORD.INTERACTION.EXPIRED'),
+                { type: MessageOptionsBuilderType.Error, ephemeral: true },
+            );
+            return;
+        }
+
         // Check if an ad is playing
         if (player.memory.isAdPlaying) {
             await interaction.replyHandler.reply(

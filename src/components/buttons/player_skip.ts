@@ -15,6 +15,15 @@ export default new ButtonHandler()
     .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
+        // Check if this is an old player control message
+        if (player.memory.currentNowPlayingMessageId &&
+            interaction.message.id !== player.memory.currentNowPlayingMessageId) {
+            await interaction.replyHandler.reply(
+                guild.locale('DISCORD.INTERACTION.EXPIRED'),
+                { type: MessageOptionsBuilderType.Error, ephemeral: true },
+            );
+            return;
+        }
         const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
         if (!player.queue.current || (!player.playing && !player.paused)) {
             await interaction.replyHandler.reply(

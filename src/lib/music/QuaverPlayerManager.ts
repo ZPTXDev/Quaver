@@ -57,6 +57,12 @@ export class QuaverPlayerManager<
                   users: [...data.memory.skip.users],
               }
             : undefined;
+        player.memory.adPlaytimeMs = data.memory.adPlaytimeMs ?? 0;
+        player.memory.preAdPlaytimeMs = data.memory.preAdPlaytimeMs;
+        player.memory.isAdPlaying = data.memory.isAdPlaying ?? false;
+        player.memory.savedFilters = data.memory.savedFilters;
+        player.memory.trackStartTime = data.memory.trackStartTime;
+        player.memory.currentNowPlayingMessageId = data.memory.currentNowPlayingMessageId;
         player.sessionLogs = data.sessionLogs ? [...data.sessionLogs] : [];
         if (resumed) {
             await player.fetch();
