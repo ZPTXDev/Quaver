@@ -80,7 +80,11 @@ export default new ButtonHandler()
                 extras = [];
             if (resolvedTracks.length === 1) {
                 msg = 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
-                extras = [getTrackMarkdownLocaleString(resolvedTracks[0], showArtist)];
+                const sourceEmoji = showSourceLabels && resolvedTracks[0].info.sourceName
+                    ? settings.emojis?.[resolvedTracks[0].info.sourceName as keyof typeof settings.emojis] || ''
+                    : '';
+                const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
+                extras = [`${sourcePrefix}${getTrackMarkdownLocaleString(resolvedTracks[0], showArtist)}`];
             } else {
                 msg = 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
                 extras = [
