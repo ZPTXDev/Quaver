@@ -210,7 +210,7 @@ export default {
                 );
                 break;
             case 'detailed': {
-                const { container, actionRows } = await buildNowPlayingMessage(guild, track, showArtist, showSourceLabels);
+                const { container, actionRows } = await buildNowPlayingMessage(guild, track, showArtist);
                 await queue.player.sendMessage(
                     container.addActionRowComponents(...actionRows)
                 );
@@ -308,7 +308,6 @@ export async function buildNowPlayingMessage(
     guild: QuaverGuild<Initialized> & Guild,
     track: QuaverSong,
     showArtist = true,
-    showSourceLabels = false,
 ): Promise<{ container: ContainerBuilder; actionRows: ActionRowBuilder<ButtonBuilder>[] }> {
     const player = await guild.getPlayer();
     const duration = msToTime(track.info.length);
