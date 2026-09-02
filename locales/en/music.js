@@ -66,7 +66,8 @@ export default {
             DEFAULT: 'Quaver is restarting and will disconnect briefly.',
             PENDING: 'Pardon the interruption! Quaver is restarting shortly.',
             SESSION_RECOVERY_DISABLED: 'You will need to start a new session after Quaver is back online as session recovery is disabled.',
-            SESSION_RECOVERY_EXPLANATION: 'Your session will be restored when Quaver is back online.'
+            SESSION_RECOVERY_EXPLANATION: 'Your session will be restored when Quaver is back online.',
+            UPDATE: 'Quaver is restarting for an update and will disconnect briefly.'
         },
         RESTORING: 'Quaver is back online! Restoring your session...',
         TRACK_SKIPPED_ERROR: 'Skipped **%1** as an internal error prevented the track from loading.',
