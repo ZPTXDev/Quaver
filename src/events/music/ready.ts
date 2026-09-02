@@ -87,7 +87,43 @@ async function restorePlayer(
                 `[G ${guild.id}] Failed to auto-unpause restored player: ${err instanceof Error ? err.message : String(err)}`,
             );
         }
-        
+
+        // Set timeout if queue is empty after restoration
+        if (!player.queue.current && player.queue.tracks.length === 0) {
+            if (await guild.settings.get<boolean>('stay.enabled') && await guild.features.isFeatureActive('stay')) {
+                await player.sendMessage(guild.locale('MUSIC.QUEUE.EMPTY'));
+            } else if (!player.timeout.pause) {
+                logger.info(`[G ${guild.id}] Setting timeout after restoration with empty queue`);
+                if (player.timeout.standard) {
+                    clearTimeout(player.timeout.standard);
+                }
+                player.timeout.standard = setTimeout(
+                    (p, g): void => {
+                        logger.info(`[G ${g.id}] Disconnecting (inactivity)`);
+                        p.sendMessage(
+                            g.locale('MUSIC.DISCONNECT.INACTIVITY.DISCONNECTED'),
+                            {
+                                type: MessageOptionsBuilderType.Warning,
+                            },
+                        );
+                        p.disconnect();
+                    },
+                    30 * 60 * 1000,
+                    player,
+                    guild,
+                );
+                player.timeout.end = Date.now() + 30 * 60 * 1000;
+                guild.sendWebUpdate('timeoutUpdate', player.timeout.end);
+                await player.sendMessage(
+                    `${guild.locale('MUSIC.QUEUE.EMPTY')} ${guild.locale(
+                        'MUSIC.DISCONNECT.INACTIVITY.WARNING',
+                        (Math.floor(Date.now() / 1000) + 30 * 60).toString(),
+                    )}`,
+                    { type: MessageOptionsBuilderType.Warning },
+                );
+            }
+        }
+
         logger.info(
             `[G ${guild.id}] Player restored from saved state (resumed = ${resumed})`,
         );
