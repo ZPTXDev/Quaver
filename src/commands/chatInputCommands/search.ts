@@ -167,15 +167,23 @@ async function handleImmediateAdd(
         result.loadType === 'track'
             ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT'
             : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
-    const extras =
-        result.loadType === 'track'
-            ? [getTrackMarkdownLocaleString(tracks[0], showArtist)]
-            : [
-                  tracks.length.toString(),
-                  result.data.info.name === query
-                      ? result.data.info.name
-                      : `[${result.data.info.name}](${query})`,
-              ];
+    let extras: string[];
+    if (result.loadType === 'track') {
+        extras = [getTrackMarkdownLocaleString(tracks[0], showArtist)];
+    } else {
+        let playlistDisplay: string;
+        if (result.data.info.name === query) {
+            playlistDisplay = showArtist && result.data.pluginInfo?.author
+                ? `${result.data.pluginInfo.author} - ${result.data.info.name}`
+                : result.data.info.name;
+        } else {
+            const displayName = showArtist && result.data.pluginInfo?.author
+                ? `${result.data.pluginInfo.author} - ${result.data.info.name}`
+                : result.data.info.name;
+            playlistDisplay = `[${displayName}](${query})`;
+        }
+        extras = [tracks.length.toString(), playlistDisplay];
+    }
     const compatible = await guild.checkPlayerCompatibility({
         member: interaction.member as GuildMember,
         textChannel: interaction.channel,

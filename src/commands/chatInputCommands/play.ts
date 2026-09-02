@@ -83,7 +83,7 @@ export default new ChatInputCommandHandler()
             query,
         );
         switch (result.loadType) {
-            case 'playlist':
+            case 'playlist': {
                 tracks = [
                     ...result.data.tracks.map((t: QuaverSong): QuaverSong => {
                         t.requesterId = interaction.user.id;
@@ -94,13 +94,24 @@ export default new ChatInputCommandHandler()
                 msg = insert
                     ? 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.INSERTED'
                     : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
+                const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+                let playlistDisplay: string;
+                if (result.data.info.name === query) {
+                    playlistDisplay = showArtist && result.data.pluginInfo?.author
+                        ? `${result.data.pluginInfo.author} - ${result.data.info.name}`
+                        : result.data.info.name;
+                } else {
+                    const displayName = showArtist && result.data.pluginInfo?.author
+                        ? `${result.data.pluginInfo.author} - ${result.data.info.name}`
+                        : result.data.info.name;
+                    playlistDisplay = `[${displayName}](${query})`;
+                }
                 extras = [
                     tracks.length.toString(),
-                    result.data.info.name === query
-                        ? result.data.info.name
-                        : `[${result.data.info.name}](${query})`,
+                    playlistDisplay,
                 ];
                 break;
+            }
             case 'track':
             case 'search': {
                 const track: QuaverSong =
