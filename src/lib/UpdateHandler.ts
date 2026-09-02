@@ -285,15 +285,16 @@ export class UpdateHandler {
                         new ContainerBuilder().addTextDisplayComponents(
                             new TextDisplayBuilder().setContent(
                                 `${guild.locale(
-                                    [
-                                        'exit',
-                                        'update',
-                                        'SIGINT',
-                                        'SIGTERM',
-                                        'lavalink',
-                                    ].includes(eventType)
-                                        ? 'MUSIC.PLAYER.RESTARTING.DEFAULT'
-                                        : 'MUSIC.PLAYER.RESTARTING.CRASHED',
+                                    eventType === 'update'
+                                        ? 'MUSIC.PLAYER.RESTARTING.UPDATE'
+                                        : [
+                                              'exit',
+                                              'SIGINT',
+                                              'SIGTERM',
+                                              'lavalink',
+                                          ].includes(eventType)
+                                          ? 'MUSIC.PLAYER.RESTARTING.DEFAULT'
+                                          : 'MUSIC.PLAYER.RESTARTING.CRASHED',
                                 )}`,
                             ),
                             guild.builders.textDisplayLocale(
