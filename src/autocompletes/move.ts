@@ -16,6 +16,7 @@ export default new AutocompleteHandler().setExecute(
                 await interaction.respond([]);
                 return;
             }
+            const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
             await interaction.respond(
                 player.queue.tracks
                     .map(
@@ -24,11 +25,19 @@ export default new AutocompleteHandler().setExecute(
                             index,
                         ): ApplicationCommandOptionChoiceData & {
                             title: string;
-                        } => ({
-                            name: `${index + 1}. ${track.info.title}`,
-                            value: index + 1,
-                            title: track.info.title,
-                        }),
+                        } => {
+                            let displayName = `${index + 1}. `;
+                            if (showArtist && track.info.author) {
+                                displayName += `${track.info.author} - ${track.info.title}`;
+                            } else {
+                                displayName += track.info.title;
+                            }
+                            return {
+                                name: displayName,
+                                value: index + 1,
+                                title: track.info.title,
+                            };
+                        },
                     )
                     .filter((track): boolean =>
                         track.title.toLowerCase().startsWith(focused.toLowerCase()),

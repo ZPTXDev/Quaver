@@ -22,6 +22,7 @@ export default new AutocompleteHandler().setExecute(async function (
             await interaction.respond([]);
             return;
         }
+        const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
         await interaction.respond(
             player.queue.tracks
                 .map(
@@ -31,12 +32,20 @@ export default new AutocompleteHandler().setExecute(async function (
                     ): ApplicationCommandOptionChoiceData & {
                         title: string;
                         requester: Snowflake;
-                    } => ({
-                        name: `${index + 1}. ${track.info.title}`,
-                        value: index + 1,
-                        title: track.info.title,
-                        requester: track.requesterId,
-                    }),
+                    } => {
+                        let displayName = `${index + 1}. `;
+                        if (showArtist && track.info.author) {
+                            displayName += `${track.info.author} - ${track.info.title}`;
+                        } else {
+                            displayName += track.info.title;
+                        }
+                        return {
+                            name: displayName,
+                            value: index + 1,
+                            title: track.info.title,
+                            requester: track.requesterId,
+                        };
+                    },
                 )
                 .filter(
                     (track): boolean =>
