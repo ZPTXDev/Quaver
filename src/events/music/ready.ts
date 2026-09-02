@@ -61,12 +61,10 @@ async function restorePlayer(
             if (snapshot.position > 0) {
                 await player.seekTo(snapshot.position);
             }
-        } else {
+        } else if (!player.playing && player.queue.tracks.length > 0) {
             // When resumed=true, Lavalink has already positioned the track correctly
             // However, if the player is not playing and there are queued tracks, start the next one
-            if (!player.playing && player.queue.tracks.length > 0) {
-                await player.queue.start();
-            }
+            await player.queue.start();
         }
         
         // Auto-unpause if the pause was initiated by the bot (e.g., due to inactivity)
