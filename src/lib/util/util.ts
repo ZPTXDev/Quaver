@@ -317,7 +317,57 @@ export function getTrackMarkdownLocaleString(track: Song, showArtist = false): s
 }
 
 /**
+ * Calculates a similarity score between a track and a search query.
+ * @param track - The track to score.
+ * @param query - The search query.
+ * @returns A score (higher is better).
+ */
+function calculateTrackSimilarity(track: Song, query: string): number {
+    const lowerQuery = query.toLowerCase();
+    const lowerTitle = track.info.title.toLowerCase();
+    const lowerAuthor = track.info.author.toLowerCase();
+
+    // Exact title match
+    if (lowerTitle === lowerQuery) return 1000;
+
+    // Exact author match
+    if (lowerAuthor === lowerQuery) return 900;
+
+    // Title starts with query
+    if (lowerTitle.startsWith(lowerQuery)) return 800;
+
+    // Author starts with query
+    if (lowerAuthor.startsWith(lowerQuery)) return 700;
+
+    // Query is in title
+    if (lowerTitle.includes(lowerQuery)) return 600;
+
+    // Query is in author
+    if (lowerAuthor.includes(lowerQuery)) return 500;
+
+    // Check for word matches in title
+    const queryWords = lowerQuery.split(/\s+/);
+    const titleWords = lowerTitle.split(/\s+/);
+    const titleMatches = queryWords.filter((word): boolean =>
+        titleWords.some((tWord): boolean => tWord.includes(word) || word.includes(tWord))
+    ).length;
+
+    if (titleMatches > 0) return 400 + (titleMatches * 10);
+
+    // Check for word matches in author
+    const authorWords = lowerAuthor.split(/\s+/);
+    const authorMatches = queryWords.filter((word): boolean =>
+        authorWords.some((aWord): boolean => aWord.includes(word) || word.includes(aWord))
+    ).length;
+
+    if (authorMatches > 0) return 300 + (authorMatches * 10);
+
+    return 0;
+}
+
+/**
  * Searches for tracks using the configured source, falling back to other sources if no tracks are found.
+ * Now searches up to 3 sources and combines results for search queries.
  * @param client - The QuaverClient instance.
  * @param guild - The QuaverGuild instance.
  * @param query - The search query.
@@ -341,30 +391,85 @@ export async function searchTracks(
         ...sources.filter((s): boolean => s !== startingSource),
     ].filter((s): boolean => !!acceptableSources[s]);
 
-    let result: LoadResult | null = null;
-    for (const source of orderedSources) {
+    const MAX_SOURCES = 3;
+    const searchResults: Array<{ result: LoadResult; sourceIndex: number; originalIndex: number }> = [];
+    let lastResult: LoadResult | null = null;
+
+    for (let i = 0; i < Math.min(orderedSources.length, MAX_SOURCES); i++) {
+        const source = orderedSources[i];
         const searchQuery = `${acceptableSources[source]}${query}`;
         try {
-            result = await client.music.api.loadTracks(searchQuery);
+            const result = await client.music.api.loadTracks(searchQuery);
+            lastResult = result;
+
             if (result) {
-                const hasTracks =
-                    (result.loadType === 'playlist' &&
-                        Array.isArray(result.data?.tracks) &&
-                        result.data.tracks.length > 0) ||
-                    (result.loadType === 'track' && result.data) ||
-                    (result.loadType === 'search' &&
-                        Array.isArray(result.data) &&
-                        result.data.length > 0);
-                if (hasTracks) {
+                // For playlists and tracks, return immediately (existing behavior)
+                if (result.loadType === 'playlist' &&
+                    Array.isArray(result.data?.tracks) &&
+                    result.data.tracks.length > 0) {
                     return result;
+                }
+
+                if (result.loadType === 'track' && result.data) {
+                    return result;
+                }
+
+                // For search results, collect them
+                if (result.loadType === 'search' &&
+                    Array.isArray(result.data) &&
+                    result.data.length > 0) {
+                    result.data.forEach((track: Song, index: number): void => {
+                        searchResults.push({
+                            result,
+                            sourceIndex: i,
+                            originalIndex: index,
+                        });
+                    });
                 }
             }
         } catch {
             // Ignore error and try the next source
         }
     }
+
+    // If we have search results from multiple sources, combine and sort them
+    if (searchResults.length > 0) {
+        // Extract all tracks with metadata
+        const tracksWithMetadata = searchResults.map((item): {
+            track: Song;
+            sourceIndex: number;
+            originalIndex: number;
+            similarity: number;
+        } => {
+            const track = (item.result as Extract<LoadResult, { loadType: 'search' }>).data[item.originalIndex];
+            return {
+                track,
+                sourceIndex: item.sourceIndex,
+                originalIndex: item.originalIndex,
+                similarity: calculateTrackSimilarity(track, query),
+            };
+        });
+
+        // Sort by: similarity (desc), then source index (asc), then original index (asc)
+        tracksWithMetadata.sort((a, b): number => {
+            if (a.similarity !== b.similarity) {
+                return b.similarity - a.similarity;
+            }
+            if (a.sourceIndex !== b.sourceIndex) {
+                return a.sourceIndex - b.sourceIndex;
+            }
+            return a.originalIndex - b.originalIndex;
+        });
+
+        // Return combined results
+        return {
+            loadType: 'search',
+            data: tracksWithMetadata.map((item): Song => item.track),
+        };
+    }
+
     return (
-        result ?? {
+        lastResult ?? {
             loadType: 'error',
             data: {
                 message: 'All search sources failed.',
