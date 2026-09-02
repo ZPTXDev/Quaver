@@ -189,7 +189,7 @@ export default new ButtonHandler()
             (track, index: number): APISelectMenuOption => {
                 let label = `${firstIndex + index}. ${track.info.title}`;
                 if (label.length >= 100) {
-                    label = `${label.substring(0, 97)}...`;
+                    label = `${label.substring(0, 99)}…`;
                 }
                 return {
                     label: label,
@@ -219,7 +219,7 @@ export default new ButtonHandler()
                     firstIdx + pages[refPg].indexOf(refTrack)
                 }. ${refTrack.info.title}`;
                 if (label.length >= 100) {
-                    label = `${label.substring(0, 97)}...`;
+                    label = `${label.substring(0, 99)}…`;
                 }
                 return {
                     label: label,
