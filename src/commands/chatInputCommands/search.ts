@@ -147,6 +147,7 @@ async function handleImmediateAdd(
     query: string,
 ): Promise<void> {
     const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+    const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? false;
     const tracks =
         result.loadType === 'track'
             ? [
@@ -169,18 +170,27 @@ async function handleImmediateAdd(
             : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
     let extras: string[];
     if (result.loadType === 'track') {
-        extras = [getTrackMarkdownLocaleString(tracks[0], showArtist)];
+        const sourceEmoji = showSourceLabels && tracks[0].info.sourceName
+            ? settings.emojis?.[tracks[0].info.sourceName as keyof typeof settings.emojis] || ''
+            : '';
+        const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
+        extras = [`${sourcePrefix}${getTrackMarkdownLocaleString(tracks[0], showArtist)}`];
     } else {
+        const sourceEmoji = showSourceLabels && tracks.length > 0 && tracks[0].info.sourceName
+            ? settings.emojis?.[tracks[0].info.sourceName as keyof typeof settings.emojis] || ''
+            : '';
+        const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
+
         let playlistDisplay: string;
         if (result.data.info.name === query) {
             playlistDisplay = showArtist && result.data.pluginInfo?.author
-                ? `${result.data.pluginInfo.author} - ${result.data.info.name}`
-                : result.data.info.name;
+                ? `${sourcePrefix}${result.data.pluginInfo.author} - ${result.data.info.name}`
+                : `${sourcePrefix}${result.data.info.name}`;
         } else {
             const displayName = showArtist && result.data.pluginInfo?.author
                 ? `${result.data.pluginInfo.author} - ${result.data.info.name}`
                 : result.data.info.name;
-            playlistDisplay = `[${displayName}](${query})`;
+            playlistDisplay = `${sourcePrefix}[${displayName}](${query})`;
         }
         extras = [tracks.length.toString(), playlistDisplay];
     }

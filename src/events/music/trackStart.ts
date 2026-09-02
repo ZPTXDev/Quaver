@@ -158,17 +158,22 @@ export default {
         let format = (await guild.settings.get<string>('format')) ?? 'simple';
         if (!notify) format = 'off';
         const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+        const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? false;
         const emoji =
             settings.emojis?.[
             track.info.sourceName as keyof typeof settings.emojis
             ] ?? '';
+        const sourceEmoji = showSourceLabels && track.info.sourceName
+            ? settings.emojis?.[track.info.sourceName as keyof typeof settings.emojis] || ''
+            : '';
+        const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
         switch (format) {
             case 'simple':
                 await queue.player.sendMessage(
                     new ContainerBuilder()
                         .addTextDisplayComponents(
                             new TextDisplayBuilder().setContent(
-                                `${guild.locale(
+                                `${sourcePrefix}${guild.locale(
                                     'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
                                     getTrackMarkdownLocaleString(track, showArtist),
                                     durationString,
@@ -205,7 +210,7 @@ export default {
                 );
                 break;
             case 'detailed': {
-                const { container, actionRows } = await buildNowPlayingMessage(guild, track, showArtist);
+                const { container, actionRows } = await buildNowPlayingMessage(guild, track, showArtist, showSourceLabels);
                 await queue.player.sendMessage(
                     container.addActionRowComponents(...actionRows)
                 );
@@ -303,6 +308,7 @@ export async function buildNowPlayingMessage(
     guild: QuaverGuild<Initialized> & Guild,
     track: QuaverSong,
     showArtist = true,
+    showSourceLabels = false,
 ): Promise<{ container: ContainerBuilder; actionRows: ActionRowBuilder<ButtonBuilder>[] }> {
     const player = await guild.getPlayer();
     const duration = msToTime(track.info.length);
@@ -316,6 +322,11 @@ export async function buildNowPlayingMessage(
         settings.emojis[
             track.info.sourceName as keyof typeof settings.emojis
         ] ?? '';
+
+    const sourceEmoji = showSourceLabels && track.info.sourceName
+        ? settings.emojis?.[track.info.sourceName as keyof typeof settings.emojis] || ''
+        : '';
+    const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
 
     const controls = (await guild.settings.get<boolean>('controls')) ?? true;
     const actionRows: ActionRowBuilder<ButtonBuilder>[] = [];
@@ -385,7 +396,7 @@ export async function buildNowPlayingMessage(
                         'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE',
                     ),
                     new TextDisplayBuilder().setContent(
-                        `${guild.locale(
+                        `${sourcePrefix}${guild.locale(
                             'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TEXT',
                             trackDisplay,
                             durationString,

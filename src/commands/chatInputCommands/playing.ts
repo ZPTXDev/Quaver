@@ -46,7 +46,13 @@ export default new ChatInputCommandHandler()
         }
 
         const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
-        
+        const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? false;
+
+        const sourceEmoji = showSourceLabels && player.queue.current.info.sourceName
+            ? settings.emojis?.[player.queue.current.info.sourceName as keyof typeof settings.emojis] || ''
+            : '';
+        const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
+
         const bar = getBar(
             (player.position / player.queue.current.info.length) * 100,
         );
@@ -65,7 +71,7 @@ export default new ChatInputCommandHandler()
         }
         if (player.queue.current.info.isStream) {
             await interaction.replyHandler.reply(
-                `**${getTrackMarkdownLocaleString(player.queue.current, showArtist)}**\n${settings.emojis.live} **${guild.locale(
+                `${sourcePrefix}**${getTrackMarkdownLocaleString(player.queue.current, showArtist)}**\n${settings.emojis.live} **${guild.locale(
                     'MISC.LIVE',
                 )}** ${'▬'.repeat(10)}${player.paused ? ` ${settings.emojis.pause}` : ''}${
                     player.queue.loop.type !== LoopType.None
@@ -86,7 +92,7 @@ export default new ChatInputCommandHandler()
             return;
         }
         await interaction.replyHandler.reply(
-            `**${getTrackMarkdownLocaleString(player.queue.current, showArtist)}**\n${bar}${player.paused ? ` ${settings.emojis.pause}` : ''}${
+            `${sourcePrefix}**${getTrackMarkdownLocaleString(player.queue.current, showArtist)}**\n${bar}${player.paused ? ` ${settings.emojis.pause}` : ''}${
                 player.queue.loop.type !== LoopType.None
                     ? ` ${
                           player.queue.loop.type === LoopType.Queue

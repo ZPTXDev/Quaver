@@ -95,16 +95,24 @@ export default new ChatInputCommandHandler()
                     ? 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.INSERTED'
                     : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
                 const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+                const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? false;
+
+                // Get source emoji from first track in playlist
+                const sourceEmoji = showSourceLabels && tracks.length > 0 && tracks[0].info.sourceName
+                    ? settings.emojis?.[tracks[0].info.sourceName as keyof typeof settings.emojis] || ''
+                    : '';
+                const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
+
                 let playlistDisplay: string;
                 if (result.data.info.name === query) {
                     playlistDisplay = showArtist && result.data.pluginInfo?.author
-                        ? `${result.data.pluginInfo.author} - ${result.data.info.name}`
-                        : result.data.info.name;
+                        ? `${sourcePrefix}${result.data.pluginInfo.author} - ${result.data.info.name}`
+                        : `${sourcePrefix}${result.data.info.name}`;
                 } else {
                     const displayName = showArtist && result.data.pluginInfo?.author
                         ? `${result.data.pluginInfo.author} - ${result.data.info.name}`
                         : result.data.info.name;
-                    playlistDisplay = `[${displayName}](${query})`;
+                    playlistDisplay = `${sourcePrefix}[${displayName}](${query})`;
                 }
                 extras = [
                     tracks.length.toString(),
@@ -130,7 +138,14 @@ export default new ChatInputCommandHandler()
                     ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.INSERTED'
                     : 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
                 const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
-                extras = [getTrackMarkdownLocaleString(track, showArtist)];
+                const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? false;
+
+                const sourceEmoji = showSourceLabels && track.info.sourceName
+                    ? settings.emojis?.[track.info.sourceName as keyof typeof settings.emojis] || ''
+                    : '';
+                const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
+
+                extras = [`${sourcePrefix}${getTrackMarkdownLocaleString(track, showArtist)}`];
                 break;
             }
             case 'empty':
