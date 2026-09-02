@@ -210,6 +210,7 @@ async function renderSearchResults(
     tracks: QuaverSong[],
 ): Promise<void> {
     const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+    const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? false;
     const pages = paginate(tracks, 10);
     const response = await interaction.replyHandler.reply(
         new ContainerBuilder()
@@ -226,15 +227,35 @@ async function renderSearchResults(
                                     'MISC.MORE_THAN_A_DAY',
                                 );
                             }
-                            return `\`${(index + 1)
+                            const sourceEmoji = showSourceLabels && track.info.sourceName
+                                ? settings.emojis?.[track.info.sourceName as keyof typeof settings.emojis] || ''
+                                : '';
+                            const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
+
+                            const indexStr = `\`${(index + 1)
                                 .toString()
                                 .padStart(
                                     tracks.length.toString().length,
                                     ' ',
-                                )}.\` **${getTrackMarkdownLocaleString(
+                                )}.\` `;
+                            const trackStr = `**${getTrackMarkdownLocaleString(
                                 track,
                                 showArtist,
-                            )}** \`[${durationString}]\``;
+                            )}**`;
+                            const durationStr = ` \`[${durationString}]\``;
+
+                            // Calculate remaining characters for the line
+                            const baseLength = indexStr.length + durationStr.length;
+                            const maxTrackLength = 300 - baseLength - sourcePrefix.length;
+
+                            let finalTrackStr = trackStr;
+                            if (trackStr.length > maxTrackLength) {
+                                // Truncate if too long
+                                const ellipsis = '…';
+                                finalTrackStr = `**${trackStr.substring(0, maxTrackLength - ellipsis.length - 4)}${ellipsis}**`;
+                            }
+
+                            return `${indexStr}${sourcePrefix}${finalTrackStr}${durationStr}`;
                         })
                         .join('\n'),
                 ),

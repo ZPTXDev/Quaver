@@ -4,7 +4,7 @@ import { QuaverGuild } from '#src/lib/guild';
 import type { LocaleKey } from '#src/lib/locales';
 import { logger } from '#src/lib/logger';
 import { searchState, updateHandler } from '#src/lib/state';
-import { buildMessageOptions, Check, getTrackMarkdownLocaleString, type QuaverChannels, } from '#src/lib/util';
+import { buildMessageOptions, Check, getTrackMarkdownLocaleString, type QuaverChannels, settings, } from '#src/lib/util';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import {
@@ -26,6 +26,7 @@ export default new ButtonHandler()
     .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+        const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? false;
         const state = searchState[interaction.message.id];
         if (!state) {
             await interaction.replyHandler.reply(
@@ -163,15 +164,33 @@ export default new ButtonHandler()
                     if (durationString === 'MORE_THAN_A_DAY') {
                         durationString = guild.locale('MISC.MORE_THAN_A_DAY');
                     }
-                    return `\`${(firstIndex + index)
+                    const sourceEmoji = showSourceLabels && track.info.sourceName
+                        ? settings.emojis?.[track.info.sourceName as keyof typeof settings.emojis] || ''
+                        : '';
+                    const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
+
+                    const indexStr = `\`${(firstIndex + index)
                         .toString()
                         .padStart(
                             largestIndexSize,
                             ' ',
-                        )}.\` **${getTrackMarkdownLocaleString(
+                        )}.\` `;
+                    const trackStr = `**${getTrackMarkdownLocaleString(
                         track,
                         showArtist,
-                    )}** \`[${durationString}]\``;
+                    )}**`;
+                    const durationStr = ` \`[${durationString}]\``;
+
+                    const baseLength = indexStr.length + durationStr.length;
+                    const maxTrackLength = 300 - baseLength - sourcePrefix.length;
+
+                    let finalTrackStr = trackStr;
+                    if (trackStr.length > maxTrackLength) {
+                        const ellipsis = '…';
+                        finalTrackStr = `**${trackStr.substring(0, maxTrackLength - ellipsis.length - 4)}${ellipsis}**`;
+                    }
+
+                    return `${indexStr}${sourcePrefix}${finalTrackStr}${durationStr}`;
                 })
                 .join('\n'),
         );

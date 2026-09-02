@@ -286,6 +286,10 @@ export default {
                         DESCRIPTION: 'Whether to show the artist name on all messages.',
                         NAME: 'Show Artist Name',
                     },
+                    SHOWSOURCELABELS: {
+                        DESCRIPTION: 'Whether to show track sources in /search and /queue commands.',
+                        NAME: 'Show Source Labels',
+                    },
                 },
             },
             GENERAL: {

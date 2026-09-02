@@ -53,6 +53,7 @@ export default new ButtonHandler().setExecute(
             return;
         }
         const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+        const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? false;
         const firstIndex = 5 * (page - 1) + 1;
         const pageSize = pages[page - 1].length;
         const largestIndexSize = (firstIndex + pageSize - 1).toString().length;
@@ -81,16 +82,45 @@ export default new ButtonHandler().setExecute(
                                     );
                                 }
                                 let trackDisplay: string;
+                                const sourceEmoji = showSourceLabels && track.info.sourceName
+                                    ? settings.emojis?.[track.info.sourceName as keyof typeof settings.emojis] || ''
+                                    : '';
+                                const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
+
                                 if (track.info.title === track.info.uri) {
-                                    trackDisplay = `**${track.info.uri}**`;
+                                    trackDisplay = `${sourcePrefix}**${track.info.uri}**`;
                                 } else if (showArtist && track.info.author) {
-                                    trackDisplay = `[**${escapeMarkdown(cleanURIForMarkdown(track.info.author))} - ${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`;
+                                    trackDisplay = `${sourcePrefix}[**${escapeMarkdown(cleanURIForMarkdown(track.info.author))} - ${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`;
                                 } else {
-                                    trackDisplay = `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`;
+                                    trackDisplay = `${sourcePrefix}[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`;
                                 }
-                                return `\`${(firstIndex + index)
+
+                                const indexStr = `\`${(firstIndex + index)
                                     .toString()
-                                    .padStart(largestIndexSize, ' ')}.\` ${trackDisplay} \`[${durationString}]\` <@${track.requesterId}>`;
+                                    .padStart(largestIndexSize, ' ')}.\` `;
+                                const durationStr = ` \`[${durationString}]\``;
+                                const mentionStr = ` <@${track.requesterId}>`;
+                                const baseLength = indexStr.length + durationStr.length + mentionStr.length;
+
+                                const maxTrackDisplayLength = 300 - baseLength;
+                                if (trackDisplay.length > maxTrackDisplayLength) {
+                                    const ellipsis = '…';
+                                    if (track.info.title === track.info.uri) {
+                                        trackDisplay = `${sourcePrefix}**${track.info.uri.substring(0, maxTrackDisplayLength - sourcePrefix.length - 3 - ellipsis.length)}${ellipsis}**`;
+                                    } else {
+                                        const urlLength = track.info.uri.length + 4;
+                                        const maxTitleLength = maxTrackDisplayLength - sourcePrefix.length - urlLength - ellipsis.length;
+                                        if (showArtist && track.info.author) {
+                                            const titlePart = `${escapeMarkdown(cleanURIForMarkdown(track.info.author))} - ${escapeMarkdown(cleanURIForMarkdown(track.info.title))}`;
+                                            trackDisplay = `${sourcePrefix}[**${titlePart.substring(0, maxTitleLength)}${ellipsis}**](${track.info.uri})`;
+                                        } else {
+                                            const titlePart = escapeMarkdown(cleanURIForMarkdown(track.info.title));
+                                            trackDisplay = `${sourcePrefix}[**${titlePart.substring(0, maxTitleLength)}${ellipsis}**](${track.info.uri})`;
+                                        }
+                                    }
+                                }
+
+                                return `${indexStr}${trackDisplay}${durationStr}${mentionStr}`;
                             })
                             .join('\n'),
                     ),

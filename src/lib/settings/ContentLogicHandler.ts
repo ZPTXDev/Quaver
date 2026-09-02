@@ -129,6 +129,19 @@ export class ContentLogicHandler {
                 );
                 return;
             }
+            case 'showsourcelabels': {
+                const showSourceLabels =
+                    (await guild.settings.get<boolean>('showsourcelabels')) ?? false;
+                await guild.settings.set('showsourcelabels', !showSourceLabels);
+                await interaction.replyHandler.reply(
+                    await SettingsRenderer.renderSubMenu(
+                        await QuaverGuild.wrap(interaction.guild),
+                        SettingsCategory.Content,
+                    ),
+                    { force: ForceType.Update },
+                );
+                return;
+            }
         }
     }
 }

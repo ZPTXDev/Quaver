@@ -270,6 +270,22 @@ export class SettingsRenderer {
             (await guild.settings.get<boolean>('autolyrics')) ?? false;
         const controls =
             (await guild.settings.get<boolean>('controls')) ?? true;
+        const showSourceLabels =
+            (await guild.settings.get<boolean>('showsourcelabels')) ?? false;
+
+        // Check if all available source emojis are configured
+        const availableSources = Object.keys(acceptableSources);
+        const allSourceEmojisConfigured = availableSources.every(
+            (source): boolean => !!settings.emojis[source as keyof typeof settings.emojis]
+        );
+
+        // If not all emojis are configured, hide the setting and force it to false
+        const showSourceLabelsEffective = allSourceEmojisConfigured ? showSourceLabels : false;
+        if (!allSourceEmojisConfigured && showSourceLabels) {
+            // Force disable if emojis are not configured
+            await guild.settings.set('showsourcelabels', false);
+        }
+
         return [
             this.createItemSection(
                 guild,
@@ -302,6 +318,19 @@ export class SettingsRenderer {
                               autoLyrics ? 'MISC.ENABLED' : 'MISC.DISABLED',
                           ),
                           autoLyrics ? ButtonStyle.Success : ButtonStyle.Danger,
+                      ),
+                  ]
+                : []),
+            ...(allSourceEmojisConfigured
+                ? [
+                      this.createItemSection(
+                          guild,
+                          SettingsCategory.Content,
+                          'showsourcelabels',
+                          guild.locale(
+                              showSourceLabelsEffective ? 'MISC.ENABLED' : 'MISC.DISABLED',
+                          ),
+                          showSourceLabelsEffective ? ButtonStyle.Success : ButtonStyle.Danger,
                       ),
                   ]
                 : []),

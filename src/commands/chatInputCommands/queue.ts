@@ -44,6 +44,7 @@ export default new ChatInputCommandHandler()
             return;
         }
         const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+        const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? false;
         const pages = paginate(player.queue.tracks, 5);
         await interaction.replyHandler.reply(
             new ContainerBuilder()
@@ -61,14 +62,47 @@ export default new ChatInputCommandHandler()
                                     );
                                 }
                                 let trackDisplay: string;
+                                const sourceEmoji = showSourceLabels && track.info.sourceName
+                                    ? settings.emojis?.[track.info.sourceName as keyof typeof settings.emojis] || ''
+                                    : '';
+                                const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
+
                                 if (track.info.title === track.info.uri) {
-                                    trackDisplay = `**${track.info.uri}**`;
+                                    trackDisplay = `${sourcePrefix}**${track.info.uri}**`;
                                 } else if (showArtist && track.info.author) {
-                                    trackDisplay = `[**${escapeMarkdown(cleanURIForMarkdown(track.info.author))} - ${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`;
+                                    trackDisplay = `${sourcePrefix}[**${escapeMarkdown(cleanURIForMarkdown(track.info.author))} - ${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`;
                                 } else {
-                                    trackDisplay = `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`;
+                                    trackDisplay = `${sourcePrefix}[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`;
                                 }
-                                return `\`${index + 1}.\` ${trackDisplay} \`[${durationString}]\` <@${track.requesterId}>`;
+
+                                // Calculate remaining characters for the line
+                                const indexStr = `\`${index + 1}.\` `;
+                                const durationStr = ` \`[${durationString}]\``;
+                                const mentionStr = ` <@${track.requesterId}>`;
+                                const baseLength = indexStr.length + durationStr.length + mentionStr.length;
+
+                                // Discord's limit is 2000 per message, but we need to be more conservative
+                                // to account for multiple lines. Let's limit each track display to ~300 chars
+                                const maxTrackDisplayLength = 300 - baseLength;
+                                if (trackDisplay.length > maxTrackDisplayLength) {
+                                    // Truncate the track display, accounting for markdown
+                                    const ellipsis = '…';
+                                    if (track.info.title === track.info.uri) {
+                                        trackDisplay = `${sourcePrefix}**${track.info.uri.substring(0, maxTrackDisplayLength - sourcePrefix.length - 3 - ellipsis.length)}${ellipsis}**`;
+                                    } else {
+                                        const urlLength = track.info.uri.length + 4; // [**]() markup
+                                        const maxTitleLength = maxTrackDisplayLength - sourcePrefix.length - urlLength - ellipsis.length;
+                                        if (showArtist && track.info.author) {
+                                            const titlePart = `${escapeMarkdown(cleanURIForMarkdown(track.info.author))} - ${escapeMarkdown(cleanURIForMarkdown(track.info.title))}`;
+                                            trackDisplay = `${sourcePrefix}[**${titlePart.substring(0, maxTitleLength)}${ellipsis}**](${track.info.uri})`;
+                                        } else {
+                                            const titlePart = escapeMarkdown(cleanURIForMarkdown(track.info.title));
+                                            trackDisplay = `${sourcePrefix}[**${titlePart.substring(0, maxTitleLength)}${ellipsis}**](${track.info.uri})`;
+                                        }
+                                    }
+                                }
+
+                                return `${indexStr}${trackDisplay}${durationStr}${mentionStr}`;
                             })
                             .join('\n'),
                     ),
