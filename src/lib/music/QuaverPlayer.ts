@@ -608,8 +608,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             'QUEUE_MOVE',
             actor,
             moved
-                ? `[${moved.info.title}](${moved.info.uri}) (\`${oldPosition}\` ➜ \`${newPosition}\`)`
-                : `(\`${oldPosition}\` ➜ \`${newPosition}\`)`,
+                ? `[${moved.info.title}](${moved.info.uri}) \`${oldPosition} -> ${newPosition}\``
+                : `\`${oldPosition} -> ${newPosition}\``,
         );
         guild.sendWebUpdate('queueUpdate', this.decorateQueue());
         return PlayerResponse.Success;
