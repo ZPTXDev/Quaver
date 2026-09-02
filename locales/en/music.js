@@ -24,19 +24,23 @@ export default {
             },
         },
         FEATURE_RESTORED: {
-            STAY: {
-                PREMIUM: "**24/7 Mode** has been re-enabled as **Quaver Premium** has been renewed.",
-                WHITELIST: "**24/7 Mode** has been re-enabled as this server has regained access to the feature."
-            },
             SMARTQUEUE: {
                 PREMIUM: "**Smart Queue** has been re-enabled as **Quaver Premium** has been renewed.",
                 WHITELIST: "**Smart Queue** has been re-enabled as this server has regained access to the feature."
+            },
+            STAY: {
+                PREMIUM: "**24/7 Mode** has been re-enabled as **Quaver Premium** has been renewed.",
+                WHITELIST: "**24/7 Mode** has been re-enabled as this server has regained access to the feature."
             },
         },
         FILTER_NOTE: '-# This may take a few seconds to apply',
         LOOP_QUEUE_DISABLED: 'Disabled looping as the queue is less than 15 seconds long.',
         LOOP_TRACK_DISABLED: 'Disabled looping as the track is less than 15 seconds long.',
         PLAYING: {
+            AD: {
+                MESSAGE: 'This is a brief ad break.\nFor ad-free listening, get **Quaver Premium**.',
+                TITLE: '### Ad Break',
+            },
             NOTHING: 'There is nothing playing right now.',
             NOW: {
                 DETAILED: {
@@ -52,10 +56,6 @@ export default {
                     SOURCE: 'Source',
                     TEXT: 'Now playing **%1** `[%2]`',
                 },
-            },
-            AD: {
-                TITLE: '### Ad Break',
-                MESSAGE: 'This is a brief ad break.\nFor ad-free listening, get **Quaver Premium**.',
             },
         },
         QUEUE_CLEARED_ERROR: 'Cleared queue as an error occurred multiple times consecutively.',

@@ -1,6 +1,9 @@
 export default {
     '247': {
         DESCRIPTION: '24/7 Mode prevents Quaver from leaving.',
+        MISC: {
+            NOTE: '-# Quaver will use the current voice and text channel if it restarts.',
+        },
         OPTION: {
             ENABLED: 'Whether 24/7 Mode is enabled. If not specified, it will be toggled.',
         },
@@ -8,9 +11,6 @@ export default {
             DISABLED: '24/7 Mode has been **disabled**',
             ENABLED: '24/7 Mode has been **enabled**',
             QUEUE_CHANNEL_MISSING: 'The queue channel is missing. Try using </bind:%1>.',
-        },
-        MISC: {
-            NOTE: '-# Quaver will use the current voice and text channel if it restarts.',
         },
     },
     BASSBOOST: {
@@ -51,16 +51,16 @@ export default {
     },
     INFO: {
         DESCRIPTION: 'Show information about Quaver.',
-        RESPONSE: {
-            MENTION: 'Hi! Quaver uses [Slash Commands](https://support-apps.discord.com/hc/en-us/articles/26501837786775-Slash-Commands-FAQ).\nFor more information about Quaver, use </info:%1>.\nTo play a track, try </play:%2> or </search:%3>.\nTo configure Quaver, use </settings:%4>.',
-            SUCCESS: 'Simple-to-use music bot with features such as bass boost, nightcore, seek, search, and more.\nMade with ❤️ by **ZPTX**.\nRunning version `%1`.',
-        },
         MISC: {
             INVITE: 'Invite',
             SOURCE_CODE: 'Source Code',
             SPONSOR_US: 'Sponsor Us',
             SUPPORT_SERVER: 'Support Server',
             TRANSLATE_FOR_US: 'Translate for Us',
+        },
+        RESPONSE: {
+            MENTION: 'Hi! Quaver uses [Slash Commands](https://support-apps.discord.com/hc/en-us/articles/26501837786775-Slash-Commands-FAQ).\nFor more information about Quaver, use </info:%1>.\nTo play a track, try </play:%2> or </search:%3>.\nTo configure Quaver, use </settings:%4>.',
+            SUCCESS: 'Simple-to-use music bot with features such as bass boost, nightcore, seek, search, and more.\nMade with ❤️ by **ZPTX**.\nRunning version `%1`.',
         },
     },
     LOOP: {
@@ -70,8 +70,8 @@ export default {
                 DESCRIPTION: 'The looping mode.',
                 OPTION: {
                     DISABLED: 'Disabled',
-                    TRACK: 'Track',
                     QUEUE: 'Queue',
+                    TRACK: 'Track',
                 },
             },
         },
@@ -81,6 +81,12 @@ export default {
     },
     LYRICS: {
         DESCRIPTION: 'Look up lyrics.',
+        MISC: {
+            JAPANESE_INACCURATE: '-# Romanizing kanji might result in slight inaccuracies.',
+            ROMANIZE_FROM_CHINESE: 'Romanize from Chinese',
+            ROMANIZE_FROM_JAPANESE: 'Romanize from Japanese',
+            ROMANIZE_FROM_KOREAN: 'Romanize from Korean',
+        },
         OPTION: {
             QUERY: 'Search query. If not specified, uses the currently playing track.',
         },
@@ -88,12 +94,6 @@ export default {
             NO_QUERY: 'No search query was specified.',
             NO_RESULTS: 'Your search yielded no results.',
             ROMANIZATION_FAILED: 'An internal error occurred. Please try again later.',
-        },
-        MISC: {
-            JAPANESE_INACCURATE: '-# Romanizing kanji might result in slight inaccuracies.',
-            ROMANIZE_FROM_CHINESE: 'Romanize from Chinese',
-            ROMANIZE_FROM_JAPANESE: 'Romanize from Japanese',
-            ROMANIZE_FROM_KOREAN: 'Romanize from Korean',
         },
     },
     MOVE: {
@@ -132,11 +132,11 @@ export default {
     },
     PING: {
         DESCRIPTION: 'Show Quaver\'s latency and uptime.',
-        RESPONSE: {
-            SUCCESS: 'Pong! Heartbeat: %1',
-        },
         MISC: {
             UPTIME: '-# Uptime: %1',
+        },
+        RESPONSE: {
+            SUCCESS: 'Pong! Heartbeat: %1',
         },
     },
     PLAY: {
@@ -155,13 +155,13 @@ export default {
     },
     QUEUE: {
         DESCRIPTION: 'Show the queue.',
-        RESPONSE: {
-            OUT_OF_RANGE: 'Your input was invalid.',
-            QUEUE_EMPTY: 'There is nothing coming up.',
-        },
         MISC: {
             MODAL_TITLE: 'Go to page',
             PAGE: 'Page',
+        },
+        RESPONSE: {
+            OUT_OF_RANGE: 'Your input was invalid.',
+            QUEUE_EMPTY: 'There is nothing coming up.',
         },
     },
     REMOVE: {
@@ -190,15 +190,15 @@ export default {
     },
     SEARCH: {
         DESCRIPTION: 'Search for a track.',
+        MISC: {
+            PICK: 'Pick track(s)',
+        },
         OPTION: {
             QUERY: 'Your search query.',
         },
         RESPONSE: {
             LOAD_FAILED: 'An internal error prevented the track(s) from loading. Please try again later.',
             NO_RESULTS: 'Your search yielded no results.',
-        },
-        MISC: {
-            PICK: 'Pick track(s)',
         },
     },
     SEEK: {
@@ -308,8 +308,8 @@ export default {
                         DESCRIPTION: '**Quaver Premium** unlocks **Ad-Free Listening**, **Auto Lyrics**, **Smart Queue**, and **24/7 Mode**.',
                         NAME: 'Quaver Premium',
                         STATE: {
+                            ACTIVE_LIFETIME_MESSAGE: 'This server has lifetime **Quaver Premium**.\nThank you for your support!',
                             ACTIVE_MESSAGE: 'This server has **Quaver Premium** until **<t:%1:f>**.\nThank you for your support!',
-                            ACTIVE_LIFETIME_MESSAGE: 'This server has lifetime **Quaver Premium**.\nThank you for your support!'
                         },
                     },
                 },
@@ -359,15 +359,15 @@ export default {
             ERROR: {
                 AD_PLAYING: 'You cannot skip ad breaks.',
             },
-            VOTED: {
-                STATE_UNCHANGED: 'You have already voted to skip this track.',
-                SUCCESS: 'Voted to skip %1 `[%2 / %3]`',
-            },
             SUCCESS: {
                 DEFAULT: 'Skipped **%1**',
                 FORCED: 'Skipped **%1** by force',
                 MANAGER: 'Skipped **%1** by manager bypass',
                 VOTED: 'Skipped **%1** by voting',
+            },
+            VOTED: {
+                STATE_UNCHANGED: 'You have already voted to skip this track.',
+                SUCCESS: 'Voted to skip %1 `[%2 / %3]`',
             },
         },
     },
@@ -393,10 +393,10 @@ export default {
     STOP: {
         DESCRIPTION: 'Stop the current track and clear the queue.',
         RESPONSE: {
+            CONFIRMATION: 'Are you sure you want to stop the current track and clear the queue?',
             ERROR: {
                 AD_PLAYING: 'You cannot stop during ad breaks.',
             },
-            CONFIRMATION: 'Are you sure you want to stop the current track and clear the queue?',
             SUCCESS: 'Stopped the current track and cleared the queue.',
         },
     },
