@@ -43,6 +43,7 @@ export default new ChatInputCommandHandler()
             );
             return;
         }
+        const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
         const pages = paginate(player.queue.tracks, 5);
         await interaction.replyHandler.reply(
             new ContainerBuilder()
@@ -59,11 +60,15 @@ export default new ChatInputCommandHandler()
                                         'MISC.MORE_THAN_A_DAY',
                                     );
                                 }
-                                return `\`${index + 1}.\` ${
-                                    track.info.title === track.info.uri
-                                        ? `**${track.info.uri}**`
-                                        : `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`
-                                } \`[${durationString}]\` <@${track.requesterId}>`;
+                                let trackDisplay: string;
+                                if (track.info.title === track.info.uri) {
+                                    trackDisplay = `**${track.info.uri}**`;
+                                } else if (showArtist && track.info.author) {
+                                    trackDisplay = `[**${escapeMarkdown(cleanURIForMarkdown(track.info.author))} - ${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`;
+                                } else {
+                                    trackDisplay = `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`;
+                                }
+                                return `\`${index + 1}.\` ${trackDisplay} \`[${durationString}]\` <@${track.requesterId}>`;
                             })
                             .join('\n'),
                     ),

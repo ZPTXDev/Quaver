@@ -31,7 +31,8 @@ export default {
     once: false,
     async execute(queue: QuaverQueue, track: QuaverSong): Promise<void> {
         const guild = await QuaverGuild.wrap(queue.player.guild);
-        queue.player.logSessionEvent('PLAY', null, `[${track.info.title}](${track.info.uri})`);
+        const showArtistForLog = (await guild.settings.get<boolean>('showartist')) ?? true;
+        queue.player.logSessionEvent('PLAY', null, getTrackMarkdownLocaleString(track, showArtistForLog));
         delete queue.player.memory.skip;
         // Record track start time for accurate playtime tracking
         queue.player.memory.trackStartTime = Date.now();
@@ -374,9 +375,7 @@ export async function buildNowPlayingMessage(
         );
     }
 
-    const trackDisplay = showArtist && track.info.author
-        ? `[${track.info.author} - ${track.info.title}](${track.info.uri})`
-        : `[${track.info.title}](${track.info.uri})`;
+    const trackDisplay = getTrackMarkdownLocaleString(track, showArtist);
 
     const container = new ContainerBuilder()
         .addSectionComponents(

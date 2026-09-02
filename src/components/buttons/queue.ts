@@ -52,6 +52,7 @@ export default new ButtonHandler().setExecute(
             );
             return;
         }
+        const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
         const firstIndex = 5 * (page - 1) + 1;
         const pageSize = pages[page - 1].length;
         const largestIndexSize = (firstIndex + pageSize - 1).toString().length;
@@ -79,13 +80,17 @@ export default new ButtonHandler().setExecute(
                                         'MISC.MORE_THAN_A_DAY',
                                     );
                                 }
+                                let trackDisplay: string;
+                                if (track.info.title === track.info.uri) {
+                                    trackDisplay = `**${track.info.uri}**`;
+                                } else if (showArtist && track.info.author) {
+                                    trackDisplay = `[**${escapeMarkdown(cleanURIForMarkdown(track.info.author))} - ${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`;
+                                } else {
+                                    trackDisplay = `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`;
+                                }
                                 return `\`${(firstIndex + index)
                                     .toString()
-                                    .padStart(largestIndexSize, ' ')}.\` ${
-                                    track.info.title === track.info.uri
-                                        ? `**${track.info.uri}**`
-                                        : `[**${escapeMarkdown(cleanURIForMarkdown(track.info.title))}**](${track.info.uri})`
-                                } \`[${durationString}]\` <@${track.requesterId}>`;
+                                    .padStart(largestIndexSize, ' ')}.\` ${trackDisplay} \`[${durationString}]\` <@${track.requesterId}>`;
                             })
                             .join('\n'),
                     ),
