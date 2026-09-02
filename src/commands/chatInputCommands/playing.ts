@@ -2,10 +2,10 @@ import { MessageOptionsBuilderType } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import { getLocaleString } from '#src/lib/locales';
-import { Check, cleanURIForMarkdown, settings } from '#src/lib/util';
+import { Check, getTrackMarkdownLocaleString, settings } from '#src/lib/util';
 import { LoopType } from '@lavaclient/plugin-queue';
 import { getBar, msToTime, msToTimeString } from '@zptxdev/zptx-lib';
-import { escapeMarkdown, SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 
 export default new ChatInputCommandHandler()
     .setData(
@@ -35,7 +35,7 @@ export default new ChatInputCommandHandler()
             );
             return;
         }
-        
+
         // Check if current track is an ad
         if (player.isAdTrack(player.queue.current)) {
             await interaction.replyHandler.reply(
@@ -44,6 +44,8 @@ export default new ChatInputCommandHandler()
             );
             return;
         }
+
+        const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
         
         const bar = getBar(
             (player.position / player.queue.current.info.length) * 100,
@@ -63,12 +65,7 @@ export default new ChatInputCommandHandler()
         }
         if (player.queue.current.info.isStream) {
             await interaction.replyHandler.reply(
-                `${
-                    player.queue.current.info.title ===
-                    player.queue.current.info.uri
-                        ? `**${player.queue.current.info.uri}**`
-                        : `[**${escapeMarkdown(cleanURIForMarkdown(player.queue.current.info.title))}**](${player.queue.current.info.uri})`
-                }\n${settings.emojis.live} **${guild.locale(
+                `**${getTrackMarkdownLocaleString(player.queue.current, showArtist)}**\n${settings.emojis.live} **${guild.locale(
                     'MISC.LIVE',
                 )}** ${'▬'.repeat(10)}${player.paused ? ` ${settings.emojis.pause}` : ''}${
                     player.queue.loop.type !== LoopType.None
@@ -89,9 +86,7 @@ export default new ChatInputCommandHandler()
             return;
         }
         await interaction.replyHandler.reply(
-            `**[${escapeMarkdown(player.queue.current.info.title)}](${
-                player.queue.current.info.uri
-            })**\n${bar}${player.paused ? ` ${settings.emojis.pause}` : ''}${
+            `**${getTrackMarkdownLocaleString(player.queue.current, showArtist)}**\n${bar}${player.paused ? ` ${settings.emojis.pause}` : ''}${
                 player.queue.loop.type !== LoopType.None
                     ? ` ${
                           player.queue.loop.type === LoopType.Queue
