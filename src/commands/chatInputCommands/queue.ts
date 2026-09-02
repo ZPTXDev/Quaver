@@ -2,7 +2,7 @@ import { MessageOptionsBuilderType } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import { getLocaleString } from '#src/lib/locales';
-import { Check, cleanURIForMarkdown, settings } from '#src/lib/util';
+import { Check, cleanURIForMarkdown, settings, acceptableSources } from '#src/lib/util';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
 import {
@@ -44,7 +44,12 @@ export default new ChatInputCommandHandler()
             return;
         }
         const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
-        const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? false;
+        // Check if all available source emojis are configured
+        const availableSources = Object.keys(acceptableSources);
+        const allSourceEmojisConfigured = availableSources.every(
+            (source): boolean => !!settings.emojis[source as keyof typeof settings.emojis]
+        );
+        const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? allSourceEmojisConfigured;
         const pages = paginate(player.queue.tracks, 5);
         await interaction.replyHandler.reply(
             new ContainerBuilder()

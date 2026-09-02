@@ -1,7 +1,7 @@
 import { ForceType, MessageOptionsBuilderType } from '#src/lib';
 import { ButtonHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
-import { cleanURIForMarkdown, settings } from '#src/lib/util';
+import { cleanURIForMarkdown, settings, acceptableSources } from '#src/lib/util';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
 import {
@@ -53,7 +53,12 @@ export default new ButtonHandler().setExecute(
             return;
         }
         const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
-        const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? false;
+        // Check if all available source emojis are configured
+        const availableSources = Object.keys(acceptableSources);
+        const allSourceEmojisConfigured = availableSources.every(
+            (source): boolean => !!settings.emojis[source as keyof typeof settings.emojis]
+        );
+        const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? allSourceEmojisConfigured;
         const firstIndex = 5 * (page - 1) + 1;
         const pageSize = pages[page - 1].length;
         const largestIndexSize = (firstIndex + pageSize - 1).toString().length;

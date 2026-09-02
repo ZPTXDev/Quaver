@@ -12,6 +12,7 @@ import {
     getTrackMarkdownLocaleString,
     searchTracks,
     settings,
+    acceptableSources,
 } from '#src/lib/util';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
@@ -210,7 +211,12 @@ async function renderSearchResults(
     tracks: QuaverSong[],
 ): Promise<void> {
     const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
-    const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? false;
+    // Check if all available source emojis are configured
+    const availableSources = Object.keys(acceptableSources);
+    const allSourceEmojisConfigured = availableSources.every(
+        (source): boolean => !!settings.emojis[source as keyof typeof settings.emojis]
+    );
+    const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? allSourceEmojisConfigured;
     const pages = paginate(tracks, 10);
     const response = await interaction.replyHandler.reply(
         new ContainerBuilder()

@@ -4,7 +4,7 @@ import { QuaverGuild } from '#src/lib/guild';
 import type { LocaleKey } from '#src/lib/locales';
 import { logger } from '#src/lib/logger';
 import { searchState, updateHandler } from '#src/lib/state';
-import { buildMessageOptions, Check, getTrackMarkdownLocaleString, type QuaverChannels, settings, } from '#src/lib/util';
+import { buildMessageOptions, Check, getTrackMarkdownLocaleString, type QuaverChannels, settings, acceptableSources, } from '#src/lib/util';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import {
@@ -26,7 +26,12 @@ export default new ButtonHandler()
     .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
-        const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? false;
+        // Check if all available source emojis are configured
+        const availableSources = Object.keys(acceptableSources);
+        const allSourceEmojisConfigured = availableSources.every(
+            (source): boolean => !!settings.emojis[source as keyof typeof settings.emojis]
+        );
+        const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? allSourceEmojisConfigured;
         const state = searchState[interaction.message.id];
         if (!state) {
             await interaction.replyHandler.reply(
