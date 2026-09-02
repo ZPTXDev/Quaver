@@ -323,11 +323,6 @@ export async function buildNowPlayingMessage(
             track.info.sourceName as keyof typeof settings.emojis
         ] ?? '';
 
-    const sourceEmoji = showSourceLabels && track.info.sourceName
-        ? settings.emojis?.[track.info.sourceName as keyof typeof settings.emojis] || ''
-        : '';
-    const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
-
     const controls = (await guild.settings.get<boolean>('controls')) ?? true;
     const actionRows: ActionRowBuilder<ButtonBuilder>[] = [];
     if (controls) {
@@ -396,7 +391,7 @@ export async function buildNowPlayingMessage(
                         'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE',
                     ),
                     new TextDisplayBuilder().setContent(
-                        `${sourcePrefix}${guild.locale(
+                        `${guild.locale(
                             'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TEXT',
                             trackDisplay,
                             durationString,
