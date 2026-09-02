@@ -58,7 +58,7 @@ export default new ChatInputCommandHandler()
         const player = await guild.getPlayer();
         const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
         const track = player.queue.tracks[oldPosition - 1];
-        const response = await player.moveQueuedTrack(oldPosition, newPosition, interaction.user);
+        const response = await player.moveQueuedTrack(oldPosition, newPosition, interaction.user, showArtist);
         switch (response) {
             case PlayerResponse.QueueInsufficientTracks:
                 await interaction.replyHandler.reply(

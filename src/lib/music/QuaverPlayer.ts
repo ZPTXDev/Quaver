@@ -7,7 +7,7 @@ import {
 import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
 import { logger } from '#src/lib/logger';
 import { updateHandler } from '#src/lib/state';
-import { buildMessageOptions, type QuaverChannels, type QuaverSong, settings, } from '#src/lib/util';
+import { buildMessageOptions, getTrackMarkdownLocaleString, type QuaverChannels, type QuaverSong, settings, } from '#src/lib/util';
 import type { PlayerEffect } from '@lavaclient/plugin-effects';
 import { QuaverQueue, type LoopType } from './QuaverQueue';
 import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
@@ -579,12 +579,14 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @param oldPosition - The old position of the track.
      * @param newPosition - The new position of the track.
      * @param actor - The user who triggered the change.
+     * @param showArtist - Whether to include the artist name in the session log.
      * @returns Whether the track was moved.
      */
     async moveQueuedTrack(
         oldPosition: number,
         newPosition: number,
         actor?: { id: string; tag: string } | string | null,
+        showArtist = false,
     ): Promise<PlayerResponse> {
         if (this.queue.tracks.length <= 1) {
             return PlayerResponse.QueueInsufficientTracks;
@@ -608,7 +610,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             'QUEUE_MOVE',
             actor,
             moved
-                ? `[${moved.info.title}](${moved.info.uri}) \`${oldPosition} -> ${newPosition}\``
+                ? `${getTrackMarkdownLocaleString(moved, showArtist)} \`${oldPosition} -> ${newPosition}\``
                 : `\`${oldPosition} -> ${newPosition}\``,
         );
         guild.sendWebUpdate('queueUpdate', this.decorateQueue());
@@ -682,11 +684,13 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * Remove a track from the queue.
      * @param position - The position of the track.
      * @param actor - The user who triggered the change.
+     * @param showArtist - Whether to include the artist name in the session log.
      * @returns Whether the track was removed.
      */
     async removeQueuedTrack(
         position: number,
         actor?: { id: string; tag: string } | string | null,
+        showArtist = false,
     ): Promise<PlayerResponse> {
         if (this.queue.tracks.length === 0)
             return PlayerResponse.QueueInsufficientTracks;
@@ -700,7 +704,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             'QUEUE_REMOVE',
             actor,
             removedSong
-                ? `[${removedSong.info.title}](${removedSong.info.uri})`
+                ? getTrackMarkdownLocaleString(removedSong, showArtist)
                 : null,
         );
         this.queue.remove(position - 1);
@@ -962,17 +966,19 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * Skip to a specific position in the queue.
      * @param position - The position to skip to.
      * @param actor - The user who triggered the change.
+     * @param showArtist - Whether to include the artist name in the session log.
      * @returns Whether the player was skipped to the position.
      */
     async skipToQueuedTrack(
         position: number,
         actor?: { id: string; tag: string } | string | null,
+        showArtist = false,
     ): Promise<PlayerResponse> {
         if (this.restartReady) return PlayerResponse.RestartInProgress;
         if (this.memory.isAdPlaying) return PlayerResponse.AdPlaying;
         const targetTrack = this.queue.tracks[position - 1];
         if (this.queue.tracks.length > 1) {
-            const moveResponse = await this.moveQueuedTrack(position, 1, actor);
+            const moveResponse = await this.moveQueuedTrack(position, 1, actor, showArtist);
             if (moveResponse !== PlayerResponse.Success) {
                 return moveResponse;
             }
@@ -981,7 +987,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             'SKIPTO',
             actor,
             targetTrack
-                ? `[${targetTrack.info.title}](${targetTrack.info.uri})`
+                ? getTrackMarkdownLocaleString(targetTrack, showArtist)
                 : null,
         );
         const skipResponse = await this.skipCurrentTrack(actor);

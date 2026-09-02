@@ -69,7 +69,7 @@ export default new ChatInputCommandHandler()
             );
             return;
         }
-        const response = await player.removeQueuedTrack(position, interaction.user);
+        const response = await player.removeQueuedTrack(position, interaction.user, showArtist);
         switch (response) {
             case PlayerResponse.QueueInsufficientTracks:
                 await interaction.replyHandler.reply(

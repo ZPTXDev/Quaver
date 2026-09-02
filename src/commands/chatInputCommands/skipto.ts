@@ -63,7 +63,7 @@ export default new ChatInputCommandHandler()
             );
             return;
         }
-        const response = await player.skipToQueuedTrack(position, interaction.user);
+        const response = await player.skipToQueuedTrack(position, interaction.user, showArtist);
         switch (response) {
             case PlayerResponse.AdPlaying: {
                 const premiumURL = getPremiumURL(interaction.guild.id);
