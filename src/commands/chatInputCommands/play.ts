@@ -4,6 +4,7 @@ import { QuaverGuild } from '#src/lib/guild';
 import { getLocaleString, type LocaleKey } from '#src/lib/locales';
 import { updateHandler } from '#src/lib/state';
 import {
+    acceptableSources,
     Check,
     getTrackMarkdownLocaleString,
     type QuaverChannels,
@@ -95,7 +96,12 @@ export default new ChatInputCommandHandler()
                     ? 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.INSERTED'
                     : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
                 const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
-                const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? false;
+                // Check if all available source emojis are configured
+                const availableSources = Object.keys(acceptableSources);
+                const allSourceEmojisConfigured = availableSources.every(
+                    (source): boolean => !!settings.emojis[source as keyof typeof settings.emojis]
+                );
+                const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? allSourceEmojisConfigured;
 
                 // Get source emoji from first track in playlist
                 const sourceEmoji = showSourceLabels && tracks.length > 0 && tracks[0].info.sourceName
@@ -138,7 +144,12 @@ export default new ChatInputCommandHandler()
                     ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.INSERTED'
                     : 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
                 const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
-                const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? false;
+                // Check if all available source emojis are configured
+                const availableSources = Object.keys(acceptableSources);
+                const allSourceEmojisConfigured = availableSources.every(
+                    (source): boolean => !!settings.emojis[source as keyof typeof settings.emojis]
+                );
+                const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? allSourceEmojisConfigured;
 
                 const sourceEmoji = showSourceLabels && track.info.sourceName
                     ? settings.emojis?.[track.info.sourceName as keyof typeof settings.emojis] || ''

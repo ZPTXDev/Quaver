@@ -2,7 +2,7 @@ import { MessageOptionsBuilderType } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import { getLocaleString } from '#src/lib/locales';
-import { Check, getTrackMarkdownLocaleString, settings } from '#src/lib/util';
+import { Check, acceptableSources, getTrackMarkdownLocaleString, settings } from '#src/lib/util';
 import { LoopType } from '@lavaclient/plugin-queue';
 import { getBar, msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import { SlashCommandBuilder } from 'discord.js';
@@ -46,7 +46,12 @@ export default new ChatInputCommandHandler()
         }
 
         const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
-        const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? false;
+        // Check if all available source emojis are configured
+        const availableSources = Object.keys(acceptableSources);
+        const allSourceEmojisConfigured = availableSources.every(
+            (source): boolean => !!settings.emojis[source as keyof typeof settings.emojis]
+        );
+        const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? allSourceEmojisConfigured;
 
         const sourceEmoji = showSourceLabels && player.queue.current.info.sourceName
             ? settings.emojis?.[player.queue.current.info.sourceName as keyof typeof settings.emojis] || ''

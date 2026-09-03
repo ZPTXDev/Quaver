@@ -1,7 +1,7 @@
 import { ForceType, MessageOptionsBuilderType } from '#src/lib';
 import { type Initialized, QuaverGuild, WhitelistStatus } from '#src/lib/guild';
 import type { QuaverInteraction } from '#src/lib/interactions';
-import { getPremiumURL, settings } from '#src/lib/util';
+import { acceptableSources, getPremiumURL, settings } from '#src/lib/util';
 import {
     ActionRowBuilder,
     type ButtonBuilder,
@@ -130,8 +130,13 @@ export class ContentLogicHandler {
                 return;
             }
             case 'showsourcelabels': {
+                // Check if all available source emojis are configured
+                const availableSources = Object.keys(acceptableSources);
+                const allSourceEmojisConfigured = availableSources.every(
+                    (source): boolean => !!settings.emojis[source as keyof typeof settings.emojis]
+                );
                 const showSourceLabels =
-                    (await guild.settings.get<boolean>('showsourcelabels')) ?? false;
+                    (await guild.settings.get<boolean>('showsourcelabels')) ?? allSourceEmojisConfigured;
                 await guild.settings.set('showsourcelabels', !showSourceLabels);
                 await interaction.replyHandler.reply(
                     await SettingsRenderer.renderSubMenu(

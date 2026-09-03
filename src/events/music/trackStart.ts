@@ -4,6 +4,7 @@ import type { LocaleKey } from '#src/lib/locales';
 import { logger } from '#src/lib/logger';
 import { updateHandler } from '#src/lib/state';
 import {
+    acceptableSources,
     formatLavaLyricsResponse,
     getPremiumURL,
     getTrackMarkdownLocaleString,
@@ -158,7 +159,12 @@ export default {
         let format = (await guild.settings.get<string>('format')) ?? 'simple';
         if (!notify) format = 'off';
         const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
-        const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? false;
+        // Check if all available source emojis are configured
+        const availableSources = Object.keys(acceptableSources);
+        const allSourceEmojisConfigured = availableSources.every(
+            (source): boolean => !!settings.emojis[source as keyof typeof settings.emojis]
+        );
+        const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? allSourceEmojisConfigured;
         const emoji =
             settings.emojis?.[
             track.info.sourceName as keyof typeof settings.emojis
