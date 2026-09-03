@@ -231,6 +231,17 @@ export class UpdateHandler {
             return;
         }
         this.restartInProgress = true;
+
+        // Log the error details if present
+        if (err) {
+            logger.error(
+                `Fatal error triggered restart (${eventType}): ${err.message}`,
+            );
+            if (err.stack) {
+                logger.error(err.stack);
+            }
+        }
+
         logger.info(
             `Restarting${eventType ? ` due to '${eventType}'` : ''}${strategy !== 'immediate' ? ` using '${strategy}' strategy` : ''}...`,
         );
@@ -326,22 +337,35 @@ export class UpdateHandler {
         } finally {
             if (
                 !['exit', 'update', 'SIGINT', 'SIGTERM'].includes(eventType) &&
-                err instanceof Error
+                err
             ) {
-                logger.error(`${err.message}\n${err.stack}`);
                 logger.info('Logging additional output to error.log.');
                 try {
-                    await writeFile(
-                        'error.log',
-                        `${eventType}${err.message ? `\n${err.message}` : ''}${
-                            err.stack ? `\n${err.stack}` : ''
-                        }`,
-                    );
+                    const timestamp = new Date().toISOString();
+                    const errorDetails = err instanceof Error
+                        ? `${err.name}: ${err.message}\n${err.stack || 'No stack trace available'}`
+                        : `Non-Error rejection: ${typeof err === 'object' ? JSON.stringify(err, null, 2) : String(err)}`;
+
+                    const errorLog = [
+                        `Timestamp: ${timestamp}`,
+                        `Event Type: ${eventType}`,
+                        `Node Version: ${process.version}`,
+                        `Platform: ${process.platform}`,
+                        `Quaver Version: ${version.version}`,
+                        '',
+                        'Error Details:',
+                        errorDetails,
+                        '',
+                        '--- End of Error Log ---',
+                    ].join('\n');
+
+                    await writeFile('error.log', errorLog);
+                    logger.info('Error details written to error.log');
                 } catch (e) {
+                    logger.error(
+                        'Encountered error while writing to error.log.',
+                    );
                     if (e instanceof Error) {
-                        logger.error(
-                            'Encountered error while writing to error.log.',
-                        );
                         logger.error(`${e.message}\n${e.stack}`);
                     }
                 }
