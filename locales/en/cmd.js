@@ -287,7 +287,7 @@ export default {
                         NAME: 'Show Artist Name',
                     },
                     SHOWSOURCELABELS: {
-                        DESCRIPTION: 'Whether to show track sources in /search and /queue commands.',
+                        DESCRIPTION: 'Whether to show track sources on "Now playing" messages, /playing, /play, /search, and /queue commands.',
                         NAME: 'Show Source Labels',
                     },
                 },
