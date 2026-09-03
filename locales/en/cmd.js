@@ -34,11 +34,23 @@ export default {
         },
     },
     CLEAR: {
-        DESCRIPTION: 'Clear the queue.',
+        DESCRIPTION: 'Clear tracks from the queue.',
+        SUBCOMMAND: {
+            ALL: {
+                DESCRIPTION: 'Clear all tracks in the queue.',
+            },
+            MINE: {
+                DESCRIPTION: 'Clear only your tracks from the queue.',
+            },
+        },
         RESPONSE: {
             CONFIRMATION: 'Are you sure you want to clear the queue?',
+            CONFIRMATION_ALL: 'Are you sure you want to clear **all tracks** in the queue?',
+            CONFIRMATION_MINE: 'Are you sure you want to clear **your tracks** in the queue?',
+            NO_USER_TRACKS: 'You have no tracks in the queue to clear.',
             QUEUE_EMPTY: 'There are no tracks in the queue to clear.',
             SUCCESS: 'The queue has been cleared.',
+            SUCCESS_MINE: 'Your tracks have been cleared from the queue.',
         },
     },
     DISCONNECT: {

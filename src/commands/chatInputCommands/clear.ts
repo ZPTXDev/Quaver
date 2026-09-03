@@ -25,6 +25,26 @@ export default new ChatInputCommandHandler()
                     settings.defaultLocaleCode,
                     'CMD.CLEAR.DESCRIPTION',
                 ),
+            )
+            .addSubcommand((subcommand) =>
+                subcommand
+                    .setName('all')
+                    .setDescription(
+                        getLocaleString(
+                            settings.defaultLocaleCode,
+                            'CMD.CLEAR.SUBCOMMAND.ALL.DESCRIPTION',
+                        ),
+                    ),
+            )
+            .addSubcommand((subcommand) =>
+                subcommand
+                    .setName('mine')
+                    .setDescription(
+                        getLocaleString(
+                            settings.defaultLocaleCode,
+                            'CMD.CLEAR.SUBCOMMAND.MINE.DESCRIPTION',
+                        ),
+                    ),
             ),
     )
     .setChecks([
@@ -34,21 +54,42 @@ export default new ChatInputCommandHandler()
         Check.InSessionVoice,
     ])
     .setExecute(async function (interaction): Promise<void> {
+        const subcommand = interaction.options.getSubcommand();
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
-        if (player.queue.tracks.length === 0) {
-            await interaction.replyHandler.reply(
-                guild.locale('CMD.CLEAR.RESPONSE.QUEUE_EMPTY'),
-                { type: MessageOptionsBuilderType.Error },
+
+        let confirmationKey: string;
+        let customId: string;
+
+        if (subcommand === 'all') {
+            if (player.queue.tracks.length === 0) {
+                await interaction.replyHandler.reply(
+                    guild.locale('CMD.CLEAR.RESPONSE.QUEUE_EMPTY'),
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
+            }
+            confirmationKey = 'CMD.CLEAR.RESPONSE.CONFIRMATION_ALL';
+            customId = 'clear';
+        } else if (subcommand === 'mine') {
+            const userTracks = player.queue.tracks.filter(
+                (track) => track.requesterId === interaction.user.id,
             );
-            return;
+            if (userTracks.length === 0) {
+                await interaction.replyHandler.reply(
+                    guild.locale('CMD.CLEAR.RESPONSE.NO_USER_TRACKS'),
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
+            }
+            confirmationKey = 'CMD.CLEAR.RESPONSE.CONFIRMATION_MINE';
+            customId = 'clear-mine';
         }
+
         const response = await interaction.replyHandler.reply(
             new ContainerBuilder()
                 .addTextDisplayComponents(
-                    guild.builders.textDisplayLocale(
-                        'CMD.CLEAR.RESPONSE.CONFIRMATION',
-                    ),
+                    guild.builders.textDisplayLocale(confirmationKey),
                     guild.builders.textDisplayLocale(
                         'MISC.ACTION_IRREVERSIBLE',
                     ),
@@ -59,7 +100,7 @@ export default new ChatInputCommandHandler()
                         guild.builders
                             .buttonLocale('MISC.CONFIRM')
                             .setStyle(ButtonStyle.Danger)
-                            .setCustomId('clear'),
+                            .setCustomId(customId),
                         guild.builders
                             .buttonLocale('MISC.CANCEL')
                             .setStyle(ButtonStyle.Secondary)
