@@ -285,9 +285,10 @@ async function renderSearchResults(
 
                             // Calculate max length for link text: account for markdown syntax
                             // Format will be: **[linkText](url)** or just url
+                            // **url** = 4 chars, **[](url)** = 6 chars + url length
                             const markdownOverhead = track.info.title === track.info.uri
-                                ? 4  // **url**
-                                : 6 + track.info.uri.length;  // **[](url)**
+                                ? 4
+                                : 6 + track.info.uri.length;
                             const maxLinkTextLength = maxTrackLength - markdownOverhead;
 
                             // Truncate link text if needed
