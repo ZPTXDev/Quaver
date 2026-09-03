@@ -7,6 +7,7 @@ import type { EventHandler } from './builders';
 import { QuaverGuild } from './guild';
 import { InteractionHandler, type InteractionHandlerMapsFlat, } from './interactions';
 import { ConnectionHealthMonitor, QuaverNode } from './music';
+import type { UpdateHandler } from './UpdateHandler';
 import { settings } from './util';
 
 export class QuaverClient extends Client {
@@ -14,6 +15,7 @@ export class QuaverClient extends Client {
     music?: QuaverNode;
     interactionHandler: InteractionHandler;
     connectionHealth: ConnectionHealthMonitor;
+    updateHandler?: UpdateHandler;
     private lastMediaUnstable: boolean = false;
 
     constructor(
@@ -52,6 +54,10 @@ export class QuaverClient extends Client {
         this.ws.on(
             GatewayDispatchEvents.VoiceServerUpdate,
             async (payload): Promise<boolean> => {
+                // Skip voice updates during shutdown to prevent encoding errors
+                if (this.updateHandler?.restartInProgress) {
+                    return false;
+                }
                 // Capture media server endpoint for health monitoring
                 this.connectionHealth.updateMediaEndpoint(
                     payload.endpoint ?? null,
@@ -61,8 +67,13 @@ export class QuaverClient extends Client {
         );
         this.ws.on(
             GatewayDispatchEvents.VoiceStateUpdate,
-            async (payload): Promise<boolean> =>
-                this.music.players.handleVoiceUpdate(payload),
+            async (payload): Promise<boolean> => {
+                // Skip voice updates during shutdown to prevent encoding errors
+                if (this.updateHandler?.restartInProgress) {
+                    return false;
+                }
+                return this.music.players.handleVoiceUpdate(payload);
+            },
         );
     }
 
