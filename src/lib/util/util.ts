@@ -316,58 +316,11 @@ export function getTrackMarkdownLocaleString(track: Song, showArtist = false): s
     return `[${track.info.title}](${track.info.uri})`;
 }
 
-/**
- * Calculates a similarity score between a track and a search query.
- * @param track - The track to score.
- * @param query - The search query.
- * @returns A score (higher is better).
- */
-function calculateTrackSimilarity(track: Song, query: string): number {
-    const lowerQuery = query.toLowerCase();
-    const lowerTitle = track.info.title.toLowerCase();
-    const lowerAuthor = track.info.author.toLowerCase();
-
-    // Exact title match
-    if (lowerTitle === lowerQuery) return 1000;
-
-    // Exact author match
-    if (lowerAuthor === lowerQuery) return 900;
-
-    // Title starts with query
-    if (lowerTitle.startsWith(lowerQuery)) return 800;
-
-    // Author starts with query
-    if (lowerAuthor.startsWith(lowerQuery)) return 700;
-
-    // Query is in title
-    if (lowerTitle.includes(lowerQuery)) return 600;
-
-    // Query is in author
-    if (lowerAuthor.includes(lowerQuery)) return 500;
-
-    // Check for word matches in title
-    const queryWords = lowerQuery.split(/\s+/);
-    const titleWords = lowerTitle.split(/\s+/);
-    const titleMatches = queryWords.filter((word): boolean =>
-        titleWords.some((tWord): boolean => tWord.includes(word) || word.includes(tWord))
-    ).length;
-
-    if (titleMatches > 0) return 400 + (titleMatches * 10);
-
-    // Check for word matches in author
-    const authorWords = lowerAuthor.split(/\s+/);
-    const authorMatches = queryWords.filter((word): boolean =>
-        authorWords.some((aWord): boolean => aWord.includes(word) || word.includes(aWord))
-    ).length;
-
-    if (authorMatches > 0) return 300 + (authorMatches * 10);
-
-    return 0;
-}
 
 /**
  * Searches for tracks using the configured source, falling back to other sources if no tracks are found.
- * Now searches up to 3 sources and combines results for search queries.
+ * Searches up to 3 sources and combines results for search queries.
+ * Results are ordered by internal source ordering, followed by each source's result order.
  * @param client - The QuaverClient instance.
  * @param guild - The QuaverGuild instance.
  * @param query - The search query.
@@ -432,29 +385,25 @@ export async function searchTracks(
         }
     }
 
-    // If we have search results from multiple sources, combine and sort them
+    // If we have search results from multiple sources, combine them
     if (searchResults.length > 0) {
         // Extract all tracks with metadata
         const tracksWithMetadata = searchResults.map((item): {
             track: Song;
             sourceIndex: number;
             originalIndex: number;
-            similarity: number;
         } => {
             const track = (item.result as Extract<LoadResult, { loadType: 'search' }>).data[item.originalIndex];
             return {
                 track,
                 sourceIndex: item.sourceIndex,
                 originalIndex: item.originalIndex,
-                similarity: calculateTrackSimilarity(track, query),
             };
         });
 
-        // Sort by: similarity (desc), then source index (asc), then original index (asc)
+        // Sort by: source index (asc), then original index (asc)
+        // This preserves the internal source ordering, followed by each source's result order
         tracksWithMetadata.sort((a, b): number => {
-            if (a.similarity !== b.similarity) {
-                return b.similarity - a.similarity;
-            }
             if (a.sourceIndex !== b.sourceIndex) {
                 return a.sourceIndex - b.sourceIndex;
             }
