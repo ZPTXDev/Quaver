@@ -22,7 +22,7 @@ export default new ButtonHandler()
 
         if (isMineOnly) {
             const userTracks = player.queue.tracks.filter(
-                (track) => track.requesterId === interaction.user.id,
+                (track): boolean => track.requesterId === interaction.user.id,
             );
 
             if (userTracks.length === 0) {
@@ -38,13 +38,13 @@ export default new ButtonHandler()
             }
 
             player.queue.tracks = player.queue.tracks.filter(
-                (track) => track.requesterId !== interaction.user.id,
+                (track): boolean => track.requesterId !== interaction.user.id,
             );
             player.logSessionEvent('QUEUE_CLEAR_MINE', interaction.user);
 
             if (player.memory.originalQueue) {
                 player.memory.originalQueue = player.memory.originalQueue.filter(
-                    (track) => track.requesterId !== interaction.user.id,
+                    (track): boolean => track.requesterId !== interaction.user.id,
                 );
             }
 

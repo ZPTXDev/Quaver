@@ -14,6 +14,7 @@ import {
     Message,
     SeparatorBuilder,
     SlashCommandBuilder,
+    type SlashCommandSubcommandBuilder,
 } from 'discord.js';
 
 export default new ChatInputCommandHandler()
@@ -26,7 +27,7 @@ export default new ChatInputCommandHandler()
                     'CMD.CLEAR.DESCRIPTION',
                 ),
             )
-            .addSubcommand((subcommand) =>
+            .addSubcommand((subcommand): SlashCommandSubcommandBuilder =>
                 subcommand
                     .setName('all')
                     .setDescription(
@@ -36,7 +37,7 @@ export default new ChatInputCommandHandler()
                         ),
                     ),
             )
-            .addSubcommand((subcommand) =>
+            .addSubcommand((subcommand): SlashCommandSubcommandBuilder =>
                 subcommand
                     .setName('mine')
                     .setDescription(
@@ -73,7 +74,7 @@ export default new ChatInputCommandHandler()
             customId = 'clear';
         } else if (subcommand === 'mine') {
             const userTracks = player.queue.tracks.filter(
-                (track) => track.requesterId === interaction.user.id,
+                (track): boolean => track.requesterId === interaction.user.id,
             );
             if (userTracks.length === 0) {
                 await interaction.replyHandler.reply(
