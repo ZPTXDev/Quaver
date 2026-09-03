@@ -267,24 +267,44 @@ async function renderSearchResults(
                                     tracks.length.toString().length,
                                     ' ',
                                 )}.\` `;
-                            const trackStr = `**${getTrackMarkdownLocaleString(
-                                track,
-                                showArtist,
-                            )}**`;
                             const durationStr = ` \`[${durationString}]\``;
 
                             // Calculate remaining characters for the line
                             const baseLength = indexStr.length + durationStr.length;
                             const maxTrackLength = 300 - baseLength - sourcePrefix.length;
 
-                            let finalTrackStr = trackStr;
-                            if (trackStr.length > maxTrackLength) {
-                                // Truncate if too long
-                                const ellipsis = '…';
-                                finalTrackStr = `**${trackStr.substring(0, maxTrackLength - ellipsis.length - 4)}${ellipsis}**`;
+                            // Build the link text (what goes inside the brackets)
+                            let linkText: string;
+                            if (track.info.title === track.info.uri) {
+                                linkText = track.info.uri;
+                            } else if (showArtist && track.info.author) {
+                                linkText = `${track.info.author} - ${track.info.title}`;
+                            } else {
+                                linkText = track.info.title;
                             }
 
-                            return `${indexStr}${sourcePrefix}${finalTrackStr}${durationStr}`;
+                            // Calculate max length for link text: account for markdown syntax
+                            // Format will be: **[linkText](url)** or just url
+                            const markdownOverhead = track.info.title === track.info.uri
+                                ? 4  // **url**
+                                : 6 + track.info.uri.length;  // **[](url)**
+                            const maxLinkTextLength = maxTrackLength - markdownOverhead;
+
+                            // Truncate link text if needed
+                            if (linkText.length > maxLinkTextLength) {
+                                const ellipsis = '…';
+                                linkText = linkText.substring(0, maxLinkTextLength - ellipsis.length) + ellipsis;
+                            }
+
+                            // Build final markdown string
+                            let trackStr: string;
+                            if (track.info.title === track.info.uri) {
+                                trackStr = `**${linkText}**`;
+                            } else {
+                                trackStr = `**[${linkText}](${track.info.uri})**`;
+                            }
+
+                            return `${indexStr}${sourcePrefix}${trackStr}${durationStr}`;
                         })
                         .join('\n'),
                 ),
