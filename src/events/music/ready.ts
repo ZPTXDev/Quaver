@@ -33,7 +33,6 @@ async function restorePlayer(
 
         // Auto-unpause if the pause was initiated by the bot (e.g., due to inactivity)
         // This must happen before handling resumed state to ensure proper playback resumption
-        let shouldUnpause = false;
         try {
             if (snapshot.paused && Array.isArray(snapshot.sessionLogs)) {
                 const lastPause = [...snapshot.sessionLogs]
@@ -46,7 +45,6 @@ async function restorePlayer(
                     !lastPause.userTag &&
                     Date.now() - lastPause.timestamp < 15_000
                 ) {
-                    shouldUnpause = true;
                     await player.setPause(false);
                     logger.info(`[G ${guild.id}] Unpaused restored player`);
                 }

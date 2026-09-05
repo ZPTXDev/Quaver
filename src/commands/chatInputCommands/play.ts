@@ -1,4 +1,4 @@
-import { MessageOptionsBuilderType, ForceType } from '#src/lib';
+import { MessageOptionsBuilderType } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import { getLocaleString, type LocaleKey } from '#src/lib/locales';
@@ -79,7 +79,6 @@ export default new ChatInputCommandHandler()
         let tracks: QuaverSong[] = [],
             msg = '',
             extras = [];
-        let hasLargePlaylist = false;
         let warningSent = false;
 
         // Helper function to search with timeout warning
@@ -102,7 +101,6 @@ export default new ChatInputCommandHandler()
 
             // If we sent a warning and this is a large playlist, update the message
             if (warningSent && result.loadType === 'playlist' && result.data.tracks.length >= 100) {
-                hasLargePlaylist = true;
                 await interaction.replyHandler.reply(
                     guild.locale('MUSIC.QUEUE.LARGE_PLAYLIST_PROCESSING'),
                     { type: MessageOptionsBuilderType.Warning },
@@ -288,10 +286,7 @@ export default new ChatInputCommandHandler()
                       ]
                     : []),
             ),
-            {
-                type: MessageOptionsBuilderType.Success,
-                force: hasLargePlaylist ? ForceType.FollowUp : undefined,
-            },
+            { type: MessageOptionsBuilderType.Success },
         );
         guild.sendWebUpdate('queueUpdate', player.decorateQueue());
     });
