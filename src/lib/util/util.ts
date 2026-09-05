@@ -328,7 +328,6 @@ export function splitMultipleLinks(query: string): string[] {
 
     // If we found multiple URLs and the query is essentially just URLs (with spaces)
     if (urls && urls.length > 1) {
-        const urlsJoined = urls.join(' ');
         // Check if removing all URLs leaves only whitespace
         const remainingText = query.replace(urlPattern, '').trim();
         if (remainingText === '') {

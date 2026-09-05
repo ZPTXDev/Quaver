@@ -87,7 +87,6 @@ export default new ChatInputCommandHandler()
         if (queries.length > 1) {
             // Handle multiple links
             const allTracks: QuaverSong[] = [];
-            let failedCount = 0;
 
             for (const singleQuery of queries) {
                 const result = await searchTracks(
@@ -99,7 +98,7 @@ export default new ChatInputCommandHandler()
                 switch (result.loadType) {
                     case 'playlist': {
                         // Check for large playlist
-                        if (result.data.tracks.length >= 500 && !hasLargePlaylist) {
+                        if (result.data.tracks.length >= 100 && !hasLargePlaylist) {
                             hasLargePlaylist = true;
                             await interaction.replyHandler.reply(
                                 guild.locale('MUSIC.QUEUE.LARGE_PLAYLIST_PROCESSING'),
@@ -127,13 +126,10 @@ export default new ChatInputCommandHandler()
                             track.requesterId = interaction.user.id;
                             track.id = crypto.randomUUID();
                             allTracks.push(track);
-                        } else {
-                            failedCount++;
                         }
                         break;
                     }
                     default:
-                        failedCount++;
                         break;
                 }
             }
@@ -161,7 +157,7 @@ export default new ChatInputCommandHandler()
             switch (result.loadType) {
             case 'playlist': {
                 // Check for large playlist
-                if (result.data.tracks.length >= 500) {
+                if (result.data.tracks.length >= 100) {
                     await interaction.replyHandler.reply(
                         guild.locale('MUSIC.QUEUE.LARGE_PLAYLIST_PROCESSING'),
                         { type: MessageOptionsBuilderType.Warning },
