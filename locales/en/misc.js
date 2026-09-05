@@ -38,5 +38,6 @@ export default {
     },
     STAGE_TOPIC: 'Music by Quaver',
     STREAMING: 'Streaming',
+    X_LINKS: '%1 links',
     YOUR_SEARCH: 'your search',
 };

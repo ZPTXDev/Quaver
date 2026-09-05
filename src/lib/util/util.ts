@@ -316,6 +316,29 @@ export function getTrackMarkdownLocaleString(track: Song, showArtist = false): s
     return `[${track.info.title}](${track.info.uri})`;
 }
 
+/**
+ * Splits a query into multiple URLs if it contains multiple links separated by spaces.
+ * Returns an array of queries (either single query or multiple URLs).
+ * @param query - The query string to check.
+ * @returns An array of query strings.
+ */
+export function splitMultipleLinks(query: string): string[] {
+    const urlPattern = /https?:\/\/[^\s]+/g;
+    const urls = query.match(urlPattern);
+
+    // If we found multiple URLs and the query is essentially just URLs (with spaces)
+    if (urls && urls.length > 1) {
+        const urlsJoined = urls.join(' ');
+        // Check if removing all URLs leaves only whitespace
+        const remainingText = query.replace(urlPattern, '').trim();
+        if (remainingText === '') {
+            return urls;
+        }
+    }
+
+    // Otherwise, return the original query as a single item
+    return [query];
+}
 
 /**
  * Searches for tracks using the configured source, falling back to other sources if no tracks are found.

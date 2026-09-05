@@ -13,6 +13,7 @@ import {
     searchTracks,
     settings,
     acceptableSources,
+    splitMultipleLinks,
 } from '#src/lib/util';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
@@ -93,6 +94,65 @@ export default new ChatInputCommandHandler()
         }
         await interaction.deferReply();
         const query = interaction.options.getString('query');
+
+        // Check for multiple links
+        const queries = splitMultipleLinks(query);
+
+        if (queries.length > 1) {
+            // Handle multiple links
+            const allTracks: QuaverSong[] = [];
+            let failedCount = 0;
+
+            for (const singleQuery of queries) {
+                const result = await searchTracks(interaction.client, guild, singleQuery);
+
+                switch (result.loadType) {
+                    case 'playlist': {
+                        const playlistTracks = result.data.tracks.map((t: QuaverSong): QuaverSong => {
+                            t.requesterId = interaction.user.id;
+                            t.id = crypto.randomUUID();
+                            return t;
+                        });
+                        allTracks.push(...playlistTracks);
+                        break;
+                    }
+                    case 'track': {
+                        const track: QuaverSong = result.data;
+                        track.requesterId = interaction.user.id;
+                        track.id = crypto.randomUUID();
+                        allTracks.push(track);
+                        break;
+                    }
+                    case 'search': {
+                        const track: QuaverSong = result.data[0];
+                        if (track) {
+                            track.requesterId = interaction.user.id;
+                            track.id = crypto.randomUUID();
+                            allTracks.push(track);
+                        } else {
+                            failedCount++;
+                        }
+                        break;
+                    }
+                    default:
+                        failedCount++;
+                        break;
+                }
+            }
+
+            if (allTracks.length === 0) {
+                await interaction.replyHandler.reply(
+                    guild.locale('CMD.PLAY.RESPONSE.NO_RESULTS'),
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
+            }
+
+            await handleMultipleLinksAdd(interaction, guild, allTracks, queries.length);
+            return;
+        }
+
+        // Handle single query (existing logic)
         const result = await searchTracks(interaction.client, guild, query);
         switch (result.loadType) {
             case 'playlist':
@@ -136,6 +196,45 @@ export default new ChatInputCommandHandler()
                 return;
         }
     });
+
+async function handleMultipleLinksAdd(
+    interaction: QuaverInteraction<ChatInputCommandInteraction>,
+    guild: QuaverGuild<Initialized>,
+    tracks: QuaverSong[],
+    linkCount: number,
+): Promise<void> {
+    const compatible = await guild.checkPlayerCompatibility({
+        member: interaction.member as GuildMember,
+        textChannel: interaction.channel,
+        replyHandler: interaction.replyHandler,
+    });
+    if (!compatible) return;
+    const player = await guild.getPlayer({
+        textChannel: interaction.channel as QuaverChannels,
+        voiceChannelId: (interaction.member as GuildMember).voice.channelId,
+        replyHandler: interaction.replyHandler,
+    });
+    if (!player) return;
+    const position = await player.addTracksToQueue(tracks, interaction.user.id);
+    await interaction.replyHandler.reply(
+        new ContainerBuilder().addTextDisplayComponents(
+            guild.builders.textDisplayLocale(
+                'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT' as LocaleKey,
+                tracks.length.toString(),
+                guild.locale('MISC.X_LINKS', linkCount.toString()),
+            ),
+            ...(position !== '0'
+                ? [
+                      new TextDisplayBuilder().setContent(
+                          `-# ${guild.locale('MISC.POSITION')}: ${position}`,
+                      ),
+                  ]
+                : []),
+        ),
+        { type: MessageOptionsBuilderType.Success },
+    );
+    guild.sendWebUpdate('queueUpdate', player.decorateQueue());
+}
 
 async function handleImmediateAdd(
     interaction: QuaverInteraction<ChatInputCommandInteraction>,

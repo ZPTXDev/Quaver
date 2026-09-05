@@ -11,6 +11,7 @@ import {
     type QuaverSong,
     searchTracks,
     settings,
+    splitMultipleLinks,
 } from '#src/lib/util';
 import {
     ContainerBuilder,
@@ -78,12 +79,77 @@ export default new ChatInputCommandHandler()
         let tracks: QuaverSong[] = [],
             msg = '',
             extras = [];
-        const result = await searchTracks(
-            interaction.client,
-            guild,
-            query,
-        );
-        switch (result.loadType) {
+
+        // Check for multiple links
+        const queries = splitMultipleLinks(query);
+
+        if (queries.length > 1) {
+            // Handle multiple links
+            const allTracks: QuaverSong[] = [];
+            let failedCount = 0;
+
+            for (const singleQuery of queries) {
+                const result = await searchTracks(
+                    interaction.client,
+                    guild,
+                    singleQuery,
+                );
+
+                switch (result.loadType) {
+                    case 'playlist': {
+                        const playlistTracks = result.data.tracks.map((t: QuaverSong): QuaverSong => {
+                            t.requesterId = interaction.user.id;
+                            t.id = crypto.randomUUID();
+                            return t;
+                        });
+                        allTracks.push(...playlistTracks);
+                        break;
+                    }
+                    case 'track': {
+                        const track: QuaverSong = result.data;
+                        track.requesterId = interaction.user.id;
+                        track.id = crypto.randomUUID();
+                        allTracks.push(track);
+                        break;
+                    }
+                    case 'search': {
+                        const track: QuaverSong = result.data[0];
+                        if (track) {
+                            track.requesterId = interaction.user.id;
+                            track.id = crypto.randomUUID();
+                            allTracks.push(track);
+                        } else {
+                            failedCount++;
+                        }
+                        break;
+                    }
+                    default:
+                        failedCount++;
+                        break;
+                }
+            }
+
+            if (allTracks.length === 0) {
+                await interaction.replyHandler.reply(
+                    guild.locale('CMD.PLAY.RESPONSE.NO_RESULTS'),
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
+            }
+
+            tracks = allTracks;
+            msg = insert
+                ? 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.INSERTED'
+                : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
+            extras = [tracks.length.toString(), guild.locale('MISC.X_LINKS', queries.length.toString())];
+        } else {
+            // Handle single query (existing logic)
+            const result = await searchTracks(
+                interaction.client,
+                guild,
+                query,
+            );
+            switch (result.loadType) {
             case 'playlist': {
                 tracks = [
                     ...result.data.tracks.map((t: QuaverSong): QuaverSong => {
@@ -177,7 +243,9 @@ export default new ChatInputCommandHandler()
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
+            }
         }
+
         const player = await guild.getPlayer({
             textChannel: interaction.channel as QuaverChannels,
             voiceChannelId: (interaction.member as GuildMember).voice.channelId,
