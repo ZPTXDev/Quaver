@@ -30,7 +30,34 @@ async function restorePlayer(
         player.voice.connect(snapshot.voiceChannelId, {
             deafened: true,
         });
-        
+
+        // Auto-unpause if the pause was initiated by the bot (e.g., due to inactivity)
+        // This must happen before handling resumed state to ensure proper playback resumption
+        let shouldUnpause = false;
+        try {
+            if (snapshot.paused && Array.isArray(snapshot.sessionLogs)) {
+                const lastPause = [...snapshot.sessionLogs]
+                    .reverse()
+                    .find((l): boolean => l.action === 'PAUSE');
+                // detect if the pause was by the bot (no user present)
+                if (
+                    lastPause &&
+                    !lastPause.userId &&
+                    !lastPause.userTag &&
+                    Date.now() - lastPause.timestamp < 15_000
+                ) {
+                    shouldUnpause = true;
+                    await player.setPause(false);
+                    logger.info(`[G ${guild.id}] Unpaused restored player`);
+                }
+            }
+        } catch (err) {
+            // don't fail the whole restore if unpause fails; log and continue
+            logger.warn(
+                `[G ${guild.id}] Failed to auto-unpause restored player: ${err instanceof Error ? err.message : String(err)}`,
+            );
+        }
+
         // Check if the current track is an ad and skip it
         // Also check memory.isAdPlaying since toJSON sets queue.current to null for ads
         const isAdTrack = snapshot.queue.current?.isAd === true || snapshot.memory.isAdPlaying;
@@ -39,14 +66,14 @@ async function restorePlayer(
             player.memory.isAdPlaying = false;
             player.memory.adPlaytimeMs = 0;
             await data.guild.set(guild.id, 'ads.playtimeMs', 0);
-            
+
             // Restore saved filters
             if (player.memory.savedFilters) {
                 await player.setBassboost(player.memory.savedFilters.bassboost);
                 await player.setNightcore(player.memory.savedFilters.nightcore);
                 delete player.memory.savedFilters;
             }
-            
+
             // If resumed, stop the current track (Lavalink already started it)
             if (resumed && player.playing) {
                 await player.stop();
@@ -65,30 +92,6 @@ async function restorePlayer(
             // When resumed=true, Lavalink has already positioned the track correctly
             // However, if the player is not playing and there are queued tracks, start the next one
             await player.queue.start();
-        }
-        
-        // Auto-unpause if the pause was initiated by the bot (e.g., due to inactivity)
-        try {
-            if (snapshot.paused && Array.isArray(snapshot.sessionLogs)) {
-                const lastPause = [...snapshot.sessionLogs]
-                    .reverse()
-                    .find((l): boolean => l.action === 'PAUSE');
-                // detect if the pause was by the bot (no user present)
-                if (
-                    lastPause &&
-                    !lastPause.userId &&
-                    !lastPause.userTag &&
-                    Date.now() - lastPause.timestamp < 15_000
-                ) {
-                    await player.setPause(false);
-                    logger.info(`[G ${guild.id}] Unpaused restored player`);
-                }
-            }
-        } catch (err) {
-            // don't fail the whole restore if unpause fails; log and continue
-            logger.warn(
-                `[G ${guild.id}] Failed to auto-unpause restored player: ${err instanceof Error ? err.message : String(err)}`,
-            );
         }
 
         // Set timeout if queue is empty after restoration
