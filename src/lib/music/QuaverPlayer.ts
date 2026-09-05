@@ -671,9 +671,17 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         if (paused) {
             await this.pause();
         } else {
+            // When resuming after a long pause, ensure we have a track to play
+            const hasCurrentTrack = this.queue.current && (this.playing || this.paused);
             await this.resume();
             this.timeout.pausedAlone = false;
-            if (!this.playing && this.queue.tracks.length > 0) {
+
+            // After resume, check if we need to start playback
+            // If there was a current track but player isn't playing, start the queue
+            if (hasCurrentTrack && !this.playing && this.queue.tracks.length > 0) {
+                await this.queue.start();
+            } else if (!hasCurrentTrack && this.queue.tracks.length > 0) {
+                // No current track, but we have queued tracks - start the queue
                 await this.queue.start();
             }
         }
