@@ -33,6 +33,7 @@ async function restorePlayer(
 
         // Auto-unpause if the pause was initiated by the bot (e.g., due to inactivity)
         // This must happen before handling resumed state to ensure proper playback resumption
+        let wasAutoUnpaused = false;
         try {
             if (snapshot.paused && Array.isArray(snapshot.sessionLogs)) {
                 const lastPause = [...snapshot.sessionLogs]
@@ -46,6 +47,7 @@ async function restorePlayer(
                     Date.now() - lastPause.timestamp < 15_000
                 ) {
                     await player.setPause(false);
+                    wasAutoUnpaused = true;
                     logger.info(`[G ${guild.id}] Unpaused restored player`);
                 }
             }
@@ -85,6 +87,12 @@ async function restorePlayer(
             }
             if (snapshot.position > 0) {
                 await player.seekTo(snapshot.position);
+            }
+        } else if (wasAutoUnpaused && snapshot.queue.current) {
+            // When resumed and we just auto-unpaused, ensure the current track starts playing
+            // Lavalink has already positioned the track, but we need to ensure it's actually playing
+            if (!player.playing || player.paused) {
+                await player.queue.start();
             }
         } else if (!player.playing && player.queue.tracks.length > 0) {
             // When resumed=true, Lavalink has already positioned the track correctly
