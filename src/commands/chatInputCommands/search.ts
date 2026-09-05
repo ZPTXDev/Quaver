@@ -94,6 +94,7 @@ export default new ChatInputCommandHandler()
         }
         await interaction.deferReply();
         const query = interaction.options.getString('query');
+        let hasLargePlaylist = false;
 
         // Check for multiple links
         const queries = splitMultipleLinks(query);
@@ -108,6 +109,14 @@ export default new ChatInputCommandHandler()
 
                 switch (result.loadType) {
                     case 'playlist': {
+                        // Check for large playlist
+                        if (result.data.tracks.length >= 500 && !hasLargePlaylist) {
+                            hasLargePlaylist = true;
+                            await interaction.replyHandler.reply(
+                                guild.locale('MUSIC.QUEUE.LARGE_PLAYLIST_PROCESSING'),
+                                { type: MessageOptionsBuilderType.Warning },
+                            );
+                        }
                         const playlistTracks = result.data.tracks.map((t: QuaverSong): QuaverSong => {
                             t.requesterId = interaction.user.id;
                             t.id = crypto.randomUUID();
@@ -252,6 +261,15 @@ async function handleImmediateAdd(
         (source): boolean => !!settings.emojis[source as keyof typeof settings.emojis]
     );
     const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? allSourceEmojisConfigured;
+
+    // Check for large playlist
+    if (result.loadType === 'playlist' && result.data.tracks.length >= 500) {
+        await interaction.replyHandler.reply(
+            guild.locale('MUSIC.QUEUE.LARGE_PLAYLIST_PROCESSING'),
+            { type: MessageOptionsBuilderType.Warning },
+        );
+    }
+
     const tracks =
         result.loadType === 'track'
             ? [
