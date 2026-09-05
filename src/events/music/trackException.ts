@@ -26,6 +26,25 @@ export default {
         const currentTrack = player.queue.current;
         const currentPosition = player.position || 0;
 
+        // Check if this is a false positive from resuming after a long pause
+        // If the player was paused for a long time, exceptions on resume are often spurious
+        if (player.pausedTimestamp) {
+            const pauseDuration = Date.now() - player.pausedTimestamp;
+            // If paused for more than 1 minute, and this is a timeout/network error, ignore it
+            if (
+                pauseDuration > 60000 &&
+                (data.exception.cause === 'java.net.SocketTimeoutException' ||
+                    data.exception.cause === 'java.io.IOException' ||
+                    data.exception.message.includes('timeout') ||
+                    data.exception.message.includes('timed out'))
+            ) {
+                logger.info(
+                    `[G ${guild.id}] Track exception after long pause (${Math.round(pauseDuration / 1000)}s), ignoring as false positive`,
+                );
+                return;
+            }
+        }
+
         // Check if this is a recoverable error (e.g., timeout, network issue)
         const isRecoverable =
             data.exception.cause === 'java.net.SocketTimeoutException' ||

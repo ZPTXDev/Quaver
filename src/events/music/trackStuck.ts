@@ -23,6 +23,19 @@ export default {
         const currentTrack = player.queue.current;
         const currentPosition = player.position || 0;
 
+        // Check if this is a false positive from resuming after a long pause
+        // If the player was paused and just resumed, the track may appear stuck but is actually fine
+        if (player.pausedTimestamp) {
+            const pauseDuration = Date.now() - player.pausedTimestamp;
+            // If paused for more than the stuck threshold, this is likely a false positive
+            if (pauseDuration > data.thresholdMs) {
+                logger.info(
+                    `[G ${guild.id}] Track stuck event after long pause (${Math.round(pauseDuration / 1000)}s), ignoring as false positive`,
+                );
+                return;
+            }
+        }
+
         // Try to recover by re-playing the track from the current position
         try {
             logger.info(
