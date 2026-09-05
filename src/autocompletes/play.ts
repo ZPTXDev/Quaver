@@ -44,7 +44,7 @@ export default new AutocompleteHandler().setExecute(
                 const firstChoiceName = `${sourceName}: ${query}`;
                 searchSuggestionsResponse.unshift({
                     name: firstChoiceName.length > 100 ? `${firstChoiceName.slice(0, 99)}…` : firstChoiceName,
-                    value: focused,
+                    value: focused.length > 100 ? focused.slice(0, 100) : focused,
                 });
                 await interaction.respond(searchSuggestionsResponse);
                 return;
@@ -95,7 +95,7 @@ export default new AutocompleteHandler().setExecute(
                 const firstChoiceName = `${sourceName}: ${query}`;
                 searchSuggestionsResponse.unshift({
                     name: firstChoiceName.length > 100 ? `${firstChoiceName.slice(0, 99)}…` : firstChoiceName,
-                    value: focused,
+                    value: focused.length > 100 ? focused.slice(0, 100) : focused,
                 });
                 await interaction.respond(searchSuggestionsResponse);
             } catch {
