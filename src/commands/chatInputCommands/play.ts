@@ -80,6 +80,37 @@ export default new ChatInputCommandHandler()
             msg = '',
             extras = [];
         let hasLargePlaylist = false;
+        let warningSent = false;
+
+        // Helper function to search with timeout warning
+        const searchWithWarning = async (q: string): Promise<Awaited<ReturnType<typeof searchTracks>>> => {
+            let warningTimeout: NodeJS.Timeout | null = null;
+
+            warningTimeout = setTimeout(async (): Promise<void> => {
+                if (!warningSent) {
+                    warningSent = true;
+                    await interaction.replyHandler.reply(
+                        guild.locale('MUSIC.QUEUE.SLOW_PROCESSING'),
+                        { type: MessageOptionsBuilderType.Warning },
+                    );
+                }
+            }, 3000);
+
+            const result = await searchTracks(interaction.client, guild, q);
+
+            if (warningTimeout) clearTimeout(warningTimeout);
+
+            // If we sent a warning and this is a large playlist, update the message
+            if (warningSent && result.loadType === 'playlist' && result.data.tracks.length >= 100) {
+                hasLargePlaylist = true;
+                await interaction.replyHandler.reply(
+                    guild.locale('MUSIC.QUEUE.LARGE_PLAYLIST_PROCESSING'),
+                    { type: MessageOptionsBuilderType.Warning },
+                );
+            }
+
+            return result;
+        };
 
         // Check for multiple links
         const queries = splitMultipleLinks(query);
@@ -89,22 +120,10 @@ export default new ChatInputCommandHandler()
             const allTracks: QuaverSong[] = [];
 
             for (const singleQuery of queries) {
-                const result = await searchTracks(
-                    interaction.client,
-                    guild,
-                    singleQuery,
-                );
+                const result = await searchWithWarning(singleQuery);
 
                 switch (result.loadType) {
                     case 'playlist': {
-                        // Check for large playlist
-                        if (result.data.tracks.length >= 100 && !hasLargePlaylist) {
-                            hasLargePlaylist = true;
-                            await interaction.replyHandler.reply(
-                                guild.locale('MUSIC.QUEUE.LARGE_PLAYLIST_PROCESSING'),
-                                { type: MessageOptionsBuilderType.Warning },
-                            );
-                        }
                         const playlistTracks = result.data.tracks.map((t: QuaverSong): QuaverSong => {
                             t.requesterId = interaction.user.id;
                             t.id = crypto.randomUUID();
@@ -149,20 +168,9 @@ export default new ChatInputCommandHandler()
             extras = [tracks.length.toString(), guild.locale('MISC.X_LINKS', queries.length.toString())];
         } else {
             // Handle single query (existing logic)
-            const result = await searchTracks(
-                interaction.client,
-                guild,
-                query,
-            );
+            const result = await searchWithWarning(query);
             switch (result.loadType) {
             case 'playlist': {
-                // Check for large playlist
-                if (result.data.tracks.length >= 100) {
-                    await interaction.replyHandler.reply(
-                        guild.locale('MUSIC.QUEUE.LARGE_PLAYLIST_PROCESSING'),
-                        { type: MessageOptionsBuilderType.Warning },
-                    );
-                }
                 tracks = [
                     ...result.data.tracks.map((t: QuaverSong): QuaverSong => {
                         t.requesterId = interaction.user.id;

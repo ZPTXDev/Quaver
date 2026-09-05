@@ -75,6 +75,7 @@ export default {
     QUEUE: {
         EMPTY: 'There\'s nothing left in the queue.',
         LARGE_PLAYLIST_PROCESSING: 'Your query contains a large number of tracks and needs additional time to process. Quaver is working on it.',
+        SLOW_PROCESSING: 'Your query is taking longer than usual to process. Quaver is working on it.',
         TRACK_ADDED: {
             MULTIPLE: {
                 DEFAULT: 'Added **%1** tracks from **%2** to queue',
