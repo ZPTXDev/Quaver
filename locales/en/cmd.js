@@ -61,6 +61,13 @@ export default {
             SUCCESS: 'Disconnected from the voice channel.',
         },
     },
+    EXPORTQUEUE: {
+        DESCRIPTION: 'Export the queue to a file.',
+        RESPONSE: {
+            QUEUE_EMPTY: 'There is nothing in the queue to export.',
+            SUCCESS: 'Exported **%1** track(s) from the queue.',
+        },
+    },
     INFO: {
         DESCRIPTION: 'Show information about Quaver.',
         MISC: {
