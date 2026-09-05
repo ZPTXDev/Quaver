@@ -1,4 +1,4 @@
-import { MessageOptionsBuilderType } from '#src/lib';
+import { MessageOptionsBuilderType, ForceType } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
 import { type Initialized, QuaverGuild } from '#src/lib/guild';
 import type { QuaverInteraction } from '#src/lib/interactions';
@@ -153,7 +153,7 @@ export default new ChatInputCommandHandler()
                 return;
             }
 
-            await handleMultipleLinksAdd(interaction, guild, allTracks, queries.length);
+            await handleMultipleLinksAdd(interaction, guild, allTracks, queries.length, hasLargePlaylist);
             return;
         }
 
@@ -162,7 +162,7 @@ export default new ChatInputCommandHandler()
         switch (result.loadType) {
             case 'playlist':
             case 'track': {
-                await handleImmediateAdd(interaction, guild, result, query);
+                await handleImmediateAdd(interaction, guild, result, query, hasLargePlaylist);
                 return;
             }
             case 'search': {
@@ -207,6 +207,7 @@ async function handleMultipleLinksAdd(
     guild: QuaverGuild<Initialized>,
     tracks: QuaverSong[],
     linkCount: number,
+    hasLargePlaylist: boolean,
 ): Promise<void> {
     const compatible = await guild.checkPlayerCompatibility({
         member: interaction.member as GuildMember,
@@ -236,7 +237,10 @@ async function handleMultipleLinksAdd(
                   ]
                 : []),
         ),
-        { type: MessageOptionsBuilderType.Success },
+        {
+            type: MessageOptionsBuilderType.Success,
+            force: hasLargePlaylist ? ForceType.FollowUp : undefined,
+        },
     );
     guild.sendWebUpdate('queueUpdate', player.decorateQueue());
 }
@@ -249,6 +253,7 @@ async function handleImmediateAdd(
         { loadType: 'track' | 'playlist' }
     >,
     query: string,
+    hasLargePlaylist: boolean,
 ): Promise<void> {
     const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
     // Check if all available source emojis are configured
@@ -260,6 +265,7 @@ async function handleImmediateAdd(
 
     // Check for large playlist
     if (result.loadType === 'playlist' && result.data.tracks.length >= 100) {
+        hasLargePlaylist = true;
         await interaction.replyHandler.reply(
             guild.locale('MUSIC.QUEUE.LARGE_PLAYLIST_PROCESSING'),
             { type: MessageOptionsBuilderType.Warning },
@@ -336,7 +342,10 @@ async function handleImmediateAdd(
                   ]
                 : []),
         ),
-        { type: MessageOptionsBuilderType.Success },
+        {
+            type: MessageOptionsBuilderType.Success,
+            force: hasLargePlaylist ? ForceType.FollowUp : undefined,
+        },
     );
     guild.sendWebUpdate('queueUpdate', player.decorateQueue());
 }

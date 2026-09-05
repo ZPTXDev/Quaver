@@ -1,4 +1,4 @@
-import { MessageOptionsBuilderType } from '#src/lib';
+import { MessageOptionsBuilderType, ForceType } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import { getLocaleString, type LocaleKey } from '#src/lib/locales';
@@ -280,7 +280,10 @@ export default new ChatInputCommandHandler()
                       ]
                     : []),
             ),
-            { type: MessageOptionsBuilderType.Success },
+            {
+                type: MessageOptionsBuilderType.Success,
+                force: hasLargePlaylist ? ForceType.FollowUp : undefined,
+            },
         );
         guild.sendWebUpdate('queueUpdate', player.decorateQueue());
     });
