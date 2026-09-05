@@ -26,6 +26,45 @@ export default {
 
         const isAdTrack = queue.player.isAdTrack(track);
 
+        // Check for premature track ending (likely due to long pause resume issue)
+        // If track "finished" but player position is significantly before the track's actual end
+        if (
+            reason === 'finished' &&
+            !isAdTrack &&
+            !track.info.isStream &&
+            track.info.length > 0
+        ) {
+            const position = queue.player.position || 0;
+            const timeRemaining = track.info.length - position;
+
+            // If more than 10 seconds remain, this is a premature end
+            // Check pausedTimestamp to see if this happened after a long pause
+            if (timeRemaining > 10000 && queue.player.pausedTimestamp) {
+                const pauseDuration = Date.now() - queue.player.pausedTimestamp;
+                // If paused for more than 1 minute, this is likely the resume bug
+                if (pauseDuration > 60000) {
+                    logger.warn(
+                        `[G ${guild.id}] Track ended prematurely after long pause (${Math.round(pauseDuration / 1000)}s pause, ${Math.round(timeRemaining / 1000)}s remaining) - replaying from position`,
+                    );
+
+                    try {
+                        // Replay the track from where it was
+                        await queue.player.play(track);
+                        if (position > 0) {
+                            await queue.player.seek(position);
+                        }
+                        return;
+                    } catch (error) {
+                        logger.error(
+                            `[G ${guild.id}] Failed to replay track after premature end:`,
+                            error,
+                        );
+                        // Fall through to normal handling
+                    }
+                }
+            }
+        }
+
         // Handle load failures
         if (reason === 'loadFailed') {
             // If ad failed to load, skip silently
