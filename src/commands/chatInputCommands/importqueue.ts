@@ -3,26 +3,16 @@ import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import { getLocaleString } from '#src/lib/locales';
 import { Check, settings } from '#src/lib/util';
-import type { Track } from '@lavaclient/types';
 import { SlashCommandBuilder } from 'discord.js';
 
 interface ExportedTrack {
     encoded: string;
-    info: {
-        identifier: string;
-        isSeekable: boolean;
-        author: string;
-        length: number;
-        isStream: boolean;
-        position: number;
-        title: string;
-        uri: string | null;
-        sourceName: string;
-        artworkUrl: string | null;
-        isrc: string | null;
-    };
-    pluginInfo: Record<string, unknown>;
-    userData: Record<string, unknown>;
+    title: string;
+    author: string;
+    length: number;
+    uri: string | null;
+    artworkUrl: string | null;
+    sourceName: string;
     requesterId?: string;
 }
 
@@ -55,56 +45,38 @@ function isValidExportedQueue(data: unknown): data is ExportedQueue {
 
         const t = track as Record<string, unknown>;
 
-        // Validate encoded string
+        // Validate encoded string (this is what Lavalink needs)
         if (typeof t.encoded !== 'string' || t.encoded.length > MAX_STRING_LENGTH) {
             return false;
         }
 
-        // Validate info object
-        if (typeof t.info !== 'object' || t.info === null) return false;
-        const info = t.info as Record<string, unknown>;
-
-        if (typeof info.identifier !== 'string' || info.identifier.length > MAX_STRING_LENGTH) {
+        // Validate user-facing fields
+        if (typeof t.title !== 'string' || t.title.length > MAX_STRING_LENGTH) {
             return false;
         }
-        if (typeof info.isSeekable !== 'boolean') return false;
-        if (typeof info.author !== 'string' || info.author.length > MAX_STRING_LENGTH) {
+        if (typeof t.author !== 'string' || t.author.length > MAX_STRING_LENGTH) {
             return false;
         }
-        if (typeof info.length !== 'number' || info.length < 0 || !Number.isFinite(info.length)) {
+        if (typeof t.length !== 'number' || t.length < 0 || !Number.isFinite(t.length)) {
             return false;
         }
-        if (typeof info.isStream !== 'boolean') return false;
-        if (typeof info.position !== 'number' || !Number.isFinite(info.position)) {
+        if (t.uri !== null && (typeof t.uri !== 'string' || t.uri.length > MAX_STRING_LENGTH)) {
             return false;
         }
-        if (typeof info.title !== 'string' || info.title.length > MAX_STRING_LENGTH) {
+        if (t.artworkUrl !== null && (typeof t.artworkUrl !== 'string' || t.artworkUrl.length > MAX_STRING_LENGTH)) {
             return false;
         }
-        if (info.uri !== null && (typeof info.uri !== 'string' || info.uri.length > MAX_STRING_LENGTH)) {
-            return false;
-        }
-        if (typeof info.sourceName !== 'string' || info.sourceName.length > MAX_STRING_LENGTH) {
-            return false;
-        }
-        if (info.artworkUrl !== null && (typeof info.artworkUrl !== 'string' || info.artworkUrl.length > MAX_STRING_LENGTH)) {
-            return false;
-        }
-        if (info.isrc !== null && (typeof info.isrc !== 'string' || info.isrc.length > MAX_STRING_LENGTH)) {
+        if (typeof t.sourceName !== 'string' || t.sourceName.length > MAX_STRING_LENGTH) {
             return false;
         }
 
-        // Validate optional fields
+        // Validate optional requesterId
         if (t.requesterId !== undefined && typeof t.requesterId !== 'string') {
             return false;
         }
         if (t.requesterId && t.requesterId.length > MAX_STRING_LENGTH) {
             return false;
         }
-
-        // pluginInfo and userData should be objects
-        if (typeof t.pluginInfo !== 'object' || t.pluginInfo === null) return false;
-        if (typeof t.userData !== 'object' || t.userData === null) return false;
     }
 
     return true;
@@ -201,22 +173,17 @@ export default new ChatInputCommandHandler()
             return;
         }
 
-        // Convert exported tracks to Track objects
-        const tracks: Track[] = exportedQueue.tracks.map((exportedTrack): Track => ({
-            encoded: exportedTrack.encoded,
-            info: exportedTrack.info,
-            pluginInfo: exportedTrack.pluginInfo,
-            userData: exportedTrack.userData,
-        }));
+        // Convert exported tracks to encoded strings for Lavalink to decode
+        const encodedTracks = exportedQueue.tracks.map((track) => track.encoded);
 
         // Add tracks to the queue
         try {
-            await player.add(tracks, interaction.user.id, false);
+            await player.add(encodedTracks, interaction.user.id, false);
 
             await interaction.replyHandler.reply(
                 guild.locale(
                     'CMD.IMPORTQUEUE.RESPONSE.SUCCESS',
-                    tracks.length.toString(),
+                    encodedTracks.length.toString(),
                 ),
             );
         } catch {

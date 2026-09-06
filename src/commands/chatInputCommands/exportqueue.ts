@@ -14,21 +14,12 @@ import {
 
 interface ExportedTrack {
     encoded: string;
-    info: {
-        identifier: string;
-        isSeekable: boolean;
-        author: string;
-        length: number;
-        isStream: boolean;
-        position: number;
-        title: string;
-        uri: string | null;
-        sourceName: string;
-        artworkUrl: string | null;
-        isrc: string | null;
-    };
-    pluginInfo: Record<string, unknown>;
-    userData: Record<string, unknown>;
+    title: string;
+    author: string;
+    length: number;
+    uri: string | null;
+    artworkUrl: string | null;
+    sourceName: string;
     requesterId?: string;
 }
 
@@ -88,21 +79,12 @@ export default new ChatInputCommandHandler()
             exportedAt: new Date().toISOString(),
             tracks: tracksToExport.map((track: Song): ExportedTrack => ({
                 encoded: track.encoded,
-                info: {
-                    identifier: track.info.identifier,
-                    isSeekable: track.info.isSeekable,
-                    author: track.info.author,
-                    length: track.info.length,
-                    isStream: track.info.isStream,
-                    position: track.info.position,
-                    title: track.info.title,
-                    uri: track.info.uri,
-                    sourceName: track.info.sourceName,
-                    artworkUrl: track.info.artworkUrl,
-                    isrc: track.info.isrc,
-                },
-                pluginInfo: track.pluginInfo,
-                userData: track.userData,
+                title: track.info.title,
+                author: track.info.author,
+                length: track.info.length,
+                uri: track.info.uri,
+                artworkUrl: track.info.artworkUrl,
+                sourceName: track.info.sourceName,
                 requesterId: track.requesterId,
             })),
         };
