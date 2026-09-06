@@ -93,7 +93,8 @@ export class QuaverPlayerManager<
         player.memory.isAdPlaying = data.memory.isAdPlaying ?? false;
         player.memory.savedFilters = data.memory.savedFilters;
         player.memory.trackStartTime = data.memory.trackStartTime;
-        player.memory.currentNowPlayingMessageId = data.memory.currentNowPlayingMessageId;
+        // Don't restore currentNowPlayingMessageId to prevent interaction with stale messages
+        player.memory.currentNowPlayingMessageId = undefined;
     }
 
     /**
