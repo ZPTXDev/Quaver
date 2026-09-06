@@ -187,9 +187,9 @@ export const SettingsSchema = z.object({
                 )
                 .min(1, 'At least one Lavalink node is required')
                 .refine(
-                    (nodes) => {
+                    (nodes): boolean => {
                         // Validate unique host:port combinations
-                        const endpoints = nodes.map((n) => `${n.host}:${n.port}`);
+                        const endpoints = nodes.map((n): string => `${n.host}:${n.port}`);
                         const uniqueEndpoints = new Set(endpoints);
                         return endpoints.length === uniqueEndpoints.size;
                     },
