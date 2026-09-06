@@ -33,7 +33,8 @@ interface ExportedQueue {
 }
 
 // Security constants
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+// 10 MB maximum file size
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const MAX_TRACKS = 1000;
 const MAX_STRING_LENGTH = 10000;
 
@@ -119,7 +120,7 @@ export default new ChatInputCommandHandler()
                     'CMD.IMPORTQUEUE.DESCRIPTION',
                 ),
             )
-            .addAttachmentOption((option) =>
+            .addAttachmentOption((option): typeof option =>
                 option
                     .setName('file')
                     .setDescription(
@@ -183,7 +184,7 @@ export default new ChatInputCommandHandler()
             }
 
             exportedQueue = data;
-        } catch (error) {
+        } catch {
             await interaction.replyHandler.reply(
                 guild.locale('CMD.IMPORTQUEUE.RESPONSE.INVALID_FORMAT'),
                 { type: MessageOptionsBuilderType.Error },
@@ -201,7 +202,7 @@ export default new ChatInputCommandHandler()
         }
 
         // Convert exported tracks to Track objects
-        const tracks: Track[] = exportedQueue.tracks.map((exportedTrack) => ({
+        const tracks: Track[] = exportedQueue.tracks.map((exportedTrack): Track => ({
             encoded: exportedTrack.encoded,
             info: exportedTrack.info,
             pluginInfo: exportedTrack.pluginInfo,
@@ -218,7 +219,7 @@ export default new ChatInputCommandHandler()
                     tracks.length.toString(),
                 ),
             );
-        } catch (error) {
+        } catch {
             await interaction.replyHandler.reply(
                 guild.locale('CMD.IMPORTQUEUE.RESPONSE.LOAD_FAILED'),
                 { type: MessageOptionsBuilderType.Error },
