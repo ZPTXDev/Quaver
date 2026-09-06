@@ -68,6 +68,21 @@ export default {
             SUCCESS: 'Exported **%1** track(s) from the queue.',
         },
     },
+    IMPORTQUEUE: {
+        DESCRIPTION: 'Import a queue from a file.',
+        OPTION: {
+            FILE: 'The queue file to import (exported from /exportqueue).',
+        },
+        RESPONSE: {
+            FILE_TOO_LARGE: 'The file is too large. Maximum size is 10 MB.',
+            INVALID_FILE: 'The file you provided is not a valid queue export.',
+            INVALID_FORMAT: 'The file format is invalid or corrupted.',
+            LOAD_FAILED: 'Failed to load tracks from the queue file. Please try again later.',
+            NO_VALID_TRACKS: 'No valid tracks were found in the file.',
+            SUCCESS: 'Imported **%1** track(s) to the queue.',
+            TOO_MANY_TRACKS: 'The queue contains too many tracks. Maximum is 1000 tracks.',
+        },
+    },
     INFO: {
         DESCRIPTION: 'Show information about Quaver.',
         MISC: {

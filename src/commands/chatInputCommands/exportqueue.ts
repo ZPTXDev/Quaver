@@ -59,7 +59,11 @@ export default new ChatInputCommandHandler()
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
 
-        if (player.queue.tracks.length === 0) {
+        // Check if there's anything to export (current track or queue)
+        const hasCurrentTrack = player.queue.current && (player.playing || player.paused);
+        const hasQueuedTracks = player.queue.tracks.length > 0;
+
+        if (!hasCurrentTrack && !hasQueuedTracks) {
             await interaction.replyHandler.reply(
                 guild.locale('CMD.EXPORTQUEUE.RESPONSE.QUEUE_EMPTY'),
                 { type: MessageOptionsBuilderType.Error },
@@ -67,11 +71,22 @@ export default new ChatInputCommandHandler()
             return;
         }
 
+        // Collect all tracks to export (current + queued)
+        const tracksToExport: Song[] = [];
+
+        // Add current track first if it exists
+        if (hasCurrentTrack) {
+            tracksToExport.push(player.queue.current);
+        }
+
+        // Add queued tracks
+        tracksToExport.push(...player.queue.tracks);
+
         // Create the export data
         const exportData: ExportedQueue = {
             version: version.version,
             exportedAt: new Date().toISOString(),
-            tracks: player.queue.tracks.map((track: Song): ExportedTrack => ({
+            tracks: tracksToExport.map((track: Song): ExportedTrack => ({
                 encoded: track.encoded,
                 info: {
                     identifier: track.info.identifier,
@@ -106,7 +121,7 @@ export default new ChatInputCommandHandler()
                     new TextDisplayBuilder().setContent(
                         guild.locale(
                             'CMD.EXPORTQUEUE.RESPONSE.SUCCESS',
-                            player.queue.tracks.length.toString(),
+                            tracksToExport.length.toString(),
                         ),
                     ),
                 )
