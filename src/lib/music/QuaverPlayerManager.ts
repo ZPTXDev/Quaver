@@ -47,9 +47,32 @@ export class QuaverPlayerManager<
         const player = this.create(guild);
         const channel = await guild.channels.fetch(data.textChannelId);
         player.queue.channel = channel as QuaverChannels;
+
+        this.restoreQueueState(player, data);
+        this.restoreMemoryState(player, data);
+        player.sessionLogs = data.sessionLogs ? [...data.sessionLogs] : [];
+
+        await this.restoreEffectsAndPlayback(player, data, resumed);
+
+        if (player.memory.shuffle || player.memory.alternate) {
+            player.recomputeQueue();
+        }
+        return player;
+    }
+
+    /**
+     * Restores queue state from JSON data
+     */
+    private restoreQueueState(player: QuaverPlayer<TNode>, data: QuaverPlayerJSON): void {
         player.queue.current = data.queue.current ?? null;
         player.queue.tracks = [...data.queue.tracks];
         player.queue.setLoop(data.loop);
+    }
+
+    /**
+     * Restores memory state from JSON data
+     */
+    private restoreMemoryState(player: QuaverPlayer<TNode>, data: QuaverPlayerJSON): void {
         player.memory.shuffle = data.memory.shuffle;
         player.memory.alternate = data.memory.alternate;
         player.memory.originalQueue = data.memory.originalQueue
@@ -71,7 +94,16 @@ export class QuaverPlayerManager<
         player.memory.savedFilters = data.memory.savedFilters;
         player.memory.trackStartTime = data.memory.trackStartTime;
         player.memory.currentNowPlayingMessageId = data.memory.currentNowPlayingMessageId;
-        player.sessionLogs = data.sessionLogs ? [...data.sessionLogs] : [];
+    }
+
+    /**
+     * Restores effects and playback state from JSON data
+     */
+    private async restoreEffectsAndPlayback(
+        player: QuaverPlayer<TNode>,
+        data: QuaverPlayerJSON,
+        resumed: boolean,
+    ): Promise<void> {
         if (resumed) {
             await player.fetch();
             player.memory.bassboost = data.effects.bassboost;
@@ -88,10 +120,6 @@ export class QuaverPlayerManager<
                 await player.setPause(true);
             }
         }
-        if (player.memory.shuffle || player.memory.alternate) {
-            player.recomputeQueue();
-        }
-        return player;
     }
 
     fetch(cache?: boolean): Promise<QuaverPlayer<TNode>[]>;
