@@ -38,13 +38,18 @@ export default {
             const timeRemaining = track.info.length - position;
 
             // If more than 10 seconds remain, this is a premature end
-            // Check pausedTimestamp to see if this happened after a long pause
-            if (timeRemaining > 10000 && queue.player.pausedTimestamp) {
-                const pauseDuration = Date.now() - queue.player.pausedTimestamp;
-                // If paused for more than 1 minute, this is likely the resume bug
-                if (pauseDuration > 60000) {
+            // Check if this happened shortly after resuming from a long pause
+            if (timeRemaining > 10000) {
+                const timeSinceResume = queue.player.memory.lastResumeTime
+                    ? Date.now() - queue.player.memory.lastResumeTime
+                    : Infinity;
+                const lastPauseDuration = queue.player.memory.lastPauseDuration || 0;
+
+                // If we resumed within the last 30 seconds and were paused for more than 1 minute
+                // This is likely the Lavalink resume bug where the audio stream dies
+                if (timeSinceResume < 30000 && lastPauseDuration > 60000) {
                     logger.warn(
-                        `[G ${guild.id}] Track ended prematurely after long pause (${Math.round(pauseDuration / 1000)}s pause, ${Math.round(timeRemaining / 1000)}s remaining) - replaying from position`,
+                        `[G ${guild.id}] Track ended prematurely after long pause (${Math.round(lastPauseDuration / 1000)}s pause, ${Math.round(timeRemaining / 1000)}s remaining) - replaying from position`,
                     );
 
                     try {
@@ -53,6 +58,9 @@ export default {
                         if (position > 0) {
                             await queue.player.seek(position);
                         }
+                        // Clear the resume tracking to prevent repeated replays
+                        delete queue.player.memory.lastResumeTime;
+                        delete queue.player.memory.lastPauseDuration;
                         return;
                     } catch (error) {
                         logger.error(

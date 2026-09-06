@@ -28,20 +28,44 @@ export default {
 
         // Check if this is a false positive from resuming after a long pause
         // If the player was paused for a long time, exceptions on resume are often spurious
-        if (player.pausedTimestamp) {
-            const pauseDuration = Date.now() - player.pausedTimestamp;
-            // If paused for more than 1 minute, and this is a timeout/network error, ignore it
-            if (
-                pauseDuration > 60000 &&
-                (data.exception.cause === 'java.net.SocketTimeoutException' ||
-                    data.exception.cause === 'java.io.IOException' ||
-                    data.exception.message.includes('timeout') ||
-                    data.exception.message.includes('timed out'))
-            ) {
+        const timeSinceResume = player.memory.lastResumeTime
+            ? Date.now() - player.memory.lastResumeTime
+            : Infinity;
+        const lastPauseDuration = player.memory.lastPauseDuration || 0;
+
+        // If this exception occurred within 30 seconds of resuming from a long pause (>1 minute)
+        // and it's a network/EOF error, this is likely the Lavalink bug where the stream died
+        if (
+            timeSinceResume < 30000 &&
+            lastPauseDuration > 60000 &&
+            (data.exception.cause === 'java.net.SocketTimeoutException' ||
+                data.exception.cause === 'java.io.IOException' ||
+                data.exception.cause === 'java.io.EOFException' ||
+                data.exception.message.includes('timeout') ||
+                data.exception.message.includes('timed out') ||
+                data.exception.message.includes('EOF'))
+        ) {
+            logger.warn(
+                `[G ${guild.id}] Track exception after long pause (${Math.round(lastPauseDuration / 1000)}s pause, ${Math.round(timeSinceResume / 1000)}s since resume), attempting recovery`,
+            );
+
+            // Try to recover by replaying from current position
+            try {
+                await player.stop();
+                await player.play(currentTrack);
+                if (currentPosition > 0) {
+                    await player.seek(currentPosition);
+                }
                 logger.info(
-                    `[G ${guild.id}] Track exception after long pause (${Math.round(pauseDuration / 1000)}s), ignoring as false positive`,
+                    `[G ${guild.id}] Successfully recovered from post-pause exception`,
                 );
                 return;
+            } catch (error) {
+                logger.error(
+                    `[G ${guild.id}] Failed to recover from post-pause exception:`,
+                    error,
+                );
+                // Fall through to normal error handling
             }
         }
 

@@ -60,6 +60,9 @@ export interface QuaverPlayerJSON {
         };
         trackStartTime?: number;
         currentNowPlayingMessageId?: Snowflake;
+        pausedTimestamp?: number;
+        lastResumeTime?: number;
+        lastPauseDuration?: number;
     };
     sessionLogs: {
         timestamp: number;
@@ -148,6 +151,9 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         };
         trackStartTime?: number;
         currentNowPlayingMessageId?: Snowflake;
+        pausedTimestamp?: number;
+        lastResumeTime?: number;
+        lastPauseDuration?: number;
     } = {
         bassboost: false,
         nightcore: false,
@@ -670,11 +676,23 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         }
         if (paused) {
             await this.pause();
+            // Track when we paused for long pause detection
+            this.memory.pausedTimestamp = Date.now();
         } else {
+            // Calculate pause duration before resuming
+            const pauseDuration = this.memory.pausedTimestamp
+                ? Date.now() - this.memory.pausedTimestamp
+                : 0;
+
             // When resuming after a long pause, ensure we have a track to play
             const hasCurrentTrack = this.queue.current && (this.playing || this.paused);
             await this.resume();
             this.timeout.pausedAlone = false;
+
+            // Track resume time and pause duration for trackEnd to detect premature ends
+            this.memory.lastResumeTime = Date.now();
+            this.memory.lastPauseDuration = pauseDuration;
+            delete this.memory.pausedTimestamp;
 
             // After resume, check if we need to start playback
             // If there was a current track but player isn't playing, start the queue
