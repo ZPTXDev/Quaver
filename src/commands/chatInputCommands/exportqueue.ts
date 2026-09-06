@@ -16,11 +16,6 @@ interface ExportedTrack {
     encoded: string;
     title: string;
     author: string;
-    length: number;
-    uri: string | null;
-    artworkUrl: string | null;
-    sourceName: string;
-    requesterId?: string;
 }
 
 interface ExportedQueue {
@@ -81,11 +76,6 @@ export default new ChatInputCommandHandler()
                 encoded: track.encoded,
                 title: track.info.title,
                 author: track.info.author,
-                length: track.info.length,
-                uri: track.info.uri,
-                artworkUrl: track.info.artworkUrl,
-                sourceName: track.info.sourceName,
-                requesterId: track.requesterId,
             })),
         };
 

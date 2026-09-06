@@ -9,11 +9,6 @@ interface ExportedTrack {
     encoded: string;
     title: string;
     author: string;
-    length: number;
-    uri: string | null;
-    artworkUrl: string | null;
-    sourceName: string;
-    requesterId?: string;
 }
 
 interface ExportedQueue {
@@ -45,36 +40,14 @@ function isValidExportedQueue(data: unknown): data is ExportedQueue {
 
         const t = track as Record<string, unknown>;
 
-        // Validate encoded string (this is what Lavalink needs)
+        // Validate required fields
         if (typeof t.encoded !== 'string' || t.encoded.length > MAX_STRING_LENGTH) {
             return false;
         }
-
-        // Validate user-facing fields
         if (typeof t.title !== 'string' || t.title.length > MAX_STRING_LENGTH) {
             return false;
         }
         if (typeof t.author !== 'string' || t.author.length > MAX_STRING_LENGTH) {
-            return false;
-        }
-        if (typeof t.length !== 'number' || t.length < 0 || !Number.isFinite(t.length)) {
-            return false;
-        }
-        if (t.uri !== null && (typeof t.uri !== 'string' || t.uri.length > MAX_STRING_LENGTH)) {
-            return false;
-        }
-        if (t.artworkUrl !== null && (typeof t.artworkUrl !== 'string' || t.artworkUrl.length > MAX_STRING_LENGTH)) {
-            return false;
-        }
-        if (typeof t.sourceName !== 'string' || t.sourceName.length > MAX_STRING_LENGTH) {
-            return false;
-        }
-
-        // Validate optional requesterId
-        if (t.requesterId !== undefined && typeof t.requesterId !== 'string') {
-            return false;
-        }
-        if (t.requesterId && t.requesterId.length > MAX_STRING_LENGTH) {
             return false;
         }
     }
@@ -173,17 +146,42 @@ export default new ChatInputCommandHandler()
             return;
         }
 
-        // Convert exported tracks to encoded strings for Lavalink to decode
-        const encodedTracks = exportedQueue.tracks.map((track) => track.encoded);
+        // Decode tracks using Lavalink API
+        const decodedTracks = [];
+
+        for (const exportedTrack of exportedQueue.tracks) {
+            try {
+                const result = await interaction.client.music.api.loadTracks(exportedTrack.encoded);
+
+                if (result && result.loadType === 'track' && result.data) {
+                    const track = result.data;
+                    track.requesterId = interaction.user.id;
+                    track.id = crypto.randomUUID();
+                    decodedTracks.push(track);
+                }
+            } catch {
+                // Skip tracks that fail to decode
+                continue;
+            }
+        }
+
+        // Check if we decoded any tracks
+        if (decodedTracks.length === 0) {
+            await interaction.replyHandler.reply(
+                guild.locale('CMD.IMPORTQUEUE.RESPONSE.NO_VALID_TRACKS'),
+                { type: MessageOptionsBuilderType.Error },
+            );
+            return;
+        }
 
         // Add tracks to the queue
         try {
-            await player.add(encodedTracks, interaction.user.id, false);
+            await player.addTracksToQueue(decodedTracks, interaction.user.id, false);
 
             await interaction.replyHandler.reply(
                 guild.locale(
                     'CMD.IMPORTQUEUE.RESPONSE.SUCCESS',
-                    encodedTracks.length.toString(),
+                    decodedTracks.length.toString(),
                 ),
             );
         } catch {
