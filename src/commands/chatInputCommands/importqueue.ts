@@ -89,7 +89,7 @@ export default new ChatInputCommandHandler()
 
         const attachment = interaction.options.getAttachment('file', true);
 
-        // Validate file size
+        // Validate file size (before deferring)
         if (attachment.size > MAX_FILE_SIZE) {
             await interaction.replyHandler.reply(
                 guild.locale('CMD.IMPORTQUEUE.RESPONSE.FILE_TOO_LARGE'),
@@ -98,7 +98,7 @@ export default new ChatInputCommandHandler()
             return;
         }
 
-        // Validate file type
+        // Validate file type (before deferring)
         if (attachment.contentType !== 'application/json' && !attachment.name.endsWith('.json')) {
             await interaction.replyHandler.reply(
                 guild.locale('CMD.IMPORTQUEUE.RESPONSE.INVALID_FILE'),
@@ -106,6 +106,21 @@ export default new ChatInputCommandHandler()
             );
             return;
         }
+
+        // Defer reply as processing may take time
+        await interaction.deferReply();
+        let warningSent = false;
+
+        // Set up warning timeout for slow processing
+        const warningTimeout = setTimeout(async (): Promise<void> => {
+            if (!warningSent) {
+                warningSent = true;
+                await interaction.replyHandler.reply(
+                    guild.locale('MUSIC.QUEUE.SLOW_PROCESSING'),
+                    { type: MessageOptionsBuilderType.Warning },
+                );
+            }
+        }, 5000);
 
         let exportedQueue: ExportedQueue;
 
@@ -130,6 +145,7 @@ export default new ChatInputCommandHandler()
 
             exportedQueue = data;
         } catch {
+            clearTimeout(warningTimeout);
             await interaction.replyHandler.reply(
                 guild.locale('CMD.IMPORTQUEUE.RESPONSE.INVALID_FORMAT'),
                 { type: MessageOptionsBuilderType.Error },
@@ -139,6 +155,7 @@ export default new ChatInputCommandHandler()
 
         // Check if we have any tracks
         if (exportedQueue.tracks.length === 0) {
+            clearTimeout(warningTimeout);
             await interaction.replyHandler.reply(
                 guild.locale('CMD.IMPORTQUEUE.RESPONSE.NO_VALID_TRACKS'),
                 { type: MessageOptionsBuilderType.Error },
@@ -146,24 +163,45 @@ export default new ChatInputCommandHandler()
             return;
         }
 
+        // Show large playlist message if applicable
+        if (warningSent && exportedQueue.tracks.length >= 100) {
+            await interaction.replyHandler.reply(
+                guild.locale('MUSIC.QUEUE.LARGE_PLAYLIST_PROCESSING'),
+                { type: MessageOptionsBuilderType.Warning },
+            );
+        }
+
         // Decode tracks using Lavalink API
-        const decodedTracks = [];
+        let decodedTracks = [];
 
-        for (const exportedTrack of exportedQueue.tracks) {
-            try {
-                const result = await interaction.client.music.api.loadTracks(exportedTrack.encoded);
+        try {
+            // Decode all tracks at once
+            const encodedTracks = exportedQueue.tracks.map((t): string => t.encoded);
+            const results = await interaction.client.music.api.decodeTracks(encodedTracks);
 
-                if (result && result.loadType === 'track' && result.data) {
-                    const track = result.data;
+            // Add metadata to decoded tracks
+            decodedTracks = results.map((track): typeof track => {
+                track.requesterId = interaction.user.id;
+                track.id = crypto.randomUUID();
+                return track;
+            });
+        } catch {
+            // If batch decode fails, fall back to individual decoding
+            for (const exportedTrack of exportedQueue.tracks) {
+                try {
+                    const track = await interaction.client.music.api.decodeTrack(exportedTrack.encoded);
                     track.requesterId = interaction.user.id;
                     track.id = crypto.randomUUID();
                     decodedTracks.push(track);
+                } catch {
+                    // Skip tracks that fail to decode
+                    continue;
                 }
-            } catch {
-                // Skip tracks that fail to decode
-                continue;
             }
         }
+
+        // Clear warning timeout
+        clearTimeout(warningTimeout);
 
         // Check if we decoded any tracks
         if (decodedTracks.length === 0) {

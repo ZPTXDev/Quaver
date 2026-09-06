@@ -108,7 +108,7 @@ export default new ChatInputCommandHandler()
                         { type: MessageOptionsBuilderType.Warning },
                     );
                 }
-            }, 3000);
+            }, 5000);
 
             const result = await searchTracks(interaction.client, guild, q);
 
