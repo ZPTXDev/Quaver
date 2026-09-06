@@ -191,8 +191,9 @@ export class QuaverClient extends Client {
                     .then((g): void => {
                         g.sendWebUpdate('gatewayHealthUpdate', data);
                     })
-                    .catch((): void => {
-                        // Silently ignore if guild wrap fails
+                    .catch((err): void => {
+                        // Log at debug level for troubleshooting
+                        logger.debug({ message: 'Failed to wrap guild for gateway health update', label: 'QuaverClient', guildId: guild.id, error: err });
                     });
             });
         });
@@ -236,8 +237,9 @@ export class QuaverClient extends Client {
                                 );
                             }
                         })
-                        .catch((): void => {
-                            // Silently ignore if guild wrap fails
+                        .catch((err): void => {
+                            // Log at debug level for troubleshooting
+                            logger.debug({ message: 'Failed to wrap guild for media health update (unstable transition)', label: 'QuaverClient', guildId: guild.id, error: err });
                         });
                 });
             } else {
@@ -252,8 +254,9 @@ export class QuaverClient extends Client {
                         .then((g): void => {
                             g.sendWebUpdate('mediaHealthUpdate', data);
                         })
-                        .catch((): void => {
-                            // Silently ignore if guild wrap fails
+                        .catch((err): void => {
+                            // Log at debug level for troubleshooting
+                            logger.debug({ message: 'Failed to wrap guild for media health update', label: 'QuaverClient', guildId: guild.id, error: err });
                         });
                 });
             }

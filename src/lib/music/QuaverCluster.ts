@@ -41,8 +41,9 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
         this.regionAffinity = regionAffinity;
 
         // Create QuaverNode instances for each configured node
-        options.nodes.forEach((nodeConfig, index): void => {
-            const nodeId = `node-${index}`;
+        options.nodes.forEach((nodeConfig): void => {
+            // Use host:port as node ID for stability and uniqueness
+            const nodeId = `${nodeConfig.info.host}:${nodeConfig.info.port}`;
             const node = new QuaverNode(
                 {
                     info: nodeConfig.info,

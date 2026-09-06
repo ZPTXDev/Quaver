@@ -67,8 +67,12 @@ export class RegionAffinity {
 
         // Keyv doesn't have a native "get all keys" method, so we need to iterate
         // This is a limitation, but acceptable for a small number of nodes
-        const iterator = this.keyv.iterator!();
-        
+        const iterator = this.keyv.iterator;
+        if (!iterator) {
+            // Iterator not available, return empty result
+            return result;
+        }
+
         for await (const [key, data] of iterator) {
             const affinityData = data as AffinityData;
             
@@ -104,8 +108,13 @@ export class RegionAffinity {
      */
     async pruneStaleEntries(staleAfterMs: number): Promise<void> {
         const now = Date.now();
-        const iterator = this.keyv.iterator!();
-        
+        const iterator = this.keyv.iterator;
+
+        if (!iterator) {
+            // Iterator not available, skip pruning
+            return;
+        }
+
         const keysToDelete: string[] = [];
         
         for await (const [key, data] of iterator) {
