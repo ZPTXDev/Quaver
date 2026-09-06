@@ -186,7 +186,7 @@ Quaver supports connecting to multiple Lavalink nodes for improved reliability, 
 - **Automatic Failover**: If a node becomes unavailable, new players route to healthy nodes
 - **Session Recovery**: Players can be restored after restarts, maintaining node affinity when possible
 
-> **Note**: The `region` field in each node configuration is an internal identifier for affinity tracking. You can set it to any value you prefer (e.g., `"sg1"`, `"us-east"`, `"europe"`). It's not matched against Discord's voice regions.
+> **Note**: The `region` field should match Discord's voice region IDs (from the `/voice/regions` API) to enable automatic region-based routing. When a player joins a voice channel, Quaver routes them to nodes configured for that channel's region. If no matching region is found, it falls back to penalty-based load balancing across all available nodes.
 
 
 | Config Item Path                                      | Description                                                                                                                                                                                                                                                                                                                                                       | Required                                                  | Version Added |
