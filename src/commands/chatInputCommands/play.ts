@@ -4,12 +4,14 @@ import { QuaverGuild } from '#src/lib/guild';
 import { getLocaleString, type LocaleKey } from '#src/lib/locales';
 import { updateHandler } from '#src/lib/state';
 import {
+    acceptableSources,
     Check,
     getTrackMarkdownLocaleString,
     type QuaverChannels,
     type QuaverSong,
     searchTracks,
     settings,
+    splitMultipleLinks,
 } from '#src/lib/util';
 import {
     ContainerBuilder,
@@ -77,13 +79,96 @@ export default new ChatInputCommandHandler()
         let tracks: QuaverSong[] = [],
             msg = '',
             extras = [];
-        const result = await searchTracks(
-            interaction.client,
-            guild,
-            query,
-        );
-        switch (result.loadType) {
-            case 'playlist':
+        let warningSent = false;
+
+        // Helper function to search with timeout warning
+        const searchWithWarning = async (q: string): Promise<Awaited<ReturnType<typeof searchTracks>>> => {
+            let warningTimeout: NodeJS.Timeout | null = null;
+
+            warningTimeout = setTimeout(async (): Promise<void> => {
+                if (!warningSent) {
+                    warningSent = true;
+                    await interaction.replyHandler.reply(
+                        guild.locale('MUSIC.QUEUE.SLOW_PROCESSING'),
+                        { type: MessageOptionsBuilderType.Warning },
+                    );
+                }
+            }, 5000);
+
+            const result = await searchTracks(interaction.client, guild, q);
+
+            if (warningTimeout) clearTimeout(warningTimeout);
+
+            // If we sent a warning and this is a large playlist, update the message
+            if (warningSent && result.loadType === 'playlist' && result.data.tracks.length >= 100) {
+                await interaction.replyHandler.reply(
+                    guild.locale('MUSIC.QUEUE.LARGE_PLAYLIST_PROCESSING'),
+                    { type: MessageOptionsBuilderType.Warning },
+                );
+            }
+
+            return result;
+        };
+
+        // Check for multiple links
+        const queries = splitMultipleLinks(query);
+
+        if (queries.length > 1) {
+            // Handle multiple links
+            const allTracks: QuaverSong[] = [];
+
+            for (const singleQuery of queries) {
+                const result = await searchWithWarning(singleQuery);
+
+                switch (result.loadType) {
+                    case 'playlist': {
+                        const playlistTracks = result.data.tracks.map((t: QuaverSong): QuaverSong => {
+                            t.requesterId = interaction.user.id;
+                            t.id = crypto.randomUUID();
+                            return t;
+                        });
+                        allTracks.push(...playlistTracks);
+                        break;
+                    }
+                    case 'track': {
+                        const track: QuaverSong = result.data;
+                        track.requesterId = interaction.user.id;
+                        track.id = crypto.randomUUID();
+                        allTracks.push(track);
+                        break;
+                    }
+                    case 'search': {
+                        const track: QuaverSong = result.data[0];
+                        if (track) {
+                            track.requesterId = interaction.user.id;
+                            track.id = crypto.randomUUID();
+                            allTracks.push(track);
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+
+            if (allTracks.length === 0) {
+                await interaction.replyHandler.reply(
+                    guild.locale('CMD.PLAY.RESPONSE.NO_RESULTS'),
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
+            }
+
+            tracks = allTracks;
+            msg = insert
+                ? 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.INSERTED'
+                : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
+            extras = [tracks.length.toString(), guild.locale('MISC.X_LINKS', queries.length.toString())];
+        } else {
+            // Handle single query (existing logic)
+            const result = await searchWithWarning(query);
+            switch (result.loadType) {
+            case 'playlist': {
                 tracks = [
                     ...result.data.tracks.map((t: QuaverSong): QuaverSong => {
                         t.requesterId = interaction.user.id;
@@ -94,13 +179,37 @@ export default new ChatInputCommandHandler()
                 msg = insert
                     ? 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.INSERTED'
                     : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
+                const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+                // Check if all available source emojis are configured
+                const availableSources = Object.keys(acceptableSources);
+                const allSourceEmojisConfigured = availableSources.every(
+                    (source): boolean => !!settings.emojis[source as keyof typeof settings.emojis]
+                );
+                const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? allSourceEmojisConfigured;
+
+                // Get source emoji from first track in playlist
+                const sourceEmoji = showSourceLabels && tracks.length > 0 && tracks[0].info.sourceName
+                    ? settings.emojis?.[tracks[0].info.sourceName as keyof typeof settings.emojis] || ''
+                    : '';
+                const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
+
+                let playlistDisplay: string;
+                if (result.data.info.name === query) {
+                    playlistDisplay = showArtist && result.data.pluginInfo?.author
+                        ? `${sourcePrefix}${result.data.pluginInfo.author} - ${result.data.info.name}`
+                        : `${sourcePrefix}${result.data.info.name}`;
+                } else {
+                    const displayName = showArtist && result.data.pluginInfo?.author
+                        ? `${result.data.pluginInfo.author} - ${result.data.info.name}`
+                        : result.data.info.name;
+                    playlistDisplay = `${sourcePrefix}[${displayName}](${query})`;
+                }
                 extras = [
                     tracks.length.toString(),
-                    result.data.info.name === query
-                        ? result.data.info.name
-                        : `[${result.data.info.name}](${query})`,
+                    playlistDisplay,
                 ];
                 break;
+            }
             case 'track':
             case 'search': {
                 const track: QuaverSong =
@@ -118,7 +227,20 @@ export default new ChatInputCommandHandler()
                 msg = insert
                     ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.INSERTED'
                     : 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
-                extras = [getTrackMarkdownLocaleString(track)];
+                const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+                // Check if all available source emojis are configured
+                const availableSources = Object.keys(acceptableSources);
+                const allSourceEmojisConfigured = availableSources.every(
+                    (source): boolean => !!settings.emojis[source as keyof typeof settings.emojis]
+                );
+                const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? allSourceEmojisConfigured;
+
+                const sourceEmoji = showSourceLabels && track.info.sourceName
+                    ? settings.emojis?.[track.info.sourceName as keyof typeof settings.emojis] || ''
+                    : '';
+                const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
+
+                extras = [`${sourcePrefix}${getTrackMarkdownLocaleString(track, showArtist)}`];
                 break;
             }
             case 'empty':
@@ -139,7 +261,9 @@ export default new ChatInputCommandHandler()
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
+            }
         }
+
         const player = await guild.getPlayer({
             textChannel: interaction.channel as QuaverChannels,
             voiceChannelId: (interaction.member as GuildMember).voice.channelId,

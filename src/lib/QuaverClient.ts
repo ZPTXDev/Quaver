@@ -12,6 +12,7 @@ import {
     type InteractionHandlerMapsFlat,
 } from './interactions';
 import { ConnectionHealthMonitor, QuaverNode, QuaverCluster, RegionAffinity } from './music';
+import type { UpdateHandler } from './UpdateHandler';
 import { settings } from './util';
 
 export class QuaverClient extends Client {
@@ -19,6 +20,7 @@ export class QuaverClient extends Client {
     music?: QuaverNode | QuaverCluster;
     interactionHandler: InteractionHandler;
     connectionHealth: ConnectionHealthMonitor;
+    updateHandler?: UpdateHandler;
     private lastMediaUnstable: boolean = false;
 
     constructor(
@@ -117,6 +119,10 @@ export class QuaverClient extends Client {
         this.ws.on(
             GatewayDispatchEvents.VoiceServerUpdate,
             async (payload): Promise<boolean> => {
+                // Skip voice updates during shutdown to prevent encoding errors
+                if (this.updateHandler?.restartInProgress) {
+                    return false;
+                }
                 // Capture media server endpoint for health monitoring
                 // Get the node ID from the player manager
                 const nodeId = this.music!.players.getNodeIdForGuild(payload.guild_id);
@@ -126,8 +132,13 @@ export class QuaverClient extends Client {
         );
         this.ws.on(
             GatewayDispatchEvents.VoiceStateUpdate,
-            async (payload): Promise<boolean> =>
-                this.music!.players.handleVoiceUpdate(payload),
+            async (payload): Promise<boolean> => {
+                // Skip voice updates during shutdown to prevent encoding errors
+                if (this.updateHandler?.restartInProgress) {
+                    return false;
+                }
+                return this.music!.players.handleVoiceUpdate(payload);
+            },
         );
     }
 
@@ -172,7 +183,9 @@ export class QuaverClient extends Client {
         this.on('gatewayHealthUpdate', (data): void => {
             if (!this.io || this.io.engine.clientsCount === 0) return;
             this.guilds.cache.forEach((guild): void => {
-                const hasActiveWebSession = (this.io?.sockets.adapter.rooms.get(guild.id)?.size ?? 0) > 0;
+                const hasActiveWebSession =
+                    (this.io?.sockets.adapter.rooms.get(guild.id)?.size ?? 0) >
+                    0;
                 if (!hasActiveWebSession) return;
                 QuaverGuild.wrap(guild)
                     .then((g): void => {
@@ -187,7 +200,8 @@ export class QuaverClient extends Client {
         // Forward media health updates and send notifications when unstable
         this.on('mediaHealthUpdate', (data): void => {
             // Detect transition from stable to unstable
-            const transitionedToUnstable = !this.lastMediaUnstable && data.unstable;
+            const transitionedToUnstable =
+                !this.lastMediaUnstable && data.unstable;
             this.lastMediaUnstable = data.unstable;
 
             // Send notification to guilds with active players when transitioning to unstable
@@ -196,18 +210,30 @@ export class QuaverClient extends Client {
                     QuaverGuild.wrap(guild)
                         .then(async (g): Promise<void> => {
                             // Forward to dashboard if active
-                            const hasActiveWebSession = (this.io?.sockets.adapter.rooms.get(guild.id)?.size ?? 0) > 0;
+                            const hasActiveWebSession =
+                                (this.io?.sockets.adapter.rooms.get(guild.id)
+                                    ?.size ?? 0) > 0;
                             if (hasActiveWebSession) {
                                 g.sendWebUpdate('mediaHealthUpdate', data);
                             }
 
                             // Check if guild has an active player
-                            const player = await this.music?.players.fetch(guild.id);
-                            if (player?.voice.connected && player.queue.channel) {
+                            const player = await this.music?.players.fetch(
+                                guild.id,
+                            );
+                            if (
+                                player?.voice.connected &&
+                                player.queue.channel
+                            ) {
                                 // Send warning message to the player's bound text channel
-                                await player.sendMessage(g.locale('MUSIC.PLAYER.CONNECTION_UNSTABLE'), {
-                                    type: MessageOptionsBuilderType.Warning,
-                                });
+                                await player.sendMessage(
+                                    g.locale(
+                                        'MUSIC.PLAYER.CONNECTION_UNSTABLE',
+                                    ),
+                                    {
+                                        type: MessageOptionsBuilderType.Warning,
+                                    },
+                                );
                             }
                         })
                         .catch((): void => {
@@ -218,7 +244,9 @@ export class QuaverClient extends Client {
                 if (!this.io || this.io.engine.clientsCount === 0) return;
                 // Just forward to dashboard if not transitioning to unstable and active
                 this.guilds.cache.forEach((guild): void => {
-                    const hasActiveWebSession = (this.io?.sockets.adapter.rooms.get(guild.id)?.size ?? 0) > 0;
+                    const hasActiveWebSession =
+                        (this.io?.sockets.adapter.rooms.get(guild.id)?.size ??
+                            0) > 0;
                     if (!hasActiveWebSession) return;
                     QuaverGuild.wrap(guild)
                         .then((g): void => {

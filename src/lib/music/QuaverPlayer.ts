@@ -7,7 +7,7 @@ import {
 import { QuaverGuild, WhitelistStatus } from '#src/lib/guild';
 import { logger } from '#src/lib/logger';
 import { updateHandler } from '#src/lib/state';
-import { buildMessageOptions, type QuaverChannels, type QuaverSong, settings, } from '#src/lib/util';
+import { buildMessageOptions, getTrackMarkdownLocaleString, type QuaverChannels, type QuaverSong, settings, } from '#src/lib/util';
 import type { PlayerEffect } from '@lavaclient/plugin-effects';
 import { QuaverQueue, type LoopType } from './QuaverQueue';
 import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
@@ -59,6 +59,10 @@ export interface QuaverPlayerJSON {
             nightcore: boolean;
         };
         trackStartTime?: number;
+        currentNowPlayingMessageId?: Snowflake;
+        pausedTimestamp?: number;
+        lastResumeTime?: number;
+        lastPauseDuration?: number;
     };
     sessionLogs: {
         timestamp: number;
@@ -146,6 +150,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             nightcore: boolean;
         };
         trackStartTime?: number;
+        currentNowPlayingMessageId?: Snowflake;
+        pausedTimestamp?: number;
+        lastResumeTime?: number;
+        lastPauseDuration?: number;
     } = {
         bassboost: false,
         nightcore: false,
@@ -579,12 +587,14 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @param oldPosition - The old position of the track.
      * @param newPosition - The new position of the track.
      * @param actor - The user who triggered the change.
+     * @param showArtist - Whether to include the artist name in the session log.
      * @returns Whether the track was moved.
      */
     async moveQueuedTrack(
         oldPosition: number,
         newPosition: number,
         actor?: { id: string; tag: string } | string | null,
+        showArtist = false,
     ): Promise<PlayerResponse> {
         if (this.queue.tracks.length <= 1) {
             return PlayerResponse.QueueInsufficientTracks;
@@ -608,8 +618,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             'QUEUE_MOVE',
             actor,
             moved
-                ? `[${moved.info.title}](${moved.info.uri}) (\`${oldPosition}\` ➜ \`${newPosition}\`)`
-                : `(\`${oldPosition}\` ➜ \`${newPosition}\`)`,
+                ? `${getTrackMarkdownLocaleString(moved, showArtist)} \`${oldPosition} -> ${newPosition}\``
+                : `\`${oldPosition} -> ${newPosition}\``,
         );
         guild.sendWebUpdate('queueUpdate', this.decorateQueue());
         return PlayerResponse.Success;
@@ -666,10 +676,30 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         }
         if (paused) {
             await this.pause();
+            // Track when we paused for long pause detection
+            this.memory.pausedTimestamp = Date.now();
         } else {
+            // Calculate pause duration before resuming
+            const pauseDuration = this.memory.pausedTimestamp
+                ? Date.now() - this.memory.pausedTimestamp
+                : 0;
+
+            // When resuming after a long pause, ensure we have a track to play
+            const hasCurrentTrack = this.queue.current && (this.playing || this.paused);
             await this.resume();
             this.timeout.pausedAlone = false;
-            if (!this.playing && this.queue.tracks.length > 0) {
+
+            // Track resume time and pause duration for trackEnd to detect premature ends
+            this.memory.lastResumeTime = Date.now();
+            this.memory.lastPauseDuration = pauseDuration;
+            delete this.memory.pausedTimestamp;
+
+            // After resume, check if we need to start playback
+            // If there was a current track but player isn't playing, start the queue
+            if (hasCurrentTrack && !this.playing && this.queue.tracks.length > 0) {
+                await this.queue.start();
+            } else if (!hasCurrentTrack && this.queue.tracks.length > 0) {
+                // No current track, but we have queued tracks - start the queue
                 await this.queue.start();
             }
         }
@@ -682,11 +712,13 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * Remove a track from the queue.
      * @param position - The position of the track.
      * @param actor - The user who triggered the change.
+     * @param showArtist - Whether to include the artist name in the session log.
      * @returns Whether the track was removed.
      */
     async removeQueuedTrack(
         position: number,
         actor?: { id: string; tag: string } | string | null,
+        showArtist = false,
     ): Promise<PlayerResponse> {
         if (this.queue.tracks.length === 0)
             return PlayerResponse.QueueInsufficientTracks;
@@ -700,7 +732,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             'QUEUE_REMOVE',
             actor,
             removedSong
-                ? `[${removedSong.info.title}](${removedSong.info.uri})`
+                ? getTrackMarkdownLocaleString(removedSong, showArtist)
                 : null,
         );
         this.queue.remove(position - 1);
@@ -962,17 +994,19 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * Skip to a specific position in the queue.
      * @param position - The position to skip to.
      * @param actor - The user who triggered the change.
+     * @param showArtist - Whether to include the artist name in the session log.
      * @returns Whether the player was skipped to the position.
      */
     async skipToQueuedTrack(
         position: number,
         actor?: { id: string; tag: string } | string | null,
+        showArtist = false,
     ): Promise<PlayerResponse> {
         if (this.restartReady) return PlayerResponse.RestartInProgress;
         if (this.memory.isAdPlaying) return PlayerResponse.AdPlaying;
         const targetTrack = this.queue.tracks[position - 1];
         if (this.queue.tracks.length > 1) {
-            const moveResponse = await this.moveQueuedTrack(position, 1, actor);
+            const moveResponse = await this.moveQueuedTrack(position, 1, actor, showArtist);
             if (moveResponse !== PlayerResponse.Success) {
                 return moveResponse;
             }
@@ -981,7 +1015,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             'SKIPTO',
             actor,
             targetTrack
-                ? `[${targetTrack.info.title}](${targetTrack.info.uri})`
+                ? getTrackMarkdownLocaleString(targetTrack, showArtist)
                 : null,
         );
         const skipResponse = await this.skipCurrentTrack(actor);
@@ -1005,13 +1039,14 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         const guild = await QuaverGuild.wrap(this.guild);
         this.logSessionEvent('STOP', actor);
         this.queue.clear();
+        this.queue.previous = [];
         delete this.memory.originalQueue;
         delete this.memory.shuffledQueue;
         // Skip current track - trackEnd handler will see the queue is empty
         await this.queue.skip();
         // Manually advance queue to nullify current and emit finish event
-        // (trackEnd is not called when reason='stopped')
-        await this.queue.next();
+        // Force=true bypasses loop logic to prevent re-queuing during stop
+        await this.queue.next(true);
         guild.sendWebUpdate('queueUpdate', []);
         return PlayerResponse.Success;
     }
@@ -1098,6 +1133,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
                       }
                     : undefined,
                 adPlaytimeMs: this.memory.adPlaytimeMs,
+                preAdPlaytimeMs: this.memory.preAdPlaytimeMs,
                 isAdPlaying: this.memory.isAdPlaying,
                 savedFilters: this.memory.savedFilters
                     ? {
@@ -1105,6 +1141,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
                           nightcore: this.memory.savedFilters.nightcore,
                       }
                     : undefined,
+                trackStartTime: this.memory.trackStartTime,
+                currentNowPlayingMessageId: this.memory.currentNowPlayingMessageId,
             },
             sessionLogs: [...this.sessionLogs],
         };

@@ -303,16 +303,46 @@ export function cleanURIForMarkdown(uri: string): string {
 /**
  * Returns the markdown-formatted locale string for a track.
  * @param track - The track to format.
+ * @param showArtist - Whether to include the artist name.
  * @returns The markdown-formatted string.
  */
-export function getTrackMarkdownLocaleString(track: Song): string {
-    return track.info.title === track.info.uri
-        ? track.info.uri
-        : `[${track.info.title}](${track.info.uri})`;
+export function getTrackMarkdownLocaleString(track: Song, showArtist = false): string {
+    if (track.info.title === track.info.uri) {
+        return track.info.uri;
+    }
+    if (showArtist && track.info.author) {
+        return `[${track.info.author} - ${track.info.title}](${track.info.uri})`;
+    }
+    return `[${track.info.title}](${track.info.uri})`;
+}
+
+/**
+ * Splits a query into multiple URLs if it contains multiple links separated by spaces.
+ * Returns an array of queries (either single query or multiple URLs).
+ * @param query - The query string to check.
+ * @returns An array of query strings.
+ */
+export function splitMultipleLinks(query: string): string[] {
+    const urlPattern = /https?:\/\/[^\s]+/g;
+    const urls = query.match(urlPattern);
+
+    // If we found multiple URLs and the query is essentially just URLs (with spaces)
+    if (urls && urls.length > 1) {
+        // Check if removing all URLs leaves only whitespace
+        const remainingText = query.replace(urlPattern, '').trim();
+        if (remainingText === '') {
+            return urls;
+        }
+    }
+
+    // Otherwise, return the original query as a single item
+    return [query];
 }
 
 /**
  * Searches for tracks using the configured source, falling back to other sources if no tracks are found.
+ * Searches up to 3 sources and combines results for search queries.
+ * Results are ordered by internal source ordering, followed by each source's result order.
  * @param client - The QuaverClient instance.
  * @param guild - The QuaverGuild instance.
  * @param query - The search query.
@@ -336,30 +366,81 @@ export async function searchTracks(
         ...sources.filter((s): boolean => s !== startingSource),
     ].filter((s): boolean => !!acceptableSources[s]);
 
-    let result: LoadResult | null = null;
-    for (const source of orderedSources) {
+    const MAX_SOURCES = 3;
+    const searchResults: Array<{ result: LoadResult; sourceIndex: number; originalIndex: number }> = [];
+    let lastResult: LoadResult | null = null;
+
+    for (let i = 0; i < Math.min(orderedSources.length, MAX_SOURCES); i++) {
+        const source = orderedSources[i];
         const searchQuery = `${acceptableSources[source]}${query}`;
         try {
-            result = await client.music.api.loadTracks(searchQuery);
+            const result = await client.music.api.loadTracks(searchQuery);
+            lastResult = result;
+
             if (result) {
-                const hasTracks =
-                    (result.loadType === 'playlist' &&
-                        Array.isArray(result.data?.tracks) &&
-                        result.data.tracks.length > 0) ||
-                    (result.loadType === 'track' && result.data) ||
-                    (result.loadType === 'search' &&
-                        Array.isArray(result.data) &&
-                        result.data.length > 0);
-                if (hasTracks) {
+                // For playlists and tracks, return immediately (existing behavior)
+                if (result.loadType === 'playlist' &&
+                    Array.isArray(result.data?.tracks) &&
+                    result.data.tracks.length > 0) {
                     return result;
+                }
+
+                if (result.loadType === 'track' && result.data) {
+                    return result;
+                }
+
+                // For search results, collect them
+                if (result.loadType === 'search' &&
+                    Array.isArray(result.data) &&
+                    result.data.length > 0) {
+                    result.data.forEach((track: Song, index: number): void => {
+                        searchResults.push({
+                            result,
+                            sourceIndex: i,
+                            originalIndex: index,
+                        });
+                    });
                 }
             }
         } catch {
             // Ignore error and try the next source
         }
     }
+
+    // If we have search results from multiple sources, combine them
+    if (searchResults.length > 0) {
+        // Extract all tracks with metadata
+        const tracksWithMetadata = searchResults.map((item): {
+            track: Song;
+            sourceIndex: number;
+            originalIndex: number;
+        } => {
+            const track = (item.result as Extract<LoadResult, { loadType: 'search' }>).data[item.originalIndex];
+            return {
+                track,
+                sourceIndex: item.sourceIndex,
+                originalIndex: item.originalIndex,
+            };
+        });
+
+        // Sort by: source index (asc), then original index (asc)
+        // This preserves the internal source ordering, followed by each source's result order
+        tracksWithMetadata.sort((a, b): number => {
+            if (a.sourceIndex !== b.sourceIndex) {
+                return a.sourceIndex - b.sourceIndex;
+            }
+            return a.originalIndex - b.originalIndex;
+        });
+
+        // Return combined results
+        return {
+            loadType: 'search',
+            data: tracksWithMetadata.map((item): Song => item.track),
+        };
+    }
+
     return (
-        result ?? {
+        lastResult ?? {
             loadType: 'error',
             data: {
                 message: 'All search sources failed.',

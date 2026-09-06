@@ -70,6 +70,7 @@ export default new ChatInputCommandHandler()
             return;
         }
         const track = player.queue.current;
+        const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
         const requesterStatus = await getRequesterStatus(
             track,
             interaction.member as GuildMember,
@@ -106,7 +107,7 @@ export default new ChatInputCommandHandler()
                         await interaction.replyHandler.reply(
                             `${guild.locale(
                                 'CMD.SKIP.RESPONSE.SUCCESS.VOTED',
-                                getTrackMarkdownLocaleString(track),
+                                getTrackMarkdownLocaleString(track, showArtist),
                             )}\n${guild.locale(
                                 'MISC.ADDED_BY',
                                 track.requesterId,
@@ -120,7 +121,7 @@ export default new ChatInputCommandHandler()
             await interaction.replyHandler.reply(
                 guild.locale(
                     'CMD.SKIP.RESPONSE.VOTED.SUCCESS',
-                    getTrackMarkdownLocaleString(track),
+                    getTrackMarkdownLocaleString(track, showArtist),
                     skip.users.length.toString(),
                     skip.required.toString(),
                 ),
@@ -150,7 +151,7 @@ export default new ChatInputCommandHandler()
                             : requesterStatus === RequesterStatus.ManagerBypass
                               ? 'CMD.SKIP.RESPONSE.SUCCESS.MANAGER'
                               : 'CMD.SKIP.RESPONSE.SUCCESS.FORCED',
-                        getTrackMarkdownLocaleString(track),
+                        getTrackMarkdownLocaleString(track, showArtist),
                     )}${
                         requesterStatus !== RequesterStatus.Requester
                             ? `\n${guild.locale(

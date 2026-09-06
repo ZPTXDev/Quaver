@@ -10,6 +10,15 @@ export default new ButtonHandler()
     .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
+        // Check if this is an old player control message
+        if (player.memory.currentNowPlayingMessageId &&
+            interaction.message.id !== player.memory.currentNowPlayingMessageId) {
+            await interaction.replyHandler.reply(
+                guild.locale('DISCORD.INTERACTION.EXPIRED'),
+                { type: MessageOptionsBuilderType.Error, ephemeral: true },
+            );
+            return;
+        }
         const shuffle = !player.memory.shuffle;
         const response = await player.setShuffle(shuffle, interaction.user);
         if (response === PlayerResponse.RestartInProgress) {

@@ -245,9 +245,11 @@ export default {
                 if (requesterStatus === RequesterStatus.NotRequester) {
                     return callback({ status: Response.AuthenticationError });
                 }
+                const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
                 const response = await player.removeQueuedTrack(
                     item.value + 1,
                     actor,
+                    showArtist,
                 );
                 if (response !== PlayerResponse.Success) {
                     return callback({ status: Response.GenericError });

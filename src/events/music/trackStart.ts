@@ -4,6 +4,7 @@ import type { LocaleKey } from '#src/lib/locales';
 import { logger } from '#src/lib/logger';
 import { updateHandler } from '#src/lib/state';
 import {
+    acceptableSources,
     formatLavaLyricsResponse,
     getPremiumURL,
     getTrackMarkdownLocaleString,
@@ -31,7 +32,8 @@ export default {
     once: false,
     async execute(queue: QuaverQueue, track: QuaverSong): Promise<void> {
         const guild = await QuaverGuild.wrap(queue.player.guild);
-        queue.player.logSessionEvent('PLAY', null, `[${track.info.title}](${track.info.uri})`);
+        const showArtistForLog = (await guild.settings.get<boolean>('showartist')) ?? true;
+        queue.player.logSessionEvent('PLAY', null, getTrackMarkdownLocaleString(track, showArtistForLog));
         delete queue.player.memory.skip;
         // Record track start time for accurate playtime tracking
         queue.player.memory.trackStartTime = Date.now();
@@ -156,19 +158,30 @@ export default {
         );
         let format = (await guild.settings.get<string>('format')) ?? 'simple';
         if (!notify) format = 'off';
+        const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+        // Check if all available source emojis are configured
+        const availableSources = Object.keys(acceptableSources);
+        const allSourceEmojisConfigured = availableSources.every(
+            (source): boolean => !!settings.emojis[source as keyof typeof settings.emojis]
+        );
+        const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? allSourceEmojisConfigured;
         const emoji =
             settings.emojis?.[
             track.info.sourceName as keyof typeof settings.emojis
             ] ?? '';
+        const sourceEmoji = showSourceLabels && track.info.sourceName
+            ? settings.emojis?.[track.info.sourceName as keyof typeof settings.emojis] || ''
+            : '';
+        const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
         switch (format) {
             case 'simple':
                 await queue.player.sendMessage(
                     new ContainerBuilder()
                         .addTextDisplayComponents(
                             new TextDisplayBuilder().setContent(
-                                `${guild.locale(
+                                `${sourcePrefix}${guild.locale(
                                     'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
-                                    getTrackMarkdownLocaleString(track),
+                                    getTrackMarkdownLocaleString(track, showArtist),
                                     durationString,
                                 )}\n${guild.locale('MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${guild.locale(`MISC.SOURCES.${track.info.sourceName.toUpperCase()}` as LocaleKey)}** ─ ${guild.locale(
                                     'MISC.ADDED_BY',
@@ -203,10 +216,13 @@ export default {
                 );
                 break;
             case 'detailed': {
-                const { container, actionRows } = await buildNowPlayingMessage(guild, track);
-                await queue.player.sendMessage(
+                const { container, actionRows } = await buildNowPlayingMessage(guild, track, showArtist);
+                const message = await queue.player.sendMessage(
                     container.addActionRowComponents(...actionRows)
                 );
+                if (message) {
+                    queue.player.memory.currentNowPlayingMessageId = message.id;
+                }
                 break;
             }
         }
@@ -297,6 +313,7 @@ export default {
 export async function buildNowPlayingMessage(
     guild: QuaverGuild<Initialized> & Guild,
     track: QuaverSong,
+    showArtist = true,
 ): Promise<{ container: ContainerBuilder; actionRows: ActionRowBuilder<ButtonBuilder>[] }> {
     const player = await guild.getPlayer();
     const duration = msToTime(track.info.length);
@@ -369,6 +386,8 @@ export async function buildNowPlayingMessage(
         );
     }
 
+    const trackDisplay = getTrackMarkdownLocaleString(track, showArtist);
+
     const container = new ContainerBuilder()
         .addSectionComponents(
             new SectionBuilder()
@@ -379,7 +398,7 @@ export async function buildNowPlayingMessage(
                     new TextDisplayBuilder().setContent(
                         `${guild.locale(
                             'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TEXT',
-                            `[${track.info.author} - ${track.info.title}](${track.info.uri})`,
+                            trackDisplay,
                             durationString,
                         )}\n${guild.locale('MUSIC.PLAYER.PLAYING.NOW.DETAILED.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${guild.locale(`MISC.SOURCES.${track.info.sourceName.toUpperCase()}` as LocaleKey)}** ─ ${guild.locale(
                             'MISC.ADDED_BY',

@@ -65,65 +65,68 @@ export default new StringSelectMenuHandler()
             ActionRowBuilder.from<StringSelectMenuBuilder>(
                 container.components[3].toJSON() as APIActionRowComponent<APIStringSelectComponent>,
             );
+        const pageOptions = selectMenuActionRow.components[0].options.map(
+            (
+                value: StringSelectMenuOptionBuilder,
+            ): SelectMenuComponentOptionData => {
+                return {
+                    label: value.data.label,
+                    description: value.data.description,
+                    value: value.data.value,
+                    default: !!state.selected.find(
+                        (id: string): boolean =>
+                            id === value.data.value,
+                    ),
+                };
+            },
+        );
+        // Cart items (selected from other pages) fill only remaining slots,
+        // ensuring page items are always shown first when the 25-option cap is hit.
+        const cartOptions = state.selected
+            .map((id: string): SelectMenuComponentOptionData => {
+                const refPg = pages.indexOf(
+                    pages.find(
+                        (pg): Song =>
+                            pg.find((t): boolean => t.id === id),
+                    ),
+                );
+                const firstIdx = 10 * refPg + 1;
+                const refTrack = pages[refPg].find(
+                    (t): boolean => t.id === id,
+                );
+                let label = `${
+                    firstIdx + pages[refPg].indexOf(refTrack)
+                }. ${refTrack.info.title}`;
+                if (label.length >= 100) {
+                    label = `${label.substring(0, 99)}…`;
+                }
+                return {
+                    label: label,
+                    description: refTrack.info.author,
+                    value: id,
+                    default: true,
+                };
+            })
+            .filter(
+                (options): boolean =>
+                    !selectMenuActionRow.components[0].options.find(
+                        (opt): boolean =>
+                            opt.data.value === options.value,
+                    ),
+            )
+            .slice(0, 25 - pageOptions.length);
+        const mergedOptions = pageOptions
+            .concat(cartOptions)
+            .sort(
+                (a, b): number =>
+                    parseInt(a.label.split('.')[0]) -
+                    parseInt(b.label.split('.')[0]),
+            );
         selectMenuActionRow.components[0] = StringSelectMenuBuilder.from(
             selectMenuActionRow.components[0].toJSON(),
-        ).setOptions(
-            selectMenuActionRow.components[0].options
-                .map(
-                    (
-                        value: StringSelectMenuOptionBuilder,
-                    ): SelectMenuComponentOptionData => {
-                        return {
-                            label: value.data.label,
-                            description: value.data.description,
-                            value: value.data.value,
-                            default: !!state.selected.find(
-                                (id: string): boolean =>
-                                    id === value.data.value,
-                            ),
-                        };
-                    },
-                )
-                .concat(
-                    state.selected
-                        .map((id: string): SelectMenuComponentOptionData => {
-                            const refPg = pages.indexOf(
-                                pages.find(
-                                    (pg): Song =>
-                                        pg.find((t): boolean => t.id === id),
-                                ),
-                            );
-                            const firstIdx = 10 * refPg + 1;
-                            const refTrack = pages[refPg].find(
-                                (t): boolean => t.id === id,
-                            );
-                            let label = `${
-                                firstIdx + pages[refPg].indexOf(refTrack)
-                            }. ${refTrack.info.title}`;
-                            if (label.length >= 100) {
-                                label = `${label.substring(0, 99)}…`;
-                            }
-                            return {
-                                label: label,
-                                description: refTrack.info.author,
-                                value: id,
-                                default: true,
-                            };
-                        })
-                        .filter(
-                            (options): boolean =>
-                                !selectMenuActionRow.components[0].options.find(
-                                    (opt): boolean =>
-                                        opt.data.value === options.value,
-                                ),
-                        ),
-                )
-                .sort(
-                    (a, b): number =>
-                        parseInt(a.label.split('.')[0]) -
-                        parseInt(b.label.split('.')[0]),
-                ),
-        );
+        )
+            .setOptions(mergedOptions)
+            .setMaxValues(mergedOptions.length);
         container.components[3] = selectMenuActionRow;
         const buttonActionRow = ActionRowBuilder.from<ButtonBuilder>(
             container.components[4].toJSON() as APIActionRowComponent<APIButtonComponent>,

@@ -43,7 +43,9 @@ export default new EventHandler()
                 'We are not responsible for damages caused by negligent use of developer mode.',
             );
         }
-        setUpdateHandler(new UpdateHandler(client as QuaverClient));
+        const handler = new UpdateHandler(client as QuaverClient);
+        setUpdateHandler(handler);
+        (client as QuaverClient).updateHandler = handler;
         let activityType:
             | ActivityType.Playing
             | ActivityType.Streaming

@@ -30,7 +30,34 @@ async function restorePlayer(
         player.voice.connect(snapshot.voiceChannelId, {
             deafened: true,
         });
-        
+
+        // Auto-unpause if the pause was initiated by the bot (e.g., due to inactivity)
+        // This must happen before handling resumed state to ensure proper playback resumption
+        let wasAutoUnpaused = false;
+        try {
+            if (snapshot.paused && Array.isArray(snapshot.sessionLogs)) {
+                const lastPause = [...snapshot.sessionLogs]
+                    .reverse()
+                    .find((l): boolean => l.action === 'PAUSE');
+                // detect if the pause was by the bot (no user present)
+                if (
+                    lastPause &&
+                    !lastPause.userId &&
+                    !lastPause.userTag &&
+                    Date.now() - lastPause.timestamp < 15_000
+                ) {
+                    await player.setPause(false);
+                    wasAutoUnpaused = true;
+                    logger.info(`[G ${guild.id}] Unpaused restored player`);
+                }
+            }
+        } catch (err) {
+            // don't fail the whole restore if unpause fails; log and continue
+            logger.warn(
+                `[G ${guild.id}] Failed to auto-unpause restored player: ${err instanceof Error ? err.message : String(err)}`,
+            );
+        }
+
         // Check if the current track is an ad and skip it
         // Also check memory.isAdPlaying since toJSON sets queue.current to null for ads
         const isAdTrack = snapshot.queue.current?.isAd === true || snapshot.memory.isAdPlaying;
@@ -39,14 +66,14 @@ async function restorePlayer(
             player.memory.isAdPlaying = false;
             player.memory.adPlaytimeMs = 0;
             await data.guild.set(guild.id, 'ads.playtimeMs', 0);
-            
+
             // Restore saved filters
             if (player.memory.savedFilters) {
                 await player.setBassboost(player.memory.savedFilters.bassboost);
                 await player.setNightcore(player.memory.savedFilters.nightcore);
                 delete player.memory.savedFilters;
             }
-            
+
             // If resumed, stop the current track (Lavalink already started it)
             if (resumed && player.playing) {
                 await player.stop();
@@ -61,33 +88,54 @@ async function restorePlayer(
             if (snapshot.position > 0) {
                 await player.seekTo(snapshot.position);
             }
-        }
-        // When resumed=true, Lavalink has already positioned the track correctly, no need to seek
-        
-        // Auto-unpause if the pause was initiated by the bot (e.g., due to inactivity)
-        try {
-            if (snapshot.paused && Array.isArray(snapshot.sessionLogs)) {
-                const lastPause = [...snapshot.sessionLogs]
-                    .reverse()
-                    .find((l): boolean => l.action === 'PAUSE');
-                // detect if the pause was by the bot (no user present)
-                if (
-                    lastPause &&
-                    !lastPause.userId &&
-                    !lastPause.userTag &&
-                    Date.now() - lastPause.timestamp < 15_000
-                ) {
-                    await player.setPause(false);
-                    logger.info(`[G ${guild.id}] Unpaused restored player`);
-                }
+        } else if (wasAutoUnpaused && snapshot.queue.current) {
+            // When resumed and we just auto-unpaused, ensure the current track starts playing
+            // Lavalink has already positioned the track, but we need to ensure it's actually playing
+            if (!player.playing || player.paused) {
+                await player.queue.start();
             }
-        } catch (err) {
-            // don't fail the whole restore if unpause fails; log and continue
-            logger.warn(
-                `[G ${guild.id}] Failed to auto-unpause restored player: ${err instanceof Error ? err.message : String(err)}`,
-            );
+        } else if (!player.playing && player.queue.tracks.length > 0) {
+            // When resumed=true, Lavalink has already positioned the track correctly
+            // However, if the player is not playing and there are queued tracks, start the next one
+            await player.queue.start();
         }
-        
+
+        // Set timeout if queue is empty after restoration
+        if (!player.queue.current && player.queue.tracks.length === 0) {
+            if (await guild.settings.get<boolean>('stay.enabled') && await guild.features.isFeatureActive('stay')) {
+                await player.sendMessage(guild.locale('MUSIC.QUEUE.EMPTY'));
+            } else if (!player.timeout.pause) {
+                logger.info(`[G ${guild.id}] Setting timeout after restoration with empty queue`);
+                if (player.timeout.standard) {
+                    clearTimeout(player.timeout.standard);
+                }
+                player.timeout.standard = setTimeout(
+                    (p, g): void => {
+                        logger.info(`[G ${g.id}] Disconnecting (inactivity)`);
+                        p.sendMessage(
+                            g.locale('MUSIC.DISCONNECT.INACTIVITY.DISCONNECTED'),
+                            {
+                                type: MessageOptionsBuilderType.Warning,
+                            },
+                        );
+                        p.disconnect();
+                    },
+                    30 * 60 * 1000,
+                    player,
+                    guild,
+                );
+                player.timeout.end = Date.now() + 30 * 60 * 1000;
+                guild.sendWebUpdate('timeoutUpdate', player.timeout.end);
+                await player.sendMessage(
+                    `${guild.locale('MUSIC.QUEUE.EMPTY')} ${guild.locale(
+                        'MUSIC.DISCONNECT.INACTIVITY.WARNING',
+                        (Math.floor(Date.now() / 1000) + 30 * 60).toString(),
+                    )}`,
+                    { type: MessageOptionsBuilderType.Warning },
+                );
+            }
+        }
+
         logger.info(
             `[G ${guild.id}] Player restored from saved state (resumed = ${resumed})`,
         );

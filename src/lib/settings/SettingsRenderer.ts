@@ -264,10 +264,31 @@ export class SettingsRenderer {
         guild: QuaverGuild<Initialized> & Guild,
     ): Promise<SectionBuilder[]> {
         const format = (await guild.settings.get<string>('format')) ?? 'simple';
+        const showArtist =
+            (await guild.settings.get<boolean>('showartist')) ?? true;
         const autoLyrics =
             (await guild.settings.get<boolean>('autolyrics')) ?? false;
         const controls =
             (await guild.settings.get<boolean>('controls')) ?? true;
+
+        // Check if all available source emojis are configured
+        const availableSources = Object.keys(acceptableSources);
+        const allSourceEmojisConfigured = availableSources.every(
+            (source): boolean => !!settings.emojis[source as keyof typeof settings.emojis]
+        );
+
+        // Default to true if all emojis are configured, false otherwise
+        const showSourceLabelsDefault = allSourceEmojisConfigured;
+        const showSourceLabels =
+            (await guild.settings.get<boolean>('showsourcelabels')) ?? showSourceLabelsDefault;
+
+        // If not all emojis are configured, hide the setting and force it to false
+        const showSourceLabelsEffective = allSourceEmojisConfigured ? showSourceLabels : false;
+        if (!allSourceEmojisConfigured && showSourceLabels) {
+            // Force disable if emojis are not configured
+            await guild.settings.set('showsourcelabels', false);
+        }
+
         return [
             this.createItemSection(
                 guild,
@@ -281,6 +302,15 @@ export class SettingsRenderer {
                           'CMD.SETTINGS.MISC.CONTENT.SETTINGS.FORMAT.OPTIONS.DETAILED',
                       ),
             ),
+            this.createItemSection(
+                guild,
+                SettingsCategory.Content,
+                'showartist',
+                guild.locale(
+                    showArtist ? 'MISC.ENABLED' : 'MISC.DISABLED',
+                ),
+                showArtist ? ButtonStyle.Success : ButtonStyle.Danger,
+            ),
             ...(settings.features.autolyrics.enabled
                 ? [
                       this.createItemSection(
@@ -291,6 +321,19 @@ export class SettingsRenderer {
                               autoLyrics ? 'MISC.ENABLED' : 'MISC.DISABLED',
                           ),
                           autoLyrics ? ButtonStyle.Success : ButtonStyle.Danger,
+                      ),
+                  ]
+                : []),
+            ...(allSourceEmojisConfigured
+                ? [
+                      this.createItemSection(
+                          guild,
+                          SettingsCategory.Content,
+                          'showsourcelabels',
+                          guild.locale(
+                              showSourceLabelsEffective ? 'MISC.ENABLED' : 'MISC.DISABLED',
+                          ),
+                          showSourceLabelsEffective ? ButtonStyle.Success : ButtonStyle.Danger,
                       ),
                   ]
                 : []),

@@ -1,7 +1,7 @@
 import { ForceType, MessageOptionsBuilderType } from '#src/lib';
 import { type Initialized, QuaverGuild, WhitelistStatus } from '#src/lib/guild';
 import type { QuaverInteraction } from '#src/lib/interactions';
-import { getPremiumURL, settings } from '#src/lib/util';
+import { acceptableSources, getPremiumURL, settings } from '#src/lib/util';
 import {
     ActionRowBuilder,
     type ButtonBuilder,
@@ -26,6 +26,19 @@ export class ContentLogicHandler {
                     'format',
                     format === 'simple' ? 'detailed' : 'simple',
                 );
+                await interaction.replyHandler.reply(
+                    await SettingsRenderer.renderSubMenu(
+                        await QuaverGuild.wrap(interaction.guild),
+                        SettingsCategory.Content,
+                    ),
+                    { force: ForceType.Update },
+                );
+                return;
+            }
+            case 'showartist': {
+                const showArtist =
+                    (await guild.settings.get<boolean>('showartist')) ?? true;
+                await guild.settings.set('showartist', !showArtist);
                 await interaction.replyHandler.reply(
                     await SettingsRenderer.renderSubMenu(
                         await QuaverGuild.wrap(interaction.guild),
@@ -107,6 +120,24 @@ export class ContentLogicHandler {
                 const controls =
                     (await guild.settings.get<boolean>('controls')) ?? true;
                 await guild.settings.set('controls', !controls);
+                await interaction.replyHandler.reply(
+                    await SettingsRenderer.renderSubMenu(
+                        await QuaverGuild.wrap(interaction.guild),
+                        SettingsCategory.Content,
+                    ),
+                    { force: ForceType.Update },
+                );
+                return;
+            }
+            case 'showsourcelabels': {
+                // Check if all available source emojis are configured
+                const availableSources = Object.keys(acceptableSources);
+                const allSourceEmojisConfigured = availableSources.every(
+                    (source): boolean => !!settings.emojis[source as keyof typeof settings.emojis]
+                );
+                const showSourceLabels =
+                    (await guild.settings.get<boolean>('showsourcelabels')) ?? allSourceEmojisConfigured;
+                await guild.settings.set('showsourcelabels', !showSourceLabels);
                 await interaction.replyHandler.reply(
                     await SettingsRenderer.renderSubMenu(
                         await QuaverGuild.wrap(interaction.guild),

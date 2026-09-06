@@ -12,6 +12,8 @@ import {
     getTrackMarkdownLocaleString,
     searchTracks,
     settings,
+    acceptableSources,
+    splitMultipleLinks,
 } from '#src/lib/util';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString, paginate } from '@zptxdev/zptx-lib';
@@ -92,7 +94,92 @@ export default new ChatInputCommandHandler()
         }
         await interaction.deferReply();
         const query = interaction.options.getString('query');
-        const result = await searchTracks(interaction.client, guild, query);
+        let warningSent = false;
+
+        // Helper function to search with timeout warning
+        const searchWithWarning = async (q: string): Promise<Awaited<ReturnType<typeof searchTracks>>> => {
+            let warningTimeout: NodeJS.Timeout | null = null;
+
+            warningTimeout = setTimeout(async (): Promise<void> => {
+                if (!warningSent) {
+                    warningSent = true;
+                    await interaction.replyHandler.reply(
+                        guild.locale('MUSIC.QUEUE.SLOW_PROCESSING'),
+                        { type: MessageOptionsBuilderType.Warning },
+                    );
+                }
+            }, 5000);
+
+            const result = await searchTracks(interaction.client, guild, q);
+
+            if (warningTimeout) clearTimeout(warningTimeout);
+
+            // If we sent a warning and this is a large playlist, update the message
+            if (warningSent && result.loadType === 'playlist' && result.data.tracks.length >= 100) {
+                await interaction.replyHandler.reply(
+                    guild.locale('MUSIC.QUEUE.LARGE_PLAYLIST_PROCESSING'),
+                    { type: MessageOptionsBuilderType.Warning },
+                );
+            }
+
+            return result;
+        };
+
+        // Check for multiple links
+        const queries = splitMultipleLinks(query);
+
+        if (queries.length > 1) {
+            // Handle multiple links
+            const allTracks: QuaverSong[] = [];
+
+            for (const singleQuery of queries) {
+                const result = await searchWithWarning(singleQuery);
+
+                switch (result.loadType) {
+                    case 'playlist': {
+                        const playlistTracks = result.data.tracks.map((t: QuaverSong): QuaverSong => {
+                            t.requesterId = interaction.user.id;
+                            t.id = crypto.randomUUID();
+                            return t;
+                        });
+                        allTracks.push(...playlistTracks);
+                        break;
+                    }
+                    case 'track': {
+                        const track: QuaverSong = result.data;
+                        track.requesterId = interaction.user.id;
+                        track.id = crypto.randomUUID();
+                        allTracks.push(track);
+                        break;
+                    }
+                    case 'search': {
+                        const track: QuaverSong = result.data[0];
+                        if (track) {
+                            track.requesterId = interaction.user.id;
+                            track.id = crypto.randomUUID();
+                            allTracks.push(track);
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+
+            if (allTracks.length === 0) {
+                await interaction.replyHandler.reply(
+                    guild.locale('CMD.PLAY.RESPONSE.NO_RESULTS'),
+                    { type: MessageOptionsBuilderType.Error },
+                );
+                return;
+            }
+
+            await handleMultipleLinksAdd(interaction, guild, allTracks, queries.length);
+            return;
+        }
+
+        // Handle single query (existing logic)
+        const result = await searchWithWarning(query);
         switch (result.loadType) {
             case 'playlist':
             case 'track': {
@@ -136,6 +223,45 @@ export default new ChatInputCommandHandler()
         }
     });
 
+async function handleMultipleLinksAdd(
+    interaction: QuaverInteraction<ChatInputCommandInteraction>,
+    guild: QuaverGuild<Initialized>,
+    tracks: QuaverSong[],
+    linkCount: number,
+): Promise<void> {
+    const compatible = await guild.checkPlayerCompatibility({
+        member: interaction.member as GuildMember,
+        textChannel: interaction.channel,
+        replyHandler: interaction.replyHandler,
+    });
+    if (!compatible) return;
+    const player = await guild.getPlayer({
+        textChannel: interaction.channel as QuaverChannels,
+        voiceChannelId: (interaction.member as GuildMember).voice.channelId,
+        replyHandler: interaction.replyHandler,
+    });
+    if (!player) return;
+    const position = await player.addTracksToQueue(tracks, interaction.user.id);
+    await interaction.replyHandler.reply(
+        new ContainerBuilder().addTextDisplayComponents(
+            guild.builders.textDisplayLocale(
+                'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT' as LocaleKey,
+                tracks.length.toString(),
+                guild.locale('MISC.X_LINKS', linkCount.toString()),
+            ),
+            ...(position !== '0'
+                ? [
+                      new TextDisplayBuilder().setContent(
+                          `-# ${guild.locale('MISC.POSITION')}: ${position}`,
+                      ),
+                  ]
+                : []),
+        ),
+        { type: MessageOptionsBuilderType.Success },
+    );
+    guild.sendWebUpdate('queueUpdate', player.decorateQueue());
+}
+
 async function handleImmediateAdd(
     interaction: QuaverInteraction<ChatInputCommandInteraction>,
     guild: QuaverGuild<Initialized>,
@@ -145,6 +271,23 @@ async function handleImmediateAdd(
     >,
     query: string,
 ): Promise<void> {
+    const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+    // Check if all available source emojis are configured
+    const availableSources = Object.keys(acceptableSources);
+    const allSourceEmojisConfigured = availableSources.every(
+        (source): boolean => !!settings.emojis[source as keyof typeof settings.emojis]
+    );
+    const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? allSourceEmojisConfigured;
+
+    // Check for large playlist
+    if (result.loadType === 'playlist' && result.data.tracks.length >= 100) {
+        hasLargePlaylist = true;
+        await interaction.replyHandler.reply(
+            guild.locale('MUSIC.QUEUE.LARGE_PLAYLIST_PROCESSING'),
+            { type: MessageOptionsBuilderType.Warning },
+        );
+    }
+
     const tracks =
         result.loadType === 'track'
             ? [
@@ -165,15 +308,32 @@ async function handleImmediateAdd(
         result.loadType === 'track'
             ? 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT'
             : 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
-    const extras =
-        result.loadType === 'track'
-            ? [getTrackMarkdownLocaleString(tracks[0])]
-            : [
-                  tracks.length.toString(),
-                  result.data.info.name === query
-                      ? result.data.info.name
-                      : `[${result.data.info.name}](${query})`,
-              ];
+    let extras: string[];
+    if (result.loadType === 'track') {
+        const sourceEmoji = showSourceLabels && tracks[0].info.sourceName
+            ? settings.emojis?.[tracks[0].info.sourceName as keyof typeof settings.emojis] || ''
+            : '';
+        const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
+        extras = [`${sourcePrefix}${getTrackMarkdownLocaleString(tracks[0], showArtist)}`];
+    } else {
+        const sourceEmoji = showSourceLabels && tracks.length > 0 && tracks[0].info.sourceName
+            ? settings.emojis?.[tracks[0].info.sourceName as keyof typeof settings.emojis] || ''
+            : '';
+        const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
+
+        let playlistDisplay: string;
+        if (result.data.info.name === query) {
+            playlistDisplay = showArtist && result.data.pluginInfo?.author
+                ? `${sourcePrefix}${result.data.pluginInfo.author} - ${result.data.info.name}`
+                : `${sourcePrefix}${result.data.info.name}`;
+        } else {
+            const displayName = showArtist && result.data.pluginInfo?.author
+                ? `${result.data.pluginInfo.author} - ${result.data.info.name}`
+                : result.data.info.name;
+            playlistDisplay = `${sourcePrefix}[${displayName}](${query})`;
+        }
+        extras = [tracks.length.toString(), playlistDisplay];
+    }
     const compatible = await guild.checkPlayerCompatibility({
         member: interaction.member as GuildMember,
         textChannel: interaction.channel,
@@ -208,6 +368,13 @@ async function renderSearchResults(
     guild: QuaverGuild<Initialized>,
     tracks: QuaverSong[],
 ): Promise<void> {
+    const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+    // Check if all available source emojis are configured
+    const availableSources = Object.keys(acceptableSources);
+    const allSourceEmojisConfigured = availableSources.every(
+        (source): boolean => !!settings.emojis[source as keyof typeof settings.emojis]
+    );
+    const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? allSourceEmojisConfigured;
     const pages = paginate(tracks, 10);
     const response = await interaction.replyHandler.reply(
         new ContainerBuilder()
@@ -224,14 +391,56 @@ async function renderSearchResults(
                                     'MISC.MORE_THAN_A_DAY',
                                 );
                             }
-                            return `\`${(index + 1)
+                            const sourceEmoji = showSourceLabels && track.info.sourceName
+                                ? settings.emojis?.[track.info.sourceName as keyof typeof settings.emojis] || ''
+                                : '';
+                            const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
+
+                            const indexStr = `\`${(index + 1)
                                 .toString()
                                 .padStart(
                                     tracks.length.toString().length,
                                     ' ',
-                                )}.\` **${getTrackMarkdownLocaleString(
-                                track,
-                            )}** \`[${durationString}]\``;
+                                )}.\` `;
+                            const durationStr = ` \`[${durationString}]\``;
+
+                            // Calculate remaining characters for the line
+                            const baseLength = indexStr.length + durationStr.length;
+                            const maxTrackLength = 300 - baseLength - sourcePrefix.length;
+
+                            // Build the link text (what goes inside the brackets)
+                            let linkText: string;
+                            if (track.info.title === track.info.uri) {
+                                linkText = track.info.uri;
+                            } else if (showArtist && track.info.author) {
+                                linkText = `${track.info.author} - ${track.info.title}`;
+                            } else {
+                                linkText = track.info.title;
+                            }
+
+                            // Calculate max length for link text: account for markdown syntax
+                            // Format will be: **[linkText](url)** or just url
+                            // **url** = 4 chars, **[](url)** = 6 chars + url length
+                            const markdownOverhead = track.info.title === track.info.uri
+                                ? 4
+                                : 6 + track.info.uri.length;
+                            const maxLinkTextLength = maxTrackLength - markdownOverhead;
+
+                            // Truncate link text if needed
+                            if (linkText.length > maxLinkTextLength) {
+                                const ellipsis = '…';
+                                linkText = linkText.substring(0, maxLinkTextLength - ellipsis.length) + ellipsis;
+                            }
+
+                            // Build final markdown string
+                            let trackStr: string;
+                            if (track.info.title === track.info.uri) {
+                                trackStr = `**${linkText}**`;
+                            } else {
+                                trackStr = `**[${linkText}](${track.info.uri})**`;
+                            }
+
+                            return `${indexStr}${sourcePrefix}${trackStr}${durationStr}`;
                         })
                         .join('\n'),
                 ),
@@ -275,7 +484,7 @@ async function renderSearchResults(
                             ),
                         )
                         .setMinValues(0)
-                        .setMaxValues(pages[0].length),
+                        .setMaxValues(Math.min(pages[0].length, 25)),
                 ),
             )
             .addActionRowComponents(

@@ -21,9 +21,57 @@ export default {
         reason: 'cleanup' | 'finished' | 'loadFailed' | 'replaced' | 'stopped',
     ): Promise<void> {
         const guild = await QuaverGuild.wrap(queue.player.guild);
+        const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
         delete queue.player.memory.skip;
 
         const isAdTrack = queue.player.isAdTrack(track);
+
+        // Check for premature track ending (likely due to long pause resume issue)
+        // If track "finished" but player position is significantly before the track's actual end
+        if (
+            reason === 'finished' &&
+            !isAdTrack &&
+            !track.info.isStream &&
+            track.info.length > 0
+        ) {
+            const position = queue.player.position || 0;
+            const timeRemaining = track.info.length - position;
+
+            // If more than 10 seconds remain, this is a premature end
+            // Check if this happened shortly after resuming from a long pause
+            if (timeRemaining > 10000) {
+                const timeSinceResume = queue.player.memory.lastResumeTime
+                    ? Date.now() - queue.player.memory.lastResumeTime
+                    : Infinity;
+                const lastPauseDuration = queue.player.memory.lastPauseDuration || 0;
+
+                // If we resumed within the last 30 seconds and were paused for more than 1 minute
+                // This is likely the Lavalink resume bug where the audio stream dies
+                if (timeSinceResume < 30000 && lastPauseDuration > 60000) {
+                    logger.warn(
+                        `[G ${guild.id}] Track ended prematurely after long pause (${Math.round(lastPauseDuration / 1000)}s pause, ${Math.round(timeRemaining / 1000)}s remaining) - replaying from position`,
+                    );
+
+                    try {
+                        // Replay the track from where it was
+                        await queue.player.play(track);
+                        if (position > 0) {
+                            await queue.player.seek(position);
+                        }
+                        // Clear the resume tracking to prevent repeated replays
+                        delete queue.player.memory.lastResumeTime;
+                        delete queue.player.memory.lastPauseDuration;
+                        return;
+                    } catch (error) {
+                        logger.error(
+                            `[G ${guild.id}] Failed to replay track after premature end:`,
+                            error,
+                        );
+                        // Fall through to normal handling
+                    }
+                }
+            }
+        }
 
         // Handle load failures
         if (reason === 'loadFailed') {
@@ -58,7 +106,7 @@ export default {
             await queue.player.sendMessage(
                 guild.locale(
                     'MUSIC.PLAYER.TRACK_SKIPPED_ERROR',
-                    getTrackMarkdownLocaleString(track),
+                    getTrackMarkdownLocaleString(track, showArtist),
                 ),
                 { type: MessageOptionsBuilderType.Warning },
             );

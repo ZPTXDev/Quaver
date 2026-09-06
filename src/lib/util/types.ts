@@ -46,7 +46,8 @@ export type SettingsPageOptions =
     | 'source'
     | 'autolyrics'
     | 'smartqueue'
-    | 'controls';
+    | 'controls'
+    | 'showsourcelabels';
 
 export type SettingsPage = {
     current: string;

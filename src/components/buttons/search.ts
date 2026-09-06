@@ -4,7 +4,7 @@ import { QuaverGuild } from '#src/lib/guild';
 import type { LocaleKey } from '#src/lib/locales';
 import { logger } from '#src/lib/logger';
 import { searchState, updateHandler } from '#src/lib/state';
-import { buildMessageOptions, Check, getTrackMarkdownLocaleString, type QuaverChannels, } from '#src/lib/util';
+import { buildMessageOptions, Check, getTrackMarkdownLocaleString, type QuaverChannels, settings, acceptableSources, } from '#src/lib/util';
 import type { Song } from '@lavaclient/plugin-queue';
 import { msToTime, msToTimeString } from '@zptxdev/zptx-lib';
 import {
@@ -25,6 +25,13 @@ export default new ButtonHandler()
     .setChecks([Check.InteractionStarter])
     .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
+        const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+        // Check if all available source emojis are configured
+        const availableSources = Object.keys(acceptableSources);
+        const allSourceEmojisConfigured = availableSources.every(
+            (source): boolean => !!settings.emojis[source as keyof typeof settings.emojis]
+        );
+        const showSourceLabels = (await guild.settings.get<boolean>('showsourcelabels')) ?? allSourceEmojisConfigured;
         const state = searchState[interaction.message.id];
         if (!state) {
             await interaction.replyHandler.reply(
@@ -73,7 +80,11 @@ export default new ButtonHandler()
                 extras = [];
             if (resolvedTracks.length === 1) {
                 msg = 'MUSIC.QUEUE.TRACK_ADDED.SINGLE.DEFAULT';
-                extras = [getTrackMarkdownLocaleString(resolvedTracks[0])];
+                const sourceEmoji = showSourceLabels && resolvedTracks[0].info.sourceName
+                    ? settings.emojis?.[resolvedTracks[0].info.sourceName as keyof typeof settings.emojis] || ''
+                    : '';
+                const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
+                extras = [`${sourcePrefix}${getTrackMarkdownLocaleString(resolvedTracks[0], showArtist)}`];
             } else {
                 msg = 'MUSIC.QUEUE.TRACK_ADDED.MULTIPLE.DEFAULT';
                 extras = [
@@ -162,14 +173,33 @@ export default new ButtonHandler()
                     if (durationString === 'MORE_THAN_A_DAY') {
                         durationString = guild.locale('MISC.MORE_THAN_A_DAY');
                     }
-                    return `\`${(firstIndex + index)
+                    const sourceEmoji = showSourceLabels && track.info.sourceName
+                        ? settings.emojis?.[track.info.sourceName as keyof typeof settings.emojis] || ''
+                        : '';
+                    const sourcePrefix = sourceEmoji ? `${sourceEmoji} ` : '';
+
+                    const indexStr = `\`${(firstIndex + index)
                         .toString()
                         .padStart(
                             largestIndexSize,
                             ' ',
-                        )}.\` **${getTrackMarkdownLocaleString(
+                        )}.\` `;
+                    const trackStr = `**${getTrackMarkdownLocaleString(
                         track,
-                    )}** \`[${durationString}]\``;
+                        showArtist,
+                    )}**`;
+                    const durationStr = ` \`[${durationString}]\``;
+
+                    const baseLength = indexStr.length + durationStr.length;
+                    const maxTrackLength = 300 - baseLength - sourcePrefix.length;
+
+                    let finalTrackStr = trackStr;
+                    if (trackStr.length > maxTrackLength) {
+                        const ellipsis = '…';
+                        finalTrackStr = `**${trackStr.substring(0, maxTrackLength - ellipsis.length - 4)}${ellipsis}**`;
+                    }
+
+                    return `${indexStr}${sourcePrefix}${finalTrackStr}${durationStr}`;
                 })
                 .join('\n'),
         );
@@ -183,11 +213,11 @@ export default new ButtonHandler()
             ActionRowBuilder.from<StringSelectMenuBuilder>(
                 container.components[3].toJSON() as APIActionRowComponent<APIStringSelectComponent>,
             );
-        const selectMenuOptions = pages[page - 1]
-            .map((track, index: number): APISelectMenuOption => {
+        const pageOptions = pages[page - 1].map(
+            (track, index: number): APISelectMenuOption => {
                 let label = `${firstIndex + index}. ${track.info.title}`;
                 if (label.length >= 100) {
-                    label = `${label.substring(0, 97)}...`;
+                    label = `${label.substring(0, 99)}…`;
                 }
                 return {
                     label: label,
@@ -197,40 +227,44 @@ export default new ButtonHandler()
                         (id: string): boolean => id === track.id,
                     ),
                 };
+            },
+        );
+        // Cart items (selected from other pages) fill only remaining slots,
+        // ensuring page items are always shown first when the 25-option cap is hit.
+        const cartOptions = state.selected
+            .map((id: string): APISelectMenuOption => {
+                const refPg = pages.indexOf(
+                    pages.find(
+                        (pg): Song =>
+                            pg.find((t): boolean => t.id === id),
+                    ),
+                );
+                const firstIdx = 10 * refPg + 1;
+                const refTrack = pages[refPg].find(
+                    (t): boolean => t.id === id,
+                );
+                let label = `${
+                    firstIdx + pages[refPg].indexOf(refTrack)
+                }. ${refTrack.info.title}`;
+                if (label.length >= 100) {
+                    label = `${label.substring(0, 99)}…`;
+                }
+                return {
+                    label: label,
+                    description: refTrack.info.author,
+                    value: id,
+                    default: true,
+                };
             })
-            .concat(
-                state.selected
-                    .map((id: string): APISelectMenuOption => {
-                        const refPg = pages.indexOf(
-                            pages.find(
-                                (pg): Song =>
-                                    pg.find((t): boolean => t.id === id),
-                            ),
-                        );
-                        const firstIdx = 10 * refPg + 1;
-                        const refTrack = pages[refPg].find(
-                            (t): boolean => t.id === id,
-                        );
-                        let label = `${
-                            firstIdx + pages[refPg].indexOf(refTrack)
-                        }. ${refTrack.info.title}`;
-                        if (label.length >= 100) {
-                            label = `${label.substring(0, 97)}...`;
-                        }
-                        return {
-                            label: label,
-                            description: refTrack.info.author,
-                            value: id,
-                            default: true,
-                        };
-                    })
-                    .filter(
-                        (options): boolean =>
-                            !pages[page - 1].find(
-                                (track): boolean => track.id === options.value,
-                            ),
+            .filter(
+                (options): boolean =>
+                    !pages[page - 1].find(
+                        (track): boolean => track.id === options.value,
                     ),
             )
+            .slice(0, 25 - pageOptions.length);
+        const selectMenuOptions = pageOptions
+            .concat(cartOptions)
             .sort(
                 (a, b): number =>
                     parseInt(a.label.split('.')[0]) -
