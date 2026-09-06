@@ -1,6 +1,7 @@
 import type { QuaverClient } from '#src/lib';
 import { logger } from '#src/lib/logger';
 import { settings } from '../util';
+import type { RegionAffinity } from './RegionAffinity';
 
 export type GatewayHealthData = {
     averagePing: number;
@@ -38,6 +39,7 @@ type ConnectionHealthConfig = {
 export class ConnectionHealthMonitor {
     private client: QuaverClient;
     private config: ConnectionHealthConfig;
+    private regionAffinity: RegionAffinity | null;
 
     // Gateway health tracking
     private pingSamples: number[] = [];
@@ -48,6 +50,7 @@ export class ConnectionHealthMonitor {
 
     // Media server health tracking
     private mediaEndpoint: string | null = null;
+    private currentNodeId: string | null = null;
     private mediaLatencySamples: (number | null)[] = [];
     private mediaConsecutiveFailures = 0;
     private mediaCheckInterval?: ReturnType<typeof setInterval>;
@@ -80,11 +83,24 @@ export class ConnectionHealthMonitor {
         this.emitGatewayHealthUpdate();
     };
 
-    constructor(client: QuaverClient) {
+    constructor(client: QuaverClient, regionAffinity: RegionAffinity | null = null) {
         this.client = client;
+        this.regionAffinity = regionAffinity;
         this.config = this.loadConfig();
         this.initializeGatewayMonitoring();
         this.initializeMediaMonitoring();
+    }
+
+    /**
+     * Extracts the region prefix from a Discord media endpoint URL.
+     * Example: 'c-sin13-f16265ef.discord.media' -> 'c-sin'
+     */
+    private static extractRegionPrefix(endpoint: string): string {
+        // Remove protocol if present
+        const cleaned = endpoint.replace(/^https?:\/\//, '');
+        // Extract the region prefix (e.g., 'c-sin' from 'c-sin13-f16265ef.discord.media')
+        const match = cleaned.match(/^([a-z]+-[a-z]+)/);
+        return match ? match[1] : 'unknown';
     }
 
     private loadConfig(): ConnectionHealthConfig {
@@ -106,6 +122,14 @@ export class ConnectionHealthMonitor {
                 checkTimeoutMs: userConfig?.media?.checkTimeoutMs ?? 2000,
             },
         };
+    }
+
+    /**
+     * Sets the RegionAffinity instance for tracking ping-based node selection.
+     * This is called after initialization when multi-node configuration is detected.
+     */
+    public setRegionAffinity(regionAffinity: RegionAffinity | null): void {
+        this.regionAffinity = regionAffinity;
     }
 
     private initializeGatewayMonitoring(): void {
@@ -173,6 +197,15 @@ export class ConnectionHealthMonitor {
                 logger.debug(
                     `Media server health check OK: ${this.mediaEndpoint} (${latency}ms)`,
                 );
+
+                // Update region affinity if enabled
+                if (this.regionAffinity && this.currentNodeId && this.mediaEndpoint) {
+                    const regionPrefix = ConnectionHealthMonitor.extractRegionPrefix(this.mediaEndpoint);
+                    await this.regionAffinity.upsertAffinity(this.currentNodeId, regionPrefix, latency);
+                    logger.debug(
+                        `Updated region affinity: node=${this.currentNodeId}, region=${regionPrefix}, ping=${latency}ms`,
+                    );
+                }
             } else {
                 this.mediaConsecutiveFailures++;
                 logger.warn(
@@ -200,10 +233,11 @@ export class ConnectionHealthMonitor {
         this.emitMediaHealthUpdate();
     }
 
-    public updateMediaEndpoint(endpoint: string | null): void {
+    public updateMediaEndpoint(endpoint: string | null, nodeId: string | null = null): void {
         if (endpoint === null && this.mediaEndpoint !== null) {
             logger.info('Media server endpoint cleared, stopping health checks');
             this.mediaEndpoint = null;
+            this.currentNodeId = null;
             this.mediaConsecutiveFailures = 0;
             this.mediaLatencySamples = [];
             this.lastMediaCheckTimestamp = Date.now();
@@ -212,8 +246,9 @@ export class ConnectionHealthMonitor {
         }
 
         if (endpoint && endpoint !== this.mediaEndpoint) {
-            logger.info(`Media server endpoint updated: ${endpoint}`);
+            logger.info(`Media server endpoint updated: ${endpoint} (node: ${nodeId ?? 'unknown'})`);
             this.mediaEndpoint = endpoint;
+            this.currentNodeId = nodeId;
             this.mediaConsecutiveFailures = 0;
             this.mediaLatencySamples = [];
             // Trigger an immediate health check

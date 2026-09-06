@@ -150,18 +150,55 @@ export const SettingsSchema = z.object({
         protocol: z.literal('sqlite'),
         path: z.string().default('database.sqlite'),
     }),
-    lavalink: z.object({
-        host: z.string(),
-        port: z.number().int(),
-        password: z.string(),
-        secure: z.boolean().default(false),
-        reconnect: z
-            .object({
-                delay: z.number().default(3000),
-                tries: z.number().default(5),
-            })
-            .optional(),
-    }),
+    // Support both legacy single-node and multi-node configurations
+    lavalink: z.union([
+        // Legacy single node (no region required)
+        z.object({
+            host: z.string().min(1, 'Host must not be empty'),
+            port: z.number().int().min(1).max(65535, 'Port must be between 1 and 65535'),
+            password: z.string(),
+            secure: z.boolean().default(false),
+            reconnect: z
+                .object({
+                    delay: z.number().default(3000),
+                    tries: z.number().default(5),
+                })
+                .optional(),
+        }).strict(),
+        // New multi-node configuration
+        z.object({
+            nodes: z
+                .array(
+                    z.object({
+                        host: z.string().min(1, 'Host must not be empty'),
+                        port: z.number().int().min(1).max(65535, 'Port must be between 1 and 65535'),
+                        password: z.string(),
+                        secure: z.boolean().default(false),
+                        // Discord voice region identifier matching client.fetchVoiceRegions()
+                        // e.g., 'singapore', 'us-east', 'japan', etc.
+                        region: z.string(),
+                        reconnect: z
+                            .object({
+                                delay: z.number().default(3000),
+                                tries: z.number().default(5),
+                            })
+                            .optional(),
+                    }),
+                )
+                .min(1, 'At least one Lavalink node is required')
+                .refine(
+                    (nodes): boolean => {
+                        // Validate unique host:port combinations
+                        const endpoints = nodes.map((n): string => `${n.host}:${n.port}`);
+                        const uniqueEndpoints = new Set(endpoints);
+                        return endpoints.length === uniqueEndpoints.size;
+                    },
+                    {
+                        message: 'Each node must have a unique host:port combination',
+                    },
+                ),
+        }).strict(),
+    ]),
     features: z.object({
         autolyrics: genericPremiumFeatureSchema,
         stay: genericPremiumFeatureSchema,
@@ -248,6 +285,18 @@ export const SettingsSchema = z.object({
             consecutiveFailureThreshold: z.number().int().positive().default(3),
             checkTimeoutMs: z.number().int().positive().default(2000),
         }),
+    }),
+    regionAffinity: z.object({
+        enabled: z.boolean().default(true),
+        maxPingMs: z.number().int().positive().default(50),
+        refreshSeconds: z.number().int().positive().default(30),
+        // 5 minutes
+        staleAfterMs: z.number().int().positive().default(5 * 60 * 1000),
+    }).optional().default({
+        enabled: true,
+        maxPingMs: 50,
+        refreshSeconds: 30,
+        staleAfterMs: 5 * 60 * 1000,
     }),
     ads: z
         .object({

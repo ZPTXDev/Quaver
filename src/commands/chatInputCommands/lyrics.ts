@@ -61,12 +61,9 @@ export default new ChatInputCommandHandler()
                 return;
             }
             try {
-                const response = await interaction.client.music.rest.execute({
+                const response = await player.node.rest.execute({
                     path: `/v4/sessions/${player.api.session.id}/players/${interaction.guildId}/track/lyrics`,
                     method: 'GET',
-                    headers: {
-                        Authorization: `Bearer ${settings.lavalink.password}`,
-                    },
                 });
                 json = (await response.json()) as LavaLyricsResponse;
                 lyrics = formatLavaLyricsResponse(json, player);

@@ -1,18 +1,23 @@
 import { getAbsoluteFileURL } from '@zptxdev/zptx-lib';
 import { Client, GatewayDispatchEvents } from 'discord.js';
 import { readdirSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { Server } from 'socket.io';
 import { MessageOptionsBuilderType } from '.';
 import type { EventHandler } from './builders';
 import { QuaverGuild } from './guild';
-import { InteractionHandler, type InteractionHandlerMapsFlat, } from './interactions';
-import { ConnectionHealthMonitor, QuaverNode } from './music';
+import {
+    InteractionHandler,
+    type InteractionHandlerMapsFlat,
+} from './interactions';
+import { ConnectionHealthMonitor, QuaverNode, QuaverCluster, RegionAffinity } from './music';
 import type { UpdateHandler } from './UpdateHandler';
 import { settings } from './util';
 
 export class QuaverClient extends Client {
     io?: Server;
-    music?: QuaverNode;
+    music?: QuaverNode | QuaverCluster;
     interactionHandler: InteractionHandler;
     connectionHealth: ConnectionHealthMonitor;
     updateHandler?: UpdateHandler;
@@ -30,27 +35,87 @@ export class QuaverClient extends Client {
     }
 
     connectToMusicNode(): void {
-        this.music = new QuaverNode(
-            {
-                info: {
-                    host: settings.lavalink.host,
-                    port: settings.lavalink.port,
-                    auth: settings.lavalink.password,
-                    tls: !!settings.lavalink.secure,
-                },
-                ws: {
-                    reconnecting: {
-                        delay: settings.lavalink.reconnect.delay ?? 3000,
-                        tries: settings.lavalink.reconnect.tries ?? 5,
+        const config = settings.lavalink;
+
+        // Detect configuration type and instantiate appropriate class
+        if ('nodes' in config) {
+            // Multi-node configuration: use QuaverCluster
+            const nodes = config.nodes.map(
+                (
+                    node,
+                ): {
+                    info: { host: string; port: number; auth: string; tls: boolean };
+                    ws: { reconnecting: { delay: number; tries: number } };
+                    region: string;
+                } => ({
+                    info: {
+                        host: node.host,
+                        port: node.port,
+                        auth: node.password,
+                        tls: !!node.secure,
+                    },
+                    ws: {
+                        reconnecting: {
+                            delay: node.reconnect?.delay ?? 3000,
+                            tries: node.reconnect?.tries ?? 5,
+                        },
+                    },
+                    region: node.region,
+                }),
+            );
+
+            // Create RegionAffinity for ping-based node selection
+            const __dirname = dirname(fileURLToPath(import.meta.url));
+            const databaseUri = settings.database
+                ? `${settings.database.protocol}://${resolve(
+                    __dirname,
+                    '..',
+                    '..',
+                    settings.database.path,
+                ).replace(/\\/g, '/')}`
+                : `sqlite://${resolve(__dirname, '..', '..', 'database.sqlite').replace(/\\/g, '/')}`;
+            const regionAffinity = new RegionAffinity(databaseUri);
+
+            // Update ConnectionHealthMonitor with RegionAffinity
+            this.connectionHealth.setRegionAffinity(regionAffinity);
+
+            this.music = new QuaverCluster(
+                {
+                    nodes,
+                    discord: {
+                        sendGatewayCommand: (id, payload): void =>
+                            this.guilds.cache.get(id)?.shard?.send(payload),
                     },
                 },
-                discord: {
-                    sendGatewayCommand: (id, payload): void =>
-                        this.guilds.cache.get(id)?.shard?.send(payload),
+                this,
+                regionAffinity,
+            );
+        } else {
+            // Single-node configuration: use QuaverNode
+            this.music = new QuaverNode(
+                {
+                    info: {
+                        host: config.host,
+                        port: config.port,
+                        auth: config.password,
+                        tls: !!config.secure,
+                    },
+                    ws: {
+                        reconnecting: {
+                            delay: config.reconnect?.delay ?? 3000,
+                            tries: config.reconnect?.tries ?? 5,
+                        },
+                    },
+                    discord: {
+                        sendGatewayCommand: (id, payload): void =>
+                            this.guilds.cache.get(id)?.shard?.send(payload),
+                    },
                 },
-            },
-            this,
-        );
+                this,
+            );
+        }
+
+        // Setup voice update handlers (work with both Node and Cluster)
         this.ws.on(
             GatewayDispatchEvents.VoiceServerUpdate,
             async (payload): Promise<boolean> => {
@@ -59,10 +124,10 @@ export class QuaverClient extends Client {
                     return false;
                 }
                 // Capture media server endpoint for health monitoring
-                this.connectionHealth.updateMediaEndpoint(
-                    payload.endpoint ?? null,
-                );
-                return this.music.players.handleVoiceUpdate(payload);
+                // Get the node ID from the player manager
+                const nodeId = this.music!.players.getNodeIdForGuild(payload.guild_id);
+                this.connectionHealth.updateMediaEndpoint(payload.endpoint ?? null, nodeId);
+                return this.music!.players.handleVoiceUpdate(payload);
             },
         );
         this.ws.on(
@@ -72,7 +137,7 @@ export class QuaverClient extends Client {
                 if (this.updateHandler?.restartInProgress) {
                     return false;
                 }
-                return this.music.players.handleVoiceUpdate(payload);
+                return this.music!.players.handleVoiceUpdate(payload);
             },
         );
     }
@@ -126,8 +191,9 @@ export class QuaverClient extends Client {
                     .then((g): void => {
                         g.sendWebUpdate('gatewayHealthUpdate', data);
                     })
-                    .catch((): void => {
-                        // Silently ignore if guild wrap fails
+                    .catch((err): void => {
+                        // Log at debug level for troubleshooting
+                        logger.debug({ message: 'Failed to wrap guild for gateway health update', label: 'QuaverClient', guildId: guild.id, error: err });
                     });
             });
         });
@@ -171,8 +237,9 @@ export class QuaverClient extends Client {
                                 );
                             }
                         })
-                        .catch((): void => {
-                            // Silently ignore if guild wrap fails
+                        .catch((err): void => {
+                            // Log at debug level for troubleshooting
+                            logger.debug({ message: 'Failed to wrap guild for media health update (unstable transition)', label: 'QuaverClient', guildId: guild.id, error: err });
                         });
                 });
             } else {
@@ -187,8 +254,9 @@ export class QuaverClient extends Client {
                         .then((g): void => {
                             g.sendWebUpdate('mediaHealthUpdate', data);
                         })
-                        .catch((): void => {
-                            // Silently ignore if guild wrap fails
+                        .catch((err): void => {
+                            // Log at debug level for troubleshooting
+                            logger.debug({ message: 'Failed to wrap guild for media health update', label: 'QuaverClient', guildId: guild.id, error: err });
                         });
                 });
             }
