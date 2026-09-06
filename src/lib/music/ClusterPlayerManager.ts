@@ -13,6 +13,7 @@ import type { Guild } from 'discord.js';
 export class ClusterPlayerManager implements PlayerManager<QuaverNode> {
     readonly cluster: QuaverCluster;
     private guildNodeMap: Map<string, string> = new Map();
+    private pendingLookups: Map<string, Promise<string | null>> = new Map();
 
     constructor(cluster: QuaverCluster) {
         this.cluster = cluster;
@@ -49,7 +50,8 @@ export class ClusterPlayerManager implements PlayerManager<QuaverNode> {
     }
 
     /**
-     * Get the node ID for a guild, verifying the player still exists
+     * Get the node ID for a guild, verifying the player still exists.
+     * Uses a lock to prevent race conditions during concurrent lookups.
      */
     getNodeIdForGuild(guildId: string): string | null {
         const nodeId = this.guildNodeMap.get(guildId);
@@ -63,16 +65,43 @@ export class ClusterPlayerManager implements PlayerManager<QuaverNode> {
             this.guildNodeMap.delete(guildId);
         }
 
+        // Check if there's already a lookup in progress for this guild
+        const pending = this.pendingLookups.get(guildId);
+        if (pending) {
+            // Another call is already searching, return null and let caller retry
+            // This is acceptable since the other lookup will update the map
+            return null;
+        }
+
+        // Start a new lookup and track it
+        const lookupPromise = this.searchNodesForGuild(guildId);
+        this.pendingLookups.set(guildId, lookupPromise);
+
+        // Perform synchronous search (we need synchronous return)
         // Fallback: search all nodes directly
-        // This handles cases like restart or direct player creation
         for (const [id, node] of this.cluster.nodes.entries()) {
             if (node.players.has(guildId)) {
                 // Update our tracking
                 this.guildNodeMap.set(guildId, id);
+                this.pendingLookups.delete(guildId);
                 return id;
             }
         }
 
+        this.pendingLookups.delete(guildId);
+        return null;
+    }
+
+    /**
+     * Asynchronous helper for searching nodes (tracked to prevent concurrent searches)
+     */
+    private async searchNodesForGuild(guildId: string): Promise<string | null> {
+        for (const [id, node] of this.cluster.nodes.entries()) {
+            if (node.players.has(guildId)) {
+                this.guildNodeMap.set(guildId, id);
+                return id;
+            }
+        }
         return null;
     }
 

@@ -55,6 +55,18 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
 
             this.nodes.set(nodeId, node);
 
+            // Forward all events from individual nodes to the cluster
+            // This ensures music events work correctly in multi-node mode
+            node.on('trackStart', (player, track) => this.emit('trackStart', player, track));
+            node.on('trackEnd', (player, track) => this.emit('trackEnd', player, track));
+            node.on('trackStuck', (player, track, threshold) => this.emit('trackStuck', player, track, threshold));
+            node.on('trackException', (player, track, exception) => this.emit('trackException', player, track, exception));
+            node.on('queueFinish', (player) => this.emit('queueFinish', player));
+            node.on('error', (player, error) => this.emit('error', player, error));
+            node.on('connected', (player, voice) => this.emit('connected', player, voice));
+            node.on('disconnected', (player) => this.emit('disconnected', player));
+            node.on('ready', (player) => this.emit('ready', player));
+
             // Build region mapping: region -> [nodeId1, nodeId2, ...]
             const nodeIds = this.regionMap.get(nodeConfig.region) || [];
             nodeIds.push(nodeId);
@@ -63,6 +75,13 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
 
         // Create cluster player manager that routes operations across nodes
         this.players = new ClusterPlayerManager(this);
+
+        // Validate and warn about duplicate regions
+        for (const [region, nodeIds] of this.regionMap.entries()) {
+            if (nodeIds.length > 1) {
+                logger.warn(`Multiple nodes (${nodeIds.join(', ')}) configured for region '${region}'. Load balancing will distribute players across these nodes.`);
+            }
+        }
 
         // Set up periodic pruning and cache refresh for affinity data if enabled
         if (this.regionAffinity && settings.regionAffinity?.enabled) {
