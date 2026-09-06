@@ -117,8 +117,10 @@ export class ClusterPlayerManager implements PlayerManager<QuaverNode> {
         if (typeof guildOrCache === 'boolean' || guildOrCache === undefined) {
             // Fetch all players
             const allPlayers: QuaverPlayer<QuaverNode>[] = [];
+            // Convert undefined to false for explicit boolean selection
+            const cacheFlag = typeof guildOrCache === 'boolean' ? guildOrCache : false;
             for (const node of this.cluster.nodes.values()) {
-                const players = await node.players.fetch(guildOrCache as boolean | undefined);
+                const players = await node.players.fetch(cacheFlag);
                 allPlayers.push(...(players as QuaverPlayer<QuaverNode>[]));
             }
             return allPlayers;

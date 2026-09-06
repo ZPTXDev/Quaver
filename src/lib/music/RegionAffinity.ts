@@ -67,12 +67,13 @@ export class RegionAffinity {
 
         // Keyv doesn't have a native "get all keys" method, so we need to iterate
         // This is a limitation, but acceptable for a small number of nodes
-        const iterator = this.keyv.iterator;
-        if (!iterator) {
+        const iteratorFunc = this.keyv.iterator;
+        if (!iteratorFunc) {
             // Iterator not available, return empty result
             return result;
         }
 
+        const iterator = iteratorFunc();
         for await (const [key, data] of iterator) {
             const affinityData = data as AffinityData;
             
@@ -82,15 +83,16 @@ export class RegionAffinity {
             }
 
             // Parse compound key: nodeId:regionPrefix
+            // Since nodeId is now host:port format, we need to find the last colon
             const keyStr = key as string;
-            const separatorIndex = keyStr.indexOf(':');
-            if (separatorIndex === -1) {
+            const lastColonIndex = keyStr.lastIndexOf(':');
+            if (lastColonIndex === -1) {
                 // Skip malformed keys
                 continue;
             }
 
-            const nodeId = keyStr.substring(0, separatorIndex);
-            const regionPrefix = keyStr.substring(separatorIndex + 1);
+            const nodeId = keyStr.substring(0, lastColonIndex);
+            const regionPrefix = keyStr.substring(lastColonIndex + 1);
 
             result.push({
                 nodeId,
@@ -108,13 +110,14 @@ export class RegionAffinity {
      */
     async pruneStaleEntries(staleAfterMs: number): Promise<void> {
         const now = Date.now();
-        const iterator = this.keyv.iterator;
+        const iteratorFunc = this.keyv.iterator;
 
-        if (!iterator) {
+        if (!iteratorFunc) {
             // Iterator not available, skip pruning
             return;
         }
 
+        const iterator = iteratorFunc();
         const keysToDelete: string[] = [];
         
         for await (const [key, data] of iterator) {

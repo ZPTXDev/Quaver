@@ -144,7 +144,7 @@ Quaver supports connecting to multiple Lavalink nodes for improved reliability, 
       {
         "host": "sg-lavalink.example.com",
         "port": 2333,
-        "password": "youshallnotpass",
+        "password": "your-secure-password-here",
         "secure": true,
         "region": "singapore",
         "reconnect": {
@@ -155,7 +155,7 @@ Quaver supports connecting to multiple Lavalink nodes for improved reliability, 
       {
         "host": "us-lavalink.example.com",
         "port": 2333,
-        "password": "youshallnotpass",
+        "password": "your-secure-password-here",
         "secure": true,
         "region": "us-central",
         "reconnect": {
@@ -166,7 +166,7 @@ Quaver supports connecting to multiple Lavalink nodes for improved reliability, 
       {
         "host": "eu-lavalink.example.com",
         "port": 2333,
-        "password": "youshallnotpass",
+        "password": "your-secure-password-here",
         "secure": true,
         "region": "rotterdam",
         "reconnect": {
@@ -222,6 +222,11 @@ Quaver supports connecting to multiple Lavalink nodes for improved reliability, 
 | `lavalink.nodes[].region`                             | Discord voice region this node serves (e.g., `singapore`, `us-central`, `rotterdam`). Players in voice channels with matching `rtcRegion` will route to nodes configured for that region. If multiple nodes serve the same region, load balancing determines which node is used. Must match region IDs from Discord's `/voice/regions` API.                       | ❌                                                         | `8.0.0`       |
 | `lavalink.nodes[].reconnect.delay`                    | The delay in milliseconds between reconnect attempts for this node.                                                                                                                                                                                                                                                                                               | ❌                                                         | `8.0.0`       |
 | `lavalink.nodes[].reconnect.tries`                    | The number of times to attempt to reconnect to this node.                                                                                                                                                                                                                                                                                                         | ❌                                                         | `8.0.0`       |
+| `regionAffinity`                                      | Configuration for ping-based region affinity tracking in multi-node mode. Controls how Quaver learns and uses latency data to route players to optimal nodes.                                                                                                                                                                                                      | ❌                                                         | `8.0.0`       |
+| `regionAffinity.enabled`                              | Whether region affinity tracking is enabled. When true, Quaver tracks ping times to media endpoints and uses this data for node selection. Default: `true`                                                                                                                                                                                                        | ❌                                                         | `8.0.0`       |
+| `regionAffinity.maxPingMs`                            | Maximum acceptable ping in milliseconds. Nodes with ping below this threshold are preferred. Default: `50`                                                                                                                                                                                                                                                         | ❌                                                         | `8.0.0`       |
+| `regionAffinity.refreshSeconds`                       | How often (in seconds) to refresh the affinity cache from the database. Default: `30`                                                                                                                                                                                                                                                                              | ❌                                                         | `8.0.0`       |
+| `regionAffinity.staleAfterMs`                         | Time in milliseconds after which affinity data is considered stale and pruned. Default: `300000` (5 minutes)                                                                                                                                                                                                                                                       | ❌                                                         | `8.0.0`       |
 | `features.autolyrics`                                 | Auto Lyrics feature: Allows users to toggle Quaver automatically sending lyrics for the current song.                                                                                                                                                                                                                                                             | ✅                                                         | `6.7.0`       |
 | `features.autolyrics.enabled`                         | Whether the feature is enabled.                                                                                                                                                                                                                                                                                                                                   | ✅                                                         | `6.7.0`       |
 | `features.autolyrics.whitelist`                       | Whether the feature requires guilds to be whitelisted. You will be able to whitelist guilds through the terminal.                                                                                                                                                                                                                                                 | ✅ (if feature is enabled)<br />❌ (if feature is disabled) | `6.7.0`       |

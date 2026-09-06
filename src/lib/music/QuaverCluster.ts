@@ -58,15 +58,33 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
 
             // Forward all events from individual nodes to the cluster
             // This ensures music events work correctly in multi-node mode
-            node.on('trackStart', (player, track): void => this.emit('trackStart', player, track));
-            node.on('trackEnd', (player, track): void => this.emit('trackEnd', player, track));
-            node.on('trackStuck', (player, track, threshold): void => this.emit('trackStuck', player, track, threshold));
-            node.on('trackException', (player, track, exception): void => this.emit('trackException', player, track, exception));
-            node.on('queueFinish', (player): void => this.emit('queueFinish', player));
-            node.on('error', (player, error): void => this.emit('error', player, error));
-            node.on('connected', (player, voice): void => this.emit('connected', player, voice));
-            node.on('disconnected', (player): void => this.emit('disconnected', player));
-            node.on('ready', (player): void => this.emit('ready', player));
+            node.on('trackStart', (player, track): void => {
+                this.emit('trackStart', player, track);
+            });
+            node.on('trackEnd', (player, track): void => {
+                this.emit('trackEnd', player, track);
+            });
+            node.on('trackStuck', (player, track, threshold): void => {
+                this.emit('trackStuck', player, track, threshold);
+            });
+            node.on('trackException', (player, track, exception): void => {
+                this.emit('trackException', player, track, exception);
+            });
+            node.on('queueFinish', (player): void => {
+                this.emit('queueFinish', player);
+            });
+            node.on('error', (player, error): void => {
+                this.emit('error', player, error);
+            });
+            node.on('connected', (player, voice): void => {
+                this.emit('connected', player, voice);
+            });
+            node.on('disconnected', (player): void => {
+                this.emit('disconnected', player);
+            });
+            node.on('ready', (player): void => {
+                this.emit('ready', player);
+            });
 
             // Build region mapping: region -> [nodeId1, nodeId2, ...]
             const nodeIds = this.regionMap.get(nodeConfig.region) || [];
@@ -317,8 +335,8 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
             return Penalties.findBestNode(readyNodes);
         }
 
-        // No ready nodes found, return first node anyway
-        return nodeArray[0];
+        // No ready nodes found, return undefined
+        return undefined;
     }
 
     /**

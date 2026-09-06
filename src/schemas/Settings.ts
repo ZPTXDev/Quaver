@@ -154,8 +154,8 @@ export const SettingsSchema = z.object({
     lavalink: z.union([
         // Legacy single node (no region required)
         z.object({
-            host: z.string(),
-            port: z.number().int(),
+            host: z.string().min(1, 'Host must not be empty'),
+            port: z.number().int().min(1).max(65535, 'Port must be between 1 and 65535'),
             password: z.string(),
             secure: z.boolean().default(false),
             reconnect: z
@@ -164,14 +164,14 @@ export const SettingsSchema = z.object({
                     tries: z.number().default(5),
                 })
                 .optional(),
-        }),
+        }).strict(),
         // New multi-node configuration
         z.object({
             nodes: z
                 .array(
                     z.object({
-                        host: z.string(),
-                        port: z.number().int(),
+                        host: z.string().min(1, 'Host must not be empty'),
+                        port: z.number().int().min(1).max(65535, 'Port must be between 1 and 65535'),
                         password: z.string(),
                         secure: z.boolean().default(false),
                         // Discord voice region identifier matching client.fetchVoiceRegions()
@@ -197,7 +197,7 @@ export const SettingsSchema = z.object({
                         message: 'Each node must have a unique host:port combination',
                     },
                 ),
-        }),
+        }).strict(),
     ]),
     features: z.object({
         autolyrics: genericPremiumFeatureSchema,
@@ -292,6 +292,11 @@ export const SettingsSchema = z.object({
         refreshSeconds: z.number().int().positive().default(30),
         // 5 minutes
         staleAfterMs: z.number().int().positive().default(5 * 60 * 1000),
+    }).optional().default({
+        enabled: true,
+        maxPingMs: 50,
+        refreshSeconds: 30,
+        staleAfterMs: 5 * 60 * 1000,
     }),
     ads: z
         .object({
