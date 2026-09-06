@@ -184,26 +184,33 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
     private selectNodeByAffinity(targetRegion: string | null): QuaverNode | null {
         if (!this.regionAffinity || this.affinityCache.size === 0 || !targetRegion) return null;
 
-        const maxPingMs = settings.regionAffinity?.maxPingMs ?? 50;
-
-        // Get list of node IDs that serve the target region
         const targetNodeIds = this.regionMap.get(targetRegion);
         if (!targetNodeIds || targetNodeIds.length === 0) return null;
 
-        // Collect ready nodes with affinity data for the target region
-        // Track minimum ping for each node (not average) to avoid skewing from fallback usage
+        const nodeAffinityMap = this.buildNodeAffinityMap(targetNodeIds);
+        if (nodeAffinityMap.size === 0) return null;
+
+        const candidateNodes = this.collectCandidateNodes(nodeAffinityMap);
+        const selectedNodes = this.selectNodesWithinThreshold(candidateNodes);
+
+        return this.selectBestNodeFromCandidates(selectedNodes);
+    }
+
+    /**
+     * Builds a map of nodes with their minimum ping for the target region.
+     * Tracks minimum ping across all region prefixes to avoid skewing from fallback usage.
+     */
+    private buildNodeAffinityMap(targetNodeIds: string[]): Map<string, { node: QuaverNode; minPing: number }> {
         const nodeAffinityMap = new Map<string, { node: QuaverNode; minPing: number }>();
 
         for (const affinityData of this.affinityCache.values()) {
             const { nodeId, avgPing } = affinityData;
-            
-            // Only consider nodes that serve the target region
+
             if (!targetNodeIds.includes(nodeId)) continue;
 
             const node = this.nodes.get(nodeId);
             if (!node || !this.isNodeReady(node)) continue;
 
-            // Track minimum ping for this node across all region prefixes
             const existing = nodeAffinityMap.get(nodeId);
             if (existing) {
                 existing.minPing = Math.min(existing.minPing, avgPing);
@@ -212,37 +219,46 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
             }
         }
 
-        if (nodeAffinityMap.size === 0) return null;
+        return nodeAffinityMap;
+    }
 
-        // Collect candidates with their minimum ping
-        const candidateNodes: Array<{ node: QuaverNode; nodeId: string; minPing: number }> = [];
+    /**
+     * Converts the node affinity map to an array of candidate nodes with their ping data.
+     */
+    private collectCandidateNodes(
+        nodeAffinityMap: Map<string, { node: QuaverNode; minPing: number }>
+    ): Array<{ node: QuaverNode; nodeId: string; minPing: number }> {
+        const candidates: Array<{ node: QuaverNode; nodeId: string; minPing: number }> = [];
+
         for (const [nodeId, { node, minPing }] of nodeAffinityMap.entries()) {
-            candidateNodes.push({
-                node,
-                nodeId,
-                minPing,
-            });
+            candidates.push({ node, nodeId, minPing });
         }
 
-        // Try to find nodes that meet the threshold
+        return candidates;
+    }
+
+    /**
+     * Filters candidates by ping threshold, or returns all if none meet the threshold.
+     */
+    private selectNodesWithinThreshold(
+        candidateNodes: Array<{ node: QuaverNode; nodeId: string; minPing: number }>
+    ): Array<{ node: QuaverNode; nodeId: string; minPing: number }> {
+        const maxPingMs = settings.regionAffinity?.maxPingMs ?? 50;
         const suitableNodes = candidateNodes.filter(({ minPing }): boolean => minPing <= maxPingMs);
-        
-        let selectedNodes: typeof candidateNodes;
-        if (suitableNodes.length > 0) {
-            // Use nodes that meet the threshold
-            selectedNodes = suitableNodes;
-        } else {
-            // No nodes meet threshold, use all candidates (will pick lowest ping)
-            selectedNodes = candidateNodes;
-        }
 
-        // Find the lowest ping
+        return suitableNodes.length > 0 ? suitableNodes : candidateNodes;
+    }
+
+    /**
+     * Selects the best node from candidates by finding the lowest ping.
+     * Uses penalty-based selection as a tiebreaker if multiple nodes have the same ping.
+     */
+    private selectBestNodeFromCandidates(
+        selectedNodes: Array<{ node: QuaverNode; nodeId: string; minPing: number }>
+    ): QuaverNode | null {
         const lowestPing = Math.min(...selectedNodes.map(({ minPing }): number => minPing));
-        
-        // Get all nodes with the lowest ping
         const bestNodes = selectedNodes.filter(({ minPing }): boolean => minPing === lowestPing);
 
-        // If multiple nodes have the same ping, use penalty-based selection as tiebreaker
         if (bestNodes.length > 1) {
             const nodeArray = bestNodes.map(({ node }): QuaverNode => node);
             return Penalties.findBestNode(nodeArray);
