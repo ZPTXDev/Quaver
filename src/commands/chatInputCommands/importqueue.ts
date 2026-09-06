@@ -136,6 +136,7 @@ export default new ChatInputCommandHandler()
 
             // Validate the structure
             if (!isValidExportedQueue(data)) {
+                clearTimeout(warningTimeout);
                 await interaction.replyHandler.reply(
                     guild.locale('CMD.IMPORTQUEUE.RESPONSE.INVALID_FORMAT'),
                     { type: MessageOptionsBuilderType.Error },
