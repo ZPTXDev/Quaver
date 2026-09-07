@@ -38,14 +38,34 @@ export default {
         const isAutoplayFeatureActive = await guild.features.isFeatureActive('autoplay');
 
         if (autoplayEnabled && isAutoplayFeatureActive) {
-            logger.info(`[G ${guild.id}] Queue finished, attempting to start autoplay`);
-
             try {
                 // Get the seed track (last played track)
-                const seedTrack = queue.player.queue.last;
+                // Use lastPlayedTrack which is set in trackEnd before queue is cleared
+                let seedTrack = queue.player.memory.lastPlayedTrack;
+
+                // Fallback to queue.last if lastPlayedTrack is not set (shouldn't happen)
+                if (!seedTrack || queue.player.isAdTrack(seedTrack)) {
+                    seedTrack = queue.player.queue.last;
+                }
+
+                // If queue.last is null or an ad, try to get from autoplay history
+                if ((!seedTrack || queue.player.isAdTrack(seedTrack)) && queue.player.memory.autoplayHistory?.length > 0) {
+                    seedTrack = queue.player.memory.autoplayHistory[queue.player.memory.autoplayHistory.length - 1];
+                }
+
+                // If still no seed, try the previous array (for tracks played in this session)
+                if ((!seedTrack || queue.player.isAdTrack(seedTrack)) && queue.player.queue.previous.length > 0) {
+                    // Find the last non-ad track in previous array
+                    for (let i = queue.player.queue.previous.length - 1; i >= 0; i--) {
+                        const track = queue.player.queue.previous[i];
+                        if (!queue.player.isAdTrack(track)) {
+                            seedTrack = track;
+                            break;
+                        }
+                    }
+                }
 
                 if (!seedTrack || queue.player.isAdTrack(seedTrack)) {
-                    logger.warn(`[G ${guild.id}] No valid seed track for autoplay`);
                     // Fall through to normal timeout behavior
                 } else {
                     // Build history from previous tracks for deduplication
@@ -63,10 +83,6 @@ export default {
                     );
 
                     if (recommendations.length > 0) {
-                        logger.info(
-                            `[G ${guild.id}] Generated ${recommendations.length} autoplay recommendations`,
-                        );
-
                         // Store autoplay queue and mark as active
                         queue.player.memory.autoplayQueue = recommendations;
                         queue.player.memory.autoplayHistory = history;
@@ -94,12 +110,10 @@ export default {
                         await queue.start();
                         guild.sendWebUpdate('queueUpdate', queue.player.decorateQueue());
                         return;
-                    } else {
-                        logger.warn(`[G ${guild.id}] No autoplay recommendations generated`);
                     }
                 }
             } catch (error) {
-                logger.error(`[G ${guild.id}] Autoplay failed:`, error);
+                logger.error(`[G ${guild.id}] Error starting autoplay:`, error);
                 // Fall through to normal timeout behavior
             }
         }

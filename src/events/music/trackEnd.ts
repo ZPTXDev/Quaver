@@ -196,6 +196,13 @@ export default {
 
             // Clean up the trackStartTime
             delete queue.player.memory.trackStartTime;
+
+            // Store the last non-ad track for autoplay seed
+            // This needs to happen here because by the time queueFinish fires,
+            // queue.last and queue.previous may be cleared
+            if (!isAdTrack && track) {
+                queue.player.memory.lastPlayedTrack = track;
+            }
         }
 
         // Only check for ad insertion when a track finishes naturally
@@ -412,9 +419,6 @@ export default {
             ) {
                 const nextAutoplayTrack = queue.player.memory.autoplayQueue.shift();
                 if (nextAutoplayTrack) {
-                    logger.info(
-                        `[G ${guild.id}] Adding next autoplay track: ${nextAutoplayTrack.info.title}`,
-                    );
                     queue.add(nextAutoplayTrack);
 
                     // Add to history for deduplication

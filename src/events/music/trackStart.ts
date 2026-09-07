@@ -160,12 +160,6 @@ export default {
         let format = (await guild.settings.get<string>('format')) ?? 'simple';
         if (!notify) format = 'off';
 
-        // Add autoplay indicator if this is an autoplay track
-        let autoplayFooter = '';
-        if (isAutoplayTrack) {
-            autoplayFooter = '\n-# Auto-play';
-        }
-
         const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
         // Check if all available source emojis are configured
         const availableSources = Object.keys(acceptableSources);
@@ -191,10 +185,10 @@ export default {
                                     'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
                                     getTrackMarkdownLocaleString(track, showArtist),
                                     durationString,
-                                )}\n${guild.locale('MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${guild.locale(`MISC.SOURCES.${track.info.sourceName.toUpperCase()}` as LocaleKey)}** ─ ${guild.locale(
+                                )}\n${guild.locale('MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${guild.locale(`MISC.SOURCES.${track.info.sourceName.toUpperCase()}` as LocaleKey)}** ─ ${isAutoplayTrack ? '**Auto-play**' : guild.locale(
                                     'MISC.ADDED_BY',
                                     track.requesterId,
-                                )}${autoplayFooter}`,
+                                )}`,
                             ),
                         )
                         .addSeparatorComponents(
@@ -224,7 +218,7 @@ export default {
                 );
                 break;
             case 'detailed': {
-                const { container, actionRows } = await buildNowPlayingMessage(guild, track, showArtist);
+                const { container, actionRows } = await buildNowPlayingMessage(guild, track, showArtist, isAutoplayTrack);
                 const message = await queue.player.sendMessage(
                     container.addActionRowComponents(...actionRows)
                 );
@@ -322,6 +316,7 @@ export async function buildNowPlayingMessage(
     guild: QuaverGuild<Initialized> & Guild,
     track: QuaverSong,
     showArtist = true,
+    isAutoplayTrack = false,
 ): Promise<{ container: ContainerBuilder; actionRows: ActionRowBuilder<ButtonBuilder>[] }> {
     const player = await guild.getPlayer();
     const duration = msToTime(track.info.length);
@@ -396,28 +391,37 @@ export async function buildNowPlayingMessage(
 
     const trackDisplay = getTrackMarkdownLocaleString(track, showArtist);
 
+    // Build text display components
+    const textDisplayComponents = [
+        guild.builders.textDisplayLocale(
+            'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE',
+        ),
+        new TextDisplayBuilder().setContent(
+            `${guild.locale(
+                'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TEXT',
+                trackDisplay,
+                durationString,
+            )}\n${guild.locale('MUSIC.PLAYER.PLAYING.NOW.DETAILED.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${guild.locale(`MISC.SOURCES.${track.info.sourceName.toUpperCase()}` as LocaleKey)}** ─ ${isAutoplayTrack ? '**Auto-play**' : guild.locale(
+                'MISC.ADDED_BY',
+                track.requesterId,
+            )}`,
+        ),
+    ];
+
+    // Only show "Remaining:" counter if not in autoplay mode
+    if (!isAutoplayTrack) {
+        textDisplayComponents.push(
+            guild.builders.textDisplayLocale(
+                'MUSIC.PLAYER.PLAYING.NOW.DETAILED.REMAINING',
+                player.queue.tracks.length.toString(),
+            ),
+        );
+    }
+
     const container = new ContainerBuilder()
         .addSectionComponents(
             new SectionBuilder()
-                .addTextDisplayComponents(
-                    guild.builders.textDisplayLocale(
-                        'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TITLE',
-                    ),
-                    new TextDisplayBuilder().setContent(
-                        `${guild.locale(
-                            'MUSIC.PLAYER.PLAYING.NOW.DETAILED.TEXT',
-                            trackDisplay,
-                            durationString,
-                        )}\n${guild.locale('MUSIC.PLAYER.PLAYING.NOW.DETAILED.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${guild.locale(`MISC.SOURCES.${track.info.sourceName.toUpperCase()}` as LocaleKey)}** ─ ${guild.locale(
-                            'MISC.ADDED_BY',
-                            track.requesterId,
-                        )}`,
-                    ),
-                    guild.builders.textDisplayLocale(
-                        'MUSIC.PLAYER.PLAYING.NOW.DETAILED.REMAINING',
-                        player.queue.tracks.length.toString(),
-                    ),
-                )
+                .addTextDisplayComponents(...textDisplayComponents)
                 .setThumbnailAccessory(
                     new ThumbnailBuilder().setURL(
                         track.info.artworkUrl ??

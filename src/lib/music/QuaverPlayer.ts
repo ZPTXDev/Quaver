@@ -66,6 +66,7 @@ export interface QuaverPlayerJSON {
         autoplayQueue?: QuaverSong[];
         autoplayHistory?: QuaverSong[];
         isAutoplayActive?: boolean;
+        lastPlayedTrack?: QuaverSong;
     };
     sessionLogs: {
         timestamp: number;
@@ -160,6 +161,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         autoplayQueue?: QuaverSong[];
         autoplayHistory?: QuaverSong[];
         isAutoplayActive?: boolean;
+        lastPlayedTrack?: QuaverSong;
     } = {
         bassboost: false,
         nightcore: false,
@@ -988,6 +990,27 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         if (!this.queue.current || (!this.playing && !this.paused)) {
             return PlayerResponse.PlayerIdle;
         }
+
+        // If autoplay is active and queue will be empty after skip, add next autoplay track
+        if (
+            this.memory.isAutoplayActive &&
+            this.queue.tracks.length === 0 &&
+            this.memory.autoplayQueue?.length > 0
+        ) {
+            const nextAutoplayTrack = this.memory.autoplayQueue.shift();
+            if (nextAutoplayTrack) {
+                this.queue.add(nextAutoplayTrack);
+
+                // Add current track to history for deduplication
+                if (!this.memory.autoplayHistory) {
+                    this.memory.autoplayHistory = [];
+                }
+                if (this.queue.current) {
+                    this.memory.autoplayHistory.push(this.queue.current);
+                }
+            }
+        }
+
         // Skip current track and start next
         // Note: player.stop() emits trackEnd with reason='stopped', but mayStartNext['stopped'] = false
         // so the trackEnd event is NOT emitted to the handler. We must manually advance the queue.
@@ -1168,6 +1191,13 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
                     : undefined,
                 trackStartTime: this.memory.trackStartTime,
                 currentNowPlayingMessageId: this.memory.currentNowPlayingMessageId,
+                autoplayQueue: this.memory.autoplayQueue
+                    ? [...this.memory.autoplayQueue]
+                    : undefined,
+                autoplayHistory: this.memory.autoplayHistory
+                    ? [...this.memory.autoplayHistory]
+                    : undefined,
+                isAutoplayActive: this.memory.isAutoplayActive,
             },
             sessionLogs: [...this.sessionLogs],
         };

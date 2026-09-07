@@ -262,6 +262,8 @@ export default {
             DISABLED: 'disabled',
             ENABLED: 'enabled',
             EVENT: {
+                AUTOPLAY_START: 'Auto-play started (**%2**)',
+                AUTOPLAY_STOP: 'Auto-play stopped (**%2**)',
                 BASSBOOST: '**%1** **%2** bass boost mode',
                 BIND: '**%1** bound the text channel to <#%2>',
                 DISCONNECT: '**%1** disconnected the player',

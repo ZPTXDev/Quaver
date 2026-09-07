@@ -2,19 +2,25 @@ import type { QuaverClient } from '#src/lib';
 import type { QuaverGuild } from '#src/lib/guild';
 import { logger } from '#src/lib/logger';
 import type { QuaverSong } from '#src/lib/util';
-import { searchTracks } from '#src/lib/util';
+import { searchTracks, settings } from '#src/lib/util';
 
 interface ListenBrainzRecording {
     artist_name: string;
     recording_name: string;
-    recording_mbid?: string;
+    recording_mbid: string;
 }
 
-interface ListenBrainzRecommendationResponse {
-    payload: {
-        mbids?: ListenBrainzRecording[];
-        recording_mbid?: string;
-    };
+interface ListenBrainzLookupResponse {
+    recording_mbid?: string;
+    recording_name?: string;
+    artist_credit_name?: string;
+}
+
+interface ListenBrainzLabsRecording {
+    recording_mbid: string;
+    recording_name?: string;
+    artist_credit_name?: string;
+    score?: number;
 }
 
 /**
@@ -22,6 +28,7 @@ interface ListenBrainzRecommendationResponse {
  */
 export class AutoplayService {
     private static readonly LISTENBRAINZ_API = 'https://api.listenbrainz.org/1';
+    private static readonly LISTENBRAINZ_LABS_API = 'https://labs.api.listenbrainz.org';
     private static readonly MAX_RECOMMENDATIONS = 10;
     private static readonly DEDUPE_HISTORY_SIZE = 50;
 
@@ -46,9 +53,6 @@ export class AutoplayService {
             );
 
             if (recommendations.length > 0) {
-                logger.info(
-                    `[G ${guild.id}] Got ${recommendations.length} ListenBrainz recommendations`,
-                );
                 return await this.resolveRecommendations(
                     client,
                     guild,
@@ -58,9 +62,6 @@ export class AutoplayService {
             }
 
             // Fallback to artist-based search
-            logger.info(
-                `[G ${guild.id}] ListenBrainz returned no results, falling back to artist search`,
-            );
             return await this.getArtistBasedRecommendations(
                 client,
                 guild,
@@ -97,6 +98,12 @@ export class AutoplayService {
         seedTrack: QuaverSong,
     ): Promise<ListenBrainzRecording[]> {
         try {
+            // Check if token is configured
+            if (!settings.features.autoplay.listenbrainzToken) {
+                logger.warn('ListenBrainz token not configured, skipping API recommendations');
+                return [];
+            }
+
             // First, try to find the recording MBID by searching
             const searchQuery = `${seedTrack.info.author} ${seedTrack.info.title}`;
             const searchUrl = `${this.LISTENBRAINZ_API}/metadata/lookup/?recording_name=${encodeURIComponent(seedTrack.info.title)}&artist_name=${encodeURIComponent(seedTrack.info.author)}`;
@@ -104,6 +111,7 @@ export class AutoplayService {
             const searchResponse = await fetch(searchUrl, {
                 headers: {
                     'User-Agent': 'Quaver/8.0 (https://github.com/ZPTXDev/Quaver)',
+                    'Authorization': `Token ${settings.features.autoplay.listenbrainzToken}`,
                 },
             });
 
@@ -114,18 +122,17 @@ export class AutoplayService {
                 return [];
             }
 
-            const searchData = (await searchResponse.json()) as ListenBrainzRecommendationResponse;
-            const recordingMbid = searchData.payload?.recording_mbid;
+            const searchData = (await searchResponse.json()) as ListenBrainzLookupResponse;
+            const recordingMbid = searchData.recording_mbid;
 
             if (!recordingMbid) {
-                logger.info(
-                    `No MusicBrainz ID found for: ${searchQuery}`,
-                );
                 return [];
             }
 
-            // Now get similar recordings using the MBID
-            const recUrl = `${this.LISTENBRAINZ_API}/cf/recommendation/recording/${recordingMbid}`;
+            // Now get similar recordings using the MBID via Labs API
+            // Use the optimized algorithm for active user listening patterns
+            const algorithm = 'session_based_days_7500_session_300_contribution_5_threshold_15_limit_50_skip_30_top_n_listeners_1000';
+            const recUrl = `${this.LISTENBRAINZ_LABS_API}/similar-recordings/json?recording_mbids=${recordingMbid}&algorithm=${algorithm}`;
             const recResponse = await fetch(recUrl, {
                 headers: {
                     'User-Agent': 'Quaver/8.0 (https://github.com/ZPTXDev/Quaver)',
@@ -139,8 +146,14 @@ export class AutoplayService {
                 return [];
             }
 
-            const recData = (await recResponse.json()) as ListenBrainzRecommendationResponse;
-            const recommendations = recData.payload?.mbids || [];
+            const recData = (await recResponse.json()) as ListenBrainzLabsRecording[];
+
+            // Labs API returns an array of recordings with metadata
+            const recommendations: ListenBrainzRecording[] = recData.map((rec) => ({
+                recording_mbid: rec.recording_mbid,
+                artist_name: rec.artist_credit_name || 'Unknown Artist',
+                recording_name: rec.recording_name || 'Unknown Track',
+            }));
 
             return recommendations.slice(0, this.MAX_RECOMMENDATIONS);
         } catch (error) {
@@ -171,9 +184,6 @@ export class AutoplayService {
 
                 // Skip if recently played
                 if (recentTrackIds.has(trackId)) {
-                    logger.debug(
-                        `[G ${guild.id}] Skipping duplicate: ${rec.recording_name}`,
-                    );
                     continue;
                 }
 
