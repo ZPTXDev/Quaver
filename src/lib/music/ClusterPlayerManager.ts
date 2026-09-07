@@ -5,6 +5,7 @@ import type { VoiceServerUpdate, VoiceStateUpdate } from 'lavaclient/dist/player
 import type { Identifiable } from 'lavaclient/dist/tools';
 import type { QuaverCluster } from './QuaverCluster';
 import type { Guild } from 'discord.js';
+import { logger } from '#src/lib/logger';
 
 /**
  * ClusterPlayerManager routes player operations to the appropriate QuaverNode
@@ -135,15 +136,20 @@ export class ClusterPlayerManager implements PlayerManager<QuaverNode> {
     /**
      * Create a player on the best available node
      */
-    create(guild: Guild): QuaverPlayer<QuaverNode> {
+    create(guild: Guild, voiceChannelId?: string): QuaverPlayer<QuaverNode> {
         const guildId = guild.id;
-        
+
         // Check if player already exists
         const existing = this.resolve(guildId);
         if (existing) return existing;
 
         // Select best node based on voice region if available
-        const voiceChannel = guild.members.me?.voice?.channel;
+        // Try to get the target voice channel to read its rtcRegion
+        let voiceChannel = guild.members.me?.voice?.channel;
+        if (!voiceChannel && voiceChannelId) {
+            // Bot isn't in voice yet, but we know where it's going - get that channel
+            voiceChannel = guild.channels.cache.get(voiceChannelId) as any;
+        }
         const region = voiceChannel?.rtcRegion ?? null;
         const node = this.cluster.getNodeForRegion(region);
         if (!node) {

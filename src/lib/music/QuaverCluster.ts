@@ -314,15 +314,6 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
         if (region && this.regionAffinity && settings.regionAffinity?.enabled) {
             const affinityNode = this.selectNodeByAffinity(region);
             if (affinityNode) {
-                // Find the node ID for logging
-                let nodeId = 'unknown';
-                for (const [id, node] of this.nodes.entries()) {
-                    if (node === affinityNode) {
-                        nodeId = id;
-                        break;
-                    }
-                }
-                logger.debug(`Selected node by affinity: ${nodeId} for region: ${region}`);
                 return affinityNode;
             }
         }

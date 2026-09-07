@@ -152,7 +152,7 @@ export class QuaverGuild<S extends Uninitialized | Initialized> {
             !options?.voiceChannelId
         )
             return player;
-        player = this.client.music.players.create(this.guild);
+        player = this.client.music.players.create(this.guild, options.voiceChannelId);
         player.queue.channel = options.textChannel;
         player.voice.connect(options.voiceChannelId, {
             deafened: true,
