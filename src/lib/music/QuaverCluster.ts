@@ -86,6 +86,30 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
                 this.emit('ready', player);
             });
 
+            // Handle WebSocket connection errors to prevent crashes
+            // These are connection-level errors (ECONNREFUSED, etc), not player errors
+            node.ws.on('error', (error: Error): void => {
+                logger.error({
+                    message: `WebSocket error for node ${nodeId}: ${error.message}`,
+                    label: 'Lavalink',
+                    error,
+                });
+            });
+
+            node.ws.on('disconnected', (event): void => {
+                logger.warn({
+                    message: `Node ${nodeId} disconnected (code: ${event.code}, reconnecting: ${event.reconnecting})`,
+                    label: 'Lavalink',
+                });
+            });
+
+            node.ws.on('connected', (event): void => {
+                logger.info({
+                    message: `Node ${nodeId} connected (reconnected: ${event.reconnected}, took: ${event.took}ms)`,
+                    label: 'Lavalink',
+                });
+            });
+
             // Build region mapping: region -> [nodeId1, nodeId2, ...]
             const nodeIds = this.regionMap.get(nodeConfig.region) || [];
             nodeIds.push(nodeId);

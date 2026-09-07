@@ -59,6 +59,9 @@ export class QuaverClient extends Client {
                             delay: node.reconnect?.delay ?? 3000,
                             tries: node.reconnect?.tries ?? 5,
                         },
+                        resuming: {
+                            timeout: 60,
+                        },
                     },
                     region: node.region,
                 }),
@@ -104,6 +107,9 @@ export class QuaverClient extends Client {
                         reconnecting: {
                             delay: config.reconnect?.delay ?? 3000,
                             tries: config.reconnect?.tries ?? 5,
+                        },
+                        resuming: {
+                            timeout: 60,
                         },
                     },
                     discord: {
