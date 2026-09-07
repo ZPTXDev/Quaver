@@ -14,6 +14,7 @@ export default {
             WARNING: 'Quaver will disconnect <t:%1:R>.',
         },
     },
+    NODE_MIGRATION: 'Quaver detected an issue with the current audio server and has migrated your session to another server.',
     NOT_READY: 'One moment please! Quaver is still starting up.',
     PLAYER: {
         CONNECTION_UNSTABLE: 'Quaver has detected an unstable connection to Discord\'s media server. If you are hearing stuttering / robotic audio or nothing at all, please try changing your [Voice Region](https://support.discord.com/hc/en-us/articles/1500007645701-Voice-Regions-on-Discord-FAQ).',

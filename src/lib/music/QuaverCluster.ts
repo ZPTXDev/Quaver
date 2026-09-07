@@ -101,6 +101,11 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
                     message: `Node ${nodeId} disconnected (code: ${event.code}, reconnecting: ${event.reconnecting})`,
                     label: 'Lavalink',
                 });
+
+                // If not reconnecting or resuming, migrate active players to another node
+                if (!event.reconnecting) {
+                    void this.migratePlayersFromNode(nodeId, node);
+                }
             });
 
             node.ws.on('connected', (event): void => {
@@ -149,6 +154,118 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
             }, refreshSeconds * 1000);
 
             logger.info('Region affinity pruning and caching scheduled');
+        }
+    }
+
+    /**
+     * Migrate active players from a failed node to other available nodes
+     */
+    private async migratePlayersFromNode(failedNodeId: string, failedNode: QuaverNode): Promise<void> {
+        const activePlayers = Array.from(failedNode.players.cache.values());
+        if (activePlayers.length === 0) return;
+
+        logger.info(`Migrating ${activePlayers.length} player(s) from failed node ${failedNodeId}`);
+
+        for (const player of activePlayers) {
+            try {
+                // Check if there are other nodes available
+                if (this.nodes.size <= 1) {
+                    logger.warn(`Cannot migrate player for guild ${player.guildId}: no other nodes available`);
+                    continue;
+                }
+
+                // Get the guild to determine voice region
+                const guild = this.client.guilds.cache.get(player.guildId);
+                if (!guild) {
+                    logger.warn(`Cannot migrate player for guild ${player.guildId}: guild not found`);
+                    continue;
+                }
+
+                // Select a new node (exclude the failed one)
+                const voiceChannel = guild.members.me?.voice?.channel;
+                const region = voiceChannel?.rtcRegion ?? null;
+                let newNode = this.getNodeForRegion(region);
+
+                // If we got the same failed node, try to get any other available node
+                if (newNode === failedNode) {
+                    for (const [id, node] of this.nodes.entries()) {
+                        if (id !== failedNodeId && this.isNodeReady(node)) {
+                            newNode = node;
+                            break;
+                        }
+                    }
+                }
+
+                if (!newNode || newNode === failedNode) {
+                    logger.warn(`Cannot migrate player for guild ${player.guildId}: no suitable node available`);
+                    continue;
+                }
+
+                // Save current player state
+                const queue = player.queue;
+                const currentTrack = queue.current;
+                const position = player.position;
+                const volume = player.volume;
+                const paused = player.paused;
+                const filters = player.filters;
+
+                // Remove from failed node's player cache
+                failedNode.players.cache.delete(player.guildId);
+
+                // Create new player on the new node
+                const newPlayer = newNode.players.create(guild);
+
+                // Update cluster's guild-to-node mapping
+                const newNodeId = Array.from(this.nodes.entries())
+                    .find(([, n]) => n === newNode)?.[0];
+                if (newNodeId) {
+                    this.players['guildNodeMap'].set(player.guildId, newNodeId);
+                }
+
+                // Reconnect to voice
+                await newPlayer.connect(player.voiceChannelId);
+
+                // Restore queue
+                if (currentTrack) {
+                    queue.tracks.unshift(currentTrack);
+                }
+                for (const track of queue.tracks) {
+                    newPlayer.queue.add(track);
+                }
+
+                // Restore filters
+                if (filters) {
+                    await newPlayer.setFilters(filters);
+                }
+
+                // Restore volume
+                if (volume !== 100) {
+                    await newPlayer.setVolume(volume);
+                }
+
+                // Start playback from saved position
+                if (currentTrack && newPlayer.queue.tracks.length > 0) {
+                    await newPlayer.play();
+                    if (position > 0) {
+                        await newPlayer.seek(position);
+                    }
+                    if (paused) {
+                        await newPlayer.pause(true);
+                    }
+                }
+
+                // Notify the user about migration
+                const textChannel = guild.channels.cache.get(player.textChannelId);
+                if (textChannel?.isTextBased()) {
+                    await textChannel.send({
+                        content: this.client.locale(guild.id, 'MUSIC.NODE_MIGRATION'),
+                    });
+                }
+
+                logger.info(`Successfully migrated player for guild ${player.guildId} from ${failedNodeId} to ${newNodeId}`);
+            } catch (error) {
+                logger.error(`Failed to migrate player for guild ${player.guildId}:`, error);
+            }
         }
     }
 
