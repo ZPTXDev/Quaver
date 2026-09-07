@@ -184,7 +184,8 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
                 // Select a new node (exclude the failed one)
                 const voiceChannel = guild.members.me?.voice?.channel;
                 const region = voiceChannel?.rtcRegion ?? null;
-                let newNode = this.getNodeForRegion(region);
+                const regionPrefix = region ? null : this.players['guildRegionPrefixMap'].get(player.guildId) ?? null;
+                let newNode = this.getNodeForRegion(region, regionPrefix);
 
                 // If we got the same failed node, try to get any other available node
                 if (newNode === failedNode) {
@@ -308,11 +309,22 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
      * 1. Affinity-based selection (if enabled and data available)
      * 2. Region-based penalty selection
      * 3. Global penalty-based load balancing
+     *
+     * @param region - The Discord rtcRegion (e.g., "singapore")
+     * @param regionPrefix - The Discord media endpoint region prefix (e.g., "c-sin"), used for affinity when rtcRegion is null
      */
-    getNodeForRegion(region?: string | null): QuaverNode | undefined {
+    getNodeForRegion(region?: string | null, regionPrefix?: string | null): QuaverNode | undefined {
         // Try affinity-based selection first if enabled and region is specified
         if (region && this.regionAffinity && settings.regionAffinity?.enabled) {
             const affinityNode = this.selectNodeByAffinity(region);
+            if (affinityNode) {
+                return affinityNode;
+            }
+        }
+
+        // If no rtcRegion but we have a region prefix from historical data, use affinity-based selection
+        if (!region && regionPrefix && this.regionAffinity && settings.regionAffinity?.enabled) {
+            const affinityNode = this.selectNodeByRegionPrefix(regionPrefix);
             if (affinityNode) {
                 return affinityNode;
             }
@@ -334,7 +346,7 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
                     readyNodes.push(node);
                 }
             }
-            
+
             // Use penalty-based selection to find the best node
             if (readyNodes.length > 0) {
                 return Penalties.findBestNode(readyNodes);
@@ -358,6 +370,40 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
         if (!targetNodeIds || targetNodeIds.length === 0) return null;
 
         const nodeAffinityMap = this.buildNodeAffinityMap(targetNodeIds);
+        if (nodeAffinityMap.size === 0) return null;
+
+        const candidateNodes = this.collectCandidateNodes(nodeAffinityMap);
+        const selectedNodes = this.selectNodesWithinThreshold(candidateNodes);
+
+        return this.selectBestNodeFromCandidates(selectedNodes);
+    }
+
+    /**
+     * Selects a node based on region prefix from Discord media endpoint (e.g., "c-sin").
+     * Used when rtcRegion is null but we have historical media endpoint data.
+     * @param regionPrefix - The Discord media endpoint region prefix (e.g., "c-sin")
+     * @returns The best node for the region prefix, or null if no affinity data available
+     */
+    private selectNodeByRegionPrefix(regionPrefix: string): QuaverNode | null {
+        if (!this.regionAffinity || this.affinityCache.size === 0) return null;
+
+        // Find all nodes that have affinity data for this region prefix
+        const nodeAffinityMap = new Map<string, { node: QuaverNode; minPing: number }>();
+
+        for (const affinityData of this.affinityCache.values()) {
+            if (affinityData.regionPrefix !== regionPrefix) continue;
+
+            const node = this.nodes.get(affinityData.nodeId);
+            if (!node || !this.isNodeReady(node)) continue;
+
+            const existing = nodeAffinityMap.get(affinityData.nodeId);
+            if (existing) {
+                existing.minPing = Math.min(existing.minPing, affinityData.avgPing);
+            } else {
+                nodeAffinityMap.set(affinityData.nodeId, { node, minPing: affinityData.avgPing });
+            }
+        }
+
         if (nodeAffinityMap.size === 0) return null;
 
         const candidateNodes = this.collectCandidateNodes(nodeAffinityMap);

@@ -14,6 +14,7 @@ export class ClusterPlayerManager implements PlayerManager<QuaverNode> {
     readonly cluster: QuaverCluster;
     private guildNodeMap: Map<string, string> = new Map();
     private pendingLookups: Map<string, Promise<string | null>> = new Map();
+    private guildRegionPrefixMap: Map<string, string> = new Map();
 
     constructor(cluster: QuaverCluster) {
         this.cluster = cluster;
@@ -149,8 +150,12 @@ export class ClusterPlayerManager implements PlayerManager<QuaverNode> {
             // Bot isn't in voice yet, but we know where it's going - get that channel
             voiceChannel = guild.channels.cache.get(voiceChannelId) as VoiceBasedChannel | undefined;
         }
-        const region = voiceChannel?.rtcRegion ?? null;
-        const node = this.cluster.getNodeForRegion(region);
+        const rtcRegion = voiceChannel?.rtcRegion ?? null;
+
+        // If no rtcRegion, check if we have historical region prefix data for this guild
+        const regionPrefix = rtcRegion ? null : this.guildRegionPrefixMap.get(guildId) ?? null;
+
+        const node = this.cluster.getNodeForRegion(rtcRegion, regionPrefix);
         if (!node) {
             throw new Error('No available Lavalink nodes');
         }
@@ -182,8 +187,9 @@ export class ClusterPlayerManager implements PlayerManager<QuaverNode> {
         // If no existing node, select best node based on voice region
         if (!node) {
             const voiceChannel = guild.members.me?.voice?.channel;
-            const region = voiceChannel?.rtcRegion ?? null;
-            node = this.cluster.getNodeForRegion(region);
+            const rtcRegion = voiceChannel?.rtcRegion ?? null;
+            const regionPrefix = rtcRegion ? null : this.guildRegionPrefixMap.get(guild.id) ?? null;
+            node = this.cluster.getNodeForRegion(rtcRegion, regionPrefix);
             if (!node) {
                 throw new Error('No available Lavalink nodes');
             }
@@ -228,12 +234,31 @@ export class ClusterPlayerManager implements PlayerManager<QuaverNode> {
     }
 
     /**
+     * Extracts the region prefix from a Discord media endpoint URL.
+     * Example: 'c-sin13-f16265ef.discord.media' -> 'c-sin'
+     */
+    private extractRegionPrefix(endpoint: string): string | null {
+        const cleaned = endpoint.replace(/^https?:\/\//, '');
+        const match = cleaned.match(/^([a-z]+-[a-z]+)/);
+        return match ? match[1] : null;
+    }
+
+    /**
      * Handle voice updates (route to appropriate node)
      */
     async handleVoiceUpdate(update: VoiceStateUpdate | VoiceServerUpdate): Promise<boolean> {
         const guildId = update.guild_id;
+
+        // If this is a VoiceServerUpdate, extract and store the region prefix
+        if ('endpoint' in update && update.endpoint) {
+            const regionPrefix = this.extractRegionPrefix(update.endpoint);
+            if (regionPrefix) {
+                this.guildRegionPrefixMap.set(guildId, regionPrefix);
+            }
+        }
+
         const node = this.getNodeForGuild(guildId);
-        
+
         if (!node) {
             // If no node assigned yet, this might be the first voice update
             // Just return false, player will be created later
