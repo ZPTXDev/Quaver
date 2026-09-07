@@ -493,7 +493,7 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
 
             // Check if this node has any affinity data for this region prefix
             const hasData = Array.from(this.affinityCache.values()).some(
-                (data) => data.nodeId === nodeId && data.regionPrefix === regionPrefix
+                (data): boolean => data.nodeId === nodeId && data.regionPrefix === regionPrefix
             );
 
             if (!hasData) {
