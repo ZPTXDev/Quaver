@@ -187,7 +187,7 @@ export default {
                     new ContainerBuilder()
                         .addTextDisplayComponents(
                             new TextDisplayBuilder().setContent(
-                                `${sourcePrefix}${guild.locale(
+                                `${guild.locale(
                                     'MUSIC.PLAYER.PLAYING.NOW.SIMPLE.TEXT',
                                     getTrackMarkdownLocaleString(track, showArtist),
                                     durationString,
