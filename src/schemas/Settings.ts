@@ -292,11 +292,15 @@ export const SettingsSchema = z.object({
         refreshSeconds: z.number().int().positive().default(30),
         // 5 minutes
         staleAfterMs: z.number().int().positive().default(5 * 60 * 1000),
+        // Exploration rate: probability (0-1) of trying a node without affinity data
+        // to build up data for new regions/nodes (epsilon-greedy strategy)
+        explorationRate: z.number().min(0).max(1).default(0.15),
     }).optional().default({
         enabled: true,
         maxPingMs: 50,
         refreshSeconds: 30,
         staleAfterMs: 5 * 60 * 1000,
+        explorationRate: 0.15,
     }),
     ads: z
         .object({

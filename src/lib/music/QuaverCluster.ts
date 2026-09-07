@@ -360,18 +360,36 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
     /**
      * Selects a node based on region affinity data (ping measurements) using cached data.
      * Only considers nodes that serve the specified target region.
+     * Uses epsilon-greedy exploration to try nodes without affinity data.
      * @param targetRegion - The Lavalink configured region to filter nodes by (e.g., "singapore")
      * @returns The best node for the target region, or null if no affinity data available
      */
     private selectNodeByAffinity(targetRegion: string | null): QuaverNode | null {
-        if (!this.regionAffinity || this.affinityCache.size === 0 || !targetRegion) return null;
+        if (!this.regionAffinity || !targetRegion) return null;
 
         const targetNodeIds = this.regionMap.get(targetRegion);
         if (!targetNodeIds || targetNodeIds.length === 0) return null;
 
         const nodeAffinityMap = this.buildNodeAffinityMap(targetNodeIds);
-        if (nodeAffinityMap.size === 0) return null;
+        const unexploredNodes = this.findUnexploredNodes(targetNodeIds, nodeAffinityMap);
 
+        // Epsilon-greedy: explore nodes without data with probability explorationRate
+        const explorationRate = settings.regionAffinity?.explorationRate ?? 0.15;
+        if (unexploredNodes.length > 0 && Math.random() < explorationRate) {
+            logger.debug(`Exploring unexplored node for region ${targetRegion} (exploration rate: ${explorationRate})`);
+            return this.selectRandomNode(unexploredNodes);
+        }
+
+        // No affinity data at all and no unexplored nodes - use penalty-based selection
+        if (nodeAffinityMap.size === 0 && unexploredNodes.length === 0) return null;
+
+        // If we have no affinity data but have unexplored nodes, pick one to start building data
+        if (nodeAffinityMap.size === 0) {
+            logger.debug(`No affinity data for region ${targetRegion}, selecting unexplored node to build data`);
+            return this.selectRandomNode(unexploredNodes);
+        }
+
+        // Use existing affinity data for exploitation
         const candidateNodes = this.collectCandidateNodes(nodeAffinityMap);
         const selectedNodes = this.selectNodesWithinThreshold(candidateNodes);
 
@@ -381,14 +399,16 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
     /**
      * Selects a node based on region prefix from Discord media endpoint (e.g., "c-sin").
      * Used when rtcRegion is null but we have historical media endpoint data.
+     * Uses epsilon-greedy exploration to try nodes without affinity data.
      * @param regionPrefix - The Discord media endpoint region prefix (e.g., "c-sin")
      * @returns The best node for the region prefix, or null if no affinity data available
      */
     private selectNodeByRegionPrefix(regionPrefix: string): QuaverNode | null {
-        if (!this.regionAffinity || this.affinityCache.size === 0) return null;
+        if (!this.regionAffinity) return null;
 
         // Find all nodes that have affinity data for this region prefix
         const nodeAffinityMap = new Map<string, { node: QuaverNode; minPing: number }>();
+        const allNodeIds = Array.from(this.nodes.keys());
 
         for (const affinityData of this.affinityCache.values()) {
             if (affinityData.regionPrefix !== regionPrefix) continue;
@@ -404,12 +424,95 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
             }
         }
 
-        if (nodeAffinityMap.size === 0) return null;
+        const unexploredNodes = this.findUnexploredNodesForRegionPrefix(allNodeIds, regionPrefix);
+
+        // Epsilon-greedy: explore nodes without data with probability explorationRate
+        const explorationRate = settings.regionAffinity?.explorationRate ?? 0.15;
+        if (unexploredNodes.length > 0 && Math.random() < explorationRate) {
+            logger.debug(`Exploring unexplored node for region prefix ${regionPrefix} (exploration rate: ${explorationRate})`);
+            return this.selectRandomNode(unexploredNodes);
+        }
+
+        // No affinity data at all and no unexplored nodes - return null to fallback
+        if (nodeAffinityMap.size === 0 && unexploredNodes.length === 0) return null;
+
+        // If we have no affinity data but have unexplored nodes, pick one to start building data
+        if (nodeAffinityMap.size === 0) {
+            logger.debug(`No affinity data for region prefix ${regionPrefix}, selecting unexplored node to build data`);
+            return this.selectRandomNode(unexploredNodes);
+        }
 
         const candidateNodes = this.collectCandidateNodes(nodeAffinityMap);
         const selectedNodes = this.selectNodesWithinThreshold(candidateNodes);
 
         return this.selectBestNodeFromCandidates(selectedNodes);
+    }
+
+    /**
+     * Finds nodes that have no affinity data for any region prefix yet.
+     * These are candidates for exploration to build up affinity data.
+     * @param targetNodeIds - Node IDs that serve the target region
+     * @param nodeAffinityMap - Map of nodes with existing affinity data
+     * @returns Array of ready nodes without affinity data
+     */
+    private findUnexploredNodes(
+        targetNodeIds: string[],
+        nodeAffinityMap: Map<string, { node: QuaverNode; minPing: number }>
+    ): QuaverNode[] {
+        const unexplored: QuaverNode[] = [];
+
+        for (const nodeId of targetNodeIds) {
+            // Skip if we already have affinity data for this node
+            if (nodeAffinityMap.has(nodeId)) continue;
+
+            const node = this.nodes.get(nodeId);
+            if (node && this.isNodeReady(node)) {
+                unexplored.push(node);
+            }
+        }
+
+        return unexplored;
+    }
+
+    /**
+     * Finds nodes that have no affinity data for a specific region prefix.
+     * These are candidates for exploration to build up affinity data.
+     * @param allNodeIds - All available node IDs
+     * @param regionPrefix - The region prefix to check for
+     * @returns Array of ready nodes without affinity data for this region prefix
+     */
+    private findUnexploredNodesForRegionPrefix(
+        allNodeIds: string[],
+        regionPrefix: string
+    ): QuaverNode[] {
+        const unexplored: QuaverNode[] = [];
+
+        for (const nodeId of allNodeIds) {
+            const node = this.nodes.get(nodeId);
+            if (!node || !this.isNodeReady(node)) continue;
+
+            // Check if this node has any affinity data for this region prefix
+            const hasData = Array.from(this.affinityCache.values()).some(
+                (data) => data.nodeId === nodeId && data.regionPrefix === regionPrefix
+            );
+
+            if (!hasData) {
+                unexplored.push(node);
+            }
+        }
+
+        return unexplored;
+    }
+
+    /**
+     * Selects a random node from the given array.
+     * @param nodes - Array of nodes to choose from
+     * @returns A randomly selected node, or null if array is empty
+     */
+    private selectRandomNode(nodes: QuaverNode[]): QuaverNode | null {
+        if (nodes.length === 0) return null;
+        const randomIndex = Math.floor(Math.random() * nodes.length);
+        return nodes[randomIndex] ?? null;
     }
 
     /**
