@@ -217,7 +217,7 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
 
                 // Update cluster's guild-to-node mapping
                 const newNodeId = Array.from(this.nodes.entries())
-                    .find(([, n]) => n === newNode)?.[0];
+                    .find(([, n]: [string, QuaverNode]): boolean => n === newNode)?.[0];
                 if (newNodeId) {
                     this.players['guildNodeMap'].set(player.guildId, newNodeId);
                 }

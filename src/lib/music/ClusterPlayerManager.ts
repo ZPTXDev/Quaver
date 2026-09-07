@@ -4,8 +4,7 @@ import type { FetchOptions, PlayerManager } from 'lavaclient';
 import type { VoiceServerUpdate, VoiceStateUpdate } from 'lavaclient/dist/playerVoice';
 import type { Identifiable } from 'lavaclient/dist/tools';
 import type { QuaverCluster } from './QuaverCluster';
-import type { Guild } from 'discord.js';
-import { logger } from '#src/lib/logger';
+import type { Guild, VoiceBasedChannel } from 'discord.js';
 
 /**
  * ClusterPlayerManager routes player operations to the appropriate QuaverNode
@@ -148,7 +147,7 @@ export class ClusterPlayerManager implements PlayerManager<QuaverNode> {
         let voiceChannel = guild.members.me?.voice?.channel;
         if (!voiceChannel && voiceChannelId) {
             // Bot isn't in voice yet, but we know where it's going - get that channel
-            voiceChannel = guild.channels.cache.get(voiceChannelId) as any;
+            voiceChannel = guild.channels.cache.get(voiceChannelId) as VoiceBasedChannel | undefined;
         }
         const region = voiceChannel?.rtcRegion ?? null;
         const node = this.cluster.getNodeForRegion(region);
