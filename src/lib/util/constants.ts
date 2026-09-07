@@ -16,7 +16,7 @@ export function getPremiumURL(guildId: string): string | undefined {
 /**
  * List of features that can be whitelisted
  */
-export const WHITELISTABLE_FEATURES = ['premium', 'stay', 'autolyrics', 'smartqueue'] as const;
+export const WHITELISTABLE_FEATURES = ['autolyrics', 'autoplay', 'premium', 'smartqueue', 'stay'] as const;
 
 export enum Check {
     /**
@@ -43,9 +43,9 @@ export enum Check {
 
 export const settingsOptions = [
     ...(settings.premiumEnabled &&
-        ['autolyrics', 'stay', 'smartqueue'].some((feature: string): boolean => {
+        ['autolyrics', 'autoplay', 'smartqueue', 'stay'].some((feature: string): boolean => {
             const f =
-                settings.features[feature as 'autolyrics' | 'stay' | 'smartqueue'];
+                settings.features[feature as 'autolyrics' | 'autoplay' | 'smartqueue' | 'stay'];
             return f.enabled && f.whitelist && f.premium;
         })
         ? ['premium']
@@ -56,6 +56,7 @@ export const settingsOptions = [
     'dj',
     'source',
     ...(settings.features.autolyrics.enabled ? ['autolyrics'] : []),
+    ...(settings.features.autoplay.enabled ? ['autoplay'] : []),
     ...(settings.features.smartqueue.enabled ? ['smartqueue'] : []),
     'controls',
     'showsourcelabels',

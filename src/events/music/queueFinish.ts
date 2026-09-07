@@ -1,6 +1,7 @@
 import { MessageOptionsBuilderType } from '#src/lib';
 import { QuaverGuild } from '#src/lib/guild';
 import { logger } from '#src/lib/logger';
+import { AutoplayService } from '#src/lib/services/AutoplayService';
 import { updateHandler } from '#src/lib/state';
 import type { QuaverQueue } from '#src/lib/util';
 import { settings } from '#src/lib/util';
@@ -31,6 +32,79 @@ export default {
             );
             return;
         }
+
+        // Check if autoplay is enabled and active
+        const autoplayEnabled = await guild.settings.get<boolean>('autoplay');
+        const isAutoplayFeatureActive = await guild.features.isFeatureActive('autoplay');
+
+        if (autoplayEnabled && isAutoplayFeatureActive) {
+            logger.info(`[G ${guild.id}] Queue finished, attempting to start autoplay`);
+
+            try {
+                // Get the seed track (last played track)
+                const seedTrack = queue.player.queue.last;
+
+                if (!seedTrack || queue.player.isAdTrack(seedTrack)) {
+                    logger.warn(`[G ${guild.id}] No valid seed track for autoplay`);
+                    // Fall through to normal timeout behavior
+                } else {
+                    // Build history from previous tracks for deduplication
+                    const history = queue.player.memory.autoplayHistory || [];
+                    if (seedTrack) {
+                        history.push(seedTrack);
+                    }
+
+                    // Generate recommendations
+                    const recommendations = await AutoplayService.generateRecommendations(
+                        queue.player.client,
+                        guild,
+                        seedTrack,
+                        history,
+                    );
+
+                    if (recommendations.length > 0) {
+                        logger.info(
+                            `[G ${guild.id}] Generated ${recommendations.length} autoplay recommendations`,
+                        );
+
+                        // Store autoplay queue and mark as active
+                        queue.player.memory.autoplayQueue = recommendations;
+                        queue.player.memory.autoplayHistory = history;
+                        queue.player.memory.isAutoplayActive = true;
+
+                        // Add first track to queue and start playing
+                        queue.add(recommendations[0]);
+                        queue.player.memory.autoplayQueue.shift();
+
+                        // Cancel any existing timeout
+                        if (queue.player.timeout.standard) {
+                            clearTimeout(queue.player.timeout.standard);
+                            queue.player.timeout.standard = undefined;
+                            queue.player.timeout.end = undefined;
+                        }
+
+                        await queue.player.sendMessage(
+                            guild.locale('MUSIC.AUTOPLAY.STARTED'),
+                            { type: MessageOptionsBuilderType.Success },
+                        );
+
+                        queue.player.logSessionEvent('AUTOPLAY_START', null, `${recommendations.length} tracks queued`);
+
+                        // Start playing
+                        await queue.start();
+                        guild.sendWebUpdate('queueUpdate', queue.player.decorateQueue());
+                        return;
+                    } else {
+                        logger.warn(`[G ${guild.id}] No autoplay recommendations generated`);
+                    }
+                }
+            } catch (error) {
+                logger.error(`[G ${guild.id}] Autoplay failed:`, error);
+                // Fall through to normal timeout behavior
+            }
+        }
+
+        // Original behavior: 24/7 or disconnect timeout
         if (await guild.settings.get<boolean>('stay.enabled') && await guild.features.isFeatureActive('stay')) {
             await queue.player.sendMessage(guild.locale('MUSIC.QUEUE.EMPTY'));
             return;

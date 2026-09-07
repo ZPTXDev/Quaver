@@ -978,6 +978,9 @@ const consoleCommands: Record<
             case 'autolyrics':
                 featureName = 'Auto Lyrics';
                 break;
+            case 'autoplay':
+                featureName = 'Auto-play';
+                break;
             case 'smartqueue':
                 featureName = 'Smart Queue';
         }

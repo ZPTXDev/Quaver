@@ -75,6 +75,11 @@
       "whitelist": false,
       "premium": false
     },
+    "autoplay": {
+      "enabled": true,
+      "whitelist": false,
+      "premium": false
+    },
     "stay": {
       "enabled": true,
       "whitelist": false,

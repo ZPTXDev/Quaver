@@ -1,4 +1,7 @@
 export default {
+    AUTOPLAY: {
+        STARTED: 'Queue ended. Auto-playing similar tracks...',
+    },
     DISCONNECT: {
         ALONE: {
             DISCONNECTED: {

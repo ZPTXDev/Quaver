@@ -201,6 +201,7 @@ export const SettingsSchema = z.object({
     ]),
     features: z.object({
         autolyrics: genericPremiumFeatureSchema,
+        autoplay: genericPremiumFeatureSchema,
         stay: genericPremiumFeatureSchema,
         smartqueue: genericPremiumFeatureSchema,
         web: z.object({

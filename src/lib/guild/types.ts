@@ -1,4 +1,4 @@
-export type WhitelistedFeatures = 'stay' | 'autolyrics' | 'smartqueue';
+export type WhitelistedFeatures = 'autolyrics' | 'autoplay' | 'smartqueue' | 'stay';
 
 export enum WhitelistStatus {
     /**

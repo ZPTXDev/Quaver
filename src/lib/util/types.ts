@@ -37,17 +37,18 @@ export type SettingsPageFormatOptions = SettingsPageGenericOptions & {
 };
 
 export type SettingsPageOptions =
-    | 'premium'
+    | 'autolyrics'
+    | 'autoplay'
+    | 'controls'
+    | 'dj'
+    | 'format'
     | 'language'
     | 'notifyin247'
     | 'pausealone247'
-    | 'format'
-    | 'dj'
-    | 'source'
-    | 'autolyrics'
+    | 'premium'
+    | 'showsourcelabels'
     | 'smartqueue'
-    | 'controls'
-    | 'showsourcelabels';
+    | 'source';
 
 export type SettingsPage = {
     current: string;

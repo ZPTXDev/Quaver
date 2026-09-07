@@ -329,6 +329,37 @@ export default {
                 });
                 break;
             }
+            case UpdateItemType.AutoPlayFeature: {
+                if (
+                    !(
+                        await guild?.members.fetch(socket.user.id)
+                    )?.permissions.has(PermissionsBitField.Flags.ManageGuild)
+                ) {
+                    return callback({ status: Response.AuthenticationError });
+                }
+                if (item.value === true) {
+                    if (!settings.features.autoplay.enabled) {
+                        return callback({
+                            status: Response.FeatureDisabledError,
+                        });
+                    }
+                    const whitelisted =
+                        await guild.features.checkWhitelisted('autoplay');
+                    if (
+                        whitelisted === WhitelistStatus.NotWhitelisted ||
+                        whitelisted === WhitelistStatus.Expired
+                    ) {
+                        return callback({
+                            status: Response.FeatureNotWhitelistedError,
+                        });
+                    }
+                }
+                await guild.settings.set('autoplay', item.value);
+                guild.sendWebUpdate('autoPlayFeatureUpdate', {
+                    enabled: item.value,
+                });
+                break;
+            }
             case UpdateItemType.SmartQueueFeature: {
                 if (
                     !(
@@ -376,9 +407,10 @@ export enum UpdateItemType {
     Seek = 'seek',
     Remove = 'remove',
     Shuffle = 'shuffle',
-    StayFeature = 'stayFeature',
     AutoLyricsFeature = 'autoLyricsFeature',
+    AutoPlayFeature = 'autoPlayFeature',
     SmartQueueFeature = 'smartQueueFeature',
+    StayFeature = 'stayFeature',
 }
 
 export enum Response {

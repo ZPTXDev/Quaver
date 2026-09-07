@@ -153,11 +153,11 @@ export class SettingsRenderer {
     ): Promise<SectionBuilder[]> {
         const premiumEnabled =
             settings.premiumEnabled &&
-            ['autolyrics', 'stay', 'smartqueue'].some(
+            ['autolyrics', 'autoplay', 'smartqueue', 'stay'].some(
                 (feature: string): boolean => {
                     const f =
                         settings.features[
-                            feature as 'autolyrics' | 'stay' | 'smartqueue'
+                            feature as 'autolyrics' | 'autoplay' | 'smartqueue' | 'stay'
                         ];
                     return f.enabled && f.whitelist && f.premium;
                 },
@@ -211,6 +211,8 @@ export class SettingsRenderer {
         const source =
             (await guild.settings.get<string>('source')) ??
             Object.keys(acceptableSources)[0];
+        const autoplay =
+            (await guild.settings.get<boolean>('autoplay')) ?? false;
         const smartQueue =
             (await guild.settings.get<boolean>('smartqueue')) ?? false;
         return [
@@ -244,6 +246,19 @@ export class SettingsRenderer {
                     `MISC.SOURCES.${source.toUpperCase()}` as LocaleKey,
                 ),
             ),
+            ...(settings.features.autoplay.enabled
+                ? [
+                      this.createItemSection(
+                          guild,
+                          SettingsCategory.Playback,
+                          'autoplay',
+                          guild.locale(
+                              autoplay ? 'MISC.ENABLED' : 'MISC.DISABLED',
+                          ),
+                          autoplay ? ButtonStyle.Success : ButtonStyle.Danger,
+                      ),
+                  ]
+                : []),
             ...(settings.features.smartqueue.enabled
                 ? [
                       this.createItemSection(

@@ -88,9 +88,10 @@ export default {
                     client.guilds.cache.get(webGuild.id),
                 );
                 for (const feature of [
-                    'stay',
                     'autolyrics',
+                    'autoplay',
                     'smartqueue',
+                    'stay',
                 ].filter(
                     (feat: WhitelistedFeatures): boolean =>
                         settings.features[feat].enabled &&

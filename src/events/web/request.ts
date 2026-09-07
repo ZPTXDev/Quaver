@@ -86,9 +86,10 @@ export default {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 response = {} as any;
                 for (const feature of [
-                    'stay',
                     'autolyrics',
+                    'autoplay',
                     'smartqueue',
+                    'stay',
                 ].filter(
                     (feat: WhitelistedFeatures): boolean =>
                         settings.features[feat].enabled,

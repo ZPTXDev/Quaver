@@ -80,7 +80,19 @@ export class PremiumSweepService {
                         }
                     }
 
-                    // 2. Check smart queue (alternating) feature
+                    // 2. Check autoplay feature
+                    if (player.memory.isAutoplayActive) {
+                        const isAutoplayActive = await guild.features.isFeatureActive('autoplay');
+                        if (!isAutoplayActive) {
+                            logger.info(`[G ${guild.id}] Premium or Auto-play whitelist expired. Deactivating feature.`);
+                            player.memory.isAutoplayActive = false;
+                            player.memory.autoplayQueue = [];
+                            player.memory.autoplayHistory = [];
+                            // Note: No message sent to user since this is a passive feature
+                        }
+                    }
+
+                    // 3. Check smart queue (alternating) feature
                     if (player.memory.alternate) {
                         const isSmartQueueActive = await guild.features.isFeatureActive('smartqueue');
                         if (!isSmartQueueActive) {

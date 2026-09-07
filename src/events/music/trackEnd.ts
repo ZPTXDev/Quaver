@@ -404,6 +404,29 @@ export default {
 
         // Advance to next track only if the reason warrants it
         if (mayStartNext[reason]) {
+            // If autoplay is active and main queue is empty, add next autoplay track
+            if (
+                queue.player.memory.isAutoplayActive &&
+                queue.isEmpty &&
+                queue.player.memory.autoplayQueue?.length > 0
+            ) {
+                const nextAutoplayTrack = queue.player.memory.autoplayQueue.shift();
+                if (nextAutoplayTrack) {
+                    logger.info(
+                        `[G ${guild.id}] Adding next autoplay track: ${nextAutoplayTrack.info.title}`,
+                    );
+                    queue.add(nextAutoplayTrack);
+
+                    // Add to history for deduplication
+                    if (!queue.player.memory.autoplayHistory) {
+                        queue.player.memory.autoplayHistory = [];
+                    }
+                    if (track) {
+                        queue.player.memory.autoplayHistory.push(track);
+                    }
+                }
+            }
+
             const hasNext = await queue.next();
             guild.sendWebUpdate('queueUpdate', queue.player.decorateQueue());
             if (!hasNext) {

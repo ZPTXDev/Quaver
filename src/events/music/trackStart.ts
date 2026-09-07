@@ -41,6 +41,7 @@ export default {
 
         // Check if this is an ad track
         const isAdTrack = queue.player.isAdTrack(track);
+        const isAutoplayTrack = queue.player.isAutoplayTrack(track);
 
         if (isAdTrack) {
             // Mark that an ad is currently playing
@@ -158,6 +159,13 @@ export default {
         );
         let format = (await guild.settings.get<string>('format')) ?? 'simple';
         if (!notify) format = 'off';
+
+        // Add autoplay indicator if this is an autoplay track
+        let autoplayFooter = '';
+        if (isAutoplayTrack) {
+            autoplayFooter = '\n-# Auto-play';
+        }
+
         const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
         // Check if all available source emojis are configured
         const availableSources = Object.keys(acceptableSources);
@@ -186,7 +194,7 @@ export default {
                                 )}\n${guild.locale('MUSIC.PLAYER.PLAYING.NOW.SIMPLE.SOURCE')}: ${emoji ? `${emoji} ` : ''}**${guild.locale(`MISC.SOURCES.${track.info.sourceName.toUpperCase()}` as LocaleKey)}** ─ ${guild.locale(
                                     'MISC.ADDED_BY',
                                     track.requesterId,
-                                )}`,
+                                )}${autoplayFooter}`,
                             ),
                         )
                         .addSeparatorComponents(

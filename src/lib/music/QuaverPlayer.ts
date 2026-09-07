@@ -63,6 +63,9 @@ export interface QuaverPlayerJSON {
         pausedTimestamp?: number;
         lastResumeTime?: number;
         lastPauseDuration?: number;
+        autoplayQueue?: QuaverSong[];
+        autoplayHistory?: QuaverSong[];
+        isAutoplayActive?: boolean;
     };
     sessionLogs: {
         timestamp: number;
@@ -154,6 +157,9 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         pausedTimestamp?: number;
         lastResumeTime?: number;
         lastPauseDuration?: number;
+        autoplayQueue?: QuaverSong[];
+        autoplayHistory?: QuaverSong[];
+        isAutoplayActive?: boolean;
     } = {
         bassboost: false,
         nightcore: false,
@@ -289,6 +295,14 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         const wasEmptyBeforeAdd =
             (!this.queue.current || (!this.playing && !this.paused)) &&
             this.queue.tracks.length === 0;
+
+        // Clear autoplay state when user adds tracks
+        if (this.memory.isAutoplayActive) {
+            this.memory.isAutoplayActive = false;
+            this.memory.autoplayQueue = [];
+            this.logSessionEvent('AUTOPLAY_STOP', null, 'User added tracks');
+        }
+
         this.queue.add(added, { requester: { id: requesterId }, next });
         if (added.length === 1) {
             this.logSessionEvent(
@@ -1076,7 +1090,14 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @returns The decorated queue.
      */
     decorateQueue(): QuaverSong[] {
-        return this.queue.tracks.map((t): QuaverSong => {
+        // Filter out autoplay tracks from the queue display
+        const visibleTracks = this.memory.isAutoplayActive
+            ? this.queue.tracks.filter((t): boolean =>
+                !this.memory.autoplayQueue?.some((apt): boolean => apt.id === t.id)
+              )
+            : this.queue.tracks;
+
+        return visibleTracks.map((t): QuaverSong => {
             const user = this.client.users.cache.get(t.requesterId);
             return {
                 ...t,
@@ -1093,6 +1114,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      */
     isAdTrack(track: QuaverSong): boolean {
         return track.isAd === true;
+    }
+
+    isAutoplayTrack(track: QuaverSong): boolean {
+        return this.memory.isAutoplayActive === true;
     }
 
     toJSON(): QuaverPlayerJSON {

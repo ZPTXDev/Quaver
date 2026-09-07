@@ -357,6 +357,10 @@ export default {
                 DESCRIPTION: 'Configure how Quaver handles music sources and queueing behavior.',
                 NAME: 'Playback & Logic',
                 SETTINGS: {
+                    AUTOPLAY: {
+                        DESCRIPTION: 'Automatically play similar tracks when the queue ends.',
+                        NAME: 'Auto-play',
+                    },
                     NOTIFYIN247: {
                         DESCRIPTION: 'Whether to send "Now playing" messages in 24/7 Mode.',
                         NAME: '24/7 Mode - "Now playing" messages',

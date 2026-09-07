@@ -76,6 +76,68 @@ export class PlaybackLogicHandler {
                 );
                 return;
             }
+            case 'autoplay': {
+                const autoplay =
+                    (await guild.settings.get<boolean>('autoplay')) ?? false;
+                if (!autoplay) {
+                    if (!settings.features.autoplay.enabled) {
+                        await interaction.replyHandler.reply(
+                            guild.locale('FEATURE.DISABLED.DEFAULT'),
+                            { type: MessageOptionsBuilderType.Error },
+                        );
+                        return;
+                    }
+                    const whitelisted =
+                        await guild.features.checkWhitelisted('autoplay');
+                    if (
+                        whitelisted === WhitelistStatus.NotWhitelisted ||
+                        whitelisted === WhitelistStatus.Expired
+                    ) {
+                        if (
+                            settings.features.autoplay.premium &&
+                            settings.premiumEnabled
+                        ) {
+                            const premiumURL = getPremiumURL(guild.id);
+                            if (premiumURL) {
+                                await interaction.replyHandler.reply(
+                                    new ContainerBuilder()
+                                        .addTextDisplayComponents(
+                                            guild.builders.textDisplayLocale(
+                                                'FEATURE.NO_PERMISSION.PREMIUM',
+                                            ),
+                                        )
+                                        .addActionRowComponents(
+                                            new ActionRowBuilder<ButtonBuilder>().setComponents(
+                                                guild.builders
+                                                    .buttonLocale(
+                                                        'MISC.GET_PREMIUM',
+                                                    )
+                                                    .setStyle(ButtonStyle.Link)
+                                                    .setURL(premiumURL),
+                                            ),
+                                        ),
+                                    { type: MessageOptionsBuilderType.Error },
+                                );
+                                return;
+                            }
+                        }
+                        await interaction.replyHandler.reply(
+                            guild.locale('FEATURE.NO_PERMISSION.DEFAULT'),
+                            { type: MessageOptionsBuilderType.Error },
+                        );
+                        return;
+                    }
+                }
+                await guild.settings.set('autoplay', !autoplay);
+                await interaction.replyHandler.reply(
+                    await SettingsRenderer.renderSubMenu(
+                        await QuaverGuild.wrap(interaction.guild),
+                        SettingsCategory.Playback,
+                    ),
+                    { force: ForceType.Update },
+                );
+                return;
+            }
             case 'smartqueue': {
                 const smartQueue =
                     (await guild.settings.get<boolean>('smartqueue')) ?? false;
