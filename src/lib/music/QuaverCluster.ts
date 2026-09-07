@@ -393,9 +393,9 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
     /**
      * Connect all nodes
      */
-    connect(): void {
+    connect(options?: { userId?: string; force?: boolean }): void {
         for (const node of this.nodes.values()) {
-            node.connect();
+            node.connect(options);
         }
     }
 
