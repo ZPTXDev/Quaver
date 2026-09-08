@@ -199,7 +199,6 @@ export class AutoplayService {
             }
 
             // First, try to find the recording MBID by searching
-            const searchQuery = `${seedTrack.info.author} ${seedTrack.info.title}`;
             const searchUrl = `${this.LISTENBRAINZ_API}/metadata/lookup/?recording_name=${encodeURIComponent(seedTrack.info.title)}&artist_name=${encodeURIComponent(seedTrack.info.author)}`;
 
             const searchResponse = await fetch(searchUrl, {
@@ -243,7 +242,7 @@ export class AutoplayService {
             const recData = (await recResponse.json()) as ListenBrainzLabsRecording[];
 
             // Labs API returns an array of recordings with metadata
-            const recommendations: ListenBrainzRecording[] = recData.map((rec) => ({
+            const recommendations: ListenBrainzRecording[] = recData.map((rec): ListenBrainzRecording => ({
                 recording_mbid: rec.recording_mbid,
                 artist_name: rec.artist_credit_name || 'Unknown Artist',
                 recording_name: rec.recording_name || 'Unknown Track',
@@ -269,11 +268,16 @@ export class AutoplayService {
             .replace(/\s+x\s+/gi, ' ')
             .replace(/\s+&\s+/g, ' ')
             .replace(/\s+,\s+/g, ' ')
-            .replace(/\s+\(\s*ft\.?.*?\)/gi, '') // Remove "(ft. Artist)" patterns
-            .replace(/\s+\(\s*feat\.?.*?\)/gi, '') // Remove "(feat. Artist)" patterns
-            .replace(/\s+\[\s*ft\.?.*?\]/gi, '') // Remove "[ft. Artist]" patterns
-            .replace(/\s+\[\s*feat\.?.*?\]/gi, '') // Remove "[feat. Artist]" patterns
-            .replace(/\s+/g, ' ') // Normalize multiple spaces
+            // Remove "(ft. Artist)" patterns
+            .replace(/\s+\(\s*ft\.?.*?\)/gi, '')
+            // Remove "(feat. Artist)" patterns
+            .replace(/\s+\(\s*feat\.?.*?\)/gi, '')
+            // Remove "[ft. Artist]" patterns
+            .replace(/\s+\[\s*ft\.?.*?\]/gi, '')
+            // Remove "[feat. Artist]" patterns
+            .replace(/\s+\[\s*feat\.?.*?\]/gi, '')
+            // Normalize multiple spaces
+            .replace(/\s+/g, ' ')
             .trim();
     }
 
@@ -326,7 +330,8 @@ export class AutoplayService {
                     track.id = crypto.randomUUID();
                     track.requesterId = client.user.id;
                     tracks.push(track);
-                    recentTrackIds.add(trackId); // Prevent duplicates within this batch
+                    // Prevent duplicates within this batch
+                    recentTrackIds.add(trackId);
                 } else if (result.loadType === 'track') {
                     const track = result.data;
                     track.id = crypto.randomUUID();

@@ -43,7 +43,7 @@ export default {
             : null;
         const hasUsers =
             voiceChannel && 'members' in voiceChannel
-                ? voiceChannel.members.filter((member) => !member.user.bot).size > 0
+                ? voiceChannel.members.filter((member): boolean => !member.user.bot).size > 0
                 : false;
 
         // Don't trigger autoplay if user explicitly stopped or if no users in voice channel

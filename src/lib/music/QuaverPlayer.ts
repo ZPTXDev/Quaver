@@ -1141,7 +1141,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         return track.isAd === true;
     }
 
-    isAutoplayTrack(track: QuaverSong): boolean {
+    isAutoplayTrack(): boolean {
         return this.memory.isAutoplayActive === true;
     }
 
