@@ -36,7 +36,11 @@
     "website": "",
     "live": "",
     "bassboost": "",
-    "nightcore": ""
+    "nightcore": "",
+    "volume_high": "🔊",
+    "volume_low": "🔉",
+    "volume_off": "🔈",
+    "volume_muted": "🔇"
   },
   "status": {
     "presence": "online",

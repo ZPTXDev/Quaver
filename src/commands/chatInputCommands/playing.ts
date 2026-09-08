@@ -75,6 +75,17 @@ export default new ChatInputCommandHandler()
             durationString = guild.locale('MISC.MORE_THAN_A_DAY');
         }
         if (player.queue.current.info.isStream) {
+            const volume = player.volume;
+            const serverMuted = player.voiceState?.serverMute ?? false;
+            let volumeEmoji = settings.emojis.volume_high || '🔊';
+            if (serverMuted) {
+                volumeEmoji = settings.emojis.volume_muted || '🔇';
+            } else if (volume === 0 || volume <= 10) {
+                volumeEmoji = settings.emojis.volume_off || '🔈';
+            } else if (volume <= 50) {
+                volumeEmoji = settings.emojis.volume_low || '🔉';
+            }
+
             await interaction.replyHandler.reply(
                 `${sourcePrefix}**${getTrackMarkdownLocaleString(player.queue.current, showArtist)}**\n${settings.emojis.live} **${guild.locale(
                     'MISC.LIVE',
@@ -86,7 +97,9 @@ export default new ChatInputCommandHandler()
                                   : settings.emojis.loop_song
                           }`
                         : ''
-                }${player.memory.shuffle ? ` ${settings.emojis.shuffle}` : ''}${player.memory.bassboost ? ` ${settings.emojis.bassboost}` : ''}\n\`[${guild.locale(
+                }${player.memory.shuffle ? ` ${settings.emojis.shuffle}` : ''}${player.memory.bassboost ? ` ${settings.emojis.bassboost}` : ''}${
+                    player.memory.nightcore ? ` ${settings.emojis.nightcore}` : ''
+                } | ${volumeEmoji} \`${volume}%\`\n\`[${guild.locale(
                     'MISC.STREAMING',
                 )}]\` | ${guild.locale(
                     'MISC.ADDED_BY',
@@ -96,6 +109,17 @@ export default new ChatInputCommandHandler()
             );
             return;
         }
+        const volume = player.volume;
+        const serverMuted = player.voiceState?.serverMute ?? false;
+        let volumeEmoji = settings.emojis.volume_high || '🔊';
+        if (serverMuted) {
+            volumeEmoji = settings.emojis.volume_muted || '🔇';
+        } else if (volume === 0 || volume <= 10) {
+            volumeEmoji = settings.emojis.volume_off || '🔈';
+        } else if (volume <= 50) {
+            volumeEmoji = settings.emojis.volume_low || '🔉';
+        }
+
         await interaction.replyHandler.reply(
             `${sourcePrefix}**${getTrackMarkdownLocaleString(player.queue.current, showArtist)}**\n${bar}${player.paused ? ` ${settings.emojis.pause}` : ''}${
                 player.queue.loop.type !== LoopType.None
@@ -107,7 +131,7 @@ export default new ChatInputCommandHandler()
                     : ''
             }${player.memory.shuffle ? ` ${settings.emojis.shuffle}` : ''}${player.memory.bassboost ? ` ${settings.emojis.bassboost}` : ''}${
                 player.memory.nightcore ? ` ${settings.emojis.nightcore}` : ''
-            }\n\`[${elapsedString} / ${durationString}]\` | ${guild.locale(
+            } | ${volumeEmoji} \`${volume}%\`\n\`[${elapsedString} / ${durationString}]\` | ${guild.locale(
                 'MISC.ADDED_BY',
                 player.queue.current.requesterId,
             )}`,
