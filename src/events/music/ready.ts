@@ -34,6 +34,7 @@ async function restorePlayer(
         // Auto-unpause if the pause was initiated by the bot (e.g., due to inactivity)
         // This must happen before handling resumed state to ensure proper playback resumption
         let wasAutoUnpaused = false;
+        let shouldStayPaused = false;
         try {
             if (snapshot.paused && Array.isArray(snapshot.sessionLogs)) {
                 const lastPause = [...snapshot.sessionLogs]
@@ -49,6 +50,10 @@ async function restorePlayer(
                     await player.setPause(false);
                     wasAutoUnpaused = true;
                     logger.info(`[G ${guild.id}] Unpaused restored player`);
+                } else if (lastPause) {
+                    // Human-initiated pause - should stay paused
+                    shouldStayPaused = true;
+                    logger.info(`[G ${guild.id}] Retaining paused state (human-initiated)`);
                 }
             }
         } catch (err) {
@@ -88,16 +93,28 @@ async function restorePlayer(
             if (snapshot.position > 0) {
                 await player.seekTo(snapshot.position);
             }
+            // If human paused it, pause the player again after starting
+            if (shouldStayPaused && snapshot.queue.current) {
+                await player.setPause(true);
+            }
         } else if (wasAutoUnpaused && snapshot.queue.current) {
             // When resumed and we just auto-unpaused, ensure the current track starts playing
             // Lavalink has already positioned the track, but we need to ensure it's actually playing
             if (!player.playing || player.paused) {
                 await player.queue.start();
             }
-        } else if (!player.playing && player.queue.tracks.length > 0) {
+        } else if (!shouldStayPaused && !player.playing && player.queue.tracks.length > 0) {
             // When resumed=true, Lavalink has already positioned the track correctly
             // However, if the player is not playing and there are queued tracks, start the next one
+            // Only do this if we're not supposed to stay paused
             await player.queue.start();
+        }
+
+        // Send pause notification if the player should stay paused
+        if (shouldStayPaused && player.paused) {
+            await player.sendMessage(guild.locale('CMD.PAUSE.RESPONSE.SUCCESS'), {
+                type: MessageOptionsBuilderType.Success,
+            });
         }
 
         // Set timeout if queue is empty after restoration
