@@ -166,6 +166,15 @@ export async function getFailedChecks(
 }
 
 /**
+ * Escapes markdown special characters in text.
+ * @param text - The text to escape.
+ * @returns The escaped text.
+ */
+export function escapeMarkdown(text: string): string {
+    return text.replace(/([*_~`|\\])/g, '\\$1');
+}
+
+/**
  * Formats LyricResponse into a string.
  * @param json - The LyricsResponse object.
  * @param player - The QuaverPlayer object. (for marking position in lyrics)
@@ -174,18 +183,19 @@ export function formatResponse(
     json: LyricsResponse,
     player?: QuaverPlayer,
 ): string | Error {
-    return json.type === 'text'
-        ? json.text
-        : json.type === 'timed'
-          ? json.lines
-                .map((line): string =>
-                    player?.position >= line.range.start &&
-                    player?.position < line.range.end
-                        ? `**__${line.line}__**`
-                        : line.line,
-                )
-                .join('\n')
-          : new Error('No results');
+    if (json.type === 'text') {
+        return escapeMarkdown(json.text);
+    } else if (json.type === 'timed') {
+        return json.lines
+            .map((line): string =>
+                player?.position >= line.range.start &&
+                player?.position < line.range.end
+                    ? `**__${escapeMarkdown(line.line)}__**`
+                    : escapeMarkdown(line.line),
+            )
+            .join('\n');
+    }
+    return new Error('No results');
 }
 
 export function formatLavaLyricsResponse(
@@ -196,15 +206,15 @@ export function formatLavaLyricsResponse(
         return new Error('No results');
     }
     // text has better formatting than lines, so prefer it if available
-    if (json.text) return json.text;
+    if (json.text) return escapeMarkdown(json.text);
     return json.lines
         .map((line): string =>
             player?.position >= line.timestamp &&
             (line.duration
                 ? player.position < line.timestamp + line.duration
                 : true)
-                ? `**__${line.line}__**`
-                : line.line,
+                ? `**__${escapeMarkdown(line.line)}__**`
+                : escapeMarkdown(line.line),
         )
         .join('\n');
 }

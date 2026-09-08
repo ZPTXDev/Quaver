@@ -1,6 +1,7 @@
 import { MessageOptionsBuilderType } from '#src/lib';
 import { ButtonHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
+import { escapeMarkdown } from '#src/lib/util';
 import {
     ComponentType,
     ContainerBuilder,
@@ -30,6 +31,10 @@ export default new ButtonHandler().setExecute(
         }
         const title = interaction.message.components[0].components[0].content;
         let lyrics = interaction.message.components[0].components[1].content;
+
+        // Unescape the lyrics before romanization (they were escaped for display)
+        lyrics = lyrics.replace(/\\([*_~`|\\])/g, '$1');
+
         switch (romanizeFrom) {
             case 'korean':
                 lyrics = romanizeFromKorean(lyrics);
@@ -68,6 +73,10 @@ export default new ButtonHandler().setExecute(
                     })
                     .join('\n');
         }
+
+        // Escape markdown characters in romanized lyrics
+        lyrics = escapeMarkdown(lyrics);
+
         // we'll re-use this since the length limit is affected by it
         const japaneseInaccurate = guild.locale(
             'CMD.LYRICS.MISC.JAPANESE_INACCURATE',
