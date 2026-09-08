@@ -202,7 +202,9 @@ export const SettingsSchema = z.object({
     features: z.object({
         autolyrics: genericPremiumFeatureSchema,
         autoplay: genericPremiumFeatureSchema.extend({
+            provider: z.enum(['listenbrainz', 'lastfm']).default('listenbrainz'),
             listenbrainzToken: z.string().optional(),
+            lastfmApiKey: z.string().optional(),
         }),
         stay: genericPremiumFeatureSchema,
         smartqueue: genericPremiumFeatureSchema,

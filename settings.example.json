@@ -75,7 +75,10 @@
     "autoplay": {
       "enabled": true,
       "whitelist": false,
-      "premium": false
+      "premium": false,
+      "provider": "listenbrainz",
+      "listenbrainzToken": "",
+      "lastfmApiKey": ""
     },
     "stay": {
       "enabled": true,

@@ -23,12 +23,27 @@ interface ListenBrainzLabsRecording {
     score?: number;
 }
 
+interface LastFmTrack {
+    name: string;
+    artist: {
+        name: string;
+    };
+    match?: number;
+}
+
+interface LastFmSimilarResponse {
+    similartracks?: {
+        track?: LastFmTrack[];
+    };
+}
+
 /**
- * Service for generating autoplay recommendations using ListenBrainz API
+ * Service for generating autoplay recommendations using ListenBrainz or Last.fm API
  */
 export class AutoplayService {
     private static readonly LISTENBRAINZ_API = 'https://api.listenbrainz.org/1';
     private static readonly LISTENBRAINZ_LABS_API = 'https://labs.api.listenbrainz.org';
+    private static readonly LASTFM_API = 'https://ws.audioscrobbler.com/2.0/';
     private static readonly MAX_RECOMMENDATIONS = 10;
     private static readonly DEDUPE_HISTORY_SIZE = 50;
 
@@ -47,10 +62,16 @@ export class AutoplayService {
         recentTracks: QuaverSong[] = [],
     ): Promise<QuaverSong[]> {
         try {
-            // Try ListenBrainz recommendations first
-            const recommendations = await this.getListenBrainzRecommendations(
-                seedTrack,
-            );
+            const provider = settings.features.autoplay.provider || 'listenbrainz';
+
+            let recommendations: ListenBrainzRecording[] | LastFmTrack[] = [];
+
+            // Try the configured provider first
+            if (provider === 'lastfm') {
+                recommendations = await this.getLastFmRecommendations(seedTrack);
+            } else {
+                recommendations = await this.getListenBrainzRecommendations(seedTrack);
+            }
 
             if (recommendations.length > 0) {
                 const resolved = await this.resolveRecommendations(
@@ -61,15 +82,15 @@ export class AutoplayService {
                 );
 
                 if (resolved.length > 0) {
-                    logger.info(`[G ${guild.id}] Autoplay: Using ListenBrainz recommendations (${resolved.length} tracks)`);
+                    logger.info(`[G ${guild.id}] Autoplay: Using ${provider} recommendations (${resolved.length} tracks)`);
                     return resolved;
                 }
 
-                // ListenBrainz returned recommendations but they couldn't be resolved
-                logger.info(`[G ${guild.id}] Autoplay: ListenBrainz recommendations couldn't be resolved, falling back to artist search`);
+                // Provider returned recommendations but they couldn't be resolved
+                logger.info(`[G ${guild.id}] Autoplay: ${provider} recommendations couldn't be resolved, falling back to artist search`);
             } else {
-                // ListenBrainz returned no recommendations
-                logger.info(`[G ${guild.id}] Autoplay: No ListenBrainz recommendations found, falling back to artist search`);
+                // Provider returned no recommendations
+                logger.info(`[G ${guild.id}] Autoplay: No ${provider} recommendations found, falling back to artist search`);
             }
 
             // Fallback to artist-based search
@@ -114,6 +135,53 @@ export class AutoplayService {
                 );
                 return [];
             }
+        }
+    }
+
+    /**
+     * Get recommendations from Last.fm API
+     */
+    private static async getLastFmRecommendations(
+        seedTrack: QuaverSong,
+    ): Promise<LastFmTrack[]> {
+        try {
+            // Check if API key is configured
+            if (!settings.features.autoplay.lastfmApiKey) {
+                logger.warn('Last.fm API key not configured, skipping API recommendations');
+                return [];
+            }
+
+            const apiKey = settings.features.autoplay.lastfmApiKey;
+            const artist = encodeURIComponent(seedTrack.info.author);
+            const track = encodeURIComponent(seedTrack.info.title);
+
+            // Get similar tracks from Last.fm
+            const url = `${this.LASTFM_API}?method=track.getsimilar&artist=${artist}&track=${track}&api_key=${apiKey}&format=json&limit=${this.MAX_RECOMMENDATIONS}`;
+
+            const response = await fetch(url, {
+                headers: {
+                    'User-Agent': 'Quaver/8.0 (https://github.com/ZPTXDev/Quaver)',
+                },
+            });
+
+            if (!response.ok) {
+                logger.warn(
+                    `Last.fm API request failed: ${response.status}`,
+                );
+                return [];
+            }
+
+            const data = (await response.json()) as LastFmSimilarResponse;
+
+            if (!data.similartracks?.track || data.similartracks.track.length === 0) {
+                return [];
+            }
+
+            // Return the similar tracks
+            return data.similartracks.track.slice(0, this.MAX_RECOMMENDATIONS);
+        } catch (error) {
+            logger.error('Last.fm API error:', error);
+            return [];
         }
     }
 
@@ -210,12 +278,12 @@ export class AutoplayService {
     }
 
     /**
-     * Resolve ListenBrainz recommendations to playable tracks
+     * Resolve ListenBrainz or Last.fm recommendations to playable tracks
      */
     private static async resolveRecommendations(
         client: QuaverClient,
         guild: QuaverGuild,
-        recommendations: ListenBrainzRecording[],
+        recommendations: ListenBrainzRecording[] | LastFmTrack[],
         recentTracks: QuaverSong[],
     ): Promise<QuaverSong[]> {
         const tracks: QuaverSong[] = [];
@@ -227,7 +295,21 @@ export class AutoplayService {
 
         for (const rec of recommendations) {
             try {
-                const trackId = `${rec.artist_name}:${rec.recording_name}`.toLowerCase();
+                // Normalize the recommendation format
+                let artistName: string;
+                let trackName: string;
+
+                if ('artist_name' in rec) {
+                    // ListenBrainz format
+                    artistName = rec.artist_name;
+                    trackName = rec.recording_name;
+                } else {
+                    // Last.fm format
+                    artistName = rec.artist.name;
+                    trackName = rec.name;
+                }
+
+                const trackId = `${artistName}:${trackName}`.toLowerCase();
 
                 // Skip if recently played
                 if (recentTrackIds.has(trackId)) {
@@ -235,8 +317,8 @@ export class AutoplayService {
                 }
 
                 // Clean artist name to remove "ft.", "feat.", etc.
-                const cleanedArtist = this.cleanArtistName(rec.artist_name);
-                const query = `${cleanedArtist} ${rec.recording_name}`;
+                const cleanedArtist = this.cleanArtistName(artistName);
+                const query = `${cleanedArtist} ${trackName}`;
                 const result = await searchTracks(client, guild, query);
 
                 if (result.loadType === 'search' && result.data.length > 0) {
@@ -259,7 +341,7 @@ export class AutoplayService {
                 }
             } catch (error) {
                 logger.warn(
-                    `[G ${guild.id}] Failed to resolve recommendation: ${rec.recording_name}`,
+                    `[G ${guild.id}] Failed to resolve recommendation: ${'recording_name' in rec ? rec.recording_name : rec.name}`,
                     error,
                 );
                 continue;
