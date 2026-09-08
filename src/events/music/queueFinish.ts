@@ -85,9 +85,14 @@ export default {
                     );
 
                     // Build history from previous tracks for deduplication
+                    // Include both already-played tracks AND tracks still in the autoplay queue
                     const history = queue.player.memory.autoplayHistory || [];
                     if (seedTrack) {
                         history.push(seedTrack);
+                    }
+                    // Add tracks from existing autoplay queue to prevent duplicates
+                    if (queue.player.memory.autoplayQueue?.length > 0) {
+                        history.push(...queue.player.memory.autoplayQueue);
                     }
 
                     // Generate recommendations
