@@ -77,7 +77,7 @@ export default new ChatInputCommandHandler()
         if (player.queue.current.info.isStream) {
             const volume = player.volume;
             const serverMuted = player.voiceState?.serverMute ?? false;
-            let volumeEmoji = settings.emojis.volume_high || '🔊';
+            let volumeEmoji = settings.emojis.volume_medium || '🔊';
             if (serverMuted) {
                 volumeEmoji = settings.emojis.volume_muted || '🔇';
             } else if (volume === 0 || volume <= 10) {
@@ -111,7 +111,7 @@ export default new ChatInputCommandHandler()
         }
         const volume = player.volume;
         const serverMuted = player.voiceState?.serverMute ?? false;
-        let volumeEmoji = settings.emojis.volume_high || '🔊';
+        let volumeEmoji = settings.emojis.volume_medium || '🔊';
         if (serverMuted) {
             volumeEmoji = settings.emojis.volume_muted || '🔇';
         } else if (volume === 0 || volume <= 10) {
