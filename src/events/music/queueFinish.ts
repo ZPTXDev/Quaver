@@ -104,6 +104,12 @@ export default {
                     );
 
                     if (recommendations.length > 0) {
+                        // Check if queue is still empty - user may have added tracks while we were fetching recommendations
+                        if (!queue.isEmpty) {
+                            logger.info(`[G ${guild.id}] Autoplay cancelled - user added tracks during recommendation fetch`);
+                            return;
+                        }
+
                         // Log before modifying the array
                         queue.player.logSessionEvent('AUTOPLAY_START', null, `${recommendations.length} tracks queued`);
 
