@@ -1079,6 +1079,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         this.queue.previous = [];
         delete this.memory.originalQueue;
         delete this.memory.shuffledQueue;
+        // Mark that user explicitly stopped - prevents autoplay from triggering
+        this.memory.userStopped = true;
         // Skip current track - trackEnd handler will see the queue is empty
         await this.queue.skip();
         // Manually advance queue to nullify current and emit finish event

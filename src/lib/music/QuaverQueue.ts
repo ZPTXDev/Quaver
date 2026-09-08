@@ -151,6 +151,11 @@ export class QuaverQueue extends TypedEmitter<QueueEvents> {
             }
         }
 
+        // Clear userStopped flag when new tracks are added by a user
+        if (options.requester) {
+            delete this.player.memory.userStopped;
+        }
+
         // Add to start or end of queue
         if (options.next) {
             this.tracks.unshift(...trackArray);

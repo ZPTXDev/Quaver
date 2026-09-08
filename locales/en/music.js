@@ -1,6 +1,6 @@
 export default {
     AUTOPLAY: {
-        STARTED: 'Queue ended. Auto-play started with similar tracks...',
+        STARTING: 'Quaver will begin auto-play shortly.',
     },
     DISCONNECT: {
         ALONE: {

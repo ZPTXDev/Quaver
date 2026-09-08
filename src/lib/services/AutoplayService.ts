@@ -53,21 +53,38 @@ export class AutoplayService {
             );
 
             if (recommendations.length > 0) {
-                return await this.resolveRecommendations(
+                const resolved = await this.resolveRecommendations(
                     client,
                     guild,
                     recommendations,
                     recentTracks,
                 );
+
+                if (resolved.length > 0) {
+                    logger.info(`[G ${guild.id}] Autoplay: Using ListenBrainz recommendations (${resolved.length} tracks)`);
+                    return resolved;
+                }
+
+                // ListenBrainz returned recommendations but they couldn't be resolved
+                logger.info(`[G ${guild.id}] Autoplay: ListenBrainz recommendations couldn't be resolved, falling back to artist search`);
+            } else {
+                // ListenBrainz returned no recommendations
+                logger.info(`[G ${guild.id}] Autoplay: No ListenBrainz recommendations found, falling back to artist search`);
             }
 
             // Fallback to artist-based search
-            return await this.getArtistBasedRecommendations(
+            const artistTracks = await this.getArtistBasedRecommendations(
                 client,
                 guild,
                 seedTrack,
                 recentTracks,
             );
+
+            if (artistTracks.length > 0) {
+                logger.info(`[G ${guild.id}] Autoplay: Using artist-based recommendations (${artistTracks.length} tracks)`);
+            }
+
+            return artistTracks;
         } catch (error) {
             logger.error(
                 `[G ${guild.id}] Error generating autoplay recommendations:`,
@@ -75,12 +92,21 @@ export class AutoplayService {
             );
             // Try fallback
             try {
-                return await this.getArtistBasedRecommendations(
+                logger.info(`[G ${guild.id}] Autoplay: Attempting artist-based fallback after error`);
+                const fallbackTracks = await this.getArtistBasedRecommendations(
                     client,
                     guild,
                     seedTrack,
                     recentTracks,
                 );
+
+                if (fallbackTracks.length > 0) {
+                    logger.info(`[G ${guild.id}] Autoplay: Artist-based fallback successful (${fallbackTracks.length} tracks)`);
+                } else {
+                    logger.warn(`[G ${guild.id}] Autoplay: Artist-based fallback returned no tracks`);
+                }
+
+                return fallbackTracks;
             } catch (fallbackError) {
                 logger.error(
                     `[G ${guild.id}] Fallback recommendations also failed:`,
@@ -163,6 +189,27 @@ export class AutoplayService {
     }
 
     /**
+     * Clean artist name by removing featuring indicators
+     */
+    private static cleanArtistName(artistName: string): string {
+        // Replace "ft.", "feat.", "featuring" and similar patterns with just a space
+        // This converts "Doja Cat ft. SZA" to "Doja Cat SZA"
+        return artistName
+            .replace(/\s+ft\.?\s+/gi, ' ')
+            .replace(/\s+feat\.?\s+/gi, ' ')
+            .replace(/\s+featuring\s+/gi, ' ')
+            .replace(/\s+x\s+/gi, ' ')
+            .replace(/\s+&\s+/g, ' ')
+            .replace(/\s+,\s+/g, ' ')
+            .replace(/\s+\(\s*ft\.?.*?\)/gi, '') // Remove "(ft. Artist)" patterns
+            .replace(/\s+\(\s*feat\.?.*?\)/gi, '') // Remove "(feat. Artist)" patterns
+            .replace(/\s+\[\s*ft\.?.*?\]/gi, '') // Remove "[ft. Artist]" patterns
+            .replace(/\s+\[\s*feat\.?.*?\]/gi, '') // Remove "[feat. Artist]" patterns
+            .replace(/\s+/g, ' ') // Normalize multiple spaces
+            .trim();
+    }
+
+    /**
      * Resolve ListenBrainz recommendations to playable tracks
      */
     private static async resolveRecommendations(
@@ -187,7 +234,9 @@ export class AutoplayService {
                     continue;
                 }
 
-                const query = `${rec.artist_name} ${rec.recording_name}`;
+                // Clean artist name to remove "ft.", "feat.", etc.
+                const cleanedArtist = this.cleanArtistName(rec.artist_name);
+                const query = `${cleanedArtist} ${rec.recording_name}`;
                 const result = await searchTracks(client, guild, query);
 
                 if (result.loadType === 'search' && result.data.length > 0) {
