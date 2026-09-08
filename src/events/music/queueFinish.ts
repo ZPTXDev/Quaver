@@ -37,7 +37,17 @@ export default {
         const autoplayEnabled = await guild.settings.get<boolean>('autoplay');
         const isAutoplayFeatureActive = await guild.features.isFeatureActive('autoplay');
 
-        if (autoplayEnabled && isAutoplayFeatureActive) {
+        // Check if there are users in the voice channel
+        const voiceChannel = queue.player.voice.channelId
+            ? queue.player.guild.channels.cache.get(queue.player.voice.channelId)
+            : null;
+        const hasUsers =
+            voiceChannel && 'members' in voiceChannel
+                ? voiceChannel.members.filter((member) => !member.user.bot).size > 0
+                : false;
+
+        // Don't trigger autoplay if user explicitly stopped or if no users in voice channel
+        if (autoplayEnabled && isAutoplayFeatureActive && !queue.player.memory.userStopped && hasUsers) {
             try {
                 // Get the seed track (last played track)
                 // Use lastPlayedTrack which is set in trackEnd before queue is cleared
@@ -68,6 +78,12 @@ export default {
                 if (!seedTrack || queue.player.isAdTrack(seedTrack)) {
                     // Fall through to normal timeout behavior
                 } else {
+                    // Show message immediately
+                    await queue.player.sendMessage(
+                        `${guild.locale('MUSIC.QUEUE.EMPTY')} ${guild.locale('MUSIC.AUTOPLAY.STARTING')}`,
+                        { type: MessageOptionsBuilderType.Neutral },
+                    );
+
                     // Build history from previous tracks for deduplication
                     const history = queue.player.memory.autoplayHistory || [];
                     if (seedTrack) {
@@ -83,6 +99,9 @@ export default {
                     );
 
                     if (recommendations.length > 0) {
+                        // Log before modifying the array
+                        queue.player.logSessionEvent('AUTOPLAY_START', null, `${recommendations.length} tracks queued`);
+
                         // Store autoplay queue and mark as active
                         queue.player.memory.autoplayQueue = recommendations;
                         queue.player.memory.autoplayHistory = history;
@@ -99,14 +118,7 @@ export default {
                             queue.player.timeout.end = undefined;
                         }
 
-                        await queue.player.sendMessage(
-                            guild.locale('MUSIC.AUTOPLAY.STARTED'),
-                            { type: MessageOptionsBuilderType.Success },
-                        );
-
-                        queue.player.logSessionEvent('AUTOPLAY_START', null, `${recommendations.length} tracks queued`);
-
-                        // Start playing
+                        // Start playing (trackStart will show the "Now playing" message)
                         await queue.start();
                         guild.sendWebUpdate('queueUpdate', queue.player.decorateQueue());
                         return;

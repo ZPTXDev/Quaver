@@ -13,6 +13,16 @@ export default {
             QUEUE_CHANNEL_MISSING: 'The queue channel is missing. Try using </bind:%1>.',
         },
     },
+    AUTOPLAY: {
+        DESCRIPTION: 'Auto-play automatically plays similar tracks when the queue ends.',
+        OPTION: {
+            ENABLED: 'Whether auto-play is enabled. If not specified, it will be toggled.',
+        },
+        RESPONSE: {
+            DISABLED: 'Auto-play has been **disabled**',
+            ENABLED: 'Auto-play has been **enabled**',
+        },
+    },
     BASSBOOST: {
         DESCRIPTION: 'Bass boost mode amplifies the bass levels.',
         OPTION: {
