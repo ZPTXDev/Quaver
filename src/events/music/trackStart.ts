@@ -207,7 +207,7 @@ export default {
                 );
                 break;
             case 'detailed': {
-                const { container, actionRows } = await buildNowPlayingMessage(guild, track, showArtist, isAutoplayTrack);
+                const { container, actionRows } = await buildNowPlayingMessage(guild, track, showArtist);
                 const message = await queue.player.sendMessage(
                     container.addActionRowComponents(...actionRows)
                 );
@@ -305,9 +305,9 @@ export async function buildNowPlayingMessage(
     guild: QuaverGuild<Initialized> & Guild,
     track: QuaverSong,
     showArtist = true,
-    isAutoplayTrack = false,
 ): Promise<{ container: ContainerBuilder; actionRows: ActionRowBuilder<ButtonBuilder>[] }> {
     const player = await guild.getPlayer();
+    const isAutoplayTrack = player.isAutoplayTrack(track);
     const duration = msToTime(track.info.length);
     let durationString = track.info.isStream
         ? '∞'
