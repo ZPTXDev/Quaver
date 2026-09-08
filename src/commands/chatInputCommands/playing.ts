@@ -77,13 +77,13 @@ export default new ChatInputCommandHandler()
         if (player.queue.current.info.isStream) {
             const volume = player.volume;
             const serverMuted = player.voiceState?.serverMute ?? false;
-            let volumeEmoji = settings.emojis.volume_medium || '🔊';
+            let volumeEmoji = settings.emojis.volume_high || '🔊';
             if (serverMuted) {
                 volumeEmoji = settings.emojis.volume_muted || '🔇';
-            } else if (volume === 0 || volume <= 10) {
-                volumeEmoji = settings.emojis.volume_off || '🔈';
-            } else if (volume <= 50) {
-                volumeEmoji = settings.emojis.volume_low || '🔉';
+            } else if (volume <= 33) {
+                volumeEmoji = settings.emojis.volume_low || '🔈';
+            } else if (volume <= 66) {
+                volumeEmoji = settings.emojis.volume_medium || '🔉';
             }
 
             await interaction.replyHandler.reply(
@@ -111,13 +111,13 @@ export default new ChatInputCommandHandler()
         }
         const volume = player.volume;
         const serverMuted = player.voiceState?.serverMute ?? false;
-        let volumeEmoji = settings.emojis.volume_medium || '🔊';
+        let volumeEmoji = settings.emojis.volume_high || '🔊';
         if (serverMuted) {
             volumeEmoji = settings.emojis.volume_muted || '🔇';
-        } else if (volume === 0 || volume <= 10) {
-            volumeEmoji = settings.emojis.volume_off || '🔈';
-        } else if (volume <= 50) {
-            volumeEmoji = settings.emojis.volume_low || '🔉';
+        } else if (volume <= 33) {
+            volumeEmoji = settings.emojis.volume_low || '🔈';
+        } else if (volume <= 66) {
+            volumeEmoji = settings.emojis.volume_medium || '🔉';
         }
 
         await interaction.replyHandler.reply(

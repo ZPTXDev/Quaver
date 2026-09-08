@@ -37,9 +37,9 @@
     "live": "",
     "bassboost": "",
     "nightcore": "",
-    "volume_medium": "🔊",
-    "volume_low": "🔉",
-    "volume_off": "🔈",
+    "volume_high": "🔊",
+    "volume_medium": "🔉",
+    "volume_low": "🔈",
     "volume_muted": "🔇"
   },
   "status": {
