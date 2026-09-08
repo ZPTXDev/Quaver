@@ -88,6 +88,7 @@ export class PremiumSweepService {
                             player.memory.isAutoplayActive = false;
                             player.memory.autoplayQueue = [];
                             player.memory.autoplayHistory = [];
+                            player.memory.autoplayFailureCount = 0;
                             // Note: No message sent to user since this is a passive feature
                         }
                     }

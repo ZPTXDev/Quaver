@@ -67,6 +67,7 @@ export interface QuaverPlayerJSON {
         autoplayHistory?: QuaverSong[];
         isAutoplayActive?: boolean;
         lastPlayedTrack?: QuaverSong;
+        autoplayFailureCount?: number;
     };
     sessionLogs: {
         timestamp: number;
@@ -162,6 +163,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         autoplayHistory?: QuaverSong[];
         isAutoplayActive?: boolean;
         lastPlayedTrack?: QuaverSong;
+        autoplayFailureCount?: number;
     } = {
         bassboost: false,
         nightcore: false,
@@ -302,6 +304,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         if (this.memory.isAutoplayActive) {
             this.memory.isAutoplayActive = false;
             this.memory.autoplayQueue = [];
+            this.memory.autoplayFailureCount = 0;
             this.logSessionEvent('AUTOPLAY_STOP', null, 'User added tracks');
         }
 

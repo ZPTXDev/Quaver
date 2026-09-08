@@ -37,6 +37,9 @@ export default {
         const autoplayEnabled = await guild.settings.get<boolean>('autoplay');
         const isAutoplayFeatureActive = await guild.features.isFeatureActive('autoplay');
 
+        // Don't start autoplay if it was stopped due to repeated failures
+        const autoplayFailuresStopped = (queue.player.memory.autoplayFailureCount || 0) >= 5;
+
         // Check if there are users in the voice channel
         const voiceChannel = queue.player.voice.channelId
             ? queue.player.guild.channels.cache.get(queue.player.voice.channelId)
@@ -46,8 +49,8 @@ export default {
                 ? voiceChannel.members.filter((member): boolean => !member.user.bot).size > 0
                 : false;
 
-        // Don't trigger autoplay if user explicitly stopped or if no users in voice channel
-        if (autoplayEnabled && isAutoplayFeatureActive && !queue.player.memory.userStopped && hasUsers) {
+        // Don't trigger autoplay if user explicitly stopped or if no users in voice channel or if stopped due to failures
+        if (autoplayEnabled && isAutoplayFeatureActive && !queue.player.memory.userStopped && !autoplayFailuresStopped && hasUsers) {
             try {
                 // Get the seed track (last played track)
                 // Use lastPlayedTrack which is set in trackEnd before queue is cleared
@@ -117,6 +120,7 @@ export default {
                         queue.player.memory.autoplayQueue = recommendations;
                         queue.player.memory.autoplayHistory = history;
                         queue.player.memory.isAutoplayActive = true;
+                        queue.player.memory.autoplayFailureCount = 0;
 
                         // Add first track to queue and start playing
                         queue.add(recommendations[0]);

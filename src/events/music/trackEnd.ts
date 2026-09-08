@@ -111,6 +111,28 @@ export default {
                 { type: MessageOptionsBuilderType.Warning },
             );
 
+            // Add failed track to autoplay history to prevent re-recommendation
+            if (queue.player.memory.isAutoplayActive && track) {
+                if (!queue.player.memory.autoplayHistory) {
+                    queue.player.memory.autoplayHistory = [];
+                }
+                queue.player.memory.autoplayHistory.push(track);
+
+                // Track autoplay failures separately
+                queue.player.memory.autoplayFailureCount =
+                    (queue.player.memory.autoplayFailureCount || 0) + 1;
+
+                logger.info(`[G ${guild.id}] Autoplay failure count: ${queue.player.memory.autoplayFailureCount}`);
+
+                // Stop autoplay after 5 consecutive failures to prevent loops
+                if (queue.player.memory.autoplayFailureCount >= 5) {
+                    logger.warn(`[G ${guild.id}] Stopping autoplay due to repeated failures`);
+                    queue.player.memory.isAutoplayActive = false;
+                    queue.player.memory.autoplayQueue = [];
+                    queue.player.memory.autoplayFailureCount = 0;
+                }
+            }
+
             queue.player.memory.failureCount =
                 (queue.player.memory.failureCount || 0) + 1;
 
@@ -362,6 +384,11 @@ export default {
         // Clear failure count on successful track
         if (queue.player.memory.failureCount) {
             delete queue.player.memory.failureCount;
+        }
+
+        // Clear autoplay failure count on successful track
+        if (queue.player.memory.isAutoplayActive && queue.player.memory.autoplayFailureCount) {
+            queue.player.memory.autoplayFailureCount = 0;
         }
 
         // Check if alone in voice channel
