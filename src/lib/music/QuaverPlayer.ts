@@ -133,6 +133,10 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         end?: number;
         pausedAlone?: boolean;
     } = {};
+    voiceState: {
+        serverMute?: boolean;
+        serverDeaf?: boolean;
+    } = {};
     // overriding native queue type
     queue!: QuaverQueue;
     memory: {

@@ -389,6 +389,11 @@ export default new EventHandler()
         if (!player) {
             return;
         }
+        // Update player's voice state when it's Quaver's own state update
+        if (isOldQuaverStateUpdate) {
+            player.voiceState.serverMute = newState.serverMute;
+            player.voiceState.serverDeaf = newState.serverDeaf;
+        }
         const isGuildStayEnabled =
             (await guild.settings.get<boolean>('stay.enabled')) &&
             (await guild.features.isFeatureActive('stay'));
