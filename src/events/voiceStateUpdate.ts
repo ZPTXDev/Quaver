@@ -380,9 +380,6 @@ export default new EventHandler()
         // Since Quaver is expected to continue playback despite its own state updates, do not operate
         // Handles ignoring state updates from self-deafening or unsuppressing itself from starting tracks
         // To prevent Quaver from falling through statements doing nothing from a user's state updates, do not operate
-        if (hasSameChannelStateUpdates) {
-            return;
-        }
         const guild = await QuaverGuild.wrap(oldState.guild);
         const player = await oldClient.music.players.fetch(guild.id);
         // To prevent further operations on an uninitialized player session / player handler, do not operate
@@ -393,6 +390,9 @@ export default new EventHandler()
         if (isOldQuaverStateUpdate) {
             player.voiceState.serverMute = newState.serverMute;
             player.voiceState.serverDeaf = newState.serverDeaf;
+        }
+        if (hasSameChannelStateUpdates) {
+            return;
         }
         const isGuildStayEnabled =
             (await guild.settings.get<boolean>('stay.enabled')) &&
