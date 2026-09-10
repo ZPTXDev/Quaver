@@ -37,7 +37,6 @@ export default new ButtonHandler()
             track,
             interaction.member as GuildMember,
             player.queue.channel,
-            player.memory.isAutoplayActive,
         );
         if (requesterStatus === RequesterStatus.NotRequester) {
             const skip = player.memory.skip ?? {

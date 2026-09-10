@@ -82,10 +82,9 @@ export async function getRequesterStatus(
     track: QuaverSong,
     member: GuildMember,
     channel: QuaverChannels,
-    isAutoplayActive?: boolean,
 ): Promise<RequesterStatus> {
-    // Autoplay tracks can be controlled by anyone
-    if (isAutoplayActive) return RequesterStatus.Requester;
+    // Autoplay tracks (requested by the bot, but not ads) can be controlled by anyone
+    if (track.requesterId === channel.client.user.id && !track.isAd) return RequesterStatus.Requester;
     if (track.requesterId === member.id) return RequesterStatus.Requester;
     const djRole = await data.guild.get<Snowflake>(
         member.guild.id,

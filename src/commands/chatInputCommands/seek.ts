@@ -104,7 +104,6 @@ export default new ChatInputCommandHandler()
             player.queue.current,
             interaction.member as GuildMember,
             player.queue.channel,
-            player.memory.isAutoplayActive,
         );
         if (requesterStatus === RequesterStatus.NotRequester) {
             await interaction.replyHandler.reply(

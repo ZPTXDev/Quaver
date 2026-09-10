@@ -60,7 +60,6 @@ export default new ChatInputCommandHandler()
                   track,
                   interaction.member as GuildMember,
                   player.queue.channel,
-                  player.memory.isAutoplayActive,
               )
             : RequesterStatus.Requester;
         if (requesterStatus === RequesterStatus.NotRequester) {
