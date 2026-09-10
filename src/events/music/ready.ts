@@ -40,20 +40,18 @@ async function restorePlayer(
                 const lastPause = [...snapshot.sessionLogs]
                     .reverse()
                     .find((l): boolean => l.action === 'PAUSE');
-                // detect if the pause was by the bot (no user present)
-                if (
-                    lastPause &&
-                    !lastPause.userId &&
-                    !lastPause.userTag &&
-                    Date.now() - lastPause.timestamp < 15_000
-                ) {
-                    await player.setPause(false);
-                    wasAutoUnpaused = true;
-                    logger.info(`[G ${guild.id}] Unpaused restored player`);
-                } else if (lastPause) {
-                    // Human-initiated pause - should stay paused
-                    shouldStayPaused = true;
-                    logger.info(`[G ${guild.id}] Retaining paused state (human-initiated)`);
+
+                if (lastPause) {
+                    // Bot pause: no userId/userTag (regardless of age)
+                    if (!lastPause.userId && !lastPause.userTag) {
+                        await player.setPause(false);
+                        wasAutoUnpaused = true;
+                        logger.info(`[G ${guild.id}] Unpaused restored player (bot-initiated pause)`);
+                    } else {
+                        // Human-initiated pause: has userId or userTag - should stay paused
+                        shouldStayPaused = true;
+                        logger.info(`[G ${guild.id}] Retaining paused state (human-initiated)`);
+                    }
                 }
             }
         } catch (err) {

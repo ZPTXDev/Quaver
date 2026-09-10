@@ -42,15 +42,19 @@ export interface QuaverPlayerJSON {
         nightcore: boolean;
     };
     memory: {
+        // Queue transforms
         shuffle: boolean;
         alternate: boolean;
         originalQueue?: QuaverSong[];
         shuffledQueue?: string[];
-        failureCount?: number;
+        // Skip voting
         skip?: {
             required: number;
             users: Snowflake[];
         };
+        // Track failure handling
+        failureCount?: number;
+        // Advertisement state
         adPlaytimeMs?: number;
         preAdPlaytimeMs?: number;
         isAdPlaying?: boolean;
@@ -58,11 +62,14 @@ export interface QuaverPlayerJSON {
             bassboost: boolean;
             nightcore: boolean;
         };
+        // Timing and session tracking
         trackStartTime?: number;
-        currentNowPlayingMessageId?: Snowflake;
         pausedTimestamp?: number;
         lastResumeTime?: number;
         lastPauseDuration?: number;
+        // UI state
+        currentNowPlayingMessageId?: Snowflake;
+        // Autoplay state
         autoplayQueue?: QuaverSong[];
         autoplayHistory?: QuaverSong[];
         isAutoplayActive?: boolean;
@@ -140,17 +147,22 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     // overriding native queue type
     queue!: QuaverQueue;
     memory: {
+        // Effects
         bassboost: boolean;
         nightcore: boolean;
-        skip?: {
-            required: number;
-            users: Snowflake[];
-        };
+        // Queue transforms
         shuffle: boolean;
         alternate: boolean;
         originalQueue?: QuaverSong[];
         shuffledQueue?: string[];
+        // Skip voting
+        skip?: {
+            required: number;
+            users: Snowflake[];
+        };
+        // Track failure handling
         failureCount?: number;
+        // Advertisement state
         adPlaytimeMs: number;
         preAdPlaytimeMs?: number;
         isAdPlaying: boolean;
@@ -158,11 +170,14 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             bassboost: boolean;
             nightcore: boolean;
         };
+        // Timing and session tracking
         trackStartTime?: number;
-        currentNowPlayingMessageId?: Snowflake;
         pausedTimestamp?: number;
         lastResumeTime?: number;
         lastPauseDuration?: number;
+        // UI state
+        currentNowPlayingMessageId?: Snowflake;
+        // Autoplay state
         autoplayQueue?: QuaverSong[];
         autoplayHistory?: QuaverSong[];
         isAutoplayActive?: boolean;
