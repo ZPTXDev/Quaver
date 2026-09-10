@@ -197,6 +197,16 @@ export default {
     PLAYING: {
         DESCRIPTION: 'Show what\'s currently playing.',
     },
+    PREVIOUS: {
+        DESCRIPTION: 'Go back to the previous track.',
+        RESPONSE: {
+            ERROR: {
+                AD_PLAYING: 'You cannot go to the previous track during ad breaks.',
+            },
+            NO_PREVIOUS_TRACKS: 'There are no previous tracks to go back to.',
+            SUCCESS: 'Now playing **%1**',
+        },
+    },
     QUEUE: {
         DESCRIPTION: 'Show the queue.',
         MISC: {
@@ -281,6 +291,7 @@ export default {
                 NIGHTCORE: '**%1** **%2** nightcore mode',
                 PAUSE: '**%1** paused the player',
                 PLAY: 'Started playing **%2**',
+                PREVIOUS: '**%1** went back to **%2**',
                 QUEUE_ADD: '**%1** added **%2**',
                 QUEUE_CLEAR: '**%1** cleared the queue',
                 QUEUE_FINISH: 'Queue finished',
@@ -294,6 +305,7 @@ export default {
                 SMARTQUEUE: '**%1** **%2** Smart Queue',
                 STAY: '**%1** **%2** 24/7 Mode',
                 STOP: '**%1** stopped the player',
+                UNMUTE: '**%1** unmuted the player',
                 VOLUME: '**%1** set the volume to **%2%**',
             },
         },

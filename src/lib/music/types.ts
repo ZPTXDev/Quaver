@@ -14,6 +14,7 @@ export enum PlayerResponse {
     PlayerIdle,
     PlayerIsStream,
     AdPlaying,
+    NoPreviousTracks,
     Success,
 }
 

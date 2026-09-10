@@ -77,6 +77,8 @@ export interface QuaverPlayerJSON {
         autoplayFailureCount?: number;
         // Volume memory (for mute/unmute)
         previousVolume?: number;
+        // Track history (for /previous command)
+        trackHistory?: QuaverSong[];
     };
     sessionLogs: {
         timestamp: number;
@@ -187,6 +189,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         autoplayFailureCount?: number;
         // Volume memory (for mute/unmute)
         previousVolume?: number;
+        // Track history (for /previous command)
+        trackHistory?: QuaverSong[];
     } = {
         bassboost: false,
         nightcore: false,
@@ -1019,6 +1023,23 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             return PlayerResponse.PlayerIdle;
         }
 
+        // Add current track to history (skip ads, but include autoplay tracks)
+        if (this.queue.current && !this.isAdTrack(this.queue.current)) {
+            if (!this.memory.trackHistory) {
+                this.memory.trackHistory = [];
+            }
+            // Mark if this was an autoplayed track
+            const trackToAdd = { ...this.queue.current };
+            if (this.memory.isAutoplayActive) {
+                trackToAdd.wasAutoplay = true;
+            }
+            this.memory.trackHistory.push(trackToAdd);
+            // Keep only last 100 tracks
+            if (this.memory.trackHistory.length > 100) {
+                this.memory.trackHistory.shift();
+            }
+        }
+
         // If autoplay is active and queue will be empty after skip, add next autoplay track
         if (
             this.memory.isAutoplayActive &&
@@ -1087,6 +1108,42 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         if (skipResponse !== PlayerResponse.Success) {
             return skipResponse;
         }
+        return PlayerResponse.Success;
+    }
+
+    /**
+     * Go back to the previous track.
+     * @param actor - The user who triggered the change.
+     * @returns Whether the previous track was played.
+     */
+    async playPreviousTrack(
+        actor?: { id: string; tag: string } | string | null,
+    ): Promise<PlayerResponse> {
+        if (this.restartReady) return PlayerResponse.RestartInProgress;
+        if (this.memory.isAdPlaying) return PlayerResponse.AdPlaying;
+
+        // Check if there are any previous tracks
+        if (!this.memory.trackHistory || this.memory.trackHistory.length === 0) {
+            return PlayerResponse.NoPreviousTracks;
+        }
+
+        // Get the previous track
+        const previousTrack = this.memory.trackHistory.pop()!;
+
+        // If there's a current track, push it to the front of the queue
+        if (this.queue.current) {
+            this.queue.tracks.unshift(this.queue.current);
+        }
+
+        // Set the previous track as current and play it
+        this.queue.current = previousTrack;
+        this.logSessionEvent(
+            'PREVIOUS',
+            actor,
+            `[${previousTrack.info.title}](${previousTrack.info.uri})`,
+        );
+        await this.play(previousTrack);
+
         return PlayerResponse.Success;
     }
 
@@ -1266,6 +1323,9 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
                     : undefined,
                 isAutoplayActive: this.memory.isAutoplayActive,
                 previousVolume: this.memory.previousVolume,
+                trackHistory: this.memory.trackHistory
+                    ? [...this.memory.trackHistory]
+                    : undefined,
             },
             sessionLogs: [...this.sessionLogs],
         };

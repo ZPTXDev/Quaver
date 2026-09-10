@@ -225,6 +225,24 @@ export default {
             if (!isAdTrack && track) {
                 queue.player.memory.lastPlayedTrack = track;
             }
+
+            // Add track to history when it finishes naturally (not skipped, only finished or replaced)
+            // Skip ads from history, but include autoplay tracks
+            if ((reason === 'finished' || reason === 'replaced') && !isAdTrack) {
+                if (!queue.player.memory.trackHistory) {
+                    queue.player.memory.trackHistory = [];
+                }
+                // Mark if this was an autoplayed track
+                const trackToAdd = { ...track };
+                if (queue.player.memory.isAutoplayActive) {
+                    trackToAdd.wasAutoplay = true;
+                }
+                queue.player.memory.trackHistory.push(trackToAdd);
+                // Keep only last 100 tracks
+                if (queue.player.memory.trackHistory.length > 100) {
+                    queue.player.memory.trackHistory.shift();
+                }
+            }
         }
 
         // Only check for ad insertion when a track finishes naturally
