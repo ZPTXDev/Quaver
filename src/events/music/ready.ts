@@ -99,13 +99,20 @@ async function restorePlayer(
             // When resumed and we just auto-unpaused, ensure the current track starts playing
             // Lavalink has already positioned the track, but we need to ensure it's actually playing
             if (!player.playing || player.paused) {
-                await player.queue.start();
+                // Don't call queue.start() - it would shift a track from the queue
+                // Instead just resume playback since Lavalink already has the track loaded
+                await player.resume();
             }
         } else if (!shouldStayPaused && !player.playing && player.queue.tracks.length > 0) {
             // When resumed=true, Lavalink has already positioned the track correctly
-            // However, if the player is not playing and there are queued tracks, start the next one
+            // If there's no current track but there are queued tracks, start the next one
             // Only do this if we're not supposed to stay paused
-            await player.queue.start();
+            if (!player.queue.current) {
+                await player.queue.start();
+            } else {
+                // Current track exists but not playing - just resume instead of advancing queue
+                await player.resume();
+            }
         }
 
         // Send pause notification if the player should stay paused

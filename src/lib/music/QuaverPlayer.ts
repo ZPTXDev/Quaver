@@ -886,9 +886,11 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         const current = this.queue.current || null;
         const currentId = current?.id;
         // baseSource EXCLUDES current track
+        // Use originalQueue if it exists AND is non-empty, otherwise use current queue.tracks
         const baseSource =
-            (this.memory.originalQueue ??
-                this.queue.tracks.filter(
+            (this.memory.originalQueue && this.memory.originalQueue.length > 0
+                ? this.memory.originalQueue
+                : this.queue.tracks.filter(
                     (t: QuaverSong): boolean => t.id !== currentId,
                 )) ||
             [];
