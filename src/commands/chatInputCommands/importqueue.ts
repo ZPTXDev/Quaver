@@ -2,8 +2,8 @@ import { MessageOptionsBuilderType } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
 import { getLocaleString } from '#src/lib/locales';
-import { Check, settings } from '#src/lib/util';
-import { SlashCommandBuilder } from 'discord.js';
+import { Check, settings, type QuaverChannels } from '#src/lib/util';
+import { type GuildMember, SlashCommandBuilder } from 'discord.js';
 
 interface ExportedTrack {
     encoded: string;
@@ -79,13 +79,17 @@ export default new ChatInputCommandHandler()
     )
     .setChecks([
         Check.GuildOnly,
-        Check.ActiveSession,
         Check.InVoice,
         Check.InSessionVoice,
     ])
     .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
-        const player = await guild.getPlayer();
+        const compatible = await guild.checkPlayerCompatibility({
+            member: interaction.member as GuildMember,
+            textChannel: interaction.channel,
+            replyHandler: interaction.replyHandler,
+        });
+        if (!compatible) return;
 
         const attachment = interaction.options.getAttachment('file', true);
 
@@ -214,6 +218,13 @@ export default new ChatInputCommandHandler()
         }
 
         // Add tracks to the queue
+        const player = await guild.getPlayer({
+            textChannel: interaction.channel as QuaverChannels,
+            voiceChannelId: (interaction.member as GuildMember).voice.channelId,
+            replyHandler: interaction.replyHandler,
+        });
+        if (!player) return;
+
         try {
             await player.addTracksToQueue(decodedTracks, interaction.user.id, false);
 
@@ -223,6 +234,7 @@ export default new ChatInputCommandHandler()
                     decodedTracks.length.toString(),
                 ),
             );
+            guild.sendWebUpdate('queueUpdate', player.decorateQueue());
         } catch {
             await interaction.replyHandler.reply(
                 guild.locale('CMD.IMPORTQUEUE.RESPONSE.LOAD_FAILED'),
