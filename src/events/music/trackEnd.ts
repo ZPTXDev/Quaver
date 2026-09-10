@@ -226,9 +226,9 @@ export default {
                 queue.player.memory.lastPlayedTrack = track;
             }
 
-            // Add track to history when it finishes naturally (not skipped, only finished or replaced)
+            // Add track to history when it finishes naturally (not skipped or replaced)
             // Skip ads from history, but include autoplay tracks
-            if ((reason === 'finished' || reason === 'replaced') && !isAdTrack) {
+            if (reason === 'finished' && !isAdTrack) {
                 if (!queue.player.memory.trackHistory) {
                     queue.player.memory.trackHistory = [];
                 }
