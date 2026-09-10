@@ -444,10 +444,15 @@ async function renderSearchResults(
                         })
                         .join('\n'),
                 ),
-                guild.builders.textDisplayLocale(
-                    'MISC.PAGE',
-                    '1',
-                    pages.length.toString(),
+                new TextDisplayBuilder().setContent(
+                    guild.locale(
+                        'MISC.PAGE',
+                        '1',
+                        pages.length.toString(),
+                    ) + ' | ' + guild.locale(
+                        'MISC.EXPIRES',
+                        Math.floor((Date.now() + 30000) / 1000).toString(),
+                    )
                 ),
             )
             .addSeparatorComponents(new SeparatorBuilder())

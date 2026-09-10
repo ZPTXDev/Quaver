@@ -204,10 +204,15 @@ export default new ButtonHandler()
                 .join('\n'),
         );
         if (!(container.components[1] instanceof TextDisplayBuilder)) return;
-        container.components[1] = guild.builders.textDisplayLocale(
-            'MISC.PAGE',
-            page.toString(),
-            pages.length.toString(),
+        container.components[1] = new TextDisplayBuilder().setContent(
+            guild.locale(
+                'MISC.PAGE',
+                page.toString(),
+                pages.length.toString(),
+            ) + ' | ' + guild.locale(
+                'MISC.EXPIRES',
+                Math.floor((Date.now() + 30000) / 1000).toString(),
+            )
         );
         const selectMenuActionRow =
             ActionRowBuilder.from<StringSelectMenuBuilder>(

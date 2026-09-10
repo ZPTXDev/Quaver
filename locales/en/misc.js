@@ -12,6 +12,7 @@ export default {
     DISABLED: 'Disabled',
     ENABLE: 'Enable',
     ENABLED: 'Enabled',
+    EXPIRES: 'Expires <t:%1:R>',
     GET_PREMIUM: 'Get Premium',
     GO_TO: 'Go to',
     LIVE: 'LIVE',
