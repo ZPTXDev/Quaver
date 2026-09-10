@@ -133,6 +133,17 @@ export default {
                 }
                 break;
             }
+            case UpdateItemType.Unmute: {
+                const player = await client.music.players.fetch(guild.id);
+                if (!player) {
+                    return callback({ status: Response.InactiveSessionError });
+                }
+                const response = await player.unmute(actor);
+                if (response !== PlayerResponse.Success) {
+                    return callback({ status: Response.GenericError });
+                }
+                break;
+            }
             case UpdateItemType.Paused: {
                 const player = await client.music.players.fetch(guild.id);
                 if (!player) {
@@ -400,6 +411,7 @@ export enum UpdateItemType {
     Add = 'add',
     Loop = 'loop',
     Volume = 'volume',
+    Unmute = 'unmute',
     Paused = 'paused',
     Skip = 'skip',
     Bassboost = 'bassboost',

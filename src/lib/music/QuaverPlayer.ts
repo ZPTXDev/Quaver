@@ -75,6 +75,8 @@ export interface QuaverPlayerJSON {
         isAutoplayActive?: boolean;
         lastPlayedTrack?: QuaverSong;
         autoplayFailureCount?: number;
+        // Volume memory (for mute/unmute)
+        previousVolume?: number;
     };
     sessionLogs: {
         timestamp: number;
@@ -183,6 +185,8 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         isAutoplayActive?: boolean;
         lastPlayedTrack?: QuaverSong;
         autoplayFailureCount?: number;
+        // Volume memory (for mute/unmute)
+        previousVolume?: number;
     } = {
         bassboost: false,
         nightcore: false,
@@ -1128,9 +1132,46 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         if (volume < 0 || volume > 200) {
             return PlayerResponse.InputOutOfRange;
         }
+
+        // Capture current volume before muting (setting to 0)
+        if (volume === 0 && this.volume > 0) {
+            this.memory.previousVolume = this.volume;
+        }
+
+        // Clear volume memory if setting to non-zero while at 0
+        if (this.volume === 0 && volume !== 0 && this.memory.previousVolume !== undefined) {
+            delete this.memory.previousVolume;
+        }
+
         await this.setVolume(volume);
         this.logSessionEvent('VOLUME', actor, volume.toString());
         guild.sendWebUpdate('volumeUpdate', volume);
+        return PlayerResponse.Success;
+    }
+
+    /**
+     * Unmute the player by restoring the previous volume.
+     * @param actor - The user who triggered the change.
+     * @returns Whether the unmute was successful.
+     */
+    async unmute(
+        actor?: { id: string; tag: string } | string | null,
+    ): Promise<PlayerResponse> {
+        const guild = await QuaverGuild.wrap(this.guild);
+
+        // Only unmute if currently at 0 volume
+        if (this.volume !== 0) {
+            return PlayerResponse.PlayerStateUnchanged;
+        }
+
+        // Restore previous volume or default to 100
+        const targetVolume = this.memory.previousVolume ?? 100;
+
+        await this.setVolume(targetVolume);
+        delete this.memory.previousVolume;
+
+        this.logSessionEvent('UNMUTE', actor, targetVolume.toString());
+        guild.sendWebUpdate('volumeUpdate', targetVolume);
         return PlayerResponse.Success;
     }
 
@@ -1224,6 +1265,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
                     ? [...this.memory.autoplayHistory]
                     : undefined,
                 isAutoplayActive: this.memory.isAutoplayActive,
+                previousVolume: this.memory.previousVolume,
             },
             sessionLogs: [...this.sessionLogs],
         };
