@@ -249,8 +249,13 @@ export class ClusterPlayerManager implements PlayerManager<QuaverNode> {
     async handleVoiceUpdate(update: VoiceStateUpdate | VoiceServerUpdate): Promise<boolean> {
         const guildId = update.guild_id;
 
-        // If this is a VoiceServerUpdate, extract and store the region prefix
-        if ('endpoint' in update && update.endpoint) {
+        // If this is a VoiceServerUpdate, validate and store the endpoint
+        if ('endpoint' in update) {
+            // Skip invalid voice server updates (null endpoint can occur during disconnection)
+            // Forwarding these to Lavalink causes "Unable to encode request body" errors
+            if (!update.endpoint) {
+                return false;
+            }
             const regionPrefix = this.extractRegionPrefix(update.endpoint);
             if (regionPrefix) {
                 this.guildRegionPrefixMap.set(guildId, regionPrefix);
