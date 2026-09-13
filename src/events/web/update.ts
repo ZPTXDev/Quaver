@@ -199,6 +199,31 @@ export default {
                 player.memory.skip = skip;
                 break;
             }
+            case UpdateItemType.Previous: {
+                const player = await client.music.players.fetch(guild.id);
+                if (!player) {
+                    return callback({ status: Response.InactiveSessionError });
+                }
+                const requesterStatus = await getRequesterStatus(
+                    player.queue.current,
+                    (await guild.members.fetch(socket.user.id)) as GuildMember,
+                    player.queue.channel,
+                );
+                if (requesterStatus === RequesterStatus.NotRequester) {
+                    return callback({ status: Response.AuthenticationError });
+                }
+                const response = await player.playPreviousTrack(actor);
+                if (response === PlayerResponse.AdPlaying) {
+                    return callback({ status: Response.AdPlayingError });
+                }
+                if (response === PlayerResponse.NoPreviousTracks) {
+                    return callback({ status: Response.NoPreviousTracksError });
+                }
+                if (response !== PlayerResponse.Success) {
+                    return callback({ status: Response.GenericError });
+                }
+                break;
+            }
             case UpdateItemType.Bassboost: {
                 const player = await client.music.players.fetch(guild.id);
                 if (!player) {
@@ -414,6 +439,7 @@ export enum UpdateItemType {
     Unmute = 'unmute',
     Paused = 'paused',
     Skip = 'skip',
+    Previous = 'previous',
     Bassboost = 'bassboost',
     Nightcore = 'nightcore',
     Seek = 'seek',
@@ -439,4 +465,5 @@ export enum Response {
     UserNotInChannelError = 'error-user-not-in-channel',
     NotReadyError = 'error-not-ready',
     AdPlayingError = 'error-ad-playing',
+    NoPreviousTracksError = 'error-no-previous-tracks',
 }
