@@ -68,7 +68,7 @@ export default new ChatInputCommandHandler()
                     { type: MessageOptionsBuilderType.Error },
                 );
                 return;
-            case PlayerResponse.Success:
+            case PlayerResponse.Success: {
                 await interaction.replyHandler.reply(
                     guild.locale('CMD.PAUSE.RESPONSE.SUCCESS'),
                     { type: MessageOptionsBuilderType.Success },
@@ -86,9 +86,11 @@ export default new ChatInputCommandHandler()
                             const { container, actionRows } = await buildNowPlayingMessage(guild, player.queue.current, showArtist);
                             await message.edit(container.addActionRowComponents(...actionRows).toMessageCreateOptions());
                         }
-                    } catch (error) {
+                    } catch {
                         // Message might have been deleted, ignore
                     }
                 }
+                break;
+            }
         }
     });

@@ -64,7 +64,7 @@ export default new ChatInputCommandHandler()
                     const { container, actionRows } = await buildNowPlayingMessage(guild, player.queue.current, showArtist);
                     await message.edit(container.addActionRowComponents(...actionRows).toMessageCreateOptions());
                 }
-            } catch (error) {
+            } catch {
                 // Message might have been deleted, ignore
             }
         }
