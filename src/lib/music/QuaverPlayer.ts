@@ -1032,9 +1032,9 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             if (!this.memory.trackHistory) {
                 this.memory.trackHistory = [];
             }
-            // Mark if this was an autoplayed track
+            // Mark if this was an autoplayed track (requested by the bot, not by a user)
             const trackToAdd = { ...this.queue.current };
-            if (this.memory.isAutoplayActive) {
+            if (this.queue.current.requesterId === this.client.user.id) {
                 trackToAdd.wasAutoplay = true;
             }
             this.memory.trackHistory.push(trackToAdd);

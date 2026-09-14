@@ -232,9 +232,9 @@ export default {
                 if (!queue.player.memory.trackHistory) {
                     queue.player.memory.trackHistory = [];
                 }
-                // Mark if this was an autoplayed track
+                // Mark if this was an autoplayed track (requested by the bot, not by a user)
                 const trackToAdd = { ...track };
-                if (queue.player.memory.isAutoplayActive) {
+                if (track.requesterId === queue.player.client.user.id) {
                     trackToAdd.wasAutoplay = true;
                 }
                 queue.player.memory.trackHistory.push(trackToAdd);
