@@ -102,6 +102,8 @@ export default new ButtonHandler()
             const position = await player.addTracksToQueue(
                 resolvedTracks,
                 interaction.user.id,
+                false,
+                showArtist,
             );
             await interaction.replyHandler.reply(
                 new ContainerBuilder().addTextDisplayComponents(

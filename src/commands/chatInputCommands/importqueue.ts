@@ -226,7 +226,8 @@ export default new ChatInputCommandHandler()
         if (!player) return;
 
         try {
-            await player.addTracksToQueue(decodedTracks, interaction.user.id, false);
+            const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+            await player.addTracksToQueue(decodedTracks, interaction.user.id, false, showArtist);
 
             await interaction.replyHandler.reply(
                 guild.locale(

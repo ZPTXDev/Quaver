@@ -26,8 +26,9 @@ export default new ChatInputCommandHandler()
     .setExecute(async function (interaction): Promise<void> {
         const guild = await QuaverGuild.wrap(interaction.guild);
         const player = await guild.getPlayer();
+        const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
 
-        const response = await player.playPreviousTrack(interaction.user);
+        const response = await player.playPreviousTrack(interaction.user, showArtist);
         switch (response) {
             case PlayerResponse.RestartInProgress:
                 await interaction.replyHandler.reply(
@@ -48,7 +49,6 @@ export default new ChatInputCommandHandler()
                 );
                 return;
             case PlayerResponse.Success: {
-                const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
                 const track = player.queue.current;
                 if (!track) {
                     await interaction.replyHandler.reply(

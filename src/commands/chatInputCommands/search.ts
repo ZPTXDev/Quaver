@@ -241,7 +241,8 @@ async function handleMultipleLinksAdd(
         replyHandler: interaction.replyHandler,
     });
     if (!player) return;
-    const position = await player.addTracksToQueue(tracks, interaction.user.id);
+    const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+    const position = await player.addTracksToQueue(tracks, interaction.user.id, false, showArtist);
     await interaction.replyHandler.reply(
         new ContainerBuilder().addTextDisplayComponents(
             guild.builders.textDisplayLocale(
@@ -346,7 +347,7 @@ async function handleImmediateAdd(
         replyHandler: interaction.replyHandler,
     });
     if (!player) return;
-    const position = await player.addTracksToQueue(tracks, interaction.user.id);
+    const position = await player.addTracksToQueue(tracks, interaction.user.id, false, showArtist);
     await interaction.replyHandler.reply(
         new ContainerBuilder().addTextDisplayComponents(
             guild.builders.textDisplayLocale(msg as LocaleKey, ...extras),

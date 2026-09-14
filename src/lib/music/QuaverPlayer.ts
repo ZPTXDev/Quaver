@@ -312,12 +312,14 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
      * @param tracks - The track(s) to add.
      * @param requesterId - The ID of the user who requested the track(s).
      * @param next - Whether to insert the track in the next position.
+     * @param showArtist - Whether to include the artist name in the session log.
      * @returns The position of the track in the queue. (e.g. 1 - 10, 34, etc.)
      */
     async addTracksToQueue(
         tracks: QuaverSong | QuaverSong[],
         requesterId: Snowflake,
         next = false,
+        showArtist = false,
     ): Promise<PlayerResponse | string> {
         if (updateHandler.restartInProgress) {
             return PlayerResponse.RestartInProgress;
@@ -340,7 +342,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             this.logSessionEvent(
                 'QUEUE_ADD',
                 requesterId,
-                `[${added[0].info.title}](${added[0].info.uri})`,
+                getTrackMarkdownLocaleString(added[0], showArtist),
             );
         } else {
             this.logSessionEvent(
@@ -1012,10 +1014,12 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Skip the current track.
      * @param actor - The user who triggered the change.
+     * @param showArtist - Whether to include the artist name in the session log.
      * @returns Whether the track was skipped.
      */
     async skipCurrentTrack(
         actor?: { id: string; tag: string } | string | null,
+        showArtist = false,
     ): Promise<PlayerResponse> {
         if (this.restartReady) return PlayerResponse.RestartInProgress;
         if (this.memory.isAdPlaying) return PlayerResponse.AdPlaying;
@@ -1068,7 +1072,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
             'SKIP',
             actor,
             this.queue.current
-                ? `[${this.queue.current.info.title}](${this.queue.current.info.uri})`
+                ? getTrackMarkdownLocaleString(this.queue.current, showArtist)
                 : null,
         );
         await this.queue.skip();
@@ -1104,7 +1108,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
                 ? getTrackMarkdownLocaleString(targetTrack, showArtist)
                 : null,
         );
-        const skipResponse = await this.skipCurrentTrack(actor);
+        const skipResponse = await this.skipCurrentTrack(actor, showArtist);
         if (skipResponse !== PlayerResponse.Success) {
             return skipResponse;
         }
@@ -1114,10 +1118,12 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
     /**
      * Go back to the previous track.
      * @param actor - The user who triggered the change.
+     * @param showArtist - Whether to include the artist name in the session log.
      * @returns Whether the previous track was played.
      */
     async playPreviousTrack(
         actor?: { id: string; tag: string } | string | null,
+        showArtist = false,
     ): Promise<PlayerResponse> {
         if (this.restartReady) return PlayerResponse.RestartInProgress;
         if (this.memory.isAdPlaying) return PlayerResponse.AdPlaying;
@@ -1140,7 +1146,7 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         this.logSessionEvent(
             'PREVIOUS',
             actor,
-            `[${previousTrack.info.title}](${previousTrack.info.uri})`,
+            getTrackMarkdownLocaleString(previousTrack, showArtist),
         );
         await this.play(previousTrack);
 

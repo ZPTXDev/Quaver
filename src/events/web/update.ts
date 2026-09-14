@@ -110,7 +110,8 @@ export default {
                 if (!player) {
                     return callback({ status: Response.GenericError });
                 }
-                await player.addTracksToQueue(tracks, socket.user.id);
+                const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+                await player.addTracksToQueue(tracks, socket.user.id, false, showArtist);
                 guild.sendWebUpdate('queueUpdate', player.decorateQueue());
                 break;
             }
@@ -169,7 +170,8 @@ export default {
                     player.queue.channel,
                 );
                 if (requesterStatus !== RequesterStatus.NotRequester) {
-                    const response = await player.skipCurrentTrack(actor);
+                    const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+                    const response = await player.skipCurrentTrack(actor, showArtist);
                     if (response !== PlayerResponse.Success) {
                         return callback({ status: Response.GenericError });
                     }
@@ -190,7 +192,8 @@ export default {
                 }
                 skip.users.push(socket.user.id);
                 if (skip.users.length >= skip.required) {
-                    const response = await player.skipCurrentTrack(actor);
+                    const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+                    const response = await player.skipCurrentTrack(actor, showArtist);
                     if (response !== PlayerResponse.Success) {
                         return callback({ status: Response.GenericError });
                     }
@@ -212,7 +215,8 @@ export default {
                 if (requesterStatus === RequesterStatus.NotRequester) {
                     return callback({ status: Response.AuthenticationError });
                 }
-                const response = await player.playPreviousTrack(actor);
+                const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+                const response = await player.playPreviousTrack(actor, showArtist);
                 if (response === PlayerResponse.AdPlaying) {
                     return callback({ status: Response.AdPlayingError });
                 }

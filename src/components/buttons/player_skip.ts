@@ -59,6 +59,7 @@ export default new ButtonHandler()
             if (skip.users.length >= skip.required) {
                 const response = await player.skipCurrentTrack(
                     interaction.user,
+                    showArtist,
                 );
                 switch (response) {
                     case PlayerResponse.RestartInProgress:
@@ -111,7 +112,7 @@ export default new ButtonHandler()
             );
             return;
         }
-        const response = await player.skipCurrentTrack(interaction.user);
+        const response = await player.skipCurrentTrack(interaction.user, showArtist);
         switch (response) {
             case PlayerResponse.RestartInProgress:
                 await interaction.replyHandler.reply(

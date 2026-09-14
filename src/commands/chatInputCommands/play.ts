@@ -270,10 +270,12 @@ export default new ChatInputCommandHandler()
             replyHandler: interaction.replyHandler,
         });
         if (!player) return;
+        const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
         const position = await player.addTracksToQueue(
             tracks,
             interaction.user.id,
             insert,
+            showArtist,
         );
         await interaction.replyHandler.reply(
             new ContainerBuilder().addTextDisplayComponents(
