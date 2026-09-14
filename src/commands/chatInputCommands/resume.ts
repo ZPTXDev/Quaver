@@ -1,3 +1,4 @@
+import { buildNowPlayingMessage } from '#src/events/music/trackStart';
 import { MessageOptionsBuilderType } from '#src/lib';
 import { ChatInputCommandHandler } from '#src/lib/builders';
 import { QuaverGuild } from '#src/lib/guild';
@@ -72,5 +73,22 @@ export default new ChatInputCommandHandler()
                     guild.locale('CMD.RESUME.RESPONSE.SUCCESS'),
                     { type: MessageOptionsBuilderType.Success },
                 );
+
+                // Update the now playing message if it exists and controls are enabled
+                const format = (await guild.settings.get<string>('format')) ?? 'simple';
+                const controls = (await guild.settings.get<boolean>('controls')) ?? true;
+                if (format === 'detailed' && controls && player.memory.currentNowPlayingMessageId && player.queue.current) {
+                    try {
+                        const channel = player.queue.channel;
+                        if (channel) {
+                            const message = await channel.messages.fetch(player.memory.currentNowPlayingMessageId);
+                            const showArtist = (await guild.settings.get<boolean>('showartist')) ?? true;
+                            const { container, actionRows } = await buildNowPlayingMessage(guild, player.queue.current, showArtist);
+                            await message.edit(container.addActionRowComponents(...actionRows).toMessageCreateOptions());
+                        }
+                    } catch (error) {
+                        // Message might have been deleted, ignore
+                    }
+                }
         }
     });
