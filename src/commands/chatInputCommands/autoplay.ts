@@ -96,6 +96,9 @@ export default new ChatInputCommandHandler()
 
         // Update the setting
         await guild.settings.set('autoplay', desiredAutoplay);
+        guild.sendWebUpdate('autoPlayFeatureUpdate', {
+            enabled: desiredAutoplay,
+        });
 
         // Send response
         await interaction.replyHandler.reply(

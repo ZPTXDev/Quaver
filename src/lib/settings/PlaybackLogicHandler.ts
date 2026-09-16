@@ -129,6 +129,9 @@ export class PlaybackLogicHandler {
                     }
                 }
                 await guild.settings.set('autoplay', !autoplay);
+                guild.sendWebUpdate('autoPlayFeatureUpdate', {
+                    enabled: !autoplay,
+                });
                 await interaction.replyHandler.reply(
                     await SettingsRenderer.renderSubMenu(
                         await QuaverGuild.wrap(interaction.guild),
