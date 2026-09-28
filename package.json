@@ -27,7 +27,7 @@
     "path-exists-cli": "^2.0.0",
     "pinyin-pro": "^3.29.4",
     "semver": "^7.8.5",
-    "socket.io": "^4.8.3",
+    "socket.io": "^4.8.4",
     "sqlite3": "^6.0.1",
     "undici": "^8.11.2",
     "wanakana": "^5.3.1",
