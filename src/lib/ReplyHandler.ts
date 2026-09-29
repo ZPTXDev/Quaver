@@ -20,6 +20,7 @@ import {
 import type { NonSpecialInteractions } from './interactions';
 import { logger } from './logger';
 import { buildMessageOptions } from './util';
+import { QuaverGuild } from './guild';
 
 type AdditionalBuilderOptions = {
     ephemeral?: boolean;
@@ -65,6 +66,10 @@ const BASE_FLAGS = [MessageFlags.IsComponentsV2] as const;
 const EPHEMERAL_FLAGS = [
     MessageFlags.IsComponentsV2,
     MessageFlags.Ephemeral,
+] as const;
+const SILENT_FLAGS = [
+    MessageFlags.IsComponentsV2,
+    MessageFlags.SuppressNotifications,
 ] as const;
 
 /** Class for handling replies to interactions. */
@@ -153,7 +158,20 @@ export class ReplyHandler {
                 ephemeral ||
                 type === MessageOptionsBuilderType.Error ||
                 this.lacksChannelPermissions();
-            if (isEphemeral) replyMsgOpts.flags = EPHEMERAL_FLAGS;
+            if (isEphemeral) {
+                replyMsgOpts.flags = EPHEMERAL_FLAGS;
+            } else {
+                // Apply silent messages flag for non-ephemeral messages
+                const guild = this.interaction.guild;
+                if (guild) {
+                    const wrappedGuild = await QuaverGuild.wrap(guild);
+                    const silentMessages =
+                        (await wrappedGuild.settings.get<boolean>('silentmessages')) ?? true;
+                    if (silentMessages) {
+                        replyMsgOpts.flags = SILENT_FLAGS;
+                    }
+                }
+            }
             return this.tryAction(
                 (): Promise<InteractionResponse<true>> =>
                     this.interaction.reply(replyMsgOpts),
@@ -182,6 +200,17 @@ export class ReplyHandler {
         if (force === ForceType.FollowUp) {
             if (ephemeral || type === MessageOptionsBuilderType.Error) {
                 replyMsgOpts.flags = EPHEMERAL_FLAGS;
+            } else {
+                // Apply silent messages flag for non-ephemeral follow-ups
+                const guild = this.interaction.guild;
+                if (guild) {
+                    const wrappedGuild = await QuaverGuild.wrap(guild);
+                    const silentMessages =
+                        (await wrappedGuild.settings.get<boolean>('silentmessages')) ?? true;
+                    if (silentMessages) {
+                        replyMsgOpts.flags = SILENT_FLAGS;
+                    }
+                }
             }
             return this.tryAction(
                 (): Promise<Message<true>> =>

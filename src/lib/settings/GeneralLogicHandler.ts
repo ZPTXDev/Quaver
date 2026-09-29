@@ -86,6 +86,19 @@ export class GeneralLogicHandler {
                 );
                 return;
             }
+            case 'silentmessages': {
+                const currentValue =
+                    (await guild.settings.get<boolean>('silentmessages')) ?? true;
+                await guild.settings.set('silentmessages', !currentValue);
+                await interaction.replyHandler.reply(
+                    await SettingsRenderer.renderSubMenu(
+                        guild,
+                        SettingsCategory.General,
+                    ),
+                    { force: ForceType.Update },
+                );
+                return;
+            }
         }
     }
 

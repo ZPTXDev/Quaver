@@ -370,6 +370,10 @@ export default {
                             ACTIVE_MESSAGE: 'This server has **Quaver Premium** until **<t:%1:f>**.\nThank you for your support!',
                         },
                     },
+                    SILENTMESSAGES: {
+                        DESCRIPTION: 'Send messages without triggering push notifications for server members.',
+                        NAME: 'Send silent messages',
+                    },
                 },
             },
             MAIN_MENU: {

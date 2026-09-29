@@ -7,6 +7,8 @@ import { Penalties } from './Penalties';
 import type { RegionAffinity } from './RegionAffinity';
 import { settings } from '../util';
 import { logger } from '../logger';
+import { QuaverGuild } from '../guild';
+import { MessageFlags } from 'discord.js';
 
 export interface QuaverClusterNodeOptions {
     info: NodeOptions['info'];
@@ -258,8 +260,14 @@ export class QuaverCluster extends TypedEmitter<NodeEvents> {
                 // Notify the user about migration
                 const textChannel = guild.channels.cache.get(player.textChannelId);
                 if (textChannel?.isTextBased()) {
+                    const wrappedGuild = await QuaverGuild.wrap(guild);
+                    const silentMessages =
+                        (await wrappedGuild.settings.get<boolean>('silentmessages')) ?? true;
                     await textChannel.send({
                         content: this.client.locale(guild.id, 'MUSIC.NODE_MIGRATION'),
+                        flags: silentMessages
+                            ? [MessageFlags.SuppressNotifications]
+                            : undefined,
                     });
                 }
 

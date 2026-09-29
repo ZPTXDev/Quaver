@@ -236,6 +236,18 @@ export class QuaverPlayer<TNode extends Node = Node> extends Player<TNode> {
         }) as MessageCreateOptions;
         sendMsgOpts.flags = [MessageFlags.IsComponentsV2];
         sendMsgOpts.allowedMentions = { parse: [] };
+
+        // Apply silent messages flag
+        const guild = await QuaverGuild.wrap(this.guild);
+        const silentMessages =
+            (await guild.settings.get<boolean>('silentmessages')) ?? true;
+        if (silentMessages) {
+            sendMsgOpts.flags = [
+                MessageFlags.IsComponentsV2,
+                MessageFlags.SuppressNotifications,
+            ];
+        }
+
         const channel = this.queue.channel;
         if (
             !channel

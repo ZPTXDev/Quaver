@@ -168,6 +168,8 @@ export class SettingsRenderer {
             [WhitelistStatus.Permanent, WhitelistStatus.Temporary].includes(
                 await guild.features.checkWhitelisted('premium'),
             );
+        const silentMessages =
+            (await guild.settings.get<boolean>('silentmessages')) ?? true;
         return [
             ...(premiumEnabled && (isPremium || premiumURL)
                 ? [
@@ -197,6 +199,15 @@ export class SettingsRenderer {
                 SettingsCategory.General,
                 'dj',
                 guild.locale('MISC.SET'),
+            ),
+            this.createItemSection(
+                guild,
+                SettingsCategory.General,
+                'silentmessages',
+                guild.locale(
+                    silentMessages ? 'MISC.ENABLED' : 'MISC.DISABLED',
+                ),
+                silentMessages ? ButtonStyle.Success : ButtonStyle.Danger,
             ),
         ];
     }
