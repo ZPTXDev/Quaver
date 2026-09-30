@@ -73,7 +73,7 @@ export default new ChatInputCommandHandler()
             );
             return;
         }
-        await interaction.deferReply();
+        await interaction.replyHandler.deferReply();
         const query = interaction.options.getString('query');
         const insert = interaction.options.getBoolean('insert');
         let tracks: QuaverSong[] = [],

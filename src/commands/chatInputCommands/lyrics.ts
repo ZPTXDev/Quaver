@@ -46,7 +46,7 @@ export default new ChatInputCommandHandler()
         const guild = await QuaverGuild.wrap(interaction.guild);
         let json;
         let lyrics: string | Error;
-        await interaction.deferReply();
+        await interaction.replyHandler.deferReply();
         const player = interaction.guildId ? await guild.getPlayer() : null;
         if (!query) {
             if (

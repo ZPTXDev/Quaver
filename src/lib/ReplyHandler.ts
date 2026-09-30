@@ -112,6 +112,38 @@ export class ReplyHandler {
     }
 
     /**
+     * Defers the reply to the interaction.
+     * @param options - Optional defer options (ephemeral flag).
+     * @returns The interaction response.
+     */
+    async deferReply(options?: {
+        ephemeral?: boolean;
+    }): Promise<InteractionResponse | undefined> {
+        const ephemeral = options?.ephemeral ?? false;
+        const deferOptions: { flags?: MessageFlags[] } = {};
+
+        if (ephemeral) {
+            deferOptions.flags = EPHEMERAL_FLAGS as MessageFlags[];
+        } else {
+            // Apply silent messages flag for non-ephemeral defers
+            const guild = this.interaction.guild;
+            if (guild) {
+                const wrappedGuild = await QuaverGuild.wrap(guild);
+                const silentMessages =
+                    (await wrappedGuild.settings.get<boolean>('silentmessages')) ?? true;
+                if (silentMessages) {
+                    deferOptions.flags = SILENT_FLAGS as MessageFlags[];
+                }
+            }
+        }
+
+        return this.tryAction(
+            (): Promise<InteractionResponse<true>> =>
+                this.interaction.deferReply(deferOptions),
+        );
+    }
+
+    /**
      * Replies with a message.
      * @param inputData - The data to be used. Can be a string, ContainerBuilder, or an array of either.
      * @param options - Extra data, such as type or components.

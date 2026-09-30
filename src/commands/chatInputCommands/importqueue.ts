@@ -112,7 +112,7 @@ export default new ChatInputCommandHandler()
         }
 
         // Defer reply as processing may take time
-        await interaction.deferReply();
+        await interaction.replyHandler.deferReply();
         let warningSent = false;
 
         // Set up warning timeout for slow processing

@@ -92,7 +92,7 @@ export default new ChatInputCommandHandler()
             );
             return;
         }
-        await interaction.deferReply();
+        await interaction.replyHandler.deferReply();
         const query = interaction.options.getString('query');
         let warningSent = false;
 
