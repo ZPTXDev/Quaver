@@ -160,6 +160,7 @@ export default new ChatInputCommandHandler()
                               )}`
                             : ''
                     }`,
+                    { type: MessageOptionsBuilderType.Success },
                 );
             }
         }

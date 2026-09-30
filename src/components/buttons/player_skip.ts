@@ -145,6 +145,7 @@ export default new ButtonHandler()
                             : ''
                     }`,
                     {
+                        type: MessageOptionsBuilderType.Success,
                         force: ForceType.FollowUp,
                     },
                 );
