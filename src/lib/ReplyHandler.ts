@@ -178,7 +178,6 @@ export class ReplyHandler {
             files,
         }) as InteractionReplyOptions;
         replyMsgOpts.withResponse = withResponse;
-        replyMsgOpts.flags = BASE_FLAGS;
         replyMsgOpts.allowedMentions = { parse: [] };
 
         const isInitialReply =
@@ -201,7 +200,11 @@ export class ReplyHandler {
                         (await wrappedGuild.settings.get<boolean>('silentmessages')) ?? true;
                     if (silentMessages) {
                         replyMsgOpts.flags = SILENT_FLAGS;
+                    } else {
+                        replyMsgOpts.flags = BASE_FLAGS;
                     }
+                } else {
+                    replyMsgOpts.flags = BASE_FLAGS;
                 }
             }
             return this.tryAction(
@@ -241,7 +244,11 @@ export class ReplyHandler {
                         (await wrappedGuild.settings.get<boolean>('silentmessages')) ?? true;
                     if (silentMessages) {
                         replyMsgOpts.flags = SILENT_FLAGS;
+                    } else {
+                        replyMsgOpts.flags = BASE_FLAGS;
                     }
+                } else {
+                    replyMsgOpts.flags = BASE_FLAGS;
                 }
             }
             return this.tryAction(
