@@ -257,6 +257,12 @@ export class ReplyHandler {
             );
         }
 
+        // For editReply, we need at minimum BASE_FLAGS for IsComponentsV2
+        // Don't set ephemeral or silent flags as those were already set during defer
+        if (!replyMsgOpts.flags) {
+            replyMsgOpts.flags = BASE_FLAGS;
+        }
+
         return this.tryAction(
             (): Promise<Message<true>> =>
                 this.interaction.editReply(
