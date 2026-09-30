@@ -257,10 +257,22 @@ export class ReplyHandler {
             );
         }
 
-        // For editReply, we need at minimum BASE_FLAGS for IsComponentsV2
-        // Don't set ephemeral or silent flags as those were already set during defer
+        // For editReply, we need to preserve the flags from defer
+        // Check if silent messages is enabled and use SILENT_FLAGS, otherwise BASE_FLAGS
         if (!replyMsgOpts.flags) {
-            replyMsgOpts.flags = BASE_FLAGS;
+            const guild = this.interaction.guild;
+            if (guild) {
+                const wrappedGuild = await QuaverGuild.wrap(guild);
+                const silentMessages =
+                    (await wrappedGuild.settings.get<boolean>('silentmessages')) ?? true;
+                if (silentMessages) {
+                    replyMsgOpts.flags = SILENT_FLAGS;
+                } else {
+                    replyMsgOpts.flags = BASE_FLAGS;
+                }
+            } else {
+                replyMsgOpts.flags = BASE_FLAGS;
+            }
         }
 
         return this.tryAction(
