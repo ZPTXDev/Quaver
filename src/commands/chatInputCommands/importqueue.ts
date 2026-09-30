@@ -234,6 +234,7 @@ export default new ChatInputCommandHandler()
                     'CMD.IMPORTQUEUE.RESPONSE.SUCCESS',
                     decodedTracks.length.toString(),
                 ),
+                { type: MessageOptionsBuilderType.Success },
             );
             guild.sendWebUpdate('queueUpdate', player.decorateQueue());
         } catch {

@@ -69,6 +69,7 @@ export default new ChatInputCommandHandler()
                         'MISC.ADDED_BY',
                         track.requesterId,
                     )}`,
+                    { type: MessageOptionsBuilderType.Success },
                 );
             }
         }
