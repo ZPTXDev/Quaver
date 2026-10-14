@@ -112,8 +112,8 @@ devDependencies:
     specifier: ^9.39.4
     version: 9.39.4
   '@types/adm-zip':
-    specifier: ^0.5.8
-    version: 0.5.8
+    specifier: ^0.6.0
+    version: 0.6.0
   '@types/crypto-js':
     specifier: ^4.2.2
     version: 4.2.2
@@ -863,10 +863,11 @@ packages:
     dev: false
     optional: true
 
-  /@types/adm-zip@0.5.8:
-    resolution: {integrity: sha512-RVVH7QvZYbN+ihqZ4kX/dMiowf6o+Jk1fNwiSdx0NahBJLU787zkULhGhJM8mf/obmLGmgdMM0bXsQTmyfbR7Q==}
+  /@types/adm-zip@0.6.0:
+    resolution: {integrity: sha512-4BJwT30zsKqyYk+PgJS+LQzVrLh0bHragg9etHGg679uuBbNDbSaLsJy+DaJQZM8AvESHB+t3ruVzbrn6BUsMQ==}
+    deprecated: This is a stub types definition. adm-zip provides its own type definitions, so you do not need this installed.
     dependencies:
-      '@types/node': 25.5.0
+      adm-zip: 0.6.1
     dev: true
 
   /@types/body-parser@1.19.6:
@@ -941,12 +942,6 @@ packages:
 
   /@types/node@25.3.3:
     resolution: {integrity: sha512-DpzbrH7wIcBaJibpKo9nnSQL0MTRdnWttGyE5haGwK86xgMOkFLp7vEyfQPGLOJh5wNYiJ3V9PmUMDhV9u8kkQ==}
-    dependencies:
-      undici-types: 7.18.2
-    dev: true
-
-  /@types/node@25.5.0:
-    resolution: {integrity: sha512-jp2P3tQMSxWugkCUKLRPVUpGaL5MVFwF8RDuSRztfwgN1wmqJeMSbKlnEtQqU8UrhTmzEmZdu2I6v2dpp7XIxw==}
     dependencies:
       undici-types: 7.18.2
     dev: true
@@ -1304,7 +1299,6 @@ packages:
   /adm-zip@0.6.1:
     resolution: {integrity: sha512-Xwrja8nx9e5o2N1my4DsKCeKpdrnACyr1wtbPxBDgGzKzKyE9kRtBFA8mWldI+RVlD7CBZNWY/wQ2+ydwOR6kQ==}
     engines: {node: '>=14.0'}
-    dev: false
 
   /agent-base@6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
