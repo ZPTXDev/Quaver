@@ -20,7 +20,7 @@ jobs:
       - name: Build
         run: bun run build
       - name: Release
-        uses: cycjimmy/semantic-release-action@v6
+        uses: cycjimmy/semantic-release-action@v8
         with:
           branches: |
             [
