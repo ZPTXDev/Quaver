@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@discordjs/rest": "^2.6.3",
-    "@keyv/sqlite": "^4.0.8",
+    "@keyv/sqlite": "^6.1.0",
     "@lavaclient/plugin-effects": "^1.0.3",
     "@lavaclient/plugin-queue": "^0.1.0",
     "@zptxdev/zptx-lib": "^1.1.0",
@@ -19,7 +19,7 @@
     "effect": "^3.21.0",
     "express": "^5.3.0",
     "hangul-romanization": "^1.0.1",
-    "keyv": "^5.6.0",
+    "keyv": "^6.1.0",
     "lavaclient": "^5.0.0-rc.6",
     "lavalink-protocol": "^1.2.1",
     "lavalink-ws-client": "^1.1.2",
