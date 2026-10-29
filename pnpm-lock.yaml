@@ -44,8 +44,8 @@ dependencies:
     specifier: ^14.27.0
     version: 14.27.0
   effect:
-    specifier: ^3.21.0
-    version: 3.21.0
+    specifier: ^4.0.6
+    version: 4.0.6
   express:
     specifier: ^5.3.0
     version: 5.3.0
@@ -1766,11 +1766,15 @@ packages:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
     dev: false
 
-  /effect@3.21.0:
-    resolution: {integrity: sha512-PPN80qRokCd1f015IANNhrwOnLO7GrrMQfk4/lnZRE/8j7UPWrNNjPV0uBrZutI/nHzernbW+J0hdqQysHiSnQ==}
+  /effect@3.22.4:
+    resolution: {integrity: sha512-RNshu7AXVxxDh6aS4lothhJ+QoZ4xSykbWNaaVdvDN72RMyVwhCGdALkyl1TbEydgAmRIdD1eTyJqBUGwSBGDA==}
     dependencies:
       '@standard-schema/spec': 1.1.0
       fast-check: 3.23.2
+    dev: false
+
+  /effect@4.0.6:
+    resolution: {integrity: sha512-Tc3mkzuLR6t6P9dhLt0D2GrxYtmU5td4XEJEiXCmILz53IRIfJyHsKZWjTA3xEjiwpNTtXBgI4iqYPxMztBDrw==}
     dev: false
 
   /emoji-regex@8.0.0:
@@ -2588,7 +2592,7 @@ packages:
     resolution: {integrity: sha512-irR0J7VNYXBiafW/Yvmh/0UyZldMe+oW0NKSgdc0r+0uQfWv9ryKj2+czvXPY3PWANvZoyyIDYQJ3GQj5JNPzw==}
     engines: {node: '>=20'}
     dependencies:
-      effect: 3.21.0
+      effect: 3.22.4
       lavalink-api-client: 1.1.2(lavalink-protocol@1.2.1)
       lavalink-protocol: 1.2.1
       lavalink-ws-client: 1.1.2(lavalink-api-client@1.1.2)(lavalink-protocol@1.2.1)
@@ -2613,7 +2617,7 @@ packages:
     resolution: {integrity: sha512-zOF+uZztHSSE0XtLfqLi76eCZEhUykjzBJWVe+Fd+LPmyzNOEKynIy9gKdPb2JltB3vn1KYm2gnyn2JtALEAZg==}
     engines: {node: '>=20'}
     dependencies:
-      effect: 3.21.0
+      effect: 3.22.4
       tslib: 2.8.1
     dev: false
 
