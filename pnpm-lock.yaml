@@ -151,8 +151,8 @@ devDependencies:
     specifier: ^6.0.3
     version: 6.0.3
   typescript-eslint:
-    specifier: ^8.72.1
-    version: 8.72.1(eslint@10.14.0)(typescript@6.0.3)
+    specifier: ^8.72.2
+    version: 8.72.2(eslint@10.14.0)(typescript@6.0.3)
 
 packages:
 
@@ -279,6 +279,11 @@ packages:
 
   /@eslint-community/regexpp@4.12.2:
     resolution: {integrity: sha512-EriSTlt5OC9/7SXkRSCAhfSxxoSUgBm33OH+IkwbdpgoqsSsUg7y3uh+IICI/Qg4BBWr3U2i39RpmycbxMq4ew==}
+    engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
+    dev: true
+
+  /@eslint-community/regexpp@4.12.3:
+    resolution: {integrity: sha512-R76UKbvsqI68DJJVTVyqFKqU98CN4+B+acxNfEA2IFarSzP0SjtKf/3+fFiXzTyv5Fj3PxLkGHe2wnVWWMxobQ==}
     engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
     dev: true
 
@@ -437,8 +442,8 @@ packages:
       tslib: 2.8.1
     dev: false
 
-  /@napi-rs/snappy-android-arm-eabi@7.4.3:
-    resolution: {integrity: sha512-IUcqhinktWCfA3Cu/PaDNjixAt5hAn1sQlnl03qpQWNuv2PLju6LQqOa5kDoXnTFrLzu1/jpRexjR/KR8+ERog==}
+  /@napi-rs/snappy-android-arm-eabi@7.4.4:
+    resolution: {integrity: sha512-up9144dDJuOTvUMIlXoD2XtIHsXavz2FNZtCkEDzgdiMVKPEO4/KexfqVBQSgx2C0AxQ4OuLycEwEbx2v73/Bw==}
     engines: {node: '>= 10'}
     cpu: [arm]
     os: [android]
@@ -446,8 +451,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-android-arm64@7.4.3:
-    resolution: {integrity: sha512-AlbjST9D7qtZS0cUKVauyO2xtGawh20n/Z1cE3Zmurgl6HBInsvO14wMxsneFfNH7WXqphu2ZbXAul+sCDMhOA==}
+  /@napi-rs/snappy-android-arm64@7.4.4:
+    resolution: {integrity: sha512-r+cUVi5iwXhfhYGJz2hKomkNvgUQfnaYW0dz0EiQKtVXpBt5m1PSXWDCZ12YK1Qi4eM3Vi5kwdgABr/lvIaNrw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [android]
@@ -455,8 +460,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-darwin-arm64@7.4.3:
-    resolution: {integrity: sha512-eTPH4pSnuDOGi8wuKVFykZvcRlxAT3NNDeJkNWpiw+lzKLr7zmEdZqmTtTJDyzJR4zyV/kIV193JT3oDRlRE3Q==}
+  /@napi-rs/snappy-darwin-arm64@7.4.4:
+    resolution: {integrity: sha512-Xo8QW7E3SEt0WdXaK9Wy1uLwH31W/g88OZapHNmDqVI9Ip61DGKEi9ic06ZTu4pLWIHF/iwN4183HXPv4IMMUg==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
@@ -464,8 +469,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-darwin-x64@7.4.3:
-    resolution: {integrity: sha512-siDEFDaia02JxigbS4ST6GtgiRXJk4knGLPAVwsPerulMgwonas7djhaX5EOR/LntdZp8K4q9wdftUB7pUJaeA==}
+  /@napi-rs/snappy-darwin-x64@7.4.4:
+    resolution: {integrity: sha512-1+JJXYmyTpbTGwnLOAXfSy1x0Su9m4J1cRQ5NOnC211cbl7WUDqTlYU0XGQ3LbvoI8QRg0V+UAUnESSkdPcNXQ==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
@@ -473,8 +478,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-freebsd-x64@7.4.3:
-    resolution: {integrity: sha512-LAj4AwbDWWKLprUJ2gl0h55imFpCzIDELms3wMAu2Jo+MF0GRKSY4bx8Yb5OWhh30OSMSq9bnKQvoEIAsS8uIw==}
+  /@napi-rs/snappy-freebsd-x64@7.4.4:
+    resolution: {integrity: sha512-NB9vVOHh8hjq8e6EXldI2v6tyr1kMvcyTHm1rmjGuSh6PADFGG8hjifGnkvb0rgwrPrTP1PDpo9gIyfIBfk7xw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [freebsd]
@@ -482,8 +487,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-linux-arm-gnueabihf@7.4.3:
-    resolution: {integrity: sha512-bUTs+JWl7kwYM1RPBBY0JLQ06+iVgRS81yVwMGtpD3C12tWKtoeTKM4ai33ySc+wnKvcpqhlHz2ZufcCESQHvg==}
+  /@napi-rs/snappy-linux-arm-gnueabihf@7.4.4:
+    resolution: {integrity: sha512-50CrPIQbJvrZrUerufDD05cYFZO7RRZ1mmYSgTpOkhQNRGR7QmIMTKC0VAoPpWP1tZPIRRVnbFC8yYn+Y4XK6w==}
     engines: {node: '>= 10'}
     cpu: [arm]
     os: [linux]
@@ -491,8 +496,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-linux-arm64-gnu@7.4.3:
-    resolution: {integrity: sha512-NOCDEWRhgnyffjUpgYy7kdUmFwtMILkQV9+n9CvnshxXsiJwTDLMkeDXWagcVBQheCnfUPLIEl1vHk71lQBANw==}
+  /@napi-rs/snappy-linux-arm64-gnu@7.4.4:
+    resolution: {integrity: sha512-Y3hQ/LnoxxutFvTzxGomZOw+ckue3E01ORS22YaWZqPel7vJLhIrIrtqiVB/6D5fhc1CqeCJ2vYAa39bBF8YIg==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
@@ -500,8 +505,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-linux-arm64-musl@7.4.3:
-    resolution: {integrity: sha512-+Lcf3PUrTE55MhCEp2FaEil8X5J68v8Y8DC1AvYmS0oODCDU2TUbn/cR6+ib1fTBjRz/b9G+NokW0bK/uE1vwA==}
+  /@napi-rs/snappy-linux-arm64-musl@7.4.4:
+    resolution: {integrity: sha512-K8EeL5uFcgWeCWEMVQwf/GgPxIQ8yPMGxVvTsspqauwHF0ysjTUhOvkyF+1vqjt0zPsg37SzYlsMjeIn3cH2OA==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
@@ -509,8 +514,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-linux-ppc64-gnu@7.4.3:
-    resolution: {integrity: sha512-FjY2TncYM75uwSt+jQ6QeWX0rN56QWL2nTDLlKp30mCz4xjJ9XbnwCNOtxdQ92lKDOH5SC88c41uq4zv0F+ldQ==}
+  /@napi-rs/snappy-linux-ppc64-gnu@7.4.4:
+    resolution: {integrity: sha512-OUCBjX4GUv1gQN9hpnHcr92EY7+cQXapyrkGwo3n1PyIRHe9atUVrRCMs3bnI0vf7vRvxR3Cmc92bGtF9DtBsA==}
     engines: {node: '>= 10'}
     cpu: [ppc64]
     os: [linux]
@@ -518,8 +523,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-linux-riscv64-gnu@7.4.3:
-    resolution: {integrity: sha512-RPdXvPOF2oRLiXj6PacW2LihJ9WTqCQyjEpw5W2p4ej3rzp3e0fFaRCOl5OepZEeiPOg0mnzHjzzE7PDEJr47A==}
+  /@napi-rs/snappy-linux-riscv64-gnu@7.4.4:
+    resolution: {integrity: sha512-NhPT6eJjJOAuCc+bq61/QhJPNT/BXLlNWejatQPQbXgJkj4wwNLtzTl2ehMOruraSlekYztrOkhSQjUqYGOwdA==}
     engines: {node: '>= 10'}
     cpu: [riscv64]
     os: [linux]
@@ -527,8 +532,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-linux-s390x-gnu@7.4.3:
-    resolution: {integrity: sha512-UeJSlY2lOe6dKwhXf2CCHYWOSPkSIEb32tW7nmfTo/CwLfMe6TA3pAdczH/NtElu0V/lKVva1vnQCiMywLVtVw==}
+  /@napi-rs/snappy-linux-s390x-gnu@7.4.4:
+    resolution: {integrity: sha512-20EBvyxIbX0E99VF0Tto/t10c9qX4IxXfaBhTNGwAULR0+8jDouw9rVRWu1aKXnQHm7DGK8lCXsIhC3cMXQu0w==}
     engines: {node: '>= 10'}
     cpu: [s390x]
     os: [linux]
@@ -536,8 +541,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-linux-x64-gnu@7.4.3:
-    resolution: {integrity: sha512-6fnGsH0yb48+PCYnKc6E5U1zUFXUpLtmyz8TnMstIBuiS7w1pf7e8GWN8GO//kz7+9E9jfD1/+8BZrp0FDOOqw==}
+  /@napi-rs/snappy-linux-x64-gnu@7.4.4:
+    resolution: {integrity: sha512-p+GGeGEu76op0hLrqrOrOhnnJVt/swHwYBwZGkt28XRsuG15+CVR2QyTQqGS3u8LJr5akDoI0JD5CZlEEyJWqA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
@@ -545,8 +550,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-linux-x64-musl@7.4.3:
-    resolution: {integrity: sha512-ixpPsplb9A3JLjjDC6q7SdOgthsmme20STwW4KMw7ri68QP6cvwmG+Bbt6aWwHS2YJPZ9cwYaXTyNDohcP9Vxg==}
+  /@napi-rs/snappy-linux-x64-musl@7.4.4:
+    resolution: {integrity: sha512-WQl4N9a3CMD5Ws4ViXXc50fXlSHNOLglyfNk3Tpssm/oHe8XEy+2xlBr7TWKmBrJZqObkBM0SMe9F0XmjcBdJg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
@@ -554,8 +559,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-openharmony-arm64@7.4.3:
-    resolution: {integrity: sha512-GUOv36Of8q8HbTDb4eaj0wpDQS15BsgNz/vVfjjKWJj+YMpnwiTAt1yVjAMCvYwSvLP5k8Xa2oYjuV+ZxazGKA==}
+  /@napi-rs/snappy-openharmony-arm64@7.4.4:
+    resolution: {integrity: sha512-UwwRn0jtKR4aKFV4CXZi+0knc+oAcPlmeaAltVNjY36DiWwvGMbtqBmJtV53qv9HCVcObHwHODJ49zhkUxVGlA==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [openharmony]
@@ -563,8 +568,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-win32-arm64-msvc@7.4.3:
-    resolution: {integrity: sha512-pHR8PD74KBm4hEoxwiwR6jgxo0wPQJVfuv2fwBw7Jv461N+hY5VI9iLZRx3yDWp+Uy4eHWQQsqhjC7JOVjh+1w==}
+  /@napi-rs/snappy-win32-arm64-msvc@7.4.4:
+    resolution: {integrity: sha512-TevJEwlCmGvsC8EC7Bz2gHXDJW2LrU+y179m87iR6JyapVkuI+BkE0HKJdWtkWnrxr1Ed41R4wvH1IZrBvpKig==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
@@ -572,8 +577,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-win32-ia32-msvc@7.4.3:
-    resolution: {integrity: sha512-/LIy2afUxoybWAdathj7GAHAHPT5XKzG3XNzAPBI+BOCmADYsv0ui8vZYHmt0SqoDcEHCifUbUKGFfhqL55hjQ==}
+  /@napi-rs/snappy-win32-ia32-msvc@7.4.4:
+    resolution: {integrity: sha512-aYdxnWHdrFWj15P3UyA4nj1eclXOyZeo2ZpEeMPMM4udgWp1LMINjtzPp1W7+N9haqlj7P91HpMf6fP7nB13Pg==}
     engines: {node: '>= 10'}
     cpu: [ia32]
     os: [win32]
@@ -581,8 +586,8 @@ packages:
     dev: false
     optional: true
 
-  /@napi-rs/snappy-win32-x64-msvc@7.4.3:
-    resolution: {integrity: sha512-Z0qi4GuqzWLGKa0cK8/kaRIuC78xuu1IfjYcOYDvSWd8uBFu3f+GaKdpl1YmXz+YJykCH1iBShie0PC6pzqI/g==}
+  /@napi-rs/snappy-win32-x64-msvc@7.4.4:
+    resolution: {integrity: sha512-r6pdAUOrnSYxa/NLscQrFzBD+9lRzMcDkPpDFaczY07YwDNOsKHhzXtLhwBkaU0KYnFl3pznUnDj0GjLOOrZow==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
@@ -996,20 +1001,20 @@ packages:
       '@types/node': 26.6.6
     dev: false
 
-  /@typescript-eslint/eslint-plugin@8.72.1(@typescript-eslint/parser@8.72.1)(eslint@10.14.0)(typescript@6.0.3):
-    resolution: {integrity: sha512-5CokTWXpmbylfFabsbvHC0CAw3XLaGnoa+nFJX5FR592h/LoZsENUE6p/rg5xvkKrFEXz6pYmgI29AgXc2N3BQ==}
+  /@typescript-eslint/eslint-plugin@8.72.2(@typescript-eslint/parser@8.72.2)(eslint@10.14.0)(typescript@6.0.3):
+    resolution: {integrity: sha512-222PKFXKihmFpi/pS5njoBgdAqsPhj2/GBmFbrNw8Tq8gEG9Sv+kSlKFy4u2q+mJv9ZzJgM2Gkv/bUzRZwZw5g==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
-      '@typescript-eslint/parser': ^8.72.1
+      '@typescript-eslint/parser': ^8.72.2
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: '>=4.8.4 <6.1.0'
     dependencies:
-      '@eslint-community/regexpp': 4.12.2
-      '@typescript-eslint/parser': 8.72.1(eslint@10.14.0)(typescript@6.0.3)
-      '@typescript-eslint/scope-manager': 8.72.1
-      '@typescript-eslint/type-utils': 8.72.1(eslint@10.14.0)(typescript@6.0.3)
-      '@typescript-eslint/utils': 8.72.1(eslint@10.14.0)(typescript@6.0.3)
-      '@typescript-eslint/visitor-keys': 8.72.1
+      '@eslint-community/regexpp': 4.12.3
+      '@typescript-eslint/parser': 8.72.2(eslint@10.14.0)(typescript@6.0.3)
+      '@typescript-eslint/scope-manager': 8.72.2
+      '@typescript-eslint/type-utils': 8.72.2(eslint@10.14.0)(typescript@6.0.3)
+      '@typescript-eslint/utils': 8.72.2(eslint@10.14.0)(typescript@6.0.3)
+      '@typescript-eslint/visitor-keys': 8.72.2
       eslint: 10.14.0
       ignore: 7.0.14
       natural-compare: 1.4.0
@@ -1019,17 +1024,17 @@ packages:
       - supports-color
     dev: true
 
-  /@typescript-eslint/parser@8.72.1(eslint@10.14.0)(typescript@6.0.3):
-    resolution: {integrity: sha512-ZGwZP4OCfyA0AQTpEAMWz+rtX01DRhQWW5hB0ucKDEIX5U7jdmPSaMx94rQfaPAQzIYz2BimOgKOJtjfpRFQ9g==}
+  /@typescript-eslint/parser@8.72.2(eslint@10.14.0)(typescript@6.0.3):
+    resolution: {integrity: sha512-llP+T1YuJOLlxEciP6OyQGtz5SMxyn+9LA2BvZw5RmToGVa1y4beEDVQL6Gje7T5WFYh19WREjDCN9Ev4gm5AA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: '>=4.8.4 <6.1.0'
     dependencies:
-      '@typescript-eslint/scope-manager': 8.72.1
-      '@typescript-eslint/types': 8.72.1
-      '@typescript-eslint/typescript-estree': 8.72.1(typescript@6.0.3)
-      '@typescript-eslint/visitor-keys': 8.72.1
+      '@typescript-eslint/scope-manager': 8.72.2
+      '@typescript-eslint/types': 8.72.2
+      '@typescript-eslint/typescript-estree': 8.72.2(typescript@6.0.3)
+      '@typescript-eslint/visitor-keys': 8.72.2
       debug: 4.4.3
       eslint: 10.14.0
       typescript: 6.0.3
@@ -1037,30 +1042,30 @@ packages:
       - supports-color
     dev: true
 
-  /@typescript-eslint/project-service@8.72.1(typescript@6.0.3):
-    resolution: {integrity: sha512-fAuVMkwdO/huI8nyo/WKnNKf6Gag93S56Rh3Ts5mGcavwSdaN8tRg1gCeIGX8PF+nzp1BjGfO4gHhGzW1J6jTg==}
+  /@typescript-eslint/project-service@8.72.2(typescript@6.0.3):
+    resolution: {integrity: sha512-6y5dLTZdHhI8Eh3yIQ/bfQhRKwn5e+TpJj64o18Cngc0iW/BCrVvrr6zGYqXPnYH31u6YXAYiFh0+qxX5mybJw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       typescript: '>=4.8.4 <6.1.0'
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.72.1(typescript@6.0.3)
-      '@typescript-eslint/types': 8.72.1
+      '@typescript-eslint/tsconfig-utils': 8.72.2(typescript@6.0.3)
+      '@typescript-eslint/types': 8.72.2
       debug: 4.4.3
       typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /@typescript-eslint/scope-manager@8.72.1:
-    resolution: {integrity: sha512-lC/t6eMCZZQAAKZEYGL6RDVSuFehpdmMT6h+nJIjIa6oylN/PwDgDVtEIbB7O9xFfZYtZAYLoLlDNWKJhtF+uQ==}
+  /@typescript-eslint/scope-manager@8.72.2:
+    resolution: {integrity: sha512-iIoMJ6/8c1/QpFNyFjU0d1YzPco4MsZjQw0k3V+vfzNWAFmUmvhlyMoYEoYYDQZXc+J6Gi1X5XcxlzW2taIIGQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     dependencies:
-      '@typescript-eslint/types': 8.72.1
-      '@typescript-eslint/visitor-keys': 8.72.1
+      '@typescript-eslint/types': 8.72.2
+      '@typescript-eslint/visitor-keys': 8.72.2
     dev: true
 
-  /@typescript-eslint/tsconfig-utils@8.72.1(typescript@6.0.3):
-    resolution: {integrity: sha512-e4D5R5vpeAEPBxT2BAzsFQL3sbwyeeeo5+aczgNSRK1V734jE7pTqaGFU+fXapWEQwnZbpFaTn32+Z8DwS6OTg==}
+  /@typescript-eslint/tsconfig-utils@8.72.2(typescript@6.0.3):
+    resolution: {integrity: sha512-+h3iCgZXuTNtoLXcnnjP12ZUHLMqoUcIHPfQrFEXTUqvb9dF8QK9b5nv5VtSo5fLkdHuks8ehbTzZj3rImAm9w==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       typescript: '>=4.8.4 <6.1.0'
@@ -1068,16 +1073,16 @@ packages:
       typescript: 6.0.3
     dev: true
 
-  /@typescript-eslint/type-utils@8.72.1(eslint@10.14.0)(typescript@6.0.3):
-    resolution: {integrity: sha512-iY2wlmyrXJmx4yxUGP3aYCFF3cA/6ShddOKmLU2dx7LnEykbAM8WThlxZEfd1NddqceF6eJmZUayxx9oKIYNlg==}
+  /@typescript-eslint/type-utils@8.72.2(eslint@10.14.0)(typescript@6.0.3):
+    resolution: {integrity: sha512-STfkR38qIdhfkLpgtXnUjAzsNy4xouqiBO0lrVc/Wpk9Kem5/aHXUx1J8dGC16zpdYN1+yc2ILQ28er1kXX7ag==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: '>=4.8.4 <6.1.0'
     dependencies:
-      '@typescript-eslint/types': 8.72.1
-      '@typescript-eslint/typescript-estree': 8.72.1(typescript@6.0.3)
-      '@typescript-eslint/utils': 8.72.1(eslint@10.14.0)(typescript@6.0.3)
+      '@typescript-eslint/types': 8.72.2
+      '@typescript-eslint/typescript-estree': 8.72.2(typescript@6.0.3)
+      '@typescript-eslint/utils': 8.72.2(eslint@10.14.0)(typescript@6.0.3)
       debug: 4.4.3
       eslint: 10.14.0
       ts-api-utils: 2.5.0(typescript@6.0.3)
@@ -1086,21 +1091,21 @@ packages:
       - supports-color
     dev: true
 
-  /@typescript-eslint/types@8.72.1:
-    resolution: {integrity: sha512-LmE5IhQet1BWOWEXqBrVtBPsMAOQ6Nzk35d+WLh3mk4EUF33sqlfxjio1MdYeSvKSG5skactKKuixBIKXhL4Rw==}
+  /@typescript-eslint/types@8.72.2:
+    resolution: {integrity: sha512-Xfn37OLZx03+PCU7qWx9DTv2FCRh1E6fk2+wONeNY15HXIwtcwuveaSwVpGAUptkNmPQegRxW5JyRel9T7wrog==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     dev: true
 
-  /@typescript-eslint/typescript-estree@8.72.1(typescript@6.0.3):
-    resolution: {integrity: sha512-DAlUoUV93hIvrtIQLwCbmZQYVZwOMhiHJrOVUUIWicFZaIYjTRqlY3I/NZevfkLmSqkNHRu2qYDcq9lrn16oOQ==}
+  /@typescript-eslint/typescript-estree@8.72.2(typescript@6.0.3):
+    resolution: {integrity: sha512-pQEGqIK/cqEvKivVWaFLYpe7XYejFxfuAOi4mu1oAWFvIo36aRHI9esRFTUxcIy/z8N482RJyH+LpZB0ZIU7Ow==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       typescript: '>=4.8.4 <6.1.0'
     dependencies:
-      '@typescript-eslint/project-service': 8.72.1(typescript@6.0.3)
-      '@typescript-eslint/tsconfig-utils': 8.72.1(typescript@6.0.3)
-      '@typescript-eslint/types': 8.72.1
-      '@typescript-eslint/visitor-keys': 8.72.1
+      '@typescript-eslint/project-service': 8.72.2(typescript@6.0.3)
+      '@typescript-eslint/tsconfig-utils': 8.72.2(typescript@6.0.3)
+      '@typescript-eslint/types': 8.72.2
+      '@typescript-eslint/visitor-keys': 8.72.2
       debug: 4.4.3
       minimatch: 10.2.6
       semver: 7.8.6
@@ -1111,28 +1116,28 @@ packages:
       - supports-color
     dev: true
 
-  /@typescript-eslint/utils@8.72.1(eslint@10.14.0)(typescript@6.0.3):
-    resolution: {integrity: sha512-5v5liypurJBFHCBNqh/RjsymAD+VWcE0djuGY/BUqp5fC3Qn+luWDEksjuTtWjPn6i5zQlUtkZCRG/CYG0yCkA==}
+  /@typescript-eslint/utils@8.72.2(eslint@10.14.0)(typescript@6.0.3):
+    resolution: {integrity: sha512-hv3eRYbpPbbpezuax1EfGrzpa3C4ySgNZkPUkLOWOAjU8HsOKowEDAr8C7nsNl1C+SBSKDpvno6VKHnlhvp9iA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: '>=4.8.4 <6.1.0'
     dependencies:
       '@eslint-community/eslint-utils': 4.10.1(eslint@10.14.0)
-      '@typescript-eslint/scope-manager': 8.72.1
-      '@typescript-eslint/types': 8.72.1
-      '@typescript-eslint/typescript-estree': 8.72.1(typescript@6.0.3)
+      '@typescript-eslint/scope-manager': 8.72.2
+      '@typescript-eslint/types': 8.72.2
+      '@typescript-eslint/typescript-estree': 8.72.2(typescript@6.0.3)
       eslint: 10.14.0
       typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /@typescript-eslint/visitor-keys@8.72.1:
-    resolution: {integrity: sha512-SB8xqipSzZHUePCCLNeYxqnxq83X61/qzNhjQGbTfjxGZIeOEP7tBgWYX05Tcd6CgE02WdTJnh5b8kMZJ/+bnQ==}
+  /@typescript-eslint/visitor-keys@8.72.2:
+    resolution: {integrity: sha512-NAGrjn0Pitjqzq/GkgMC4kBYm233PQ8GffyQ9+kTA3AlNQYEzOf25EIM02BAHZv5FRJSpHpJk+OGUxVkOB93GQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     dependencies:
-      '@typescript-eslint/types': 8.72.1
+      '@typescript-eslint/types': 8.72.2
       eslint-visitor-keys: 5.0.1
     dev: true
 
@@ -3671,28 +3676,28 @@ packages:
     dev: false
     optional: true
 
-  /snappy@7.4.3:
-    resolution: {integrity: sha512-oP0N73t0urt9niE9PAoj8eV7SDXkCWB76oWkPbGmIJ70L4nBes66hZxRhVtOBQG1uJXkmLhs6yTxyW/I8XAeHQ==}
+  /snappy@7.4.4:
+    resolution: {integrity: sha512-F9BsNSAePMi9lloD5+T6TdhnQ9Z4xwH0wf8Hd4Rk3NavI4A5dc/1LV71qF6sxfbeeHq4tWY+VFWfqSND74EZFQ==}
     engines: {node: '>= 10'}
     requiresBuild: true
     optionalDependencies:
-      '@napi-rs/snappy-android-arm-eabi': 7.4.3
-      '@napi-rs/snappy-android-arm64': 7.4.3
-      '@napi-rs/snappy-darwin-arm64': 7.4.3
-      '@napi-rs/snappy-darwin-x64': 7.4.3
-      '@napi-rs/snappy-freebsd-x64': 7.4.3
-      '@napi-rs/snappy-linux-arm-gnueabihf': 7.4.3
-      '@napi-rs/snappy-linux-arm64-gnu': 7.4.3
-      '@napi-rs/snappy-linux-arm64-musl': 7.4.3
-      '@napi-rs/snappy-linux-ppc64-gnu': 7.4.3
-      '@napi-rs/snappy-linux-riscv64-gnu': 7.4.3
-      '@napi-rs/snappy-linux-s390x-gnu': 7.4.3
-      '@napi-rs/snappy-linux-x64-gnu': 7.4.3
-      '@napi-rs/snappy-linux-x64-musl': 7.4.3
-      '@napi-rs/snappy-openharmony-arm64': 7.4.3
-      '@napi-rs/snappy-win32-arm64-msvc': 7.4.3
-      '@napi-rs/snappy-win32-ia32-msvc': 7.4.3
-      '@napi-rs/snappy-win32-x64-msvc': 7.4.3
+      '@napi-rs/snappy-android-arm-eabi': 7.4.4
+      '@napi-rs/snappy-android-arm64': 7.4.4
+      '@napi-rs/snappy-darwin-arm64': 7.4.4
+      '@napi-rs/snappy-darwin-x64': 7.4.4
+      '@napi-rs/snappy-freebsd-x64': 7.4.4
+      '@napi-rs/snappy-linux-arm-gnueabihf': 7.4.4
+      '@napi-rs/snappy-linux-arm64-gnu': 7.4.4
+      '@napi-rs/snappy-linux-arm64-musl': 7.4.4
+      '@napi-rs/snappy-linux-ppc64-gnu': 7.4.4
+      '@napi-rs/snappy-linux-riscv64-gnu': 7.4.4
+      '@napi-rs/snappy-linux-s390x-gnu': 7.4.4
+      '@napi-rs/snappy-linux-x64-gnu': 7.4.4
+      '@napi-rs/snappy-linux-x64-musl': 7.4.4
+      '@napi-rs/snappy-openharmony-arm64': 7.4.4
+      '@napi-rs/snappy-win32-arm64-msvc': 7.4.4
+      '@napi-rs/snappy-win32-ia32-msvc': 7.4.4
+      '@napi-rs/snappy-win32-x64-msvc': 7.4.4
     dev: false
     optional: true
 
@@ -4066,17 +4071,17 @@ packages:
       rxjs: 7.8.2
     dev: false
 
-  /typescript-eslint@8.72.1(eslint@10.14.0)(typescript@6.0.3):
-    resolution: {integrity: sha512-3Li9FfPmQp45nxEtFD1ZCrYFI3cYK5kpyNtmm1H7lMagm8u9sy6PTjy3ytwQZs7KNukOyKFHAZ6z6GjYFeaeXw==}
+  /typescript-eslint@8.72.2(eslint@10.14.0)(typescript@6.0.3):
+    resolution: {integrity: sha512-c/+AKMW1KB81r28Sp0AAdcyXj5dzNmAsZFcsrxKbZTKmcBK2xIwBR31dcSYSDu3bKmzXe8GKrSxO+eDQ401Uzg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: '>=4.8.4 <6.1.0'
     dependencies:
-      '@typescript-eslint/eslint-plugin': 8.72.1(@typescript-eslint/parser@8.72.1)(eslint@10.14.0)(typescript@6.0.3)
-      '@typescript-eslint/parser': 8.72.1(eslint@10.14.0)(typescript@6.0.3)
-      '@typescript-eslint/typescript-estree': 8.72.1(typescript@6.0.3)
-      '@typescript-eslint/utils': 8.72.1(eslint@10.14.0)(typescript@6.0.3)
+      '@typescript-eslint/eslint-plugin': 8.72.2(@typescript-eslint/parser@8.72.2)(eslint@10.14.0)(typescript@6.0.3)
+      '@typescript-eslint/parser': 8.72.2(eslint@10.14.0)(typescript@6.0.3)
+      '@typescript-eslint/typescript-estree': 8.72.2(typescript@6.0.3)
+      '@typescript-eslint/utils': 8.72.2(eslint@10.14.0)(typescript@6.0.3)
       eslint: 10.14.0
       typescript: 6.0.3
     transitivePeerDependencies:
@@ -4205,7 +4210,7 @@ packages:
       url-polyfill: 1.1.14
       winston-transport: 4.9.0
     optionalDependencies:
-      snappy: 7.4.3
+      snappy: 7.4.4
     dev: false
     patched: true
 
